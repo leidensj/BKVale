@@ -2,29 +2,16 @@
 #include "ui_mainwindow.h"
 #include "tinyexpr.h"
 #include <QComboBox>
-#include <string>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSerialPortInfo>
 
-namespace
-{
-    void fillComboBoxWithAvailablePorts(QComboBox* cb)
-    {
-        if (cb != nullptr)
-        {
-            const auto info = QSerialPortInfo::availablePorts();
-            for (const auto& it : info)
-                cb->addItem(it.portName());
-        }
-    }
-}
-
 BKVale::BKVale(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::BKVale)
+    ui(new Ui::BKVale),
+    m_availablePorts(nullptr)
 {
-    ui->setupUi(this);
+      ui->setupUi(this);
 
       QObject::connect(ui->actionAdd,
                        SIGNAL(triggered(bool)),
@@ -36,19 +23,41 @@ BKVale::BKVale(QWidget *parent) :
                        this,
                        SLOT(evaluateCellContent(int, int)));
 
-      QObject::connect(ui->actionTeste,
+      QObject::connect(ui->actionRefresh,
                        SIGNAL(triggered(bool)),
                        this,
-                       SLOT(testPrint()));
+                       SLOT(refreshAvailablePorts()));
 
-      QComboBox* portList = new QComboBox;
-      fillComboBoxWithAvailablePorts(portList);
-      ui->mainToolBar->insertWidget(ui->actionConnect, portList);
+      QObject::connect(ui->actionConnect,
+                       SIGNAL(triggered(bool)),
+                       this,
+                       SLOT(connect()));
+
+      QObject::connect(ui->actionDisconnect,
+                       SIGNAL(triggered(bool)),
+                       this,
+                       SLOT(disconnect()));
+
+      m_availablePorts = new QComboBox;
+      ui->mainToolBar->insertWidget(ui->actionRefresh, m_availablePorts);
+      refreshAvailablePorts();
+      updateUI();
 }
 
 BKVale::~BKVale()
 {
   delete ui;
+}
+
+void BKVale::refreshAvailablePorts()
+{
+    if (m_availablePorts != nullptr)
+    {
+        m_availablePorts->clear();
+        const auto info = QSerialPortInfo::availablePorts();
+        for (const auto& it : info)
+            m_availablePorts->addItem(it.portName());
+    }
 }
 
 void BKVale::createNewItem()
@@ -80,27 +89,61 @@ void BKVale::evaluateCellContent(int row, int column)
   }
 }
 
-void BKVale::testPrint()
+void BKVale::connect()
 {
-    QString error;
-    bool bRet = m_printer.connect(m_portName, error);
-
-    if (bRet)
-        bRet = m_printer.initialize(error);
-
-    if (bRet)
+    if (m_printer.isOpen())
     {
-        QString text = QInputDialog::getText(this,
-                                             tr("Enviar"),
-                                             tr("User name:"));
-
-        bRet = m_printer.write(text, error);
+        if (m_printer.portName() != m_availablePorts->currentText())
+        {
+            m_printer.close();
+        }
+        else
+        {
+            QMessageBox msgBox(QMessageBox::Information,
+                               tr("Aviso"),
+                               tr("Você já está conectado a está impressora."),
+                               QMessageBox::Ok);
+            return;
+        }
     }
 
-    if (!bRet)
+    if (!m_availablePorts->currentText().isEmpty())
     {
-        QMessageBox msg;
-        msg.setText(error);
-        msg.exec();
+        m_printer.setPortName(m_availablePorts->currentText());
+        if (!m_printer.open((QIODevice::ReadWrite)))
+        {
+            QMessageBox msgBox(QMessageBox::Critical,
+                               tr("Erro número: ") + QString::number(m_printer.error()),
+                               tr("O seguinte erro ocorreu ao conectar à impressora: '") +
+                               m_printer.errorString() + "'.",
+                               QMessageBox::Ok);
+            msgBox.exec();
+        }
     }
+    else
+    {
+        QMessageBox msgBox(QMessageBox::Warning,
+                           tr("Atenção"),
+                           tr("É necessário selecionar uma porta para se conectar à impressora."),
+                           QMessageBox::Ok);
+    }
+
+    updateUI();
+}
+
+void BKVale::updateUI()
+{
+    const bool bIsOpen = m_printer.isOpen();
+    ui->actionRefresh->setEnabled(!bIsOpen);
+    ui->actionConnect->setEnabled(!bIsOpen);
+    ui->actionDisconnect->setEnabled(bIsOpen);
+    ui->actionDisconnect->setEnabled(bIsOpen);
+    m_availablePorts->setEnabled(!bIsOpen);
+}
+
+void BKVale::disconnect()
+{
+    if (m_printer.isOpen())
+        m_printer.close();
+    updateUI();
 }

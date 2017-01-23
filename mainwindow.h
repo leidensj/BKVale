@@ -2,11 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSerialPort>
 #include "printer.h"
 
 namespace Ui {
 class BKVale;
 }
+
+class QComboBox;
 
 enum Columns
 {
@@ -27,13 +30,17 @@ public:
 
 private:
     Ui::BKVale *ui;
-    Printer m_printer;
     QString m_portName;
+    QComboBox* m_availablePorts;
+    QSerialPort m_printer;
+    void updateUI();
 
 private slots:
   void createNewItem();
   void evaluateCellContent(int row, int column);
-  void testPrint();
+  void refreshAvailablePorts();
+  void connect();
+  void disconnect();
 };
 
 #endif // MAINWINDOW_H

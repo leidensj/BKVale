@@ -22,13 +22,10 @@ HEADERS  += mainwindow.h \
     tinyexpr.h \
     printer.h
 
-FORMS    += mainwindow.ui \
-    devicelist.ui
+FORMS    += mainwindow.ui
 
 RESOURCES += \
     icons.qrc
-
-win32: LIBS += -L$$PWD/./ -lBemaFI32
 
 INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.

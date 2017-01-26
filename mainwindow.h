@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
-#include "printer.h"
 
 namespace Ui {
 class BKVale;

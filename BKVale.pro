@@ -15,12 +15,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    tinyexpr.c \
-    printer.cpp
+    tinyexpr.c
 
 HEADERS  += mainwindow.h \
-    tinyexpr.h \
-    printer.h
+    tinyexpr.h
 
 FORMS    += mainwindow.ui
 

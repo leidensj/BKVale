@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
-#include "printer.h"
 
 namespace Ui {
 class BKVale;
@@ -29,11 +28,11 @@ public:
   ~BKVale();
 
 private:
-    Ui::BKVale *ui;
-    QString m_portName;
-    QComboBox* m_availablePorts;
-    QSerialPort m_printer;
-    void updateUI();
+  Ui::BKVale *ui;
+  QString m_portName;
+  QComboBox* m_availablePorts;
+  QSerialPort m_printer;
+  void updateUI();
 
 private slots:
   void createNewItem();
@@ -41,6 +40,7 @@ private slots:
   void refreshAvailablePorts();
   void connect();
   void disconnect();
+  void print();
 };
 
 #endif // MAINWINDOW_H

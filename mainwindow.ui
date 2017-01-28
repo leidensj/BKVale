@@ -97,7 +97,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionAdd"/>
-   <addaction name="actionTeste"/>
    <addaction name="separator"/>
    <addaction name="actionRefresh"/>
    <addaction name="actionConnect"/>
@@ -119,15 +118,6 @@
    </property>
    <property name="shortcut">
     <string>Alt++</string>
-   </property>
-  </action>
-  <action name="actionTeste">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/bkvale.png</normaloff>:/icons/res/bkvale.png</iconset>
-   </property>
-   <property name="text">
-    <string>Teste</string>
    </property>
   </action>
   <action name="actionConnect">

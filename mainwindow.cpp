@@ -6,6 +6,7 @@
 #include <QInputDialog>
 #include <QSerialPortInfo>
 
+#define PARTIAL_CUT "\x1b"
 namespace
 {
   bool printerPrint(QSerialPort& printer, const QString& msg, QString& error)

@@ -5,6 +5,48 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSerialPortInfo>
+#include <QByteArray>
+
+namespace
+{
+    bool print(QSerialPort& printer, const QString& msg, QString error)
+    {
+        error.clear();
+        QByteArray data(msg.toLocal8Bit() + "\n");
+        bool bRet = false;
+        auto nBytes = printer.write(data);
+        if (nBytes == -1 || nBytes != data.size())
+        {
+            error = QObject::tr("Erro '%1' ao imprimir: %2").arg(
+                        QString::number(printer.error()),
+                        printer.errorString());
+        }
+        else if (!printer.waitForBytesWritten(5000))
+        {
+            error = QObject::tr("Erro ao imprimir: falha de timeout.");
+        }
+        else
+        {
+            bRet = true;
+        }
+
+        return bRet;
+    }
+
+    bool printHeader(QSerialPort& printer, QString& error)
+    {
+        error.clear();
+
+    }
+
+    bool printInit(QSerialPort& printer, QString& error)
+    {
+        error.clear();
+        QString msg = "\n\x1b@";
+        msg += "\nhaha";
+        return print(printer, msg, error);
+    }
+}
 
 #define PARTIAL_CUT "\x1b"
 namespace
@@ -113,12 +155,12 @@ void BKVale::refreshAvailablePorts()
 
 void BKVale::createNewItem()
 {
-  ui->tableWidget->insertRow(ui->tableWidget->rowCount());
-  QComboBox* cb = new QComboBox();
-  QStringList list;
-  list << tr("UN") << tr("KG") << tr("FD");
-  cb->insertItems(0, list);
-  ui->tableWidget->setCellWidget(ui->tableWidget->rowCount() - 1, 1, cb);
+      ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+      QComboBox* cb = new QComboBox();
+      QStringList list;
+      list << tr("UN") << tr("KG") << tr("FD");
+      cb->insertItems(0, list);
+      ui->tableWidget->setCellWidget(ui->tableWidget->rowCount() - 1, 1, cb);
 }
 
 void BKVale::evaluateCellContent(int row, int column)
@@ -184,6 +226,7 @@ void BKVale::connect()
 
 void BKVale::updateUI()
 {
+<<<<<<< HEAD
   const bool bIsOpen = m_printer.isOpen();
   ui->actionRefresh->setEnabled(!bIsOpen);
   ui->actionConnect->setEnabled(!bIsOpen);
@@ -191,6 +234,15 @@ void BKVale::updateUI()
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
   m_availablePorts->setEnabled(!bIsOpen);
+=======
+    const bool bIsOpen = m_printer.isOpen();
+    ui->actionRefresh->setEnabled(!bIsOpen);
+    ui->actionConnect->setEnabled(!bIsOpen);
+    ui->actionDisconnect->setEnabled(bIsOpen);
+    ui->actionDisconnect->setEnabled(bIsOpen);
+    ui->actionPrint->setEnabled(bIsOpen);
+    m_availablePorts->setEnabled(!bIsOpen);
+>>>>>>> origin/master
 }
 
 void BKVale::disconnect()

@@ -8,5 +8,8 @@
         <file>res/printer.png</file>
         <file>res/refresh.png</file>
         <file>res/calendar.png</file>
+        <file>res/file.png</file>
+        <file>res/open.png</file>
+        <file>res/settings.png</file>
     </qresource>
 </RCC>

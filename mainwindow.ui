@@ -99,6 +99,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew"/>
+   <addaction name="actionAbrir"/>
    <addaction name="actionAdd"/>
    <addaction name="actionCalendar"/>
    <addaction name="separator"/>
@@ -107,6 +109,8 @@
    <addaction name="actionDisconnect"/>
    <addaction name="separator"/>
    <addaction name="actionPrint"/>
+   <addaction name="separator"/>
+   <addaction name="actionSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAdd">
@@ -173,6 +177,39 @@
    </property>
    <property name="toolTip">
     <string>Alterar data do vale</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/file.png</normaloff>:/icons/res/file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Novo</string>
+   </property>
+   <property name="toolTip">
+    <string>Criar novo vale</string>
+   </property>
+  </action>
+  <action name="actionAbrir">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/open.png</normaloff>:/icons/res/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Abrir...</string>
+   </property>
+   <property name="toolTip">
+    <string>Abrir um vale</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/settings.png</normaloff>:/icons/res/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Configurações</string>
    </property>
   </action>
  </widget>

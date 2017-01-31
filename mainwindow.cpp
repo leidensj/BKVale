@@ -7,54 +7,34 @@
 #include <QSerialPortInfo>
 #include <QByteArray>
 
-namespace
-{
-    bool print(QSerialPort& printer, const QString& msg, QString error)
-    {
-        error.clear();
-        QByteArray data(msg.toLocal8Bit() + "\n");
-        bool bRet = false;
-        auto nBytes = printer.write(data);
-        if (nBytes == -1 || nBytes != data.size())
-        {
-            error = QObject::tr("Erro '%1' ao imprimir: %2").arg(
-                        QString::number(printer.error()),
-                        printer.errorString());
-        }
-        else if (!printer.waitForBytesWritten(5000))
-        {
-            error = QObject::tr("Erro ao imprimir: falha de timeout.");
-        }
-        else
-        {
-            bRet = true;
-        }
+#define ESC              "\x1b"
+#define ESC_ALIGN_CENTER "\x1b\x61\x31"
+#define ESC_ALIGN_LEFT   "\x1b\x61\x30"
+#define ESC_FULL_CUT     "\x1b\x77"
+#define ESC_PARTIAL_CUT  "\x1b\x6d"
+#define ESC_STRESS_ON    "\x1b\x45"
+#define ESC_STRESS_OFF   "\x1b\x46"
+#define ESC_LF           "\n"
+#define ESC_INIT         "\x1b\x40"
+#define ESC_DOUBLE_FONT  "\x1b\x0e\x1b\x56" //ESC SO + ESC V
+#define ESC_PORTUGUESE   "\x1b\x74\x08"
 
-        return bRet;
-    }
+#define HEADER_COMPANY   "BAITAKÃO RESTAURANTE E LANCHERIA"
+#define HEADER_TELEPHONE "3228 1666"
 
-    bool printHeader(QSerialPort& printer, QString& error)
-    {
-        error.clear();
+#define MAX_WIDTH        50
+#define TABLE_TOP        "╔════════╦══╦══════════════════════╦══════╦══════╗"
+#define SOME_TEXT        "║........║FD║asddsdsdsa@dfdfdfd    ║R$4,00║R$3,00║"
+#define TABLE_MIDDLE     "╠════════╬══╬══════════════════════╬══════╬══════╣"
 
-    }
+#define TABLE_BOTTOM     "╚════════╩══╩══════════════════════╩══════╩══════╝"
 
-    bool printInit(QSerialPort& printer, QString& error)
-    {
-        error.clear();
-        QString msg = "\n\x1b@";
-        msg += "\nhaha";
-        return print(printer, msg, error);
-    }
-}
-
-#define PARTIAL_CUT "\x1b"
 namespace
 {
   bool printerPrint(QSerialPort& printer, const QString& msg, QString& error)
   {
     error.clear();
-    QByteArray data(msg.toLocal8Bit() + "\n");
+    QByteArray data(msg.toUtf8());
     bool bRet = false;
     auto nBytes = printer.write(data);
 
@@ -79,17 +59,30 @@ namespace
   bool printerInit(QSerialPort& printer, QString& error)
   {
     error.clear();
-    QString msg = "\x1b@";
+    QString msg = QString(ESC_INIT) +
+                  ESC_PORTUGUESE;
     return printerPrint(printer, msg, error);
   }
 
   bool printerPrintHeader(QSerialPort& printer, QString& error)
   {
     error.clear();
-    QString msg = "B.K Restaurante e Lancheria\n"
-                  "Rua Sinimbu 175. Bairro Lurdes\n"
-                  "Caxias do Sul - RS\n\n"
-                  "VALE\n";
+    QString msg = QString(ESC_ALIGN_CENTER) +
+                  ESC_DOUBLE_FONT +
+                  HEADER_COMPANY +
+                  ESC_LF +
+                  ESC_DOUBLE_FONT +
+                  HEADER_TELEPHONE +
+                  ESC_LF +
+                  ESC_ALIGN_LEFT +
+                  TABLE_TOP +
+                  ESC_LF +
+                  SOME_TEXT +
+                  ESC_LF +
+                  TABLE_BOTTOM +
+                  ESC_LF +
+                  ESC_FULL_CUT;
+
     return printerPrint(printer, msg, error);
   }
 }
@@ -146,21 +139,21 @@ void BKVale::refreshAvailablePorts()
 {
   if (m_availablePorts != nullptr)
   {
-      m_availablePorts->clear();
-      const auto info = QSerialPortInfo::availablePorts();
-      for (const auto& it : info)
-          m_availablePorts->addItem(it.portName());
+    m_availablePorts->clear();
+    const auto info = QSerialPortInfo::availablePorts();
+    for (const auto& it : info)
+      m_availablePorts->addItem(it.portName());
   }
 }
 
 void BKVale::createNewItem()
 {
-      ui->tableWidget->insertRow(ui->tableWidget->rowCount());
-      QComboBox* cb = new QComboBox();
-      QStringList list;
-      list << tr("UN") << tr("KG") << tr("FD");
-      cb->insertItems(0, list);
-      ui->tableWidget->setCellWidget(ui->tableWidget->rowCount() - 1, 1, cb);
+  ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+  QComboBox* cb = new QComboBox();
+  QStringList list;
+  list << tr("UN") << tr("KG") << tr("FD");
+  cb->insertItems(0, list);
+  ui->tableWidget->setCellWidget(ui->tableWidget->rowCount() - 1, 1, cb);
 }
 
 void BKVale::evaluateCellContent(int row, int column)
@@ -212,6 +205,18 @@ void BKVale::connect()
                          QMessageBox::Ok);
       msgBox.exec();
     }
+    else
+    {
+      QString error;
+      if (!printerInit(m_printer, error))
+      {
+        QMessageBox msgBox(QMessageBox::Warning,
+                           tr("Aviso") + QString::number(m_printer.error()),
+                           tr("Erro ao inicializar a impressora: '%1'.").arg(error),
+                           QMessageBox::Ok);
+        msgBox.exec();
+      }
+    }
   }
   else
   {
@@ -219,6 +224,7 @@ void BKVale::connect()
                        tr("Atenção"),
                        tr("É necessário selecionar uma porta para se conectar à impressora."),
                        QMessageBox::Ok);
+    msgBox.exec();
   }
 
   updateUI();
@@ -226,7 +232,6 @@ void BKVale::connect()
 
 void BKVale::updateUI()
 {
-<<<<<<< HEAD
   const bool bIsOpen = m_printer.isOpen();
   ui->actionRefresh->setEnabled(!bIsOpen);
   ui->actionConnect->setEnabled(!bIsOpen);
@@ -234,15 +239,6 @@ void BKVale::updateUI()
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
   m_availablePorts->setEnabled(!bIsOpen);
-=======
-    const bool bIsOpen = m_printer.isOpen();
-    ui->actionRefresh->setEnabled(!bIsOpen);
-    ui->actionConnect->setEnabled(!bIsOpen);
-    ui->actionDisconnect->setEnabled(bIsOpen);
-    ui->actionDisconnect->setEnabled(bIsOpen);
-    ui->actionPrint->setEnabled(bIsOpen);
-    m_availablePorts->setEnabled(!bIsOpen);
->>>>>>> origin/master
 }
 
 void BKVale::disconnect()
@@ -255,13 +251,7 @@ void BKVale::disconnect()
 void BKVale::print()
 {
   QString error;
-  bool bRet = printerInit(m_printer, error);
-  if (bRet)
-  {
-    bRet = printerPrintHeader(m_printer, error);
-  }
-
-  if (!bRet)
+  if (!printerPrintHeader(m_printer, error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        tr("Erro"),

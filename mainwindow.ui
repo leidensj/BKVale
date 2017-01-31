@@ -100,6 +100,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionAdd"/>
+   <addaction name="actionCalendar"/>
    <addaction name="separator"/>
    <addaction name="actionRefresh"/>
    <addaction name="actionConnect"/>
@@ -160,6 +161,18 @@
    </property>
    <property name="text">
     <string>Atualizar</string>
+   </property>
+  </action>
+  <action name="actionCalendar">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/calendar.png</normaloff>:/icons/res/calendar.png</iconset>
+   </property>
+   <property name="text">
+    <string>Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Alterar data do vale</string>
    </property>
   </action>
  </widget>

@@ -41,6 +41,7 @@ private slots:
   void connect();
   void disconnect();
   void print();
+  void showCalendar();
 };
 
 #endif // MAINWINDOW_H

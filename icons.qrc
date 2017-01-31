@@ -7,5 +7,6 @@
         <file>res/disconnected.png</file>
         <file>res/printer.png</file>
         <file>res/refresh.png</file>
+        <file>res/calendar.png</file>
     </qresource>
 </RCC>

@@ -6,6 +6,8 @@
 #include <QInputDialog>
 #include <QSerialPortInfo>
 #include <QByteArray>
+#include <QDateTime>
+#include "calendardlg.h"
 
 #define ESC              "\x1b"
 #define ESC_ALIGN_CENTER "\x1b\x61\x31"
@@ -19,8 +21,11 @@
 #define ESC_DOUBLE_FONT  "\x1b\x0e\x1b\x56" //ESC SO + ESC V
 #define ESC_PORTUGUESE   "\x1b\x74\x08"
 
-#define HEADER_COMPANY   "BAITAKÃO RESTAURANTE E LANCHERIA"
-#define HEADER_TELEPHONE "3228 1666"
+#define HEADER_COMPANY1   "BAITAKÃO"
+#define HEADER_COMPANY2   "RESTAURANTE E LANCHERIA"
+#define HEADER_TELEPHONE  "3228 1666"
+
+#define DATE_TIME_FORMAT  "Data dd/MM/yyyy  Hora HH:mm:ss"
 
 #define MAX_WIDTH        50
 #define TABLE_TOP        "╔════════╦══╦══════════════════════╦══════╦══════╗"
@@ -69,7 +74,10 @@ namespace
     error.clear();
     QString msg = QString(ESC_ALIGN_CENTER) +
                   ESC_DOUBLE_FONT +
-                  HEADER_COMPANY +
+                  HEADER_COMPANY1 +
+                  ESC_LF +
+                  ESC_DOUBLE_FONT +
+                  HEADER_COMPANY2 +
                   ESC_LF +
                   ESC_DOUBLE_FONT +
                   HEADER_TELEPHONE +
@@ -80,6 +88,15 @@ namespace
                   SOME_TEXT +
                   ESC_LF +
                   TABLE_BOTTOM +
+                  ESC_LF +
+                  "Data: " + ESC_STRESS_ON +
+                  QDate::currentDate().toString("dd/MM/yyyy") +
+                  ESC_STRESS_OFF +
+                  ESC_LF +
+                  "Hora: " +
+                  ESC_STRESS_ON +
+                  QTime::currentTime().toString("hh:mm:ss") +
+                  ESC_STRESS_OFF
                   ESC_LF +
                   ESC_FULL_CUT;
 
@@ -123,6 +140,11 @@ BKVale::BKVale(QWidget *parent) :
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(print()));
+
+  QObject::connect(ui->actionCalendar,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(showCalendar()));
 
   m_availablePorts = new QComboBox;
   ui->mainToolBar->insertWidget(ui->actionRefresh, m_availablePorts);
@@ -259,4 +281,10 @@ void BKVale::print()
                        QMessageBox::Ok);
     msgBox.exec();
   }
+}
+
+void BKVale::showCalendar()
+{
+  CalendarDlg dlg;
+  dlg.exec();
 }

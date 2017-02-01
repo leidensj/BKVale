@@ -69,7 +69,7 @@ namespace
     return printerPrint(printer, msg, error);
   }
 
-  bool printerPrintHeader(QSerialPort& printer, QString& error)
+  bool printerPrintHeader(QSerialPort& printer, const QDate& date, QString& error)
   {
     error.clear();
     QString msg = QString(ESC_ALIGN_CENTER) +
@@ -83,20 +83,23 @@ namespace
                   HEADER_TELEPHONE +
                   ESC_LF +
                   ESC_ALIGN_LEFT +
-                  TABLE_TOP +
                   ESC_LF +
-                  SOME_TEXT +
                   ESC_LF +
-                  TABLE_BOTTOM +
-                  ESC_LF +
-                  "Data: " + ESC_STRESS_ON +
+                  "Data da impressão: " + ESC_STRESS_ON +
                   QDate::currentDate().toString("dd/MM/yyyy") +
                   ESC_STRESS_OFF +
                   ESC_LF +
-                  "Hora: " +
+                  "Hora da impressão: " +
                   ESC_STRESS_ON +
                   QTime::currentTime().toString("hh:mm:ss") +
-                  ESC_STRESS_OFF
+                  ESC_LF +
+                  ESC_LF +
+                  ESC_ALIGN_CENTER +
+                  "Data do vale:" +
+                  ESC_LF
+                  ESC_STRESS_OFF +
+                  ESC_DOUBLE_FONT +
+                  date.toString("dd/MM/yyyy\n(dddd)") +
                   ESC_LF +
                   ESC_FULL_CUT;
 
@@ -107,7 +110,8 @@ namespace
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::BKVale),
-  m_availablePorts(nullptr)
+  m_availablePorts(nullptr),
+  m_date(QDate::currentDate())
 {
   ui->setupUi(this);
 
@@ -273,7 +277,7 @@ void BKVale::disconnect()
 void BKVale::print()
 {
   QString error;
-  if (!printerPrintHeader(m_printer, error))
+  if (!printerPrintHeader(m_printer, m_date, error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        tr("Erro"),
@@ -286,5 +290,6 @@ void BKVale::print()
 void BKVale::showCalendar()
 {
   CalendarDlg dlg;
-  dlg.exec();
+  if (dlg.exec() == QDialog::Accepted)
+    m_date = dlg.getDate();
 }

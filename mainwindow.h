@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
+#include <QDate>
 
 namespace Ui {
 class BKVale;
@@ -32,6 +33,7 @@ private:
   QString m_portName;
   QComboBox* m_availablePorts;
   QSerialPort m_printer;
+  QDate m_date;
   void updateUI();
 
 private slots:

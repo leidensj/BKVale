@@ -4,10 +4,10 @@
 #include <QComboBox>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QSerialPortInfo>
 #include <QByteArray>
 #include <QDateTime>
 #include "calendardlg.h"
+#include "settingsdlg.h"
 
 #define ESC              "\x1b"
 #define ESC_ALIGN_CENTER "\x1b\x61\x31"
@@ -110,7 +110,6 @@ namespace
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::BKVale),
-  m_availablePorts(nullptr),
   m_date(QDate::currentDate())
 {
   ui->setupUi(this);
@@ -124,11 +123,6 @@ BKVale::BKVale(QWidget *parent) :
                    SIGNAL(cellChanged(int, int)),
                    this,
                    SLOT(evaluateCellContent(int, int)));
-
-  QObject::connect(ui->actionRefresh,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(refreshAvailablePorts()));
 
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),
@@ -150,26 +144,17 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showCalendar()));
 
-  m_availablePorts = new QComboBox;
-  ui->mainToolBar->insertWidget(ui->actionRefresh, m_availablePorts);
-  refreshAvailablePorts();
+  QObject::connect(ui->actionSettings,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(showSettings()));
+
   updateUI();
 }
 
 BKVale::~BKVale()
 {
   delete ui;
-}
-
-void BKVale::refreshAvailablePorts()
-{
-  if (m_availablePorts != nullptr)
-  {
-    m_availablePorts->clear();
-    const auto info = QSerialPortInfo::availablePorts();
-    for (const auto& it : info)
-      m_availablePorts->addItem(it.portName());
-  }
 }
 
 void BKVale::createNewItem()
@@ -205,7 +190,7 @@ void BKVale::connect()
 {
   if (m_printer.isOpen())
   {
-    if (m_printer.portName() != m_availablePorts->currentText())
+    if (m_printer.portName() != m_portName)
     {
       m_printer.close();
     }
@@ -219,9 +204,9 @@ void BKVale::connect()
     }
   }
 
-  if (!m_availablePorts->currentText().isEmpty())
+  if (!m_portName.isEmpty())
   {
-    m_printer.setPortName(m_availablePorts->currentText());
+    m_printer.setPortName(m_portName);
     if (!m_printer.open((QIODevice::ReadWrite)))
     {
       QMessageBox msgBox(QMessageBox::Critical,
@@ -259,12 +244,10 @@ void BKVale::connect()
 void BKVale::updateUI()
 {
   const bool bIsOpen = m_printer.isOpen();
-  ui->actionRefresh->setEnabled(!bIsOpen);
   ui->actionConnect->setEnabled(!bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
-  m_availablePorts->setEnabled(!bIsOpen);
 }
 
 void BKVale::disconnect()
@@ -292,4 +275,10 @@ void BKVale::showCalendar()
   CalendarDlg dlg;
   if (dlg.exec() == QDialog::Accepted)
     m_date = dlg.getDate();
+}
+
+void BKVale::showSettings()
+{
+  SettingsDlg dlg;
+  dlg.exec();
 }

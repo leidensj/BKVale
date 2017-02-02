@@ -104,10 +104,8 @@
    <addaction name="actionAdd"/>
    <addaction name="actionCalendar"/>
    <addaction name="separator"/>
-   <addaction name="actionRefresh"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
-   <addaction name="separator"/>
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
@@ -156,15 +154,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
-   </property>
-  </action>
-  <action name="actionRefresh">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/refresh.png</normaloff>:/icons/res/refresh.png</iconset>
-   </property>
-   <property name="text">
-    <string>Atualizar</string>
    </property>
   </action>
   <action name="actionCalendar">

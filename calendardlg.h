@@ -15,7 +15,7 @@ class CalendarDlg : public QDialog
 public:
   explicit CalendarDlg(QWidget *parent = 0);
   ~CalendarDlg();
-  const QDate& getDate();
+  const QDate& getDate() const { return m_date; }
 
 private:
   Ui::CalendarDlg *ui;

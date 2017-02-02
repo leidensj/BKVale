@@ -31,7 +31,6 @@ public:
 private:
   Ui::BKVale *ui;
   QString m_portName;
-  QComboBox* m_availablePorts;
   QSerialPort m_printer;
   QDate m_date;
   void updateUI();
@@ -39,11 +38,11 @@ private:
 private slots:
   void createNewItem();
   void evaluateCellContent(int row, int column);
-  void refreshAvailablePorts();
   void connect();
   void disconnect();
   void print();
   void showCalendar();
+  void showSettings();
 };
 
 #endif // MAINWINDOW_H

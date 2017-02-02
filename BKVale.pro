@@ -16,14 +16,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     tinyexpr.c \
-    calendardlg.cpp
+    calendardlg.cpp \
+    settingsdlg.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
-    calendardlg.h
+    calendardlg.h \
+    settingsdlg.h
 
 FORMS    += mainwindow.ui \
-    calendardlg.ui
+    calendardlg.ui \
+    settingsdlg.ui
 
 RESOURCES += \
     icons.qrc

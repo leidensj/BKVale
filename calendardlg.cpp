@@ -6,6 +6,8 @@ CalendarDlg::CalendarDlg(QWidget *parent) :
   ui(new Ui::CalendarDlg)
 {
   ui->setupUi(this);
+  auto flags = this->windowFlags();
+  flags &= ~Qt::WindowContextHelpButtonHint;
   QObject::connect(ui->calendarWidget,
                    SIGNAL(activated(const QDate&)),
                    this,
@@ -15,11 +17,6 @@ CalendarDlg::CalendarDlg(QWidget *parent) :
 CalendarDlg::~CalendarDlg()
 {
   delete ui;
-}
-
-const QDate& CalendarDlg::getDate()
-{
-  return m_date;
 }
 
 void CalendarDlg::updateDate(const QDate & date)

@@ -11,5 +11,6 @@
         <file>res/file.png</file>
         <file>res/open.png</file>
         <file>res/settings.png</file>
+        <file>res/serial.png</file>
     </qresource>
 </RCC>

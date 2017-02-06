@@ -7,7 +7,6 @@
 #include <QByteArray>
 #include <QDateTime>
 #include "calendardlg.h"
-#include "settingsdlg.h"
 
 #define ESC              "\x1b"
 #define ESC_ALIGN_CENTER "\x1b\x61\x31"
@@ -190,7 +189,7 @@ void BKVale::connect()
 {
   if (m_printer.isOpen())
   {
-    if (m_printer.portName() != m_portName)
+    if (m_printer.portName() != m_settings.port)
     {
       m_printer.close();
     }
@@ -204,9 +203,9 @@ void BKVale::connect()
     }
   }
 
-  if (!m_portName.isEmpty())
+  if (!m_settings.port.isEmpty())
   {
-    m_printer.setPortName(m_portName);
+    m_printer.setPortName(m_settings.port);
     if (!m_printer.open((QIODevice::ReadWrite)))
     {
       QMessageBox msgBox(QMessageBox::Critical,
@@ -248,6 +247,7 @@ void BKVale::updateUI()
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
+  ui->actionSettings->setEnabled(!bIsOpen);
 }
 
 void BKVale::disconnect()
@@ -279,6 +279,18 @@ void BKVale::showCalendar()
 
 void BKVale::showSettings()
 {
-  SettingsDlg dlg;
-  dlg.exec();
+  if (!m_printer.isOpen())
+  {
+    SettingsDlg dlg;
+    if (dlg.exec() == QDialog::Accepted)
+      m_settings = dlg.getSettings();
+  }
+  else
+  {
+    QMessageBox msgBox(QMessageBox::Critical,
+                       tr("Erro"),
+                       tr("Desconecte a impressora primeiro."),
+                       QMessageBox::Ok);
+    msgBox.exec();
+  }
 }

@@ -17,6 +17,7 @@ struct Settings
   QSerialPort::Parity parity;
   QSerialPort::StopBits stopBits;
 
+  Settings();
   void clear();
 };
 
@@ -32,11 +33,12 @@ public:
 private:
   Ui::SettingsDlg *ui;
   Settings m_settings;
-  void init();
+  void doDataExchange(bool toUI);
 
 private slots:
   void refreshAvailablePorts();
-  void updateSettings();
+  void update();
+  void restoreDefaults();
 };
 
 #endif // SETTINGSDLG_H

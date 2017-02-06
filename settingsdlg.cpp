@@ -1,6 +1,12 @@
 #include "settingsdlg.h"
 #include "ui_settingsdlg.h"
 #include <QSerialPortInfo>
+#include <QPushButton>
+
+Settings::Settings()
+{
+  clear();
+}
 
 void Settings::clear()
 {
@@ -21,7 +27,12 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
   QObject::connect(this,
                    SIGNAL(accepted()),
                    this,
-                   SLOT(updateSettings()));
+                   SLOT(update()));
+
+  QObject::connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults),
+                   SIGNAL(clicked()),
+                   this,
+                   SLOT(restoreDefaults()));
 
   ui->cbBaudrate->addItem("1200", QSerialPort::Baud1200);
   ui->cbBaudrate->addItem("2400", QSerialPort::Baud2400);
@@ -52,8 +63,7 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
   ui->cbParity->addItem("Mark parity", QSerialPort::MarkParity);
 
   refreshAvailablePorts();
-
-  init();
+  doDataExchange(true);
 }
 
 SettingsDlg::~SettingsDlg()
@@ -61,14 +71,25 @@ SettingsDlg::~SettingsDlg()
   delete ui;
 }
 
-void SettingsDlg::init()
+void SettingsDlg::doDataExchange(bool toUI)
 {
-  m_settings.clear();
-  ui->cbBaudrate->setCurrentIndex(ui->cbBaudrate->findData(m_settings.baudRate));
-  ui->cbFlow->setCurrentIndex(ui->cbFlow->findData(m_settings.flowControl));
-  ui->cbDataBits->setCurrentIndex(ui->cbDataBits->findData(m_settings.dataBits));
-  ui->cbStopBits->setCurrentIndex(ui->cbStopBits->findData(m_settings.stopBits));
-  ui->cbParity->setCurrentIndex(ui->cbParity->findData(m_settings.parity));
+  if (toUI)
+  {
+    ui->cbBaudrate->setCurrentIndex(ui->cbBaudrate->findData(m_settings.baudRate));
+    ui->cbFlow->setCurrentIndex(ui->cbFlow->findData(m_settings.flowControl));
+    ui->cbDataBits->setCurrentIndex(ui->cbDataBits->findData(m_settings.dataBits));
+    ui->cbStopBits->setCurrentIndex(ui->cbStopBits->findData(m_settings.stopBits));
+    ui->cbParity->setCurrentIndex(ui->cbParity->findData(m_settings.parity));
+  }
+  else
+  {
+    m_settings.port = ui->cbPort->currentText();
+    m_settings.baudRate = (QSerialPort::BaudRate)ui->cbBaudrate->currentData().toUInt();
+    m_settings.dataBits = (QSerialPort::DataBits)ui->cbDataBits->currentData().toUInt();
+    m_settings.flowControl = (QSerialPort::FlowControl)ui->cbFlow->currentData().toUInt();
+    m_settings.parity = (QSerialPort::Parity)ui->cbParity->currentData().toUInt();
+    m_settings.stopBits = (QSerialPort::StopBits)ui->cbStopBits->currentData().toUInt();
+  }
 }
 
 void SettingsDlg::refreshAvailablePorts()
@@ -79,12 +100,13 @@ void SettingsDlg::refreshAvailablePorts()
     ui->cbPort->addItem(it.portName());
 }
 
-void SettingsDlg::updateSettings()
+void SettingsDlg::update()
 {
-  m_settings.port = ui->cbPort->currentText();
-  m_settings.baudRate = (QSerialPort::BaudRate)ui->cbBaudrate->currentData().toUInt();
-  m_settings.dataBits = (QSerialPort::DataBits)ui->cbDataBits->currentData().toUInt();
-  m_settings.flowControl = (QSerialPort::FlowControl)ui->cbFlow->currentData().toUInt();
-  m_settings.parity = (QSerialPort::Parity)ui->cbParity->currentData().toUInt();
-  m_settings.stopBits = (QSerialPort::StopBits)ui->cbStopBits->currentData().toUInt();
+  doDataExchange(false);
+}
+
+void SettingsDlg::restoreDefaults()
+{
+  m_settings.clear();
+  doDataExchange(true);
 }

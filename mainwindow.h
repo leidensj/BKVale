@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QDate>
+#include "settingsdlg.h"
 
 namespace Ui {
 class BKVale;
@@ -30,9 +31,9 @@ public:
 
 private:
   Ui::BKVale *ui;
-  QString m_portName;
   QSerialPort m_printer;
   QDate m_date;
+  Settings m_settings;
   void updateUI();
 
 private slots:

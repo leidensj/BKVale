@@ -6,7 +6,6 @@
 #include <QInputDialog>
 #include <QByteArray>
 #include <QDateTime>
-#include "calendardlg.h"
 
 #define ESC              "\x1b"
 #define ESC_ALIGN_CENTER "\x1b\x61\x31"
@@ -17,25 +16,19 @@
 #define ESC_STRESS_OFF   "\x1b\x46"
 #define ESC_LF           "\n"
 #define ESC_INIT         "\x1b\x40"
-#define ESC_DOUBLE_FONT  "\x1b\x0e\x1b\x56" //ESC SO + ESC V
+#define ESC_DOUBLE_FONT  "\x1b\x0e\x1b\x56"
 #define ESC_PORTUGUESE   "\x1b\x74\x08"
+#define ESC_REVERSE_ON   "\x1b\x7d\x31"
+#define ESC_REVERSE_OFF  "\x1b\x7d\x30"
 
-#define HEADER_COMPANY1   "BAITAKÃO"
-#define HEADER_COMPANY2   "RESTAURANTE E LANCHERIA"
-#define HEADER_TELEPHONE  "3228 1666"
-
-#define DATE_TIME_FORMAT  "Data dd/MM/yyyy  Hora HH:mm:ss"
-
-#define MAX_WIDTH        50
-#define TABLE_TOP        "╔════════╦══╦══════════════════════╦══════╦══════╗"
-#define SOME_TEXT        "║........║FD║asddsdsdsa@dfdfdfd    ║R$4,00║R$3,00║"
-#define TABLE_MIDDLE     "╠════════╬══╬══════════════════════╬══════╬══════╣"
-
-#define TABLE_BOTTOM     "╚════════╩══╩══════════════════════╩══════╩══════╝"
+#define TABLE_WIDTH           48
+#define TABLE_MAX_VALUE       10000
 
 namespace
 {
-  bool printerPrint(QSerialPort& printer, const QString& msg, QString& error)
+  bool printerPrint(QSerialPort& printer,
+                    const QString& msg,
+                    QString& error)
   {
     error.clear();
     QByteArray data(msg.toUtf8());
@@ -60,35 +53,44 @@ namespace
     return bRet;
   }
 
-  bool printerInit(QSerialPort& printer, QString& error)
+  bool printerInit(QSerialPort& printer,
+                   QString& error)
   {
     error.clear();
-    QString msg = QString(ESC_INIT) +
-                  ESC_PORTUGUESE;
+    QString msg = QString(ESC_INIT) + ESC_PORTUGUESE;
     return printerPrint(printer, msg, error);
   }
 
-  bool printerPrintHeader(QSerialPort& printer, const QDate& date, QString& error)
+  QString formatNumber(double d, bool b3)
   {
-    error.clear();
-    QString msg = QString(ESC_ALIGN_CENTER) +
+    return QString::number(d, 'f', b3 ? 3 : 2);
+  }
+
+  QString formatNumber(const QString& number, bool b3)
+  {
+    return formatNumber(number.toDouble(), b3);
+  }
+
+  QString buildTop(const QDate& date)
+  {
+    QString str = QString(ESC_ALIGN_CENTER) +
                   ESC_DOUBLE_FONT +
-                  HEADER_COMPANY1 +
+                  "B.K. RESTAURANTE"+
                   ESC_LF +
                   ESC_DOUBLE_FONT +
-                  HEADER_COMPANY2 +
+                  "E LANCHERIA LTDA" +
                   ESC_LF +
                   ESC_DOUBLE_FONT +
-                  HEADER_TELEPHONE +
+                  "3228-1666" +
                   ESC_LF +
                   ESC_ALIGN_LEFT +
                   ESC_LF +
                   ESC_LF +
-                  "Data da impressão: " + ESC_STRESS_ON +
+                  "Data de impressão: " + ESC_STRESS_ON +
                   QDate::currentDate().toString("dd/MM/yyyy") +
                   ESC_STRESS_OFF +
                   ESC_LF +
-                  "Hora da impressão: " +
+                  "Hora de impressão: " +
                   ESC_STRESS_ON +
                   QTime::currentTime().toString("hh:mm:ss") +
                   ESC_LF +
@@ -100,16 +102,52 @@ namespace
                   ESC_DOUBLE_FONT +
                   date.toString("dd/MM/yyyy\n(dddd)") +
                   ESC_LF +
-                  ESC_FULL_CUT;
+                  ESC_LF;
+    return str;
+  }
 
-    return printerPrint(printer, msg, error);
+  QString buildBottom(double total)
+  {
+    QString str = QString(ESC_LF) +
+                  ESC_ALIGN_CENTER +
+                  ESC_DOUBLE_FONT +
+                  "TOTAL R$" +
+                  formatNumber(total, false) +
+                  ESC_LF +
+                  ESC_LF +
+                  ESC_FULL_CUT;
+    return str;
+  }
+
+  QString buildTable(const QTableWidget& table)
+  {
+    QString str(ESC_ALIGN_LEFT);
+    for (int row = 0; row != table.rowCount(); ++row)
+    {
+      QComboBox* pcb = static_cast<QComboBox*>(table.cellWidget(row, TableColumnUnity));
+      QString subTotal(formatNumber(table.item(row, TableColumnAmmount)->text(), true) +
+                       pcb->currentText() + " x R$" +
+                       formatNumber(table.item(row, TableColumnUnitValue)->text(), false));
+
+      {
+        const QString subTotalValue("R$"+formatNumber(table.item(row, TableColumnSubTotalValue)->text(), false));
+        const int n = TABLE_WIDTH - (subTotal.length() + subTotalValue.length());
+        for (int i = 0; i != n; ++i)
+          subTotal += " ";
+        subTotal += ESC_STRESS_ON + subTotalValue + ESC_STRESS_OFF;
+      }
+
+      str += table.item(row, TableColumnDescription)->text() + ESC_LF;
+      str += subTotal + ESC_LF;
+      str += QString("────────────────────────────────────────────────") + ESC_LF;
+    }
+    return str;
   }
 }
 
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
-  ui(new Ui::BKVale),
-  m_date(QDate::currentDate())
+  ui(new Ui::BKVale)
 {
   ui->setupUi(this);
 
@@ -138,16 +176,12 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(print()));
 
-  QObject::connect(ui->actionCalendar,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(showCalendar()));
-
   QObject::connect(ui->actionSettings,
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(showSettings()));
 
+  ui->dateEdit->setDate(QDate::currentDate());
   updateUI();
 }
 
@@ -170,9 +204,9 @@ void BKVale::evaluateCellContent(int row, int column)
 {
   switch (column)
   {
-    case Ammount:
-    case UnitValue:
-    case TotalValue:
+    case TableColumnAmmount:
+    case TableColumnUnitValue:
+    case TableColumnSubTotalValue:
     {
       int error = 0;
       auto exp = ui->tableWidget->item(row, column)->text().toStdString();
@@ -259,8 +293,11 @@ void BKVale::disconnect()
 
 void BKVale::print()
 {
+  QString str = buildTop(ui->dateEdit->date());
+  str += buildTable(*ui->tableWidget);
+  str += buildBottom(total());
   QString error;
-  if (!printerPrintHeader(m_printer, m_date, error))
+  if (!printerPrint(m_printer, str, error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        tr("Erro"),
@@ -268,13 +305,6 @@ void BKVale::print()
                        QMessageBox::Ok);
     msgBox.exec();
   }
-}
-
-void BKVale::showCalendar()
-{
-  CalendarDlg dlg;
-  if (dlg.exec() == QDialog::Accepted)
-    m_date = dlg.getDate();
 }
 
 void BKVale::showSettings()
@@ -293,4 +323,12 @@ void BKVale::showSettings()
                        QMessageBox::Ok);
     msgBox.exec();
   }
+}
+
+double BKVale::total() const
+{
+  double total = 0.0;
+  for (int i = 0; i != ui->tableWidget->rowCount(); ++i)
+    total += ui->tableWidget->item(i, TableColumnSubTotalValue)->text().toDouble();
+  return total;
 }

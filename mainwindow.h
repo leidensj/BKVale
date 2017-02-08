@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
-#include <QDate>
 #include "settingsdlg.h"
 
 namespace Ui {
@@ -12,13 +11,13 @@ class BKVale;
 
 class QComboBox;
 
-enum Columns
+enum TableColumn
 {
-  Ammount,
-  Unity,
-  Description,
-  UnitValue,
-  TotalValue
+  TableColumnAmmount,
+  TableColumnUnity,
+  TableColumnDescription,
+  TableColumnUnitValue,
+  TableColumnSubTotalValue
 };
 
 class BKVale : public QMainWindow
@@ -32,9 +31,9 @@ public:
 private:
   Ui::BKVale *ui;
   QSerialPort m_printer;
-  QDate m_date;
   Settings m_settings;
   void updateUI();
+  double total() const;
 
 private slots:
   void createNewItem();
@@ -42,7 +41,6 @@ private slots:
   void connect();
   void disconnect();
   void print();
-  void showCalendar();
   void showSettings();
 };
 

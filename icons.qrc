@@ -2,7 +2,6 @@
     <qresource prefix="/icons">
         <file>res/add.png</file>
         <file>res/bkvale.png</file>
-        <file>res/device.png</file>
         <file>res/connected.png</file>
         <file>res/disconnected.png</file>
         <file>res/printer.png</file>
@@ -12,5 +11,7 @@
         <file>res/open.png</file>
         <file>res/settings.png</file>
         <file>res/serial.png</file>
+        <file>res/about.png</file>
+        <file>res/remove.png</file>
     </qresource>
 </RCC>

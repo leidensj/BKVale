@@ -32,16 +32,18 @@ private:
   Ui::BKVale *ui;
   QSerialPort m_printer;
   Settings m_settings;
-  void updateUI();
+  void enableControls();
   double total() const;
 
 private slots:
-  void createNewItem();
+  void addItem();
+  void removeItem();
   void evaluateCellContent(int row, int column);
   void connect();
   void disconnect();
   void print();
   void showSettings();
+  void updateUI();
 };
 
 #endif // MAINWINDOW_H

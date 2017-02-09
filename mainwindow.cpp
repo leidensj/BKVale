@@ -154,9 +154,14 @@ BKVale::BKVale(QWidget *parent) :
   QObject::connect(ui->actionAdd,
                    SIGNAL(triggered(bool)),
                    this,
-                   SLOT(createNewItem()));
+                   SLOT(addItem()));
 
-  QObject::connect(ui->tableWidget,
+  QObject::connect(ui->actionRemove,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(removeItem()));
+
+  QObject::connect(ui->table,
                    SIGNAL(cellChanged(int, int)),
                    this,
                    SLOT(evaluateCellContent(int, int)));
@@ -181,7 +186,18 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSettings()));
 
-  ui->dateEdit->setDate(QDate::currentDate());
+  QObject::connect(ui->table,
+                   SIGNAL(cellChanged(int, int)),
+                   this,
+                   SLOT(updateUI()));
+
+  QObject::connect(ui->table,
+                   SIGNAL(itemSelectionChanged()),
+                   this,
+                   SLOT(updateUI()));
+
+  ui->provider->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
+  ui->date->setDate(QDate::currentDate());
   updateUI();
 }
 
@@ -190,14 +206,19 @@ BKVale::~BKVale()
   delete ui;
 }
 
-void BKVale::createNewItem()
+void BKVale::addItem()
 {
-  ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+  ui->table->insertRow(ui->table->rowCount());
   QComboBox* cb = new QComboBox();
   QStringList list;
   list << tr("UN") << tr("KG") << tr("FD");
   cb->insertItems(0, list);
-  ui->tableWidget->setCellWidget(ui->tableWidget->rowCount() - 1, 1, cb);
+  ui->table->setCellWidget(ui->table->rowCount() - 1, 1, cb);
+}
+
+void BKVale::removeItem()
+{
+  ui->table->removeRow(ui->table->currentRow());
 }
 
 void BKVale::evaluateCellContent(int row, int column)
@@ -209,10 +230,10 @@ void BKVale::evaluateCellContent(int row, int column)
     case TableColumnSubTotalValue:
     {
       int error = 0;
-      auto exp = ui->tableWidget->item(row, column)->text().toStdString();
+      auto exp = ui->table->item(row, column)->text().toStdString();
       double res = te_interp(exp.c_str(), &error);
       if (error == 0)
-        ui->tableWidget->item(row, column)->setText(QString::number(res));
+        ui->table->item(row, column)->setText(QString::number(res));
     }
     default:
       break;
@@ -274,16 +295,6 @@ void BKVale::connect()
   updateUI();
 }
 
-void BKVale::updateUI()
-{
-  const bool bIsOpen = m_printer.isOpen();
-  ui->actionConnect->setEnabled(!bIsOpen);
-  ui->actionDisconnect->setEnabled(bIsOpen);
-  ui->actionDisconnect->setEnabled(bIsOpen);
-  ui->actionPrint->setEnabled(bIsOpen);
-  ui->actionSettings->setEnabled(!bIsOpen);
-}
-
 void BKVale::disconnect()
 {
   if (m_printer.isOpen())
@@ -293,8 +304,8 @@ void BKVale::disconnect()
 
 void BKVale::print()
 {
-  QString str = buildTop(ui->dateEdit->date());
-  str += buildTable(*ui->tableWidget);
+  QString str = buildTop(ui->date->date());
+  str += buildTable(*ui->table);
   str += buildBottom(total());
   QString error;
   if (!printerPrint(m_printer, str, error))
@@ -328,7 +339,27 @@ void BKVale::showSettings()
 double BKVale::total() const
 {
   double total = 0.0;
-  for (int i = 0; i != ui->tableWidget->rowCount(); ++i)
-    total += ui->tableWidget->item(i, TableColumnSubTotalValue)->text().toDouble();
+  for (int i = 0; i != ui->table->rowCount(); ++i)
+  {
+    auto pt = ui->table->item(i, TableColumnSubTotalValue);
+    if (pt != nullptr)
+      total += pt->text().toDouble();
+  }
   return total;
+}
+
+void BKVale::updateUI()
+{
+  const bool bIsOpen = m_printer.isOpen();
+  ui->actionConnect->setEnabled(!bIsOpen);
+  ui->actionDisconnect->setEnabled(bIsOpen);
+  ui->actionDisconnect->setEnabled(bIsOpen);
+  ui->actionPrint->setEnabled(bIsOpen);
+  ui->actionSettings->setEnabled(!bIsOpen);
+  ui->actionRemove->setEnabled(ui->table->currentRow() != -1);
+
+  if (ui->table->rowCount() != 0)
+    ui->total->setText(formatNumber(total(), false));
+  else
+    ui->total->clear();
 }

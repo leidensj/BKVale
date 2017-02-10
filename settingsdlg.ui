@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>432</width>
+    <width>407</width>
     <height>247</height>
    </rect>
   </property>
@@ -23,12 +23,25 @@
      <property name="tabShape">
       <enum>QTabWidget::Rounded</enum>
      </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <property name="documentMode">
       <bool>false</bool>
      </property>
      <property name="tabsClosable">
       <bool>false</bool>
      </property>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Tab 2</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QListView" name="listView"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="serial">
       <attribute name="icon">
        <iconset resource="icons.qrc">
@@ -40,20 +53,13 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QFormLayout" name="formLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Porta</string>
-           </property>
-          </widget>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="cbFlow"/>
          </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="cbPort"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_2">
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_4">
            <property name="text">
-            <string>Taxa de transmissão</string>
+            <string>Bits de dados</string>
            </property>
           </widget>
          </item>
@@ -67,15 +73,8 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="cbFlow"/>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Bits de dados</string>
-           </property>
-          </widget>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="cbStopBits"/>
          </item>
          <item row="3" column="1">
           <widget class="QComboBox" name="cbDataBits"/>
@@ -87,9 +86,6 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="QComboBox" name="cbStopBits"/>
-         </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_6">
            <property name="text">
@@ -97,17 +93,29 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Taxa de transmissão</string>
+           </property>
+          </widget>
+         </item>
          <item row="5" column="1">
           <widget class="QComboBox" name="cbParity"/>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="cbPort"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Porta</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>Tab 2</string>
-      </attribute>
      </widget>
     </widget>
    </item>

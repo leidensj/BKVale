@@ -17,7 +17,7 @@ enum TableColumn
   TableColumnUnity,
   TableColumnDescription,
   TableColumnUnitValue,
-  TableColumnSubTotalValue
+  TableColumnSubTotal
 };
 
 class BKVale : public QMainWindow
@@ -32,8 +32,10 @@ private:
   Ui::BKVale *ui;
   QSerialPort m_printer;
   Settings m_settings;
-  void enableControls();
-  double total() const;
+  QString computeUnitValue(int row) const;
+  QString computeSubTotal(int row) const;
+  QString computeTotal() const;
+  void setItemEditable(int row, int column, bool editable);
 
 private slots:
   void addItem();
@@ -43,7 +45,7 @@ private slots:
   void disconnect();
   void print();
   void showSettings();
-  void updateUI();
+  void enableControls();
 };
 
 #endif // MAINWINDOW_H

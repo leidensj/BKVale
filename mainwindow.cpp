@@ -106,13 +106,13 @@ namespace
     return str;
   }
 
-  QString buildBottom(double total)
+  QString buildBottom(QString total)
   {
     QString str = QString(ESC_LF) +
                   ESC_ALIGN_CENTER +
                   ESC_DOUBLE_FONT +
                   "TOTAL R$" +
-                  formatNumber(total, false) +
+                  total +
                   ESC_LF +
                   ESC_LF +
                   ESC_FULL_CUT;
@@ -130,7 +130,7 @@ namespace
                        formatNumber(table.item(row, TableColumnUnitValue)->text(), false));
 
       {
-        const QString subTotalValue("R$"+formatNumber(table.item(row, TableColumnSubTotalValue)->text(), false));
+        const QString subTotalValue("R$"+formatNumber(table.item(row, TableColumnSubTotal)->text(), false));
         const int n = TABLE_WIDTH - (subTotal.length() + subTotalValue.length());
         for (int i = 0; i != n; ++i)
           subTotal += " ";
@@ -187,18 +187,13 @@ BKVale::BKVale(QWidget *parent) :
                    SLOT(showSettings()));
 
   QObject::connect(ui->table,
-                   SIGNAL(cellChanged(int, int)),
-                   this,
-                   SLOT(updateUI()));
-
-  QObject::connect(ui->table,
                    SIGNAL(itemSelectionChanged()),
                    this,
-                   SLOT(updateUI()));
+                   SLOT(enableControls()));
 
   ui->provider->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
   ui->date->setDate(QDate::currentDate());
-  updateUI();
+  enableControls();
 }
 
 BKVale::~BKVale()
@@ -209,11 +204,19 @@ BKVale::~BKVale()
 void BKVale::addItem()
 {
   ui->table->insertRow(ui->table->rowCount());
-  QComboBox* cb = new QComboBox();
+  QComboBox* unit = new QComboBox();
   QStringList list;
   list << tr("UN") << tr("KG") << tr("FD");
-  cb->insertItems(0, list);
-  ui->table->setCellWidget(ui->table->rowCount() - 1, 1, cb);
+  unit->insertItems(0, list);
+  unit->setEditable(true);
+  const int row = ui->table->rowCount() - 1;
+  ui->table->blockSignals(true);
+  ui->table->setCellWidget(row, TableColumnUnity, unit);
+  ui->table->setItem(row, TableColumnAmmount, new QTableWidgetItem("0.000"));
+  ui->table->setItem(row, TableColumnDescription, new QTableWidgetItem(""));
+  ui->table->setItem(row, TableColumnUnitValue, new QTableWidgetItem("0.00"));
+  ui->table->setItem(row, TableColumnSubTotal, new QTableWidgetItem("0.00"));
+  ui->table->blockSignals(false);
 }
 
 void BKVale::removeItem()
@@ -221,23 +224,50 @@ void BKVale::removeItem()
   ui->table->removeRow(ui->table->currentRow());
 }
 
+void BKVale::setItemEditable(int row, int column, bool editable)
+{
+  auto pt = ui->table->item(row, column);
+  if (pt != nullptr)
+  {
+    if (editable)
+      pt->setFlags(pt->flags() & Qt::ItemIsEditable);
+    else
+      pt->setFlags(pt->flags() ^ Qt::ItemIsEditable);
+  }
+}
+
 void BKVale::evaluateCellContent(int row, int column)
 {
+  ui->table->blockSignals(true);
   switch (column)
   {
     case TableColumnAmmount:
     case TableColumnUnitValue:
-    case TableColumnSubTotalValue:
     {
-      int error = 0;
       auto exp = ui->table->item(row, column)->text().toStdString();
-      double res = te_interp(exp.c_str(), &error);
-      if (error == 0)
-        ui->table->item(row, column)->setText(QString::number(res));
-    }
+      int error = 0;
+      double d = te_interp(exp.c_str(), &error);
+      auto res = formatNumber(error ? 0.0 : d, column == TableColumnAmmount);
+      ui->table->item(row, column)->setText(res);
+
+      ui->table->item(row, TableColumnSubTotal)->setText(computeSubTotal(row));
+      ui->total->setText(computeTotal());
+    } break;
+    case TableColumnSubTotal:
+    {
+      auto exp = ui->table->item(row, column)->text().toStdString();
+      int error = 0;
+      double d = te_interp(exp.c_str(), &error);
+      auto res = formatNumber(error ? 0.0 : d, column == TableColumnAmmount);
+      ui->table->item(row, column)->setText(res);
+
+      ui->table->item(row, TableColumnUnitValue)->setText(computeUnitValue(row));
+      ui->total->setText(computeTotal());
+    } break;
     default:
       break;
   }
+  ui->table->blockSignals(false);
 }
 
 void BKVale::connect()
@@ -292,21 +322,21 @@ void BKVale::connect()
     msgBox.exec();
   }
 
-  updateUI();
+  enableControls();
 }
 
 void BKVale::disconnect()
 {
   if (m_printer.isOpen())
       m_printer.close();
-  updateUI();
+  enableControls();
 }
 
 void BKVale::print()
 {
   QString str = buildTop(ui->date->date());
   str += buildTable(*ui->table);
-  str += buildBottom(total());
+  str += buildBottom(computeTotal());
   QString error;
   if (!printerPrint(m_printer, str, error))
   {
@@ -336,19 +366,31 @@ void BKVale::showSettings()
   }
 }
 
-double BKVale::total() const
+QString BKVale::computeUnitValue(int row) const
 {
-  double total = 0.0;
-  for (int i = 0; i != ui->table->rowCount(); ++i)
-  {
-    auto pt = ui->table->item(i, TableColumnSubTotalValue);
-    if (pt != nullptr)
-      total += pt->text().toDouble();
-  }
-  return total;
+  if (ui->table->item(row, TableColumnAmmount)->text().toDouble() == 0.0)
+    return "0.00";
+  double d = ui->table->item(row, TableColumnSubTotal)->text().toDouble() /
+             ui->table->item(row, TableColumnAmmount)->text().toDouble();
+  return formatNumber(d, false);
 }
 
-void BKVale::updateUI()
+QString BKVale::computeSubTotal(int row) const
+{
+  double d = ui->table->item(row, TableColumnAmmount)->text().toDouble() *
+             ui->table->item(row, TableColumnUnitValue)->text().toDouble();
+  return formatNumber(d, false);
+}
+
+QString BKVale::computeTotal() const
+{
+  double d = 0.0;
+  for (int row = 0; row != ui->table->rowCount(); ++row)
+    d += ui->table->item(row, TableColumnSubTotal)->text().toDouble();
+  return formatNumber(d, false);
+}
+
+void BKVale::enableControls()
 {
   const bool bIsOpen = m_printer.isOpen();
   ui->actionConnect->setEnabled(!bIsOpen);
@@ -357,9 +399,4 @@ void BKVale::updateUI()
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
   ui->actionRemove->setEnabled(ui->table->currentRow() != -1);
-
-  if (ui->table->rowCount() != 0)
-    ui->total->setText(formatNumber(total(), false));
-  else
-    ui->total->clear();
 }

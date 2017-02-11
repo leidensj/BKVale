@@ -61,16 +61,6 @@ namespace
     return printerPrint(printer, msg, error);
   }
 
-  QString formatNumber(double d, bool b3)
-  {
-    return QString::number(d, 'f', b3 ? 3 : 2);
-  }
-
-  QString formatNumber(const QString& number, bool b3)
-  {
-    return formatNumber(number.toDouble(), b3);
-  }
-
   QString buildTop(const QDate& date)
   {
     QString str = QString(ESC_ALIGN_CENTER) +
@@ -201,29 +191,6 @@ BKVale::~BKVale()
   delete ui;
 }
 
-void BKVale::addItem()
-{
-  ui->table->insertRow(ui->table->rowCount());
-  QComboBox* unit = new QComboBox();
-  QStringList list;
-  list << tr("UN") << tr("KG") << tr("FD");
-  unit->insertItems(0, list);
-  unit->setEditable(true);
-  const int row = ui->table->rowCount() - 1;
-  ui->table->blockSignals(true);
-  ui->table->setCellWidget(row, TableColumnUnity, unit);
-  ui->table->setItem(row, TableColumnAmmount, new QTableWidgetItem("0.000"));
-  ui->table->setItem(row, TableColumnDescription, new QTableWidgetItem(""));
-  ui->table->setItem(row, TableColumnUnitValue, new QTableWidgetItem("0.00"));
-  ui->table->setItem(row, TableColumnSubTotal, new QTableWidgetItem("0.00"));
-  ui->table->blockSignals(false);
-}
-
-void BKVale::removeItem()
-{
-  ui->table->removeRow(ui->table->currentRow());
-}
-
 void BKVale::setItemEditable(int row, int column, bool editable)
 {
   auto pt = ui->table->item(row, column);
@@ -234,40 +201,6 @@ void BKVale::setItemEditable(int row, int column, bool editable)
     else
       pt->setFlags(pt->flags() ^ Qt::ItemIsEditable);
   }
-}
-
-void BKVale::evaluateCellContent(int row, int column)
-{
-  ui->table->blockSignals(true);
-  switch (column)
-  {
-    case TableColumnAmmount:
-    case TableColumnUnitValue:
-    {
-      auto exp = ui->table->item(row, column)->text().toStdString();
-      int error = 0;
-      double d = te_interp(exp.c_str(), &error);
-      auto res = formatNumber(error ? 0.0 : d, column == TableColumnAmmount);
-      ui->table->item(row, column)->setText(res);
-
-      ui->table->item(row, TableColumnSubTotal)->setText(computeSubTotal(row));
-      ui->total->setText(computeTotal());
-    } break;
-    case TableColumnSubTotal:
-    {
-      auto exp = ui->table->item(row, column)->text().toStdString();
-      int error = 0;
-      double d = te_interp(exp.c_str(), &error);
-      auto res = formatNumber(error ? 0.0 : d, column == TableColumnAmmount);
-      ui->table->item(row, column)->setText(res);
-
-      ui->table->item(row, TableColumnUnitValue)->setText(computeUnitValue(row));
-      ui->total->setText(computeTotal());
-    } break;
-    default:
-      break;
-  }
-  ui->table->blockSignals(false);
 }
 
 void BKVale::connect()
@@ -364,30 +297,6 @@ void BKVale::showSettings()
                        QMessageBox::Ok);
     msgBox.exec();
   }
-}
-
-QString BKVale::computeUnitValue(int row) const
-{
-  if (ui->table->item(row, TableColumnAmmount)->text().toDouble() == 0.0)
-    return "0.00";
-  double d = ui->table->item(row, TableColumnSubTotal)->text().toDouble() /
-             ui->table->item(row, TableColumnAmmount)->text().toDouble();
-  return formatNumber(d, false);
-}
-
-QString BKVale::computeSubTotal(int row) const
-{
-  double d = ui->table->item(row, TableColumnAmmount)->text().toDouble() *
-             ui->table->item(row, TableColumnUnitValue)->text().toDouble();
-  return formatNumber(d, false);
-}
-
-QString BKVale::computeTotal() const
-{
-  double d = 0.0;
-  for (int row = 0; row != ui->table->rowCount(); ++row)
-    d += ui->table->item(row, TableColumnSubTotal)->text().toDouble();
-  return formatNumber(d, false);
 }
 
 void BKVale::enableControls()

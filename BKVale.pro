@@ -17,16 +17,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     tinyexpr.c \
     settingsdlg.cpp \
-    frame.cpp
+    bkframe.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
-    frame.h
+    bkframe.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \
-    frame.ui
+    bkframe.ui
 
 RESOURCES += \
     icons.qrc

@@ -17,12 +17,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     tinyexpr.c \
     settingsdlg.cpp \
-    bkframe.cpp
+    bkframe.cpp \
+    printutils.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
-    bkframe.h
+    bkframe.h \
+    printutils.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

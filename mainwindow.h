@@ -9,6 +9,8 @@ namespace Ui {
 class BKVale;
 }
 
+class BKFrame;
+
 class BKVale : public QMainWindow
 {
   Q_OBJECT
@@ -19,6 +21,7 @@ public:
 
 private:
   Ui::BKVale *ui;
+  BKFrame* bkframe;
   QSerialPort m_printer;
   Settings m_settings;
   void setItemEditable(int row, int column, bool editable);

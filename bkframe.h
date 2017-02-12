@@ -2,6 +2,7 @@
 #define BKFRAME_H
 
 #include <QFrame>
+#include <vector>
 
 namespace Ui {
 class BKFrame;
@@ -16,6 +17,8 @@ enum class Column : int
   SubTotal
 };
 
+typedef std::vector<std::vector<QString>> TableContent;
+
 class BKFrame : public QFrame
 {
   Q_OBJECT
@@ -23,6 +26,7 @@ class BKFrame : public QFrame
 public:
   explicit BKFrame(QWidget *parent = 0);
   ~BKFrame();
+  void getContent(TableContent& tableContent, QString& total);
 
 private:
   Ui::BKFrame *ui;
@@ -39,7 +43,6 @@ private slots:
 public slots:
   void addItem();
   void removeItem();
-
 };
 
 #endif // BKFRAME_H

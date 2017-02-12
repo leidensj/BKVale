@@ -8,6 +8,11 @@ BKFrame::BKFrame(QWidget *parent) :
   ui(new Ui::BKFrame)
 {
   ui->setupUi(this);
+
+  QObject::connect(ui->table,
+                   SIGNAL(cellChanged(int, int)),
+                   this,
+                   SLOT(updateTable(int, int)));
 }
 
 BKFrame::~BKFrame()
@@ -118,4 +123,26 @@ void BKFrame::addItem()
 void BKFrame::removeItem()
 {
   ui->table->removeRow(ui->table->currentRow());
+}
+
+void BKFrame::getContent(TableContent& tableContent, QString& total)
+{
+  tableContent.clear();
+  tableContent.reserve(ui->table->rowCount());
+  total.clear();
+  for (int row = 0; row != ui->table->rowCount(); ++row)
+  {
+    std::vector v;
+    v.reserve(ui->table->columnCount());
+    for (int column = 0; column != ui->table->columnCount(); ++column)
+    {
+      switch(column)
+      {
+
+      }
+    }
+      v.emplace_back(ui->table->item(row, column)->text());
+    tableContent.emplace_back(v);
+  }
+  total = ui->total->text();
 }

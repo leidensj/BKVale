@@ -32,6 +32,8 @@ static QString BKFrame::format(double d, bool b3places /*= false*/)
 
 QString BKFrame::computeUnitValue(int row) const
 {
+  Q_ASSERT(ui->table->item(row, Column::Ammount) != nullptr);
+  Q_ASSERT(ui->table->item(row, Column::SubTotal) != nullptr);
   const double ammount = ui->table->item(row, Column::Ammount)->text().toDouble();
   const double subTotal = ui->table->item(row, Column::SubTotal)->text().toDouble();
   const double unitValue = ammount ? subTotal / ammount : 0.0;

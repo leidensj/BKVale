@@ -21,10 +21,9 @@ public:
 
 private:
   Ui::BKVale *ui;
-  BKFrame* bkframe;
+  BKFrame* m_bkframe;
   QSerialPort m_printer;
   Settings m_settings;
-  void setItemEditable(int row, int column, bool editable);
 
 private slots:
   void connect();

@@ -1,5 +1,6 @@
 #include "bkframe.h"
 #include "ui_bkframe.h"
+#include "tinyexpr.h"
 #include <QComboBox>
 #include <QStringList>
 
@@ -20,34 +21,34 @@ BKFrame::~BKFrame()
   delete ui;
 }
 
-static QString BKFrame::format(const QString& str, bool b3places /*= false*/)
+QString BKFrame::format(const QString& str, bool b3places /*= false*/)
 {
   return format(str.toDouble(), b3places);
 }
 
-static QString BKFrame::format(double d, bool b3places /*= false*/)
+QString BKFrame::format(double d, bool b3places /*= false*/)
 {
-  return QString::number(d, 'f', b3 ? 3 : 2);
+  return QString::number(d, 'f', b3places ? 3 : 2);
 }
 
 QString BKFrame::computeUnitValue(int row) const
 {
-  Q_ASSERT(ui->table->item(row, Column::Ammount) != nullptr);
-  Q_ASSERT(ui->table->item(row, Column::SubTotal) != nullptr);
-  const double ammount = ui->table->item(row, Column::Ammount)->text().toDouble();
-  const double subTotal = ui->table->item(row, Column::SubTotal)->text().toDouble();
+  Q_ASSERT(ui->table->item(row, (int)Column::Ammount) != nullptr);
+  Q_ASSERT(ui->table->item(row, (int)Column::SubTotal) != nullptr);
+  const double ammount = ui->table->item(row, (int)Column::Ammount)->text().toDouble();
+  const double subTotal = ui->table->item(row, (int)Column::SubTotal)->text().toDouble();
   const double unitValue = ammount ? subTotal / ammount : 0.0;
   return format(unitValue, false);
 }
 
 QString BKFrame::computeSubTotal(int row) const
 {
-  Q_ASSERT(ui->table->item(row, Column::Ammount) != nullptr);
-  Q_ASSERT(ui->table->item(row, Column::UnitValue) != nullptr);
-  const double ammount = ui->table->item(row, Column::Ammount)->text().toDouble();
-  const double unitValue = ui->table->item(row, Column::UnitValue)->text().toDouble();
+  Q_ASSERT(ui->table->item(row, (int)Column::Ammount) != nullptr);
+  Q_ASSERT(ui->table->item(row, (int)Column::UnitValue) != nullptr);
+  const double ammount = ui->table->item(row, (int)Column::Ammount)->text().toDouble();
+  const double unitValue = ui->table->item(row, (int)Column::UnitValue)->text().toDouble();
   const double subTotal = ammount * unitValue;
-  return format(total, false);
+  return format(subTotal, false);
 }
 
 QString BKFrame::computeTotal() const
@@ -55,8 +56,8 @@ QString BKFrame::computeTotal() const
   double total = 0.0;
   for (int row = 0; row != ui->table->rowCount(); ++row)
   {
-    Q_ASSERT(ui->table->item(row, Column::SubTotal) != nullptr);
-    total += ui->table->item(row, Column::SubTotal)->text().toDouble();
+    Q_ASSERT(ui->table->item(row, (int)Column::SubTotal) != nullptr);
+    total += ui->table->item(row, (int)Column::SubTotal)->text().toDouble();
   }
   return format(total, false);
 }
@@ -76,26 +77,26 @@ void BKFrame::updateTable(int row, int column)
   ui->table->blockSignals(true);
   switch (column)
   {
-    case Column::Ammount:
+    case (int)Column::Ammount:
     {
       QString res(format(evaluate(row, column), true));
       ui->table->item(row, column)->setText(res);
-      ui->table->item(row, Column::SubTotal)->setText(computeSubTotal(row));
-      // analisar ultimo estado
+      ui->table->item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
+      // TODO: analisar ultimo estado
       ui->total->setText(computeTotal());
     } break;
-    case Column::UnitValue:
+    case (int)Column::UnitValue:
     {
       QString res(format(evaluate(row, column), false));
       ui->table->item(row, column)->setText(res);
-      ui->table->item(row, Column::SubTotal)->setText(computeSubTotal(row));
+      ui->table->item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
       ui->total->setText(computeTotal());
     } break;
-    case Column::SubTotal:
+    case (int)Column::SubTotal:
     {
       QString res(format(evaluate(row, column), false));
       ui->table->item(row, column)->setText(res);
-      ui->table->item(row, Column::UnitValue)->setText(computeUnitValue(row, column));
+      ui->table->item(row, (int)Column::UnitValue)->setText(computeUnitValue(row));
       ui->total->setText(computeTotal());
     } break;
     default:
@@ -114,11 +115,11 @@ void BKFrame::addItem()
   unit->setEditable(true);
   const int row = ui->table->rowCount() - 1;
   ui->table->blockSignals(true);
-  ui->table->setCellWidget(row, Column::Unity, unit);
-  ui->table->setItem(row, Column::Ammount, new QTableWidgetItem("0.000"));
-  ui->table->setItem(row, Column::Description, new QTableWidgetItem(""));
-  ui->table->setItem(row, Column::UnitValue, new QTableWidgetItem("0.00"));
-  ui->table->setItem(row, Column::SubTotal, new QTableWidgetItem("0.00"));
+  ui->table->setCellWidget(row, (int)Column::Unity, unit);
+  ui->table->setItem(row, (int)Column::Ammount, new QTableWidgetItem("0.000"));
+  ui->table->setItem(row, (int)Column::Description, new QTableWidgetItem(""));
+  ui->table->setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
+  ui->table->setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
   ui->table->blockSignals(false);
 }
 
@@ -134,16 +135,23 @@ void BKFrame::getContent(TableContent& tableContent, QString& total)
   total.clear();
   for (int row = 0; row != ui->table->rowCount(); ++row)
   {
-    std::vector v;
+    std::vector<QString> v;
     v.reserve(ui->table->columnCount());
     for (int column = 0; column != ui->table->columnCount(); ++column)
     {
       switch(column)
       {
-
+        case (int)Column::Unity:
+        {
+          auto pt = static_cast<QComboBox*>(ui->table->cellWidget(row, column));
+          v.emplace_back(pt->currentText());
+        } break;
+        default:
+        {
+          v.emplace_back(ui->table->item(row, column)->text());
+        } break;
       }
     }
-      v.emplace_back(ui->table->item(row, column)->text());
     tableContent.emplace_back(v);
   }
   total = ui->total->text();

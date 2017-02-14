@@ -2,22 +2,11 @@
 #define BKFRAME_H
 
 #include <QFrame>
-#include <vector>
+#include "cons.h"
 
 namespace Ui {
 class BKFrame;
 }
-
-enum class Column : int
-{
-  Ammount,
-  Unity,
-  Description,
-  UnitValue,
-  SubTotal
-};
-
-typedef std::vector<std::vector<QString>> TableContent;
 
 class BKFrame : public QFrame
 {
@@ -38,7 +27,7 @@ private:
   static QString format(double d, bool b3places = false);
 
 private slots:
-  void updateTable();
+  void updateTable(int row, int column);
 
 public slots:
   void addItem();

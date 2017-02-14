@@ -49,82 +49,78 @@ bool PrintUtils::initPrinter(QSerialPort& printer,
 {
   error.clear();
   QString msg = QString(ESC_INIT) + ESC_PORTUGUESE;
-  return printerPrint(printer, msg, error);
+  return print(printer, msg, error);
 }
 
 
-void PrintUtils::buildHeader(const QDate& date,
-                             QString& header)
+QString PrintUtils::buildHeader(const QDate& date)
 {
-  header.clear();
-  header = QString(ESC_ALIGN_CENTER) +
-           ESC_DOUBLE_FONT +
-           "B.K. RESTAURANTE"+
-           ESC_LF +
-           ESC_DOUBLE_FONT +
-           "E LANCHERIA LTDA" +
-           ESC_LF +
-           ESC_DOUBLE_FONT +
-           "3228-1666" +
-           ESC_LF +
-           ESC_ALIGN_LEFT +
-           ESC_LF +
-           ESC_LF +
-           "Data de impressão: " + ESC_STRESS_ON +
-           QDate::currentDate().toString("dd/MM/yyyy") +
-           ESC_STRESS_OFF +
-           ESC_LF +
-           "Hora de impressão: " +
-           ESC_STRESS_ON +
-           QTime::currentTime().toString("hh:mm:ss") +
-           ESC_LF +
-           ESC_LF +
-           ESC_ALIGN_CENTER +
-           "Data do vale:" +
-           ESC_LF
-           ESC_STRESS_OFF +
-           ESC_DOUBLE_FONT +
-           date.toString("dd/MM/yyyy\n(dddd)") +
-           ESC_LF +
-           ESC_LF;
+  return QString(ESC_ALIGN_CENTER) +
+      ESC_DOUBLE_FONT +
+      "B.K. RESTAURANTE"+
+      ESC_LF +
+      ESC_DOUBLE_FONT +
+      "E LANCHERIA LTDA" +
+      ESC_LF +
+      ESC_DOUBLE_FONT +
+      "3228-1666" +
+      ESC_LF +
+      ESC_ALIGN_LEFT +
+      ESC_LF +
+      ESC_LF +
+      "Data de impressão: " + ESC_STRESS_ON +
+      QDate::currentDate().toString("dd/MM/yyyy") +
+      ESC_STRESS_OFF +
+      ESC_LF +
+      "Hora de impressão: " +
+      ESC_STRESS_ON +
+      QTime::currentTime().toString("hh:mm:ss") +
+      ESC_LF +
+      ESC_LF +
+      ESC_ALIGN_CENTER +
+      "Data do vale:" +
+      ESC_LF
+      ESC_STRESS_OFF +
+      ESC_DOUBLE_FONT +
+      date.toString("dd/MM/yyyy\n(dddd)") +
+      ESC_LF +
+      ESC_LF;
 }
 
 
-QString PrintUtils::buildFooter(const QString& total,
-                                QString& footer)
+QString PrintUtils::buildFooter(const QString& total)
 {
-  footer = QString(ESC_LF) +
-           ESC_ALIGN_CENTER +
-           ESC_DOUBLE_FONT +
-           "TOTAL R$" +
-           total +
-           ESC_LF +
-           ESC_LF +
-           ESC_FULL_CUT;
+  return QString(ESC_LF) +
+      ESC_ALIGN_CENTER +
+      ESC_DOUBLE_FONT +
+      "TOTAL R$" +
+      total +
+      ESC_LF +
+      ESC_LF +
+      ESC_FULL_CUT;
 }
 
-void PrintUtils::buildBody(const std::vector<std::vector<QString>>& tableContent,
-                           QString& body)
+QString PrintUtils::buildBody(const TableContent& tableContent)
 {
-  QString str(ESC_ALIGN_LEFT);
-  for (int row = 0; row != table.rowCount(); ++row)
+  QString body = tableContent.empty() ? "" : ESC_ALIGN_LEFT;
+  for (size_t i = 0; i != tableContent.size(); ++i)
   {
-    QComboBox* pcb = static_cast<QComboBox*>(table.cellWidget(row, TableColumnUnity));
-    QString subTotal(formatNumber(table.item(row, TableColumnAmmount)->text(), true) +
-                     pcb->currentText() + " x R$" +
-                     formatNumber(table.item(row, TableColumnUnitValue)->text(), false));
-
+    QString item;
     {
-      const QString subTotalValue("R$"+formatNumber(table.item(row, TableColumnSubTotal)->text(), false));
-      const int n = TABLE_WIDTH - (subTotal.length() + subTotalValue.length());
-      for (int i = 0; i != n; ++i)
-        subTotal += " ";
-      subTotal += ESC_STRESS_ON + subTotalValue + ESC_STRESS_OFF;
+      QString itemPt1 = tableContent.at(i).at((int)Column::Ammount) +
+                        tableContent.at(i).at((int)Column::Unity) +
+                        " x R$" +
+                        tableContent.at(i).at((int)Column::UnitValue);
+      QString itemPt2 = "R$" +
+                        tableContent.at(i).at((int)Column::SubTotal);
+      const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
+      for (int j = 0; j != n; ++j)
+        itemPt1 += " ";
+      item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
     }
-
-    str += table.item(row, TableColumnDescription)->text() + ESC_LF;
-    str += subTotal + ESC_LF;
-    str += QString("────────────────────────────────────────────────") + ESC_LF;
+    body += tableContent.at(i).at((int)Column::Description) + ESC_LF +
+            item + ESC_LF +
+            "────────────────────────────────────────────────" + ESC_LF;
   }
-  return str;
+  return body;
 }

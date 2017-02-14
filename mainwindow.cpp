@@ -1,29 +1,28 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "tinyexpr.h"
 #include "bkframe.h"
+#include "printutils.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
-#include <QDateTime>
 
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::BKVale),
-  bkframe(nullptr)
+  m_bkframe(nullptr)
 {
   ui->setupUi(this);
-  bkframe = new BKFrame();
-  ui->frame->layout()->addWidget(bkframe);
+  m_bkframe = new BKFrame();
+  ui->frame->layout()->addWidget(m_bkframe);
 
   QObject::connect(ui->actionAdd,
                    SIGNAL(triggered(bool)),
-                   bkframe,
+                   m_bkframe,
                    SLOT(addItem()));
 
   QObject::connect(ui->actionRemove,
                    SIGNAL(triggered(bool)),
-                   bkframe,
+                   m_bkframe,
                    SLOT(removeItem()));
 
   QObject::connect(ui->actionConnect,
@@ -55,19 +54,7 @@ BKVale::~BKVale()
 {
   delete ui;
   ui = nullptr;
-  bkframe = nullptr;
-}
-
-void BKVale::setItemEditable(int row, int column, bool editable)
-{
-  auto pt = ui->table->item(row, column);
-  if (pt != nullptr)
-  {
-    if (editable)
-      pt->setFlags(pt->flags() & Qt::ItemIsEditable);
-    else
-      pt->setFlags(pt->flags() ^ Qt::ItemIsEditable);
-  }
+  m_bkframe = nullptr;
 }
 
 void BKVale::connect()
@@ -103,7 +90,7 @@ void BKVale::connect()
     else
     {
       QString error;
-      if (!printerInit(m_printer, error))
+      if (!PrintUtils::initPrinter(m_printer, error))
       {
         QMessageBox msgBox(QMessageBox::Warning,
                            tr("Aviso") + QString::number(m_printer.error()),
@@ -134,11 +121,16 @@ void BKVale::disconnect()
 
 void BKVale::print()
 {
-  QString str = buildTop(ui->date->date());
-  str += buildTable(*ui->table);
-  str += buildBottom(computeTotal());
+  TableContent tableContent;
+  QString total;
+  m_bkframe->getContent(tableContent, total);
+
+  QString str = PrintUtils::buildHeader(ui->date->date());
+  str += PrintUtils::buildBody(tableContent);
+  str += PrintUtils::buildFooter(total);
+
   QString error;
-  if (!printerPrint(m_printer, str, error))
+  if (!PrintUtils::print(m_printer, str, error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        tr("Erro"),
@@ -174,5 +166,4 @@ void BKVale::enableControls()
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
-  ui->actionRemove->setEnabled(ui->table->currentRow() != -1);
 }

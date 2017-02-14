@@ -24,7 +24,8 @@ HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
     bkframe.h \
-    printutils.h
+    printutils.h \
+    cons.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

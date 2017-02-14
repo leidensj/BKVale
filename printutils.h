@@ -2,9 +2,8 @@
 #define PRINTUTILS_H
 
 #include <QSerialPort>
-#include <QString>
 #include <QDate>
-#include <vector>
+#include <cons.h>
 
 namespace PrintUtils
 {
@@ -15,13 +14,10 @@ namespace PrintUtils
   bool initPrinter(QSerialPort& printer,
                    QString& error);
 
-  void buildHeader(const QDate& date,
-                   QString& header);
+  QString buildHeader(const QDate& date);
 
-  void buildBody(const std::vector<std::vector<QString>>& tableContent,
-                 QString& body);
+  QString buildBody(const TableContent& tableContent);
 
-  void buildFooter(const QString& total,
-                   QString& footer);
+  QString buildFooter(const QString& total);
 }
 #endif // PRINTUTILS_H

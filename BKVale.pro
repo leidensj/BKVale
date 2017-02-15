@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport
+QT       += core gui serialport sql
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -18,14 +18,16 @@ SOURCES += main.cpp\
     tinyexpr.c \
     settingsdlg.cpp \
     bkframe.cpp \
-    printutils.cpp
+    printutils.cpp \
+    databaseutils.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
     bkframe.h \
     printutils.h \
-    cons.h
+    cons.h \
+    databaseutils.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

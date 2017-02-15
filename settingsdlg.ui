@@ -32,13 +32,17 @@
      <property name="tabsClosable">
       <bool>false</bool>
      </property>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="general">
+      <attribute name="icon">
+       <iconset resource="icons.qrc">
+        <normaloff>:/icons/res/general.png</normaloff>:/icons/res/general.png</iconset>
+      </attribute>
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>Geral</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QListView" name="listView"/>
+        <layout class="QFormLayout" name="formLayout_2"/>
        </item>
       </layout>
      </widget>

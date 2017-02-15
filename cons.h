@@ -15,4 +15,12 @@ enum class Column : int
 
 typedef std::vector<std::vector<QString>> TableContent;
 
+struct PromissoryNote
+{
+  int number;
+  QString supplier;
+  TableContent tableContent;
+  QString total;
+};
+
 #endif // CONS_H

@@ -114,7 +114,7 @@ QString PrintUtils::buildBody(const TableContent& tableContent)
       QString itemPt2 = "R$" +
                         tableContent.at(i).at((int)Column::SubTotal);
       const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
-      for (int j = 0; j != n; ++j)
+      for (int j = 0; j < n; ++j)
         itemPt1 += " ";
       item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
     }

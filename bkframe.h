@@ -16,6 +16,7 @@ public:
   explicit BKFrame(QWidget *parent = 0);
   ~BKFrame();
   void getContent(TableContent& tableContent, QString& total);
+  bool isValidSelection();
 
 private:
   Ui::BKFrame *ui;
@@ -28,10 +29,15 @@ private:
 
 private slots:
   void updateTable(int row, int column);
+  void tableSelectionChanged();
 
 public slots:
   void addItem();
   void removeItem();
+
+signals:
+  void tableSelectionChangedSignal();
+
 };
 
 #endif // BKFRAME_H

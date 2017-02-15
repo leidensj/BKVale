@@ -45,6 +45,11 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSettings()));
 
+  QObject::connect(m_bkframe,
+                   SIGNAL(tableSelectionChangedSignal()),
+                   this,
+                   SLOT(enableControls()));
+
   ui->provider->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
   ui->date->setDate(QDate::currentDate());
   enableControls();
@@ -160,10 +165,12 @@ void BKVale::showSettings()
 
 void BKVale::enableControls()
 {
+  Q_ASSERT(m_bkframe != nullptr);
   const bool bIsOpen = m_printer.isOpen();
   ui->actionConnect->setEnabled(!bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
+  ui->actionRemove->setEnabled(m_bkframe->isValidSelection());
 }

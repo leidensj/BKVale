@@ -14,6 +14,11 @@ BKFrame::BKFrame(QWidget *parent) :
                    SIGNAL(cellChanged(int, int)),
                    this,
                    SLOT(updateTable(int, int)));
+
+  QObject::connect(ui->table,
+                   SIGNAL(itemSelectionChanged()),
+                   this,
+                   SLOT(tableSelectionChanged()));
 }
 
 BKFrame::~BKFrame()
@@ -66,10 +71,13 @@ double BKFrame::evaluate(int row, int column)
 {
   Q_ASSERT(ui->table->item(row, column) != nullptr);
 
-  auto exp = ui->table->item(row, column)->text().toStdString();
+  auto pt = ui->table->item(row, column);
+  auto exp = pt->text().toStdString();
   int error = 0;
   double res = te_interp(exp.c_str(), &error);
-  return error ? 0.0 : res;
+  if (!error)
+    pt->setData(Qt::UserRole, res);
+  return pt->data(Qt::UserRole).toDouble();
 }
 
 void BKFrame::updateTable(int row, int column)
@@ -155,4 +163,14 @@ void BKFrame::getContent(TableContent& tableContent, QString& total)
     tableContent.emplace_back(v);
   }
   total = ui->total->text();
+}
+
+void BKFrame::tableSelectionChanged()
+{
+  emit tableSelectionChangedSignal();
+}
+
+bool BKFrame::isValidSelection()
+{
+  return ui->table->currentRow() >= 0;
 }

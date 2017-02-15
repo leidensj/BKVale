@@ -13,5 +13,7 @@
         <file>res/serial.png</file>
         <file>res/about.png</file>
         <file>res/remove.png</file>
+        <file>res/general.png</file>
+        <file>res/baita.png</file>
     </qresource>
 </RCC>

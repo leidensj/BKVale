@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     settingsdlg.cpp \
     bkframe.cpp \
     printutils.cpp \
-    databaseutils.cpp
+    databaseutils.cpp \
+    cons.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \

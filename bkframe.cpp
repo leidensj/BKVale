@@ -75,7 +75,7 @@ double BKFrame::evaluate(int row, int column)
   auto exp = pt->text().toStdString();
   int error = 0;
   double res = te_interp(exp.c_str(), &error);
-  if (!error)
+  if (!error && res >= 0)
     pt->setData(Qt::UserRole, res);
   return pt->data(Qt::UserRole).toDouble();
 }
@@ -90,7 +90,6 @@ void BKFrame::updateTable(int row, int column)
       QString res(format(evaluate(row, column), true));
       ui->table->item(row, column)->setText(res);
       ui->table->item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
-      // TODO: analisar ultimo estado
       ui->total->setText(computeTotal());
     } break;
     case (int)Column::UnitValue:
@@ -134,6 +133,7 @@ void BKFrame::addItem()
 void BKFrame::removeItem()
 {
   ui->table->removeRow(ui->table->currentRow());
+  ui->total->setText(computeTotal());
 }
 
 void BKFrame::getContent(TableContent& tableContent, QString& total)

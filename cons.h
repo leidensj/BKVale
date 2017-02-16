@@ -4,6 +4,7 @@
 #include <vector>
 #include <QString>
 
+#define NUMBER_OF_COLUMNS 5
 enum class Column : int
 {
   Ammount,
@@ -17,10 +18,18 @@ typedef std::vector<std::vector<QString>> TableContent;
 
 struct PromissoryNote
 {
-  int number;
-  QString supplier;
-  TableContent tableContent;
-  QString total;
+  int m_id;
+  int m_number;
+  QString m_supplier;
+  TableContent m_tableContent;
+  QString m_total;
+
+  static const QChar st_separator;
+
+  PromissoryNote();
+  void clear();
+  QString serializeItems() const;
+  void deserializeItems(const QString& str);
 };
 
 #endif // CONS_H

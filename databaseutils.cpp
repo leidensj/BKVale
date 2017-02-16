@@ -1,6 +1,7 @@
 #include "databaseutils.h"
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QSqlRecord>
 #include <QVariant>
 
 Database::Database()
@@ -58,35 +59,47 @@ bool Database::createTables(QString& error)
   return bSuccess;
 }
 
-bool Database::insertPromissoryNote(PromissoryNote note,
-                                    QString& error)
+bool Database::insert(PromissoryNote note,
+                      QString& error)
 {
   error.clear();
 
   if (!isOpen(error))
     return false;
 
-  QString serializedTable;
-  for (size_t i = 0; i != note.tableContent.size(); ++i)
-  {
-    for (size_t j = 0; j != note.tableContent.size(); ++j)
-    {
-      serializedTable += note.tableContent.at(i).at(j);
-      serializedTable += ";";
-    }
-  }
-
   QSqlQuery query;
   query.prepare("INSERT INTO PROMISSORYNOTES "
                 "(NUMBER, SUPPLIER, ITEMS, TOTAL) VALUES "
                 "(:number), (:supplier), (:items), (:total);");
-  query.bindValue(":number", note.number);
-  query.bindValue(":supplier", note.supplier);
-  query.bindValue(":items", serializedTable);
-  query.bindValue(":total", note.total);
+  query.bindValue(":number", note.m_number);
+  query.bindValue(":supplier", note.m_supplier);
+  query.bindValue(":items", note.serializeItems());
+  query.bindValue(":total", note.m_total);
 
   bool bSuccess = query.exec();
   if (!bSuccess)
     error = query.lastError().text();
   return bSuccess;
+}
+
+bool Database::select(int id,
+                      PromissoryNote& note,
+                      QString& error)
+{
+  error.clear();
+  note.clear();
+  QSqlQuery query;
+  query.prepare("SELECT NUMBER, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id)");
+  query.bindValue(":id", id);
+
+  if (query.exec())
+  {
+     if (query.next())
+     {
+        note.m_number = query.value(query.record().indexOf("NUMBER")).toInt();
+        note.m_supplier = query.value(query.record().indexOf("SUPPLIER")).toString();
+        note.deserializeItems(query.value(query.record().indexOf("ITEMS")).toString());
+        note.m_supplier = query.value(query.record().indexOf("TOTAL")).toString();
+     }
+  }
 }

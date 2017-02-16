@@ -19,7 +19,11 @@ public:
 
   bool createTables(QString& error);
 
-  bool insertPromissoryNote(PromissoryNote note,
-                            QString& error);
+  bool insert(PromissoryNote note,
+              QString& error);
+
+  bool select(int id,
+              PromissoryNote& note,
+              QString& error);
 };
 #endif // DATABASEUTILS_H

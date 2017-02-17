@@ -15,8 +15,8 @@ class BKFrame : public QFrame
 public:
   explicit BKFrame(QWidget *parent = 0);
   ~BKFrame();
-  void getContent(TableContent& tableContent, QString& total);
-  bool isValidSelection();
+  void getContent(TableContent& tableContent, QString& total) const;
+  bool isValidSelection() const;
 
 private:
   Ui::BKFrame *ui;

@@ -45,6 +45,11 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSettings()));
 
+  QObject::connect(ui->actionInfo,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(showInfo()));
+
   QObject::connect(m_bkframe,
                    SIGNAL(tableSelectionChangedSignal()),
                    this,
@@ -124,15 +129,22 @@ void BKVale::disconnect()
   enableControls();
 }
 
+PromissoryNote BKVale::buildPromissoryNote()
+{
+  PromissoryNote note;
+  m_bkframe->getContent(note.m_tableContent, note.m_total);
+  note.m_number = m_db.nextNumber();
+  note.m_date = ui->date->date().toJulianDay();
+  note.m_supplier = ui->provider->currentText();
+  return note;
+}
+
 void BKVale::print()
 {
-  TableContent tableContent;
-  QString total;
-  m_bkframe->getContent(tableContent, total);
-
+  PromissoryNote note = buildPromissoryNote();
   QString str = PrintUtils::buildHeader(ui->date->date());
-  str += PrintUtils::buildBody(tableContent);
-  str += PrintUtils::buildFooter(total);
+  str += PrintUtils::buildBody(note.m_tableContent);
+  str += PrintUtils::buildFooter(note.m_total);
 
   QString error;
   if (!PrintUtils::print(m_printer, str, error))
@@ -142,6 +154,17 @@ void BKVale::print()
                        error,
                        QMessageBox::Ok);
     msgBox.exec();
+  }
+  else
+  {
+    if (!m_db.insert(note, error))
+    {
+      QMessageBox msgBox(QMessageBox::Warning,
+                         tr("Erro ao salvar vale"),
+                         error,
+                         QMessageBox::Ok);
+      msgBox.exec();
+    }
   }
 }
 
@@ -173,4 +196,20 @@ void BKVale::enableControls()
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
   ui->actionRemove->setEnabled(m_bkframe->isValidSelection());
+}
+
+void BKVale::showInfo()
+{
+  QString error;
+  bool bSuccess = m_db.open(error);
+  if (bSuccess)
+    bSuccess = m_db.createTable(error);
+  if (!bSuccess)
+  {
+    QMessageBox msgBox(QMessageBox::Critical,
+                       tr("Erro"),
+                       error,
+                       QMessageBox::Ok);
+    msgBox.exec();
+  }
 }

@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QSerialPort>
 #include "settingsdlg.h"
+#include "databaseutils.h"
+#include "cons.h"
 
 namespace Ui {
 class BKVale;
@@ -24,6 +26,8 @@ private:
   BKFrame* m_bkframe;
   QSerialPort m_printer;
   Settings m_settings;
+  Database m_db;
+  PromissoryNote buildPromissoryNote();
 
 private slots:
   void connect();
@@ -31,6 +35,7 @@ private slots:
   void print();
   void showSettings();
   void enableControls();
+  void showInfo();
 };
 
 #endif // MAINWINDOW_H

@@ -14,16 +14,17 @@ public:
 
   bool isOpen(QString& error);
 
-  bool open(const QString& path,
-            QString& error);
+  bool open(QString& error);
 
-  bool createTables(QString& error);
+  bool createTable(QString& error);
 
-  bool insert(PromissoryNote note,
+  bool insert(const PromissoryNote note,
               QString& error);
 
   bool select(int id,
               PromissoryNote& note,
               QString& error);
+
+  int nextNumber(int offset = 1000);
 };
 #endif // DATABASEUTILS_H

@@ -10,7 +10,6 @@ PromissoryNote::PromissoryNote()
 
 void PromissoryNote::clear()
 {
-  m_id = -1;
   m_number = 0;
   m_supplier.clear();
   m_tableContent.clear();

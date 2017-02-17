@@ -3,6 +3,9 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QDir>
+
+#define DATABASE_NAME "/setup.db"
 
 Database::Database()
   : m_db(QSqlDatabase::addDatabase("QSQLITE"))
@@ -21,12 +24,12 @@ bool Database::isOpen(QString& error)
   return true;
 }
 
-bool Database::open(const QString& path,
-                    QString& error)
+bool Database::open(QString& error)
 {
   error.clear();
   if (m_db.isOpen())
     m_db.close();
+  QString path(QDir::currentPath() + DATABASE_NAME);
   m_db.setDatabaseName(path);
   bool bSuccess = m_db.open();
   if (!bSuccess)
@@ -34,7 +37,7 @@ bool Database::open(const QString& path,
   return bSuccess;
 }
 
-bool Database::createTables(QString& error)
+bool Database::createTable(QString& error)
 {
   error.clear();
 
@@ -42,13 +45,10 @@ bool Database::createTables(QString& error)
     return false;
 
   QSqlQuery query;
-  query.prepare("CREATE TABLE IF NOT EXISTS SETTINGS ("
-                "PROMISSORYNOTENUMBER INT NOT NULL,"
-                "SERIALPORT TEXT);"
-
-                "CREATE TABLE IF NOT EXISTS PROMISSORYNOTES ("
-                "ID INT PRIMARY KEY NOT NULL,"
+  query.prepare("CREATE TABLE IF NOT EXISTS PROMISSORYNOTES ("
+                "ID PRIMARY KEY AUTOINCREMENT "
                 "NUMBER INT NOT NULL,"
+                "DATE INT NOT NULL,"
                 "SUPPLIER TEXT NOT NULL,"
                 "ITEMS TEXT,"
                 "TOTAL TEXT);");
@@ -59,7 +59,7 @@ bool Database::createTables(QString& error)
   return bSuccess;
 }
 
-bool Database::insert(PromissoryNote note,
+bool Database::insert(const PromissoryNote note,
                       QString& error)
 {
   error.clear();
@@ -69,9 +69,10 @@ bool Database::insert(PromissoryNote note,
 
   QSqlQuery query;
   query.prepare("INSERT INTO PROMISSORYNOTES "
-                "(NUMBER, SUPPLIER, ITEMS, TOTAL) VALUES "
-                "(:number), (:supplier), (:items), (:total);");
+                "(NUMBER, DATE, SUPPLIER, ITEMS, TOTAL) VALUES "
+                "(:number), (:date), (:supplier), (:items), (:total);");
   query.bindValue(":number", note.m_number);
+  query.bindValue(":number", note.m_date);
   query.bindValue(":supplier", note.m_supplier);
   query.bindValue(":items", note.serializeItems());
   query.bindValue(":total", note.m_total);
@@ -88,8 +89,13 @@ bool Database::select(int id,
 {
   error.clear();
   note.clear();
+
+  if (!isOpen(error))
+    return false;
+
   QSqlQuery query;
-  query.prepare("SELECT NUMBER, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id)");
+  query.prepare("SELECT NUMBER, DATE, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id);"
+                "");
   query.bindValue(":id", id);
 
   if (query.exec())
@@ -97,9 +103,28 @@ bool Database::select(int id,
      if (query.next())
      {
         note.m_number = query.value(query.record().indexOf("NUMBER")).toInt();
+        note.m_date = query.value(query.record().indexOf("DATE")).toLongLong();
         note.m_supplier = query.value(query.record().indexOf("SUPPLIER")).toString();
         note.deserializeItems(query.value(query.record().indexOf("ITEMS")).toString());
         note.m_supplier = query.value(query.record().indexOf("TOTAL")).toString();
      }
   }
+}
+
+int Database::nextNumber(int offset /*= 1000*/)
+{
+  int nextNumber = 0;
+
+  QString error;
+  if (isOpen(error))
+  {
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM PROMISSORYNOTES;");
+
+    if (query.exec())
+       if (query.next())
+         nextNumber = query.value(0).toInt();
+  }
+
+  return nextNumber + offset;
 }

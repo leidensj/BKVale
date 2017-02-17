@@ -136,7 +136,7 @@ void BKFrame::removeItem()
   ui->total->setText(computeTotal());
 }
 
-void BKFrame::getContent(TableContent& tableContent, QString& total)
+void BKFrame::getContent(TableContent& tableContent, QString& total) const
 {
   tableContent.clear();
   tableContent.reserve(ui->table->rowCount());
@@ -170,7 +170,7 @@ void BKFrame::tableSelectionChanged()
   emit tableSelectionChangedSignal();
 }
 
-bool BKFrame::isValidSelection()
+bool BKFrame::isValidSelection() const
 {
   return ui->table->currentRow() >= 0;
 }

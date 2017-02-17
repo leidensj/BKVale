@@ -161,16 +161,22 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="readOnly">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="correctionMode">
              <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
             </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>false</bool>
+            </property>
             <property name="minimum">
-             <number>1000</number>
+             <number>0</number>
             </property>
             <property name="maximum">
              <number>999999999</number>
+            </property>
+            <property name="displayIntegerBase">
+             <number>10</number>
             </property>
            </widget>
           </item>
@@ -328,7 +334,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="separator"/>
    <addaction name="actionAdd"/>
@@ -339,6 +344,7 @@
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
+   <addaction name="actionInfo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAdd">
@@ -386,18 +392,6 @@
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="actionNew">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/file.png</normaloff>:/icons/res/file.png</iconset>
-   </property>
-   <property name="text">
-    <string>Novo</string>
-   </property>
-   <property name="toolTip">
-    <string>Novo vale</string>
-   </property>
-  </action>
   <action name="actionOpen">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -432,6 +426,18 @@
    </property>
    <property name="shortcut">
     <string>Alt+-</string>
+   </property>
+  </action>
+  <action name="actionInfo">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/about.png</normaloff>:/icons/res/about.png</iconset>
+   </property>
+   <property name="text">
+    <string>Informações</string>
+   </property>
+   <property name="toolTip">
+    <string>Informações</string>
    </property>
   </action>
  </widget>

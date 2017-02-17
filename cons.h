@@ -18,8 +18,8 @@ typedef std::vector<std::vector<QString>> TableContent;
 
 struct PromissoryNote
 {
-  int m_id;
   int m_number;
+  qint64 m_date;
   QString m_supplier;
   TableContent m_tableContent;
   QString m_total;

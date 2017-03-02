@@ -100,25 +100,26 @@ QString PrintUtils::buildFooter(const QString& total)
       ESC_FULL_CUT;
 }
 
-QString PrintUtils::buildBody(const TableContent& tableContent)
+QString PrintUtils::buildBody(const PromissoryNoteWidget& note)
 {
-  QString body = tableContent.empty() ? "" : ESC_ALIGN_LEFT;
-  for (size_t i = 0; i != tableContent.size(); ++i)
+  const int count = note.getTableCount();
+  QString body = count != 0 ? "" : ESC_ALIGN_LEFT;
+  for (int i = 0; i != count; ++i)
   {
     QString item;
     {
-      QString itemPt1 = tableContent.at(i).at((int)Column::Ammount) +
-                        tableContent.at(i).at((int)Column::Unity) +
+      QString itemPt1 = note.getTableText(i, Column::Ammount) +
+                        note.getTableText(i, Column::Unity) +
                         " x R$" +
-                        tableContent.at(i).at((int)Column::UnitValue);
+                        note.getTableText(i, Column::UnitValue);
       QString itemPt2 = "R$" +
-                        tableContent.at(i).at((int)Column::SubTotal);
+                        note.getTableText(i, Column::SubTotal);
       const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
       for (int j = 0; j < n; ++j)
         itemPt1 += " ";
       item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
     }
-    body += tableContent.at(i).at((int)Column::Description) + ESC_LF +
+    body += note.getTableText(i, Column::Description) + ESC_LF +
             item + ESC_LF +
             "────────────────────────────────────────────────" + ESC_LF;
   }

@@ -2,7 +2,7 @@
 #define DATABASEUTILS_H
 
 #include <QSqlDatabase>
-#include <cons.h>
+#include <promissorynotewidget.h>
 
 class Database
 {
@@ -18,11 +18,11 @@ public:
 
   bool createTable(QString& error);
 
-  bool insert(const PromissoryNote note,
+  bool insert(const PromissoryNoteWidget& note,
               QString& error);
 
   bool select(int id,
-              PromissoryNote& note,
+              PromissoryNoteWidget& note,
               QString& error);
 
   int nextNumber(int offset = 1000);

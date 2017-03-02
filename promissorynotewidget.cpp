@@ -1,12 +1,14 @@
-#include "bkframe.h"
+#include "promissorynotewidget.h"
 #include "ui_bkframe.h"
 #include "tinyexpr.h"
 #include <QComboBox>
 #include <QStringList>
 
-BKFrame::BKFrame(QWidget *parent) :
+const QChar PromissoryNoteWidget::st_separator = ';';
+
+PromissoryNoteWidget::PromissoryNoteWidget(QWidget *parent) :
   QFrame(parent),
-  ui(new Ui::BKFrame)
+  ui(new Ui::PromissoryNoteWidget)
 {
   ui->setupUi(this);
 
@@ -19,24 +21,27 @@ BKFrame::BKFrame(QWidget *parent) :
                    SIGNAL(itemSelectionChanged()),
                    this,
                    SLOT(tableSelectionChanged()));
+
+  ui->supplier->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
+  ui->date->setDate(QDate::currentDate());
 }
 
-BKFrame::~BKFrame()
+PromissoryNoteWidget::~PromissoryNoteWidget()
 {
   delete ui;
 }
 
-QString BKFrame::format(const QString& str, bool b3places /*= false*/)
+QString PromissoryNoteWidget::format(const QString& str, bool b3places /*= false*/)
 {
   return format(str.toDouble(), b3places);
 }
 
-QString BKFrame::format(double d, bool b3places /*= false*/)
+QString PromissoryNoteWidget::format(double d, bool b3places /*= false*/)
 {
   return QString::number(d, 'f', b3places ? 3 : 2);
 }
 
-QString BKFrame::computeUnitValue(int row) const
+QString PromissoryNoteWidget::computeUnitValue(int row) const
 {
   Q_ASSERT(ui->table->item(row, (int)Column::Ammount) != nullptr);
   Q_ASSERT(ui->table->item(row, (int)Column::SubTotal) != nullptr);
@@ -46,7 +51,7 @@ QString BKFrame::computeUnitValue(int row) const
   return format(unitValue, false);
 }
 
-QString BKFrame::computeSubTotal(int row) const
+QString PromissoryNoteWidget::computeSubTotal(int row) const
 {
   Q_ASSERT(ui->table->item(row, (int)Column::Ammount) != nullptr);
   Q_ASSERT(ui->table->item(row, (int)Column::UnitValue) != nullptr);
@@ -56,7 +61,7 @@ QString BKFrame::computeSubTotal(int row) const
   return format(subTotal, false);
 }
 
-QString BKFrame::computeTotal() const
+QString PromissoryNoteWidget::computeTotal() const
 {
   double total = 0.0;
   for (int row = 0; row != ui->table->rowCount(); ++row)
@@ -67,7 +72,7 @@ QString BKFrame::computeTotal() const
   return format(total, false);
 }
 
-double BKFrame::evaluate(int row, int column)
+double PromissoryNoteWidget::evaluate(int row, int column)
 {
   Q_ASSERT(ui->table->item(row, column) != nullptr);
 
@@ -80,7 +85,7 @@ double BKFrame::evaluate(int row, int column)
   return pt->data(Qt::UserRole).toDouble();
 }
 
-void BKFrame::updateTable(int row, int column)
+void PromissoryNoteWidget::updateTable(int row, int column)
 {
   ui->table->blockSignals(true);
   switch (column)
@@ -112,7 +117,7 @@ void BKFrame::updateTable(int row, int column)
   ui->table->blockSignals(false);
 }
 
-void BKFrame::addItem()
+void PromissoryNoteWidget::addItem()
 {
   ui->table->insertRow(ui->table->rowCount());
   QComboBox* unit = new QComboBox();
@@ -130,13 +135,13 @@ void BKFrame::addItem()
   ui->table->blockSignals(false);
 }
 
-void BKFrame::removeItem()
+void PromissoryNoteWidget::removeItem()
 {
   ui->table->removeRow(ui->table->currentRow());
   ui->total->setText(computeTotal());
 }
 
-void BKFrame::getContent(TableContent& tableContent, QString& total) const
+void PromissoryNoteWidget::getContent(TableContent& tableContent) const
 {
   tableContent.clear();
   tableContent.reserve(ui->table->rowCount());
@@ -162,15 +167,95 @@ void BKFrame::getContent(TableContent& tableContent, QString& total) const
     }
     tableContent.emplace_back(v);
   }
-  total = ui->total->text();
 }
 
-void BKFrame::tableSelectionChanged()
+void PromissoryNoteWidget::tableSelectionChanged()
 {
   emit tableSelectionChangedSignal();
 }
 
-bool BKFrame::isValidSelection() const
+bool PromissoryNoteWidget::isValidSelection() const
 {
   return ui->table->currentRow() >= 0;
+}
+
+QString PromissoryNoteWidget::serializeTable() const
+{
+  QString items;
+  for (int row = 0; row != ui->table->rowCount(); ++row)
+  {
+    for (int column = 0; column != ui->table->columnCount(); ++column)
+    {
+      items += getTableText(row, column);
+      items += st_separator;
+    }
+  }
+  return items;
+}
+
+void PromissoryNoteWidget::deserializeTable(const QString& str)
+{
+
+}
+
+void PromissoryNoteWidget::setSupplier(const QString& supplier)
+{
+  ui->supplier->setCurrentText(supplier);
+}
+
+QString PromissoryNoteWidget::getSupplier() const
+{
+  return ui->supplier->currentText();
+}
+
+void PromissoryNoteWidget::setNumber(int number)
+{
+  ui->number->setValue(number);
+}
+
+int PromissoryNoteWidget::getNumber() const
+{
+  return ui->number->value();
+}
+
+void PromissoryNoteWidget::setDate(const QDate& date)
+{
+  ui->date->setDate(date);
+}
+
+QDate PromissoryNoteWidget::getDate() const
+{
+  return ui->date->date();
+}
+
+QString PromissoryNoteWidget::getTableText(int row, Column column) const
+{
+  QString text;
+  if (row >= 0 && row < ui->table->rowCount())
+  {
+    switch(column)
+    {
+      case (int)Column::Unity:
+      {
+        auto pt = static_cast<QComboBox*>(ui->table->cellWidget(row, (int)column));
+        if (pt != nullptr)
+          text = pt->currentText();
+      } break;
+      default:
+      {
+        items += ui->table->item(row, (int)column)->text();
+      } break;
+    }
+  }
+  return text;
+}
+
+int PromissoryNoteWidget::getTableCount() const
+{
+  return ui->table->rowCount();
+}
+
+QString PromissoryNoteWidget::getTotal() const
+{
+  return ui->total->text();
 }

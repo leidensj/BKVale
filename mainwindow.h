@@ -5,13 +5,13 @@
 #include <QSerialPort>
 #include "settingsdlg.h"
 #include "databaseutils.h"
-#include "cons.h"
+#include "promissorynotewidget.h"
 
 namespace Ui {
 class BKVale;
 }
 
-class BKFrame;
+class PromissoryNoteWidget;
 
 class BKVale : public QMainWindow
 {
@@ -23,11 +23,10 @@ public:
 
 private:
   Ui::BKVale *ui;
-  BKFrame* m_bkframe;
+  PromissoryNoteWidget* m_promissoryNoteWidget;
   QSerialPort m_printer;
   Settings m_settings;
   Database m_db;
-  PromissoryNote buildPromissoryNote();
 
 private slots:
   void connect();

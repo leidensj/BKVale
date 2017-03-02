@@ -17,18 +17,18 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     tinyexpr.c \
     settingsdlg.cpp \
-    bkframe.cpp \
     printutils.cpp \
     databaseutils.cpp \
-    cons.cpp
+    promissorynotewidget.cpp \
+    common.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
-    bkframe.h \
     printutils.h \
-    cons.h \
-    databaseutils.h
+    databaseutils.h \
+    promissorynotewidget.h \
+    common.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

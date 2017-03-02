@@ -3,7 +3,7 @@
 
 #include <QSerialPort>
 #include <QDate>
-#include <cons.h>
+#include <promissorynotewidget.h>
 
 namespace PrintUtils
 {
@@ -16,7 +16,7 @@ namespace PrintUtils
 
   QString buildHeader(const QDate& date);
 
-  QString buildBody(const TableContent& tableContent);
+  QString buildBody(const PromissoryNoteWidget& note);
 
   QString buildFooter(const QString& total);
 }

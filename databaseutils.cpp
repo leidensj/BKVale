@@ -50,8 +50,7 @@ bool Database::createTable(QString& error)
                 "NUMBER INT NOT NULL,"
                 "DATE INT NOT NULL,"
                 "SUPPLIER TEXT NOT NULL,"
-                "ITEMS TEXT,"
-                "TOTAL TEXT);");
+                "ITEMS TEXT);");
 
   bool bSuccess = query.exec();
   if (!bSuccess)
@@ -59,7 +58,7 @@ bool Database::createTable(QString& error)
   return bSuccess;
 }
 
-bool Database::insert(const PromissoryNote note,
+bool Database::insert(const PromissoryNoteWidget& note,
                       QString& error)
 {
   error.clear();
@@ -69,13 +68,12 @@ bool Database::insert(const PromissoryNote note,
 
   QSqlQuery query;
   query.prepare("INSERT INTO PROMISSORYNOTES "
-                "(NUMBER, DATE, SUPPLIER, ITEMS, TOTAL) VALUES "
-                "(:number), (:date), (:supplier), (:items), (:total);");
-  query.bindValue(":number", note.m_number);
-  query.bindValue(":number", note.m_date);
-  query.bindValue(":supplier", note.m_supplier);
-  query.bindValue(":items", note.serializeItems());
-  query.bindValue(":total", note.m_total);
+                "(NUMBER, DATE, SUPPLIER, ITEMS) VALUES "
+                "(:number), (:date), (:supplier), (:items);");
+  query.bindValue(":number", note.getNumber());
+  query.bindValue(":date", note.getDate().toJulianDay());
+  query.bindValue(":supplier", note.getSupplier());
+  query.bindValue(":items", note.serializeTable());
 
   bool bSuccess = query.exec();
   if (!bSuccess)
@@ -84,7 +82,7 @@ bool Database::insert(const PromissoryNote note,
 }
 
 bool Database::select(int id,
-                      PromissoryNote& note,
+                      PromissoryNoteWidget& note,
                       QString& error)
 {
   error.clear();
@@ -94,8 +92,13 @@ bool Database::select(int id,
     return false;
 
   QSqlQuery query;
-  query.prepare("SELECT NUMBER, DATE, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id);"
-                "");
+  query.prepare("SELECT"
+                "NUMBER,"
+                "DATE,"
+                "SUPPLIER,"
+                "ITEMS"
+                "FROM PROMISSORYNOTES"
+                "WHERE ID = (:id);");
   query.bindValue(":id", id);
 
   if (query.exec())

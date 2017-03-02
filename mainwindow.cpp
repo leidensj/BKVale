@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "bkframe.h"
+#include "promissorynotewidget.h"
 #include "printutils.h"
 #include <QMessageBox>
 #include <QInputDialog>
@@ -9,20 +9,20 @@
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::BKVale),
-  m_bkframe(nullptr)
+  m_promissoryNoteWidget(nullptr)
 {
   ui->setupUi(this);
-  m_bkframe = new BKFrame();
-  ui->frame->layout()->addWidget(m_bkframe);
+  m_promissoryNoteWidget = new PromissoryNoteWidget();
+  ui->centralWidget->layout()->addWidget(m_promissoryNoteWidget);
 
   QObject::connect(ui->actionAdd,
                    SIGNAL(triggered(bool)),
-                   m_bkframe,
+                   m_promissoryNoteWidget,
                    SLOT(addItem()));
 
   QObject::connect(ui->actionRemove,
                    SIGNAL(triggered(bool)),
-                   m_bkframe,
+                   m_promissoryNoteWidget,
                    SLOT(removeItem()));
 
   QObject::connect(ui->actionConnect,
@@ -50,13 +50,11 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showInfo()));
 
-  QObject::connect(m_bkframe,
+  QObject::connect(m_promissoryNoteWidget,
                    SIGNAL(tableSelectionChangedSignal()),
                    this,
                    SLOT(enableControls()));
 
-  ui->provider->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
-  ui->date->setDate(QDate::currentDate());
   enableControls();
 }
 
@@ -64,7 +62,7 @@ BKVale::~BKVale()
 {
   delete ui;
   ui = nullptr;
-  m_bkframe = nullptr;
+  m_promissoryNoteWidget = nullptr;
 }
 
 void BKVale::connect()
@@ -129,22 +127,11 @@ void BKVale::disconnect()
   enableControls();
 }
 
-PromissoryNote BKVale::buildPromissoryNote()
-{
-  PromissoryNote note;
-  m_bkframe->getContent(note.m_tableContent, note.m_total);
-  note.m_number = m_db.nextNumber();
-  note.m_date = ui->date->date().toJulianDay();
-  note.m_supplier = ui->provider->currentText();
-  return note;
-}
-
 void BKVale::print()
 {
-  PromissoryNote note = buildPromissoryNote();
-  QString str = PrintUtils::buildHeader(ui->date->date());
-  str += PrintUtils::buildBody(note.m_tableContent);
-  str += PrintUtils::buildFooter(note.m_total);
+  QString str = PrintUtils::buildHeader(m_promissoryNoteWidget->getDate());
+  str += PrintUtils::buildBody(*m_promissoryNoteWidget);
+  str += PrintUtils::buildFooter(m_promissoryNoteWidget->getTotal());
 
   QString error;
   if (!PrintUtils::print(m_printer, str, error))
@@ -157,7 +144,7 @@ void BKVale::print()
   }
   else
   {
-    if (!m_db.insert(note, error))
+    if (!m_db.insert(*m_promissoryNoteWidget, error))
     {
       QMessageBox msgBox(QMessageBox::Warning,
                          tr("Erro ao salvar vale"),
@@ -188,14 +175,14 @@ void BKVale::showSettings()
 
 void BKVale::enableControls()
 {
-  Q_ASSERT(m_bkframe != nullptr);
+  Q_ASSERT(m_promissoryNoteWidget != nullptr);
   const bool bIsOpen = m_printer.isOpen();
   ui->actionConnect->setEnabled(!bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
-  ui->actionRemove->setEnabled(m_bkframe->isValidSelection());
+  ui->actionRemove->setEnabled(m_promissoryNoteWidget->isValidSelection());
 }
 
 void BKVale::showInfo()

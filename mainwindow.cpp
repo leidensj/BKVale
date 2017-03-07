@@ -46,6 +46,7 @@ BKVale::BKVale(QWidget *parent) :
                    SLOT(showSettings()));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   QObject::connect(ui->actionInfo,
                    SIGNAL(triggered(bool)),
                    this,
@@ -53,6 +54,8 @@ BKVale::BKVale(QWidget *parent) :
 
   QObject::connect(m_promissoryNoteWidget,
 =======
+=======
+>>>>>>> parent of da3042d... criando banco de dados
   QObject::connect(m_bkframe,
 >>>>>>> parent of da3042d... criando banco de dados
                    SIGNAL(tableSelectionChangedSignal()),
@@ -134,10 +137,13 @@ void BKVale::disconnect()
 void BKVale::print()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
   QString str = PrintUtils::buildHeader(m_promissoryNoteWidget->getDate());
   str += PrintUtils::buildBody(*m_promissoryNoteWidget);
   str += PrintUtils::buildFooter(m_promissoryNoteWidget->getTotal());
 =======
+=======
+>>>>>>> parent of da3042d... criando banco de dados
   TableContent tableContent;
   QString total;
   m_bkframe->getContent(tableContent, total);
@@ -145,6 +151,9 @@ void BKVale::print()
   QString str = PrintUtils::buildHeader(ui->date->date());
   str += PrintUtils::buildBody(tableContent);
   str += PrintUtils::buildFooter(total);
+<<<<<<< HEAD
+>>>>>>> parent of da3042d... criando banco de dados
+=======
 >>>>>>> parent of da3042d... criando banco de dados
 
   QString error;
@@ -157,6 +166,7 @@ void BKVale::print()
     msgBox.exec();
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
   else
   {
     if (!m_db.insert(*m_promissoryNoteWidget, error))
@@ -168,6 +178,8 @@ void BKVale::print()
       msgBox.exec();
     }
   }
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 =======
 >>>>>>> parent of da3042d... criando banco de dados
 }
@@ -199,5 +211,9 @@ void BKVale::enableControls()
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
+<<<<<<< HEAD
   ui->actionRemove->setEnabled(m_promissoryNoteWidget->isValidSelection());
+=======
+  ui->actionRemove->setEnabled(m_bkframe->isValidSelection());
+>>>>>>> parent of da3042d... criando banco de dados
 }

@@ -59,7 +59,11 @@ bool Database::createTables(QString& error)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 bool Database::insert(const PromissoryNoteWidget& note,
+=======
+bool Database::insert(PromissoryNote note,
+>>>>>>> parent of da3042d... criando banco de dados
 =======
 bool Database::insert(PromissoryNote note,
 >>>>>>> parent of da3042d... criando banco de dados
@@ -73,6 +77,7 @@ bool Database::insert(PromissoryNote note,
   QSqlQuery query;
   query.prepare("INSERT INTO PROMISSORYNOTES "
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "(NUMBER, DATE, SUPPLIER, ITEMS) VALUES "
                 "(:number), (:date), (:supplier), (:items);");
   query.bindValue(":number", note.getNumber());
@@ -80,6 +85,8 @@ bool Database::insert(PromissoryNote note,
   query.bindValue(":supplier", note.getSupplier());
   query.bindValue(":items", note.serializeTable());
 =======
+=======
+>>>>>>> parent of da3042d... criando banco de dados
                 "(NUMBER, SUPPLIER, ITEMS, TOTAL) VALUES "
                 "(:number), (:supplier), (:items), (:total);");
   query.bindValue(":number", note.m_number);
@@ -102,6 +109,7 @@ bool Database::select(int id,
   note.clear();
   QSqlQuery query;
 <<<<<<< HEAD
+<<<<<<< HEAD
   query.prepare("SELECT"
                 "NUMBER,"
                 "DATE,"
@@ -109,6 +117,9 @@ bool Database::select(int id,
                 "ITEMS"
                 "FROM PROMISSORYNOTES"
                 "WHERE ID = (:id);");
+=======
+  query.prepare("SELECT NUMBER, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id)");
+>>>>>>> parent of da3042d... criando banco de dados
 =======
   query.prepare("SELECT NUMBER, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id)");
 >>>>>>> parent of da3042d... criando banco de dados

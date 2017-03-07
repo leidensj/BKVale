@@ -5,8 +5,11 @@
 #include <QSerialPort>
 #include "settingsdlg.h"
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include "databaseutils.h"
 #include "promissorynotewidget.h"
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 =======
 >>>>>>> parent of da3042d... criando banco de dados
 
@@ -30,7 +33,10 @@ private:
   QSerialPort m_printer;
   Settings m_settings;
 <<<<<<< HEAD
+<<<<<<< HEAD
   Database m_db;
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 =======
 >>>>>>> parent of da3042d... criando banco de dados
 

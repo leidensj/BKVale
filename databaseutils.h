@@ -20,7 +20,11 @@ public:
   bool createTables(QString& error);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   bool insert(const PromissoryNoteWidget& note,
+=======
+  bool insert(PromissoryNote note,
+>>>>>>> parent of da3042d... criando banco de dados
 =======
   bool insert(PromissoryNote note,
 >>>>>>> parent of da3042d... criando banco de dados

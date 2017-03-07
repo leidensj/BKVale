@@ -142,7 +142,11 @@ void PromissoryNoteWidget::removeItem()
 }
 
 <<<<<<< HEAD:promissorynotewidget.cpp
+<<<<<<< HEAD:promissorynotewidget.cpp
 void PromissoryNoteWidget::getContent(TableContent& tableContent) const
+=======
+void BKFrame::getContent(TableContent& tableContent, QString& total)
+>>>>>>> parent of da3042d... criando banco de dados:bkframe.cpp
 =======
 void BKFrame::getContent(TableContent& tableContent, QString& total)
 >>>>>>> parent of da3042d... criando banco de dados:bkframe.cpp
@@ -179,7 +183,11 @@ void PromissoryNoteWidget::tableSelectionChanged()
 }
 
 <<<<<<< HEAD:promissorynotewidget.cpp
+<<<<<<< HEAD:promissorynotewidget.cpp
 bool PromissoryNoteWidget::isValidSelection() const
+=======
+bool BKFrame::isValidSelection()
+>>>>>>> parent of da3042d... criando banco de dados:bkframe.cpp
 =======
 bool BKFrame::isValidSelection()
 >>>>>>> parent of da3042d... criando banco de dados:bkframe.cpp

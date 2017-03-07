@@ -45,12 +45,16 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSettings()));
 
+<<<<<<< HEAD
   QObject::connect(ui->actionInfo,
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(showInfo()));
 
   QObject::connect(m_promissoryNoteWidget,
+=======
+  QObject::connect(m_bkframe,
+>>>>>>> parent of da3042d... criando banco de dados
                    SIGNAL(tableSelectionChangedSignal()),
                    this,
                    SLOT(enableControls()));
@@ -129,9 +133,19 @@ void BKVale::disconnect()
 
 void BKVale::print()
 {
+<<<<<<< HEAD
   QString str = PrintUtils::buildHeader(m_promissoryNoteWidget->getDate());
   str += PrintUtils::buildBody(*m_promissoryNoteWidget);
   str += PrintUtils::buildFooter(m_promissoryNoteWidget->getTotal());
+=======
+  TableContent tableContent;
+  QString total;
+  m_bkframe->getContent(tableContent, total);
+
+  QString str = PrintUtils::buildHeader(ui->date->date());
+  str += PrintUtils::buildBody(tableContent);
+  str += PrintUtils::buildFooter(total);
+>>>>>>> parent of da3042d... criando banco de dados
 
   QString error;
   if (!PrintUtils::print(m_printer, str, error))
@@ -142,6 +156,7 @@ void BKVale::print()
                        QMessageBox::Ok);
     msgBox.exec();
   }
+<<<<<<< HEAD
   else
   {
     if (!m_db.insert(*m_promissoryNoteWidget, error))
@@ -153,6 +168,8 @@ void BKVale::print()
       msgBox.exec();
     }
   }
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 }
 
 void BKVale::showSettings()
@@ -183,20 +200,4 @@ void BKVale::enableControls()
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
   ui->actionRemove->setEnabled(m_promissoryNoteWidget->isValidSelection());
-}
-
-void BKVale::showInfo()
-{
-  QString error;
-  bool bSuccess = m_db.open(error);
-  if (bSuccess)
-    bSuccess = m_db.createTable(error);
-  if (!bSuccess)
-  {
-    QMessageBox msgBox(QMessageBox::Critical,
-                       tr("Erro"),
-                       error,
-                       QMessageBox::Ok);
-    msgBox.exec();
-  }
 }

@@ -14,17 +14,20 @@ public:
 
   bool isOpen(QString& error);
 
-  bool open(QString& error);
+  bool open(const QString& path,
+            QString& error);
 
-  bool createTable(QString& error);
+  bool createTables(QString& error);
 
+<<<<<<< HEAD
   bool insert(const PromissoryNoteWidget& note,
+=======
+  bool insert(PromissoryNote note,
+>>>>>>> parent of da3042d... criando banco de dados
               QString& error);
 
   bool select(int id,
               PromissoryNoteWidget& note,
               QString& error);
-
-  int nextNumber(int offset = 1000);
 };
 #endif // DATABASEUTILS_H

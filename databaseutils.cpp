@@ -3,9 +3,6 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QVariant>
-#include <QDir>
-
-#define DATABASE_NAME "/setup.db"
 
 Database::Database()
   : m_db(QSqlDatabase::addDatabase("QSQLITE"))
@@ -24,12 +21,12 @@ bool Database::isOpen(QString& error)
   return true;
 }
 
-bool Database::open(QString& error)
+bool Database::open(const QString& path,
+                    QString& error)
 {
   error.clear();
   if (m_db.isOpen())
     m_db.close();
-  QString path(QDir::currentPath() + DATABASE_NAME);
   m_db.setDatabaseName(path);
   bool bSuccess = m_db.open();
   if (!bSuccess)
@@ -37,7 +34,7 @@ bool Database::open(QString& error)
   return bSuccess;
 }
 
-bool Database::createTable(QString& error)
+bool Database::createTables(QString& error)
 {
   error.clear();
 
@@ -45,10 +42,13 @@ bool Database::createTable(QString& error)
     return false;
 
   QSqlQuery query;
-  query.prepare("CREATE TABLE IF NOT EXISTS PROMISSORYNOTES ("
-                "ID PRIMARY KEY AUTOINCREMENT "
+  query.prepare("CREATE TABLE IF NOT EXISTS SETTINGS ("
+                "PROMISSORYNOTENUMBER INT NOT NULL,"
+                "SERIALPORT TEXT);"
+
+                "CREATE TABLE IF NOT EXISTS PROMISSORYNOTES ("
+                "ID INT PRIMARY KEY NOT NULL,"
                 "NUMBER INT NOT NULL,"
-                "DATE INT NOT NULL,"
                 "SUPPLIER TEXT NOT NULL,"
                 "ITEMS TEXT);");
 
@@ -58,7 +58,11 @@ bool Database::createTable(QString& error)
   return bSuccess;
 }
 
+<<<<<<< HEAD
 bool Database::insert(const PromissoryNoteWidget& note,
+=======
+bool Database::insert(PromissoryNote note,
+>>>>>>> parent of da3042d... criando banco de dados
                       QString& error)
 {
   error.clear();
@@ -68,12 +72,21 @@ bool Database::insert(const PromissoryNoteWidget& note,
 
   QSqlQuery query;
   query.prepare("INSERT INTO PROMISSORYNOTES "
+<<<<<<< HEAD
                 "(NUMBER, DATE, SUPPLIER, ITEMS) VALUES "
                 "(:number), (:date), (:supplier), (:items);");
   query.bindValue(":number", note.getNumber());
   query.bindValue(":date", note.getDate().toJulianDay());
   query.bindValue(":supplier", note.getSupplier());
   query.bindValue(":items", note.serializeTable());
+=======
+                "(NUMBER, SUPPLIER, ITEMS, TOTAL) VALUES "
+                "(:number), (:supplier), (:items), (:total);");
+  query.bindValue(":number", note.m_number);
+  query.bindValue(":supplier", note.m_supplier);
+  query.bindValue(":items", note.serializeItems());
+  query.bindValue(":total", note.m_total);
+>>>>>>> parent of da3042d... criando banco de dados
 
   bool bSuccess = query.exec();
   if (!bSuccess)
@@ -87,11 +100,8 @@ bool Database::select(int id,
 {
   error.clear();
   note.clear();
-
-  if (!isOpen(error))
-    return false;
-
   QSqlQuery query;
+<<<<<<< HEAD
   query.prepare("SELECT"
                 "NUMBER,"
                 "DATE,"
@@ -99,6 +109,9 @@ bool Database::select(int id,
                 "ITEMS"
                 "FROM PROMISSORYNOTES"
                 "WHERE ID = (:id);");
+=======
+  query.prepare("SELECT NUMBER, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id)");
+>>>>>>> parent of da3042d... criando banco de dados
   query.bindValue(":id", id);
 
   if (query.exec())
@@ -106,28 +119,9 @@ bool Database::select(int id,
      if (query.next())
      {
         note.m_number = query.value(query.record().indexOf("NUMBER")).toInt();
-        note.m_date = query.value(query.record().indexOf("DATE")).toLongLong();
         note.m_supplier = query.value(query.record().indexOf("SUPPLIER")).toString();
         note.deserializeItems(query.value(query.record().indexOf("ITEMS")).toString());
         note.m_supplier = query.value(query.record().indexOf("TOTAL")).toString();
      }
   }
-}
-
-int Database::nextNumber(int offset /*= 1000*/)
-{
-  int nextNumber = 0;
-
-  QString error;
-  if (isOpen(error))
-  {
-    QSqlQuery query;
-    query.prepare("SELECT COUNT(*) FROM PROMISSORYNOTES;");
-
-    if (query.exec())
-       if (query.next())
-         nextNumber = query.value(0).toInt();
-  }
-
-  return nextNumber + offset;
 }

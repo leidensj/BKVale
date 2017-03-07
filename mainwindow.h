@@ -4,8 +4,11 @@
 #include <QMainWindow>
 #include <QSerialPort>
 #include "settingsdlg.h"
+<<<<<<< HEAD
 #include "databaseutils.h"
 #include "promissorynotewidget.h"
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 
 namespace Ui {
 class BKVale;
@@ -26,7 +29,10 @@ private:
   PromissoryNoteWidget* m_promissoryNoteWidget;
   QSerialPort m_printer;
   Settings m_settings;
+<<<<<<< HEAD
   Database m_db;
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 
 private slots:
   void connect();
@@ -34,7 +40,6 @@ private slots:
   void print();
   void showSettings();
   void enableControls();
-  void showInfo();
 };
 
 #endif // MAINWINDOW_H

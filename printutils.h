@@ -2,8 +2,7 @@
 #define PRINTUTILS_H
 
 #include <QSerialPort>
-#include <QDate>
-#include <promissorynotewidget.h>
+#include <note.h>
 
 namespace PrintUtils
 {
@@ -14,10 +13,6 @@ namespace PrintUtils
   bool initPrinter(QSerialPort& printer,
                    QString& error);
 
-  QString buildHeader(const QDate& date);
-
-  QString buildBody(const PromissoryNoteWidget& note);
-
-  QString buildFooter(const QString& total);
+  QString buildNote(const Note& note);
 }
 #endif // PRINTUTILS_H

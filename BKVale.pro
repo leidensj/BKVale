@@ -19,16 +19,16 @@ SOURCES += main.cpp\
     settingsdlg.cpp \
     printutils.cpp \
     databaseutils.cpp \
-    promissorynotewidget.cpp \
-    common.cpp
+    notewidget.cpp \
+    note.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
     printutils.h \
     databaseutils.h \
-    promissorynotewidget.h \
-    common.h
+    notewidget.h \
+    note.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

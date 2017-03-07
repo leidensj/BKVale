@@ -2,7 +2,7 @@
 #define DATABASEUTILS_H
 
 #include <QSqlDatabase>
-#include <promissorynotewidget.h>
+#include <note.h>
 
 class Database
 {
@@ -19,19 +19,11 @@ public:
 
   bool createTables(QString& error);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  bool insert(const PromissoryNoteWidget& note,
-=======
-  bool insert(PromissoryNote note,
->>>>>>> parent of da3042d... criando banco de dados
-=======
-  bool insert(PromissoryNote note,
->>>>>>> parent of da3042d... criando banco de dados
+  bool insert(const Note& note,
               QString& error);
 
   bool select(int id,
-              PromissoryNoteWidget& note,
+              Note& note,
               QString& error);
 };
 #endif // DATABASEUTILS_H

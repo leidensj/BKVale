@@ -49,8 +49,10 @@ bool Database::createTables(QString& error)
                 "CREATE TABLE IF NOT EXISTS PROMISSORYNOTES ("
                 "ID INT PRIMARY KEY NOT NULL,"
                 "NUMBER INT NOT NULL,"
+                "DATE INT NOT NULL"
                 "SUPPLIER TEXT NOT NULL,"
-                "ITEMS TEXT);");
+                "ITEMS TEXT,"
+                "TOTAL REAL);");
 
   bool bSuccess = query.exec();
   if (!bSuccess)
@@ -58,15 +60,7 @@ bool Database::createTables(QString& error)
   return bSuccess;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-bool Database::insert(const PromissoryNoteWidget& note,
-=======
-bool Database::insert(PromissoryNote note,
->>>>>>> parent of da3042d... criando banco de dados
-=======
-bool Database::insert(PromissoryNote note,
->>>>>>> parent of da3042d... criando banco de dados
+bool Database::insert(const Note& note,
                       QString& error)
 {
   error.clear();
@@ -76,24 +70,13 @@ bool Database::insert(PromissoryNote note,
 
   QSqlQuery query;
   query.prepare("INSERT INTO PROMISSORYNOTES "
-<<<<<<< HEAD
-<<<<<<< HEAD
-                "(NUMBER, DATE, SUPPLIER, ITEMS) VALUES "
-                "(:number), (:date), (:supplier), (:items);");
-  query.bindValue(":number", note.getNumber());
-  query.bindValue(":date", note.getDate().toJulianDay());
-  query.bindValue(":supplier", note.getSupplier());
-  query.bindValue(":items", note.serializeTable());
-=======
-=======
->>>>>>> parent of da3042d... criando banco de dados
-                "(NUMBER, SUPPLIER, ITEMS, TOTAL) VALUES "
-                "(:number), (:supplier), (:items), (:total);");
+                "(NUMBER, DATE, SUPPLIER, ITEMS, TOTAL) VALUES "
+                "(:number), (:date), (:supplier), (:items), (:total);");
   query.bindValue(":number", note.m_number);
+  query.bindValue(":date", note.m_date);
   query.bindValue(":supplier", note.m_supplier);
-  query.bindValue(":items", note.serializeItems());
+  query.bindValue(":items", note.m_items);
   query.bindValue(":total", note.m_total);
->>>>>>> parent of da3042d... criando banco de dados
 
   bool bSuccess = query.exec();
   if (!bSuccess)
@@ -102,27 +85,22 @@ bool Database::insert(PromissoryNote note,
 }
 
 bool Database::select(int id,
-                      PromissoryNoteWidget& note,
+                      Note& note,
                       QString& error)
 {
   error.clear();
   note.clear();
   QSqlQuery query;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  query.prepare("SELECT"
+  query.prepare("SELECT "
                 "NUMBER,"
                 "DATE,"
                 "SUPPLIER,"
-                "ITEMS"
-                "FROM PROMISSORYNOTES"
+                "ITEMS,"
+                "TOTAL "
+                "FROM PROMISSORYNOTES "
                 "WHERE ID = (:id);");
-=======
-  query.prepare("SELECT NUMBER, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id)");
->>>>>>> parent of da3042d... criando banco de dados
-=======
-  query.prepare("SELECT NUMBER, SUPPLIER, ITEMS, TOTAL FROM PROMISSORYNOTES WHERE ID = (:id)");
->>>>>>> parent of da3042d... criando banco de dados
+
+
   query.bindValue(":id", id);
 
   if (query.exec())
@@ -130,8 +108,9 @@ bool Database::select(int id,
      if (query.next())
      {
         note.m_number = query.value(query.record().indexOf("NUMBER")).toInt();
+        note.m_date = query.value(query.record().indexOf("NUMBER")).toLongLong();
         note.m_supplier = query.value(query.record().indexOf("SUPPLIER")).toString();
-        note.deserializeItems(query.value(query.record().indexOf("ITEMS")).toString());
+        note.m_items = query.value(query.record().indexOf("ITEMS")).toString();
         note.m_supplier = query.value(query.record().indexOf("TOTAL")).toString();
      }
   }

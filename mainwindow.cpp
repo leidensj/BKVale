@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "promissorynotewidget.h"
+#include "notewidget.h"
 #include "printutils.h"
 #include <QMessageBox>
 #include <QInputDialog>
@@ -9,20 +9,20 @@
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::BKVale),
-  m_promissoryNoteWidget(nullptr)
+  m_noteWidget(nullptr)
 {
   ui->setupUi(this);
-  m_promissoryNoteWidget = new PromissoryNoteWidget();
-  ui->centralWidget->layout()->addWidget(m_promissoryNoteWidget);
+  m_noteWidget = new NoteWidget();
+  ui->centralWidget->layout()->addWidget(m_noteWidget);
 
   QObject::connect(ui->actionAdd,
                    SIGNAL(triggered(bool)),
-                   m_promissoryNoteWidget,
+                   m_noteWidget,
                    SLOT(addItem()));
 
   QObject::connect(ui->actionRemove,
                    SIGNAL(triggered(bool)),
-                   m_promissoryNoteWidget,
+                   m_noteWidget,
                    SLOT(removeItem()));
 
   QObject::connect(ui->actionConnect,
@@ -45,19 +45,12 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSettings()));
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   QObject::connect(ui->actionInfo,
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(showInfo()));
 
-  QObject::connect(m_promissoryNoteWidget,
-=======
-=======
->>>>>>> parent of da3042d... criando banco de dados
-  QObject::connect(m_bkframe,
->>>>>>> parent of da3042d... criando banco de dados
+  QObject::connect(m_noteWidget,
                    SIGNAL(tableSelectionChangedSignal()),
                    this,
                    SLOT(enableControls()));
@@ -136,12 +129,12 @@ void BKVale::disconnect()
 
 void BKVale::print()
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   QString str = PrintUtils::buildHeader(m_promissoryNoteWidget->getDate());
   str += PrintUtils::buildBody(*m_promissoryNoteWidget);
   str += PrintUtils::buildFooter(m_promissoryNoteWidget->getTotal());
 =======
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 =======
 >>>>>>> parent of da3042d... criando banco de dados
   TableContent tableContent;
@@ -152,6 +145,9 @@ void BKVale::print()
   str += PrintUtils::buildBody(tableContent);
   str += PrintUtils::buildFooter(total);
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of da3042d... criando banco de dados
+=======
 >>>>>>> parent of da3042d... criando banco de dados
 =======
 >>>>>>> parent of da3042d... criando banco de dados
@@ -167,6 +163,7 @@ void BKVale::print()
   }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   else
   {
     if (!m_db.insert(*m_promissoryNoteWidget, error))
@@ -178,6 +175,8 @@ void BKVale::print()
       msgBox.exec();
     }
   }
+=======
+>>>>>>> parent of da3042d... criando banco de dados
 =======
 >>>>>>> parent of da3042d... criando banco de dados
 =======
@@ -215,5 +214,8 @@ void BKVale::enableControls()
   ui->actionRemove->setEnabled(m_promissoryNoteWidget->isValidSelection());
 =======
   ui->actionRemove->setEnabled(m_bkframe->isValidSelection());
+<<<<<<< HEAD
+>>>>>>> parent of da3042d... criando banco de dados
+=======
 >>>>>>> parent of da3042d... criando banco de dados
 }

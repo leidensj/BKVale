@@ -28,17 +28,19 @@ private:
   QString computeUnitValue(int row) const;
   QString computeSubTotal(int row) const;
   QString computeTotal() const;
-  double evaluate(int row, Column column) const;
-  QString text(int row, Column column)const ;
+  double evaluate(int row, int column) const;
+  QString text(int row, int column) const ;
   QString serializeItems() const;
 
 private slots:
-  void updateTable(int row, Column column);
+  void updateTable(int row, int column);
   void tableSelectionChanged();
 
 public slots:
   void addItem();
   void removeItem();
+  void clear();
+  void setEnabled(bool bEnable);
 
 signals:
   void tableSelectionChangedSignal();

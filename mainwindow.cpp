@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
+#include <QDir>
 
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
@@ -50,6 +51,12 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(enableControls()));
 
+  QObject::connect(ui->actionNew,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(createNew()));
+
+  m_noteWidget->setEnabled(false);
   enableControls();
 }
 
@@ -175,4 +182,36 @@ void BKVale::enableControls()
   ui->actionPrint->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
   ui->actionRemove->setEnabled(m_noteWidget->isValidSelection());
+}
+
+void BKVale::createNew()
+{
+  QString error;
+  bool bSuccess = m_db.open(QDir::currentPath() + "setup.db",
+                            error);
+  if (!bSuccess)
+  {
+    QMessageBox msgBox(QMessageBox::Critical,
+                       tr("Erro"),
+                       error,
+                       QMessageBox::Ok);
+    msgBox.exec();
+  }
+  else
+  {
+    bSuccess = m_db.createTables(error);
+    if (!bSuccess)
+    {
+      QMessageBox msgBox(QMessageBox::Critical,
+                         tr("Erro"),
+                         error,
+                         QMessageBox::Ok);
+      msgBox.exec();
+    }
+    else
+    {
+      m_noteWidget->clear();
+      m_noteWidget->setEnabled(true);
+    }
+  }
 }

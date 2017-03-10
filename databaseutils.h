@@ -12,7 +12,7 @@ public:
 
   Database();
 
-  bool isOpen(QString& error);
+  bool isOpen(QString& error) const;
 
   bool open(const QString& path,
             QString& error);

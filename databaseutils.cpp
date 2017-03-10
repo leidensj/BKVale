@@ -10,15 +10,12 @@ Database::Database()
 
 }
 
-bool Database::isOpen(QString& error)
+bool Database::isOpen(QString& error) const
 {
   error.clear();
   if (!m_db.isOpen())
-  {
-    error = "O arquivo de configuração não está aberto.";
-    return false;
-  }
-  return true;
+     error = "Arquivo de configuração não foi aberto.";
+  return m_db.isOpen();
 }
 
 bool Database::open(const QString& path,
@@ -30,7 +27,7 @@ bool Database::open(const QString& path,
   m_db.setDatabaseName(path);
   bool bSuccess = m_db.open();
   if (!bSuccess)
-    error = "A conexão com o arquivo de configuração falhou.";
+    error = m_db.lastError().text();
   return bSuccess;
 }
 
@@ -70,8 +67,18 @@ bool Database::insert(const Note& note,
 
   QSqlQuery query;
   query.prepare("INSERT INTO PROMISSORYNOTES "
-                "(NUMBER, DATE, SUPPLIER, ITEMS, TOTAL) VALUES "
-                "(:number), (:date), (:supplier), (:items), (:total);");
+                "(NUMBER,"
+                "DATE,"
+                "SUPPLIER,"
+                "ITEMS,"
+                "TOTAL) "
+                "VALUES "
+                "(:number),"
+                "(:date),"
+                "(:supplier),"
+                "(:items),"
+                "(:total);");
+
   query.bindValue(":number", note.m_number);
   query.bindValue(":date", note.m_date);
   query.bindValue(":supplier", note.m_supplier);
@@ -90,6 +97,10 @@ bool Database::select(int id,
 {
   error.clear();
   note.clear();
+
+  if (!isOpen(error))
+    return false;
+
   QSqlQuery query;
   query.prepare("SELECT "
                 "NUMBER,"
@@ -103,15 +114,21 @@ bool Database::select(int id,
 
   query.bindValue(":id", id);
 
-  if (query.exec())
+  bool bSuccess = query.exec();
+  if (bSuccess)
   {
-     if (query.next())
+     bSuccess = query.next();
+     if (bSuccess)
      {
         note.m_number = query.value(query.record().indexOf("NUMBER")).toInt();
-        note.m_date = query.value(query.record().indexOf("NUMBER")).toLongLong();
+        note.m_date = query.value(query.record().indexOf("DATE")).toLongLong();
         note.m_supplier = query.value(query.record().indexOf("SUPPLIER")).toString();
         note.m_items = query.value(query.record().indexOf("ITEMS")).toString();
         note.m_supplier = query.value(query.record().indexOf("TOTAL")).toString();
      }
   }
+
+  if (!bSuccess)
+    error = query.lastError().text();
+  return bSuccess;
 }

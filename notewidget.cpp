@@ -62,11 +62,11 @@ QString NoteWidget::computeTotal() const
   return Note::format(total, false);
 }
 
-double NoteWidget::evaluate(int row, Column column) const
+double NoteWidget::evaluate(int row, int column) const
 {
-  Q_ASSERT(ui->table->item(row, (int)column) != nullptr);
+  Q_ASSERT(ui->table->item(row, column) != nullptr);
 
-  auto pt = ui->table->item(row, (int)column);
+  auto pt = ui->table->item(row, column);
   auto exp = pt->text().toStdString();
   int error = 0;
   double res = te_interp(exp.c_str(), &error);
@@ -75,29 +75,29 @@ double NoteWidget::evaluate(int row, Column column) const
   return pt->data(Qt::UserRole).toDouble();
 }
 
-void NoteWidget::updateTable(int row, Column column)
+void NoteWidget::updateTable(int row, int column)
 {
   ui->table->blockSignals(true);
-  switch (column)
+  switch ((Column)column)
   {
     case Column::Ammount:
     {
       QString res(Note::format(evaluate(row, column), true));
-      ui->table->item(row, (int)column)->setText(res);
+      ui->table->item(row, column)->setText(res);
       ui->table->item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
       ui->total->setText(computeTotal());
     } break;
     case Column::UnitValue:
     {
       QString res(Note::format(evaluate(row, column), false));
-      ui->table->item(row, (int)column)->setText(res);
+      ui->table->item(row, column)->setText(res);
       ui->table->item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
       ui->total->setText(computeTotal());
     } break;
     case Column::SubTotal:
     {
       QString res(Note::format(evaluate(row, column), false));
-      ui->table->item(row, (int)column)->setText(res);
+      ui->table->item(row, column)->setText(res);
       ui->table->item(row, (int)Column::UnitValue)->setText(computeUnitValue(row));
       ui->total->setText(computeTotal());
     } break;
@@ -141,10 +141,10 @@ bool NoteWidget::isValidSelection() const
   return ui->table->currentRow() >= 0;
 }
 
-QString NoteWidget::text(int row, Column column) const
+QString NoteWidget::text(int row, int column) const
 {
   QString str;
-  switch(column)
+  switch((Column)column)
   {
     case Column::Ammount:
     case Column::Unity:
@@ -173,12 +173,8 @@ QString NoteWidget::serializeItems() const
 {
   QString str;
   for (int i = 0; i != ui->table->rowCount(); ++i)
-  {
     for (int j = 0; j!= ui->table->columnCount(); ++i)
-    {
-      str += text(i, (Column)j) + ";";
-    }
-  }
+      str += text(i, j) + ";";
 
   if (!str.isEmpty())
     str.chop(1);
@@ -200,4 +196,22 @@ Note NoteWidget::getNote() const
 void NoteWidget::setNote(const Note& note)
 {
 
+}
+
+void NoteWidget::clear()
+{
+  ui->date->setDate(QDate::currentDate());
+  ui->supplier->setCurrentText("");
+  ui->number->setValue(0);
+  ui->total->setText("");
+  ui->table->setRowCount(0);
+}
+
+void NoteWidget::setEnabled(bool bEnable)
+{
+  ui->date->setEnabled(bEnable);
+  ui->supplier->setEnabled(bEnable);
+  ui->number->setEnabled(bEnable);
+  ui->total->setEnabled(bEnable);
+  ui->table->setEnabled(bEnable);
 }

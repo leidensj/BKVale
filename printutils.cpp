@@ -1,4 +1,6 @@
 #include "printutils.h"
+#include <QDate>
+#include <QTime>
 
 #define ESC              "\x1b"
 #define ESC_ALIGN_CENTER "\x1b\x61\x31"
@@ -67,24 +69,24 @@ namespace
 
   QString buildBody(const Note& note)
   {
-    const int count = note.getTableCount();
-    QString body = count != 0 ? "" : ESC_ALIGN_LEFT;
-    for (int i = 0; i != count; ++i)
+    NoteItems items(note.m_items);
+    QString body = items.m_size != 0 ? "" : ESC_ALIGN_LEFT;
+    for (int i = 0; i != items.m_size; ++i)
     {
       QString item;
       {
-        QString itemPt1 = note.getTableText(i, Column::Ammount) +
-                          note.getTableText(i, Column::Unity) +
+        QString itemPt1 = items.at(i, Column::Ammount) +
+                          items.at(i, Column::Unity) +
                           " x R$" +
-                          note.getTableText(i, Column::UnitValue);
+                          items.at(i, Column::UnitValue);
         QString itemPt2 = "R$" +
-                          note.getTableText(i, Column::SubTotal);
+                          items.at(i, Column::SubTotal);
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += " ";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      body += note.getTableText(i, Column::Description) + ESC_LF +
+      body += items.at(i, Column::Description) + ESC_LF +
               item + ESC_LF +
               "────────────────────────────────────────────────" + ESC_LF;
     }
@@ -129,7 +131,9 @@ bool PrintUtils::initPrinter(QSerialPort& printer,
 
 QString PrintUtils::buildNote(const Note& note)
 {
-
+  return buildHeader(note) +
+      buildBody(note) +
+      buildFooter(note);
 }
 
 

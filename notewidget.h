@@ -19,19 +19,21 @@ public:
   explicit NoteWidget(QWidget *parent = 0);
   ~NoteWidget();
   bool isValidSelection() const;
-  void getNote(Note& note) const;
+  Note getNote() const;
   void setNote(const Note& note);
 
 private:
   static const QChar st_separator;
-  Ui::PromissoryNoteWidget *ui;
+  Ui::NoteWidget *ui;
   QString computeUnitValue(int row) const;
   QString computeSubTotal(int row) const;
   QString computeTotal() const;
-  double evaluate(int row, int column);
+  double evaluate(int row, Column column) const;
+  QString text(int row, Column column)const ;
+  QString serializeItems() const;
 
 private slots:
-  void updateTable(int row, int column);
+  void updateTable(int row, Column column);
   void tableSelectionChanged();
 
 public slots:

@@ -39,19 +39,20 @@ bool Database::createTables(QString& error)
     return false;
 
   QSqlQuery query;
-  query.prepare("CREATE TABLE IF NOT EXISTS SETTINGS ("
-                "PROMISSORYNOTENUMBER INT NOT NULL,"
-                "SERIALPORT TEXT);"
+  bool bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _SETTINGS ("
+                             "_PROMISSORYNOTENUMBER INT NOT NULL,"
+                             "_SERIALPORT TEXT)");
+  if (bSuccess)
+  {
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
+                          "_ID INT PRIMARY KEY NOT NULL,"
+                          "_NUMBER INT NOT NULL,"
+                          "_DATE INT NOT NULL,"
+                          "_SUPPLIER TEXT NOT NULL,"
+                          "_ITEMS TEXT,"
+                          "_TOTAL REAL)");
+  }
 
-                "CREATE TABLE IF NOT EXISTS PROMISSORYNOTES ("
-                "ID INT PRIMARY KEY NOT NULL,"
-                "NUMBER INT NOT NULL,"
-                "DATE INT NOT NULL"
-                "SUPPLIER TEXT NOT NULL,"
-                "ITEMS TEXT,"
-                "TOTAL REAL);");
-
-  bool bSuccess = query.exec();
   if (!bSuccess)
     error = query.lastError().text();
   return bSuccess;
@@ -66,24 +67,24 @@ bool Database::insert(const Note& note,
     return false;
 
   QSqlQuery query;
-  query.prepare("INSERT INTO PROMISSORYNOTES "
-                "(NUMBER,"
-                "DATE,"
-                "SUPPLIER,"
-                "ITEMS,"
-                "TOTAL) "
+  query.prepare("INSERT INTO _PROMISSORYNOTES "
+                "(_NUMBER,"
+                "_DATE,"
+                "_SUPPLIER,"
+                "_ITEMS,"
+                "_TOTAL) "
                 "VALUES "
-                "(:number),"
-                "(:date),"
-                "(:supplier),"
-                "(:items),"
-                "(:total);");
+                "(:_number),"
+                "(:_date),"
+                "(:_supplier),"
+                "(:_items),"
+                "(:_total);");
 
-  query.bindValue(":number", note.m_number);
-  query.bindValue(":date", note.m_date);
-  query.bindValue(":supplier", note.m_supplier);
-  query.bindValue(":items", note.m_items);
-  query.bindValue(":total", note.m_total);
+  query.bindValue(":_number", note.m_number);
+  query.bindValue(":_date", note.m_date);
+  query.bindValue(":_supplier", note.m_supplier);
+  query.bindValue(":_items", note.m_items);
+  query.bindValue(":_total", note.m_total);
 
   bool bSuccess = query.exec();
   if (!bSuccess)
@@ -103,16 +104,16 @@ bool Database::select(int id,
 
   QSqlQuery query;
   query.prepare("SELECT "
-                "NUMBER,"
-                "DATE,"
-                "SUPPLIER,"
-                "ITEMS,"
-                "TOTAL "
+                "_NUMBER,"
+                "_DATE,"
+                "_SUPPLIER,"
+                "_ITEMS,"
+                "_TOTAL "
                 "FROM PROMISSORYNOTES "
-                "WHERE ID = (:id);");
+                "WHERE _ID = (:_id);");
 
 
-  query.bindValue(":id", id);
+  query.bindValue(":_id", id);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -120,11 +121,11 @@ bool Database::select(int id,
      bSuccess = query.next();
      if (bSuccess)
      {
-        note.m_number = query.value(query.record().indexOf("NUMBER")).toInt();
-        note.m_date = query.value(query.record().indexOf("DATE")).toLongLong();
-        note.m_supplier = query.value(query.record().indexOf("SUPPLIER")).toString();
-        note.m_items = query.value(query.record().indexOf("ITEMS")).toString();
-        note.m_supplier = query.value(query.record().indexOf("TOTAL")).toString();
+        note.m_number = query.value(query.record().indexOf("_NUMBER")).toInt();
+        note.m_date = query.value(query.record().indexOf("_DATE")).toLongLong();
+        note.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
+        note.m_items = query.value(query.record().indexOf("_ITEMS")).toString();
+        note.m_supplier = query.value(query.record().indexOf("_TOTAL")).toString();
      }
   }
 

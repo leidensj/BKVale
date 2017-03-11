@@ -9,8 +9,6 @@ namespace Ui {
 class NoteWidget;
 }
 
-
-
 class NoteWidget : public QFrame
 {
   Q_OBJECT
@@ -21,6 +19,7 @@ public:
   bool isValidSelection() const;
   Note getNote() const;
   void setNote(const Note& note);
+  bool isValid() const;
 
 private:
   static const QChar st_separator;
@@ -34,7 +33,7 @@ private:
 
 private slots:
   void updateTable(int row, int column);
-  void tableSelectionChanged();
+  void changed();
 
 public slots:
   void addItem();
@@ -43,7 +42,7 @@ public slots:
   void setEnabled(bool bEnable);
 
 signals:
-  void tableSelectionChangedSignal();
+  void changedSignal();
 
 };
 

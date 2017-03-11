@@ -20,7 +20,12 @@ NoteWidget::NoteWidget(QWidget *parent) :
   QObject::connect(ui->table,
                    SIGNAL(itemSelectionChanged()),
                    this,
-                   SLOT(tableSelectionChanged()));
+                   SLOT(changed()));
+
+  QObject::connect(ui->supplier,
+                   SIGNAL(editTextChanged(const QString &)),
+                   this,
+                   SLOT(changed()));
 
   ui->supplier->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
   ui->date->setDate(QDate::currentDate());
@@ -112,9 +117,13 @@ void NoteWidget::addItem()
   ui->table->insertRow(ui->table->rowCount());
   QComboBox* unit = new QComboBox();
   QStringList list;
-  list << tr("UN") << tr("KG") << tr("FD");
+  list << tr("UN")
+       << tr("KG")
+       << tr("FD")
+       << tr("CX")
+       << tr("ML")
+       << tr("PCT");
   unit->insertItems(0, list);
-  unit->setEditable(true);
   const int row = ui->table->rowCount() - 1;
   ui->table->blockSignals(true);
   ui->table->setCellWidget(row, (int)Column::Unity, unit);
@@ -123,17 +132,22 @@ void NoteWidget::addItem()
   ui->table->setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
   ui->table->setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
   ui->table->blockSignals(false);
+  ui->total->setText(computeTotal());
 }
 
 void NoteWidget::removeItem()
 {
   ui->table->removeRow(ui->table->currentRow());
-  ui->total->setText(computeTotal());
+  if (ui->table->rowCount() != 0)
+    ui->total->setText(computeTotal());
+  else
+    ui->total->clear();
+
 }
 
-void NoteWidget::tableSelectionChanged()
+void NoteWidget::changed()
 {
-  emit tableSelectionChangedSignal();
+  emit changedSignal();
 }
 
 bool NoteWidget::isValidSelection() const
@@ -196,6 +210,12 @@ Note NoteWidget::getNote() const
 void NoteWidget::setNote(const Note& note)
 {
 
+}
+
+bool NoteWidget::isValid() const
+{
+  return !ui->supplier->currentText().isEmpty() &&
+      ui->table->rowCount() != 0;
 }
 
 void NoteWidget::clear()

@@ -27,6 +27,7 @@ private:
   QSerialPort m_printer;
   Settings m_settings;
   Database m_db;
+  bool m_bReady;
 
 private slots:
   void connect();

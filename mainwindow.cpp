@@ -10,7 +10,8 @@
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::BKVale),
-  m_noteWidget(nullptr)
+  m_noteWidget(nullptr),
+  m_bReady(false)
 {
   ui->setupUi(this);
   m_noteWidget = new NoteWidget();
@@ -47,7 +48,7 @@ BKVale::BKVale(QWidget *parent) :
                    SLOT(showSettings()));
 
   QObject::connect(m_noteWidget,
-                   SIGNAL(tableSelectionChangedSignal()),
+                   SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
 
@@ -56,7 +57,6 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(createNew()));
 
-  m_noteWidget->setEnabled(false);
   enableControls();
 }
 
@@ -81,6 +81,7 @@ void BKVale::connect()
                          tr("Aviso"),
                          tr("A impressora já está conectada."),
                          QMessageBox::Ok);
+      msgBox.exec();
       return;
     }
   }
@@ -179,15 +180,19 @@ void BKVale::enableControls()
   ui->actionConnect->setEnabled(!bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
-  ui->actionPrint->setEnabled(bIsOpen);
+  ui->actionPrint->setEnabled(m_noteWidget->isValid() && bIsOpen && m_bReady);
   ui->actionSettings->setEnabled(!bIsOpen);
-  ui->actionRemove->setEnabled(m_noteWidget->isValidSelection());
+  ui->actionAdd->setEnabled(m_bReady);
+  ui->actionRemove->setEnabled(m_bReady && m_noteWidget->isValidSelection());
+  m_noteWidget->setEnabled(m_bReady);
 }
 
 void BKVale::createNew()
 {
   QString error;
-  bool bSuccess = m_db.open(QDir::currentPath() + "setup.db",
+  bool bSuccess = m_db.open(qApp->applicationDirPath() +
+                            QDir::separator() +
+                            "setup.db",
                             error);
   if (!bSuccess)
   {
@@ -210,8 +215,9 @@ void BKVale::createNew()
     }
     else
     {
+      m_bReady = true;
       m_noteWidget->clear();
-      m_noteWidget->setEnabled(true);
+      enableControls();
     }
   }
 }

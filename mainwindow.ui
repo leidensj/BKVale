@@ -10,6 +10,12 @@
     <height>349</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>535</width>
+    <height>349</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>BaitaVale</string>
   </property>
@@ -18,35 +24,7 @@
     <normaloff>:/icons/res/baita.png</normaloff>:/icons/res/baita.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QFrame" name="frame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-      </layout>
-     </widget>
-    </item>
-   </layout>
+   <layout class="QVBoxLayout" name="verticalLayout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">
@@ -68,7 +46,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionNew"/>
-   <addaction name="actionOpen"/>
+   <addaction name="actionSearch"/>
    <addaction name="separator"/>
    <addaction name="actionAdd"/>
    <addaction name="actionRemove"/>
@@ -137,18 +115,6 @@
     <string>Novo vale</string>
    </property>
   </action>
-  <action name="actionOpen">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/open.png</normaloff>:/icons/res/open.png</iconset>
-   </property>
-   <property name="text">
-    <string>Abrir...</string>
-   </property>
-   <property name="toolTip">
-    <string>Abrir um vale</string>
-   </property>
-  </action>
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -171,6 +137,21 @@
    </property>
    <property name="shortcut">
     <string>Alt+-</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/search.png</normaloff>:/icons/res/search.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pesquisar</string>
+   </property>
+   <property name="toolTip">
+    <string>Pesquisar vales</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

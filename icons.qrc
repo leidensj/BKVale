@@ -15,5 +15,6 @@
         <file>res/remove.png</file>
         <file>res/general.png</file>
         <file>res/baita.png</file>
+        <file>res/search.png</file>
     </qresource>
 </RCC>

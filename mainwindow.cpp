@@ -14,17 +14,16 @@ BKVale::BKVale(QWidget *parent) :
   m_bReady(false)
 {
   ui->setupUi(this);
-  m_noteWidget = new NoteWidget();
-  ui->centralWidget->layout()->addWidget(m_noteWidget);
+  ui->centralWidget->layout()->addWidget(&m_noteWidget);
 
   QObject::connect(ui->actionAdd,
                    SIGNAL(triggered(bool)),
-                   m_noteWidget,
+                   &m_noteWidget,
                    SLOT(addItem()));
 
   QObject::connect(ui->actionRemove,
                    SIGNAL(triggered(bool)),
-                   m_noteWidget,
+                   &m_noteWidget,
                    SLOT(removeItem()));
 
   QObject::connect(ui->actionConnect,
@@ -47,7 +46,7 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSettings()));
 
-  QObject::connect(m_noteWidget,
+  QObject::connect(&m_noteWidget,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
@@ -63,8 +62,6 @@ BKVale::BKVale(QWidget *parent) :
 BKVale::~BKVale()
 {
   delete ui;
-  ui = nullptr;
-  m_noteWidget = nullptr;
 }
 
 void BKVale::connect()
@@ -132,7 +129,7 @@ void BKVale::disconnect()
 
 void BKVale::print()
 {
-  Note note = m_noteWidget->getNote();
+  Note note = m_noteWidget.getNote();
   QString str(PrintUtils::buildNote(note));
   QString error;
   if (!PrintUtils::print(m_printer, str, error))
@@ -180,11 +177,11 @@ void BKVale::enableControls()
   ui->actionConnect->setEnabled(!bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
-  ui->actionPrint->setEnabled(m_noteWidget->isValid() && bIsOpen && m_bReady);
+  ui->actionPrint->setEnabled(m_noteWidget.isValid() && bIsOpen && m_bReady);
   ui->actionSettings->setEnabled(!bIsOpen);
   ui->actionAdd->setEnabled(m_bReady);
-  ui->actionRemove->setEnabled(m_bReady && m_noteWidget->isValidSelection());
-  m_noteWidget->setEnabled(m_bReady);
+  ui->actionRemove->setEnabled(m_bReady && m_noteWidget.isValidSelection());
+  m_noteWidget.setEnabled(m_bReady);
 }
 
 void BKVale::createNew()
@@ -216,7 +213,7 @@ void BKVale::createNew()
     else
     {
       m_bReady = true;
-      m_noteWidget->clear();
+      m_noteWidget.clear();
       enableControls();
     }
   }

@@ -161,7 +161,7 @@ QString NoteWidget::text(int row, int column) const
   switch((Column)column)
   {
     case Column::Ammount:
-    case Column::Unity:
+    case Column::UnitValue:
     case Column::Description:
     case Column::SubTotal:
     {
@@ -169,7 +169,7 @@ QString NoteWidget::text(int row, int column) const
       if (p != nullptr)
         str = p->text();
     } break;
-    case Column::UnitValue:
+    case Column::Unity:
     {
       QComboBox* pt = dynamic_cast<QComboBox*>(ui->table->cellWidget(row, (int)column));
       if (pt != nullptr)
@@ -187,7 +187,7 @@ QString NoteWidget::serializeItems() const
 {
   QString str;
   for (int i = 0; i != ui->table->rowCount(); ++i)
-    for (int j = 0; j!= ui->table->columnCount(); ++i)
+    for (int j = 0; j!= ui->table->columnCount(); ++j)
       str += text(i, j) + ";";
 
   if (!str.isEmpty())

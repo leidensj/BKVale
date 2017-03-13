@@ -28,19 +28,16 @@ QString Note::format(double d, bool b3places /*= false*/)
 
 NoteItems::NoteItems(const QString &items)
   : m_items(items.split(";"))
-  , m_size(m_items.size() % NUMBER_OF_COLUMNS ? m_items.size() / NUMBER_OF_COLUMNS : 0)
+  , m_size(m_items.size() / NUMBER_OF_COLUMNS)
 {
-
+  Q_ASSERT(m_items.size() % NUMBER_OF_COLUMNS == 0);
 }
 
 QString NoteItems::at(int row, Column column) const
 {
   QString str;
-  if (m_items.size() % NUMBER_OF_COLUMNS)
-  {
-    const int idx = (row * NUMBER_OF_COLUMNS) + (int)column;
-    if (idx < m_items.size())
-      str = m_items.at(idx);
-  }
+  const int idx = (row * NUMBER_OF_COLUMNS) + (int)column;
+  if (idx < m_items.size())
+    str = m_items.at(idx);
   return str;
 }

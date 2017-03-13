@@ -23,7 +23,7 @@ public:
 
 private:
   Ui::BKVale *ui;
-  NoteWidget* m_noteWidget;
+  NoteWidget m_noteWidget;
   QSerialPort m_printer;
   Settings m_settings;
   Database m_db;

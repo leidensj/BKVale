@@ -40,14 +40,14 @@ bool Database::createTables(QString& error)
 
   QSqlQuery query;
   bool bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _SETTINGS ("
-                             "_PROMISSORYNOTENUMBER INT NOT NULL,"
+                             "_LASTNUMBER INTEGER AUTOINCREMENT DEFAULT 10000,"
                              "_SERIALPORT TEXT)");
   if (bSuccess)
   {
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
-                          "_ID INT PRIMARY KEY NOT NULL,"
-                          "_NUMBER INT NOT NULL,"
-                          "_DATE INT NOT NULL,"
+                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          "_NUMBER INTEGER NOT NULL,"
+                          "_DATE INTEGER NOT NULL,"
                           "_SUPPLIER TEXT NOT NULL,"
                           "_ITEMS TEXT,"
                           "_TOTAL REAL)");
@@ -67,18 +67,18 @@ bool Database::insert(const Note& note,
     return false;
 
   QSqlQuery query;
-  query.prepare("INSERT INTO _PROMISSORYNOTES "
-                "(_NUMBER,"
+  query.prepare("INSERT INTO _PROMISSORYNOTES ("
+                "_NUMBER,"
                 "_DATE,"
                 "_SUPPLIER,"
                 "_ITEMS,"
                 "_TOTAL) "
-                "VALUES "
+                "VALUES ("
                 "(:_number),"
                 "(:_date),"
                 "(:_supplier),"
                 "(:_items),"
-                "(:_total);");
+                "(:_total))");
 
   query.bindValue(":_number", note.m_number);
   query.bindValue(":_date", note.m_date);
@@ -111,7 +111,6 @@ bool Database::select(int id,
                 "_TOTAL "
                 "FROM PROMISSORYNOTES "
                 "WHERE _ID = (:_id);");
-
 
   query.bindValue(":_id", id);
 

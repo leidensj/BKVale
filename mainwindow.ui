@@ -56,6 +56,7 @@
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
+   <addaction name="actionInfo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAdd">
@@ -152,6 +153,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionInfo">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/about.png</normaloff>:/icons/res/about.png</iconset>
+   </property>
+   <property name="text">
+    <string>Informações</string>
+   </property>
+   <property name="toolTip">
+    <string>Informações</string>
    </property>
   </action>
  </widget>

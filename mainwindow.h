@@ -36,6 +36,7 @@ private slots:
   void showSettings();
   void enableControls();
   void createNew();
+  void showInfo();
 };
 
 #endif // MAINWINDOW_H

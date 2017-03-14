@@ -46,6 +46,11 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSettings()));
 
+  QObject::connect(ui->actionInfo,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(showInfo()));
+
   QObject::connect(&m_noteWidget,
                    SIGNAL(changedSignal()),
                    this,
@@ -216,5 +221,19 @@ void BKVale::createNew()
       m_noteWidget.clear();
       enableControls();
     }
+  }
+}
+
+void BKVale::showInfo()
+{
+  Note note = m_noteWidget.getNote();
+  QString error;
+  if (!m_db.insert(note, error))
+  {
+    QMessageBox msgBox(QMessageBox::Warning,
+                       tr("Erro ao salvar vale"),
+                       error,
+                       QMessageBox::Ok);
+    msgBox.exec();
   }
 }

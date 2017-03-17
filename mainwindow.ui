@@ -20,11 +20,11 @@
    <string>BaitaVale</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="icons.qrc">
+   <iconset>
     <normaloff>:/icons/res/baita.png</normaloff>:/icons/res/baita.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout"/>
+   <layout class="QHBoxLayout" name="horizontalLayout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">
@@ -59,9 +59,42 @@
    <addaction name="actionInfo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="dock">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable</set>
+   </property>
+   <property name="windowTitle">
+    <string>Pesquisar</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>9</number>
+     </property>
+     <property name="topMargin">
+      <number>9</number>
+     </property>
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
+     <property name="bottomMargin">
+      <number>9</number>
+     </property>
+    </layout>
+   </widget>
+  </widget>
   <action name="actionAdd">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/add.png</normaloff>:/icons/res/add.png</iconset>
    </property>
    <property name="text">
@@ -76,7 +109,7 @@
   </action>
   <action name="actionConnect">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/connected.png</normaloff>:/icons/res/connected.png</iconset>
    </property>
    <property name="text">
@@ -85,7 +118,7 @@
   </action>
   <action name="actionDisconnect">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/disconnected.png</normaloff>:/icons/res/disconnected.png</iconset>
    </property>
    <property name="text">
@@ -94,7 +127,7 @@
   </action>
   <action name="actionPrint">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/printer.png</normaloff>:/icons/res/printer.png</iconset>
    </property>
    <property name="text">
@@ -106,7 +139,7 @@
   </action>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/file.png</normaloff>:/icons/res/file.png</iconset>
    </property>
    <property name="text">
@@ -118,7 +151,7 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/settings.png</normaloff>:/icons/res/settings.png</iconset>
    </property>
    <property name="text">
@@ -127,7 +160,7 @@
   </action>
   <action name="actionRemove">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/remove.png</normaloff>:/icons/res/remove.png</iconset>
    </property>
    <property name="text">
@@ -142,7 +175,7 @@
   </action>
   <action name="actionSearch">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/search.png</normaloff>:/icons/res/search.png</iconset>
    </property>
    <property name="text">
@@ -157,7 +190,7 @@
   </action>
   <action name="actionInfo">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/icons/res/about.png</normaloff>:/icons/res/about.png</iconset>
    </property>
    <property name="text">
@@ -169,8 +202,6 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

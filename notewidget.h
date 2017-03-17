@@ -20,6 +20,7 @@ public:
   Note getNote() const;
   void setNote(const Note& note);
   bool isValid() const;
+  bool isDirty() const;
 
 private:
   static const QChar st_separator;
@@ -30,6 +31,7 @@ private:
   double evaluate(int row, int column) const;
   QString text(int row, int column) const ;
   QString serializeItems() const;
+  bool m_bDirty;
 
 private slots:
   void updateTable(int row, int column);
@@ -38,7 +40,7 @@ private slots:
 public slots:
   void addItem();
   void removeItem();
-  void clear();
+  void clear(int number);
   void setEnabled(bool bEnable);
 
 signals:

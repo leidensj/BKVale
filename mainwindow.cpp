@@ -10,11 +10,12 @@
 BKVale::BKVale(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::BKVale),
-  m_noteWidget(nullptr),
   m_bReady(false)
 {
   ui->setupUi(this);
   ui->centralWidget->layout()->addWidget(&m_noteWidget);
+  ui->dockContents->layout()->addWidget(&m_historyWidget);
+  ui->dock->close();
 
   QObject::connect(ui->actionAdd,
                    SIGNAL(triggered(bool)),
@@ -60,6 +61,11 @@ BKVale::BKVale(QWidget *parent) :
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(createNew()));
+
+  QObject::connect(ui->actionSearch,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(showSearch()));
 
   enableControls();
 }
@@ -206,7 +212,7 @@ void BKVale::createNew()
   }
   else
   {
-    bSuccess = m_db.createTables(error);
+    bSuccess = m_db.init(error);
     if (!bSuccess)
     {
       QMessageBox msgBox(QMessageBox::Critical,
@@ -218,7 +224,7 @@ void BKVale::createNew()
     else
     {
       m_bReady = true;
-      m_noteWidget.clear();
+      m_noteWidget.clear(m_db.number());
       enableControls();
     }
   }
@@ -235,5 +241,17 @@ void BKVale::showInfo()
                        error,
                        QMessageBox::Ok);
     msgBox.exec();
+  }
+}
+
+void BKVale::showSearch()
+{
+  if (ui->dock->isHidden())
+  {
+    Notes notes;
+    QString error;
+    m_db.selectAll(notes, error);
+    m_historyWidget.refresh(notes);
+    ui->dock->show();
   }
 }

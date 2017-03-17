@@ -8,7 +8,8 @@ const QChar NoteWidget::st_separator = ';';
 
 NoteWidget::NoteWidget(QWidget *parent) :
   QFrame(parent),
-  ui(new Ui::NoteWidget)
+  ui(new Ui::NoteWidget),
+  m_bDirty(false)
 {
   ui->setupUi(this);
 
@@ -147,6 +148,7 @@ void NoteWidget::removeItem()
 
 void NoteWidget::changed()
 {
+  m_bDirty = true;
   emit changedSignal();
 }
 
@@ -210,6 +212,7 @@ Note NoteWidget::getNote() const
 void NoteWidget::setNote(const Note& note)
 {
 
+  m_bDirty = false;
 }
 
 bool NoteWidget::isValid() const
@@ -218,13 +221,20 @@ bool NoteWidget::isValid() const
       ui->table->rowCount() != 0;
 }
 
-void NoteWidget::clear()
+bool NoteWidget::isDirty() const
+{
+  return m_bDirty;
+}
+
+void NoteWidget::clear(int number)
 {
   ui->date->setDate(QDate::currentDate());
   ui->supplier->setCurrentText("");
-  ui->number->setValue(0);
+  ui->number->setValue(number);
   ui->total->setText("");
   ui->table->setRowCount(0);
+  ui->supplier->setFocus();
+  m_bDirty = false;
 }
 
 void NoteWidget::setEnabled(bool bEnable)

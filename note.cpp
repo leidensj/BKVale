@@ -6,6 +6,22 @@ Note::Note()
   clear();
 }
 
+Note::Note(int id,
+           int number,
+           qint64 date,
+           QString supplier,
+           QString items,
+           double total)
+        : m_id(id)
+        , m_number(number)
+        , m_date(date)
+        , m_supplier(supplier)
+        , m_items(items)
+        , m_total(total)
+{
+
+}
+
 void Note::clear()
 {
   m_id = 0;

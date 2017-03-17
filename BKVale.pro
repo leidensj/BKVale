@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     printutils.cpp \
     databaseutils.cpp \
     notewidget.cpp \
-    note.cpp
+    note.cpp \
+    historywidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -28,11 +29,13 @@ HEADERS  += mainwindow.h \
     printutils.h \
     databaseutils.h \
     notewidget.h \
-    note.h
+    note.h \
+    historywidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \
-    bkframe.ui
+    bkframe.ui \
+    historywidget.ui
 
 RESOURCES += \
     icons.qrc

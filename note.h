@@ -25,11 +25,21 @@ struct Note
   double m_total;
 
   Note();
+
+  Note(int id,
+       int number,
+       qint64 date,
+       QString supplier,
+       QString items,
+       double total);
+
   void clear();
 
   static QString format(const QString& str, bool b3places = false);
   static QString format(double d, bool b3places = false);
 };
+
+typedef std::vector<Note> Notes;
 
 struct NoteItems
 {

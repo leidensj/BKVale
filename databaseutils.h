@@ -3,10 +3,18 @@
 
 #include <QSqlDatabase>
 #include <note.h>
+#include <vector>
+
+#define DEFAULT_NUMBER     1000
+#define DEFAULT_NUMBER_STR "1000"
 
 class Database
 {
   QSqlDatabase m_db;
+
+  bool incNumber(QString& error);
+
+  bool hasConfig();
 
 public:
 
@@ -17,7 +25,7 @@ public:
   bool open(const QString& path,
             QString& error);
 
-  bool createTables(QString& error);
+  bool init(QString& error);
 
   bool insert(const Note& note,
               QString& error);
@@ -25,5 +33,10 @@ public:
   bool select(int id,
               Note& note,
               QString& error);
+
+  bool selectAll(Notes& notes,
+                 QString& error);
+
+  int number();
 };
 #endif // DATABASEUTILS_H

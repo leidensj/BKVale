@@ -6,6 +6,7 @@
 #include "settingsdlg.h"
 #include "databaseutils.h"
 #include "notewidget.h"
+#include "historywidget.h"
 
 namespace Ui {
 class BKVale;
@@ -24,6 +25,7 @@ public:
 private:
   Ui::BKVale *ui;
   NoteWidget m_noteWidget;
+  HistoryWidget m_historyWidget;
   QSerialPort m_printer;
   Settings m_settings;
   Database m_db;
@@ -37,6 +39,7 @@ private slots:
   void enableControls();
   void createNew();
   void showInfo();
+  void showSearch();
 };
 
 #endif // MAINWINDOW_H

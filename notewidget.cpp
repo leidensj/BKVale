@@ -143,7 +143,6 @@ void NoteWidget::removeItem()
     ui->total->setText(computeTotal());
   else
     ui->total->clear();
-
 }
 
 void NoteWidget::changed()

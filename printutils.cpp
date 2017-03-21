@@ -10,11 +10,14 @@
 #define ESC_STRESS_ON    "\x1b\x45"
 #define ESC_STRESS_OFF   "\x1b\x46"
 #define ESC_LF           "\n"
+#define ESC_VERT_TAB     "\x1b\x4a\x40"
 #define ESC_INIT         "\x1b\x40"
 #define ESC_DOUBLE_FONT  "\x1b\x0e\x1b\x56"
 #define ESC_PORTUGUESE   "\x1b\x74\x08"
 #define ESC_REVERSE_ON   "\x1b\x7d\x31"
 #define ESC_REVERSE_OFF  "\x1b\x7d\x30"
+#define ESC_EXPAND_ON    "\x1b\x57\x31"
+#define ESC_EXPAND_OFF   "\x1b\x57\x30"
 
 #define TABLE_WIDTH           48
 #define TABLE_MAX_VALUE       10000
@@ -23,54 +26,55 @@ namespace
 {
   QString buildHeader(const Note& note)
   {
-    return QString(ESC_ALIGN_CENTER) +
-        ESC_DOUBLE_FONT +
-        "B.K. RESTAURANTE"+
-        ESC_LF +
-        ESC_DOUBLE_FONT +
-        "E LANCHERIA LTDA" +
-        ESC_LF +
-        ESC_DOUBLE_FONT +
-        "3228-1666" +
-        ESC_LF +
-        ESC_ALIGN_LEFT +
-        ESC_LF +
-        ESC_LF +
-        "Data de impressão: " + ESC_STRESS_ON +
-        QDate::fromJulianDay(note.m_date).toString("dd/MM/yyyy") +
-        ESC_STRESS_OFF +
-        ESC_LF +
-        "Hora de impressão: " +
-        ESC_STRESS_ON +
-        QTime::currentTime().toString("hh:mm:ss") +
-        ESC_LF +
-        ESC_LF +
-        ESC_ALIGN_CENTER +
-        "Data do vale:" +
+    return QString(ESC_EXPAND_ON) +
+        ESC_ALIGN_CENTER
+        "BaitaKão"
         ESC_LF
-        ESC_STRESS_OFF +
+        "Rua Sinimbu 175 Lourdes"
+        ESC_LF
+        "32221034 32281666"
+        ESC_EXPAND_OFF
+        ESC_LF
+        ESC_VERT_TAB
+        "Data de impressão: " +
+        QDate::fromJulianDay(note.m_date).toString("dd/MM/yyyy") +
+        ESC_LF
+        "Hora de impressão: " +
+        QTime::currentTime().toString("hh:mm:ss") +
+        ESC_LF
+        ESC_VERT_TAB
+        ESC_ALIGN_CENTER
+        "Data do vale:"
+        ESC_LF
         ESC_DOUBLE_FONT +
         QDate::fromJulianDay(note.m_date).toString("dd/MM/yyyy\n(dddd)") +
+        ESC_VERT_TAB
+        "Fornecedor:"
         ESC_LF +
-        ESC_LF;
+        ESC_DOUBLE_FONT +
+        note.m_supplier +
+        ESC_LF +
+        ESC_VERT_TAB;
   }
 
   QString buildFooter(const Note& note)
   {
     return QString(ESC_LF) +
-        ESC_ALIGN_CENTER +
-        ESC_DOUBLE_FONT +
+        ESC_ALIGN_CENTER
+        ESC_DOUBLE_FONT
         "TOTAL R$" +
         Note::format(note.m_total) +
-        ESC_LF +
-        ESC_LF +
+        ESC_VERT_TAB
         ESC_FULL_CUT;
   }
 
   QString buildBody(const Note& note)
   {
     NoteItems items(note.m_items);
-    QString body = items.m_size != 0 ? "" : ESC_ALIGN_LEFT;
+    if (items.m_size == 0)
+      return "";
+
+    QString body(ESC_ALIGN_LEFT);
     for (int i = 0; i != items.m_size; ++i)
     {
       QString item;
@@ -87,8 +91,7 @@ namespace
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
       body += items.at(i, Column::Description) + ESC_LF +
-              item + ESC_LF +
-              "────────────────────────────────────────────────" + ESC_LF;
+              item + ESC_LF "────────────────────────────────────────────────" ESC_LF;
     }
     return body;
   }

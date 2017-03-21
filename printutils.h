@@ -1,7 +1,7 @@
 #ifndef PRINTUTILS_H
 #define PRINTUTILS_H
 
-#include <QSerialPort>
+#include <QtSerialPort/QtSerialPort>
 #include <note.h>
 
 namespace PrintUtils

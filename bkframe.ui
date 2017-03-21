@@ -231,7 +231,7 @@
             <bool>true</bool>
            </property>
            <property name="insertPolicy">
-            <enum>QComboBox::InsertAlphabetically</enum>
+            <enum>QComboBox::InsertAtTop</enum>
            </property>
            <property name="frame">
             <bool>true</bool>

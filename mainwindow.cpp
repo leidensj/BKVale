@@ -100,8 +100,11 @@ void BKVale::connect()
     if (!m_printer.open((QIODevice::ReadWrite)))
     {
       QMessageBox msgBox(QMessageBox::Critical,
-                         tr("Erro número: ") + QString::number(m_printer.error()),
-                         tr("O seguinte erro ocorreu ao conectar à impressora: '%1'.").arg(
+                         tr("Erro"),
+                         tr("O seguinte erro ocorreu ('%1') ao conectar à impressora "
+                            "(porta '%2'): '%3'.").arg(
+                           QString::number(m_printer.error()),
+                           m_printer.portName(),
                            m_printer.errorString()),
                          QMessageBox::Ok);
       msgBox.exec();
@@ -116,6 +119,7 @@ void BKVale::connect()
                            tr("Erro ao inicializar a impressora: '%1'.").arg(error),
                            QMessageBox::Ok);
         msgBox.exec();
+        m_printer.close();
       }
     }
   }

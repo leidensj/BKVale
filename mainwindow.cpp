@@ -67,6 +67,12 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(showSearch()));
 
+  QObject::connect(&m_historyWidget,
+                   SIGNAL(noteSelectedSignal(int)),
+                   this,
+                   SLOT(openNote(int)));
+
+  m_noteWidget.clear();
   enableControls();
 }
 
@@ -155,7 +161,7 @@ void BKVale::print()
                        QMessageBox::Ok);
     msgBox.exec();
   }
-  else
+  else if (!m_noteWidget.isHistoryMode())
   {
     if (!m_db.insert(note, error))
     {
@@ -164,6 +170,10 @@ void BKVale::print()
                          error,
                          QMessageBox::Ok);
       msgBox.exec();
+    }
+    else
+    {
+      createNew();
     }
   }
 }
@@ -189,38 +199,67 @@ void BKVale::showSettings()
 void BKVale::enableControls()
 {
   const bool bIsOpen = m_printer.isOpen();
+  const bool bCanEdit = m_bReady && !m_noteWidget.isHistoryMode() && ui->dock->isHidden();
   ui->actionConnect->setEnabled(!bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionPrint->setEnabled(m_noteWidget.isValid() && bIsOpen && m_bReady);
   ui->actionSettings->setEnabled(!bIsOpen);
-  ui->actionAdd->setEnabled(m_bReady);
-  ui->actionRemove->setEnabled(m_bReady && m_noteWidget.isValidSelection());
-  m_noteWidget.setEnabled(m_bReady);
+  ui->actionAdd->setEnabled(bCanEdit);
+  ui->actionRemove->setEnabled(bCanEdit && m_noteWidget.isValidSelection());
+  m_noteWidget.setEnabled(bCanEdit);
+}
+
+bool BKVale::initDatabase(QString& error)
+{
+  error.clear();
+  bool bSuccess = m_db.open(qApp->applicationDirPath() +
+                            QDir::separator() +
+                            "setup.db",
+                            error);
+  if (bSuccess)
+    bSuccess = m_db.init(error);
+  else
+    m_db.close();
+
+  return bSuccess;
 }
 
 void BKVale::createNew()
 {
   QString error;
-  bool bSuccess = m_db.open(qApp->applicationDirPath() +
-                            QDir::separator() +
-                            "setup.db",
-                            error);
-  if (!bSuccess)
+  if (!initDatabase(error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
-                       tr("Erro"),
+                       tr("Erro ao inicializar banco de dados"),
                        error,
                        QMessageBox::Ok);
     msgBox.exec();
   }
   else
   {
-    bSuccess = m_db.init(error);
-    if (!bSuccess)
+    m_bReady = true;
+    m_noteWidget.createNew(m_db.number());
+    if (!ui->dock->isHidden())
+      ui->dock->close();
+    enableControls();
+  }
+}
+
+void BKVale::showInfo()
+{
+
+}
+
+void BKVale::showSearch()
+{
+  if (ui->dock->isHidden())
+  {
+    QString error;
+    if (!initDatabase(error))
     {
       QMessageBox msgBox(QMessageBox::Critical,
-                         tr("Erro"),
+                         tr("Erro ao inicializar banco de dados"),
                          error,
                          QMessageBox::Ok);
       msgBox.exec();
@@ -228,34 +267,20 @@ void BKVale::createNew()
     else
     {
       m_bReady = true;
-      m_noteWidget.clear(m_db.number());
+      Notes notes;
+      QString error;
+      m_db.selectAll(notes, error);
+      m_historyWidget.refresh(notes);
+      m_noteWidget.clear();
+      ui->dock->show();
       enableControls();
     }
   }
 }
 
-void BKVale::showInfo()
+void BKVale::openNote(int idx)
 {
-  Note note = m_noteWidget.getNote();
-  QString error;
-  if (!m_db.insert(note, error))
-  {
-    QMessageBox msgBox(QMessageBox::Warning,
-                       tr("Erro ao salvar vale"),
-                       error,
-                       QMessageBox::Ok);
-    msgBox.exec();
-  }
-}
-
-void BKVale::showSearch()
-{
-  if (ui->dock->isHidden())
-  {
-    Notes notes;
-    QString error;
-    m_db.selectAll(notes, error);
-    m_historyWidget.refresh(notes);
-    ui->dock->show();
-  }
+  Note note(m_historyWidget.at(idx));
+  m_noteWidget.setNote(note);
+  enableControls();
 }

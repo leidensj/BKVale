@@ -6,10 +6,11 @@
 
 const QChar NoteWidget::st_separator = ';';
 
-NoteWidget::NoteWidget(QWidget *parent) :
-  QFrame(parent),
-  ui(new Ui::NoteWidget),
-  m_bDirty(false)
+NoteWidget::NoteWidget(QWidget *parent)
+  : QFrame(parent)
+  , ui(new Ui::NoteWidget)
+  , m_bDirty(false)
+  , m_bHistoryMode(false)
 {
   ui->setupUi(this);
 
@@ -184,6 +185,36 @@ QString NoteWidget::text(int row, int column) const
   return str;
 }
 
+void NoteWidget::setText(int row, int column, const QString& str)
+{
+  switch((Column)column)
+  {
+    case Column::Ammount:
+    case Column::UnitValue:
+    case Column::Description:
+    case Column::SubTotal:
+    {
+      auto p = ui->table->item(row, column);
+      if (p != nullptr)
+        p->setText(str);
+    } break;
+    case Column::Unity:
+    {
+      QComboBox* pt = dynamic_cast<QComboBox*>(ui->table->cellWidget(row, column));
+      if (pt != nullptr)
+      {
+        int idx = pt->findText(str, Qt::MatchFixedString);
+        if (idx != -1)
+          pt->setCurrentIndex(idx);
+      }
+    } break;
+    default:
+    {
+      Q_ASSERT(false);
+    } break;
+  }
+}
+
 QString NoteWidget::serializeItems() const
 {
   QString str;
@@ -210,8 +241,21 @@ Note NoteWidget::getNote() const
 
 void NoteWidget::setNote(const Note& note)
 {
-
+  ui->table->setRowCount(0);
+  ui->date->setDate(QDate::fromJulianDay(note.m_date));
+  ui->supplier->setCurrentText(note.m_supplier);
+  ui->number->setValue(note.m_number);
+  NoteItems items(note.m_items);
+  for (int row = 0; row != items.m_size; ++row)
+  {
+    addItem();
+    setText(row, (int)Column::Ammount, items.at(row, Column::Ammount));
+    setText(row, (int)Column::UnitValue, items.at(row, Column::UnitValue));
+    setText(row, (int)Column::Description, items.at(row, Column::Description));
+    setText(row, (int)Column::SubTotal, items.at(row, Column::SubTotal));
+  }
   m_bDirty = false;
+  m_bHistoryMode = true;
 }
 
 bool NoteWidget::isValid() const
@@ -225,15 +269,29 @@ bool NoteWidget::isDirty() const
   return m_bDirty;
 }
 
-void NoteWidget::clear(int number)
+bool NoteWidget::isHistoryMode() const
 {
-  ui->date->setDate(QDate::currentDate());
+  return m_bHistoryMode;
+}
+
+void NoteWidget::clear()
+{
+  ui->date->setSpecialValueText(" ");
+  ui->date->setDate(ui->date->minimumDate());
   ui->supplier->setCurrentText("");
-  ui->number->setValue(number);
+  ui->number->clear();
   ui->total->setText("");
   ui->table->setRowCount(0);
   ui->supplier->setFocus();
   m_bDirty = false;
+  m_bHistoryMode = false;
+}
+
+void NoteWidget::createNew(int number)
+{
+  clear();
+  ui->date->setDate(QDate::currentDate());
+  ui->number->setValue(number);
 }
 
 void NoteWidget::setEnabled(bool bEnable)

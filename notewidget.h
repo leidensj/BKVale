@@ -21,6 +21,7 @@ public:
   void setNote(const Note& note);
   bool isValid() const;
   bool isDirty() const;
+  bool isHistoryMode() const;
 
 private:
   static const QChar st_separator;
@@ -30,8 +31,10 @@ private:
   QString computeTotal() const;
   double evaluate(int row, int column) const;
   QString text(int row, int column) const ;
+  void setText(int row, int column, const QString& str);
   QString serializeItems() const;
   bool m_bDirty;
+  bool m_bHistoryMode;
 
 private slots:
   void updateTable(int row, int column);
@@ -39,8 +42,9 @@ private slots:
 
 public slots:
   void addItem();
+  void clear();
   void removeItem();
-  void clear(int number);
+  void createNew(int number);
   void setEnabled(bool bEnable);
 
 signals:

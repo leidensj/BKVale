@@ -253,10 +253,10 @@
       <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="verticalScrollMode">
-      <enum>QAbstractItemView::ScrollPerItem</enum>
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
      <property name="horizontalScrollMode">
-      <enum>QAbstractItemView::ScrollPerItem</enum>
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
      <property name="cornerButtonEnabled">
       <bool>true</bool>

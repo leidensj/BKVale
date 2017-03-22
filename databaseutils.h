@@ -25,6 +25,8 @@ public:
   bool open(const QString& path,
             QString& error);
 
+  void close();
+
   bool init(QString& error);
 
   bool insert(const Note& note,

@@ -43,7 +43,7 @@ QString Note::format(double d, bool b3places /*= false*/)
 }
 
 NoteItems::NoteItems(const QString &items)
-  : m_items(items.split(";"))
+  : m_items(items.isEmpty() ? QStringList() : items.split(";"))
   , m_size(m_items.size() / NUMBER_OF_COLUMNS)
 {
   Q_ASSERT(m_items.size() % NUMBER_OF_COLUMNS == 0);

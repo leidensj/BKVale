@@ -44,7 +44,7 @@ typedef std::vector<Note> Notes;
 struct NoteItems
 {
   const QStringList m_items;
-  const int m_size;
+  int m_size;
   NoteItems(const QString& items);
   QString at(int row, Column column) const;
 };

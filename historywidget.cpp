@@ -7,6 +7,11 @@ HistoryWidget::HistoryWidget(QWidget *parent) :
   ui(new Ui::HistoryWidget)
 {
   ui->setupUi(this);
+
+  QObject::connect(ui->table,
+                   SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
+                   this,
+                   SLOT(noteSelected(QTableWidgetItem*)));
 }
 
 HistoryWidget::~HistoryWidget()
@@ -39,4 +44,15 @@ void HistoryWidget::refresh(Notes& notes)
                        (int)HistColumn::Total,
                        new QTableWidgetItem(Note::format(m_notes.at(row).m_total)));
   }
+}
+
+void HistoryWidget::noteSelected(QTableWidgetItem* p)
+{
+  int idx = p != nullptr ? p->row() : -1;
+  emit noteSelectedSignal(idx);
+}
+
+Note HistoryWidget::at(int idx) const
+{
+  return (size_t)idx < m_notes.size() ? m_notes.at((size_t)idx) : Note();
 }

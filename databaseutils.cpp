@@ -31,6 +31,11 @@ bool Database::open(const QString& path,
   return bSuccess;
 }
 
+void Database::close()
+{
+  m_db.close();
+}
+
 bool Database::init(QString& error)
 {
   error.clear();

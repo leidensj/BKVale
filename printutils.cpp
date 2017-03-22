@@ -144,8 +144,8 @@ QString PrintUtils::buildNote(const Note& note)
   appendBody(note, strNote1);
   appendFooter(note, strNote1);
   QString strNote2(strNote1);
-  strNote1 += "1ª via" ESC_PARTIAL_CUT;
-  strNote2 += "2ª via" ESC_FULL_CUT;
+  strNote1 += "1ª via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
+  strNote2 += "2ª via" ESC_LF ESC_LF ESC_FULL_CUT;
   return strNote1 + strNote2;
 }
 

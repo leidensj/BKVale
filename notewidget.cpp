@@ -3,6 +3,7 @@
 #include "tinyexpr.h"
 #include <QComboBox>
 #include <QStringList>
+#include <QKeyEvent>
 
 const QChar NoteWidget::st_separator = ';';
 
@@ -28,6 +29,16 @@ NoteWidget::NoteWidget(QWidget *parent)
                    SIGNAL(editTextChanged(const QString &)),
                    this,
                    SLOT(changed()));
+
+  QObject::connect(ui->supplier,
+                   SIGNAL(editTextChanged(const QString&)),
+                   this,
+                   SLOT(upperSupplier(const QString&)));
+
+  QObject::connect(ui->table,
+                   SIGNAL(itemChanged(QTableWidgetItem*)),
+                   this,
+                   SLOT(upperDescription(QTableWidgetItem*)));
 
   ui->supplier->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
   ui->date->setDate(QDate::currentDate());
@@ -133,6 +144,8 @@ void NoteWidget::addItem()
   ui->table->setItem(row, (int)Column::Description, new QTableWidgetItem(""));
   ui->table->setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
   ui->table->setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
+  ui->table->setCurrentCell(row, (int)Column::Ammount);
+  ui->table->setFocus();
   ui->table->blockSignals(false);
   ui->total->setText(computeTotal());
 }
@@ -301,4 +314,60 @@ void NoteWidget::setEnabled(bool bEnable)
   ui->number->setEnabled(bEnable);
   ui->total->setEnabled(bEnable);
   ui->table->setEnabled(bEnable);
+}
+
+void NoteWidget::upperSupplier(const QString& text)
+{
+  ui->supplier->blockSignals(true);
+  ui->supplier->setCurrentText(text.toUpper());
+  ui->supplier->blockSignals(false);
+}
+
+void NoteWidget::upperDescription(QTableWidgetItem* item)
+{
+  if (item != nullptr)
+  {
+    if (item->column() == (int)Column::Description)
+    {
+      ui->table->blockSignals(true);
+      item->setText(item->text().toUpper());
+      ui->table->blockSignals(false);
+    }
+  }
+}
+
+bool NoteWidget::eventFilter(QObject* obj, QEvent* event)
+{
+  if (event->type() == QEvent::KeyPress)
+  {
+    QKeyEvent* key = static_cast<QKeyEvent*>(event);
+    if ((key->key()==Qt::Key_Enter) || (key->key()==Qt::Key_Return))
+    {
+      if (ui->supplier->hasFocus() && ui->table->rowCount() != 0)
+        ui->table->item(0, 0)->setSelected(true);
+      else if(ui->table->hasFocus())
+      {
+        auto list = ui->table->selectedItems();
+        if (list.size() != 0)
+        {
+          auto p = list.at(0);
+          if (p != nullptr)
+          {
+            if (p->column() < (NUMBER_OF_COLUMNS - 1))
+              ui->table->item(p->row(), p->column() + 1)->setSelected(true);
+          }
+        }
+      }
+    }
+    else
+    {
+      return QObject::eventFilter(obj, event);
+    }
+    return true;
+  }
+  else
+  {
+    return QObject::eventFilter(obj, event);
+  }
+  return false;
 }

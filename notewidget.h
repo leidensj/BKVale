@@ -5,6 +5,8 @@
 #include <QStringList>
 #include "note.h"
 
+class QTableWidgetItem;
+
 namespace Ui {
 class NoteWidget;
 }
@@ -12,6 +14,9 @@ class NoteWidget;
 class NoteWidget : public QFrame
 {
   Q_OBJECT
+
+protected:
+    bool eventFilter(QObject* obj, QEvent* event);
 
 public:
   explicit NoteWidget(QWidget *parent = 0);
@@ -39,6 +44,8 @@ private:
 private slots:
   void updateTable(int row, int column);
   void changed();
+  void upperSupplier(const QString& text);
+  void upperDescription(QTableWidgetItem* item);
 
 public slots:
   void addItem();

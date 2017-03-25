@@ -163,7 +163,9 @@ void BKVale::print()
   }
   else if (!m_noteWidget.isHistoryMode())
   {
-    if (!m_db.insert(note, error))
+    if (!m_db.insert(note,
+                     m_noteWidget.getItemDescriptions(),
+                     error))
     {
       QMessageBox msgBox(QMessageBox::Warning,
                          tr("Erro ao salvar vale"),
@@ -239,7 +241,8 @@ void BKVale::createNew()
   else
   {
     m_bReady = true;
-    m_noteWidget.createNew(m_db.number());
+    m_noteWidget.createNew(m_db.number(),
+                           m_db.selectSuppliers());
     if (!ui->dock->isHidden())
       ui->dock->close();
     enableControls();

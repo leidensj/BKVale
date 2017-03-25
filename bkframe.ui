@@ -101,7 +101,7 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>8</pointsize>
+             <pointsize>12</pointsize>
              <weight>50</weight>
              <bold>false</bold>
             </font>
@@ -156,7 +156,7 @@
           <widget class="QDateEdit" name="date">
            <property name="font">
             <font>
-             <pointsize>8</pointsize>
+             <pointsize>12</pointsize>
              <weight>50</weight>
              <bold>false</bold>
             </font>
@@ -222,7 +222,7 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>10</pointsize>
+             <pointsize>12</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -246,6 +246,11 @@
    </item>
    <item>
     <widget class="QTableWidget" name="table">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="alternatingRowColors">
       <bool>false</bool>
      </property>

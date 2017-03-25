@@ -56,6 +56,12 @@ bool Database::init(QString& error)
                           "_SUPPLIER TEXT NOT NULL,"
                           "_ITEMS TEXT,"
                           "_TOTAL REAL)");
+    if (bSuccess)
+    {
+      bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
+                            "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            "_DESCRIPTION TEXT NOT NULL UNIQUE)");
+    }
   }
 
   if (bSuccess && !hasConfig())
@@ -67,6 +73,7 @@ bool Database::init(QString& error)
 }
 
 bool Database::insert(const Note& note,
+                      QStringList itemDescriptions,
                       QString& error)
 {
   error.clear();
@@ -96,9 +103,15 @@ bool Database::insert(const Note& note,
 
   bool bSuccess = query.exec();
   if (!bSuccess)
+  {
+
     error = query.lastError().text();
+  }
   else
-    bSuccess = incNumber(error);
+  {
+    incNumber();
+    insertItemDescriptions(itemDescriptions);
+  }
 
   return bSuccess;
 }
@@ -161,16 +174,13 @@ int Database::number()
   return query.next() ? query.value(idx).toInt() : DEFAULT_NUMBER;
 }
 
-bool Database::incNumber(QString &error)
+void Database::incNumber()
 {
   int n = number() + 1;
   QSqlQuery query;
   query.prepare("UPDATE _SETTINGS SET _LASTNUMBER = :_number");
   query.bindValue(":_number", n);
-  bool bSuccess = query.exec();
-  if (!bSuccess)
-    error = query.lastError().text();
-  return bSuccess;
+  query.exec();
 }
 
 bool Database::hasConfig()
@@ -223,4 +233,55 @@ bool Database::selectAll(Notes& notes,
   }
 
   return bSuccess;
+}
+
+QStringList Database::selectSuppliers()
+{
+  QStringList list;
+  QString error;
+  if (isOpen(error))
+  {
+    QSqlQuery query;
+    if (query.exec("SELECT DISTINCT "
+                   "_SUPPLIER "
+                   "FROM _PROMISSORYNOTES"))
+    {
+      while (query.next())
+        list << query.value(query.record().indexOf("_SUPPLIER")).toString();
+    }
+  }
+  return list;
+}
+
+void Database::insertItemDescriptions(const QStringList& itemDescriptions)
+{
+  for (int i = 0; i != itemDescriptions.size(); ++i)
+  {
+    QSqlQuery query;
+    query.prepare("INSERT INTO _ITEMS ("
+                  "_DESCRIPTION) "
+                  "VALUES ("
+                  "(:_description))");
+
+    query.bindValue(":_description", itemDescriptions.at(i));
+    query.exec();
+  }
+}
+
+QStringList Database::selectItemDescriptions()
+{
+  QStringList list;
+  QString error;
+  if (isOpen(error))
+  {
+    QSqlQuery query;
+    if (query.exec("SELECT DISTINCT "
+                   "_DESCRIPTION "
+                   "FROM _ITEMS"))
+    {
+      while (query.next())
+        list << query.value(query.record().indexOf("_DESCRIPTION")).toString();
+    }
+  }
+  return list;
 }

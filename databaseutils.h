@@ -12,9 +12,11 @@ class Database
 {
   QSqlDatabase m_db;
 
-  bool incNumber(QString& error);
+  void incNumber();
 
   bool hasConfig();
+
+  void insertItemDescriptions(const QStringList& itemDescriptions);
 
 public:
 
@@ -30,6 +32,7 @@ public:
   bool init(QString& error);
 
   bool insert(const Note& note,
+              QStringList itemDescriptions,
               QString& error);
 
   bool select(int id,
@@ -38,6 +41,10 @@ public:
 
   bool selectAll(Notes& notes,
                  QString& error);
+
+  QStringList selectSuppliers();
+
+  QStringList selectItemDescriptions();
 
   int number();
 };

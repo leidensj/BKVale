@@ -24,12 +24,12 @@ public:
   bool isValidSelection() const;
   Note getNote() const;
   void setNote(const Note& note);
+  QStringList getItemDescriptions() const;
   bool isValid() const;
   bool isDirty() const;
   bool isHistoryMode() const;
 
 private:
-  static const QChar st_separator;
   Ui::NoteWidget *ui;
   QString computeUnitValue(int row) const;
   QString computeSubTotal(int row) const;
@@ -51,7 +51,8 @@ public slots:
   void addItem();
   void clear();
   void removeItem();
-  void createNew(int number);
+  void createNew(int number,
+                 const QStringList& suppliers);
   void setEnabled(bool bEnable);
 
 signals:

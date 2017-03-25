@@ -5,8 +5,6 @@
 #include <QStringList>
 #include <QKeyEvent>
 
-const QChar NoteWidget::st_separator = ';';
-
 NoteWidget::NoteWidget(QWidget *parent)
   : QFrame(parent)
   , ui(new Ui::NoteWidget)
@@ -263,6 +261,7 @@ void NoteWidget::setNote(const Note& note)
   {
     addItem();
     setText(row, (int)Column::Ammount, items.at(row, Column::Ammount));
+    setText(row, (int)Column::Unity, items.at(row, Column::Unity));
     setText(row, (int)Column::UnitValue, items.at(row, Column::UnitValue));
     setText(row, (int)Column::Description, items.at(row, Column::Description));
     setText(row, (int)Column::SubTotal, items.at(row, Column::SubTotal));
@@ -296,15 +295,19 @@ void NoteWidget::clear()
   ui->total->setText("");
   ui->table->setRowCount(0);
   ui->supplier->setFocus();
+  while (ui->supplier->count())
+    ui->supplier->removeItem(ui->supplier->count() - 1);
   m_bDirty = false;
   m_bHistoryMode = false;
 }
 
-void NoteWidget::createNew(int number)
+void NoteWidget::createNew(int number,
+                           const QStringList& suppliers)
 {
   clear();
   ui->date->setDate(QDate::currentDate());
   ui->number->setValue(number);
+  ui->supplier->addItems(suppliers);
 }
 
 void NoteWidget::setEnabled(bool bEnable)
@@ -370,4 +373,12 @@ bool NoteWidget::eventFilter(QObject* obj, QEvent* event)
     return QObject::eventFilter(obj, event);
   }
   return false;
+}
+
+QStringList NoteWidget::getItemDescriptions() const
+{
+  QStringList ls;
+  for (auto row = 0; row != ui->table->rowCount(); ++row)
+    ls << text(row, (int)Column::Description);
+  return ls;
 }

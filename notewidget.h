@@ -40,19 +40,20 @@ private:
   QString serializeItems() const;
   bool m_bDirty;
   bool m_bHistoryMode;
+  QStringList m_descriptions;
 
 private slots:
   void updateTable(int row, int column);
   void changed();
-  void upperSupplier(const QString& text);
-  void upperDescription(QTableWidgetItem* item);
+  void toUpper(const QString& text);
 
 public slots:
   void addItem();
   void clear();
   void removeItem();
   void createNew(int number,
-                 const QStringList& suppliers);
+                 const QStringList& suppliers,
+                 const QStringList& descriptions);
   void setEnabled(bool bEnable);
 
 signals:

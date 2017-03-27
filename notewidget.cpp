@@ -31,12 +31,7 @@ NoteWidget::NoteWidget(QWidget *parent)
   QObject::connect(ui->supplier,
                    SIGNAL(editTextChanged(const QString&)),
                    this,
-                   SLOT(upperSupplier(const QString&)));
-
-  QObject::connect(ui->table,
-                   SIGNAL(itemChanged(QTableWidgetItem*)),
-                   this,
-                   SLOT(upperDescription(QTableWidgetItem*)));
+                   SLOT(toUpper(const QString&)));
 
   ui->supplier->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
   ui->date->setDate(QDate::currentDate());
@@ -135,17 +130,28 @@ void NoteWidget::addItem()
        << tr("ML")
        << tr("PCT");
   unit->insertItems(0, list);
+  QComboBox* description = new QComboBox();
+  description->setEditable(true);
+  description->addItems(m_descriptions);
+  description->setCurrentText("");
+
+  QObject::connect(description,
+                   SIGNAL(editTextChanged(const QString&)),
+                   this,
+                   SLOT(toUpper(const QString&)));
+
   const int row = ui->table->rowCount() - 1;
   ui->table->blockSignals(true);
   ui->table->setCellWidget(row, (int)Column::Unity, unit);
+  ui->table->setCellWidget(row, (int)Column::Description, description);
   ui->table->setItem(row, (int)Column::Ammount, new QTableWidgetItem("0.000"));
-  ui->table->setItem(row, (int)Column::Description, new QTableWidgetItem(""));
   ui->table->setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
   ui->table->setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
   ui->table->setCurrentCell(row, (int)Column::Ammount);
   ui->table->setFocus();
   ui->table->blockSignals(false);
   ui->total->setText(computeTotal());
+  emit changedSignal();
 }
 
 void NoteWidget::removeItem()
@@ -175,13 +181,13 @@ QString NoteWidget::text(int row, int column) const
   {
     case Column::Ammount:
     case Column::UnitValue:
-    case Column::Description:
     case Column::SubTotal:
     {
       auto p = ui->table->item(row, (int)column);
       if (p != nullptr)
         str = p->text();
     } break;
+    case Column::Description:
     case Column::Unity:
     {
       QComboBox* pt = dynamic_cast<QComboBox*>(ui->table->cellWidget(row, (int)column));
@@ -202,12 +208,17 @@ void NoteWidget::setText(int row, int column, const QString& str)
   {
     case Column::Ammount:
     case Column::UnitValue:
-    case Column::Description:
     case Column::SubTotal:
     {
       auto p = ui->table->item(row, column);
       if (p != nullptr)
         p->setText(str);
+    } break;
+    case Column::Description:
+    {
+      QComboBox* pt = dynamic_cast<QComboBox*>(ui->table->cellWidget(row, column));
+      if (pt != nullptr)
+        pt->setCurrentText(str);
     } break;
     case Column::Unity:
     {
@@ -294,7 +305,6 @@ void NoteWidget::clear()
   ui->number->clear();
   ui->total->setText("");
   ui->table->setRowCount(0);
-  ui->supplier->setFocus();
   while (ui->supplier->count())
     ui->supplier->removeItem(ui->supplier->count() - 1);
   m_bDirty = false;
@@ -302,12 +312,16 @@ void NoteWidget::clear()
 }
 
 void NoteWidget::createNew(int number,
-                           const QStringList& suppliers)
+                           const QStringList& suppliers,
+                           const QStringList& descriptions)
 {
   clear();
   ui->date->setDate(QDate::currentDate());
   ui->number->setValue(number);
   ui->supplier->addItems(suppliers);
+  ui->supplier->setCurrentText("");
+  ui->supplier->setFocus();
+  m_descriptions = descriptions;
 }
 
 void NoteWidget::setEnabled(bool bEnable)
@@ -319,23 +333,14 @@ void NoteWidget::setEnabled(bool bEnable)
   ui->table->setEnabled(bEnable);
 }
 
-void NoteWidget::upperSupplier(const QString& text)
+void NoteWidget::toUpper(const QString& text)
 {
-  ui->supplier->blockSignals(true);
-  ui->supplier->setCurrentText(text.toUpper());
-  ui->supplier->blockSignals(false);
-}
-
-void NoteWidget::upperDescription(QTableWidgetItem* item)
-{
-  if (item != nullptr)
+  QComboBox* cb = qobject_cast<QComboBox*>(sender());
+  if (cb != nullptr)
   {
-    if (item->column() == (int)Column::Description)
-    {
-      ui->table->blockSignals(true);
-      item->setText(item->text().toUpper());
-      ui->table->blockSignals(false);
-    }
+    cb->blockSignals(true);
+    cb->setCurrentText(text.toUpper());
+    cb->blockSignals(false);
   }
 }
 

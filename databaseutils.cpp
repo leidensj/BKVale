@@ -73,7 +73,6 @@ bool Database::init(QString& error)
 }
 
 bool Database::insert(const Note& note,
-                      QStringList itemDescriptions,
                       QString& error)
 {
   error.clear();
@@ -104,13 +103,11 @@ bool Database::insert(const Note& note,
   bool bSuccess = query.exec();
   if (!bSuccess)
   {
-
     error = query.lastError().text();
   }
   else
   {
     incNumber();
-    insertItemDescriptions(itemDescriptions);
   }
 
   return bSuccess;
@@ -253,9 +250,9 @@ QStringList Database::selectSuppliers()
   return list;
 }
 
-void Database::insertItemDescriptions(const QStringList& itemDescriptions)
+void Database::insertDescriptions(const QStringList& descriptions)
 {
-  for (int i = 0; i != itemDescriptions.size(); ++i)
+  for (int i = 0; i != descriptions.size(); ++i)
   {
     QSqlQuery query;
     query.prepare("INSERT INTO _ITEMS ("
@@ -263,12 +260,12 @@ void Database::insertItemDescriptions(const QStringList& itemDescriptions)
                   "VALUES ("
                   "(:_description))");
 
-    query.bindValue(":_description", itemDescriptions.at(i));
+    query.bindValue(":_description", descriptions.at(i));
     query.exec();
   }
 }
 
-QStringList Database::selectItemDescriptions()
+QStringList Database::selectDescriptions()
 {
   QStringList list;
   QString error;

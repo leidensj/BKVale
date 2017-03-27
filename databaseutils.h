@@ -16,8 +16,6 @@ class Database
 
   bool hasConfig();
 
-  void insertItemDescriptions(const QStringList& itemDescriptions);
-
 public:
 
   Database();
@@ -32,8 +30,9 @@ public:
   bool init(QString& error);
 
   bool insert(const Note& note,
-              QStringList itemDescriptions,
               QString& error);
+
+  void insertDescriptions(const QStringList& descriptions);
 
   bool select(int id,
               Note& note,
@@ -44,7 +43,7 @@ public:
 
   QStringList selectSuppliers();
 
-  QStringList selectItemDescriptions();
+  QStringList selectDescriptions();
 
   int number();
 };

@@ -164,7 +164,6 @@ void BKVale::print()
   else if (!m_noteWidget.isHistoryMode())
   {
     if (!m_db.insert(note,
-                     m_noteWidget.getItemDescriptions(),
                      error))
     {
       QMessageBox msgBox(QMessageBox::Warning,
@@ -175,6 +174,7 @@ void BKVale::print()
     }
     else
     {
+      m_db.insertDescriptions(m_noteWidget.getItemDescriptions());
       createNew();
     }
   }
@@ -242,7 +242,8 @@ void BKVale::createNew()
   {
     m_bReady = true;
     m_noteWidget.createNew(m_db.number(),
-                           m_db.selectSuppliers());
+                           m_db.selectSuppliers(),
+                           m_db.selectDescriptions());
     if (!ui->dock->isHidden())
       ui->dock->close();
     enableControls();

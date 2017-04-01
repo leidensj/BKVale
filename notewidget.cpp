@@ -5,6 +5,74 @@
 #include <QStringList>
 #include <QKeyEvent>
 
+namespace
+{
+  QComboBox* buildUnitComboBox()
+  {
+    auto pt = new BKComboBox();
+    if (pt != nullptr)
+    {
+      QStringList ls;
+      ls << "UN"
+         << "KG"
+         << "FD"
+         << "CX"
+         << "ML"
+         << "PCT";
+      pt->insertItems(0, ls);
+      pt->setEditable(true);
+    }
+    return pt;
+  }
+
+  QComboBox* buildDescriptionComboBox(const QStringList& descriptions)
+  {
+    auto pt = new BKComboBox();
+    if (pt != nullptr)
+    {
+      pt->setEditable(true);
+      pt->addItems(descriptions);
+      pt->setCurrentText("");
+    }
+    return pt;
+  }
+}
+
+BKComboBox::BKComboBox()
+{
+  connect(this,
+          SIGNAL(editTextChanged(const QString &)),
+          this,
+          SLOT(toUpper()));
+}
+
+void BKComboBox::keyPressEvent(QKeyEvent *event)
+{
+  if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+  {
+    QKeyEvent event2(event->type(),
+                     Qt::Key_Tab,
+                     event->modifiers(),
+                     event->nativeScanCode(),
+                     event->nativeVirtualKey(),
+                     event->nativeModifiers(),
+                     event->text(), event->isAutoRepeat(),
+                     event->count());
+    QComboBox::keyPressEvent(&event2);
+  }
+  else
+  {
+    QComboBox::keyPressEvent(event);
+  }
+}
+
+void BKComboBox::toUpper()
+{
+  blockSignals(true);
+  setCurrentText(currentText().toUpper());
+  blockSignals(false);
+}
+
 NoteWidget::NoteWidget(QWidget *parent)
   : QFrame(parent)
   , ui(new Ui::NoteWidget)
@@ -121,35 +189,29 @@ void NoteWidget::updateTable(int row, int column)
 void NoteWidget::addItem()
 {
   ui->table->insertRow(ui->table->rowCount());
-  QComboBox* unit = new QComboBox();
-  QStringList list;
-  list << tr("UN")
-       << tr("KG")
-       << tr("FD")
-       << tr("CX")
-       << tr("ML")
-       << tr("PCT");
-  unit->insertItems(0, list);
-  QComboBox* description = new QComboBox();
-  description->setEditable(true);
-  description->addItems(m_descriptions);
-  description->setCurrentText("");
-
-  QObject::connect(description,
-                   SIGNAL(editTextChanged(const QString&)),
-                   this,
-                   SLOT(toUpper(const QString&)));
-
   const int row = ui->table->rowCount() - 1;
+  auto unit = buildUnitComboBox();
+  auto description = buildDescriptionComboBox(m_descriptions);
+
+  connect(unit,
+          SIGNAL(advanceSignal()),
+          this,
+          SLOT(advance()));
+
+  connect(description,
+          SIGNAL(advanceSignal()),
+          this,
+          SLOT(advance()));
+
   ui->table->blockSignals(true);
   ui->table->setCellWidget(row, (int)Column::Unity, unit);
   ui->table->setCellWidget(row, (int)Column::Description, description);
   ui->table->setItem(row, (int)Column::Ammount, new QTableWidgetItem("0.000"));
   ui->table->setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
   ui->table->setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
+  ui->table->blockSignals(false);
   ui->table->setCurrentCell(row, (int)Column::Ammount);
   ui->table->setFocus();
-  ui->table->blockSignals(false);
   ui->total->setText(computeTotal());
   emit changedSignal();
 }
@@ -344,46 +406,24 @@ void NoteWidget::toUpper(const QString& text)
   }
 }
 
-bool NoteWidget::eventFilter(QObject* obj, QEvent* event)
-{
-  if (event->type() == QEvent::KeyPress)
-  {
-    QKeyEvent* key = static_cast<QKeyEvent*>(event);
-    if ((key->key()==Qt::Key_Enter) || (key->key()==Qt::Key_Return))
-    {
-      if (ui->supplier->hasFocus() && ui->table->rowCount() != 0)
-        ui->table->item(0, 0)->setSelected(true);
-      else if(ui->table->hasFocus())
-      {
-        auto list = ui->table->selectedItems();
-        if (list.size() != 0)
-        {
-          auto p = list.at(0);
-          if (p != nullptr)
-          {
-            if (p->column() < (NUMBER_OF_COLUMNS - 1))
-              ui->table->item(p->row(), p->column() + 1)->setSelected(true);
-          }
-        }
-      }
-    }
-    else
-    {
-      return QObject::eventFilter(obj, event);
-    }
-    return true;
-  }
-  else
-  {
-    return QObject::eventFilter(obj, event);
-  }
-  return false;
-}
-
 QStringList NoteWidget::getItemDescriptions() const
 {
   QStringList ls;
   for (auto row = 0; row != ui->table->rowCount(); ++row)
     ls << text(row, (int)Column::Description);
   return ls;
+}
+
+void NoteWidget::advance()
+{
+  if (ui->table->currentColumn() < ui->table->columnCount() - 1)
+  {
+    ui->table->setCurrentCell(ui->table->currentRow(), ui->table->currentColumn() + 1);
+    ui->table->setFocus();
+  }
+  else if (ui->table->currentRow() < ui->table->rowCount() - 1)
+  {
+    ui->table->setCurrentCell(ui->table->currentRow() + 1, 0);
+    ui->table->setFocus();
+  }
 }

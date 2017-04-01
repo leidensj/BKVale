@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QStringList>
+#include <QComboBox>
 #include "note.h"
 
 class QTableWidgetItem;
@@ -11,12 +12,26 @@ namespace Ui {
 class NoteWidget;
 }
 
-class NoteWidget : public QFrame
+class BKComboBox : public QComboBox
 {
   Q_OBJECT
 
+public:
+  BKComboBox();
+
 protected:
-    bool eventFilter(QObject* obj, QEvent* event);
+  void keyPressEvent(QKeyEvent *event);
+
+public slots:
+  void toUpper();
+
+signals:
+  void advanceSignal();
+};
+
+class NoteWidget : public QFrame
+{
+  Q_OBJECT
 
 public:
   explicit NoteWidget(QWidget *parent = 0);
@@ -55,6 +70,7 @@ public slots:
                  const QStringList& suppliers,
                  const QStringList& descriptions);
   void setEnabled(bool bEnable);
+  void advance();
 
 signals:
   void changedSignal();

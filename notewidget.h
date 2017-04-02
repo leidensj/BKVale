@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QStringList>
 #include <QComboBox>
+#include <QTableWidget>
 #include "note.h"
 
 class QTableWidgetItem;
@@ -17,7 +18,15 @@ class BKComboBox : public QComboBox
   Q_OBJECT
 
 public:
-  BKComboBox();
+
+  enum Behavior
+  {
+    Supplier,
+    TableCell
+  };
+
+  BKComboBox(Behavior behavior);
+  const Behavior m_behavior;
 
 protected:
   void keyPressEvent(QKeyEvent *event);
@@ -26,7 +35,21 @@ public slots:
   void toUpper();
 
 signals:
-  void advanceSignal();
+  void supplierEnteredSignal();
+};
+
+class BKTableWidget : public QTableWidget
+{
+  Q_OBJECT
+
+protected:
+  void keyPressEvent(QKeyEvent *event);
+
+public:
+  BKTableWidget();
+  QString text(int row, int column) const ;
+  void setText(int row, int column, const QString& str);
+  QString serializeItems() const;
 };
 
 class NoteWidget : public QFrame
@@ -46,13 +69,12 @@ public:
 
 private:
   Ui::NoteWidget *ui;
+  BKComboBox m_supplier;
+  BKTableWidget m_table;
   QString computeUnitValue(int row) const;
   QString computeSubTotal(int row) const;
   QString computeTotal() const;
   double evaluate(int row, int column) const;
-  QString text(int row, int column) const ;
-  void setText(int row, int column, const QString& str);
-  QString serializeItems() const;
   bool m_bDirty;
   bool m_bHistoryMode;
   QStringList m_descriptions;
@@ -60,7 +82,6 @@ private:
 private slots:
   void updateTable(int row, int column);
   void changed();
-  void toUpper(const QString& text);
 
 public slots:
   void addItem();
@@ -70,7 +91,7 @@ public slots:
                  const QStringList& suppliers,
                  const QStringList& descriptions);
   void setEnabled(bool bEnable);
-  void advance();
+  void supplierEntered();
 
 signals:
   void changedSignal();

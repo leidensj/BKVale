@@ -5,41 +5,18 @@
 #include <QStringList>
 #include <QKeyEvent>
 
-namespace
+BKComboBox::BKComboBox(Behavior behavior)
+  : m_behavior(behavior)
 {
-  QComboBox* buildUnitComboBox()
+  setEditable(true);
+  if (m_behavior == Supplier)
   {
-    auto pt = new BKComboBox();
-    if (pt != nullptr)
-    {
-      QStringList ls;
-      ls << "UN"
-         << "KG"
-         << "FD"
-         << "CX"
-         << "ML"
-         << "PCT";
-      pt->insertItems(0, ls);
-      pt->setEditable(true);
-    }
-    return pt;
+    auto f = font();
+    f.setPointSize(12);
+    setFont(f);
+    lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
   }
 
-  QComboBox* buildDescriptionComboBox(const QStringList& descriptions)
-  {
-    auto pt = new BKComboBox();
-    if (pt != nullptr)
-    {
-      pt->setEditable(true);
-      pt->addItems(descriptions);
-      pt->setCurrentText("");
-    }
-    return pt;
-  }
-}
-
-BKComboBox::BKComboBox()
-{
   connect(this,
           SIGNAL(editTextChanged(const QString &)),
           this,
@@ -47,6 +24,65 @@ BKComboBox::BKComboBox()
 }
 
 void BKComboBox::keyPressEvent(QKeyEvent *event)
+{
+  switch (m_behavior)
+  {
+    case Supplier:
+    {
+      if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+      {
+        emit supplierEnteredSignal();
+      }
+      else
+      {
+        QComboBox::keyPressEvent(event);
+      }
+    } break;
+    case TableCell:
+    {
+      if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+      {
+        QKeyEvent event2(event->type(),
+                         Qt::Key_Tab,
+                         event->modifiers(),
+                         event->nativeScanCode(),
+                         event->nativeVirtualKey(),
+                         event->nativeModifiers(),
+                         event->text(), event->isAutoRepeat(),
+                         event->count());
+        QComboBox::keyPressEvent(&event2);
+      }
+      else
+      {
+        QComboBox::keyPressEvent(event);
+      }
+    } break;
+    default:
+    {
+      QComboBox::keyPressEvent(event);
+    } break;
+  }
+}
+
+BKTableWidget::BKTableWidget()
+{
+  setColumnCount(NUMBER_OF_COLUMNS);
+  QStringList headers;
+  headers << "Quantidade" << "Unidade" << "Descrição" << "Valor Unitário" << "Subtotal";
+  setHorizontalHeaderLabels(headers);
+  {
+    auto f = font();
+    f.setPointSize(12);
+    setFont(f);
+  }
+  horizontalHeader()->setSectionResizeMode((int)Column::Ammount, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Unity, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Description, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)Column::UnitValue, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::SubTotal, QHeaderView::ResizeToContents);
+}
+
+void BKTableWidget::keyPressEvent(QKeyEvent *event)
 {
   if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
   {
@@ -58,185 +94,15 @@ void BKComboBox::keyPressEvent(QKeyEvent *event)
                      event->nativeModifiers(),
                      event->text(), event->isAutoRepeat(),
                      event->count());
-    QComboBox::keyPressEvent(&event2);
+    QTableWidget::keyPressEvent(&event2);
   }
   else
   {
-    QComboBox::keyPressEvent(event);
+    QTableWidget::keyPressEvent(event);
   }
 }
 
-void BKComboBox::toUpper()
-{
-  blockSignals(true);
-  setCurrentText(currentText().toUpper());
-  blockSignals(false);
-}
-
-NoteWidget::NoteWidget(QWidget *parent)
-  : QFrame(parent)
-  , ui(new Ui::NoteWidget)
-  , m_bDirty(false)
-  , m_bHistoryMode(false)
-{
-  ui->setupUi(this);
-
-  QObject::connect(ui->table,
-                   SIGNAL(cellChanged(int, int)),
-                   this,
-                   SLOT(updateTable(int, int)));
-
-  QObject::connect(ui->table,
-                   SIGNAL(itemSelectionChanged()),
-                   this,
-                   SLOT(changed()));
-
-  QObject::connect(ui->supplier,
-                   SIGNAL(editTextChanged(const QString &)),
-                   this,
-                   SLOT(changed()));
-
-  QObject::connect(ui->supplier,
-                   SIGNAL(editTextChanged(const QString&)),
-                   this,
-                   SLOT(toUpper(const QString&)));
-
-  ui->supplier->lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
-  ui->date->setDate(QDate::currentDate());
-}
-
-NoteWidget::~NoteWidget()
-{
-  delete ui;
-}
-
-QString NoteWidget::computeUnitValue(int row) const
-{
-  Q_ASSERT(ui->table->item(row, (int)Column::Ammount) != nullptr);
-  Q_ASSERT(ui->table->item(row, (int)Column::SubTotal) != nullptr);
-  const double ammount = ui->table->item(row, (int)Column::Ammount)->text().toDouble();
-  const double subTotal = ui->table->item(row, (int)Column::SubTotal)->text().toDouble();
-  const double unitValue = ammount ? subTotal / ammount : 0.0;
-  return Note::format(unitValue, false);
-}
-
-QString NoteWidget::computeSubTotal(int row) const
-{
-  Q_ASSERT(ui->table->item(row, (int)Column::Ammount) != nullptr);
-  Q_ASSERT(ui->table->item(row, (int)Column::UnitValue) != nullptr);
-  const double ammount = ui->table->item(row, (int)Column::Ammount)->text().toDouble();
-  const double unitValue = ui->table->item(row, (int)Column::UnitValue)->text().toDouble();
-  const double subTotal = ammount * unitValue;
-  return Note::format(subTotal, false);
-}
-
-QString NoteWidget::computeTotal() const
-{
-  double total = 0.0;
-  for (int row = 0; row != ui->table->rowCount(); ++row)
-  {
-    Q_ASSERT(ui->table->item(row, (int)Column::SubTotal) != nullptr);
-    total += ui->table->item(row, (int)Column::SubTotal)->text().toDouble();
-  }
-  return Note::format(total, false);
-}
-
-double NoteWidget::evaluate(int row, int column) const
-{
-  Q_ASSERT(ui->table->item(row, column) != nullptr);
-
-  auto pt = ui->table->item(row, column);
-  auto exp = pt->text().toStdString();
-  int error = 0;
-  double res = te_interp(exp.c_str(), &error);
-  if (!error && res >= 0)
-    pt->setData(Qt::UserRole, res);
-  return pt->data(Qt::UserRole).toDouble();
-}
-
-void NoteWidget::updateTable(int row, int column)
-{
-  ui->table->blockSignals(true);
-  switch ((Column)column)
-  {
-    case Column::Ammount:
-    {
-      QString res(Note::format(evaluate(row, column), true));
-      ui->table->item(row, column)->setText(res);
-      ui->table->item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
-      ui->total->setText(computeTotal());
-    } break;
-    case Column::UnitValue:
-    {
-      QString res(Note::format(evaluate(row, column), false));
-      ui->table->item(row, column)->setText(res);
-      ui->table->item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
-      ui->total->setText(computeTotal());
-    } break;
-    case Column::SubTotal:
-    {
-      QString res(Note::format(evaluate(row, column), false));
-      ui->table->item(row, column)->setText(res);
-      ui->table->item(row, (int)Column::UnitValue)->setText(computeUnitValue(row));
-      ui->total->setText(computeTotal());
-    } break;
-    default:
-      break;
-  }
-  ui->table->blockSignals(false);
-}
-
-void NoteWidget::addItem()
-{
-  ui->table->insertRow(ui->table->rowCount());
-  const int row = ui->table->rowCount() - 1;
-  auto unit = buildUnitComboBox();
-  auto description = buildDescriptionComboBox(m_descriptions);
-
-  connect(unit,
-          SIGNAL(advanceSignal()),
-          this,
-          SLOT(advance()));
-
-  connect(description,
-          SIGNAL(advanceSignal()),
-          this,
-          SLOT(advance()));
-
-  ui->table->blockSignals(true);
-  ui->table->setCellWidget(row, (int)Column::Unity, unit);
-  ui->table->setCellWidget(row, (int)Column::Description, description);
-  ui->table->setItem(row, (int)Column::Ammount, new QTableWidgetItem("0.000"));
-  ui->table->setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
-  ui->table->setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
-  ui->table->blockSignals(false);
-  ui->table->setCurrentCell(row, (int)Column::Ammount);
-  ui->table->setFocus();
-  ui->total->setText(computeTotal());
-  emit changedSignal();
-}
-
-void NoteWidget::removeItem()
-{
-  ui->table->removeRow(ui->table->currentRow());
-  if (ui->table->rowCount() != 0)
-    ui->total->setText(computeTotal());
-  else
-    ui->total->clear();
-}
-
-void NoteWidget::changed()
-{
-  m_bDirty = true;
-  emit changedSignal();
-}
-
-bool NoteWidget::isValidSelection() const
-{
-  return ui->table->currentRow() >= 0;
-}
-
-QString NoteWidget::text(int row, int column) const
+QString BKTableWidget::text(int row, int column) const
 {
   QString str;
   switch((Column)column)
@@ -245,14 +111,14 @@ QString NoteWidget::text(int row, int column) const
     case Column::UnitValue:
     case Column::SubTotal:
     {
-      auto p = ui->table->item(row, (int)column);
+      auto p = item(row, (int)column);
       if (p != nullptr)
         str = p->text();
     } break;
     case Column::Description:
     case Column::Unity:
     {
-      QComboBox* pt = dynamic_cast<QComboBox*>(ui->table->cellWidget(row, (int)column));
+      QComboBox* pt = dynamic_cast<QComboBox*>(cellWidget(row, (int)column));
       if (pt != nullptr)
         str = pt->currentText();
     } break;
@@ -264,7 +130,7 @@ QString NoteWidget::text(int row, int column) const
   return str;
 }
 
-void NoteWidget::setText(int row, int column, const QString& str)
+void BKTableWidget::setText(int row, int column, const QString& str)
 {
   switch((Column)column)
   {
@@ -272,19 +138,19 @@ void NoteWidget::setText(int row, int column, const QString& str)
     case Column::UnitValue:
     case Column::SubTotal:
     {
-      auto p = ui->table->item(row, column);
+      auto p = item(row, column);
       if (p != nullptr)
         p->setText(str);
     } break;
     case Column::Description:
     {
-      QComboBox* pt = dynamic_cast<QComboBox*>(ui->table->cellWidget(row, column));
+      QComboBox* pt = dynamic_cast<QComboBox*>(cellWidget(row, column));
       if (pt != nullptr)
         pt->setCurrentText(str);
     } break;
     case Column::Unity:
     {
-      QComboBox* pt = dynamic_cast<QComboBox*>(ui->table->cellWidget(row, column));
+      QComboBox* pt = dynamic_cast<QComboBox*>(cellWidget(row, column));
       if (pt != nullptr)
       {
         int idx = pt->findText(str, Qt::MatchFixedString);
@@ -299,11 +165,11 @@ void NoteWidget::setText(int row, int column, const QString& str)
   }
 }
 
-QString NoteWidget::serializeItems() const
+QString BKTableWidget::serializeItems() const
 {
   QString str;
-  for (int i = 0; i != ui->table->rowCount(); ++i)
-    for (int j = 0; j!= ui->table->columnCount(); ++j)
+  for (int i = 0; i != rowCount(); ++i)
+    for (int j = 0; j!= columnCount(); ++j)
       str += text(i, j) + ";";
 
   if (!str.isEmpty())
@@ -312,32 +178,202 @@ QString NoteWidget::serializeItems() const
   return str;
 }
 
+void BKComboBox::toUpper()
+{
+  blockSignals(true);
+  setCurrentText(currentText().toUpper());
+  blockSignals(false);
+}
+
+NoteWidget::NoteWidget(QWidget *parent)
+  : QFrame(parent)
+  , ui(new Ui::NoteWidget)
+  , m_supplier(BKComboBox::Supplier)
+  , m_bDirty(false)
+  , m_bHistoryMode(false)
+{
+  ui->setupUi(this);
+
+  QObject::connect(&m_table,
+                   SIGNAL(cellChanged(int, int)),
+                   this,
+                   SLOT(updateTable(int, int)));
+
+  QObject::connect(&m_table,
+                   SIGNAL(itemSelectionChanged()),
+                   this,
+                   SLOT(changed()));
+
+  QObject::connect(&m_supplier,
+                   SIGNAL(editTextChanged(const QString &)),
+                   this,
+                   SLOT(changed()));
+
+  QObject::connect(&m_supplier,
+                   SIGNAL(supplierEnteredSignal()),
+                   this,
+                   SLOT(supplierEntered()));
+
+
+  ui->frameTable->layout()->addWidget(&m_table);
+  ui->frameSupplier->layout()->addWidget(&m_supplier);
+  ui->date->setDate(QDate::currentDate());
+}
+
+NoteWidget::~NoteWidget()
+{
+  delete ui;
+}
+
+QString NoteWidget::computeUnitValue(int row) const
+{
+  Q_ASSERT(m_table.item(row, (int)Column::Ammount) != nullptr);
+  Q_ASSERT(m_table.item(row, (int)Column::SubTotal) != nullptr);
+  const double ammount = m_table.item(row, (int)Column::Ammount)->text().toDouble();
+  const double subTotal = m_table.item(row, (int)Column::SubTotal)->text().toDouble();
+  const double unitValue = ammount ? subTotal / ammount : 0.0;
+  return Note::format(unitValue, false);
+}
+
+QString NoteWidget::computeSubTotal(int row) const
+{
+  Q_ASSERT(m_table.item(row, (int)Column::Ammount) != nullptr);
+  Q_ASSERT(m_table.item(row, (int)Column::UnitValue) != nullptr);
+  const double ammount = m_table.item(row, (int)Column::Ammount)->text().toDouble();
+  const double unitValue = m_table.item(row, (int)Column::UnitValue)->text().toDouble();
+  const double subTotal = ammount * unitValue;
+  return Note::format(subTotal, false);
+}
+
+QString NoteWidget::computeTotal() const
+{
+  double total = 0.0;
+  for (int row = 0; row != m_table.rowCount(); ++row)
+  {
+    Q_ASSERT(m_table.item(row, (int)Column::SubTotal) != nullptr);
+    total += m_table.item(row, (int)Column::SubTotal)->text().toDouble();
+  }
+  return Note::format(total, false);
+}
+
+double NoteWidget::evaluate(int row, int column) const
+{
+  Q_ASSERT(m_table.item(row, column) != nullptr);
+
+  auto pt = m_table.item(row, column);
+  auto exp = pt->text().toStdString();
+  int error = 0;
+  double res = te_interp(exp.c_str(), &error);
+  if (!error && res >= 0)
+    pt->setData(Qt::UserRole, res);
+  return pt->data(Qt::UserRole).toDouble();
+}
+
+void NoteWidget::updateTable(int row, int column)
+{
+  m_table.blockSignals(true);
+  switch ((Column)column)
+  {
+    case Column::Ammount:
+    {
+      QString res(Note::format(evaluate(row, column), true));
+      m_table.item(row, column)->setText(res);
+      m_table.item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
+      ui->total->setText(computeTotal());
+    } break;
+    case Column::UnitValue:
+    {
+      QString res(Note::format(evaluate(row, column), false));
+      m_table.item(row, column)->setText(res);
+      m_table.item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
+      ui->total->setText(computeTotal());
+    } break;
+    case Column::SubTotal:
+    {
+      QString res(Note::format(evaluate(row, column), false));
+      m_table.item(row, column)->setText(res);
+      m_table.item(row, (int)Column::UnitValue)->setText(computeUnitValue(row));
+      ui->total->setText(computeTotal());
+    } break;
+    default:
+      break;
+  }
+  m_table.blockSignals(false);
+}
+
+void NoteWidget::addItem()
+{
+  m_table.insertRow(m_table.rowCount());
+  const int row = m_table.rowCount() - 1;
+  auto unit = new BKComboBox(BKComboBox::TableCell);
+  QStringList ls;
+  ls << "UN"
+     << "KG"
+     << "FD"
+     << "CX"
+     << "ML"
+     << "PCT";
+  unit->insertItems(0, ls);
+  auto description = new BKComboBox(BKComboBox::TableCell);
+  m_table.blockSignals(true);
+  m_table.setCellWidget(row, (int)Column::Unity, unit);
+  m_table.setCellWidget(row, (int)Column::Description, description);
+  m_table.setItem(row, (int)Column::Ammount, new QTableWidgetItem("0.000"));
+  m_table.setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
+  m_table.setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
+  m_table.blockSignals(false);
+  m_table.setCurrentCell(row, (int)Column::Ammount);
+  m_table.setFocus();
+  ui->total->setText(computeTotal());
+  emit changedSignal();
+}
+
+void NoteWidget::removeItem()
+{
+  m_table.removeRow(m_table.currentRow());
+  if (m_table.rowCount() != 0)
+    ui->total->setText(computeTotal());
+  else
+    ui->total->clear();
+}
+
+void NoteWidget::changed()
+{
+  m_bDirty = true;
+  emit changedSignal();
+}
+
+bool NoteWidget::isValidSelection() const
+{
+  return m_table.currentRow() >= 0;
+}
+
 Note NoteWidget::getNote() const
 {
   Note note;
   note.m_date = ui->date->date().toJulianDay();
-  note.m_supplier = ui->supplier->currentText();
+  note.m_supplier = m_supplier.currentText();
   note.m_number = ui->number->text().toInt();
   note.m_total = ui->total->text().toDouble();
-  note.m_items = serializeItems();
+  note.m_items = m_table.serializeItems();
   return note;
 }
 
 void NoteWidget::setNote(const Note& note)
 {
-  ui->table->setRowCount(0);
+  m_table.setRowCount(0);
   ui->date->setDate(QDate::fromJulianDay(note.m_date));
-  ui->supplier->setCurrentText(note.m_supplier);
+  m_supplier.setCurrentText(note.m_supplier);
   ui->number->setValue(note.m_number);
   NoteItems items(note.m_items);
   for (int row = 0; row != items.m_size; ++row)
   {
     addItem();
-    setText(row, (int)Column::Ammount, items.at(row, Column::Ammount));
-    setText(row, (int)Column::Unity, items.at(row, Column::Unity));
-    setText(row, (int)Column::UnitValue, items.at(row, Column::UnitValue));
-    setText(row, (int)Column::Description, items.at(row, Column::Description));
-    setText(row, (int)Column::SubTotal, items.at(row, Column::SubTotal));
+    m_table.setText(row, (int)Column::Ammount, items.at(row, Column::Ammount));
+    m_table.setText(row, (int)Column::Unity, items.at(row, Column::Unity));
+    m_table.setText(row, (int)Column::UnitValue, items.at(row, Column::UnitValue));
+    m_table.setText(row, (int)Column::Description, items.at(row, Column::Description));
+    m_table.setText(row, (int)Column::SubTotal, items.at(row, Column::SubTotal));
   }
   m_bDirty = false;
   m_bHistoryMode = true;
@@ -345,8 +381,8 @@ void NoteWidget::setNote(const Note& note)
 
 bool NoteWidget::isValid() const
 {
-  return !ui->supplier->currentText().isEmpty() &&
-      ui->table->rowCount() != 0;
+  return !m_supplier.currentText().isEmpty() &&
+      m_table.rowCount() != 0;
 }
 
 bool NoteWidget::isDirty() const
@@ -363,12 +399,12 @@ void NoteWidget::clear()
 {
   ui->date->setSpecialValueText(" ");
   ui->date->setDate(ui->date->minimumDate());
-  ui->supplier->setCurrentText("");
+  m_supplier.setCurrentText("");
   ui->number->clear();
   ui->total->setText("");
-  ui->table->setRowCount(0);
-  while (ui->supplier->count())
-    ui->supplier->removeItem(ui->supplier->count() - 1);
+  m_table.setRowCount(0);
+  while (m_supplier.count())
+    m_supplier.removeItem(m_supplier.count() - 1);
   m_bDirty = false;
   m_bHistoryMode = false;
 }
@@ -380,50 +416,38 @@ void NoteWidget::createNew(int number,
   clear();
   ui->date->setDate(QDate::currentDate());
   ui->number->setValue(number);
-  ui->supplier->addItems(suppliers);
-  ui->supplier->setCurrentText("");
-  ui->supplier->setFocus();
+  m_supplier.addItems(suppliers);
+  m_supplier.setCurrentText("");
+  m_supplier.setFocus();
   m_descriptions = descriptions;
 }
 
 void NoteWidget::setEnabled(bool bEnable)
 {
   ui->date->setEnabled(bEnable);
-  ui->supplier->setEnabled(bEnable);
+  m_supplier.setEnabled(bEnable);
   ui->number->setEnabled(bEnable);
   ui->total->setEnabled(bEnable);
-  ui->table->setEnabled(bEnable);
-}
-
-void NoteWidget::toUpper(const QString& text)
-{
-  QComboBox* cb = qobject_cast<QComboBox*>(sender());
-  if (cb != nullptr)
-  {
-    cb->blockSignals(true);
-    cb->setCurrentText(text.toUpper());
-    cb->blockSignals(false);
-  }
+  m_table.setEnabled(bEnable);
 }
 
 QStringList NoteWidget::getItemDescriptions() const
 {
   QStringList ls;
-  for (auto row = 0; row != ui->table->rowCount(); ++row)
-    ls << text(row, (int)Column::Description);
+  for (auto row = 0; row != m_table.rowCount(); ++row)
+    ls << m_table.text(row, (int)Column::Description);
   return ls;
 }
 
-void NoteWidget::advance()
+void NoteWidget::supplierEntered()
 {
-  if (ui->table->currentColumn() < ui->table->columnCount() - 1)
+  if (m_table.rowCount() != 0)
   {
-    ui->table->setCurrentCell(ui->table->currentRow(), ui->table->currentColumn() + 1);
-    ui->table->setFocus();
+    m_table.setCurrentCell(0, 0);
+    m_table.setFocus();
   }
-  else if (ui->table->currentRow() < ui->table->rowCount() - 1)
+  else
   {
-    ui->table->setCurrentCell(ui->table->currentRow() + 1, 0);
-    ui->table->setFocus();
+    addItem();
   }
 }

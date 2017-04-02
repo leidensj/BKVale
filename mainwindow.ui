@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>535</width>
-    <height>349</height>
+    <width>822</width>
+    <height>390</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,7 +20,7 @@
    <string>BaitaVale</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="icons.qrc">
     <normaloff>:/icons/res/baita.png</normaloff>:/icons/res/baita.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -94,7 +94,7 @@
   </widget>
   <action name="actionAdd">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/add.png</normaloff>:/icons/res/add.png</iconset>
    </property>
    <property name="text">
@@ -109,7 +109,7 @@
   </action>
   <action name="actionConnect">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/connected.png</normaloff>:/icons/res/connected.png</iconset>
    </property>
    <property name="text">
@@ -118,7 +118,7 @@
   </action>
   <action name="actionDisconnect">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/disconnected.png</normaloff>:/icons/res/disconnected.png</iconset>
    </property>
    <property name="text">
@@ -127,7 +127,7 @@
   </action>
   <action name="actionPrint">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/printer.png</normaloff>:/icons/res/printer.png</iconset>
    </property>
    <property name="text">
@@ -139,7 +139,7 @@
   </action>
   <action name="actionNew">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/file.png</normaloff>:/icons/res/file.png</iconset>
    </property>
    <property name="text">
@@ -151,7 +151,7 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/settings.png</normaloff>:/icons/res/settings.png</iconset>
    </property>
    <property name="text">
@@ -160,7 +160,7 @@
   </action>
   <action name="actionRemove">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/remove.png</normaloff>:/icons/res/remove.png</iconset>
    </property>
    <property name="text">
@@ -175,7 +175,7 @@
   </action>
   <action name="actionSearch">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/search.png</normaloff>:/icons/res/search.png</iconset>
    </property>
    <property name="text">
@@ -190,7 +190,7 @@
   </action>
   <action name="actionInfo">
    <property name="icon">
-    <iconset>
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/res/about.png</normaloff>:/icons/res/about.png</iconset>
    </property>
    <property name="text">
@@ -202,6 +202,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

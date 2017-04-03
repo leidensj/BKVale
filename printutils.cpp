@@ -2,22 +2,23 @@
 #include <QDate>
 #include <QTime>
 
-#define ESC              "\x1b"
-#define ESC_ALIGN_CENTER "\x1b\x61\x31"
-#define ESC_ALIGN_LEFT   "\x1b\x61\x30"
-#define ESC_FULL_CUT     "\x1b\x77"
-#define ESC_PARTIAL_CUT  "\x1b\x6d"
-#define ESC_STRESS_ON    "\x1b\x45"
-#define ESC_STRESS_OFF   "\x1b\x46"
-#define ESC_LF           "\n"
-#define ESC_VERT_TAB     "\x1b\x4a\x40"
-#define ESC_INIT         "\x1b\x40"
-#define ESC_DOUBLE_FONT  "\x1b\x0e\x1b\x56"
-#define ESC_PORTUGUESE   "\x1b\x74\x08"
-#define ESC_REVERSE_ON   "\x1b\x7d\x31"
-#define ESC_REVERSE_OFF  "\x1b\x7d\x30"
-#define ESC_EXPAND_ON    "\x1b\x57\x31"
-#define ESC_EXPAND_OFF   "\x1b\x57\x30"
+#define ESC                 "\x1b"
+#define ESC_ALIGN_CENTER    "\x1b\x61\x31"
+#define ESC_ALIGN_LEFT      "\x1b\x61\x30"
+#define ESC_FULL_CUT        "\x1b\x77"
+#define ESC_PARTIAL_CUT     "\x1b\x6d"
+#define ESC_STRESS_ON       "\x1b\x45"
+#define ESC_STRESS_OFF      "\x1b\x46"
+#define ESC_LF              "\n"
+#define ESC_VERT_TAB        "\x1b\x4a\x40"
+#define ESC_INIT            "\x1b\x40"
+#define ESC_DOUBLE_FONT_ON  "\x1b\x0e\x1b\x56"
+#define ESC_DOUBLE_FONT_OFF "\x1b\x14\x1b\x64\x30"
+#define ESC_PORTUGUESE      "\x1b\x74\x08"
+#define ESC_REVERSE_ON      "\x1b\x7d\x31"
+#define ESC_REVERSE_OFF     "\x1b\x7d\x30"
+#define ESC_EXPAND_ON       "\x1b\x57\x31"
+#define ESC_EXPAND_OFF      "\x1b\x57\x30"
 
 #define TABLE_WIDTH           48
 #define TABLE_MAX_VALUE       10000
@@ -28,25 +29,34 @@ namespace
   {
     strNote += ESC_EXPAND_ON
                ESC_ALIGN_CENTER
-               "BaitaKão"
+               "BAITAKÃO"
                ESC_LF
-               "Rua Sinimbu 175 Lourdes"
+               "RUA SINIMBU 175 LOURDES"
                ESC_LF
                "32221034 32281666"
+               ESC_LF
+               "WWW.BAITAKAO.COM.BR"
+               ESC_LF
+               ESC_VERT_TAB
                ESC_EXPAND_OFF
+               "ORDEM DE RECEBIMENTO"
+               ESC_LF
+               "DE MERCADORIA"
                ESC_LF
                ESC_VERT_TAB
                ESC_ALIGN_LEFT
-               "Número do vale.."
-               ESC_DOUBLE_FONT +
+               "Número     "
+               ESC_DOUBLE_FONT_ON +
                QString::number(note.m_number) +
                ESC_LF
-               "Data do vale...."
-               ESC_DOUBLE_FONT +
+               "Data       "
+               ESC_DOUBLE_FONT_ON +
                QDate::fromJulianDay(note.m_date).toString("dd/MM/yyyy") +
+               ESC_DOUBLE_FONT_OFF +
+               QDate::fromJulianDay(note.m_date).toString(" (dddd)") +
                ESC_LF
-               "Fornecedor......"
-               ESC_DOUBLE_FONT +
+               "Fornecedor "
+               ESC_DOUBLE_FONT_ON +
                note.m_supplier +
                ESC_LF +
                ESC_VERT_TAB;
@@ -56,13 +66,13 @@ namespace
   {
     strNote += ESC_LF
                ESC_ALIGN_CENTER
-               ESC_DOUBLE_FONT
+               ESC_DOUBLE_FONT_ON
                "TOTAL R$" +
                Note::format(note.m_total) +
                ESC_LF
                ESC_VERT_TAB
                "Emissão: " +
-               QDate::fromJulianDay(note.m_date).toString("dd/MM/yyyy ") +
+               QDate::currentDate().toString("dd/MM/yyyy ") +
                QTime::currentTime().toString("hh:mm:ss") +
                ESC_LF
                ESC_LF

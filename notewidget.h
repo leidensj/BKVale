@@ -7,6 +7,8 @@
 #include <QTableWidget>
 #include "note.h"
 
+#define MAX_ITEMS 100
+
 class QTableWidgetItem;
 
 namespace Ui {
@@ -22,7 +24,8 @@ public:
   enum Behavior
   {
     Supplier,
-    TableCell
+    TableUnity,
+    TableDescription
   };
 
   BKComboBox(Behavior behavior);
@@ -50,6 +53,10 @@ public:
   QString text(int row, int column) const ;
   void setText(int row, int column, const QString& str);
   QString serializeItems() const;
+
+private slots:
+  void adjustFocus(int,
+                   int currentColumn, int, int);
 };
 
 class NoteWidget : public QFrame

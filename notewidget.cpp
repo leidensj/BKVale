@@ -38,7 +38,8 @@ void BKComboBox::keyPressEvent(QKeyEvent *event)
         QComboBox::keyPressEvent(event);
       }
     } break;
-    case TableCell:
+    case TableUnity:
+    case TableDescription:
     {
       if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
       {
@@ -70,11 +71,13 @@ BKTableWidget::BKTableWidget()
   QStringList headers;
   headers << "Quantidade" << "Unidade" << "Descrição" << "Valor Unitário" << "Subtotal";
   setHorizontalHeaderLabels(headers);
-  {
-    auto f = font();
-    f.setPointSize(12);
-    setFont(f);
-  }
+  auto f = font();
+  f.setPointSize(12);
+  setFont(f);
+  setSelectionBehavior(QAbstractItemView::SelectItems);
+  setSelectionMode(QAbstractItemView::SingleSelection);
+  horizontalHeader()->setHighlightSections(false);
+  verticalHeader()->setHighlightSections(false);
   horizontalHeader()->setSectionResizeMode((int)Column::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Description, QHeaderView::Stretch);
@@ -167,6 +170,23 @@ QString BKTableWidget::serializeItems() const
     str.chop(1);
 
   return str;
+}
+
+void BKTableWidget::adjustFocus(int /*currentRow*/,
+                                int currentColumn,
+                                int /*previousRow*/,
+                                int /*previousColumn*/)
+{
+  switch (currentColumn)
+  {
+    case (int)Column::Unity:
+    case (int)Column::Description:
+      break;
+    case (int)Column::Ammount:
+    case (int)Column::UnitValue:
+    case (int)Column::SubTotal:
+      setFocus();
+  }
 }
 
 void BKComboBox::toUpper()
@@ -296,7 +316,7 @@ void NoteWidget::addItem()
 {
   m_table.insertRow(m_table.rowCount());
   const int row = m_table.rowCount() - 1;
-  auto unit = new BKComboBox(BKComboBox::TableCell);
+  auto unity = new BKComboBox(BKComboBox::TableUnity);
   QStringList ls;
   ls << "UN"
      << "KG"
@@ -305,12 +325,12 @@ void NoteWidget::addItem()
      << "SC"
      << "ML"
      << "PCT";
-  unit->addItems(ls);
-  auto description = new BKComboBox(BKComboBox::TableCell);
+  unity->addItems(ls);
+  auto description = new BKComboBox(BKComboBox::TableDescription);
   description->addItems(m_descriptions);
   description->setCurrentText("");
   m_table.blockSignals(true);
-  m_table.setCellWidget(row, (int)Column::Unity, unit);
+  m_table.setCellWidget(row, (int)Column::Unity, unity);
   m_table.setCellWidget(row, (int)Column::Description, description);
   m_table.setItem(row, (int)Column::Ammount, new QTableWidgetItem("0.000"));
   m_table.setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));

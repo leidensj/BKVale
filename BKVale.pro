@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     databaseutils.cpp \
     notewidget.cpp \
     note.cpp \
-    historywidget.cpp
+    historywidget.cpp \
+    settings.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -30,7 +31,8 @@ HEADERS  += mainwindow.h \
     databaseutils.h \
     notewidget.h \
     note.h \
-    historywidget.h
+    historywidget.h \
+    settings.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

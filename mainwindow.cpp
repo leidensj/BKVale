@@ -72,7 +72,13 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(openNote(int)));
 
+  QObject::connect(this,
+                   SIGNAL(initSignal()),
+                   this,
+                   SLOT(init()));
+
   m_noteWidget.clear();
+  emit initSignal();
   enableControls();
 }
 
@@ -186,7 +192,19 @@ void BKVale::showSettings()
   {
     SettingsDlg dlg;
     if (dlg.exec() == QDialog::Accepted)
+    {
       m_settings = dlg.getSettings();
+      QString error;
+      if (!m_db.insertSettings(m_settings,
+                               error))
+      {
+        QMessageBox msgBox(QMessageBox::Critical,
+                           tr("Erro ao salvar a configuração"),
+                           tr("Desconecte a impressora primeiro."),
+                           QMessageBox::Ok);
+        msgBox.exec();
+      }
+    }
   }
   else
   {
@@ -212,9 +230,9 @@ void BKVale::enableControls()
   m_noteWidget.setEnabled(bCanEdit);
 }
 
-bool BKVale::initDatabase(QString& error)
+void BKVale::init()
 {
-  error.clear();
+  QString error;
   bool bSuccess = m_db.open(qApp->applicationDirPath() +
                             QDir::separator() +
                             "setup.db",
@@ -224,13 +242,7 @@ bool BKVale::initDatabase(QString& error)
   else
     m_db.close();
 
-  return bSuccess;
-}
-
-void BKVale::createNew()
-{
-  QString error;
-  if (!initDatabase(error))
+  if (!bSuccess)
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        tr("Erro ao inicializar banco de dados"),
@@ -241,6 +253,19 @@ void BKVale::createNew()
   else
   {
     m_bReady = true;
+    m_db.selectSettings(m_settings);
+    if (!m_settings.port.isEmpty())
+      connect();
+    createNew();
+  }
+
+  enableControls();
+}
+
+void BKVale::createNew()
+{
+  if (m_bReady)
+  {
     m_noteWidget.createNew(m_db.number(),
                            m_db.selectSuppliers(),
                            m_db.selectDescriptions());
@@ -259,18 +284,8 @@ void BKVale::showSearch()
 {
   if (ui->dock->isHidden())
   {
-    QString error;
-    if (!initDatabase(error))
+    if (m_bReady)
     {
-      QMessageBox msgBox(QMessageBox::Critical,
-                         tr("Erro ao inicializar banco de dados"),
-                         error,
-                         QMessageBox::Ok);
-      msgBox.exec();
-    }
-    else
-    {
-      m_bReady = true;
       Notes notes;
       QString error;
       m_db.selectAll(notes, error);

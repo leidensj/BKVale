@@ -30,7 +30,6 @@ private:
   Settings m_settings;
   Database m_db;
   bool m_bReady;
-  bool initDatabase(QString& error);
 
 private slots:
   void connect();
@@ -42,6 +41,10 @@ private slots:
   void showInfo();
   void showSearch();
   void openNote(int idx);
+  void init();
+
+signals:
+  void initSignal();
 };
 
 #endif // MAINWINDOW_H

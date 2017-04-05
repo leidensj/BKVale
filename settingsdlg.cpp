@@ -3,21 +3,6 @@
 #include <QSerialPortInfo>
 #include <QPushButton>
 
-Settings::Settings()
-{
-  clear();
-}
-
-void Settings::clear()
-{
-  port.clear();
-  baudRate = QSerialPort::Baud9600;
-  dataBits = QSerialPort::Data8;
-  flowControl = QSerialPort::NoFlowControl;
-  parity = QSerialPort::NoParity;
-  stopBits = QSerialPort::OneStop;
-}
-
 SettingsDlg::SettingsDlg(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::SettingsDlg)

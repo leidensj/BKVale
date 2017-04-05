@@ -3,23 +3,11 @@
 
 #include <QDialog>
 #include <QSerialPort>
+#include "settings.h"
 
 namespace Ui {
 class SettingsDlg;
 }
-
-struct Settings
-{
-  QString port;
-  QSerialPort::BaudRate baudRate;
-  QSerialPort::DataBits dataBits;
-  QSerialPort::FlowControl flowControl;
-  QSerialPort::Parity parity;
-  QSerialPort::StopBits stopBits;
-
-  Settings();
-  void clear();
-};
 
 class SettingsDlg : public QDialog
 {

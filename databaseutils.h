@@ -2,8 +2,9 @@
 #define DATABASEUTILS_H
 
 #include <QSqlDatabase>
-#include <note.h>
 #include <vector>
+#include "note.h"
+#include "settings.h"
 
 #define DEFAULT_NUMBER     1000
 #define DEFAULT_NUMBER_STR "1000"
@@ -44,6 +45,11 @@ public:
   QStringList selectSuppliers();
 
   QStringList selectDescriptions();
+
+  bool insertSettings(const Settings& settings,
+                      QString& error);
+
+  void selectSettings(Settings& settings);
 
   int number();
 };

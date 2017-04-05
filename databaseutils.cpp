@@ -46,7 +46,13 @@ bool Database::init(QString& error)
   QSqlQuery query;
   bool bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _SETTINGS ("
                              "_LASTNUMBER INTEGER DEFAULT " DEFAULT_NUMBER_STR ","
-                             "_SERIALPORT TEXT)");
+                             "_SERIALPORT TEXT,"
+                             "_BAUDRATE INTEGER DEFAULT 9600,"
+                             "_DATABITS INTEGER DEFAULT 8,"
+                             "_FLOWCONTROL INTEGER DEFAULT 0,"
+                             "_PARITY INTEGER DEFAULT 0,"
+                             "_STOPBITS INTEGER DEFAULT 1)");
+
   if (bSuccess)
   {
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
@@ -56,6 +62,7 @@ bool Database::init(QString& error)
                           "_SUPPLIER TEXT NOT NULL,"
                           "_ITEMS TEXT,"
                           "_TOTAL REAL)");
+
     if (bSuccess)
     {
       bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
@@ -281,4 +288,63 @@ QStringList Database::selectDescriptions()
     }
   }
   return list;
+}
+
+bool Database::insertSettings(const Settings& settings,
+                              QString& error)
+{
+  if (!isOpen(error))
+    return false;
+
+  QSqlQuery query;
+  bool bSuccess = query.prepare("UPDATE _SETTINGS SET "
+                                "_BAUDRATE = :_baudrate,"
+                                "_DATABITS = :_databits,"
+                                "_FLOWCONTROL = :_flowcontrol,"
+                                "_PARITY = :_parity,"
+                                "_STOPBITS = :_stopbits,"
+                                "_SERIALPORT = :_serialport");
+  if (bSuccess)
+  {
+
+    query.bindValue(":_baudrate", (int)settings.baudRate);
+    query.bindValue(":_databits", (int)settings.dataBits);
+    query.bindValue(":_flowcontrol", (int)settings.flowControl);
+    query.bindValue(":_parity", (int)settings.parity);
+    query.bindValue(":_stopbits", (int)settings.stopBits);
+    query.bindValue(":_serialport", settings.port);
+    bSuccess = query.exec();
+  }
+
+  if (!bSuccess)
+    error = query.lastError().text();
+  return bSuccess;
+}
+
+void Database::selectSettings(Settings& settings)
+{
+  settings.clear();
+  QString error;
+  if (isOpen(error))
+  {
+    QSqlQuery query;
+    query.prepare("SELECT * FROM _SETTINGS LIMIT 1)");
+    if (query.exec())
+    {
+      if (query.next())
+      {
+        settings.baudRate = (QSerialPort::BaudRate)
+                            query.value(query.record().indexOf("_BAUDRATE")).toInt();
+        settings.dataBits = (QSerialPort::DataBits)
+                            query.value(query.record().indexOf("_DATABITS")).toInt();
+        settings.flowControl = (QSerialPort::FlowControl)
+                               query.value(query.record().indexOf("_FLOWCONTROL")).toInt();
+        settings.parity = (QSerialPort::Parity)
+                               query.value(query.record().indexOf("_PARITY")).toInt();
+        settings.stopBits = (QSerialPort::StopBits)
+                               query.value(query.record().indexOf("_STOPBITS")).toInt();
+        settings.port = query.value(query.record().indexOf("_SERIALPORT")).toString();
+      }
+    }
+  }
 }

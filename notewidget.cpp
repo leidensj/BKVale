@@ -143,20 +143,11 @@ void BKTableWidget::setText(int row, int column, const QString& str)
         p->setText(str);
     } break;
     case Column::Description:
-    {
-      QComboBox* pt = dynamic_cast<QComboBox*>(cellWidget(row, column));
-      if (pt != nullptr)
-        pt->setCurrentText(str);
-    } break;
     case Column::Unity:
     {
       QComboBox* pt = dynamic_cast<QComboBox*>(cellWidget(row, column));
       if (pt != nullptr)
-      {
-        int idx = pt->findText(str, Qt::MatchFixedString);
-        if (idx != -1)
-          pt->setCurrentIndex(idx);
-      }
+        pt->setCurrentText(str);
     } break;
     default:
     {
@@ -309,12 +300,15 @@ void NoteWidget::addItem()
   QStringList ls;
   ls << "UN"
      << "KG"
-     << "FD"
      << "CX"
+     << "FD"
+     << "SC"
      << "ML"
      << "PCT";
-  unit->insertItems(0, ls);
+  unit->addItems(ls);
   auto description = new BKComboBox(BKComboBox::TableCell);
+  description->addItems(m_descriptions);
+  description->setCurrentText("");
   m_table.blockSignals(true);
   m_table.setCellWidget(row, (int)Column::Unity, unit);
   m_table.setCellWidget(row, (int)Column::Description, description);

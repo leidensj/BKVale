@@ -200,7 +200,7 @@ void BKVale::showSettings()
       {
         QMessageBox msgBox(QMessageBox::Critical,
                            tr("Erro ao salvar a configuração"),
-                           tr("Desconecte a impressora primeiro."),
+                           error,
                            QMessageBox::Ok);
         msgBox.exec();
       }

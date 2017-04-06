@@ -3,6 +3,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QDebug>
 
 Database::Database()
   : m_db(QSqlDatabase::addDatabase("QSQLITE"))
@@ -306,7 +307,6 @@ bool Database::insertSettings(const Settings& settings,
                                 "_SERIALPORT = :_serialport");
   if (bSuccess)
   {
-
     query.bindValue(":_baudrate", (int)settings.baudRate);
     query.bindValue(":_databits", (int)settings.dataBits);
     query.bindValue(":_flowcontrol", (int)settings.flowControl);
@@ -328,7 +328,7 @@ void Database::selectSettings(Settings& settings)
   if (isOpen(error))
   {
     QSqlQuery query;
-    query.prepare("SELECT * FROM _SETTINGS LIMIT 1)");
+    query.prepare("SELECT * FROM _SETTINGS LIMIT 1");
     if (query.exec())
     {
       if (query.next())
@@ -345,6 +345,10 @@ void Database::selectSettings(Settings& settings)
                                query.value(query.record().indexOf("_STOPBITS")).toInt();
         settings.port = query.value(query.record().indexOf("_SERIALPORT")).toString();
       }
+    }
+    else
+    {
+      qDebug() << query.lastError().text();
     }
   }
 }

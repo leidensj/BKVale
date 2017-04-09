@@ -275,7 +275,7 @@ double NoteWidget::evaluate(int row, int column) const
   auto exp = pt->text().toStdString();
   int error = 0;
   double res = te_interp(exp.c_str(), &error);
-  if (!error && res >= 0)
+  if (!error)
     pt->setData(Qt::UserRole, res);
   return pt->data(Qt::UserRole).toDouble();
 }

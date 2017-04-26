@@ -253,6 +253,7 @@ void BKVale::init()
   else
   {
     m_bReady = true;
+    m_historyWidget.set(m_db.getSqlDatabase());
     m_db.selectSettings(m_settings);
     if (!m_settings.port.isEmpty())
       connect();
@@ -289,7 +290,6 @@ void BKVale::showSearch()
       Notes notes;
       QString error;
       m_db.selectAll(notes, error);
-      m_historyWidget.refresh(notes);
       m_noteWidget.clear();
       ui->dock->show();
       enableControls();

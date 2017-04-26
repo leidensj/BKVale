@@ -1,6 +1,7 @@
 #include "historywidget.h"
 #include "ui_historywidget.h"
 #include <QDate>
+#include <QSqlRecord>
 
 HistoryWidget::HistoryWidget(QWidget *parent) :
   QFrame(parent),
@@ -9,9 +10,29 @@ HistoryWidget::HistoryWidget(QWidget *parent) :
   ui->setupUi(this);
 
   QObject::connect(ui->table,
-                   SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
+                   SIGNAL(doubleClicked(const QModelIndex&)),
                    this,
-                   SLOT(noteSelected(QTableWidgetItem*)));
+                   SLOT(noteSelected(const QModelIndex&)));
+}
+
+void HistoryWidget::set(const QSqlDatabase& sqldb)
+{
+  if (m_model == nullptr)
+    return;
+
+  m_model = new QSqlTableModel(this, sqldb);
+  m_model->setTable("_PROMISSORYNOTES");
+  m_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+  m_model->select();
+  m_model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+  m_model->setHeaderData(1, Qt::Horizontal, tr("Número"));
+  m_model->setHeaderData(2, Qt::Horizontal, tr("Data"));
+  m_model->setHeaderData(3, Qt::Horizontal, tr("Fornecedor"));
+  m_model->setHeaderData(4, Qt::Horizontal, tr("Itens"));
+  m_model->setHeaderData(5, Qt::Horizontal, tr("Total"));
+  ui->table->setModel(m_model);
+  ui->table->hideColumn(0);
+  ui->table->hideColumn(4);
 }
 
 HistoryWidget::~HistoryWidget()
@@ -19,40 +40,20 @@ HistoryWidget::~HistoryWidget()
   delete ui;
 }
 
-void HistoryWidget::refresh(Notes& notes)
+void HistoryWidget::noteSelected(const QModelIndex& idx)
 {
-  m_notes = std::move(notes);
-  ui->table->setRowCount(0);
-  for (size_t row = 0; row != m_notes.size(); ++row)
-  {
-    ui->table->insertRow(ui->table->rowCount());
-
-    ui->table->setItem((int)row,
-                       (int)HistColumn::Number,
-                       new QTableWidgetItem(QString::number(m_notes.at(row).m_number)));
-
-    QString strDate = QDate::fromJulianDay(m_notes.at(row).m_date).toString("dd/MM/yyyy");
-    ui->table->setItem((int)row,
-                       (int)HistColumn::Date,
-                       new QTableWidgetItem(strDate));
-
-    ui->table->setItem((int)row,
-                       (int)HistColumn::Supplier,
-                       new QTableWidgetItem(m_notes.at(row).m_supplier));
-
-    ui->table->setItem((int)row,
-                       (int)HistColumn::Total,
-                       new QTableWidgetItem(Note::format(m_notes.at(row).m_total)));
-  }
-}
-
-void HistoryWidget::noteSelected(QTableWidgetItem* p)
-{
-  int idx = p != nullptr ? p->row() : -1;
-  emit noteSelectedSignal(idx);
+  emit noteSelectedSignal(idx.row());
 }
 
 Note HistoryWidget::at(int idx) const
 {
-  return (size_t)idx < m_notes.size() ? m_notes.at((size_t)idx) : Note();
+  QSqlRecord record = m_model->record(idx);
+  Note note;
+  note.m_id = record.value("_ID").toInt();
+  note.m_number = record.value("_NUMBER").toInt();
+  note.m_date = record.value("_DATE").toLongLong();
+  note.m_supplier = record.value("_SUPPLIER").toString();
+  note.m_items = record.value("_ITEMS").toString();
+  note.m_total = record.value("_TOTAL").toDouble();
+  return note;
 }

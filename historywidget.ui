@@ -33,12 +33,9 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTableWidget" name="table">
+    <widget class="QTableView" name="table">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
@@ -49,32 +46,9 @@
      <property name="horizontalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
-     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+     <property name="sortingEnabled">
       <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderVisible">
-      <bool>true</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Número</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Data</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Fornecedor</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Total</string>
-      </property>
-     </column>
+     </property>
     </widget>
    </item>
   </layout>

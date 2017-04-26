@@ -21,6 +21,8 @@ public:
 
   Database();
 
+  const QSqlDatabase& getSqlDatabase() const { return m_db; }
+
   bool isOpen(QString& error) const;
 
   bool open(const QString& path,

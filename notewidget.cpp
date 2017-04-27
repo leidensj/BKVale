@@ -65,6 +65,13 @@ void BKComboBox::keyPressEvent(QKeyEvent *event)
   }
 }
 
+void BKComboBox::toUpper()
+{
+  blockSignals(true);
+  setCurrentText(currentText().toUpper());
+  blockSignals(false);
+}
+
 BKTableWidget::BKTableWidget()
 {
   setColumnCount(NUMBER_OF_COLUMNS);
@@ -83,6 +90,11 @@ BKTableWidget::BKTableWidget()
   horizontalHeader()->setSectionResizeMode((int)Column::Description, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)Column::UnitValue, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::SubTotal, QHeaderView::ResizeToContents);
+
+  QObject::connect(this,
+                   SIGNAL(currentCellChanged(int, int, int, int)),
+                   this,
+                   SLOT(adjustFocus(int, int, int, int)));
 }
 
 void BKTableWidget::keyPressEvent(QKeyEvent *event)
@@ -189,13 +201,6 @@ void BKTableWidget::adjustFocus(int /*currentRow*/,
   }
 }
 
-void BKComboBox::toUpper()
-{
-  blockSignals(true);
-  setCurrentText(currentText().toUpper());
-  blockSignals(false);
-}
-
 NoteWidget::NoteWidget(QWidget *parent)
   : QFrame(parent)
   , ui(new Ui::NoteWidget)
@@ -209,11 +214,6 @@ NoteWidget::NoteWidget(QWidget *parent)
                    SIGNAL(cellChanged(int, int)),
                    this,
                    SLOT(updateTable(int, int)));
-
-  QObject::connect(&m_table,
-                   SIGNAL(itemSelectionChanged()),
-                   this,
-                   SLOT(changed()));
 
   QObject::connect(&m_supplier,
                    SIGNAL(editTextChanged(const QString &)),
@@ -310,6 +310,7 @@ void NoteWidget::updateTable(int row, int column)
       break;
   }
   m_table.blockSignals(false);
+  changed();
 }
 
 void NoteWidget::addItem()

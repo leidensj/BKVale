@@ -36,8 +36,8 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \
-    bkframe.ui \
-    historywidget.ui
+    historywidget.ui \
+    notewidget.ui
 
 RESOURCES += \
     icons.qrc

@@ -13,6 +13,15 @@ namespace Ui {
 class HistoryWidget;
 }
 
+class HistoryTableModel : public QSqlTableModel
+{
+  Q_OBJECT
+
+public:
+  HistoryTableModel(QObject *parent, QSqlDatabase db);
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+};
+
 class HistoryWidget : public QFrame
 {
   Q_OBJECT
@@ -20,18 +29,22 @@ class HistoryWidget : public QFrame
 public:
   explicit HistoryWidget(QWidget *parent = 0);
   ~HistoryWidget();
-  void set(const QSqlDatabase& sqldb);
+  void setDatabase(const QSqlDatabase& sqldb);
   Note at(int idx) const;
+
+public slots:
+  void refresh();
 
 private:
   Ui::HistoryWidget *ui;
-  QSqlTableModel* m_model;
+  HistoryTableModel* m_model;
 
 private slots:
   void noteSelected(const QModelIndex& idx);
+  void noteSelected();
 
 signals:
-  void noteSelectedSignal(int idx);
+  void noteSelectedSignal(const Note& note);
 };
 
 #endif // HISTORYWIDGET_H

@@ -1,0 +1,17 @@
+INPUT(
+./release\main.o
+./release\mainwindow.o
+./release\tinyexpr.o
+./release\settingsdlg.o
+./release\printutils.o
+./release\databaseutils.o
+./release\notewidget.o
+./release\note.o
+./release\historywidget.o
+./release\settings.o
+./release\qrc_icons.o
+./release\moc_mainwindow.o
+./release\moc_settingsdlg.o
+./release\moc_notewidget.o
+./release\moc_historywidget.o
+);

@@ -16,5 +16,9 @@
         <file>res/general.png</file>
         <file>res/baita.png</file>
         <file>res/search.png</file>
+        <file>res/postit.png</file>
+        <file>res/note.png</file>
+        <file>res/shop.png</file>
+        <file>res/trash.png</file>
     </qresource>
 </RCC>

@@ -95,18 +95,18 @@ namespace
     {
       QString item;
       {
-        QString itemPt1 = items.at(i, Column::Ammount) +
-                          items.at(i, Column::Unity) +
+        QString itemPt1 = items.at(i, NoteColumn::Ammount) +
+                          items.at(i, NoteColumn::Unity) +
                           " x R$" +
-                          items.at(i, Column::UnitValue);
+                          items.at(i, NoteColumn::UnitValue);
         QString itemPt2 = "R$" +
-                          items.at(i, Column::SubTotal);
+                          items.at(i, NoteColumn::SubTotal);
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += " ";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      strNote += items.at(i, Column::Description) + ESC_LF +
+      strNote += items.at(i, NoteColumn::Description) + ESC_LF +
               item + ESC_LF "────────────────────────────────────────────────" ESC_LF;
     }
   }

@@ -6,6 +6,7 @@
 #include <QComboBox>
 #include <QTableWidget>
 #include "note.h"
+#include "historywidget.h"
 
 #define MAX_ITEMS 100
 
@@ -15,7 +16,7 @@ namespace Ui {
 class NoteWidget;
 }
 
-class BKComboBox : public QComboBox
+class NoteComboBox : public QComboBox
 {
   Q_OBJECT
 
@@ -28,7 +29,7 @@ public:
     TableDescription
   };
 
-  BKComboBox(Behavior behavior);
+  NoteComboBox(Behavior behavior);
   const Behavior m_behavior;
 
 protected:
@@ -41,7 +42,7 @@ signals:
   void supplierEnteredSignal();
 };
 
-class BKTableWidget : public QTableWidget
+class NoteTableWidget : public QTableWidget
 {
   Q_OBJECT
 
@@ -49,14 +50,10 @@ protected:
   void keyPressEvent(QKeyEvent *event);
 
 public:
-  BKTableWidget();
+  NoteTableWidget();
   QString text(int row, int column) const ;
   void setText(int row, int column, const QString& str);
   QString serializeItems() const;
-
-private slots:
-  void adjustFocus(int,
-                   int currentColumn, int, int);
 };
 
 class NoteWidget : public QFrame
@@ -66,25 +63,23 @@ class NoteWidget : public QFrame
 public:
   explicit NoteWidget(QWidget *parent = 0);
   ~NoteWidget();
-  bool isValidSelection() const;
+  bool isItemSelected() const;
   Note getNote() const;
-  void setNote(const Note& note);
   QStringList getItemDescriptions() const;
   bool isValid() const;
-  bool isDirty() const;
   bool isHistoryMode() const;
+  void setHistoryDatabase(const QSqlDatabase& sqldb);
 
 private:
   Ui::NoteWidget *ui;
-  BKComboBox m_supplier;
-  BKTableWidget m_table;
+  NoteComboBox m_supplier;
+  NoteTableWidget m_table;
   QString computeUnitValue(int row) const;
   QString computeSubTotal(int row) const;
   QString computeTotal() const;
   double evaluate(int row, int column) const;
-  bool m_bDirty;
-  bool m_bHistoryMode;
   QStringList m_descriptions;
+  HistoryWidget m_historyWidget;
 
 private slots:
   void updateTable(int row, int column);
@@ -92,17 +87,18 @@ private slots:
 
 public slots:
   void addItem();
-  void clear();
   void removeItem();
-  void createNew(int number,
-                 const QStringList& suppliers,
-                 const QStringList& descriptions);
+  void clear();
+  void create(int number,
+              const QStringList& suppliers,
+              const QStringList& descriptions);
   void setEnabled(bool bEnable);
   void supplierEntered();
+  void showHistory();
+  void setNote(const Note& note);
 
 signals:
   void changedSignal();
-
 };
 
 #endif // BKFRAME_H

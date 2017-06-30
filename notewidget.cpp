@@ -1,11 +1,11 @@
 #include "notewidget.h"
-#include "ui_bkframe.h"
+#include "ui_notewidget.h"
 #include "tinyexpr.h"
 #include <QComboBox>
 #include <QStringList>
 #include <QKeyEvent>
 
-BKComboBox::BKComboBox(Behavior behavior)
+NoteComboBox::NoteComboBox(Behavior behavior)
   : m_behavior(behavior)
 {
   setEditable(true);
@@ -23,7 +23,7 @@ BKComboBox::BKComboBox(Behavior behavior)
           SLOT(toUpper()));
 }
 
-void BKComboBox::keyPressEvent(QKeyEvent *event)
+void NoteComboBox::keyPressEvent(QKeyEvent *event)
 {
   switch (m_behavior)
   {
@@ -65,14 +65,14 @@ void BKComboBox::keyPressEvent(QKeyEvent *event)
   }
 }
 
-void BKComboBox::toUpper()
+void NoteComboBox::toUpper()
 {
   blockSignals(true);
   setCurrentText(currentText().toUpper());
   blockSignals(false);
 }
 
-BKTableWidget::BKTableWidget()
+NoteTableWidget::NoteTableWidget()
 {
   setColumnCount(NUMBER_OF_COLUMNS);
   QStringList headers;
@@ -85,19 +85,14 @@ BKTableWidget::BKTableWidget()
   setSelectionMode(QAbstractItemView::SingleSelection);
   horizontalHeader()->setHighlightSections(false);
   verticalHeader()->setHighlightSections(false);
-  horizontalHeader()->setSectionResizeMode((int)Column::Ammount, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)Column::Unity, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)Column::Description, QHeaderView::Stretch);
-  horizontalHeader()->setSectionResizeMode((int)Column::UnitValue, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)Column::SubTotal, QHeaderView::ResizeToContents);
-
-  QObject::connect(this,
-                   SIGNAL(currentCellChanged(int, int, int, int)),
-                   this,
-                   SLOT(adjustFocus(int, int, int, int)));
+  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Ammount, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Unity, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Description, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)NoteColumn::UnitValue, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)NoteColumn::SubTotal, QHeaderView::ResizeToContents);
 }
 
-void BKTableWidget::keyPressEvent(QKeyEvent *event)
+void NoteTableWidget::keyPressEvent(QKeyEvent *event)
 {
   if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
   {
@@ -117,21 +112,21 @@ void BKTableWidget::keyPressEvent(QKeyEvent *event)
   }
 }
 
-QString BKTableWidget::text(int row, int column) const
+QString NoteTableWidget::text(int row, int column) const
 {
   QString str;
-  switch((Column)column)
+  switch((NoteColumn)column)
   {
-    case Column::Ammount:
-    case Column::UnitValue:
-    case Column::SubTotal:
+    case NoteColumn::Ammount:
+    case NoteColumn::UnitValue:
+    case NoteColumn::SubTotal:
     {
       auto p = item(row, (int)column);
       if (p != nullptr)
         str = p->text();
     } break;
-    case Column::Description:
-    case Column::Unity:
+    case NoteColumn::Description:
+    case NoteColumn::Unity:
     {
       QComboBox* pt = dynamic_cast<QComboBox*>(cellWidget(row, (int)column));
       if (pt != nullptr)
@@ -145,20 +140,20 @@ QString BKTableWidget::text(int row, int column) const
   return str;
 }
 
-void BKTableWidget::setText(int row, int column, const QString& str)
+void NoteTableWidget::setText(int row, int column, const QString& str)
 {
-  switch((Column)column)
+  switch((NoteColumn)column)
   {
-    case Column::Ammount:
-    case Column::UnitValue:
-    case Column::SubTotal:
+    case NoteColumn::Ammount:
+    case NoteColumn::UnitValue:
+    case NoteColumn::SubTotal:
     {
       auto p = item(row, column);
       if (p != nullptr)
         p->setText(str);
     } break;
-    case Column::Description:
-    case Column::Unity:
+    case NoteColumn::Description:
+    case NoteColumn::Unity:
     {
       QComboBox* pt = dynamic_cast<QComboBox*>(cellWidget(row, column));
       if (pt != nullptr)
@@ -171,7 +166,7 @@ void BKTableWidget::setText(int row, int column, const QString& str)
   }
 }
 
-QString BKTableWidget::serializeItems() const
+QString NoteTableWidget::serializeItems() const
 {
   QString str;
   for (int i = 0; i != rowCount(); ++i)
@@ -184,39 +179,20 @@ QString BKTableWidget::serializeItems() const
   return str;
 }
 
-void BKTableWidget::adjustFocus(int /*currentRow*/,
-                                int currentColumn,
-                                int /*previousRow*/,
-                                int /*previousColumn*/)
-{
-  switch (currentColumn)
-  {
-    case (int)Column::Unity:
-    case (int)Column::Description:
-      break;
-    case (int)Column::Ammount:
-    case (int)Column::UnitValue:
-    case (int)Column::SubTotal:
-      setFocus();
-  }
-}
-
 NoteWidget::NoteWidget(QWidget *parent)
   : QFrame(parent)
   , ui(new Ui::NoteWidget)
-  , m_supplier(BKComboBox::Supplier)
-  , m_bDirty(false)
-  , m_bHistoryMode(false)
+  , m_supplier(NoteComboBox::Supplier)
 {
   ui->setupUi(this);
-
+  ui->dockWidgetContents->layout()->addWidget(&m_historyWidget);
   QObject::connect(&m_table,
                    SIGNAL(cellChanged(int, int)),
                    this,
                    SLOT(updateTable(int, int)));
 
   QObject::connect(&m_supplier,
-                   SIGNAL(editTextChanged(const QString &)),
+                   SIGNAL(editTextChanged(const QString&)),
                    this,
                    SLOT(changed()));
 
@@ -225,10 +201,15 @@ NoteWidget::NoteWidget(QWidget *parent)
                    this,
                    SLOT(supplierEntered()));
 
+  QObject::connect(&m_historyWidget,
+                   SIGNAL(noteSelectedSignal(const Note&)),
+                   this,
+                   SLOT(setNote(const Note&)));
 
   ui->frameTable->layout()->addWidget(&m_table);
   ui->frameSupplier->layout()->addWidget(&m_supplier);
   ui->date->setDate(QDate::currentDate());
+  ui->dockWidget->close();
 }
 
 NoteWidget::~NoteWidget()
@@ -238,20 +219,20 @@ NoteWidget::~NoteWidget()
 
 QString NoteWidget::computeUnitValue(int row) const
 {
-  Q_ASSERT(m_table.item(row, (int)Column::Ammount) != nullptr);
-  Q_ASSERT(m_table.item(row, (int)Column::SubTotal) != nullptr);
-  const double ammount = m_table.item(row, (int)Column::Ammount)->text().toDouble();
-  const double subTotal = m_table.item(row, (int)Column::SubTotal)->text().toDouble();
+  Q_ASSERT(m_table.item(row, (int)NoteColumn::Ammount) != nullptr);
+  Q_ASSERT(m_table.item(row, (int)NoteColumn::SubTotal) != nullptr);
+  const double ammount = m_table.item(row, (int)NoteColumn::Ammount)->text().toDouble();
+  const double subTotal = m_table.item(row, (int)NoteColumn::SubTotal)->text().toDouble();
   const double unitValue = ammount ? subTotal / ammount : 0.0;
   return Note::format(unitValue, false);
 }
 
 QString NoteWidget::computeSubTotal(int row) const
 {
-  Q_ASSERT(m_table.item(row, (int)Column::Ammount) != nullptr);
-  Q_ASSERT(m_table.item(row, (int)Column::UnitValue) != nullptr);
-  const double ammount = m_table.item(row, (int)Column::Ammount)->text().toDouble();
-  const double unitValue = m_table.item(row, (int)Column::UnitValue)->text().toDouble();
+  Q_ASSERT(m_table.item(row, (int)NoteColumn::Ammount) != nullptr);
+  Q_ASSERT(m_table.item(row, (int)NoteColumn::UnitValue) != nullptr);
+  const double ammount = m_table.item(row, (int)NoteColumn::Ammount)->text().toDouble();
+  const double unitValue = m_table.item(row, (int)NoteColumn::UnitValue)->text().toDouble();
   const double subTotal = ammount * unitValue;
   return Note::format(subTotal, false);
 }
@@ -261,8 +242,8 @@ QString NoteWidget::computeTotal() const
   double total = 0.0;
   for (int row = 0; row != m_table.rowCount(); ++row)
   {
-    Q_ASSERT(m_table.item(row, (int)Column::SubTotal) != nullptr);
-    total += m_table.item(row, (int)Column::SubTotal)->text().toDouble();
+    Q_ASSERT(m_table.item(row, (int)NoteColumn::SubTotal) != nullptr);
+    total += m_table.item(row, (int)NoteColumn::SubTotal)->text().toDouble();
   }
   return Note::format(total, false);
 }
@@ -283,27 +264,27 @@ double NoteWidget::evaluate(int row, int column) const
 void NoteWidget::updateTable(int row, int column)
 {
   m_table.blockSignals(true);
-  switch ((Column)column)
+  switch ((NoteColumn)column)
   {
-    case Column::Ammount:
+    case NoteColumn::Ammount:
     {
       QString res(Note::format(evaluate(row, column), true));
       m_table.item(row, column)->setText(res);
-      m_table.item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
+      m_table.item(row, (int)NoteColumn::SubTotal)->setText(computeSubTotal(row));
       ui->total->setText(computeTotal());
     } break;
-    case Column::UnitValue:
+    case NoteColumn::UnitValue:
     {
       QString res(Note::format(evaluate(row, column), false));
       m_table.item(row, column)->setText(res);
-      m_table.item(row, (int)Column::SubTotal)->setText(computeSubTotal(row));
+      m_table.item(row, (int)NoteColumn::SubTotal)->setText(computeSubTotal(row));
       ui->total->setText(computeTotal());
     } break;
-    case Column::SubTotal:
+    case NoteColumn::SubTotal:
     {
       QString res(Note::format(evaluate(row, column), false));
       m_table.item(row, column)->setText(res);
-      m_table.item(row, (int)Column::UnitValue)->setText(computeUnitValue(row));
+      m_table.item(row, (int)NoteColumn::UnitValue)->setText(computeUnitValue(row));
       ui->total->setText(computeTotal());
     } break;
     default:
@@ -317,27 +298,21 @@ void NoteWidget::addItem()
 {
   m_table.insertRow(m_table.rowCount());
   const int row = m_table.rowCount() - 1;
-  auto unity = new BKComboBox(BKComboBox::TableUnity);
+  auto unity = new NoteComboBox(NoteComboBox::TableUnity);
   QStringList ls;
-  ls << "UN"
-     << "KG"
-     << "CX"
-     << "FD"
-     << "SC"
-     << "ML"
-     << "PCT";
+  ls << "UN" << "KG" << "CX" << "FD" << "SC" << "ML" << "PCT";
   unity->addItems(ls);
-  auto description = new BKComboBox(BKComboBox::TableDescription);
+  auto description = new NoteComboBox(NoteComboBox::TableDescription);
   description->addItems(m_descriptions);
   description->setCurrentText("");
   m_table.blockSignals(true);
-  m_table.setCellWidget(row, (int)Column::Unity, unity);
-  m_table.setCellWidget(row, (int)Column::Description, description);
-  m_table.setItem(row, (int)Column::Ammount, new QTableWidgetItem("0.000"));
-  m_table.setItem(row, (int)Column::UnitValue, new QTableWidgetItem("0.00"));
-  m_table.setItem(row, (int)Column::SubTotal, new QTableWidgetItem("0.00"));
+  m_table.setCellWidget(row, (int)NoteColumn::Unity, unity);
+  m_table.setCellWidget(row, (int)NoteColumn::Description, description);
+  m_table.setItem(row, (int)NoteColumn::Ammount, new QTableWidgetItem("0.000"));
+  m_table.setItem(row, (int)NoteColumn::UnitValue, new QTableWidgetItem("0.00"));
+  m_table.setItem(row, (int)NoteColumn::SubTotal, new QTableWidgetItem("0.00"));
   m_table.blockSignals(false);
-  m_table.setCurrentCell(row, (int)Column::Ammount);
+  m_table.setCurrentCell(row, (int)NoteColumn::Ammount);
   m_table.setFocus();
   ui->total->setText(computeTotal());
   emit changedSignal();
@@ -350,15 +325,15 @@ void NoteWidget::removeItem()
     ui->total->setText(computeTotal());
   else
     ui->total->clear();
+  changed();
 }
 
 void NoteWidget::changed()
 {
-  m_bDirty = true;
   emit changedSignal();
 }
 
-bool NoteWidget::isValidSelection() const
+bool NoteWidget::isItemSelected() const
 {
   return m_table.currentRow() >= 0;
 }
@@ -376,6 +351,7 @@ Note NoteWidget::getNote() const
 
 void NoteWidget::setNote(const Note& note)
 {
+  clear();
   m_table.setRowCount(0);
   ui->date->setDate(QDate::fromJulianDay(note.m_date));
   m_supplier.setCurrentText(note.m_supplier);
@@ -384,30 +360,24 @@ void NoteWidget::setNote(const Note& note)
   for (int row = 0; row != items.m_size; ++row)
   {
     addItem();
-    m_table.setText(row, (int)Column::Ammount, items.at(row, Column::Ammount));
-    m_table.setText(row, (int)Column::Unity, items.at(row, Column::Unity));
-    m_table.setText(row, (int)Column::UnitValue, items.at(row, Column::UnitValue));
-    m_table.setText(row, (int)Column::Description, items.at(row, Column::Description));
-    m_table.setText(row, (int)Column::SubTotal, items.at(row, Column::SubTotal));
+    m_table.setText(row, (int)NoteColumn::Ammount, items.at(row, NoteColumn::Ammount));
+    m_table.setText(row, (int)NoteColumn::Unity, items.at(row, NoteColumn::Unity));
+    m_table.setText(row, (int)NoteColumn::UnitValue, items.at(row, NoteColumn::UnitValue));
+    m_table.setText(row, (int)NoteColumn::Description, items.at(row, NoteColumn::Description));
+    m_table.setText(row, (int)NoteColumn::SubTotal, items.at(row, NoteColumn::SubTotal));
   }
-  m_bDirty = false;
-  m_bHistoryMode = true;
 }
 
 bool NoteWidget::isValid() const
 {
   return !m_supplier.currentText().isEmpty() &&
-      m_table.rowCount() != 0;
-}
-
-bool NoteWidget::isDirty() const
-{
-  return m_bDirty;
+      m_table.rowCount() &&
+      computeTotal().toDouble();
 }
 
 bool NoteWidget::isHistoryMode() const
 {
-  return m_bHistoryMode;
+  return false;
 }
 
 void NoteWidget::clear()
@@ -420,13 +390,11 @@ void NoteWidget::clear()
   m_table.setRowCount(0);
   while (m_supplier.count())
     m_supplier.removeItem(m_supplier.count() - 1);
-  m_bDirty = false;
-  m_bHistoryMode = false;
 }
 
-void NoteWidget::createNew(int number,
-                           const QStringList& suppliers,
-                           const QStringList& descriptions)
+void NoteWidget::create(int number,
+                        const QStringList& suppliers,
+                        const QStringList& descriptions)
 {
   clear();
   ui->date->setDate(QDate::currentDate());
@@ -450,7 +418,7 @@ QStringList NoteWidget::getItemDescriptions() const
 {
   QStringList ls;
   for (auto row = 0; row != m_table.rowCount(); ++row)
-    ls << m_table.text(row, (int)Column::Description);
+    ls << m_table.text(row, (int)NoteColumn::Description);
   return ls;
 }
 
@@ -465,4 +433,15 @@ void NoteWidget::supplierEntered()
   {
     addItem();
   }
+}
+
+void NoteWidget::setHistoryDatabase(const QSqlDatabase& sqldb)
+{
+  m_historyWidget.setDatabase(sqldb);
+}
+
+void NoteWidget::showHistory()
+{
+  if (ui->dockWidget->isHidden())
+    ui->dockWidget->show();
 }

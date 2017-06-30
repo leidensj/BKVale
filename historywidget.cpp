@@ -3,36 +3,61 @@
 #include <QDate>
 #include <QSqlRecord>
 
+HistoryTableModel::HistoryTableModel(QObject *parent, QSqlDatabase db)
+  : QSqlTableModel(parent, db)
+{
+
+}
+
+QVariant HistoryTableModel::data(const QModelIndex &index, int role) const
+{
+  if (!index.isValid())
+    return QModelIndex();
+
+  QVariant value = QSqlTableModel::data(index, role);
+  if (role == Qt::DisplayRole && index.column() == (int)NoteTableIndex::Date)
+    value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
+
+  return value;
+}
+
 HistoryWidget::HistoryWidget(QWidget *parent) :
   QFrame(parent),
   ui(new Ui::HistoryWidget)
 {
   ui->setupUi(this);
+  ui->table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  ui->table->setSelectionMode(QAbstractItemView::SingleSelection);
 
   QObject::connect(ui->table,
                    SIGNAL(doubleClicked(const QModelIndex&)),
                    this,
                    SLOT(noteSelected(const QModelIndex&)));
+
+  QObject::connect(ui->buttonOpen,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(noteSelected()));
 }
 
-void HistoryWidget::set(const QSqlDatabase& sqldb)
+void HistoryWidget::setDatabase(const QSqlDatabase& sqldb)
 {
   if (m_model == nullptr)
     return;
 
-  m_model = new QSqlTableModel(this, sqldb);
+  m_model = new HistoryTableModel(this, sqldb);
   m_model->setTable("_PROMISSORYNOTES");
   m_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-  m_model->select();
-  m_model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-  m_model->setHeaderData(1, Qt::Horizontal, tr("Número"));
-  m_model->setHeaderData(2, Qt::Horizontal, tr("Data"));
-  m_model->setHeaderData(3, Qt::Horizontal, tr("Fornecedor"));
-  m_model->setHeaderData(4, Qt::Horizontal, tr("Itens"));
-  m_model->setHeaderData(5, Qt::Horizontal, tr("Total"));
+  m_model->setHeaderData((int)NoteTableIndex::ID, Qt::Horizontal, tr("ID"));
+  m_model->setHeaderData((int)NoteTableIndex::Number, Qt::Horizontal, tr("Número"));
+  m_model->setHeaderData((int)NoteTableIndex::Date, Qt::Horizontal, tr("Data"));
+  m_model->setHeaderData((int)NoteTableIndex::Supplier, Qt::Horizontal, tr("Fornecedor"));
+  m_model->setHeaderData((int)NoteTableIndex::Items, Qt::Horizontal, tr("Itens"));
+  m_model->setHeaderData((int)NoteTableIndex::Total, Qt::Horizontal, tr("Total"));
   ui->table->setModel(m_model);
-  ui->table->hideColumn(0);
-  ui->table->hideColumn(4);
+  ui->table->hideColumn((int)NoteTableIndex::ID);
+  ui->table->hideColumn((int)NoteTableIndex::Items);
+  refresh();
 }
 
 HistoryWidget::~HistoryWidget()
@@ -40,9 +65,25 @@ HistoryWidget::~HistoryWidget()
   delete ui;
 }
 
+void HistoryWidget::noteSelected()
+{
+  noteSelected(ui->table->currentIndex());
+}
+
 void HistoryWidget::noteSelected(const QModelIndex& idx)
 {
-  emit noteSelectedSignal(idx.row());
+  Note note;
+  if (m_model != nullptr && idx.isValid())
+  {
+    const int row = idx.row();
+    note.m_id = m_model->index(row, (int)NoteTableIndex::ID).data(Qt::EditRole).toInt();
+    note.m_number = m_model->index(row, (int)NoteTableIndex::Number).data(Qt::EditRole).toInt();
+    note.m_date = m_model->index(row, (int)NoteTableIndex::Date).data(Qt::EditRole).toLongLong();
+    note.m_supplier = m_model->index(row, (int)NoteTableIndex::Supplier).data(Qt::EditRole).toString();
+    note.m_items = m_model->index(row, (int)NoteTableIndex::Items).data(Qt::EditRole).toString();
+    note.m_total = m_model->index(row, (int)NoteTableIndex::Total).data(Qt::EditRole).toDouble();
+    emit noteSelectedSignal(note);
+  }
 }
 
 Note HistoryWidget::at(int idx) const
@@ -56,4 +97,10 @@ Note HistoryWidget::at(int idx) const
   note.m_items = record.value("_ITEMS").toString();
   note.m_total = record.value("_TOTAL").toDouble();
   return note;
+}
+
+void HistoryWidget::refresh()
+{
+  if (m_model != nullptr)
+    m_model->select();
 }

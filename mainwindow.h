@@ -6,26 +6,31 @@
 #include "settingsdlg.h"
 #include "databaseutils.h"
 #include "notewidget.h"
-#include "historywidget.h"
 
 namespace Ui {
-class BKVale;
+class BaitaAssistant;
 }
 
 class NoteWidget;
 
-class BKVale : public QMainWindow
+enum class Functionality : int
+{
+    FNotes = 0,
+    FPostits,
+    FShop
+};
+
+class BaitaAssistant : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit BKVale(QWidget *parent = 0);
-  ~BKVale();
+  explicit BaitaAssistant(QWidget *parent = 0);
+  ~BaitaAssistant();
 
 private:
-  Ui::BKVale *ui;
+  Ui::BaitaAssistant *ui;
   NoteWidget m_noteWidget;
-  HistoryWidget m_historyWidget;
   QSerialPort m_printer;
   Settings m_settings;
   Database m_db;
@@ -34,14 +39,13 @@ private:
 private slots:
   void connect();
   void disconnect();
-  void print();
   void showSettings();
   void enableControls();
-  void createNew();
-  void showInfo();
-  void showSearch();
-  void openNote(int idx);
   void init();
+  void showInfo();
+
+  void noteCreate();
+  void notePrint();
 
 signals:
   void initSignal();

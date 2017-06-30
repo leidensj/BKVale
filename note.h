@@ -6,13 +6,24 @@
 #include <vector>
 
 #define NUMBER_OF_COLUMNS 5
-enum class Column : int
+
+enum class NoteColumn : int
 {
   Ammount,
   Unity,
   Description,
   UnitValue,
   SubTotal
+};
+
+enum class NoteTableIndex : int
+{
+  ID = 0,
+  Number,
+  Date,
+  Supplier,
+  Items,
+  Total
 };
 
 struct Note
@@ -46,7 +57,7 @@ struct NoteItems
   const QStringList m_items;
   int m_size;
   NoteItems(const QString& items);
-  QString at(int row, Column column) const;
+  QString at(int row, NoteColumn column) const;
 };
 
 #endif // COMMON_H

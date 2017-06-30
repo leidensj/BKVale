@@ -49,7 +49,7 @@ NoteItems::NoteItems(const QString &items)
   Q_ASSERT(m_items.size() % NUMBER_OF_COLUMNS == 0);
 }
 
-QString NoteItems::at(int row, Column column) const
+QString NoteItems::at(int row, NoteColumn column) const
 {
   QString str;
   const int idx = (row * NUMBER_OF_COLUMNS) + (int)column;

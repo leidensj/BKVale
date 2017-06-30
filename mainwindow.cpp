@@ -7,22 +7,20 @@
 #include <QByteArray>
 #include <QDir>
 
-BKVale::BKVale(QWidget *parent) :
-  QMainWindow(parent),
-  ui(new Ui::BKVale),
-  m_bReady(false)
+BaitaAssistant::BaitaAssistant(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::BaitaAssistant),
+    m_bReady(false)
 {
   ui->setupUi(this);
-  ui->centralWidget->layout()->addWidget(&m_noteWidget);
-  ui->dockContents->layout()->addWidget(&m_historyWidget);
-  ui->dock->close();
+  ui->tabNotes->layout()->addWidget(&m_noteWidget);
 
-  QObject::connect(ui->actionAdd,
+  QObject::connect(ui->actionNoteAdd,
                    SIGNAL(triggered(bool)),
                    &m_noteWidget,
                    SLOT(addItem()));
 
-  QObject::connect(ui->actionRemove,
+  QObject::connect(ui->actionNoteRemove,
                    SIGNAL(triggered(bool)),
                    &m_noteWidget,
                    SLOT(removeItem()));
@@ -40,7 +38,7 @@ BKVale::BKVale(QWidget *parent) :
   QObject::connect(ui->actionPrint,
                    SIGNAL(triggered(bool)),
                    this,
-                   SLOT(print()));
+                   SLOT(notePrint()));
 
   QObject::connect(ui->actionSettings,
                    SIGNAL(triggered(bool)),
@@ -57,37 +55,37 @@ BKVale::BKVale(QWidget *parent) :
                    this,
                    SLOT(enableControls()));
 
-  QObject::connect(ui->actionNew,
+  QObject::connect(ui->actionNoteNew,
                    SIGNAL(triggered(bool)),
                    this,
-                   SLOT(createNew()));
+                   SLOT(noteCreate()));
 
-  QObject::connect(ui->actionSearch,
+  QObject::connect(ui->actionNoteSearch,
                    SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(showSearch()));
-
-  QObject::connect(&m_historyWidget,
-                   SIGNAL(noteSelectedSignal(int)),
-                   this,
-                   SLOT(openNote(int)));
+                   &m_noteWidget,
+                   SLOT(showHistory()));
 
   QObject::connect(this,
                    SIGNAL(initSignal()),
                    this,
                    SLOT(init()));
 
+  QObject::connect(ui->tabWidget,
+                   SIGNAL(currentChanged(int)),
+                   this,
+                   SLOT(enableControls()));
+
   m_noteWidget.clear();
   emit initSignal();
   enableControls();
 }
 
-BKVale::~BKVale()
+BaitaAssistant::~BaitaAssistant()
 {
   delete ui;
 }
 
-void BKVale::connect()
+void BaitaAssistant::connect()
 {
   if (m_printer.isOpen())
   {
@@ -147,14 +145,14 @@ void BKVale::connect()
   enableControls();
 }
 
-void BKVale::disconnect()
+void BaitaAssistant::disconnect()
 {
   if (m_printer.isOpen())
       m_printer.close();
   enableControls();
 }
 
-void BKVale::print()
+void BaitaAssistant::notePrint()
 {
   Note note = m_noteWidget.getNote();
   QString str(PrintUtils::buildNote(note));
@@ -181,12 +179,12 @@ void BKVale::print()
     else
     {
       m_db.insertDescriptions(m_noteWidget.getItemDescriptions());
-      createNew();
+      noteCreate();
     }
   }
 }
 
-void BKVale::showSettings()
+void BaitaAssistant::showSettings()
 {
   if (!m_printer.isOpen())
   {
@@ -216,21 +214,39 @@ void BKVale::showSettings()
   }
 }
 
-void BKVale::enableControls()
+void BaitaAssistant::enableControls()
 {
   const bool bIsOpen = m_printer.isOpen();
-  const bool bCanEdit = m_bReady && !m_noteWidget.isHistoryMode() && ui->dock->isHidden();
   ui->actionConnect->setEnabled(!bIsOpen);
   ui->actionDisconnect->setEnabled(bIsOpen);
-  ui->actionDisconnect->setEnabled(bIsOpen);
-  ui->actionPrint->setEnabled(m_noteWidget.isValid() && bIsOpen && m_bReady);
   ui->actionSettings->setEnabled(!bIsOpen);
-  ui->actionAdd->setEnabled(bCanEdit);
-  ui->actionRemove->setEnabled(bCanEdit && m_noteWidget.isValidSelection());
-  m_noteWidget.setEnabled(bCanEdit);
+
+  Functionality func = (Functionality)ui->tabWidget->currentIndex();
+  switch (func)
+  {
+    case Functionality::FNotes:
+    {
+      ui->actionPrint->setEnabled(m_noteWidget.isValid() && bIsOpen && m_bReady);
+      ui->actionNoteRemove->setEnabled(m_noteWidget.isItemSelected());
+      ui->toolNotes->setHidden(false);
+      ui->toolNotes->setEnabled(true);
+      ui->toolPostits->setHidden(true);
+      ui->toolPostits->setEnabled(false);
+    } break;
+    case Functionality::FPostits:
+    {
+      ui->toolNotes->setHidden(true);
+      ui->toolNotes->setEnabled(false);
+      ui->toolPostits->setHidden(false);
+      ui->toolPostits->setEnabled(true);
+    } break;
+    case Functionality::FShop:
+    default:
+      break;
+  }
 }
 
-void BKVale::init()
+void BaitaAssistant::init()
 {
   QString error;
   bool bSuccess = m_db.open(qApp->applicationDirPath() +
@@ -253,53 +269,28 @@ void BKVale::init()
   else
   {
     m_bReady = true;
-    m_historyWidget.set(m_db.getSqlDatabase());
     m_db.selectSettings(m_settings);
     if (!m_settings.port.isEmpty())
       connect();
-    createNew();
+    m_noteWidget.setHistoryDatabase(m_db.getSqlDatabase());
+    noteCreate();
   }
 
   enableControls();
 }
 
-void BKVale::createNew()
+void BaitaAssistant::noteCreate()
 {
   if (m_bReady)
   {
-    m_noteWidget.createNew(m_db.number(),
-                           m_db.selectSuppliers(),
-                           m_db.selectDescriptions());
-    if (!ui->dock->isHidden())
-      ui->dock->close();
+    m_noteWidget.create(m_db.number(),
+                        m_db.selectSuppliers(),
+                        m_db.selectDescriptions());
     enableControls();
   }
 }
 
-void BKVale::showInfo()
+void BaitaAssistant::showInfo()
 {
 
-}
-
-void BKVale::showSearch()
-{
-  if (ui->dock->isHidden())
-  {
-    if (m_bReady)
-    {
-      Notes notes;
-      QString error;
-      m_db.selectAll(notes, error);
-      m_noteWidget.clear();
-      ui->dock->show();
-      enableControls();
-    }
-  }
-}
-
-void BKVale::openNote(int idx)
-{
-  Note note(m_historyWidget.at(idx));
-  m_noteWidget.setNote(note);
-  enableControls();
 }

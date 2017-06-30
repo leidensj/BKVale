@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BKVale</class>
- <widget class="QMainWindow" name="BKVale">
+ <class>BaitaAssistant</class>
+ <widget class="QMainWindow" name="BaitaAssistant">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,16 +17,87 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>BaitaVale</string>
+   <string>Baita Assistente</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
     <normaloff>:/icons/res/baita.png</normaloff>:/icons/res/baita.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout"/>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tabNotes">
+       <attribute name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/res/note.png</normaloff>:/icons/res/note.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Vales</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout"/>
+      </widget>
+      <widget class="QWidget" name="tabPostits">
+       <attribute name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/res/postit.png</normaloff>:/icons/res/postit.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Lembretes</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tabShop">
+       <attribute name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/res/shop.png</normaloff>:/icons/res/shop.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Compras</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
+  <widget class="QToolBar" name="toolMain">
    <property name="movable">
     <bool>false</bool>
    </property>
@@ -40,17 +111,11 @@
     <bool>false</bool>
    </property>
    <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
+    <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNew"/>
-   <addaction name="actionSearch"/>
-   <addaction name="separator"/>
-   <addaction name="actionAdd"/>
-   <addaction name="actionRemove"/>
-   <addaction name="separator"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
    <addaction name="actionPrint"/>
@@ -59,46 +124,31 @@
    <addaction name="actionInfo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="dock">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="features">
-    <set>QDockWidget::DockWidgetClosable</set>
-   </property>
+  <widget class="QToolBar" name="toolNotes">
    <property name="windowTitle">
-    <string>Pesquisar</string>
+    <string>toolBar</string>
    </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
    </attribute>
-   <widget class="QWidget" name="dockContents">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="leftMargin">
-      <number>9</number>
-     </property>
-     <property name="topMargin">
-      <number>9</number>
-     </property>
-     <property name="rightMargin">
-      <number>9</number>
-     </property>
-     <property name="bottomMargin">
-      <number>9</number>
-     </property>
-    </layout>
-   </widget>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNoteNew"/>
+   <addaction name="actionNoteSearch"/>
+   <addaction name="actionNoteAdd"/>
+   <addaction name="actionNoteRemove"/>
   </widget>
-  <action name="actionAdd">
+  <action name="actionNoteAdd">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/add.png</normaloff>:/icons/res/add.png</iconset>
    </property>
    <property name="text">
-    <string>Adicionar</string>
+    <string>Adicionar item</string>
    </property>
    <property name="toolTip">
     <string>Adicionar item</string>
@@ -137,13 +187,13 @@
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="actionNew">
+  <action name="actionNoteNew">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/file.png</normaloff>:/icons/res/file.png</iconset>
    </property>
    <property name="text">
-    <string>Novo</string>
+    <string>Novo vale</string>
    </property>
    <property name="toolTip">
     <string>Novo vale</string>
@@ -158,13 +208,13 @@
     <string>Configurações</string>
    </property>
   </action>
-  <action name="actionRemove">
+  <action name="actionNoteRemove">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/remove.png</normaloff>:/icons/res/remove.png</iconset>
    </property>
    <property name="text">
-    <string>Remover</string>
+    <string>Remover item</string>
    </property>
    <property name="toolTip">
     <string>Remover item</string>
@@ -173,13 +223,13 @@
     <string>Alt+-</string>
    </property>
   </action>
-  <action name="actionSearch">
+  <action name="actionNoteSearch">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/search.png</normaloff>:/icons/res/search.png</iconset>
    </property>
    <property name="text">
-    <string>Pesquisar</string>
+    <string>Pesquisar vales</string>
    </property>
    <property name="toolTip">
     <string>Pesquisar vales</string>

@@ -96,6 +96,91 @@
         <number>0</number>
        </property>
        <item>
+        <layout class="QHBoxLayout" name="buttons">
+         <item>
+          <widget class="QPushButton" name="buttonNew">
+           <property name="toolTip">
+            <string>Novo</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="icons.qrc">
+             <normaloff>:/icons/res/file.png</normaloff>:/icons/res/file.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+N</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonSearch">
+           <property name="toolTip">
+            <string>Pesquisar</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="icons.qrc">
+             <normaloff>:/icons/res/search.png</normaloff>:/icons/res/search.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+F</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonAdd">
+           <property name="toolTip">
+            <string>Adicionar item</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="icons.qrc">
+             <normaloff>:/icons/res/add.png</normaloff>:/icons/res/add.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Alt++</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonRemove">
+           <property name="toolTip">
+            <string>Remover item</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="icons.qrc">
+             <normaloff>:/icons/res/remove.png</normaloff>:/icons/res/remove.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Alt+-</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QFrame" name="frameHeader">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -466,6 +551,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

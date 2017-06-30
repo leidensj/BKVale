@@ -6,7 +6,7 @@
 #include <QComboBox>
 #include <QTableWidget>
 #include "note.h"
-#include "historywidget.h"
+#include "notedatabasewidget.h"
 
 #define MAX_ITEMS 100
 
@@ -79,7 +79,7 @@ private:
   QString computeTotal() const;
   double evaluate(int row, int column) const;
   QStringList m_descriptions;
-  HistoryWidget m_historyWidget;
+  NoteDatabaseWidget m_noteDatabaseWidget;
 
 private slots:
   void updateTable(int row, int column);
@@ -94,7 +94,7 @@ public slots:
               const QStringList& descriptions);
   void setEnabled(bool bEnable);
   void supplierEntered();
-  void showHistory();
+  void showNoteDatabase();
   void setNote(const Note& note);
 
 signals:

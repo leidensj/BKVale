@@ -43,8 +43,6 @@ private slots:
   void enableControls();
   void init();
   void showInfo();
-
-  void noteCreate();
   void notePrint();
 
 signals:

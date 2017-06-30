@@ -185,7 +185,7 @@ NoteWidget::NoteWidget(QWidget *parent)
   , m_supplier(NoteComboBox::Supplier)
 {
   ui->setupUi(this);
-  ui->dockWidgetContents->layout()->addWidget(&m_historyWidget);
+  ui->dockWidgetContents->layout()->addWidget(&m_noteDatabaseWidget);
   QObject::connect(&m_table,
                    SIGNAL(cellChanged(int, int)),
                    this,
@@ -196,12 +196,27 @@ NoteWidget::NoteWidget(QWidget *parent)
                    this,
                    SLOT(changed()));
 
+  QObject::connect(ui->buttonSearch,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(showNoteDatabase()));
+
+  QObject::connect(ui->buttonAdd,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(addItem()));
+
+  QObject::connect(ui->buttonRemove,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(removeItem()));
+
   QObject::connect(&m_supplier,
                    SIGNAL(supplierEnteredSignal()),
                    this,
                    SLOT(supplierEntered()));
 
-  QObject::connect(&m_historyWidget,
+  QObject::connect(&m_noteDatabaseWidget,
                    SIGNAL(noteSelectedSignal(const Note&)),
                    this,
                    SLOT(setNote(const Note&)));
@@ -437,10 +452,10 @@ void NoteWidget::supplierEntered()
 
 void NoteWidget::setHistoryDatabase(const QSqlDatabase& sqldb)
 {
-  m_historyWidget.setDatabase(sqldb);
+  m_noteDatabaseWidget.setDatabase(sqldb);
 }
 
-void NoteWidget::showHistory()
+void NoteWidget::showNoteDatabase()
 {
   if (ui->dockWidget->isHidden())
     ui->dockWidget->show();

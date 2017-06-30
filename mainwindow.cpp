@@ -15,16 +15,6 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
   ui->setupUi(this);
   ui->tabNotes->layout()->addWidget(&m_noteWidget);
 
-  QObject::connect(ui->actionNoteAdd,
-                   SIGNAL(triggered(bool)),
-                   &m_noteWidget,
-                   SLOT(addItem()));
-
-  QObject::connect(ui->actionNoteRemove,
-                   SIGNAL(triggered(bool)),
-                   &m_noteWidget,
-                   SLOT(removeItem()));
-
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),
                    this,
@@ -54,16 +44,6 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
-
-  QObject::connect(ui->actionNoteNew,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(noteCreate()));
-
-  QObject::connect(ui->actionNoteSearch,
-                   SIGNAL(triggered(bool)),
-                   &m_noteWidget,
-                   SLOT(showHistory()));
 
   QObject::connect(this,
                    SIGNAL(initSignal()),
@@ -179,7 +159,7 @@ void BaitaAssistant::notePrint()
     else
     {
       m_db.insertDescriptions(m_noteWidget.getItemDescriptions());
-      noteCreate();
+      //TODO criar nova nota
     }
   }
 }
@@ -227,18 +207,9 @@ void BaitaAssistant::enableControls()
     case Functionality::FNotes:
     {
       ui->actionPrint->setEnabled(m_noteWidget.isValid() && bIsOpen && m_bReady);
-      ui->actionNoteRemove->setEnabled(m_noteWidget.isItemSelected());
-      ui->toolNotes->setHidden(false);
-      ui->toolNotes->setEnabled(true);
-      ui->toolPostits->setHidden(true);
-      ui->toolPostits->setEnabled(false);
     } break;
     case Functionality::FPostits:
     {
-      ui->toolNotes->setHidden(true);
-      ui->toolNotes->setEnabled(false);
-      ui->toolPostits->setHidden(false);
-      ui->toolPostits->setEnabled(true);
     } break;
     case Functionality::FShop:
     default:
@@ -273,21 +244,9 @@ void BaitaAssistant::init()
     if (!m_settings.port.isEmpty())
       connect();
     m_noteWidget.setHistoryDatabase(m_db.getSqlDatabase());
-    noteCreate();
   }
 
   enableControls();
-}
-
-void BaitaAssistant::noteCreate()
-{
-  if (m_bReady)
-  {
-    m_noteWidget.create(m_db.number(),
-                        m_db.selectSuppliers(),
-                        m_db.selectDescriptions());
-    enableControls();
-  }
 }
 
 void BaitaAssistant::showInfo()

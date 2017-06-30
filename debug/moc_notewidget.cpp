@@ -203,7 +203,7 @@ int NoteTableWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 struct qt_meta_stringdata_NoteWidget_t {
     QByteArrayData data[21];
-    char stringdata0[184];
+    char stringdata0[189];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -229,18 +229,18 @@ QT_MOC_LITERAL(13, 106, 12), // "descriptions"
 QT_MOC_LITERAL(14, 119, 10), // "setEnabled"
 QT_MOC_LITERAL(15, 130, 7), // "bEnable"
 QT_MOC_LITERAL(16, 138, 15), // "supplierEntered"
-QT_MOC_LITERAL(17, 154, 11), // "showHistory"
-QT_MOC_LITERAL(18, 166, 7), // "setNote"
-QT_MOC_LITERAL(19, 174, 4), // "Note"
-QT_MOC_LITERAL(20, 179, 4) // "note"
+QT_MOC_LITERAL(17, 154, 16), // "showNoteDatabase"
+QT_MOC_LITERAL(18, 171, 7), // "setNote"
+QT_MOC_LITERAL(19, 179, 4), // "Note"
+QT_MOC_LITERAL(20, 184, 4) // "note"
 
     },
     "NoteWidget\0changedSignal\0\0updateTable\0"
     "row\0column\0changed\0addItem\0removeItem\0"
     "clear\0create\0number\0suppliers\0"
     "descriptions\0setEnabled\0bEnable\0"
-    "supplierEntered\0showHistory\0setNote\0"
-    "Note\0note"
+    "supplierEntered\0showNoteDatabase\0"
+    "setNote\0Note\0note"
 };
 #undef QT_MOC_LITERAL
 
@@ -305,7 +305,7 @@ void NoteWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 6: _t->create((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QStringList(*)>(_a[2])),(*reinterpret_cast< const QStringList(*)>(_a[3]))); break;
         case 7: _t->setEnabled((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 8: _t->supplierEntered(); break;
-        case 9: _t->showHistory(); break;
+        case 9: _t->showNoteDatabase(); break;
         case 10: _t->setNote((*reinterpret_cast< const Note(*)>(_a[1]))); break;
         default: ;
         }

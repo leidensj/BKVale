@@ -7,11 +7,11 @@ INPUT(
 ./debug\databaseutils.o
 ./debug\notewidget.o
 ./debug\note.o
-./debug\historywidget.o
 ./debug\settings.o
+./debug\notedatabasewidget.o
 ./debug\qrc_icons.o
 ./debug\moc_mainwindow.o
 ./debug\moc_settingsdlg.o
 ./debug\moc_notewidget.o
-./debug\moc_historywidget.o
+./debug\moc_notedatabasewidget.o
 );

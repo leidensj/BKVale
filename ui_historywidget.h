@@ -61,6 +61,7 @@ public:
         QIcon icon1;
         icon1.addFile(QStringLiteral(":/icons/res/refresh.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonRefresh->setIcon(icon1);
+        buttonRefresh->setIconSize(QSize(24, 24));
 
         horizontalLayout->addWidget(buttonRefresh);
 

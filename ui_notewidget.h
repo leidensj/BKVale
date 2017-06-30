@@ -20,6 +20,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QSplitter>
@@ -38,6 +39,12 @@ public:
     QVBoxLayout *verticalLayout_4;
     QFrame *frameNote;
     QVBoxLayout *verticalLayout;
+    QHBoxLayout *buttons;
+    QPushButton *buttonNew;
+    QPushButton *buttonSearch;
+    QPushButton *buttonAdd;
+    QPushButton *buttonRemove;
+    QSpacerItem *horizontalSpacer_3;
     QFrame *frameHeader;
     QVBoxLayout *verticalLayout_2;
     QFrame *frame_3;
@@ -98,6 +105,47 @@ public:
         verticalLayout = new QVBoxLayout(frameNote);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
+        buttons = new QHBoxLayout();
+        buttons->setObjectName(QStringLiteral("buttons"));
+        buttonNew = new QPushButton(frameNote);
+        buttonNew->setObjectName(QStringLiteral("buttonNew"));
+        QIcon icon;
+        icon.addFile(QStringLiteral(":/icons/res/file.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonNew->setIcon(icon);
+
+        buttons->addWidget(buttonNew);
+
+        buttonSearch = new QPushButton(frameNote);
+        buttonSearch->setObjectName(QStringLiteral("buttonSearch"));
+        QIcon icon1;
+        icon1.addFile(QStringLiteral(":/icons/res/search.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonSearch->setIcon(icon1);
+
+        buttons->addWidget(buttonSearch);
+
+        buttonAdd = new QPushButton(frameNote);
+        buttonAdd->setObjectName(QStringLiteral("buttonAdd"));
+        QIcon icon2;
+        icon2.addFile(QStringLiteral(":/icons/res/add.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonAdd->setIcon(icon2);
+
+        buttons->addWidget(buttonAdd);
+
+        buttonRemove = new QPushButton(frameNote);
+        buttonRemove->setObjectName(QStringLiteral("buttonRemove"));
+        QIcon icon3;
+        icon3.addFile(QStringLiteral(":/icons/res/remove.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonRemove->setIcon(icon3);
+
+        buttons->addWidget(buttonRemove);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        buttons->addItem(horizontalSpacer_3);
+
+
+        verticalLayout->addLayout(buttons);
+
         frameHeader = new QFrame(frameNote);
         frameHeader->setObjectName(QStringLiteral("frameHeader"));
         frameHeader->setFrameShape(QFrame::StyledPanel);
@@ -249,6 +297,34 @@ public:
     {
         NoteWidget->setWindowTitle(QApplication::translate("NoteWidget", "BKFrame", Q_NULLPTR));
         dockWidget->setWindowTitle(QApplication::translate("NoteWidget", "Pesquisar", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        buttonNew->setToolTip(QApplication::translate("NoteWidget", "Novo", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        buttonNew->setText(QString());
+#ifndef QT_NO_SHORTCUT
+        buttonNew->setShortcut(QApplication::translate("NoteWidget", "Ctrl+N", Q_NULLPTR));
+#endif // QT_NO_SHORTCUT
+#ifndef QT_NO_TOOLTIP
+        buttonSearch->setToolTip(QApplication::translate("NoteWidget", "Pesquisar", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        buttonSearch->setText(QString());
+#ifndef QT_NO_SHORTCUT
+        buttonSearch->setShortcut(QApplication::translate("NoteWidget", "Ctrl+F", Q_NULLPTR));
+#endif // QT_NO_SHORTCUT
+#ifndef QT_NO_TOOLTIP
+        buttonAdd->setToolTip(QApplication::translate("NoteWidget", "Adicionar item", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        buttonAdd->setText(QString());
+#ifndef QT_NO_SHORTCUT
+        buttonAdd->setShortcut(QApplication::translate("NoteWidget", "Alt++", Q_NULLPTR));
+#endif // QT_NO_SHORTCUT
+#ifndef QT_NO_TOOLTIP
+        buttonRemove->setToolTip(QApplication::translate("NoteWidget", "Remover item", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        buttonRemove->setText(QString());
+#ifndef QT_NO_SHORTCUT
+        buttonRemove->setShortcut(QApplication::translate("NoteWidget", "Alt+-", Q_NULLPTR));
+#endif // QT_NO_SHORTCUT
         label_2->setText(QApplication::translate("NoteWidget", "N\303\272mero:", Q_NULLPTR));
         number->setPrefix(QString());
         label->setText(QApplication::translate("NoteWidget", "Data:", Q_NULLPTR));

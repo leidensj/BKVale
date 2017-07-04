@@ -5,6 +5,118 @@
 #include <QVariant>
 #include <QDebug>
 
+#define DATABASE_NOT_OPEN_TXT "O arquivo de configuração não foi aberto."
+
+int NoteDatabase::nextNumber(QSqlDatabase db)
+{
+  if (!db.isOpen())
+    return -1;
+
+  QSqlQuery query("SELECT _LASTNUMBER FROM _SETTINGS", db);
+  int idx = query.record().indexOf("_LASTNUMBER");
+  return query.next() ? query.value(idx).toInt() : DEFAULT_NUMBER;
+}
+
+QStringList NoteDatabase::suppliers(QSqlDatabase db)
+{
+  QStringList list;
+  if (db.isOpen())
+  {
+    QSqlQuery query(db);
+    if (query.exec("SELECT DISTINCT "
+                   "_SUPPLIER "
+                   "FROM _PROMISSORYNOTES"))
+    {
+      while (query.next())
+        list << query.value(query.record().indexOf("_SUPPLIER")).toString();
+    }
+  }
+  return list;
+}
+
+QStringList NoteDatabase::descriptions(QSqlDatabase db)
+{
+  QStringList list;
+  if (db.isOpen())
+  {
+    QSqlQuery query(db);
+    if (query.exec("SELECT DISTINCT "
+                   "_DESCRIPTION "
+                   "FROM _ITEMS"))
+    {
+      while (query.next())
+        list << query.value(query.record().indexOf("_DESCRIPTION")).toString();
+    }
+  }
+  return list;
+}
+
+bool NoteDatabase::insertOrUpdate(const Note& note, QSqlDatabase db, QString& error)
+{
+  error.clear();
+
+  if (!db.isOpen())
+  {
+    error = DATABASE_NOT_OPEN_TXT;
+    return false;
+  }
+
+  QSqlQuery query(db);
+  if (!Note::isValidID(note.m_id))
+  {
+    query.prepare("INSERT INTO _PROMISSORYNOTES ("
+                  "_NUMBER,"
+                  "_DATE,"
+                  "_SUPPLIER,"
+                  "_ITEMS,"
+                  "_TOTAL) "
+                  "VALUES ("
+                  "(:_number),"
+                  "(:_date),"
+                  "(:_supplier),"
+                  "(:_items),"
+                  "(:_total))");
+  }
+  else
+  {
+    query.prepare("UPDATE _PROMISSORYNOTES "
+                  "SET _NUMBER = (:_number),"
+                  "_DATE = (:_date),"
+                  "_SUPPLIER = (:_supplier),"
+                  "_ITEMS = (:_items),"
+                  "_TOTAL = (:_total) "
+                  "WHERE _ID = (:_id)");
+    query.bindValue(":_id", note.m_id);
+  }
+
+  query.bindValue(":_number", note.m_number);
+  query.bindValue(":_date", note.m_date);
+  query.bindValue(":_supplier", note.m_supplier);
+  query.bindValue(":_items", note.m_items);
+  query.bindValue(":_total", note.m_total);
+
+  bool bSuccess = query.exec();
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+  }
+  else if (!Note::isValidID(note.m_id))
+  {
+    incNumber(db);
+  }
+
+  return bSuccess;
+}
+
+void NoteDatabase::incNumber(QSqlDatabase db)
+{
+  int n = nextNumber(db) + 1;
+  QSqlQuery query(db);
+  query.prepare("UPDATE _SETTINGS SET _LASTNUMBER = :_number");
+  query.bindValue(":_number", n);
+  query.exec();
+}
+
 Database::Database()
   : m_db(QSqlDatabase::addDatabase("QSQLITE"))
 {
@@ -80,47 +192,6 @@ bool Database::init(QString& error)
   return bSuccess;
 }
 
-bool Database::insert(const Note& note,
-                      QString& error)
-{
-  error.clear();
-
-  if (!isOpen(error))
-    return false;
-
-  QSqlQuery query;
-  query.prepare("INSERT INTO _PROMISSORYNOTES ("
-                "_NUMBER,"
-                "_DATE,"
-                "_SUPPLIER,"
-                "_ITEMS,"
-                "_TOTAL) "
-                "VALUES ("
-                "(:_number),"
-                "(:_date),"
-                "(:_supplier),"
-                "(:_items),"
-                "(:_total))");
-
-  query.bindValue(":_number", note.m_number);
-  query.bindValue(":_date", note.m_date);
-  query.bindValue(":_supplier", note.m_supplier);
-  query.bindValue(":_items", note.m_items);
-  query.bindValue(":_total", note.m_total);
-
-  bool bSuccess = query.exec();
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-  }
-  else
-  {
-    incNumber();
-  }
-
-  return bSuccess;
-}
-
 bool Database::select(int id,
                       Note& note,
                       QString& error)
@@ -166,26 +237,6 @@ bool Database::select(int id,
   }
 
   return bSuccess;
-}
-
-int Database::number()
-{
-  QString error;
-  if (!isOpen(error))
-    return DEFAULT_NUMBER;
-
-  QSqlQuery query("SELECT _LASTNUMBER FROM _SETTINGS");
-  int idx = query.record().indexOf("_LASTNUMBER");
-  return query.next() ? query.value(idx).toInt() : DEFAULT_NUMBER;
-}
-
-void Database::incNumber()
-{
-  int n = number() + 1;
-  QSqlQuery query;
-  query.prepare("UPDATE _SETTINGS SET _LASTNUMBER = :_number");
-  query.bindValue(":_number", n);
-  query.exec();
 }
 
 bool Database::hasConfig()
@@ -240,24 +291,6 @@ bool Database::selectAll(Notes& notes,
   return bSuccess;
 }
 
-QStringList Database::selectSuppliers()
-{
-  QStringList list;
-  QString error;
-  if (isOpen(error))
-  {
-    QSqlQuery query;
-    if (query.exec("SELECT DISTINCT "
-                   "_SUPPLIER "
-                   "FROM _PROMISSORYNOTES"))
-    {
-      while (query.next())
-        list << query.value(query.record().indexOf("_SUPPLIER")).toString();
-    }
-  }
-  return list;
-}
-
 void Database::insertDescriptions(const QStringList& descriptions)
 {
   for (int i = 0; i != descriptions.size(); ++i)
@@ -271,24 +304,6 @@ void Database::insertDescriptions(const QStringList& descriptions)
     query.bindValue(":_description", descriptions.at(i));
     query.exec();
   }
-}
-
-QStringList Database::selectDescriptions()
-{
-  QStringList list;
-  QString error;
-  if (isOpen(error))
-  {
-    QSqlQuery query;
-    if (query.exec("SELECT DISTINCT "
-                   "_DESCRIPTION "
-                   "FROM _ITEMS"))
-    {
-      while (query.next())
-        list << query.value(query.record().indexOf("_DESCRIPTION")).toString();
-    }
-  }
-  return list;
 }
 
 bool Database::insertSettings(const Settings& settings,

@@ -145,10 +145,10 @@ void BaitaAssistant::notePrint()
                        QMessageBox::Ok);
     msgBox.exec();
   }
-  else if (!m_noteWidget.isHistoryMode())
+  else
   {
-    if (!m_db.insert(note,
-                     error))
+    QString error;
+    if (!m_noteWidget.save(error))
     {
       QMessageBox msgBox(QMessageBox::Warning,
                          tr("Erro ao salvar vale"),
@@ -159,7 +159,7 @@ void BaitaAssistant::notePrint()
     else
     {
       m_db.insertDescriptions(m_noteWidget.getItemDescriptions());
-      //TODO criar nova nota
+      m_noteWidget.create();
     }
   }
 }
@@ -244,6 +244,7 @@ void BaitaAssistant::init()
     if (!m_settings.port.isEmpty())
       connect();
     m_noteWidget.setHistoryDatabase(m_db.getSqlDatabase());
+    m_noteWidget.create();
   }
 
   enableControls();

@@ -29,11 +29,13 @@ class NoteDatabaseWidget : public QFrame
 public:
   explicit NoteDatabaseWidget(QWidget *parent = 0);
   ~NoteDatabaseWidget();
-  void setDatabase(const QSqlDatabase& sqldb);
-  Note at(int idx) const;
+  void setDatabase(QSqlDatabase db);
+  QSqlDatabase getDatabase() const;
 
 public slots:
   void refresh();
+  void removeSelectedNote();
+  void enableControls();
 
 private:
   Ui::NoteDatabaseWidget *ui;
@@ -45,6 +47,7 @@ private slots:
 
 signals:
   void noteSelectedSignal(const Note& note);
+  void noteRemovedSignal(int id);
 };
 
 #endif // HISTORYWIDGET_H

@@ -46,6 +46,12 @@
         <iconset resource="icons.qrc">
          <normaloff>:/icons/res/open.png</normaloff>:/icons/res/open.png</iconset>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
        <property name="checkable">
         <bool>false</bool>
        </property>
@@ -53,7 +59,7 @@
         <bool>false</bool>
        </property>
        <property name="flat">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -71,14 +77,17 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>16</width>
-         <height>16</height>
+         <width>24</width>
+         <height>24</height>
         </size>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="buttonDelete">
+      <widget class="QPushButton" name="buttonRemove">
        <property name="toolTip">
         <string>Apagar vale</string>
        </property>
@@ -88,6 +97,15 @@
        <property name="icon">
         <iconset resource="icons.qrc">
          <normaloff>:/icons/res/trash.png</normaloff>:/icons/res/trash.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

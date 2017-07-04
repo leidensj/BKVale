@@ -97,6 +97,9 @@
        </property>
        <item>
         <layout class="QHBoxLayout" name="buttons">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QPushButton" name="buttonNew">
            <property name="toolTip">
@@ -109,8 +112,17 @@
             <iconset resource="icons.qrc">
              <normaloff>:/icons/res/file.png</normaloff>:/icons/res/file.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
            <property name="shortcut">
             <string>Ctrl+N</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -126,8 +138,17 @@
             <iconset resource="icons.qrc">
              <normaloff>:/icons/res/search.png</normaloff>:/icons/res/search.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
            <property name="shortcut">
             <string>Ctrl+F</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -143,8 +164,17 @@
             <iconset resource="icons.qrc">
              <normaloff>:/icons/res/add.png</normaloff>:/icons/res/add.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
            <property name="shortcut">
             <string>Alt++</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -160,8 +190,17 @@
             <iconset resource="icons.qrc">
              <normaloff>:/icons/res/remove.png</normaloff>:/icons/res/remove.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
            <property name="shortcut">
             <string>Alt+-</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

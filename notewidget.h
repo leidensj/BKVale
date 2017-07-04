@@ -63,12 +63,11 @@ class NoteWidget : public QFrame
 public:
   explicit NoteWidget(QWidget *parent = 0);
   ~NoteWidget();
-  bool isItemSelected() const;
-  Note getNote() const;
   QStringList getItemDescriptions() const;
   bool isValid() const;
-  bool isHistoryMode() const;
   void setHistoryDatabase(const QSqlDatabase& sqldb);
+  bool save(QString& error);
+  Note getNote() const;
 
 private:
   Ui::NoteWidget *ui;
@@ -80,22 +79,22 @@ private:
   double evaluate(int row, int column) const;
   QStringList m_descriptions;
   NoteDatabaseWidget m_noteDatabaseWidget;
+  int currentNoteID;
 
 private slots:
   void updateTable(int row, int column);
-  void changed();
+  void emitChangedSignal();
+  void noteRemoved(int id);
 
 public slots:
   void addItem();
   void removeItem();
   void clear();
-  void create(int number,
-              const QStringList& suppliers,
-              const QStringList& descriptions);
-  void setEnabled(bool bEnable);
+  void create();
   void supplierEntered();
   void showNoteDatabase();
   void setNote(const Note& note);
+  void enableControls();
 
 signals:
   void changedSignal();

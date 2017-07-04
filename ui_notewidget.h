@@ -106,12 +106,15 @@ public:
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         buttons = new QHBoxLayout();
+        buttons->setSpacing(0);
         buttons->setObjectName(QStringLiteral("buttons"));
         buttonNew = new QPushButton(frameNote);
         buttonNew->setObjectName(QStringLiteral("buttonNew"));
         QIcon icon;
         icon.addFile(QStringLiteral(":/icons/res/file.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonNew->setIcon(icon);
+        buttonNew->setIconSize(QSize(24, 24));
+        buttonNew->setFlat(true);
 
         buttons->addWidget(buttonNew);
 
@@ -120,6 +123,8 @@ public:
         QIcon icon1;
         icon1.addFile(QStringLiteral(":/icons/res/search.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonSearch->setIcon(icon1);
+        buttonSearch->setIconSize(QSize(24, 24));
+        buttonSearch->setFlat(true);
 
         buttons->addWidget(buttonSearch);
 
@@ -128,6 +133,8 @@ public:
         QIcon icon2;
         icon2.addFile(QStringLiteral(":/icons/res/add.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonAdd->setIcon(icon2);
+        buttonAdd->setIconSize(QSize(24, 24));
+        buttonAdd->setFlat(true);
 
         buttons->addWidget(buttonAdd);
 
@@ -136,6 +143,8 @@ public:
         QIcon icon3;
         icon3.addFile(QStringLiteral(":/icons/res/remove.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonRemove->setIcon(icon3);
+        buttonRemove->setIconSize(QSize(24, 24));
+        buttonRemove->setFlat(true);
 
         buttons->addWidget(buttonRemove);
 

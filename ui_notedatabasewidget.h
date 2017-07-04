@@ -30,7 +30,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *buttonOpen;
     QPushButton *buttonRefresh;
-    QPushButton *buttonDelete;
+    QPushButton *buttonRemove;
     QSpacerItem *horizontalSpacer;
     QTableView *table;
 
@@ -51,8 +51,9 @@ public:
         QIcon icon;
         icon.addFile(QStringLiteral(":/icons/res/open.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonOpen->setIcon(icon);
+        buttonOpen->setIconSize(QSize(24, 24));
         buttonOpen->setCheckable(false);
-        buttonOpen->setFlat(false);
+        buttonOpen->setFlat(true);
 
         horizontalLayout->addWidget(buttonOpen);
 
@@ -61,17 +62,20 @@ public:
         QIcon icon1;
         icon1.addFile(QStringLiteral(":/icons/res/refresh.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonRefresh->setIcon(icon1);
-        buttonRefresh->setIconSize(QSize(16, 16));
+        buttonRefresh->setIconSize(QSize(24, 24));
+        buttonRefresh->setFlat(true);
 
         horizontalLayout->addWidget(buttonRefresh);
 
-        buttonDelete = new QPushButton(NoteDatabaseWidget);
-        buttonDelete->setObjectName(QStringLiteral("buttonDelete"));
+        buttonRemove = new QPushButton(NoteDatabaseWidget);
+        buttonRemove->setObjectName(QStringLiteral("buttonRemove"));
         QIcon icon2;
         icon2.addFile(QStringLiteral(":/icons/res/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
-        buttonDelete->setIcon(icon2);
+        buttonRemove->setIcon(icon2);
+        buttonRemove->setIconSize(QSize(24, 24));
+        buttonRemove->setFlat(true);
 
-        horizontalLayout->addWidget(buttonDelete);
+        horizontalLayout->addWidget(buttonRemove);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -112,9 +116,9 @@ public:
 #endif // QT_NO_TOOLTIP
         buttonRefresh->setText(QString());
 #ifndef QT_NO_TOOLTIP
-        buttonDelete->setToolTip(QApplication::translate("NoteDatabaseWidget", "Apagar vale", Q_NULLPTR));
+        buttonRemove->setToolTip(QApplication::translate("NoteDatabaseWidget", "Apagar vale", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
-        buttonDelete->setText(QString());
+        buttonRemove->setText(QString());
     } // retranslateUi
 
 };

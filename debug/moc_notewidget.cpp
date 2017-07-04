@@ -202,8 +202,8 @@ int NoteTableWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     return _id;
 }
 struct qt_meta_stringdata_NoteWidget_t {
-    QByteArrayData data[21];
-    char stringdata0[189];
+    QByteArrayData data[19];
+    char stringdata0[180];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -218,29 +218,26 @@ QT_MOC_LITERAL(2, 25, 0), // ""
 QT_MOC_LITERAL(3, 26, 11), // "updateTable"
 QT_MOC_LITERAL(4, 38, 3), // "row"
 QT_MOC_LITERAL(5, 42, 6), // "column"
-QT_MOC_LITERAL(6, 49, 7), // "changed"
-QT_MOC_LITERAL(7, 57, 7), // "addItem"
-QT_MOC_LITERAL(8, 65, 10), // "removeItem"
-QT_MOC_LITERAL(9, 76, 5), // "clear"
-QT_MOC_LITERAL(10, 82, 6), // "create"
-QT_MOC_LITERAL(11, 89, 6), // "number"
-QT_MOC_LITERAL(12, 96, 9), // "suppliers"
-QT_MOC_LITERAL(13, 106, 12), // "descriptions"
-QT_MOC_LITERAL(14, 119, 10), // "setEnabled"
-QT_MOC_LITERAL(15, 130, 7), // "bEnable"
-QT_MOC_LITERAL(16, 138, 15), // "supplierEntered"
-QT_MOC_LITERAL(17, 154, 16), // "showNoteDatabase"
-QT_MOC_LITERAL(18, 171, 7), // "setNote"
-QT_MOC_LITERAL(19, 179, 4), // "Note"
-QT_MOC_LITERAL(20, 184, 4) // "note"
+QT_MOC_LITERAL(6, 49, 17), // "emitChangedSignal"
+QT_MOC_LITERAL(7, 67, 11), // "noteRemoved"
+QT_MOC_LITERAL(8, 79, 2), // "id"
+QT_MOC_LITERAL(9, 82, 7), // "addItem"
+QT_MOC_LITERAL(10, 90, 10), // "removeItem"
+QT_MOC_LITERAL(11, 101, 5), // "clear"
+QT_MOC_LITERAL(12, 107, 6), // "create"
+QT_MOC_LITERAL(13, 114, 15), // "supplierEntered"
+QT_MOC_LITERAL(14, 130, 16), // "showNoteDatabase"
+QT_MOC_LITERAL(15, 147, 7), // "setNote"
+QT_MOC_LITERAL(16, 155, 4), // "Note"
+QT_MOC_LITERAL(17, 160, 4), // "note"
+QT_MOC_LITERAL(18, 165, 14) // "enableControls"
 
     },
     "NoteWidget\0changedSignal\0\0updateTable\0"
-    "row\0column\0changed\0addItem\0removeItem\0"
-    "clear\0create\0number\0suppliers\0"
-    "descriptions\0setEnabled\0bEnable\0"
+    "row\0column\0emitChangedSignal\0noteRemoved\0"
+    "id\0addItem\0removeItem\0clear\0create\0"
     "supplierEntered\0showNoteDatabase\0"
-    "setNote\0Note\0note"
+    "setNote\0Note\0note\0enableControls"
 };
 #undef QT_MOC_LITERAL
 
@@ -250,7 +247,7 @@ static const uint qt_meta_data_NoteWidget[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -258,19 +255,20 @@ static const uint qt_meta_data_NoteWidget[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   69,    2, 0x06 /* Public */,
+       1,    0,   74,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    2,   70,    2, 0x08 /* Private */,
-       6,    0,   75,    2, 0x08 /* Private */,
-       7,    0,   76,    2, 0x0a /* Public */,
-       8,    0,   77,    2, 0x0a /* Public */,
-       9,    0,   78,    2, 0x0a /* Public */,
-      10,    3,   79,    2, 0x0a /* Public */,
-      14,    1,   86,    2, 0x0a /* Public */,
-      16,    0,   89,    2, 0x0a /* Public */,
-      17,    0,   90,    2, 0x0a /* Public */,
-      18,    1,   91,    2, 0x0a /* Public */,
+       3,    2,   75,    2, 0x08 /* Private */,
+       6,    0,   80,    2, 0x08 /* Private */,
+       7,    1,   81,    2, 0x08 /* Private */,
+       9,    0,   84,    2, 0x0a /* Public */,
+      10,    0,   85,    2, 0x0a /* Public */,
+      11,    0,   86,    2, 0x0a /* Public */,
+      12,    0,   87,    2, 0x0a /* Public */,
+      13,    0,   88,    2, 0x0a /* Public */,
+      14,    0,   89,    2, 0x0a /* Public */,
+      15,    1,   90,    2, 0x0a /* Public */,
+      18,    0,   93,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void,
@@ -278,14 +276,15 @@ static const uint qt_meta_data_NoteWidget[] = {
  // slots: parameters
     QMetaType::Void, QMetaType::Int, QMetaType::Int,    4,    5,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    8,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::QStringList, QMetaType::QStringList,   11,   12,   13,
-    QMetaType::Void, QMetaType::Bool,   15,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 19,   20,
+    QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 16,   17,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -298,15 +297,16 @@ void NoteWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->changedSignal(); break;
         case 1: _t->updateTable((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 2: _t->changed(); break;
-        case 3: _t->addItem(); break;
-        case 4: _t->removeItem(); break;
-        case 5: _t->clear(); break;
-        case 6: _t->create((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QStringList(*)>(_a[2])),(*reinterpret_cast< const QStringList(*)>(_a[3]))); break;
-        case 7: _t->setEnabled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 2: _t->emitChangedSignal(); break;
+        case 3: _t->noteRemoved((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 4: _t->addItem(); break;
+        case 5: _t->removeItem(); break;
+        case 6: _t->clear(); break;
+        case 7: _t->create(); break;
         case 8: _t->supplierEntered(); break;
         case 9: _t->showNoteDatabase(); break;
         case 10: _t->setNote((*reinterpret_cast< const Note(*)>(_a[1]))); break;
+        case 11: _t->enableControls(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -347,13 +347,13 @@ int NoteWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 12;
     }
     return _id;
 }

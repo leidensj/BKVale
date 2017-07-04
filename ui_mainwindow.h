@@ -46,7 +46,7 @@ public:
     {
         if (BaitaAssistant->objectName().isEmpty())
             BaitaAssistant->setObjectName(QStringLiteral("BaitaAssistant"));
-        BaitaAssistant->resize(822, 390);
+        BaitaAssistant->resize(1000, 600);
         BaitaAssistant->setMinimumSize(QSize(535, 349));
         QIcon icon;
         icon.addFile(QStringLiteral(":/icons/res/baita.png"), QSize(), QIcon::Normal, QIcon::Off);

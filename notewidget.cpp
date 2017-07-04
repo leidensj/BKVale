@@ -1,6 +1,7 @@
 #include "notewidget.h"
 #include "ui_notewidget.h"
 #include "tinyexpr.h"
+#include "databaseutils.h"
 #include <QComboBox>
 #include <QStringList>
 #include <QKeyEvent>
@@ -183,6 +184,7 @@ NoteWidget::NoteWidget(QWidget *parent)
   : QFrame(parent)
   , ui(new Ui::NoteWidget)
   , m_supplier(NoteComboBox::Supplier)
+  , currentNoteID(INVALID_ID)
 {
   ui->setupUi(this);
   ui->dockWidgetContents->layout()->addWidget(&m_noteDatabaseWidget);
@@ -194,7 +196,7 @@ NoteWidget::NoteWidget(QWidget *parent)
   QObject::connect(&m_supplier,
                    SIGNAL(editTextChanged(const QString&)),
                    this,
-                   SLOT(changed()));
+                   SLOT(emitChangedSignal()));
 
   QObject::connect(ui->buttonSearch,
                    SIGNAL(clicked(bool)),
@@ -221,10 +223,26 @@ NoteWidget::NoteWidget(QWidget *parent)
                    this,
                    SLOT(setNote(const Note&)));
 
+  QObject::connect(ui->buttonNew,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(create()));
+
+  QObject::connect(&m_table,
+                   SIGNAL(currentCellChanged(int, int, int, int)),
+                   this,
+                   SLOT(enableControls()));
+
+  QObject::connect(&m_noteDatabaseWidget,
+                   SIGNAL(noteRemovedSignal(int)),
+                   this,
+                   SLOT(noteRemoved(int)));
+
   ui->frameTable->layout()->addWidget(&m_table);
   ui->frameSupplier->layout()->addWidget(&m_supplier);
   ui->date->setDate(QDate::currentDate());
   ui->dockWidget->close();
+  enableControls();
 }
 
 NoteWidget::~NoteWidget()
@@ -306,7 +324,7 @@ void NoteWidget::updateTable(int row, int column)
       break;
   }
   m_table.blockSignals(false);
-  changed();
+  emitChangedSignal();
 }
 
 void NoteWidget::addItem()
@@ -330,32 +348,33 @@ void NoteWidget::addItem()
   m_table.setCurrentCell(row, (int)NoteColumn::Ammount);
   m_table.setFocus();
   ui->total->setText(computeTotal());
-  emit changedSignal();
+  emitChangedSignal();
 }
 
 void NoteWidget::removeItem()
 {
   m_table.removeRow(m_table.currentRow());
   if (m_table.rowCount() != 0)
+  {
     ui->total->setText(computeTotal());
+  }
   else
+  {
     ui->total->clear();
-  changed();
+    m_supplier.setFocus();
+  }
+  emitChangedSignal();
 }
 
-void NoteWidget::changed()
+void NoteWidget::emitChangedSignal()
 {
   emit changedSignal();
-}
-
-bool NoteWidget::isItemSelected() const
-{
-  return m_table.currentRow() >= 0;
 }
 
 Note NoteWidget::getNote() const
 {
   Note note;
+  note.m_id = currentNoteID;
   note.m_date = ui->date->date().toJulianDay();
   note.m_supplier = m_supplier.currentText();
   note.m_number = ui->number->text().toInt();
@@ -368,6 +387,12 @@ void NoteWidget::setNote(const Note& note)
 {
   clear();
   m_table.setRowCount(0);
+
+  m_supplier.addItems(NoteDatabase::suppliers(m_noteDatabaseWidget.getDatabase()));
+  m_supplier.setCurrentText("");
+  m_descriptions = NoteDatabase::descriptions(m_noteDatabaseWidget.getDatabase());
+
+  currentNoteID = note.m_id;
   ui->date->setDate(QDate::fromJulianDay(note.m_date));
   m_supplier.setCurrentText(note.m_supplier);
   ui->number->setValue(note.m_number);
@@ -381,52 +406,43 @@ void NoteWidget::setNote(const Note& note)
     m_table.setText(row, (int)NoteColumn::Description, items.at(row, NoteColumn::Description));
     m_table.setText(row, (int)NoteColumn::SubTotal, items.at(row, NoteColumn::SubTotal));
   }
+
+  enableControls();
 }
 
 bool NoteWidget::isValid() const
 {
   return !m_supplier.currentText().isEmpty() &&
       m_table.rowCount() &&
-      computeTotal().toDouble();
-}
-
-bool NoteWidget::isHistoryMode() const
-{
-  return false;
+      computeTotal().toDouble() &&
+      ui->number->value() > 0;
 }
 
 void NoteWidget::clear()
 {
+  currentNoteID = INVALID_ID;
   ui->date->setSpecialValueText(" ");
   ui->date->setDate(ui->date->minimumDate());
   m_supplier.setCurrentText("");
+  ui->number->setValue(0);
   ui->number->clear();
   ui->total->setText("");
   m_table.setRowCount(0);
   while (m_supplier.count())
     m_supplier.removeItem(m_supplier.count() - 1);
+  enableControls();
 }
 
-void NoteWidget::create(int number,
-                        const QStringList& suppliers,
-                        const QStringList& descriptions)
+void NoteWidget::create()
 {
   clear();
   ui->date->setDate(QDate::currentDate());
-  ui->number->setValue(number);
-  m_supplier.addItems(suppliers);
+  ui->number->setValue(NoteDatabase::nextNumber(m_noteDatabaseWidget.getDatabase()));
+  m_supplier.addItems(NoteDatabase::suppliers(m_noteDatabaseWidget.getDatabase()));
   m_supplier.setCurrentText("");
   m_supplier.setFocus();
-  m_descriptions = descriptions;
-}
-
-void NoteWidget::setEnabled(bool bEnable)
-{
-  ui->date->setEnabled(bEnable);
-  m_supplier.setEnabled(bEnable);
-  ui->number->setEnabled(bEnable);
-  ui->total->setEnabled(bEnable);
-  m_table.setEnabled(bEnable);
+  m_descriptions = NoteDatabase::descriptions(m_noteDatabaseWidget.getDatabase());
+  enableControls();
 }
 
 QStringList NoteWidget::getItemDescriptions() const
@@ -459,4 +475,43 @@ void NoteWidget::showNoteDatabase()
 {
   if (ui->dockWidget->isHidden())
     ui->dockWidget->show();
+  else
+    ui->dockWidget->close();
+}
+
+void NoteWidget::enableControls()
+{
+  const bool bCreated = ui->number->value() > 0;
+  ui->buttonRemove->setEnabled(bCreated && m_table.currentRow() >= 0);
+  ui->buttonAdd->setEnabled(bCreated);
+  m_supplier.setEnabled(bCreated);
+  ui->number->setEnabled(bCreated);
+  ui->date->setEnabled(bCreated);
+  m_table.setEnabled(bCreated);
+  ui->total->setEnabled(bCreated);
+}
+
+bool NoteWidget::save(QString& error)
+{
+  error.clear();
+
+  Q_ASSERT(isValid());
+  if (!isValid())
+    return false;
+
+  bool bSuccess = NoteDatabase::insertOrUpdate(getNote(),
+                                               m_noteDatabaseWidget.getDatabase(),
+                                               error);
+
+  if (bSuccess)
+    m_noteDatabaseWidget.refresh();
+
+  return bSuccess;
+
+}
+
+void NoteWidget::noteRemoved(int id)
+{
+  if (id == currentNoteID)
+    clear();
 }

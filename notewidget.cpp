@@ -344,9 +344,9 @@ void NoteWidget::addItem()
   m_table.setItem(row, (int)NoteColumn::Ammount, new QTableWidgetItem("0.000"));
   m_table.setItem(row, (int)NoteColumn::UnitValue, new QTableWidgetItem("0.00"));
   m_table.setItem(row, (int)NoteColumn::SubTotal, new QTableWidgetItem("0.00"));
-  m_table.blockSignals(false);
   m_table.setCurrentCell(row, (int)NoteColumn::Ammount);
   m_table.setFocus();
+  m_table.blockSignals(false);
   ui->total->setText(computeTotal());
   emitChangedSignal();
 }

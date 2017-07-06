@@ -466,9 +466,9 @@ void NoteWidget::supplierEntered()
   }
 }
 
-void NoteWidget::setHistoryDatabase(const QSqlDatabase& sqldb)
+void NoteWidget::setHistoryDatabase(QSqlDatabase db)
 {
-  m_noteDatabaseWidget.setDatabase(sqldb);
+  m_noteDatabaseWidget.setDatabase(db);
 }
 
 void NoteWidget::showNoteDatabase()

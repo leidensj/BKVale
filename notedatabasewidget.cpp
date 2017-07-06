@@ -58,7 +58,7 @@ NoteDatabaseWidget::NoteDatabaseWidget(QWidget *parent) :
 
 void NoteDatabaseWidget::setDatabase(QSqlDatabase db)
 {
-  if (m_model == nullptr)
+  if (m_model != nullptr)
     return;
 
   m_model = new NoteDatabaseTableModel(this, db);

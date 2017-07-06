@@ -6,6 +6,7 @@
 #include "settingsdlg.h"
 #include "databaseutils.h"
 #include "notewidget.h"
+#include "reminderwidget.h"
 
 namespace Ui {
 class BaitaAssistant;
@@ -15,9 +16,9 @@ class NoteWidget;
 
 enum class Functionality : int
 {
-    FNotes = 0,
-    FPostits,
-    FShop
+    NoteMode = 0,
+    ReminderMode,
+    ShopMode
 };
 
 class BaitaAssistant : public QMainWindow
@@ -31,6 +32,7 @@ public:
 private:
   Ui::BaitaAssistant *ui;
   NoteWidget m_noteWidget;
+  ReminderWidget m_reminderWidget;
   QSerialPort m_printer;
   Settings m_settings;
   Database m_db;

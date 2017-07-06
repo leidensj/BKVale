@@ -25,7 +25,7 @@
 
 namespace
 {
-  void appendHeader(const Note& note, QString& strNote)
+  void noteAppendHeader(const Note& note, QString& strNote)
   {
     strNote += ESC_EXPAND_ON
                ESC_ALIGN_CENTER
@@ -62,7 +62,7 @@ namespace
                ESC_VERT_TAB;
   }
 
-  void appendFooter(const Note& note, QString& strNote)
+  void noteAppendFooter(const Note& note, QString& strNote)
   {
     strNote += ESC_LF
                ESC_ALIGN_CENTER
@@ -84,7 +84,7 @@ namespace
                ESC_LF;
   }
 
-  void appendBody(const Note& note, QString& strNote)
+  void noteAppendBody(const Note& note, QString& strNote)
   {
     NoteItems items(note.m_items);
     if (items.m_size == 0)
@@ -112,9 +112,17 @@ namespace
   }
 }
 
-bool PrintUtils::print(QSerialPort& printer,
-                       const QString& msg,
-                       QString& error)
+bool Printer::init(QSerialPort& printer,
+                   QString& error)
+{
+  error.clear();
+  QString msg = QString(ESC_INIT) + ESC_PORTUGUESE;
+  return print(printer, msg, error);
+}
+
+bool NotePrinter::print(QSerialPort& printer,
+                        const QString& msg,
+                        QString& error)
 {
   error.clear();
   QByteArray data(msg.toUtf8());
@@ -139,24 +147,45 @@ bool PrintUtils::print(QSerialPort& printer,
   return bSuccess;
 }
 
-bool PrintUtils::initPrinter(QSerialPort& printer,
-                             QString& error)
-{
-  error.clear();
-  QString msg = QString(ESC_INIT) + ESC_PORTUGUESE;
-  return print(printer, msg, error);
-}
-
-QString PrintUtils::buildNote(const Note& note)
+QString NotePrinter::build(const Note& note)
 {
   QString strNote1;
-  appendHeader(note, strNote1);
-  appendBody(note, strNote1);
-  appendFooter(note, strNote1);
+  noteAppendHeader(note, strNote1);
+  noteAppendBody(note, strNote1);
+  noteAppendFooter(note, strNote1);
   QString strNote2(strNote1);
   strNote1 += "1ª via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
   strNote2 += "2ª via" ESC_LF ESC_LF ESC_FULL_CUT;
   return strNote1 + strNote2;
+}
+
+QString ReminderPrinter::print(const QString& title,
+                               const QString& msg,
+                               bool bExpandFont)
+{
+  QString reminder;
+  if (!title.isEmpty())
+  {
+    reminder += ESC_DOUBLE_FONT_ON
+                ESC_ALIGN_CENTER +
+                title +
+                ESC_LF
+                ESC_DOUBLE_FONT_OFF
+                "────────────────────────────────────────────────"
+                ESC_LF
+                ESC_ALIGN_LEFT;
+  }
+
+  if (!msg.isEmpty())
+  {
+    if (bExpandFont)
+      reminder += ESC_DOUBLE_FONT_ON;
+    reminder += msg;
+    if (bExpandFont)
+      reminder += ESC_DOUBLE_FONT_OFF;
+  }
+
+  return reminder;
 }
 
 

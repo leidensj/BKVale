@@ -20,5 +20,6 @@
         <file>res/note.png</file>
         <file>res/shop.png</file>
         <file>res/trash.png</file>
+        <file>res/text.png</file>
     </qresource>
 </RCC>

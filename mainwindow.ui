@@ -75,7 +75,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout"/>
       </widget>
-      <widget class="QWidget" name="tabPostits">
+      <widget class="QWidget" name="tabReminder">
        <attribute name="icon">
         <iconset resource="icons.qrc">
          <normaloff>:/icons/res/postit.png</normaloff>:/icons/res/postit.png</iconset>
@@ -83,6 +83,7 @@
        <attribute name="title">
         <string>Lembretes</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2"/>
       </widget>
       <widget class="QWidget" name="tabShop">
        <attribute name="icon">

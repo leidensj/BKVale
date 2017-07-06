@@ -14,6 +14,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
 {
   ui->setupUi(this);
   ui->tabNotes->layout()->addWidget(&m_noteWidget);
+  ui->tabReminder->layout()->addWidget(&m_reminderWidget);
 
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),
@@ -204,14 +205,14 @@ void BaitaAssistant::enableControls()
   Functionality func = (Functionality)ui->tabWidget->currentIndex();
   switch (func)
   {
-    case Functionality::FNotes:
+    case Functionality::NoteMode:
     {
       ui->actionPrint->setEnabled(m_noteWidget.isValid() && bIsOpen && m_bReady);
     } break;
-    case Functionality::FPostits:
+    case Functionality::ReminderMode:
     {
     } break;
-    case Functionality::FShop:
+    case Functionality::ShopMode:
     default:
       break;
   }

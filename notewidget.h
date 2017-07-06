@@ -65,7 +65,7 @@ public:
   ~NoteWidget();
   QStringList getItemDescriptions() const;
   bool isValid() const;
-  void setHistoryDatabase(const QSqlDatabase& sqldb);
+  void setHistoryDatabase(QSqlDatabase db);
   bool save(QString& error);
   Note getNote() const;
 

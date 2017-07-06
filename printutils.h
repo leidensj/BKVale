@@ -4,15 +4,25 @@
 #include <QtSerialPort/QtSerialPort>
 #include <note.h>
 
-namespace PrintUtils
+namespace Printer
 {
+  bool init(QSerialPort& printer,
+            QString& error);
+
   bool print(QSerialPort& printer,
              const QString& msg,
              QString& error);
+}
 
-  bool initPrinter(QSerialPort& printer,
-                   QString& error);
+namespace NotePrinter
+{
+  QString build(const Note& note);
+}
 
-  QString buildNote(const Note& note);
+namespace ReminderPrinter
+{
+  QString build(const QString& title,
+                const QString& msg,
+                bool bExpandFont);
 }
 #endif // PRINTUTILS_H

@@ -1,7 +1,8 @@
-#ifndef REMINDER_H
-#define REMINDER_H
+#ifndef REMINDERWIDGET_H
+#define REMINDERWIDGET_H
 
 #include <QFrame>
+#include "reminder.h"
 
 namespace Ui {
 class ReminderWidget;
@@ -14,9 +15,12 @@ class ReminderWidget : public QFrame
 public:
   explicit ReminderWidget(QWidget *parent = 0);
   ~ReminderWidget();
+  Reminder reminder() const;
+  void clear();
+  bool isValid() const;
 
 private:
   Ui::ReminderWidget *ui;
 };
 
-#endif // REMINDER_H
+#endif // REMINDERWIDGET_H

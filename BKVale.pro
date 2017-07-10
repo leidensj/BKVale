@@ -34,7 +34,8 @@ HEADERS  += mainwindow.h \
     note.h \
     settings.h \
     notedatabasewidget.h \
-    reminderwidget.h
+    reminderwidget.h \
+    reminder.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

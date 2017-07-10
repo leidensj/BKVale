@@ -120,7 +120,7 @@ bool Printer::init(QSerialPort& printer,
   return print(printer, msg, error);
 }
 
-bool NotePrinter::print(QSerialPort& printer,
+bool Printer::print(QSerialPort& printer,
                         const QString& msg,
                         QString& error)
 {
@@ -159,33 +159,32 @@ QString NotePrinter::build(const Note& note)
   return strNote1 + strNote2;
 }
 
-QString ReminderPrinter::print(const QString& title,
-                               const QString& msg,
-                               bool bExpandFont)
+QString ReminderPrinter::build(const Reminder& r)
 {
-  QString reminder;
-  if (!title.isEmpty())
+  QString str;
+  if (!r.m_title.isEmpty())
   {
-    reminder += ESC_DOUBLE_FONT_ON
-                ESC_ALIGN_CENTER +
-                title +
-                ESC_LF
-                ESC_DOUBLE_FONT_OFF
-                "────────────────────────────────────────────────"
-                ESC_LF
-                ESC_ALIGN_LEFT;
+    str += ESC_DOUBLE_FONT_ON
+           ESC_ALIGN_CENTER +
+           r.m_title +
+           ESC_LF
+           ESC_DOUBLE_FONT_OFF
+           "────────────────────────────────────────────────"
+           ESC_LF
+           ESC_ALIGN_LEFT;
   }
 
-  if (!msg.isEmpty())
+  if (!r.m_message.isEmpty())
   {
-    if (bExpandFont)
-      reminder += ESC_DOUBLE_FONT_ON;
-    reminder += msg;
-    if (bExpandFont)
-      reminder += ESC_DOUBLE_FONT_OFF;
+    if (!r.m_bFontSmall)
+      str += ESC_EXPAND_ON;
+    str += r.m_message;
+    if (!r.m_bFontSmall)
+      str += ESC_EXPAND_OFF;
   }
 
-  return reminder;
+  str += ESC_LF ESC_LF ESC_FULL_CUT;
+  return str;
 }
 
 

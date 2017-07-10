@@ -2,7 +2,8 @@
 #define PRINTUTILS_H
 
 #include <QtSerialPort/QtSerialPort>
-#include <note.h>
+#include "note.h"
+#include "reminder.h"
 
 namespace Printer
 {
@@ -21,8 +22,6 @@ namespace NotePrinter
 
 namespace ReminderPrinter
 {
-  QString build(const QString& title,
-                const QString& msg,
-                bool bExpandFont);
+  QString build(const Reminder& r);
 }
 #endif // PRINTUTILS_H

@@ -103,7 +103,7 @@ void BaitaAssistant::connect()
     else
     {
       QString error;
-      if (!PrintUtils::initPrinter(m_printer, error))
+      if (!Printer::init(m_printer, error))
       {
         QMessageBox msgBox(QMessageBox::Warning,
                            tr("Aviso") + QString::number(m_printer.error()),
@@ -135,33 +135,42 @@ void BaitaAssistant::disconnect()
 
 void BaitaAssistant::notePrint()
 {
-  Note note = m_noteWidget.getNote();
-  QString str(PrintUtils::buildNote(note));
-  QString error;
-  if (!PrintUtils::print(m_printer, str, error))
+  if (ui->tabWidget->currentIndex() == (int)Functionality::NoteMode)
   {
-    QMessageBox msgBox(QMessageBox::Critical,
-                       tr("Erro"),
-                       error,
-                       QMessageBox::Ok);
-    msgBox.exec();
-  }
-  else
-  {
+    Note note = m_noteWidget.getNote();
+    QString str(NotePrinter::build(note));
     QString error;
-    if (!m_noteWidget.save(error))
+    if (!Printer::print(m_printer, str, error))
     {
-      QMessageBox msgBox(QMessageBox::Warning,
-                         tr("Erro ao salvar vale"),
+      QMessageBox msgBox(QMessageBox::Critical,
+                         tr("Erro"),
                          error,
                          QMessageBox::Ok);
       msgBox.exec();
     }
     else
     {
-      m_db.insertDescriptions(m_noteWidget.getItemDescriptions());
-      m_noteWidget.create();
+      QString error;
+      if (!m_noteWidget.save(error))
+      {
+        QMessageBox msgBox(QMessageBox::Warning,
+                           tr("Erro ao salvar vale"),
+                           error,
+                           QMessageBox::Ok);
+        msgBox.exec();
+      }
+      else
+      {
+        m_db.insertDescriptions(m_noteWidget.getItemDescriptions());
+        m_noteWidget.create();
+      }
     }
+  }
+  else if (ui->tabWidget->currentIndex() == (int)Functionality::ReminderMode)
+  {
+    QString str(ReminderPrinter::build(m_reminderWidget.reminder()));
+    QString error;
+    Printer::print(m_printer, str, error);
   }
 }
 
@@ -211,6 +220,7 @@ void BaitaAssistant::enableControls()
     } break;
     case Functionality::ReminderMode:
     {
+      ui->actionPrint->setEnabled(m_reminderWidget.isValid() && bIsOpen && m_bReady);
     } break;
     case Functionality::ShopMode:
     default:

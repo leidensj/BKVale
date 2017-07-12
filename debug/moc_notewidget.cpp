@@ -20,29 +20,29 @@
 QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-struct qt_meta_stringdata_NoteComboBox_t {
+struct qt_meta_stringdata_SupplierComboBox_t {
     QByteArrayData data[4];
-    char stringdata0[44];
+    char stringdata0[48];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_NoteComboBox_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_SupplierComboBox_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
-static const qt_meta_stringdata_NoteComboBox_t qt_meta_stringdata_NoteComboBox = {
+static const qt_meta_stringdata_SupplierComboBox_t qt_meta_stringdata_SupplierComboBox = {
     {
-QT_MOC_LITERAL(0, 0, 12), // "NoteComboBox"
-QT_MOC_LITERAL(1, 13, 21), // "supplierEnteredSignal"
-QT_MOC_LITERAL(2, 35, 0), // ""
-QT_MOC_LITERAL(3, 36, 7) // "toUpper"
+QT_MOC_LITERAL(0, 0, 16), // "SupplierComboBox"
+QT_MOC_LITERAL(1, 17, 21), // "supplierEnteredSignal"
+QT_MOC_LITERAL(2, 39, 0), // ""
+QT_MOC_LITERAL(3, 40, 7) // "toUpper"
 
     },
-    "NoteComboBox\0supplierEnteredSignal\0\0"
-    "toUpper"
+    "SupplierComboBox\0supplierEnteredSignal\0"
+    "\0toUpper"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_NoteComboBox[] = {
+static const uint qt_meta_data_SupplierComboBox[] = {
 
  // content:
        7,       // revision
@@ -70,10 +70,10 @@ static const uint qt_meta_data_NoteComboBox[] = {
        0        // eod
 };
 
-void NoteComboBox::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void SupplierComboBox::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        NoteComboBox *_t = static_cast<NoteComboBox *>(_o);
+        SupplierComboBox *_t = static_cast<SupplierComboBox *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->supplierEnteredSignal(); break;
@@ -84,8 +84,8 @@ void NoteComboBox::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (NoteComboBox::*_t)();
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&NoteComboBox::supplierEnteredSignal)) {
+            typedef void (SupplierComboBox::*_t)();
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&SupplierComboBox::supplierEnteredSignal)) {
                 *result = 0;
                 return;
             }
@@ -94,26 +94,26 @@ void NoteComboBox::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
     Q_UNUSED(_a);
 }
 
-const QMetaObject NoteComboBox::staticMetaObject = {
-    { &QComboBox::staticMetaObject, qt_meta_stringdata_NoteComboBox.data,
-      qt_meta_data_NoteComboBox,  qt_static_metacall, nullptr, nullptr}
+const QMetaObject SupplierComboBox::staticMetaObject = {
+    { &QComboBox::staticMetaObject, qt_meta_stringdata_SupplierComboBox.data,
+      qt_meta_data_SupplierComboBox,  qt_static_metacall, nullptr, nullptr}
 };
 
 
-const QMetaObject *NoteComboBox::metaObject() const
+const QMetaObject *SupplierComboBox::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *NoteComboBox::qt_metacast(const char *_clname)
+void *SupplierComboBox::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_NoteComboBox.stringdata0))
-        return static_cast<void*>(const_cast< NoteComboBox*>(this));
+    if (!strcmp(_clname, qt_meta_stringdata_SupplierComboBox.stringdata0))
+        return static_cast<void*>(const_cast< SupplierComboBox*>(this));
     return QComboBox::qt_metacast(_clname);
 }
 
-int NoteComboBox::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int SupplierComboBox::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QComboBox::qt_metacall(_c, _id, _a);
     if (_id < 0)
@@ -131,7 +131,7 @@ int NoteComboBox::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void NoteComboBox::supplierEnteredSignal()
+void SupplierComboBox::supplierEnteredSignal()
 {
     QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
 }

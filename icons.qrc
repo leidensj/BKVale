@@ -21,5 +21,10 @@
         <file>res/shop.png</file>
         <file>res/trash.png</file>
         <file>res/text.png</file>
+        <file>res/stock.png</file>
+        <file>res/revert.png</file>
+        <file>res/save.png</file>
+        <file>res/item.png</file>
+        <file>res/newitem.png</file>
     </qresource>
 </RCC>

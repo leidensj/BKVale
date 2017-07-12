@@ -94,6 +94,15 @@
         <string>Compras</string>
        </attribute>
       </widget>
+      <widget class="QWidget" name="tabConsume">
+       <attribute name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/res/stock.png</normaloff>:/icons/res/stock.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Consumo</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -117,6 +126,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionItems"/>
+   <addaction name="separator"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
    <addaction name="actionPrint"/>
@@ -174,6 +185,18 @@
    </property>
    <property name="toolTip">
     <string>Informações</string>
+   </property>
+  </action>
+  <action name="actionItems">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/item.png</normaloff>:/icons/res/item.png</iconset>
+   </property>
+   <property name="text">
+    <string>Produtos</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar Produtos</string>
    </property>
   </action>
  </widget>

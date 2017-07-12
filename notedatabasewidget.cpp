@@ -29,7 +29,8 @@ QVariant NoteDatabaseTableModel::data(const QModelIndex &index, int role) const
 
 NoteDatabaseWidget::NoteDatabaseWidget(QWidget *parent) :
   QFrame(parent),
-  ui(new Ui::NoteDatabaseWidget)
+  ui(new Ui::NoteDatabaseWidget),
+  m_model(nullptr)
 {
   ui->setupUi(this);
   ui->table->setSelectionBehavior(QAbstractItemView::SelectRows);

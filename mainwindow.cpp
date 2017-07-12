@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "notewidget.h"
 #include "printutils.h"
+#include "productwidget.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -10,7 +11,8 @@
 BaitaAssistant::BaitaAssistant(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::BaitaAssistant),
-    m_bReady(false)
+    m_bReady(false),
+    m_db(QSqlDatabase::addDatabase("QSQLITE"))
 {
   ui->setupUi(this);
   ui->tabNotes->layout()->addWidget(&m_noteWidget);
@@ -56,9 +58,13 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    this,
                    SLOT(enableControls()));
 
+  QObject::connect(ui->actionItems,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openItemsDialog()));
+
   m_noteWidget.clear();
   emit initSignal();
-  enableControls();
 }
 
 BaitaAssistant::~BaitaAssistant()
@@ -161,7 +167,6 @@ void BaitaAssistant::notePrint()
       }
       else
       {
-        m_db.insertDescriptions(m_noteWidget.getItemDescriptions());
         m_noteWidget.create();
       }
     }
@@ -183,8 +188,9 @@ void BaitaAssistant::showSettings()
     {
       m_settings = dlg.getSettings();
       QString error;
-      if (!m_db.insertSettings(m_settings,
-                               error))
+      if (!BaitaDatabase::insertSettings(m_db,
+                                         m_settings,
+                                         error))
       {
         QMessageBox msgBox(QMessageBox::Critical,
                            tr("Erro ao salvar a configuração"),
@@ -231,12 +237,13 @@ void BaitaAssistant::enableControls()
 void BaitaAssistant::init()
 {
   QString error;
-  bool bSuccess = m_db.open(qApp->applicationDirPath() +
-                            QDir::separator() +
-                            "setup.db",
-                            error);
+  bool bSuccess = BaitaDatabase::open(m_db,
+                                      qApp->applicationDirPath() +
+                                      QDir::separator() +
+                                      "setup.db",
+                                      error);
   if (bSuccess)
-    bSuccess = m_db.init(error);
+    bSuccess = BaitaDatabase::init(m_db, error);
   else
     m_db.close();
 
@@ -251,17 +258,30 @@ void BaitaAssistant::init()
   else
   {
     m_bReady = true;
-    m_db.selectSettings(m_settings);
+    BaitaDatabase::selectSettings(m_db, m_settings);
     if (!m_settings.port.isEmpty())
       connect();
-    m_noteWidget.setHistoryDatabase(m_db.getSqlDatabase());
+    m_noteWidget.setHistoryDatabase(m_db);
     m_noteWidget.create();
   }
-
   enableControls();
 }
 
 void BaitaAssistant::showInfo()
 {
 
+}
+
+void BaitaAssistant::openItemsDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *h = new QHBoxLayout();
+  dlg.setLayout(h);
+  ProductWidget* p = new ProductWidget();
+  p->setDatabase(m_db);
+  h->addWidget(p);
+  dlg.setWindowTitle(tr("Gerenciar Produtos"));
+  dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
+  dlg.setModal(true);
+  dlg.exec();
 }

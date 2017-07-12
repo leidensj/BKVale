@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     note.cpp \
     settings.cpp \
     notedatabasewidget.cpp \
-    reminderwidget.cpp
+    reminderwidget.cpp \
+    productwidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -35,13 +36,16 @@ HEADERS  += mainwindow.h \
     settings.h \
     notedatabasewidget.h \
     reminderwidget.h \
-    reminder.h
+    reminder.h \
+    productwidget.h \
+    product.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \
     notewidget.ui \
     notedatabasewidget.ui \
-    reminderwidget.ui
+    reminderwidget.ui \
+    productwidget.ui
 
 RESOURCES += \
     icons.qrc

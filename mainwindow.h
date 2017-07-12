@@ -35,8 +35,8 @@ private:
   ReminderWidget m_reminderWidget;
   QSerialPort m_printer;
   Settings m_settings;
-  Database m_db;
   bool m_bReady;
+  QSqlDatabase m_db;
 
 private slots:
   void connect();
@@ -46,6 +46,7 @@ private slots:
   void init();
   void showInfo();
   void notePrint();
+  void openItemsDialog();
 
 signals:
   void initSignal();

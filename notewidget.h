@@ -16,21 +16,12 @@ namespace Ui {
 class NoteWidget;
 }
 
-class NoteComboBox : public QComboBox
+class SupplierComboBox : public QComboBox
 {
   Q_OBJECT
 
 public:
-
-  enum Behavior
-  {
-    Supplier,
-    TableUnity,
-    TableDescription
-  };
-
-  NoteComboBox(Behavior behavior);
-  const Behavior m_behavior;
+  SupplierComboBox();
 
 protected:
   void keyPressEvent(QKeyEvent *event);
@@ -71,13 +62,12 @@ public:
 
 private:
   Ui::NoteWidget *ui;
-  NoteComboBox m_supplier;
+  SupplierComboBox m_supplier;
   NoteTableWidget m_table;
   QString computeUnitValue(int row) const;
   QString computeSubTotal(int row) const;
   QString computeTotal() const;
   double evaluate(int row, int column) const;
-  QStringList m_descriptions;
   NoteDatabaseWidget m_noteDatabaseWidget;
   int currentNoteID;
 

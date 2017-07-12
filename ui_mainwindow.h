@@ -32,6 +32,7 @@ public:
     QAction *actionPrint;
     QAction *actionSettings;
     QAction *actionInfo;
+    QAction *actionItems;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout;
     QTabWidget *tabWidget;
@@ -40,6 +41,7 @@ public:
     QWidget *tabReminder;
     QVBoxLayout *verticalLayout_2;
     QWidget *tabShop;
+    QWidget *tabConsume;
     QToolBar *toolMain;
     QStatusBar *statusBar;
 
@@ -77,6 +79,11 @@ public:
         QIcon icon5;
         icon5.addFile(QStringLiteral(":/icons/res/about.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionInfo->setIcon(icon5);
+        actionItems = new QAction(BaitaAssistant);
+        actionItems->setObjectName(QStringLiteral("actionItems"));
+        QIcon icon6;
+        icon6.addFile(QStringLiteral(":/icons/res/item.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionItems->setIcon(icon6);
         centralWidget = new QWidget(BaitaAssistant);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout = new QHBoxLayout(centralWidget);
@@ -100,23 +107,28 @@ public:
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        QIcon icon6;
-        icon6.addFile(QStringLiteral(":/icons/res/note.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tabWidget->addTab(tabNotes, icon6, QString());
+        QIcon icon7;
+        icon7.addFile(QStringLiteral(":/icons/res/note.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tabWidget->addTab(tabNotes, icon7, QString());
         tabReminder = new QWidget();
         tabReminder->setObjectName(QStringLiteral("tabReminder"));
         verticalLayout_2 = new QVBoxLayout(tabReminder);
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        QIcon icon7;
-        icon7.addFile(QStringLiteral(":/icons/res/postit.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tabWidget->addTab(tabReminder, icon7, QString());
+        QIcon icon8;
+        icon8.addFile(QStringLiteral(":/icons/res/postit.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tabWidget->addTab(tabReminder, icon8, QString());
         tabShop = new QWidget();
         tabShop->setObjectName(QStringLiteral("tabShop"));
-        QIcon icon8;
-        icon8.addFile(QStringLiteral(":/icons/res/shop.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tabWidget->addTab(tabShop, icon8, QString());
+        QIcon icon9;
+        icon9.addFile(QStringLiteral(":/icons/res/shop.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tabWidget->addTab(tabShop, icon9, QString());
+        tabConsume = new QWidget();
+        tabConsume->setObjectName(QStringLiteral("tabConsume"));
+        QIcon icon10;
+        icon10.addFile(QStringLiteral(":/icons/res/stock.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tabWidget->addTab(tabConsume, icon10, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
@@ -131,6 +143,8 @@ public:
         statusBar->setObjectName(QStringLiteral("statusBar"));
         BaitaAssistant->setStatusBar(statusBar);
 
+        toolMain->addAction(actionItems);
+        toolMain->addSeparator();
         toolMain->addAction(actionConnect);
         toolMain->addAction(actionDisconnect);
         toolMain->addAction(actionPrint);
@@ -160,9 +174,14 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionInfo->setToolTip(QApplication::translate("BaitaAssistant", "Informa\303\247\303\265es", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
+        actionItems->setText(QApplication::translate("BaitaAssistant", "Produtos", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionItems->setToolTip(QApplication::translate("BaitaAssistant", "Gerenciar Produtos", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         tabWidget->setTabText(tabWidget->indexOf(tabNotes), QApplication::translate("BaitaAssistant", "Vales", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabReminder), QApplication::translate("BaitaAssistant", "Lembretes", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabShop), QApplication::translate("BaitaAssistant", "Compras", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tabConsume), QApplication::translate("BaitaAssistant", "Consumo", Q_NULLPTR));
     } // retranslateUi
 
 };

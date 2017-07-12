@@ -34,24 +34,9 @@ QStringList NoteDatabase::suppliers(QSqlDatabase db)
   return list;
 }
 
-QStringList NoteDatabase::descriptions(QSqlDatabase db)
-{
-  QStringList list;
-  if (db.isOpen())
-  {
-    QSqlQuery query(db);
-    if (query.exec("SELECT DISTINCT "
-                   "_DESCRIPTION "
-                   "FROM _ITEMS"))
-    {
-      while (query.next())
-        list << query.value(query.record().indexOf("_DESCRIPTION")).toString();
-    }
-  }
-  return list;
-}
-
-bool NoteDatabase::insertOrUpdate(const Note& note, QSqlDatabase db, QString& error)
+bool NoteDatabase::insertOrUpdate(QSqlDatabase db,
+                                  const Note& note,
+                                  QString& error)
 {
   error.clear();
 
@@ -117,92 +102,18 @@ void NoteDatabase::incNumber(QSqlDatabase db)
   query.exec();
 }
 
-Database::Database()
-  : m_db(QSqlDatabase::addDatabase("QSQLITE"))
-{
-
-}
-
-bool Database::isOpen(QString& error) const
-{
-  error.clear();
-  if (!m_db.isOpen())
-     error = "Arquivo de configuração não foi aberto.";
-  return m_db.isOpen();
-}
-
-bool Database::open(const QString& path,
-                    QString& error)
-{
-  error.clear();
-  if (m_db.isOpen())
-    m_db.close();
-  m_db.setDatabaseName(path);
-  bool bSuccess = m_db.open();
-  if (!bSuccess)
-    error = m_db.lastError().text();
-  return bSuccess;
-}
-
-void Database::close()
-{
-  m_db.close();
-}
-
-bool Database::init(QString& error)
-{
-  error.clear();
-
-  if (!isOpen(error))
-    return false;
-
-  QSqlQuery query;
-  bool bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _SETTINGS ("
-                             "_LASTNUMBER INTEGER DEFAULT " DEFAULT_NUMBER_STR ","
-                             "_SERIALPORT TEXT,"
-                             "_BAUDRATE INTEGER DEFAULT 9600,"
-                             "_DATABITS INTEGER DEFAULT 8,"
-                             "_FLOWCONTROL INTEGER DEFAULT 0,"
-                             "_PARITY INTEGER DEFAULT 0,"
-                             "_STOPBITS INTEGER DEFAULT 1)");
-
-  if (bSuccess)
-  {
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
-                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "_NUMBER INTEGER NOT NULL,"
-                          "_DATE INTEGER NOT NULL,"
-                          "_SUPPLIER TEXT NOT NULL,"
-                          "_ITEMS TEXT,"
-                          "_TOTAL REAL)");
-
-    if (bSuccess)
-    {
-      bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
-                            "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                            "_DESCRIPTION TEXT NOT NULL UNIQUE)");
-    }
-  }
-
-  if (bSuccess && !hasConfig())
-    bSuccess = query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
-
-  if (!bSuccess)
-    error = query.lastError().text();
-  return bSuccess;
-}
-
-bool Database::select(int id,
-                      Note& note,
-                      QString& error)
+bool NoteDatabase::select(QSqlDatabase db,
+                          int id,
+                          Note& note,
+                          QString& error)
 {
   error.clear();
   note.clear();
 
-  if (!isOpen(error))
+  if (!BaitaDatabase::isOpen(db, error))
     return false;
 
-  QSqlQuery query;
+  QSqlQuery query(db);
   query.prepare("SELECT "
                 "_NUMBER,"
                 "_DATE,"
@@ -239,29 +150,17 @@ bool Database::select(int id,
   return bSuccess;
 }
 
-bool Database::hasConfig()
-{
-  QString error;
-  if (!isOpen(error))
-    return false;
-
-  QSqlQuery query;
-  if (query.exec("SELECT * FROM _SETTINGS LIMIT 1"))
-    return query.next();
-
-  return false;
-}
-
-bool Database::selectAll(Notes& notes,
-                         QString& error)
+bool NoteDatabase::selectAll(QSqlDatabase db,
+                             Notes& notes,
+                             QString& error)
 {
   error.clear();
   notes.clear();
 
-  if (!isOpen(error))
+  if (!BaitaDatabase::isOpen(db, error))
     return false;
 
-  QSqlQuery query;
+  QSqlQuery query(db);
   bool bSuccess = query.exec("SELECT "
                              "_ID,"
                              "_NUMBER,"
@@ -291,28 +190,104 @@ bool Database::selectAll(Notes& notes,
   return bSuccess;
 }
 
-void Database::insertDescriptions(const QStringList& descriptions)
+bool BaitaDatabase::isOpen(QSqlDatabase db,
+                           QString& error)
 {
-  for (int i = 0; i != descriptions.size(); ++i)
-  {
-    QSqlQuery query;
-    query.prepare("INSERT INTO _ITEMS ("
-                  "_DESCRIPTION) "
-                  "VALUES ("
-                  "(:_description))");
-
-    query.bindValue(":_description", descriptions.at(i));
-    query.exec();
-  }
+  error.clear();
+  if (!db.isOpen())
+     error = "Arquivo de configuração não foi aberto.";
+  return db.isOpen();
 }
 
-bool Database::insertSettings(const Settings& settings,
-                              QString& error)
+bool BaitaDatabase::open(QSqlDatabase db,
+                         const QString& path,
+                         QString& error)
 {
-  if (!isOpen(error))
+  error.clear();
+  if (db.isOpen())
+    db.close();
+  db.setDatabaseName(path);
+  bool bSuccess = db.open();
+  if (!bSuccess)
+    error = db.lastError().text();
+  return bSuccess;
+}
+
+void BaitaDatabase::close(QSqlDatabase db)
+{
+  db.close();
+}
+
+bool BaitaDatabase::init(QSqlDatabase db,
+                         QString& error)
+{
+  error.clear();
+
+  if (!isOpen(db, error))
     return false;
 
-  QSqlQuery query;
+  bool bHasConfig = BaitaDatabase::hasConfig(db);
+
+  QSqlQuery query(db);
+  db.transaction();
+  query.exec("CREATE TABLE IF NOT EXISTS _SETTINGS ("
+             "_LASTNUMBER INTEGER DEFAULT " DEFAULT_NUMBER_STR ","
+             "_SERIALPORT TEXT,"
+             "_BAUDRATE INTEGER DEFAULT 9600,"
+             "_DATABITS INTEGER DEFAULT 8,"
+             "_FLOWCONTROL INTEGER DEFAULT 0,"
+             "_PARITY INTEGER DEFAULT 0,"
+             "_STOPBITS INTEGER DEFAULT 1)");
+
+  query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_NUMBER INTEGER NOT NULL,"
+             "_DATE INTEGER NOT NULL,"
+             "_SUPPLIER TEXT NOT NULL,"
+             "_ITEMS TEXT,"
+             "_TOTAL REAL)");
+
+  query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_DESCRIPTION TEXT NOT NULL UNIQUE,"
+             "_UNITY TEXT NOT NULL,"
+             "_SUPPLIER TEXT,"
+             "_PRICE REAL,"
+             "_DETAILS TEXT,"
+             "_MIDASCODE TEXT,"
+             "_ICON INT)");
+
+  if (!bHasConfig)
+    query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
+
+  bool bSuccess = db.commit();
+  if (!bSuccess)
+    error = db.lastError().text();
+
+  return true;
+}
+
+bool BaitaDatabase::hasConfig(QSqlDatabase db)
+{
+  QString error;
+  if (!isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  if (query.exec("SELECT * FROM _SETTINGS LIMIT 1"))
+    return query.next();
+
+  return false;
+}
+
+bool BaitaDatabase::insertSettings(QSqlDatabase db,
+                              const Settings& settings,
+                              QString& error)
+{
+  if (!isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
   bool bSuccess = query.prepare("UPDATE _SETTINGS SET "
                                 "_BAUDRATE = :_baudrate,"
                                 "_DATABITS = :_databits,"
@@ -336,13 +311,14 @@ bool Database::insertSettings(const Settings& settings,
   return bSuccess;
 }
 
-void Database::selectSettings(Settings& settings)
+void BaitaDatabase::selectSettings(QSqlDatabase db,
+                                   Settings& settings)
 {
   settings.clear();
   QString error;
-  if (isOpen(error))
+  if (isOpen(db, error))
   {
-    QSqlQuery query;
+    QSqlQuery query(db);
     query.prepare("SELECT * FROM _SETTINGS LIMIT 1");
     if (query.exec())
     {

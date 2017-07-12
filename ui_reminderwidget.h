@@ -30,8 +30,8 @@ public:
     QVBoxLayout *verticalLayout;
     QLineEdit *editTitle;
     QHBoxLayout *horizontalLayout;
-    QRadioButton *buttonFontBig;
     QRadioButton *buttonFontSmall;
+    QRadioButton *buttonFontBig;
     QSpacerItem *horizontalSpacer;
     QPlainTextEdit *editMessage;
 
@@ -44,6 +44,7 @@ public:
         ReminderWidget->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(ReminderWidget);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
         editTitle = new QLineEdit(ReminderWidget);
         editTitle->setObjectName(QStringLiteral("editTitle"));
         editTitle->setClearButtonEnabled(false);
@@ -52,20 +53,20 @@ public:
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        buttonFontBig = new QRadioButton(ReminderWidget);
-        buttonFontBig->setObjectName(QStringLiteral("buttonFontBig"));
+        buttonFontSmall = new QRadioButton(ReminderWidget);
+        buttonFontSmall->setObjectName(QStringLiteral("buttonFontSmall"));
         QIcon icon;
         icon.addFile(QStringLiteral(":/icons/res/text.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonFontSmall->setIcon(icon);
+
+        horizontalLayout->addWidget(buttonFontSmall);
+
+        buttonFontBig = new QRadioButton(ReminderWidget);
+        buttonFontBig->setObjectName(QStringLiteral("buttonFontBig"));
         buttonFontBig->setIcon(icon);
         buttonFontBig->setIconSize(QSize(24, 24));
 
         horizontalLayout->addWidget(buttonFontBig);
-
-        buttonFontSmall = new QRadioButton(ReminderWidget);
-        buttonFontSmall->setObjectName(QStringLiteral("buttonFontSmall"));
-        buttonFontSmall->setIcon(icon);
-
-        horizontalLayout->addWidget(buttonFontSmall);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -91,8 +92,8 @@ public:
     {
         ReminderWidget->setWindowTitle(QApplication::translate("ReminderWidget", "Frame", Q_NULLPTR));
         editTitle->setPlaceholderText(QApplication::translate("ReminderWidget", "T\303\255tulo", Q_NULLPTR));
-        buttonFontBig->setText(QString());
         buttonFontSmall->setText(QString());
+        buttonFontBig->setText(QString());
         editMessage->setDocumentTitle(QString());
         editMessage->setPlainText(QString());
         editMessage->setPlaceholderText(QApplication::translate("ReminderWidget", "Mensagem", Q_NULLPTR));

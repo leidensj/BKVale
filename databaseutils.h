@@ -9,48 +9,50 @@
 #define DEFAULT_NUMBER     1000
 #define DEFAULT_NUMBER_STR "1000"
 
+namespace BaitaDatabase
+{
+  bool isOpen(QSqlDatabase db,
+              QString& error);
+
+  bool hasConfig(QSqlDatabase db);
+
+  bool open(QSqlDatabase db,
+            const QString& path,
+            QString& error);
+
+  void close(QSqlDatabase db);
+
+  bool init(QSqlDatabase db,
+            QString& error);
+
+  bool insertSettings(QSqlDatabase db,
+                      const Settings& settings,
+                      QString& error);
+
+  void selectSettings(QSqlDatabase db,
+                      Settings& settings);
+}
+
 namespace NoteDatabase
 {
   int nextNumber(QSqlDatabase db);
+
   void incNumber(QSqlDatabase db);
+
   QStringList suppliers(QSqlDatabase db);
-  QStringList descriptions(QSqlDatabase db);
-  bool insertOrUpdate(const Note& note, QSqlDatabase db, QString& error);
-}
 
-class Database
-{
-  QSqlDatabase m_db;
+  bool insertOrUpdate(QSqlDatabase db,
+                      const Note& note,
+                      QString& error);
 
-  bool hasConfig();
-
-public:
-
-  Database();
-
-  const QSqlDatabase& getSqlDatabase() const { return m_db; }
-
-  bool isOpen(QString& error) const;
-
-  bool open(const QString& path,
-            QString& error);
-
-  void close();
-
-  bool init(QString& error);
-
-  void insertDescriptions(const QStringList& descriptions);
-
-  bool select(int id,
+  bool select(QSqlDatabase db,
+              int id,
               Note& note,
               QString& error);
 
-  bool selectAll(Notes& notes,
+  bool selectAll(QSqlDatabase db,
+                 Notes& notes,
                  QString& error);
+}
 
-  bool insertSettings(const Settings& settings,
-                      QString& error);
-
-  void selectSettings(Settings& settings);
-};
 #endif // DATABASEUTILS_H

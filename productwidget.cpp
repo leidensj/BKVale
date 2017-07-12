@@ -10,6 +10,9 @@ ProductWidget::ProductWidget(QWidget *parent) :
   ui->setupUi(this);
   ui->table->setSelectionBehavior(QAbstractItemView::SelectItems);
   ui->table->setSelectionMode(QAbstractItemView::SingleSelection);
+  QFont f = ui->table->font();
+  f.setCapitalization(QFont::AllUppercase);
+  ui->table->setFont(f);
 
   QObject::connect(ui->buttonRemove,
                    SIGNAL(clicked(bool)),
@@ -35,10 +38,6 @@ ProductWidget::ProductWidget(QWidget *parent) :
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
-
-  QFont font = ui->table->font();
-  font.setCapitalization(QFont::AllUppercase);
-  ui->table->setFont(font);
 }
 
 ProductWidget::~ProductWidget()
@@ -56,12 +55,18 @@ void ProductWidget::setDatabase(QSqlDatabase db)
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
   model->setHeaderData((int)ProductTableIndex::ID, Qt::Horizontal, tr("ID"));
   model->setHeaderData((int)ProductTableIndex::Description, Qt::Horizontal, tr("Descrição"));
+  model->setHeaderData((int)ProductTableIndex::Description, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/description.png")), Qt::DecorationRole);
   model->setHeaderData((int)ProductTableIndex::Unity, Qt::Horizontal, tr("Unidade"));
+  model->setHeaderData((int)ProductTableIndex::Unity, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/unity.png")), Qt::DecorationRole);
   model->setHeaderData((int)ProductTableIndex::Supplier, Qt::Horizontal, tr("Fornecedor"));
+  model->setHeaderData((int)ProductTableIndex::Supplier, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/supplier.png")), Qt::DecorationRole);
   model->setHeaderData((int)ProductTableIndex::Price, Qt::Horizontal, tr("Preço"));
+  model->setHeaderData((int)ProductTableIndex::Price, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/price.png")), Qt::DecorationRole);
   model->setHeaderData((int)ProductTableIndex::Details, Qt::Horizontal, tr("Detalhes"));
+  model->setHeaderData((int)ProductTableIndex::Details, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/details.png")), Qt::DecorationRole);
   model->setHeaderData((int)ProductTableIndex::MidasCode, Qt::Horizontal, tr("Código Midas"));
   model->setHeaderData((int)ProductTableIndex::Icon, Qt::Horizontal, tr("Ícone"));
+
   ui->table->setModel(model);
   ui->table->hideColumn((int)ProductTableIndex::ID);
   ui->table->hideColumn((int)ProductTableIndex::MidasCode);

@@ -26,5 +26,10 @@
         <file>res/save.png</file>
         <file>res/item.png</file>
         <file>res/newitem.png</file>
+        <file>res/description.png</file>
+        <file>res/details.png</file>
+        <file>res/price.png</file>
+        <file>res/supplier.png</file>
+        <file>res/unity.png</file>
     </qresource>
 </RCC>

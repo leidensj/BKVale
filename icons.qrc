@@ -33,5 +33,6 @@
         <file>res/unity.png</file>
         <file>res/uppercase.png</file>
         <file>res/chart.png</file>
+        <file>res/ammount.png</file>
     </qresource>
 </RCC>

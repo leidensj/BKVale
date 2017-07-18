@@ -31,5 +31,7 @@
         <file>res/price.png</file>
         <file>res/supplier.png</file>
         <file>res/unity.png</file>
+        <file>res/uppercase.png</file>
+        <file>res/chart.png</file>
     </qresource>
 </RCC>

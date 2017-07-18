@@ -161,29 +161,51 @@ QString NotePrinter::build(const Note& note)
 
 QString ReminderPrinter::build(const Reminder& r)
 {
-  QString str;
-  if (!r.m_title.isEmpty())
+  QString str, title, msg;
+
+  switch (r.m_bfontType)
+  {
+    case Reminder::FontType::Normal:
+      title = r.m_title;
+      msg = r.m_message;
+      break;
+    case Reminder::FontType::AllLowercase:
+      title = r.m_title.toLower();
+      msg = r.m_message.toLower();
+      break;
+    case Reminder::FontType::AllUppercase:
+    default:
+      title = r.m_title.toUpper();
+      msg = r.m_message.toUpper();
+      break;
+  }
+
+  if (!title.isEmpty())
   {
     str += ESC_DOUBLE_FONT_ON
            ESC_ALIGN_CENTER +
-           r.m_title +
+           title +
            ESC_LF
-           ESC_DOUBLE_FONT_OFF
-           "────────────────────────────────────────────────"
-           ESC_LF
-           ESC_ALIGN_LEFT;
+           ESC_DOUBLE_FONT_OFF;
+    if (!msg.isEmpty())
+    {
+      str += "────────────────────────────────────────────────"
+             ESC_LF;
+    }
+    str += ESC_ALIGN_LEFT;
   }
 
-  if (!r.m_message.isEmpty())
+  if (!msg.isEmpty())
   {
     if (!r.m_bFontSmall)
       str += ESC_EXPAND_ON;
-    str += r.m_message;
+    str += msg;
     if (!r.m_bFontSmall)
       str += ESC_EXPAND_OFF;
+    str += ESC_LF ESC_LF;
   }
 
-  str += ESC_LF ESC_LF ESC_FULL_CUT;
+  str += ESC_FULL_CUT;
   return str;
 }
 

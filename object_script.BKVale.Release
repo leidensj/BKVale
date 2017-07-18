@@ -11,6 +11,7 @@ INPUT(
 ./release\notedatabasewidget.o
 ./release\reminderwidget.o
 ./release\productwidget.o
+./release\consumptionwidget.o
 ./release\qrc_icons.o
 ./release\moc_mainwindow.o
 ./release\moc_settingsdlg.o
@@ -18,4 +19,5 @@ INPUT(
 ./release\moc_notedatabasewidget.o
 ./release\moc_reminderwidget.o
 ./release\moc_productwidget.o
+./release\moc_consumptionwidget.o
 );

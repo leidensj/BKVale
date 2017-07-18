@@ -94,7 +94,7 @@
         <string>Compras</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tabConsume">
+      <widget class="QWidget" name="tabConsumption">
        <attribute name="icon">
         <iconset resource="icons.qrc">
          <normaloff>:/icons/res/stock.png</normaloff>:/icons/res/stock.png</iconset>
@@ -102,6 +102,7 @@
        <attribute name="title">
         <string>Consumo</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3"/>
       </widget>
      </widget>
     </item>

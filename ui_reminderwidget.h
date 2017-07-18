@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -30,8 +31,10 @@ public:
     QVBoxLayout *verticalLayout;
     QLineEdit *editTitle;
     QHBoxLayout *horizontalLayout;
-    QRadioButton *buttonFontSmall;
+    QCheckBox *buttonUppercase;
+    QFrame *line;
     QRadioButton *buttonFontBig;
+    QRadioButton *buttonFontSmall;
     QSpacerItem *horizontalSpacer;
     QPlainTextEdit *editMessage;
 
@@ -53,20 +56,39 @@ public:
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        buttonFontSmall = new QRadioButton(ReminderWidget);
-        buttonFontSmall->setObjectName(QStringLiteral("buttonFontSmall"));
+        buttonUppercase = new QCheckBox(ReminderWidget);
+        buttonUppercase->setObjectName(QStringLiteral("buttonUppercase"));
         QIcon icon;
-        icon.addFile(QStringLiteral(":/icons/res/text.png"), QSize(), QIcon::Normal, QIcon::Off);
-        buttonFontSmall->setIcon(icon);
+        icon.addFile(QStringLiteral(":/icons/res/uppercase.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonUppercase->setIcon(icon);
+        buttonUppercase->setIconSize(QSize(24, 24));
+        buttonUppercase->setChecked(false);
+        buttonUppercase->setTristate(true);
 
-        horizontalLayout->addWidget(buttonFontSmall);
+        horizontalLayout->addWidget(buttonUppercase);
+
+        line = new QFrame(ReminderWidget);
+        line->setObjectName(QStringLiteral("line"));
+        line->setFrameShape(QFrame::VLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        horizontalLayout->addWidget(line);
 
         buttonFontBig = new QRadioButton(ReminderWidget);
         buttonFontBig->setObjectName(QStringLiteral("buttonFontBig"));
-        buttonFontBig->setIcon(icon);
+        QIcon icon1;
+        icon1.addFile(QStringLiteral(":/icons/res/text.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonFontBig->setIcon(icon1);
         buttonFontBig->setIconSize(QSize(24, 24));
 
         horizontalLayout->addWidget(buttonFontBig);
+
+        buttonFontSmall = new QRadioButton(ReminderWidget);
+        buttonFontSmall->setObjectName(QStringLiteral("buttonFontSmall"));
+        buttonFontSmall->setIcon(icon1);
+        buttonFontSmall->setIconSize(QSize(16, 16));
+
+        horizontalLayout->addWidget(buttonFontSmall);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -92,8 +114,9 @@ public:
     {
         ReminderWidget->setWindowTitle(QApplication::translate("ReminderWidget", "Frame", Q_NULLPTR));
         editTitle->setPlaceholderText(QApplication::translate("ReminderWidget", "T\303\255tulo", Q_NULLPTR));
-        buttonFontSmall->setText(QString());
+        buttonUppercase->setText(QString());
         buttonFontBig->setText(QString());
+        buttonFontSmall->setText(QString());
         editMessage->setDocumentTitle(QString());
         editMessage->setPlainText(QString());
         editMessage->setPlaceholderText(QApplication::translate("ReminderWidget", "Mensagem", Q_NULLPTR));

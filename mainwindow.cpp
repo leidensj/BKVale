@@ -17,6 +17,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
   ui->setupUi(this);
   ui->tabNotes->layout()->addWidget(&m_noteWidget);
   ui->tabReminder->layout()->addWidget(&m_reminderWidget);
+  ui->tabConsumption->layout()->addWidget(&m_consumptionWidget);
 
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),
@@ -55,6 +56,11 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
 
   QObject::connect(ui->tabWidget,
                    SIGNAL(currentChanged(int)),
+                   this,
+                   SLOT(enableControls()));
+
+  QObject::connect(&m_reminderWidget,
+                   SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
 

@@ -19,6 +19,13 @@ public:
   void clear();
   bool isValid() const;
 
+private slots:
+  void emitChangedSignal();
+  void setCapitalization(int state);
+
+signals:
+  changedSignal();
+
 private:
   Ui::ReminderWidget *ui;
 };

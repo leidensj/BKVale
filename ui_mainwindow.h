@@ -41,7 +41,8 @@ public:
     QWidget *tabReminder;
     QVBoxLayout *verticalLayout_2;
     QWidget *tabShop;
-    QWidget *tabConsume;
+    QWidget *tabConsumption;
+    QVBoxLayout *verticalLayout_3;
     QToolBar *toolMain;
     QStatusBar *statusBar;
 
@@ -124,11 +125,15 @@ public:
         QIcon icon9;
         icon9.addFile(QStringLiteral(":/icons/res/shop.png"), QSize(), QIcon::Normal, QIcon::Off);
         tabWidget->addTab(tabShop, icon9, QString());
-        tabConsume = new QWidget();
-        tabConsume->setObjectName(QStringLiteral("tabConsume"));
+        tabConsumption = new QWidget();
+        tabConsumption->setObjectName(QStringLiteral("tabConsumption"));
+        verticalLayout_3 = new QVBoxLayout(tabConsumption);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         QIcon icon10;
         icon10.addFile(QStringLiteral(":/icons/res/stock.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tabWidget->addTab(tabConsume, icon10, QString());
+        tabWidget->addTab(tabConsumption, icon10, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
@@ -181,7 +186,7 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tabNotes), QApplication::translate("BaitaAssistant", "Vales", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabReminder), QApplication::translate("BaitaAssistant", "Lembretes", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabShop), QApplication::translate("BaitaAssistant", "Compras", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tabConsume), QApplication::translate("BaitaAssistant", "Consumo", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tabConsumption), QApplication::translate("BaitaAssistant", "Consumo", Q_NULLPTR));
     } // retranslateUi
 
 };

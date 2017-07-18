@@ -11,6 +11,7 @@ INPUT(
 ./debug\notedatabasewidget.o
 ./debug\reminderwidget.o
 ./debug\productwidget.o
+./debug\consumptionwidget.o
 ./debug\qrc_icons.o
 ./debug\moc_mainwindow.o
 ./debug\moc_settingsdlg.o
@@ -18,4 +19,5 @@ INPUT(
 ./debug\moc_notedatabasewidget.o
 ./debug\moc_reminderwidget.o
 ./debug\moc_productwidget.o
+./debug\moc_consumptionwidget.o
 );

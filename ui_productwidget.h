@@ -114,6 +114,8 @@ public:
 
         table = new QTableView(ProductWidget);
         table->setObjectName(QStringLiteral("table"));
+        table->setAlternatingRowColors(true);
+        table->setIconSize(QSize(24, 24));
         table->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
         table->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
         table->setSortingEnabled(true);

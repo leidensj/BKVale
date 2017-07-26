@@ -20,6 +20,9 @@
    <enum>QFrame::Raised</enum>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -75,7 +78,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="buttonRevert">
+      <widget class="QPushButton" name="buttonDiscard">
        <property name="text">
         <string/>
        </property>
@@ -150,14 +153,41 @@
     </layout>
    </item>
    <item>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="placeholderText">
-      <string>Localizar...</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLineEdit" name="editFilter">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="buttonContains">
+       <property name="text">
+        <string>Contendo</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTableView" name="table">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="alternatingRowColors">
       <bool>false</bool>
      </property>

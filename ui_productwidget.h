@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -31,11 +32,13 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *buttonCreate;
     QPushButton *buttonSave;
-    QPushButton *buttonRevert;
+    QPushButton *buttonDiscard;
     QPushButton *buttonRefresh;
     QPushButton *buttonRemove;
     QSpacerItem *horizontalSpacer;
-    QLineEdit *lineEdit;
+    QHBoxLayout *horizontalLayout_2;
+    QLineEdit *editFilter;
+    QCheckBox *buttonContains;
     QTableView *table;
 
     void setupUi(QFrame *ProductWidget)
@@ -46,6 +49,7 @@ public:
         ProductWidget->setFrameShape(QFrame::StyledPanel);
         ProductWidget->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(ProductWidget);
+        verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
@@ -70,15 +74,15 @@ public:
 
         horizontalLayout->addWidget(buttonSave);
 
-        buttonRevert = new QPushButton(ProductWidget);
-        buttonRevert->setObjectName(QStringLiteral("buttonRevert"));
+        buttonDiscard = new QPushButton(ProductWidget);
+        buttonDiscard->setObjectName(QStringLiteral("buttonDiscard"));
         QIcon icon2;
         icon2.addFile(QStringLiteral(":/icons/res/revert.png"), QSize(), QIcon::Normal, QIcon::Off);
-        buttonRevert->setIcon(icon2);
-        buttonRevert->setIconSize(QSize(24, 24));
-        buttonRevert->setFlat(true);
+        buttonDiscard->setIcon(icon2);
+        buttonDiscard->setIconSize(QSize(24, 24));
+        buttonDiscard->setFlat(true);
 
-        horizontalLayout->addWidget(buttonRevert);
+        horizontalLayout->addWidget(buttonDiscard);
 
         buttonRefresh = new QPushButton(ProductWidget);
         buttonRefresh->setObjectName(QStringLiteral("buttonRefresh"));
@@ -107,14 +111,30 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        lineEdit = new QLineEdit(ProductWidget);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        editFilter = new QLineEdit(ProductWidget);
+        editFilter->setObjectName(QStringLiteral("editFilter"));
+        QFont font;
+        font.setPointSize(12);
+        editFilter->setFont(font);
+        editFilter->setFrame(true);
+        editFilter->setClearButtonEnabled(true);
 
-        verticalLayout->addWidget(lineEdit);
+        horizontalLayout_2->addWidget(editFilter);
+
+        buttonContains = new QCheckBox(ProductWidget);
+        buttonContains->setObjectName(QStringLiteral("buttonContains"));
+
+        horizontalLayout_2->addWidget(buttonContains);
+
+
+        verticalLayout->addLayout(horizontalLayout_2);
 
         table = new QTableView(ProductWidget);
         table->setObjectName(QStringLiteral("table"));
-        table->setAlternatingRowColors(true);
+        table->setFont(font);
+        table->setAlternatingRowColors(false);
         table->setIconSize(QSize(24, 24));
         table->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
         table->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -133,10 +153,11 @@ public:
         ProductWidget->setWindowTitle(QApplication::translate("ProductWidget", "Frame", Q_NULLPTR));
         buttonCreate->setText(QString());
         buttonSave->setText(QString());
-        buttonRevert->setText(QString());
+        buttonDiscard->setText(QString());
         buttonRefresh->setText(QString());
         buttonRemove->setText(QString());
-        lineEdit->setPlaceholderText(QApplication::translate("ProductWidget", "Localizar...", Q_NULLPTR));
+        editFilter->setPlaceholderText(QString());
+        buttonContains->setText(QApplication::translate("ProductWidget", "Contendo", Q_NULLPTR));
     } // retranslateUi
 
 };

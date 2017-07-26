@@ -281,11 +281,12 @@ void BaitaAssistant::showInfo()
 void BaitaAssistant::openItemsDialog()
 {
   QDialog dlg(this);
-  QHBoxLayout *h = new QHBoxLayout();
-  dlg.setLayout(h);
-  ProductWidget* p = new ProductWidget();
-  p->setDatabase(m_db);
-  h->addWidget(p);
+  QHBoxLayout *layout = new QHBoxLayout();
+  dlg.setLayout(layout);
+  ProductWidget* product = new ProductWidget();
+  product->setDatabase(m_db);
+  layout->addWidget(product);
+  dlg.resize(width(), height());
   dlg.setWindowTitle(tr("Gerenciar Produtos"));
   dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
   dlg.setModal(true);

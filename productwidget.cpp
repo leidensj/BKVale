@@ -2,6 +2,106 @@
 #include "ui_productwidget.h"
 #include <QMessageBox>
 #include <QSqlTableModel>
+#include "QSqlRecord"
+
+namespace
+{
+QString friendlyColumnName(ProductTableIndex idx)
+{
+  switch (idx)
+  {
+    case ProductTableIndex::ID:
+      return QObject::tr("ID"); break;
+    case ProductTableIndex::Description:
+      return QObject::tr("Descrição"); break;
+    case ProductTableIndex::Unity:
+      return QObject::tr("Unidade"); break;
+    case ProductTableIndex::Supplier:
+      return QObject::tr("Fornecedor"); break;
+    case ProductTableIndex::Price:
+      return QObject::tr("Preço"); break;
+    case ProductTableIndex::Details:
+      return QObject::tr("Detalhes"); break;
+    case ProductTableIndex::MidasCode:
+      return QObject::tr("Código Midas"); break;
+    case ProductTableIndex::Icon:
+      return QObject::tr("Ícone"); break;
+    default:
+      return "";
+  }
+}
+
+QString columnIcon(ProductTableIndex idx)
+{
+  switch (idx)
+  {
+    case ProductTableIndex::Description:
+      return ":/icons/res/description.png";
+    case ProductTableIndex::Unity:
+      return ":/icons/res/unity.png";
+    case ProductTableIndex::Supplier:
+      return ":/icons/res/supplier.png";
+    case ProductTableIndex::Price:
+      return ":/icons/res/price.png";
+    case ProductTableIndex::Details:
+      return ":/icons/res/details.png";
+    case ProductTableIndex::MidasCode:
+    case ProductTableIndex::Icon:
+    case ProductTableIndex::ID:
+    default:
+      return "";
+  }
+}
+
+void setColumnText(QSqlTableModel* model,
+                   ProductTableIndex idx)
+{
+  if (model != nullptr)
+  {
+    model->setHeaderData((int)idx,
+                         Qt::Horizontal,
+                         friendlyColumnName(idx));
+  }
+}
+
+void setColumnIcon(QSqlTableModel* model,
+                   ProductTableIndex idx)
+{
+  if (model != nullptr)
+  {
+    model->setHeaderData((int)idx,
+                         Qt::Horizontal,
+                         QVariant::fromValue(QIcon(columnIcon(idx))),
+                         Qt::DecorationRole);
+  }
+}
+
+QString filterPlaceholder(ProductTableIndex idx)
+{
+  QString column = friendlyColumnName(idx);
+  if (!column.isEmpty())
+    column[0].toLower();
+  return QObject::tr("Procurar pelo(a) ") +
+      column +
+      "...";
+}
+
+QString buildFilter(QString text,
+                    ProductTableIndex idx,
+                    bool bContains)
+{
+  QString filter;
+  if (!text.isEmpty())
+  {
+    QString column = Product::columnName(idx);
+    filter = column + " LIKE '";
+    if (bContains)
+      filter += "%";
+    filter += text + "%'";
+  }
+  return filter;
+}
+}
 
 ProductWidget::ProductWidget(QWidget *parent) :
   QFrame(parent),
@@ -27,17 +127,33 @@ ProductWidget::ProductWidget(QWidget *parent) :
   QObject::connect(ui->buttonSave,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(save()));
+                   SLOT(save(bool)));
 
-  QObject::connect(ui->buttonRevert,
+  QObject::connect(ui->buttonDiscard,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(revert()));
+                   SLOT(discard(bool)));
 
   QObject::connect(ui->buttonCreate,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
+
+  QObject::connect(ui->editFilter,
+                   SIGNAL(textEdited(const QString&)),
+                   this,
+                   SLOT(setFilter()));
+
+  QObject::connect(ui->buttonContains,
+                   SIGNAL(stateChanged(int)),
+                   this,
+                   SLOT(contains()));
+
+  QObject::connect(ui->table->horizontalHeader(),
+                   SIGNAL(sortIndicatorChanged(int,
+                                               Qt::SortOrder)),
+                   this,
+                   SLOT(refresh()));
 }
 
 ProductWidget::~ProductWidget()
@@ -53,19 +169,21 @@ void ProductWidget::setDatabase(QSqlDatabase db)
   QSqlTableModel* model = new QSqlTableModel(this, db);
   model->setTable("_ITEMS");
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-  model->setHeaderData((int)ProductTableIndex::ID, Qt::Horizontal, tr("ID"));
-  model->setHeaderData((int)ProductTableIndex::Description, Qt::Horizontal, tr("Descrição"));
-  model->setHeaderData((int)ProductTableIndex::Description, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/description.png")), Qt::DecorationRole);
-  model->setHeaderData((int)ProductTableIndex::Unity, Qt::Horizontal, tr("Unidade"));
-  model->setHeaderData((int)ProductTableIndex::Unity, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/unity.png")), Qt::DecorationRole);
-  model->setHeaderData((int)ProductTableIndex::Supplier, Qt::Horizontal, tr("Fornecedor"));
-  model->setHeaderData((int)ProductTableIndex::Supplier, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/supplier.png")), Qt::DecorationRole);
-  model->setHeaderData((int)ProductTableIndex::Price, Qt::Horizontal, tr("Preço"));
-  model->setHeaderData((int)ProductTableIndex::Price, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/price.png")), Qt::DecorationRole);
-  model->setHeaderData((int)ProductTableIndex::Details, Qt::Horizontal, tr("Detalhes"));
-  model->setHeaderData((int)ProductTableIndex::Details, Qt::Horizontal, QVariant::fromValue(QIcon(":/icons/res/details.png")), Qt::DecorationRole);
-  model->setHeaderData((int)ProductTableIndex::MidasCode, Qt::Horizontal, tr("Código Midas"));
-  model->setHeaderData((int)ProductTableIndex::Icon, Qt::Horizontal, tr("Ícone"));
+
+  setColumnText(model, ProductTableIndex::ID);
+  setColumnText(model, ProductTableIndex::Description);
+  setColumnText(model, ProductTableIndex::Unity);
+  setColumnText(model, ProductTableIndex::Supplier);
+  setColumnText(model, ProductTableIndex::Price);
+  setColumnText(model, ProductTableIndex::Details);
+  setColumnText(model, ProductTableIndex::MidasCode);
+  setColumnText(model, ProductTableIndex::Icon);
+
+  setColumnIcon(model, ProductTableIndex::Description);
+  setColumnIcon(model, ProductTableIndex::Unity);
+  setColumnIcon(model, ProductTableIndex::Supplier);
+  setColumnIcon(model, ProductTableIndex::Price);
+  setColumnIcon(model, ProductTableIndex::Details);
 
   ui->table->setModel(model);
   ui->table->hideColumn((int)ProductTableIndex::ID);
@@ -77,7 +195,7 @@ void ProductWidget::setDatabase(QSqlDatabase db)
                    this,
                    SLOT(enableControls()));
 
-  QObject::connect(ui->table->selectionModel(),
+  QObject::connect(model,
                    SIGNAL(dataChanged(const QModelIndex&,
                                       const QModelIndex&,
                                       const QVector<int>&)),
@@ -90,7 +208,12 @@ void ProductWidget::refresh()
 {
   if (ui->table->model() != nullptr)
   {
+    confirm();
+    auto idx = currentSortIndicator();
+    ui->editFilter->clear();
+    ui->editFilter->setPlaceholderText(filterPlaceholder(idx));
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+    model->setFilter("");
     model->select();
   }
   enableControls();
@@ -104,7 +227,7 @@ void ProductWidget::enableControls()
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
     ui->buttonSave->setEnabled(model->isDirty());
-    ui->buttonRevert->setEnabled(model->isDirty());
+    ui->buttonDiscard->setEnabled(model->isDirty());
   }
 }
 
@@ -121,14 +244,16 @@ void ProductWidget::removeSelectedProduct()
   enableControls();
 }
 
-void ProductWidget::save()
+void ProductWidget::save(bool bSkipConfirmation)
 {
   if (ui->table->model() != nullptr)
   {
-    if (QMessageBox::question(this,
-                              tr("Salvar mudanças"),
-                              tr("Tem certeza que deseja salvar as mudanças realizadas?"),
-                              QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
+    int ret = !bSkipConfirmation ? QMessageBox::question(this,
+                                                         tr("Salvar mudanças"),
+                                                         tr("Tem certeza que deseja salvar as mudanças realizadas?"),
+                                                         QMessageBox::Ok | QMessageBox::Cancel)
+                                 : QMessageBox::Ok;
+    if (ret == QMessageBox::Ok)
     {
       QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
       model->submitAll();
@@ -137,16 +262,20 @@ void ProductWidget::save()
   }
 }
 
-void ProductWidget::revert()
+void ProductWidget::discard(bool bSkipConfirmation)
 {
   if (ui->table->model() != nullptr)
   {
-    if (QMessageBox::question(this,
-                              tr("Reverter mudanças"),
-                              tr("Tem certeza que deseja reverter as mudanças realizadas?"),
-                              QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
+    int ret = !bSkipConfirmation ? QMessageBox::question(this,
+                                                        tr("Descartar mudanças"),
+                                                        tr("Tem certeza que deseja descartar as mudanças realizadas?"),
+                                                        QMessageBox::Ok | QMessageBox::Cancel)
+                                : QMessageBox::Ok;
+    if (ret == QMessageBox::Ok)
     {
+      ui->editFilter->clear();
       QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+      model->setFilter("");
       model->revertAll();
       refresh();
     }
@@ -161,4 +290,75 @@ void ProductWidget::create()
     model->insertRow(model->rowCount());
   }
   enableControls();
+}
+
+void ProductWidget::setFilter()
+{
+  if (ui->table->model() != nullptr)
+  {
+    confirm();
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+    auto idx = currentSortIndicator();
+    if (ui->editFilter->text().isEmpty())
+      ui->editFilter->setPlaceholderText(filterPlaceholder(idx));
+    QString filter(buildFilter(ui->editFilter->text(),
+                               idx,
+                               ui->buttonContains->isChecked()));
+    model->setFilter(filter);
+  }
+}
+
+void ProductWidget::contains()
+{
+  setFilter();
+  ui->editFilter->setFocus();
+}
+
+void ProductWidget::confirm()
+{
+  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+  if (model->isDirty())
+  {
+    int ret = QMessageBox::question(this,
+                                    tr("O cadastro de produtos foi modificado"),
+                                    tr("Deseja salvar as mudaças?"),
+                                    QMessageBox::Save | QMessageBox::Discard);
+    switch(ret)
+    {
+      case QMessageBox::Save:
+        save(true);
+        break;
+      case QMessageBox::Discard:
+      default:
+        discard(true);
+    }
+  }
+}
+
+ProductTableIndex ProductWidget::currentSortIndicator() const
+{
+  int idx = ui->table->horizontalHeader()->sortIndicatorSection();
+  return (ProductTableIndex)idx;
+}
+
+Product ProductWidget::product() const
+{
+  Product product;
+  if (ui->table->currentIndex().isValid())
+  {
+    if (ui->table->model() != nullptr)
+    {
+      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+      QSqlRecord rec = model->record(ui->table->currentIndex().row());
+      product.m_id = rec.value((int)ProductTableIndex::ID).toInt();
+      product.m_description = rec.value((int)ProductTableIndex::Description).toString();
+      product.m_unity = rec.value((int)ProductTableIndex::Unity).toString();
+      product.m_supplier = rec.value((int)ProductTableIndex::Supplier).toString();
+      product.m_price = rec.value((int)ProductTableIndex::Price).toDouble();
+      product.m_details = rec.value((int)ProductTableIndex::ID).toString();
+      product.m_midasCode = rec.value((int)ProductTableIndex::ID).toString();
+      product.m_icon = rec.value((int)ProductTableIndex::Icon).toInt();
+    }
+  }
+  return product;
 }

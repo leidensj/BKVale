@@ -25,6 +25,7 @@ SOURCES += main.cpp\
     notedatabasewidget.cpp \
     reminderwidget.cpp \
     productwidget.cpp \
+    consumptiondatabasewidget.cpp \
     consumptionwidget.cpp
 
 HEADERS  += mainwindow.h \
@@ -40,6 +41,7 @@ HEADERS  += mainwindow.h \
     reminder.h \
     productwidget.h \
     product.h \
+    consumptiondatabasewidget.h \
     consumptionwidget.h
 
 FORMS    += mainwindow.ui \
@@ -48,6 +50,7 @@ FORMS    += mainwindow.ui \
     notedatabasewidget.ui \
     reminderwidget.ui \
     productwidget.ui \
+    consumptiondatabasewidget.ui \
     consumptionwidget.ui
 
 RESOURCES += \

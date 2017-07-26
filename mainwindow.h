@@ -7,7 +7,7 @@
 #include "databaseutils.h"
 #include "notewidget.h"
 #include "reminderwidget.h"
-#include "consumptionwidget.h"
+#include "consumptiondatabasewidget.h"
 
 namespace Ui {
 class BaitaAssistant;
@@ -35,7 +35,7 @@ private:
   Ui::BaitaAssistant *ui;
   NoteWidget m_noteWidget;
   ReminderWidget m_reminderWidget;
-  ConsumptionWidget m_consumptionWidget;
+  ConsumptionDatabaseWidget m_consumptionDatabaseWidget;
   QSerialPort m_printer;
   Settings m_settings;
   bool m_bReady;

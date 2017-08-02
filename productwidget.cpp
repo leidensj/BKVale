@@ -2,7 +2,9 @@
 #include "ui_productwidget.h"
 #include <QMessageBox>
 #include <QSqlTableModel>
-#include "QSqlRecord"
+#include <QSqlRecord>
+#include <QKeyEvent>
+#include <QShortcut>
 
 namespace
 {
@@ -103,9 +105,37 @@ QString buildFilter(QString text,
 }
 }
 
-ProductWidget::ProductWidget(QWidget *parent) :
+FilterLineEdit::FilterLineEdit()
+{
+  QFont f = font();
+  f.setPointSize(12);
+  setFont(f);
+  setClearButtonEnabled(true);
+
+  QObject::connect(this,
+                   SIGNAL(textEdited(const QString&)),
+                   this,
+                   SLOT(toUpper()));
+}
+
+void FilterLineEdit::keyPressEvent(QKeyEvent *event)
+{
+  if (event->key() == Qt::Key_Down)
+    emit downArrowPressedSignal();
+  else
+    QLineEdit::keyPressEvent(event);
+}
+
+void FilterLineEdit::toUpper()
+{
+  setText(text().toUpper());
+  emit filterChangedSignal();
+}
+
+ProductWidget::ProductWidget(bool bEditMode, QWidget *parent) :
   QFrame(parent),
-  ui(new Ui::ProductWidget)
+  ui(new Ui::ProductWidget),
+  m_bEditMode(bEditMode)
 {
   ui->setupUi(this);
   ui->table->setSelectionBehavior(QAbstractItemView::SelectItems);
@@ -113,6 +143,17 @@ ProductWidget::ProductWidget(QWidget *parent) :
   QFont f = ui->table->font();
   f.setCapitalization(QFont::AllUppercase);
   ui->table->setFont(f);
+  ui->filterLayout->insertWidget(0, &m_filter);
+
+  if (!bEditMode)
+  {
+    ui->cmdFrame->setEnabled(false);
+    ui->cmdFrame->setVisible(false);
+    ui->table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    ui->table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+    ui->table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    ui->table->horizontalHeader()->setHighlightSections(false);
+  }
 
   QObject::connect(ui->buttonRemove,
                    SIGNAL(clicked(bool)),
@@ -139,21 +180,30 @@ ProductWidget::ProductWidget(QWidget *parent) :
                    this,
                    SLOT(create()));
 
-  QObject::connect(ui->editFilter,
-                   SIGNAL(textEdited(const QString&)),
+  QObject::connect(&m_filter,
+                   SIGNAL(filterChangedSignal()),
                    this,
                    SLOT(setFilter()));
+
+  QObject::connect(&m_filter,
+                   SIGNAL(downArrowPressedSignal()),
+                   this,
+                   SLOT(downArrowPressed()));
 
   QObject::connect(ui->buttonContains,
                    SIGNAL(stateChanged(int)),
                    this,
-                   SLOT(contains()));
+                   SLOT(containsPressed()));
 
   QObject::connect(ui->table->horizontalHeader(),
                    SIGNAL(sortIndicatorChanged(int,
                                                Qt::SortOrder)),
                    this,
                    SLOT(refresh()));
+
+  new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F),
+                this,
+                SLOT(focusFilter()));
 }
 
 ProductWidget::~ProductWidget()
@@ -189,6 +239,19 @@ void ProductWidget::setDatabase(QSqlDatabase db)
   ui->table->hideColumn((int)ProductTableIndex::ID);
   ui->table->hideColumn((int)ProductTableIndex::MidasCode);
   ui->table->hideColumn((int)ProductTableIndex::Icon);
+  ui->table->horizontalHeader()->setSortIndicator((int)ProductTableIndex::Description,
+                                                  Qt::SortOrder::AscendingOrder);
+  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Description,
+                                                      QHeaderView::Stretch);
+  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Unity,
+                                                      QHeaderView::ResizeToContents);
+  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Supplier,
+                                                      QHeaderView::ResizeToContents);
+  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Price,
+                                                      QHeaderView::ResizeToContents);
+  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Price,
+                                                      QHeaderView::ResizeToContents);
+
 
   QObject::connect(ui->table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
@@ -210,8 +273,8 @@ void ProductWidget::refresh()
   {
     confirm();
     auto idx = currentSortIndicator();
-    ui->editFilter->clear();
-    ui->editFilter->setPlaceholderText(filterPlaceholder(idx));
+    m_filter.clear();
+    m_filter.setPlaceholderText(filterPlaceholder(idx));
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
     model->setFilter("");
     model->select();
@@ -273,7 +336,7 @@ void ProductWidget::discard(bool bSkipConfirmation)
                                 : QMessageBox::Ok;
     if (ret == QMessageBox::Ok)
     {
-      ui->editFilter->clear();
+      m_filter.clear();
       QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
       model->setFilter("");
       model->revertAll();
@@ -299,19 +362,25 @@ void ProductWidget::setFilter()
     confirm();
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
     auto idx = currentSortIndicator();
-    if (ui->editFilter->text().isEmpty())
-      ui->editFilter->setPlaceholderText(filterPlaceholder(idx));
-    QString filter(buildFilter(ui->editFilter->text(),
+    if (m_filter.text().isEmpty())
+      m_filter.setPlaceholderText(filterPlaceholder(idx));
+    QString filter(buildFilter(m_filter.text(),
                                idx,
                                ui->buttonContains->isChecked()));
     model->setFilter(filter);
   }
 }
 
-void ProductWidget::contains()
+void ProductWidget::containsPressed()
 {
   setFilter();
-  ui->editFilter->setFocus();
+  m_filter.setFocus();
+}
+
+void ProductWidget::focusFilter()
+{
+  m_filter.setFocus();
+  m_filter.selectAll();
 }
 
 void ProductWidget::confirm()
@@ -361,4 +430,14 @@ Product ProductWidget::product() const
     }
   }
   return product;
+}
+
+void ProductWidget::downArrowPressed()
+{
+  ui->table->setFocus();
+  if (ui->table->model() != nullptr)
+  {
+    if (ui->table->model()->rowCount() != 0)
+      ui->table->selectRow(0);
+  }
 }

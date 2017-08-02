@@ -268,6 +268,7 @@ void BaitaAssistant::init()
     if (!m_settings.port.isEmpty())
       connect();
     m_noteWidget.setHistoryDatabase(m_db);
+    m_consumptionDatabaseWidget.setDatabase(m_db);
     m_noteWidget.create();
   }
   enableControls();
@@ -283,7 +284,7 @@ void BaitaAssistant::openItemsDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ProductWidget* product = new ProductWidget();
+  ProductWidget* product = new ProductWidget(true);
   product->setDatabase(m_db);
   layout->addWidget(product);
   dlg.resize(width(), height());

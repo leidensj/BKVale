@@ -17,7 +17,6 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTableView>
@@ -29,6 +28,7 @@ class Ui_ProductWidget
 {
 public:
     QVBoxLayout *verticalLayout;
+    QFrame *cmdFrame;
     QHBoxLayout *horizontalLayout;
     QPushButton *buttonCreate;
     QPushButton *buttonSave;
@@ -36,8 +36,7 @@ public:
     QPushButton *buttonRefresh;
     QPushButton *buttonRemove;
     QSpacerItem *horizontalSpacer;
-    QHBoxLayout *horizontalLayout_2;
-    QLineEdit *editFilter;
+    QHBoxLayout *filterLayout;
     QCheckBox *buttonContains;
     QTableView *table;
 
@@ -49,12 +48,16 @@ public:
         ProductWidget->setFrameShape(QFrame::StyledPanel);
         ProductWidget->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(ProductWidget);
-        verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
-        horizontalLayout = new QHBoxLayout();
+        cmdFrame = new QFrame(ProductWidget);
+        cmdFrame->setObjectName(QStringLiteral("cmdFrame"));
+        cmdFrame->setFrameShape(QFrame::NoFrame);
+        cmdFrame->setFrameShadow(QFrame::Plain);
+        cmdFrame->setLineWidth(0);
+        horizontalLayout = new QHBoxLayout(cmdFrame);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        buttonCreate = new QPushButton(ProductWidget);
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        buttonCreate = new QPushButton(cmdFrame);
         buttonCreate->setObjectName(QStringLiteral("buttonCreate"));
         QIcon icon;
         icon.addFile(QStringLiteral(":/icons/res/newitem.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -64,7 +67,7 @@ public:
 
         horizontalLayout->addWidget(buttonCreate);
 
-        buttonSave = new QPushButton(ProductWidget);
+        buttonSave = new QPushButton(cmdFrame);
         buttonSave->setObjectName(QStringLiteral("buttonSave"));
         QIcon icon1;
         icon1.addFile(QStringLiteral(":/icons/res/save.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -74,7 +77,7 @@ public:
 
         horizontalLayout->addWidget(buttonSave);
 
-        buttonDiscard = new QPushButton(ProductWidget);
+        buttonDiscard = new QPushButton(cmdFrame);
         buttonDiscard->setObjectName(QStringLiteral("buttonDiscard"));
         QIcon icon2;
         icon2.addFile(QStringLiteral(":/icons/res/revert.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -84,7 +87,7 @@ public:
 
         horizontalLayout->addWidget(buttonDiscard);
 
-        buttonRefresh = new QPushButton(ProductWidget);
+        buttonRefresh = new QPushButton(cmdFrame);
         buttonRefresh->setObjectName(QStringLiteral("buttonRefresh"));
         QIcon icon3;
         icon3.addFile(QStringLiteral(":/icons/res/refresh.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -94,7 +97,7 @@ public:
 
         horizontalLayout->addWidget(buttonRefresh);
 
-        buttonRemove = new QPushButton(ProductWidget);
+        buttonRemove = new QPushButton(cmdFrame);
         buttonRemove->setObjectName(QStringLiteral("buttonRemove"));
         QIcon icon4;
         icon4.addFile(QStringLiteral(":/icons/res/trash.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -104,35 +107,27 @@ public:
 
         horizontalLayout->addWidget(buttonRemove);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(402, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
 
-        verticalLayout->addLayout(horizontalLayout);
+        verticalLayout->addWidget(cmdFrame);
 
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        editFilter = new QLineEdit(ProductWidget);
-        editFilter->setObjectName(QStringLiteral("editFilter"));
-        QFont font;
-        font.setPointSize(12);
-        editFilter->setFont(font);
-        editFilter->setFrame(true);
-        editFilter->setClearButtonEnabled(true);
-
-        horizontalLayout_2->addWidget(editFilter);
-
+        filterLayout = new QHBoxLayout();
+        filterLayout->setObjectName(QStringLiteral("filterLayout"));
         buttonContains = new QCheckBox(ProductWidget);
         buttonContains->setObjectName(QStringLiteral("buttonContains"));
 
-        horizontalLayout_2->addWidget(buttonContains);
+        filterLayout->addWidget(buttonContains);
 
 
-        verticalLayout->addLayout(horizontalLayout_2);
+        verticalLayout->addLayout(filterLayout);
 
         table = new QTableView(ProductWidget);
         table->setObjectName(QStringLiteral("table"));
+        QFont font;
+        font.setPointSize(12);
         table->setFont(font);
         table->setAlternatingRowColors(false);
         table->setIconSize(QSize(24, 24));
@@ -156,7 +151,6 @@ public:
         buttonDiscard->setText(QString());
         buttonRefresh->setText(QString());
         buttonRemove->setText(QString());
-        editFilter->setPlaceholderText(QString());
         buttonContains->setText(QApplication::translate("ProductWidget", "Contendo", Q_NULLPTR));
     } // retranslateUi
 

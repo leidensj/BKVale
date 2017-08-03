@@ -75,7 +75,7 @@ void ReminderWidget::setCapitalization(int state)
   switch ((Qt::CheckState)state)
   {
     case Qt::CheckState::Unchecked:
-      cap = QFont::Capitalize; break;
+      cap = QFont::MixedCase; break;
     case Qt::CheckState::PartiallyChecked:
       cap = QFont::AllLowercase; break;
     default:

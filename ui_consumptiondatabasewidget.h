@@ -30,15 +30,18 @@ class Ui_ConsumptionDatabaseWidget
 {
 public:
     QVBoxLayout *verticalLayout;
+    QHBoxLayout *headerLayout;
     QFrame *frame;
+    QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout;
-    QLabel *label;
-    QDateEdit *dateInitial;
     QLabel *label_2;
+    QDateEdit *dateInitial;
+    QLabel *label;
     QDateEdit *dateFinal;
+    QSpacerItem *horizontalSpacer;
+    QHBoxLayout *horizontalLayout_2;
     QLineEdit *editTotal;
     QPushButton *buttonChart;
-    QSpacerItem *horizontalSpacer;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *buttonCreate;
     QPushButton *buttonRefresh;
@@ -55,17 +58,23 @@ public:
         ConsumptionDatabaseWidget->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(ConsumptionDatabaseWidget);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        headerLayout = new QHBoxLayout();
+        headerLayout->setObjectName(QStringLiteral("headerLayout"));
         frame = new QFrame(ConsumptionDatabaseWidget);
         frame->setObjectName(QStringLiteral("frame"));
         frame->setFrameShape(QFrame::Box);
-        frame->setFrameShadow(QFrame::Raised);
-        horizontalLayout = new QHBoxLayout(frame);
+        frame->setFrameShadow(QFrame::Plain);
+        verticalLayout_2 = new QVBoxLayout(frame);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(9, 9, 9, 9);
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        horizontalLayout->setContentsMargins(9, 9, 9, 9);
-        label = new QLabel(frame);
-        label->setObjectName(QStringLiteral("label"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        label_2 = new QLabel(frame);
+        label_2->setObjectName(QStringLiteral("label_2"));
 
-        horizontalLayout->addWidget(label);
+        horizontalLayout->addWidget(label_2);
 
         dateInitial = new QDateEdit(frame);
         dateInitial->setObjectName(QStringLiteral("dateInitial"));
@@ -73,10 +82,10 @@ public:
 
         horizontalLayout->addWidget(dateInitial);
 
-        label_2 = new QLabel(frame);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label = new QLabel(frame);
+        label->setObjectName(QStringLiteral("label"));
 
-        horizontalLayout->addWidget(label_2);
+        horizontalLayout->addWidget(label);
 
         dateFinal = new QDateEdit(frame);
         dateFinal->setObjectName(QStringLiteral("dateFinal"));
@@ -86,6 +95,16 @@ public:
 
         horizontalLayout->addWidget(dateFinal);
 
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
+
+
+        verticalLayout_2->addLayout(horizontalLayout);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         editTotal = new QLineEdit(frame);
         editTotal->setObjectName(QStringLiteral("editTotal"));
         QPalette palette;
@@ -110,7 +129,7 @@ public:
         editTotal->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         editTotal->setReadOnly(true);
 
-        horizontalLayout->addWidget(editTotal);
+        horizontalLayout_2->addWidget(editTotal);
 
         buttonChart = new QPushButton(frame);
         buttonChart->setObjectName(QStringLiteral("buttonChart"));
@@ -120,14 +139,16 @@ public:
         buttonChart->setIconSize(QSize(24, 24));
         buttonChart->setFlat(true);
 
-        horizontalLayout->addWidget(buttonChart);
-
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout->addItem(horizontalSpacer);
+        horizontalLayout_2->addWidget(buttonChart);
 
 
-        verticalLayout->addWidget(frame);
+        verticalLayout_2->addLayout(horizontalLayout_2);
+
+
+        headerLayout->addWidget(frame);
+
+
+        verticalLayout->addLayout(headerLayout);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
@@ -188,9 +209,9 @@ public:
     void retranslateUi(QFrame *ConsumptionDatabaseWidget)
     {
         ConsumptionDatabaseWidget->setWindowTitle(QApplication::translate("ConsumptionDatabaseWidget", "Frame", Q_NULLPTR));
-        label->setText(QApplication::translate("ConsumptionDatabaseWidget", "Data inicial:", Q_NULLPTR));
-        dateInitial->setDisplayFormat(QApplication::translate("ConsumptionDatabaseWidget", "dd/MM/yyyy", Q_NULLPTR));
         label_2->setText(QApplication::translate("ConsumptionDatabaseWidget", "Data final:", Q_NULLPTR));
+        dateInitial->setDisplayFormat(QApplication::translate("ConsumptionDatabaseWidget", "dd/MM/yyyy", Q_NULLPTR));
+        label->setText(QApplication::translate("ConsumptionDatabaseWidget", "Data inicial:", Q_NULLPTR));
         dateFinal->setDisplayFormat(QApplication::translate("ConsumptionDatabaseWidget", "dd/MM/yyyy", Q_NULLPTR));
         editTotal->setPlaceholderText(QApplication::translate("ConsumptionDatabaseWidget", "Consumo Total", Q_NULLPTR));
         buttonChart->setText(QString());

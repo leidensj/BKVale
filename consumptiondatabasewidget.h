@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QSqlDatabase>
+#include "consumptionwidget.h"
 
 namespace Ui {
 class ConsumptionDatabaseWidget;
@@ -23,6 +24,7 @@ private slots:
 private:
   Ui::ConsumptionDatabaseWidget *ui;
   QSqlDatabase m_db;
+  ConsumptionWidget m_consumptionWidget;
 };
 
 #endif // CONSUMPTIONDATABASEWIDGET_H

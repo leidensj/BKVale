@@ -129,7 +129,9 @@ public:
         QFont font;
         font.setPointSize(12);
         table->setFont(font);
+        table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
         table->setAlternatingRowColors(false);
+        table->setSelectionMode(QAbstractItemView::SingleSelection);
         table->setIconSize(QSize(24, 24));
         table->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
         table->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);

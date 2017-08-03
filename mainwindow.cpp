@@ -291,5 +291,6 @@ void BaitaAssistant::openItemsDialog()
   dlg.setWindowTitle(tr("Gerenciar Produtos"));
   dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
   dlg.setModal(true);
+  product->focusFilter();
   dlg.exec();
 }

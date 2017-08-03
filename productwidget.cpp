@@ -122,6 +122,9 @@ void FilterLineEdit::keyPressEvent(QKeyEvent *event)
 {
   if (event->key() == Qt::Key_Down)
     emit downArrowPressedSignal();
+  else if (event->key() == Qt::Key_Enter ||
+           event->key() == Qt::Key_Return)
+    emit enterKeyPressedSignal();
   else
     QLineEdit::keyPressEvent(event);
 }
@@ -140,9 +143,17 @@ ProductWidget::ProductWidget(bool bEditMode, QWidget *parent) :
   ui->setupUi(this);
   ui->table->setSelectionBehavior(QAbstractItemView::SelectItems);
   ui->table->setSelectionMode(QAbstractItemView::SingleSelection);
-  QFont f = ui->table->font();
-  f.setCapitalization(QFont::AllUppercase);
-  ui->table->setFont(f);
+  {
+    QFont f = ui->table->font();
+    f.setCapitalization(QFont::AllUppercase);
+    ui->table->setFont(f);
+  }
+  {
+    QFont f = ui->table->horizontalHeader()->font();
+    f.setCapitalization(QFont::Capitalize);
+    ui->table->horizontalHeader()->setFont(f);
+  }
+
   ui->filterLayout->insertWidget(0, &m_filter);
 
   if (!bEditMode)
@@ -188,7 +199,12 @@ ProductWidget::ProductWidget(bool bEditMode, QWidget *parent) :
   QObject::connect(&m_filter,
                    SIGNAL(downArrowPressedSignal()),
                    this,
-                   SLOT(downArrowPressed()));
+                   SLOT(filterDownArrowPressed()));
+
+  QObject::connect(&m_filter,
+                   SIGNAL(enterKeyPressedSignal()),
+                   this,
+                   SLOT(filterEnterKeyPressed()));
 
   QObject::connect(ui->buttonContains,
                    SIGNAL(stateChanged(int)),
@@ -252,7 +268,6 @@ void ProductWidget::setDatabase(QSqlDatabase db)
   ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Price,
                                                       QHeaderView::ResizeToContents);
 
-
   QObject::connect(ui->table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
@@ -265,6 +280,7 @@ void ProductWidget::setDatabase(QSqlDatabase db)
                    this,
                    SLOT(enableControls()));
   refresh();
+  focusFilter();
 }
 
 void ProductWidget::refresh()
@@ -432,12 +448,44 @@ Product ProductWidget::product() const
   return product;
 }
 
-void ProductWidget::downArrowPressed()
+void ProductWidget::filterDownArrowPressed()
 {
   ui->table->setFocus();
   if (ui->table->model() != nullptr)
   {
     if (ui->table->model()->rowCount() != 0)
       ui->table->selectRow(0);
+  }
+}
+
+void ProductWidget::filterEnterKeyPressed()
+{
+  ui->table->setFocus();
+  if (!ui->table->currentIndex().isValid())
+  {
+    if (ui->table->model() != nullptr &&
+        ui->table->model()->rowCount() != 0)
+    {
+      ui->table->selectRow(0);
+      ui->table->setFocus();
+    }
+    else
+    {
+      focusFilter();
+    }
+  }
+}
+
+void ProductWidget::productSelected()
+{
+  if (ui->table->currentIndex().isValid())
+  {
+    Product p = product();
+    if (p.isValid())
+    {
+      emit productSelectedSignal(p);
+      if (parentWidget() != nullptr)
+        parentWidget()->close();
+    }
   }
 }

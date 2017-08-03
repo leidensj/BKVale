@@ -41,10 +41,19 @@ NoteTableWidget::NoteTableWidget()
   QStringList headers;
   headers << "Quantidade" << "Unidade" << "Descrição" << "Valor Unitário" << "Subtotal";
   setHorizontalHeaderLabels(headers);
-  auto f = font();
-  f.setPointSize(12);
-  f.setCapitalization(QFont::AllUppercase);
-  setFont(f);
+  {
+    QFont f = font();
+    f.setPointSize(12);
+    f.setCapitalization(QFont::AllUppercase);
+    setFont(f);
+  }
+  {
+    QFont f = horizontalHeader()->font();
+    f.setPointSize(12);
+    f.setCapitalization(QFont::Capitalize);
+    horizontalHeader()->setFont(f);
+  }
+
   setSelectionBehavior(QAbstractItemView::SelectItems);
   setSelectionMode(QAbstractItemView::SingleSelection);
   horizontalHeader()->setHighlightSections(false);

@@ -21,7 +21,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -33,33 +32,35 @@ public:
     QHBoxLayout *horizontalLayout_6;
     QDateEdit *date;
     QLabel *labelDay;
-    QHBoxLayout *horizontalLayout;
     QPushButton *buttonSearch;
     QLineEdit *editItem;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_2;
-    QLineEdit *editPrice;
-    QHBoxLayout *horizontalLayout_4;
+    QDoubleSpinBox *spinPrice;
     QLabel *label_3;
     QDoubleSpinBox *spinAmmount;
-    QSpacerItem *verticalSpacer;
+    QPushButton *buttonSave;
 
     void setupUi(QFrame *ConsumptionWidget)
     {
         if (ConsumptionWidget->objectName().isEmpty())
             ConsumptionWidget->setObjectName(QStringLiteral("ConsumptionWidget"));
-        ConsumptionWidget->resize(261, 201);
+        ConsumptionWidget->resize(463, 118);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(ConsumptionWidget->sizePolicy().hasHeightForWidth());
         ConsumptionWidget->setSizePolicy(sizePolicy);
-        ConsumptionWidget->setFrameShape(QFrame::StyledPanel);
-        ConsumptionWidget->setFrameShadow(QFrame::Raised);
+        ConsumptionWidget->setMinimumSize(QSize(0, 0));
+        ConsumptionWidget->setMaximumSize(QSize(16777215, 16777215));
+        ConsumptionWidget->setFrameShape(QFrame::Box);
+        ConsumptionWidget->setFrameShadow(QFrame::Plain);
         verticalLayout = new QVBoxLayout(ConsumptionWidget);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(9, 9, 9, 9);
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        horizontalLayout_6->setContentsMargins(0, 0, 0, 0);
         date = new QDateEdit(ConsumptionWidget);
         date->setObjectName(QStringLiteral("date"));
         QFont font;
@@ -75,15 +76,22 @@ public:
 
         labelDay = new QLabel(ConsumptionWidget);
         labelDay->setObjectName(QStringLiteral("labelDay"));
+        QPalette palette;
+        QBrush brush(QColor(255, 0, 0, 255));
+        brush.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        QBrush brush1(QColor(120, 120, 120, 255));
+        brush1.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Disabled, QPalette::WindowText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::Text, brush1);
+        labelDay->setPalette(palette);
         labelDay->setFont(font);
 
         horizontalLayout_6->addWidget(labelDay);
 
-
-        verticalLayout->addLayout(horizontalLayout_6);
-
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         buttonSearch = new QPushButton(ConsumptionWidget);
         buttonSearch->setObjectName(QStringLiteral("buttonSearch"));
         QIcon icon;
@@ -92,7 +100,7 @@ public:
         buttonSearch->setIconSize(QSize(24, 24));
         buttonSearch->setFlat(true);
 
-        horizontalLayout->addWidget(buttonSearch);
+        horizontalLayout_6->addWidget(buttonSearch);
 
         editItem = new QLineEdit(ConsumptionWidget);
         editItem->setObjectName(QStringLiteral("editItem"));
@@ -100,13 +108,15 @@ public:
         editItem->setFont(font);
         editItem->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        horizontalLayout->addWidget(editItem);
+        horizontalLayout_6->addWidget(editItem);
 
 
-        verticalLayout->addLayout(horizontalLayout);
+        verticalLayout->addLayout(horizontalLayout_6);
 
         horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
         label_2 = new QLabel(ConsumptionWidget);
         label_2->setObjectName(QStringLiteral("label_2"));
         label_2->setMinimumSize(QSize(24, 24));
@@ -116,19 +126,17 @@ public:
 
         horizontalLayout_3->addWidget(label_2);
 
-        editPrice = new QLineEdit(ConsumptionWidget);
-        editPrice->setObjectName(QStringLiteral("editPrice"));
-        editPrice->setEnabled(true);
-        editPrice->setFont(font);
-        editPrice->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        spinPrice = new QDoubleSpinBox(ConsumptionWidget);
+        spinPrice->setObjectName(QStringLiteral("spinPrice"));
+        QFont font1;
+        font1.setPointSize(12);
+        spinPrice->setFont(font1);
+        spinPrice->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        spinPrice->setProperty("showGroupSeparator", QVariant(false));
+        spinPrice->setMaximum(9999.99);
 
-        horizontalLayout_3->addWidget(editPrice);
+        horizontalLayout_3->addWidget(spinPrice);
 
-
-        verticalLayout->addLayout(horizontalLayout_3);
-
-        horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
         label_3 = new QLabel(ConsumptionWidget);
         label_3->setObjectName(QStringLiteral("label_3"));
         label_3->setMinimumSize(QSize(24, 24));
@@ -136,24 +144,37 @@ public:
         label_3->setPixmap(QPixmap(QString::fromUtf8(":/icons/res/ammount.png")));
         label_3->setScaledContents(true);
 
-        horizontalLayout_4->addWidget(label_3);
+        horizontalLayout_3->addWidget(label_3);
 
         spinAmmount = new QDoubleSpinBox(ConsumptionWidget);
         spinAmmount->setObjectName(QStringLiteral("spinAmmount"));
+        spinAmmount->setMinimumSize(QSize(0, 0));
         spinAmmount->setFont(font);
         spinAmmount->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         spinAmmount->setProperty("showGroupSeparator", QVariant(false));
         spinAmmount->setDecimals(3);
         spinAmmount->setMaximum(9999.99);
 
-        horizontalLayout_4->addWidget(spinAmmount);
+        horizontalLayout_3->addWidget(spinAmmount);
+
+        buttonSave = new QPushButton(ConsumptionWidget);
+        buttonSave->setObjectName(QStringLiteral("buttonSave"));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(buttonSave->sizePolicy().hasHeightForWidth());
+        buttonSave->setSizePolicy(sizePolicy1);
+        QIcon icon1;
+        icon1.addFile(QStringLiteral(":/icons/res/save.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonSave->setIcon(icon1);
+        buttonSave->setIconSize(QSize(24, 24));
+        buttonSave->setCheckable(true);
+        buttonSave->setFlat(true);
+
+        horizontalLayout_3->addWidget(buttonSave);
 
 
-        verticalLayout->addLayout(horizontalLayout_4);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer);
+        verticalLayout->addLayout(horizontalLayout_3);
 
 
         retranslateUi(ConsumptionWidget);
@@ -165,13 +186,20 @@ public:
     {
         ConsumptionWidget->setWindowTitle(QApplication::translate("ConsumptionWidget", "Frame", Q_NULLPTR));
         labelDay->setText(QApplication::translate("ConsumptionWidget", "DayOfTheWeek", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        buttonSearch->setToolTip(QApplication::translate("ConsumptionWidget", "Pesquisar produto", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         buttonSearch->setText(QString());
         editItem->setPlaceholderText(QApplication::translate("ConsumptionWidget", "Produto", Q_NULLPTR));
         label_2->setText(QString());
-        editPrice->setPlaceholderText(QApplication::translate("ConsumptionWidget", "Pre\303\247o", Q_NULLPTR));
+        spinPrice->setSpecialValueText(QApplication::translate("ConsumptionWidget", "Pre\303\247o", Q_NULLPTR));
         label_3->setText(QString());
         spinAmmount->setSpecialValueText(QApplication::translate("ConsumptionWidget", "Quantidade", Q_NULLPTR));
         spinAmmount->setSuffix(QString());
+#ifndef QT_NO_TOOLTIP
+        buttonSave->setToolTip(QApplication::translate("ConsumptionWidget", "Salvar consumo", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        buttonSave->setText(QString());
     } // retranslateUi
 
 };

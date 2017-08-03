@@ -1,6 +1,5 @@
 #include "consumptiondatabasewidget.h"
 #include "ui_consumptiondatabasewidget.h"
-#include "consumptionwidget.h"
 #include <QDialog>
 
 ConsumptionDatabaseWidget::ConsumptionDatabaseWidget(QWidget *parent) :
@@ -8,6 +7,7 @@ ConsumptionDatabaseWidget::ConsumptionDatabaseWidget(QWidget *parent) :
   ui(new Ui::ConsumptionDatabaseWidget)
 {
   ui->setupUi(this);
+  ui->headerLayout->insertWidget(0, &m_consumptionWidget);
   QObject::connect(ui->buttonCreate,
                    SIGNAL(clicked(bool)),
                    this,

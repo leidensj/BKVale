@@ -178,8 +178,14 @@
        <pointsize>12</pointsize>
       </font>
      </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+     </property>
      <property name="alternatingRowColors">
       <bool>false</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="iconSize">
       <size>

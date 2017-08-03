@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QSqlDatabase>
+#include "product.h"
 
 namespace Ui {
 class ConsumptionWidget;
@@ -23,6 +24,8 @@ private:
 
 private slots:
   void search();
+  void dateChanged(const QDate& date);
+  void enableControls();
 };
 
 #endif // CONSUMPTIONWIDGET_H

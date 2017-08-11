@@ -163,17 +163,17 @@ QString ReminderPrinter::build(const Reminder& r)
 {
   QString str, title, msg;
 
-  switch (r.m_bfontType)
+  switch (r.m_capitalization)
   {
-    case Reminder::FontType::Normal:
+    case ReminderCapitalization::Normal:
       title = r.m_title;
       msg = r.m_message;
       break;
-    case Reminder::FontType::AllLowercase:
+    case ReminderCapitalization::AllLowercase:
       title = r.m_title.toLower();
       msg = r.m_message.toLower();
       break;
-    case Reminder::FontType::AllUppercase:
+    case ReminderCapitalization::AllUppercase:
     default:
       title = r.m_title.toUpper();
       msg = r.m_message.toUpper();

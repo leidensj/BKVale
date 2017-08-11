@@ -257,6 +257,14 @@ bool BaitaDatabase::init(QSqlDatabase db,
              "_MIDASCODE TEXT,"
              "_ICON INT)");
 
+  query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_TITLE TEXT,"
+             "_MESSAGE TEXT,"
+             "_FAVORITE INT,"
+             "_CAPITALIZATION INT,"
+             "_SIZE INT)");
+
   if (!bHasConfig)
     query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
 

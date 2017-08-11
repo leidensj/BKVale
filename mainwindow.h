@@ -34,7 +34,7 @@ public:
 private:
   Ui::BaitaAssistant *ui;
   NoteWidget m_noteWidget;
-  ReminderWidget m_reminderWidget;
+  ReminderWidget m_reminder;
   ConsumptionDatabaseWidget m_consumptionDatabaseWidget;
   QSerialPort m_printer;
   Settings m_settings;

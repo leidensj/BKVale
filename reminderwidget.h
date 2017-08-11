@@ -3,31 +3,27 @@
 
 #include <QFrame>
 #include "reminder.h"
-
-namespace Ui {
-class ReminderWidget;
-}
+#include "reminderdatabase.h"
+#include "reminderview.h"
 
 class ReminderWidget : public QFrame
 {
   Q_OBJECT
 
+private:
+  ReminderView m_view;
+  ReminderDatabase m_db;
+
 public:
-  explicit ReminderWidget(QWidget *parent = 0);
-  ~ReminderWidget();
-  Reminder reminder() const;
-  void clear();
-  bool isValid() const;
+  ReminderWidget(QWidget *parent = 0);
+  Reminder reminder() const { return m_view.reminder(); }
+  bool isValid() const { return m_view.isValid(); }
 
 private slots:
   void emitChangedSignal();
-  void setCapitalization(int state);
 
 signals:
   changedSignal();
-
-private:
-  Ui::ReminderWidget *ui;
 };
 
 #endif // REMINDERWIDGET_H

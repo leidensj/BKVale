@@ -16,7 +16,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
 {
   ui->setupUi(this);
   ui->tabNotes->layout()->addWidget(&m_noteWidget);
-  ui->tabReminder->layout()->addWidget(&m_reminderWidget);
+  ui->tabReminder->layout()->addWidget(&m_reminder);
   ui->tabConsumption->layout()->addWidget(&m_consumptionDatabaseWidget);
 
   QObject::connect(ui->actionConnect,
@@ -59,7 +59,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    this,
                    SLOT(enableControls()));
 
-  QObject::connect(&m_reminderWidget,
+  QObject::connect(&m_reminder,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
@@ -179,7 +179,7 @@ void BaitaAssistant::notePrint()
   }
   else if (ui->tabWidget->currentIndex() == (int)Functionality::ReminderMode)
   {
-    QString str(ReminderPrinter::build(m_reminderWidget.reminder()));
+    QString str(ReminderPrinter::build(m_reminder.reminder()));
     QString error;
     Printer::print(m_printer, str, error);
   }
@@ -232,7 +232,7 @@ void BaitaAssistant::enableControls()
     } break;
     case Functionality::ReminderMode:
     {
-      ui->actionPrint->setEnabled(m_reminderWidget.isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_reminder.isValid() && bIsOpen && m_bReady);
     } break;
     case Functionality::ShopMode:
     default:

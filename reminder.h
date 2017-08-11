@@ -3,22 +3,34 @@
 
 #include <QString>
 
+enum class ReminderColumn : int
+{
+  ID,
+  Title,
+  Message,
+  Favorite,
+  Capitalization,
+  Size
+};
+
+enum ReminderCapitalization
+{
+  Normal,
+  AllUppercase,
+  AllLowercase
+};
+
 struct Reminder
 {
-  enum FontType
-  {
-    AllUppercase,
-    AllLowercase,
-    Normal
-  };
-
   Reminder()
     : m_bFontSmall(false)
-    , m_bfontType(AllUppercase) {}
+    , m_bFavorite(false)
+    , m_capitalization(Normal) {}
   QString m_title;
   QString m_message;
   bool m_bFontSmall;
-  FontType m_bfontType;
+  bool m_bFavorite;
+  ReminderCapitalization m_capitalization;
 };
 
 #endif // REMINDER_H

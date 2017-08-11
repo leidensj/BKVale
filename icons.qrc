@@ -34,5 +34,6 @@
         <file>res/uppercase.png</file>
         <file>res/chart.png</file>
         <file>res/ammount.png</file>
+        <file>res/favorite.png</file>
     </qresource>
 </RCC>

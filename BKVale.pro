@@ -52,7 +52,6 @@ FORMS    += mainwindow.ui \
     settingsdlg.ui \
     notewidget.ui \
     notedatabasewidget.ui \
-    productwidget.ui \
     consumptiondatabasewidget.ui \
     consumptionwidget.ui \
     reminderview.ui

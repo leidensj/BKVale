@@ -6,9 +6,9 @@
 #include <QSqlDatabase>
 #include <QLineEdit>
 
-namespace Ui {
-class ProductWidget;
-}
+class QCheckBox;
+class QTableView;
+class QPushButton;
 
 class FilterLineEdit : public QLineEdit
 {
@@ -53,8 +53,15 @@ public slots:
   void productSelected();
 
 private:
-  Ui::ProductWidget *ui;
-  FilterLineEdit m_filter;
+  FilterLineEdit* m_filter;
+  QCheckBox* m_contains;
+  QTableView* m_table;
+  QPushButton* m_create;
+  QPushButton* m_save;
+  QPushButton* m_discard;
+  QPushButton* m_refresh;
+  QPushButton* m_remove;
+  QFrame* m_buttons;
   bool m_bEditMode;
   void confirm();
   Product product() const;

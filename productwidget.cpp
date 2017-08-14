@@ -1,10 +1,14 @@
 #include "productwidget.h"
-#include "ui_productwidget.h"
 #include <QMessageBox>
 #include <QSqlTableModel>
 #include <QSqlRecord>
 #include <QKeyEvent>
 #include <QShortcut>
+#include <QLayout>
+#include <QHeaderView>
+#include <QCheckBox>
+#include <QTableView>
+#include <QPushButton>
 
 namespace
 {
@@ -137,81 +141,137 @@ void FilterLineEdit::toUpper()
 
 ProductWidget::ProductWidget(bool bEditMode, QWidget *parent) :
   QFrame(parent),
-  ui(new Ui::ProductWidget),
+  m_filter(nullptr),
+  m_contains(nullptr),
+  m_create(nullptr),
+  m_save(nullptr),
+  m_discard(nullptr),
+  m_refresh(nullptr),
+  m_remove(nullptr),
+  m_buttons(nullptr),
   m_bEditMode(bEditMode)
 {
-  ui->setupUi(this);
-  ui->table->setSelectionBehavior(QAbstractItemView::SelectItems);
-  ui->table->setSelectionMode(QAbstractItemView::SingleSelection);
-  {
-    QFont f = ui->table->font();
-    f.setCapitalization(QFont::AllUppercase);
-    ui->table->setFont(f);
-  }
-  {
-    QFont f = ui->table->horizontalHeader()->font();
-    f.setCapitalization(QFont::Capitalize);
-    ui->table->horizontalHeader()->setFont(f);
-  }
+  QHBoxLayout* buttonLayout = new QHBoxLayout();
+  buttonLayout->setContentsMargins(0, 0, 0, 0);
+  m_create = new QPushButton();
+  m_create->setFlat(true);
+  m_create->setText("");
+  m_create->setIconSize(QSize(24, 24));
+  m_create->setIcon(QIcon(":/icons/res/newitem.png"));
+  m_save = new QPushButton();
+  m_save->setFlat(true);
+  m_save->setText("");
+  m_save->setIconSize(QSize(24, 24));
+  m_save->setIcon(QIcon(":/icons/res/save.png"));
+  m_discard = new QPushButton();
+  m_discard->setFlat(true);
+  m_discard->setText("");
+  m_discard->setIconSize(QSize(24, 24));
+  m_discard->setIcon(QIcon(":/icons/res/revert.png"));
+  m_refresh = new QPushButton();
+  m_refresh->setFlat(true);
+  m_refresh->setText("");
+  m_refresh->setIconSize(QSize(24, 24));
+  m_refresh->setIcon(QIcon(":/icons/res/refresh.png"));
+  m_remove = new QPushButton();
+  m_remove->setFlat(true);
+  m_remove->setText("");
+  m_remove->setIconSize(QSize(24, 24));
+  m_remove->setIcon(QIcon(":/icons/res/trash.png"));
+  buttonLayout->addWidget(m_create);
+  buttonLayout->addWidget(m_save);
+  buttonLayout->addWidget(m_discard);
+  buttonLayout->addWidget(m_refresh);
+  buttonLayout->addWidget(m_remove);
+  buttonLayout->setAlignment(Qt::AlignLeft);
+  m_buttons = new QFrame();
+  m_buttons->setLayout(buttonLayout);
 
-  ui->filterLayout->insertWidget(0, &m_filter);
+  QHBoxLayout* filterLayout = new QHBoxLayout();
+  filterLayout->setContentsMargins(0, 0, 0, 0);
+  m_filter = new FilterLineEdit();
+  m_contains = new QCheckBox();
+  m_contains->setText(tr("Contendo"));
+  filterLayout->addWidget(m_filter);
+  filterLayout->addWidget(m_contains);
+
+  m_table = new QTableView();
+
+  QVBoxLayout* layout = new QVBoxLayout();
+  layout->addWidget(m_buttons);
+  layout->addLayout(filterLayout);
+  layout->addWidget(m_table);
+  setLayout(layout);
+
+  m_table->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+  {
+    QFont f = m_table->font();
+    f.setCapitalization(QFont::AllUppercase);
+    m_table->setFont(f);
+  }
+  {
+    QFont f = m_table->horizontalHeader()->font();
+    f.setCapitalization(QFont::Capitalize);
+    m_table->horizontalHeader()->setFont(f);
+  }
 
   if (!bEditMode)
   {
-    ui->cmdFrame->setEnabled(false);
-    ui->cmdFrame->setVisible(false);
-    ui->table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-    ui->table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-    ui->table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    ui->table->horizontalHeader()->setHighlightSections(false);
+    m_buttons->setEnabled(false);
+    m_buttons->setVisible(false);
+    m_table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+    m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    m_table->horizontalHeader()->setHighlightSections(false);
   }
 
-  QObject::connect(ui->buttonRemove,
+  QObject::connect(m_remove,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(removeSelectedProduct()));
 
-  QObject::connect(ui->buttonRefresh,
+  QObject::connect(m_refresh,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(refresh()));
 
-  QObject::connect(ui->buttonSave,
+  QObject::connect(m_save,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(save(bool)));
 
-  QObject::connect(ui->buttonDiscard,
+  QObject::connect(m_discard,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(discard(bool)));
 
-  QObject::connect(ui->buttonCreate,
+  QObject::connect(m_create,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
 
-  QObject::connect(&m_filter,
+  QObject::connect(m_filter,
                    SIGNAL(filterChangedSignal()),
                    this,
                    SLOT(setFilter()));
 
-  QObject::connect(&m_filter,
+  QObject::connect(m_filter,
                    SIGNAL(downArrowPressedSignal()),
                    this,
                    SLOT(filterDownArrowPressed()));
 
-  QObject::connect(&m_filter,
+  QObject::connect(m_filter,
                    SIGNAL(enterKeyPressedSignal()),
                    this,
                    SLOT(filterEnterKeyPressed()));
 
-  QObject::connect(ui->buttonContains,
+  QObject::connect(m_contains,
                    SIGNAL(stateChanged(int)),
                    this,
                    SLOT(containsPressed()));
 
-  QObject::connect(ui->table->horizontalHeader(),
+  QObject::connect(m_table->horizontalHeader(),
                    SIGNAL(sortIndicatorChanged(int,
                                                Qt::SortOrder)),
                    this,
@@ -224,12 +284,12 @@ ProductWidget::ProductWidget(bool bEditMode, QWidget *parent) :
 
 ProductWidget::~ProductWidget()
 {
-  delete ui;
+
 }
 
 void ProductWidget::setDatabase(QSqlDatabase db)
 {
-  if (ui->table->model() != nullptr)
+  if (m_table->model() != nullptr)
     return;
 
   QSqlTableModel* model = new QSqlTableModel(this, db);
@@ -251,24 +311,24 @@ void ProductWidget::setDatabase(QSqlDatabase db)
   setColumnIcon(model, ProductTableIndex::Price);
   setColumnIcon(model, ProductTableIndex::Details);
 
-  ui->table->setModel(model);
-  ui->table->hideColumn((int)ProductTableIndex::ID);
-  ui->table->hideColumn((int)ProductTableIndex::MidasCode);
-  ui->table->hideColumn((int)ProductTableIndex::Icon);
-  ui->table->horizontalHeader()->setSortIndicator((int)ProductTableIndex::Description,
+  m_table->setModel(model);
+  m_table->hideColumn((int)ProductTableIndex::ID);
+  m_table->hideColumn((int)ProductTableIndex::MidasCode);
+  m_table->hideColumn((int)ProductTableIndex::Icon);
+  m_table->horizontalHeader()->setSortIndicator((int)ProductTableIndex::Description,
                                                   Qt::SortOrder::AscendingOrder);
-  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Description,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Description,
                                                       QHeaderView::Stretch);
-  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Unity,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Unity,
                                                       QHeaderView::ResizeToContents);
-  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Supplier,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Supplier,
                                                       QHeaderView::ResizeToContents);
-  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Price,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Price,
                                                       QHeaderView::ResizeToContents);
-  ui->table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Price,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ProductTableIndex::Price,
                                                       QHeaderView::ResizeToContents);
 
-  QObject::connect(ui->table->selectionModel(),
+  QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
                    SLOT(enableControls()));
@@ -285,13 +345,13 @@ void ProductWidget::setDatabase(QSqlDatabase db)
 
 void ProductWidget::refresh()
 {
-  if (ui->table->model() != nullptr)
+  if (m_table->model() != nullptr)
   {
     confirm();
     auto idx = currentSortIndicator();
-    m_filter.clear();
-    m_filter.setPlaceholderText(filterPlaceholder(idx));
-    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+    m_filter->clear();
+    m_filter->setPlaceholderText(filterPlaceholder(idx));
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->setFilter("");
     model->select();
   }
@@ -300,24 +360,24 @@ void ProductWidget::refresh()
 
 void ProductWidget::enableControls()
 {
-  bool bSelected = ui->table->currentIndex().isValid();
-  ui->buttonRemove->setEnabled(bSelected);
-  if (ui->table->model() != nullptr)
+  bool bSelected = m_table->currentIndex().isValid();
+  m_remove->setEnabled(bSelected);
+  if (m_table->model() != nullptr)
   {
-    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
-    ui->buttonSave->setEnabled(model->isDirty());
-    ui->buttonDiscard->setEnabled(model->isDirty());
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+    m_save->setEnabled(model->isDirty());
+    m_discard->setEnabled(model->isDirty());
   }
 }
 
 void ProductWidget::removeSelectedProduct()
 {
-  if (ui->table->currentIndex().isValid())
+  if (m_table->currentIndex().isValid())
   {
-    if (ui->table->model() != nullptr)
+    if (m_table->model() != nullptr)
     {
-      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
-      model->removeRow(ui->table->currentIndex().row());
+      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+      model->removeRow(m_table->currentIndex().row());
     }
   }
   enableControls();
@@ -325,7 +385,7 @@ void ProductWidget::removeSelectedProduct()
 
 void ProductWidget::save(bool bSkipConfirmation)
 {
-  if (ui->table->model() != nullptr)
+  if (m_table->model() != nullptr)
   {
     int ret = !bSkipConfirmation ? QMessageBox::question(this,
                                                          tr("Salvar mudanças"),
@@ -334,16 +394,15 @@ void ProductWidget::save(bool bSkipConfirmation)
                                  : QMessageBox::Ok;
     if (ret == QMessageBox::Ok)
     {
-      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
       model->submitAll();
-      refresh();
     }
   }
 }
 
 void ProductWidget::discard(bool bSkipConfirmation)
 {
-  if (ui->table->model() != nullptr)
+  if (m_table->model() != nullptr)
   {
     int ret = !bSkipConfirmation ? QMessageBox::question(this,
                                                         tr("Descartar mudanças"),
@@ -352,8 +411,8 @@ void ProductWidget::discard(bool bSkipConfirmation)
                                 : QMessageBox::Ok;
     if (ret == QMessageBox::Ok)
     {
-      m_filter.clear();
-      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+      m_filter->clear();
+      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
       model->setFilter("");
       model->revertAll();
       refresh();
@@ -363,9 +422,9 @@ void ProductWidget::discard(bool bSkipConfirmation)
 
 void ProductWidget::create()
 {
-  if (ui->table->model() != nullptr)
+  if (m_table->model() != nullptr)
   {
-    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->insertRow(model->rowCount());
   }
   enableControls();
@@ -373,16 +432,16 @@ void ProductWidget::create()
 
 void ProductWidget::setFilter()
 {
-  if (ui->table->model() != nullptr)
+  if (m_table->model() != nullptr)
   {
     confirm();
-    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     auto idx = currentSortIndicator();
-    if (m_filter.text().isEmpty())
-      m_filter.setPlaceholderText(filterPlaceholder(idx));
-    QString filter(buildFilter(m_filter.text(),
+    if (m_filter->text().isEmpty())
+      m_filter->setPlaceholderText(filterPlaceholder(idx));
+    QString filter(buildFilter(m_filter->text(),
                                idx,
-                               ui->buttonContains->isChecked()));
+                               m_contains->isChecked()));
     model->setFilter(filter);
   }
 }
@@ -390,18 +449,18 @@ void ProductWidget::setFilter()
 void ProductWidget::containsPressed()
 {
   setFilter();
-  m_filter.setFocus();
+  m_filter->setFocus();
 }
 
 void ProductWidget::focusFilter()
 {
-  m_filter.setFocus();
-  m_filter.selectAll();
+  m_filter->setFocus();
+  m_filter->selectAll();
 }
 
 void ProductWidget::confirm()
 {
-  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
+  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
   if (model->isDirty())
   {
     int ret = QMessageBox::question(this,
@@ -422,19 +481,19 @@ void ProductWidget::confirm()
 
 ProductTableIndex ProductWidget::currentSortIndicator() const
 {
-  int idx = ui->table->horizontalHeader()->sortIndicatorSection();
+  int idx = m_table->horizontalHeader()->sortIndicatorSection();
   return (ProductTableIndex)idx;
 }
 
 Product ProductWidget::product() const
 {
   Product product;
-  if (ui->table->currentIndex().isValid())
+  if (m_table->currentIndex().isValid())
   {
-    if (ui->table->model() != nullptr)
+    if (m_table->model() != nullptr)
     {
-      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(ui->table->model());
-      QSqlRecord rec = model->record(ui->table->currentIndex().row());
+      QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+      QSqlRecord rec = model->record(m_table->currentIndex().row());
       product.m_id = rec.value((int)ProductTableIndex::ID).toInt();
       product.m_description = rec.value((int)ProductTableIndex::Description).toString();
       product.m_unity = rec.value((int)ProductTableIndex::Unity).toString();
@@ -450,24 +509,24 @@ Product ProductWidget::product() const
 
 void ProductWidget::filterDownArrowPressed()
 {
-  ui->table->setFocus();
-  if (ui->table->model() != nullptr)
+  m_table->setFocus();
+  if (m_table->model() != nullptr)
   {
-    if (ui->table->model()->rowCount() != 0)
-      ui->table->selectRow(0);
+    if (m_table->model()->rowCount() != 0)
+      m_table->selectRow(0);
   }
 }
 
 void ProductWidget::filterEnterKeyPressed()
 {
-  ui->table->setFocus();
-  if (!ui->table->currentIndex().isValid())
+  m_table->setFocus();
+  if (!m_table->currentIndex().isValid())
   {
-    if (ui->table->model() != nullptr &&
-        ui->table->model()->rowCount() != 0)
+    if (m_table->model() != nullptr &&
+        m_table->model()->rowCount() != 0)
     {
-      ui->table->selectRow(0);
-      ui->table->setFocus();
+      m_table->selectRow(0);
+      m_table->setFocus();
     }
     else
     {
@@ -478,7 +537,7 @@ void ProductWidget::filterEnterKeyPressed()
 
 void ProductWidget::productSelected()
 {
-  if (ui->table->currentIndex().isValid())
+  if (m_table->currentIndex().isValid())
   {
     Product p = product();
     if (p.isValid())

@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "notewidget.h"
 #include "printutils.h"
-#include "productwidget.h"
+#include "itemwidget.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -284,13 +284,13 @@ void BaitaAssistant::openItemsDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ProductWidget* product = new ProductWidget(true);
-  product->setDatabase(m_db);
-  layout->addWidget(product);
+  ItemWidget* itemWidget = new ItemWidget(true);
+  itemWidget->setDatabase(m_db);
+  layout->addWidget(itemWidget);
   dlg.resize(width(), height());
   dlg.setWindowTitle(tr("Gerenciar Produtos"));
   dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
   dlg.setModal(true);
-  product->focusFilter();
+  itemWidget->focusFilter();
   dlg.exec();
 }

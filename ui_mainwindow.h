@@ -40,6 +40,7 @@ public:
     QVBoxLayout *verticalLayout;
     QWidget *tabReminder;
     QVBoxLayout *verticalLayout_2;
+    QWidget *tabCalculator;
     QWidget *tabShop;
     QWidget *tabConsumption;
     QVBoxLayout *verticalLayout_3;
@@ -120,20 +121,25 @@ public:
         QIcon icon8;
         icon8.addFile(QStringLiteral(":/icons/res/postit.png"), QSize(), QIcon::Normal, QIcon::Off);
         tabWidget->addTab(tabReminder, icon8, QString());
+        tabCalculator = new QWidget();
+        tabCalculator->setObjectName(QStringLiteral("tabCalculator"));
+        QIcon icon9;
+        icon9.addFile(QStringLiteral(":/icons/res/calculator.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tabWidget->addTab(tabCalculator, icon9, QString());
         tabShop = new QWidget();
         tabShop->setObjectName(QStringLiteral("tabShop"));
-        QIcon icon9;
-        icon9.addFile(QStringLiteral(":/icons/res/shop.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tabWidget->addTab(tabShop, icon9, QString());
+        QIcon icon10;
+        icon10.addFile(QStringLiteral(":/icons/res/shop.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tabWidget->addTab(tabShop, icon10, QString());
         tabConsumption = new QWidget();
         tabConsumption->setObjectName(QStringLiteral("tabConsumption"));
         verticalLayout_3 = new QVBoxLayout(tabConsumption);
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        QIcon icon10;
-        icon10.addFile(QStringLiteral(":/icons/res/stock.png"), QSize(), QIcon::Normal, QIcon::Off);
-        tabWidget->addTab(tabConsumption, icon10, QString());
+        QIcon icon11;
+        icon11.addFile(QStringLiteral(":/icons/res/stock.png"), QSize(), QIcon::Normal, QIcon::Off);
+        tabWidget->addTab(tabConsumption, icon11, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
@@ -185,6 +191,7 @@ public:
 #endif // QT_NO_TOOLTIP
         tabWidget->setTabText(tabWidget->indexOf(tabNotes), QApplication::translate("BaitaAssistant", "Vales", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabReminder), QApplication::translate("BaitaAssistant", "Lembretes", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tabCalculator), QApplication::translate("BaitaAssistant", "Calculadora", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabShop), QApplication::translate("BaitaAssistant", "Compras", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tabConsumption), QApplication::translate("BaitaAssistant", "Consumo", Q_NULLPTR));
     } // retranslateUi

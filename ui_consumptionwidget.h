@@ -98,6 +98,8 @@ public:
         icon.addFile(QStringLiteral(":/icons/res/search.png"), QSize(), QIcon::Normal, QIcon::Off);
         buttonSearch->setIcon(icon);
         buttonSearch->setIconSize(QSize(24, 24));
+        buttonSearch->setCheckable(false);
+        buttonSearch->setChecked(false);
         buttonSearch->setFlat(true);
 
         horizontalLayout_6->addWidget(buttonSearch);

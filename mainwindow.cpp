@@ -15,9 +15,9 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
     m_db(QSqlDatabase::addDatabase("QSQLITE"))
 {
   ui->setupUi(this);
-  ui->tabNotes->layout()->addWidget(&m_noteWidget);
+  ui->tabNotes->layout()->addWidget(&m_note);
   ui->tabReminder->layout()->addWidget(&m_reminder);
-  ui->tabConsumption->layout()->addWidget(&m_consumptionDatabaseWidget);
+  ui->tabConsumption->layout()->addWidget(&m_consumption);
 
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),
@@ -44,7 +44,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    this,
                    SLOT(showInfo()));
 
-  QObject::connect(&m_noteWidget,
+  QObject::connect(&m_note,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
@@ -69,7 +69,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    this,
                    SLOT(openItemsDialog()));
 
-  m_noteWidget.clear();
+  m_note.clear();
   emit initSignal();
 }
 
@@ -149,7 +149,7 @@ void BaitaAssistant::notePrint()
 {
   if (ui->tabWidget->currentIndex() == (int)Functionality::NoteMode)
   {
-    Note note = m_noteWidget.getNote();
+    Note note = m_note.getNote();
     QString str(NotePrinter::build(note));
     QString error;
     if (!Printer::print(m_printer, str, error))
@@ -163,7 +163,7 @@ void BaitaAssistant::notePrint()
     else
     {
       QString error;
-      if (!m_noteWidget.save(error))
+      if (!m_note.save(error))
       {
         QMessageBox msgBox(QMessageBox::Warning,
                            tr("Erro ao salvar vale"),
@@ -173,7 +173,7 @@ void BaitaAssistant::notePrint()
       }
       else
       {
-        m_noteWidget.create();
+        m_note.create();
       }
     }
   }
@@ -228,7 +228,7 @@ void BaitaAssistant::enableControls()
   {
     case Functionality::NoteMode:
     {
-      ui->actionPrint->setEnabled(m_noteWidget.isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_note.isValid() && bIsOpen && m_bReady);
     } break;
     case Functionality::ReminderMode:
     {
@@ -267,9 +267,9 @@ void BaitaAssistant::init()
     BaitaDatabase::selectSettings(m_db, m_settings);
     if (!m_settings.port.isEmpty())
       connect();
-    m_noteWidget.setHistoryDatabase(m_db);
-    m_consumptionDatabaseWidget.setDatabase(m_db);
-    m_noteWidget.create();
+    m_note.setHistoryDatabase(m_db);
+    m_consumption.setDatabase(m_db);
+    m_note.create();
   }
   enableControls();
 }

@@ -265,6 +265,13 @@ bool BaitaDatabase::init(QSqlDatabase db,
              "_CAPITALIZATION INT,"
              "_SIZE INT)");
 
+  query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_ITEMID INTEGER,"
+             "_DATE INTEGER,"
+             "_PRICE REAL,"
+             "_AMMOUNT REAL)");
+
   if (!bHasConfig)
     query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
 

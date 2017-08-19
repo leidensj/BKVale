@@ -23,12 +23,13 @@ SOURCES += main.cpp\
     note.cpp \
     settings.cpp \
     notedatabasewidget.cpp \
-    consumptiondatabasewidget.cpp \
-    consumptionwidget.cpp \
     reminderview.cpp \
     reminderwidget.cpp \
     reminderdatabase.cpp \
-    itemwidget.cpp
+    itemwidget.cpp \
+    consumptionview.cpp \
+    consumptiondatabase.cpp \
+    consumptionwidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -40,20 +41,20 @@ HEADERS  += mainwindow.h \
     settings.h \
     notedatabasewidget.h \
     reminder.h \
-    consumptiondatabasewidget.h \
-    consumptionwidget.h \
     reminderview.h \
     reminderwidget.h \
     reminderdatabase.h \
     item.h \
     itemwidget.h \
-    consumption.h
+    consumption.h \
+    consumptionview.h \
+    consumptiondatabase.h \
+    consumptionwidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \
     notewidget.ui \
     notedatabasewidget.ui \
-    consumptiondatabasewidget.ui \
     reminderview.ui
 
 RESOURCES += \

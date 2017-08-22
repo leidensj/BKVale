@@ -267,8 +267,8 @@ bool BaitaDatabase::init(QSqlDatabase db,
 
   query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_ITEMID INTEGER,"
              "_DATE INTEGER,"
+             "_ITEMID INTEGER,"
              "_PRICE REAL,"
              "_AMMOUNT REAL)");
 
@@ -357,4 +357,56 @@ void BaitaDatabase::selectSettings(QSqlDatabase db,
       qDebug() << query.lastError().text();
     }
   }
+}
+
+bool ItemDatabase::select(QSqlDatabase db,
+                          int id,
+                          Item& item,
+                          QString& error)
+{
+  error.clear();
+  item.clear();
+
+  if (!BaitaDatabase::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                "_DESCRIPTION,"
+                "_UNITY,"
+                "_SUPPLIER,"
+                "_PRICE,"
+                "_DETAILS,"
+                "_MIDASCODE,"
+                "_ICON "
+                "FROM _ITEMS "
+                "WHERE _ID = (:_id)");
+
+  query.bindValue(":_id", id);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    bSuccess = query.next();
+    if (bSuccess)
+    {
+      item.m_description = query.value(query.record().indexOf("_DESCRIPTION")).toString();
+      item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
+      item.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
+      item.m_price = query.value(query.record().indexOf("_PRICE")).toDouble();
+      item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
+      item.m_midasCode = query.value(query.record().indexOf("_MIDASCODE")).toString();
+      item.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
+    }
+    else
+    {
+      error = "Item não encontrado.";
+    }
+  }
+  else
+  {
+    error = query.lastError().text();
+  }
+
+  return bSuccess;
 }

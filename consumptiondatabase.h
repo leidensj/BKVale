@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include <QSqlDatabase>
-#include "consumptionview.h"
+#include "consumption.h"
 
 class QPushButton;
 class QTableView;
@@ -18,12 +18,15 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
+  void enableControls();
+  void insert(const Consumption& consumption);
+  void remove();
+  void refresh();
 
 private:
   QPushButton* m_refresh;
   QPushButton* m_remove;
   QTableView* m_table;
-  QSqlDatabase m_db;
 };
 
 #endif // CONSUMPTIONDATABASE_H

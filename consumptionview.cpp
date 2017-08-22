@@ -105,14 +105,14 @@ ConsumptionView::ConsumptionView(QWidget *parent)
   hlayout1->addWidget(m_item);
   hlayout1->setContentsMargins(0, 0, 0, 0);
 
-  {
+  /*{
     m_priceIcon = new QLabel();
     m_priceIcon->setText("");
     m_priceIcon->setPixmap(QPixmap(":/icons/res/price.png"));
     m_priceIcon->setMinimumSize(24, 24);
     m_priceIcon->setMaximumSize(24,24);
     m_priceIcon->setScaledContents(true);
-  }
+  }*/
 
   {
     m_price = new EnterDoubleSpinBox();
@@ -123,14 +123,14 @@ ConsumptionView::ConsumptionView(QWidget *parent)
                            QSizePolicy::Policy::Fixed);
   }
 
-  {
+  /*{
     m_ammountIcon = new QLabel();
     m_ammountIcon->setText("");
     m_ammountIcon->setPixmap(QPixmap(":/icons/res/ammount.png"));
     m_ammountIcon->setMinimumSize(24, 24);
     m_ammountIcon->setMaximumSize(24,24);
     m_ammountIcon->setScaledContents(true);
-  }
+  }*/
 
   {
     m_ammount = new EnterDoubleSpinBox();
@@ -175,11 +175,6 @@ ConsumptionView::ConsumptionView(QWidget *parent)
                    SIGNAL(dateChanged(const QDate&)),
                    this,
                    SLOT(dateChanged(const QDate&)));
-
-  QObject::connect(m_save,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(save()));
 
   QObject::connect(m_save,
                    SIGNAL(clicked(bool)),
@@ -235,7 +230,7 @@ void ConsumptionView::search()
 
 void ConsumptionView::dateChanged(const QDate& date)
 {
-  m_weekDay->setText(date.toString("dddd").toUpper());
+  m_weekDay->setText(date.toString("dddd"));
 }
 
 void ConsumptionView::enableControls()
@@ -274,7 +269,7 @@ Consumption ConsumptionView::consumption() const
 
 void ConsumptionView::save()
 {
-  emit saveSignal(consumption());
+  emit insertSignal(consumption());
   clear();
   enableControls();
   m_search->setFocus();

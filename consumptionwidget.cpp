@@ -16,6 +16,11 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   vlayout->addWidget(m_view);
   vlayout->addWidget(m_database);
   setLayout(vlayout);
+
+  QObject::connect(m_view,
+                   SIGNAL(insertSignal(const Consumption&)),
+                   m_database,
+                   SLOT(insert(const Consumption&)));
 }
 
 void ConsumptionWidget::setDatabase(QSqlDatabase db)

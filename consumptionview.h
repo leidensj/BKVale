@@ -66,7 +66,7 @@ private slots:
   void clear();
 
 signals:
-  void saveSignal(const Consumption& consumption);
+  void insertSignal(const Consumption& consumption);
 };
 
 #endif // CONSUMPTIONVIEW_H

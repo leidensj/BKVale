@@ -2,8 +2,95 @@
 #include "ui_consumptiondatabasewidget.h"
 #include <QDialog>
 #include <QTableView>
+#include <QHeaderView>
 #include <QPushButton>
 #include <QLayout>
+#include <QSqlTableModel>
+#include <QSqlRecord>
+#include <QMessageBox>
+#include "databaseutils.h"
+
+namespace
+{
+QString friendlyColumnName(ConsumptionTableIndex idx)
+{
+  switch (idx)
+  {
+    case ConsumptionTableIndex::ID:
+      return QObject::tr("ID"); break;
+    case ConsumptionTableIndex::Date:
+      return QObject::tr("Data"); break;
+    case ConsumptionTableIndex::ItemID:
+      return QObject::tr("Item"); break;
+    case ConsumptionTableIndex::Ammount:
+      return QObject::tr("Quantidade"); break;
+    case ConsumptionTableIndex::Price:
+      return QObject::tr("Preço"); break;
+    default:
+      return "";
+  }
+}
+
+void setColumnText(QSqlTableModel* model,
+                   ConsumptionTableIndex idx)
+{
+  if (model != nullptr)
+  {
+    model->setHeaderData((int)idx,
+                         Qt::Horizontal,
+                         friendlyColumnName(idx));
+  }
+}
+}
+
+class ConsumptionTableModel : public QSqlTableModel
+{
+
+public:
+  ConsumptionTableModel(QObject *parent, QSqlDatabase db)
+   : QSqlTableModel(parent, db)
+  {
+
+  }
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  {
+    if (!index.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlTableModel::data(index, role);
+    if (role == Qt::DisplayRole)
+    {
+
+      switch ((ConsumptionTableIndex)index.column())
+      {
+        case ConsumptionTableIndex::Date:
+          value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
+          break;
+        case ConsumptionTableIndex::Price:
+          value = "R$ " + QString::number(value.toDouble(), 'f', 2);
+          break;
+        case ConsumptionTableIndex::Ammount:
+          value = QString::number(value.toDouble(), 'f', 3);
+          break;
+        case ConsumptionTableIndex::ItemID:
+        {
+          Item item;
+          QString error;
+          bool bSuccess = ItemDatabase::select(database(),
+                                              value.toInt(),
+                                              item,
+                                              error);
+          value = bSuccess ? item.m_description : error;
+        } break;
+        default:
+          break;
+      }
+    }
+
+    return value;
+  }
+};
 
 ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   : QFrame(parent)
@@ -33,12 +120,30 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   hlayout->setAlignment(Qt::AlignLeft);
   hlayout->setContentsMargins(0, 0, 0, 0);
 
-  m_table = new QTableView();
+  {
+    m_table = new QTableView();
+    m_table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+    m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    m_table->horizontalHeader()->setHighlightSections(false);
+  }
+
   QVBoxLayout* vlayout = new QVBoxLayout();
   vlayout->addLayout(hlayout);
   vlayout->addWidget(m_table);
 
   setLayout(vlayout);
+
+  QObject::connect(m_remove,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(remove()));
+
+
+  QObject::connect(m_refresh,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(refresh()));
 }
 
 ConsumptionDatabase::~ConsumptionDatabase()
@@ -48,5 +153,92 @@ ConsumptionDatabase::~ConsumptionDatabase()
 
 void ConsumptionDatabase::setDatabase(QSqlDatabase db)
 {
-  m_db = db;
+  if (m_table->model() != nullptr)
+    return;
+
+  ConsumptionTableModel* model = new ConsumptionTableModel(this, db);
+  model->setTable("_CONSUMPTION");
+  model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
+  setColumnText(model, ConsumptionTableIndex::ID);
+  setColumnText(model, ConsumptionTableIndex::Date);
+  setColumnText(model, ConsumptionTableIndex::ItemID);
+  setColumnText(model, ConsumptionTableIndex::Price);
+  setColumnText(model, ConsumptionTableIndex::Ammount);
+
+  m_table->setModel(model);
+  m_table->hideColumn((int)ConsumptionTableIndex::ID);
+  m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Date,
+                                                      QHeaderView::ResizeToContents);
+  m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::ItemID,
+                                                      QHeaderView::Stretch);
+  m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Price,
+                                                      QHeaderView::ResizeToContents);
+  m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Ammount,
+                                                      QHeaderView::ResizeToContents);
+
+  QObject::connect(m_table->selectionModel(),
+                   SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+                   this,
+                   SLOT(enableControls()));
+
+  QObject::connect(model,
+                   SIGNAL(dataChanged(const QModelIndex&,
+                                      const QModelIndex&,
+                                      const QVector<int>&)),
+                   this,
+                   SLOT(enableControls()));
+  refresh();
+}
+
+void ConsumptionDatabase::enableControls()
+{
+  bool bSelected = m_table->currentIndex().isValid();
+  m_remove->setEnabled(bSelected);
+}
+
+void ConsumptionDatabase::insert(const Consumption& consumption)
+{
+  if (m_table->model() != nullptr)
+  {
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+    QSqlRecord rec = model->record();
+    rec.setValue("_ITEMID", consumption.m_itemID);
+    rec.setValue("_DATE", consumption.m_date);
+    rec.setValue("_PRICE", consumption.m_price);
+    rec.setValue("_AMMOUNT", consumption.m_ammount);
+    model->insertRecord(-1, rec);
+    model->submitAll();
+  }
+}
+
+void ConsumptionDatabase::remove()
+{
+  if (m_table->currentIndex().isValid())
+  {
+    int row = m_table->currentIndex().row();
+    if (m_table->model() != nullptr)
+    {
+      if (QMessageBox::question(this,
+                                tr("Remover Consumo"),
+                                tr("Tem certeza que deseja remover o consumo selecionado?"),
+                                QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
+      {
+        QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+        model->removeRow(row);
+        model->submitAll();
+      }
+    }
+  }
+  enableControls();
+}
+
+void ConsumptionDatabase::refresh()
+{
+  if (m_table->model() != nullptr)
+  {
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+    model->select();
+  }
+  enableControls();
 }

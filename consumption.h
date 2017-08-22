@@ -9,6 +9,7 @@
 enum class ConsumptionTableIndex
 {
   ID = 0,
+  Date,
   ItemID,
   Price,
   Ammount
@@ -50,6 +51,8 @@ struct Consumption
       case ConsumptionTableIndex::ID:
         str = "_ID"; break;
       case ConsumptionTableIndex::ItemID:
+        str = "_ITEMID"; break;
+      case ConsumptionTableIndex::Date:
         str = "_ITEMID"; break;
       case ConsumptionTableIndex::Price:
         str = "_PRICE"; break;

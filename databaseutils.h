@@ -4,6 +4,7 @@
 #include <QSqlDatabase>
 #include <vector>
 #include "note.h"
+#include "item.h"
 #include "settings.h"
 
 #define DEFAULT_NUMBER     1000
@@ -53,6 +54,14 @@ namespace NoteDatabase
   bool selectAll(QSqlDatabase db,
                  Notes& notes,
                  QString& error);
+}
+
+namespace ItemDatabase
+{
+  bool select(QSqlDatabase db,
+              int id,
+              Item& item,
+              QString& error);
 }
 
 #endif // DATABASEUTILS_H

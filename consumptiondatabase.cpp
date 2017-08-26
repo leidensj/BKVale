@@ -26,6 +26,8 @@ QString friendlyColumnName(ConsumptionTableIndex idx)
       return QObject::tr("Quantidade"); break;
     case ConsumptionTableIndex::Price:
       return QObject::tr("Preço"); break;
+    case ConsumptionTableIndex::Total:
+      return QObject::tr("Total"); break;
     default:
       return "";
   }
@@ -61,7 +63,6 @@ public:
     QVariant value = QSqlTableModel::data(index, role);
     if (role == Qt::DisplayRole)
     {
-
       switch ((ConsumptionTableIndex)index.column())
       {
         case ConsumptionTableIndex::Date:
@@ -71,17 +72,33 @@ public:
           value = "R$ " + QString::number(value.toDouble(), 'f', 2);
           break;
         case ConsumptionTableIndex::Ammount:
-          value = QString::number(value.toDouble(), 'f', 3);
+        {
+          int itemID = record(index.row()).value("_ITEMID").toInt();
+          Item item;
+          QString error;
+          ItemDatabase::select(database(),
+                               itemID,
+                               item,
+                               error);
+          value = QString::number(value.toDouble(), 'f', 3) + item.m_unity;
+        }
+
           break;
         case ConsumptionTableIndex::ItemID:
         {
           Item item;
           QString error;
           bool bSuccess = ItemDatabase::select(database(),
-                                              value.toInt(),
-                                              item,
-                                              error);
+                                               value.toInt(),
+                                               item,
+                                               error);
           value = bSuccess ? item.m_description : error;
+        } break;
+        case ConsumptionTableIndex::Total:
+        {
+          double total = record(index.row()).value("_PRICE").toDouble() *
+                         record(index.row()).value("_AMMOUNT").toDouble();
+          value = "R$ " + QString::number(total, 'f', 2);
         } break;
         default:
           break;
@@ -129,6 +146,7 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   }
 
   QVBoxLayout* vlayout = new QVBoxLayout();
+  vlayout->setContentsMargins(0, 0, 0, 0);
   vlayout->addLayout(hlayout);
   vlayout->addWidget(m_table);
 
@@ -138,7 +156,6 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(remove()));
-
 
   QObject::connect(m_refresh,
                    SIGNAL(clicked(bool)),
@@ -165,6 +182,7 @@ void ConsumptionDatabase::setDatabase(QSqlDatabase db)
   setColumnText(model, ConsumptionTableIndex::ItemID);
   setColumnText(model, ConsumptionTableIndex::Price);
   setColumnText(model, ConsumptionTableIndex::Ammount);
+  setColumnText(model, ConsumptionTableIndex::Total);
 
   m_table->setModel(model);
   m_table->hideColumn((int)ConsumptionTableIndex::ID);
@@ -175,6 +193,8 @@ void ConsumptionDatabase::setDatabase(QSqlDatabase db)
   m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Price,
                                                       QHeaderView::ResizeToContents);
   m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Ammount,
+                                                      QHeaderView::ResizeToContents);
+  m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Total,
                                                       QHeaderView::ResizeToContents);
 
   QObject::connect(m_table->selectionModel(),
@@ -207,6 +227,7 @@ void ConsumptionDatabase::insert(const Consumption& consumption)
     rec.setValue("_DATE", consumption.m_date);
     rec.setValue("_PRICE", consumption.m_price);
     rec.setValue("_AMMOUNT", consumption.m_ammount);
+    rec.setValue("_TOTAL", consumption.m_total);
     model->insertRecord(-1, rec);
     model->submitAll();
   }
@@ -241,4 +262,48 @@ void ConsumptionDatabase::refresh()
     model->select();
   }
   enableControls();
+}
+
+void ConsumptionDatabase::setFilter(bool bEnable,
+                                    qint64 datei,
+                                    qint64 datef)
+{
+  if (m_table->model() != nullptr)
+  {
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+    QString filter;
+    if (bEnable)
+    {
+      filter = Consumption::columnName(ConsumptionTableIndex::Date) +
+               " BETWEEN " +
+               QString::number(datei) +
+               " AND " +
+               QString::number(datef);
+    }
+    model->setFilter(filter);
+    emitTotalSignal(bEnable,
+                    datei,
+                    datef);
+  }
+}
+void ConsumptionDatabase::emitTotalSignal(bool bEnable,
+                                          qint64 datei,
+                                          qint64 datef)
+{
+  if (m_table->model() != nullptr)
+  {
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+    double total = 0.0;
+    QString error;
+    if (!ConsumptionSQL::selectTotal(model->database(),
+                                    bEnable,
+                                    datei,
+                                    datef,
+                                    total,
+                                    error))
+    {
+      total = -1.0;
+    }
+    emit totalSignal(total);
+  }
 }

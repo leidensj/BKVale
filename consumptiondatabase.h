@@ -22,6 +22,17 @@ private slots:
   void insert(const Consumption& consumption);
   void remove();
   void refresh();
+  void emitTotalSignal(bool bEnable,
+                       qint64 datei,
+                       qint64 datef);
+
+public slots:
+  void setFilter(bool bEnable,
+                 qint64 datei,
+                 qint64 datef);
+
+signals:
+  void totalSignal(double total);
 
 private:
   QPushButton* m_refresh;

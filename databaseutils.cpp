@@ -270,7 +270,8 @@ bool BaitaDatabase::init(QSqlDatabase db,
              "_DATE INTEGER,"
              "_ITEMID INTEGER,"
              "_PRICE REAL,"
-             "_AMMOUNT REAL)");
+             "_AMMOUNT REAL,"
+             "_TOTAL REAL)");
 
   if (!bHasConfig)
     query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
@@ -402,6 +403,46 @@ bool ItemDatabase::select(QSqlDatabase db,
     {
       error = "Item não encontrado.";
     }
+  }
+  else
+  {
+    error = query.lastError().text();
+  }
+
+  return bSuccess;
+}
+
+bool ConsumptionSQL::selectTotal(QSqlDatabase db,
+                                 bool bEnable,
+                                 qint64 datei,
+                                 qint64 datef,
+                                 double& total,
+                                 QString& error)
+{
+  error.clear();
+  total = 0.0;
+
+  if (!BaitaDatabase::isOpen(db, error))
+    return false;
+
+  QString str("SELECT SUM(_TOTAL) FROM _CONSUMPTION");
+  if (bEnable)
+  {
+    str += " WHERE _DATE BETWEEN " +
+           QString::number(datei) +
+           " AND " +
+           QString::number(datef);
+  }
+
+  QSqlQuery query(db);
+  bool bSuccess = query.exec(str);
+  if (bSuccess)
+  {
+    bSuccess = query.next();
+    if (bSuccess)
+      total = query.value(0).toDouble();
+    else
+      error = "Valor não encontrado.";
   }
   else
   {

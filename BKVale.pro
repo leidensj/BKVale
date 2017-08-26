@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     itemwidget.cpp \
     consumptionview.cpp \
     consumptiondatabase.cpp \
-    consumptionwidget.cpp
+    consumptionwidget.cpp \
+    consumptionfilter.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     consumption.h \
     consumptionview.h \
     consumptiondatabase.h \
-    consumptionwidget.h
+    consumptionwidget.h \
+    consumptionfilter.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

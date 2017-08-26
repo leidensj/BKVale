@@ -6,6 +6,7 @@
 
 class ConsumptionView;
 class ConsumptionDatabase;
+class ConsumptionFilter;
 
 class ConsumptionWidget : public QFrame
 {
@@ -18,6 +19,7 @@ public:
 private:
   ConsumptionView* m_view;
   ConsumptionDatabase* m_database;
+  ConsumptionFilter* m_filter;
 };
 
 #endif // CONSUMPTIONWIDGET_H

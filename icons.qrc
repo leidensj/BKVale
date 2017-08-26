@@ -36,5 +36,6 @@
         <file>res/ammount.png</file>
         <file>res/favorite.png</file>
         <file>res/calculator.png</file>
+        <file>res/process.png</file>
     </qresource>
 </RCC>

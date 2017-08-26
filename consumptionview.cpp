@@ -263,6 +263,7 @@ Consumption ConsumptionView::consumption() const
   c.m_date = m_date->date().toJulianDay();
   c.m_ammount = m_ammount->value();
   c.m_price = m_price->value();
+  c.m_total = m_ammount->value() * m_price->value();
   c.m_itemID = m_currentItemID;
   return c;
 }

@@ -12,7 +12,8 @@ enum class ConsumptionTableIndex
   Date,
   ItemID,
   Price,
-  Ammount
+  Ammount,
+  Total
 };
 
 struct Consumption
@@ -28,6 +29,7 @@ struct Consumption
   int m_itemID;
   double m_price;
   double m_ammount;
+  double m_total;
 
   void clear()
   {
@@ -36,6 +38,7 @@ struct Consumption
     m_itemID = INVALID_CONSUMPTION_ID;
     m_price = 0.0;
     m_ammount = 0.0;
+    m_total = 0.0;
   }
 
   bool isValid() const
@@ -49,15 +52,25 @@ struct Consumption
     switch (idx)
     {
       case ConsumptionTableIndex::ID:
-        str = "_ID"; break;
+        str = "_ID";
+        break;
       case ConsumptionTableIndex::ItemID:
-        str = "_ITEMID"; break;
+        str = "_ITEMID";
+        break;
       case ConsumptionTableIndex::Date:
-        str = "_ITEMID"; break;
+        str = "_DATE";
+        break;
       case ConsumptionTableIndex::Price:
-        str = "_PRICE"; break;
+        str = "_PRICE";
+        break;
       case ConsumptionTableIndex::Ammount:
-        str = "_AMMOUNT"; break;
+        str = "_AMMOUNT";
+        break;
+        case ConsumptionTableIndex::Total:
+        str = "_TOTAL";
+        break;
+      default:
+        break;
     }
     return str;
   }

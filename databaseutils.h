@@ -64,4 +64,14 @@ namespace ItemDatabase
               QString& error);
 }
 
+namespace ConsumptionSQL
+{
+  bool selectTotal(QSqlDatabase db,
+                   bool bEnable,
+                   qint64 datei,
+                   qint64 datef,
+                   double& total,
+                   QString& error);
+}
+
 #endif // DATABASEUTILS_H

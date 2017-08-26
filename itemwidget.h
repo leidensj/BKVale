@@ -17,6 +17,9 @@ class ItemTableView : public QTableView
 public:
   ItemTableView(bool bEditMode, QWidget *parent = 0);
 
+private:
+  const bool m_bEditMode;
+
 protected:
   void keyPressEvent(QKeyEvent* event);
 

@@ -112,6 +112,7 @@ QString buildFilter(QString text,
 
 ItemTableView::ItemTableView(bool bEditMode, QWidget *parent)
   : QTableView(parent)
+  , m_bEditMode(bEditMode)
 {
   setSelectionBehavior(QAbstractItemView::SelectItems);
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -128,24 +129,24 @@ ItemTableView::ItemTableView(bool bEditMode, QWidget *parent)
     horizontalHeader()->setFont(f);
   }
 
-  if (!bEditMode)
+  if (!m_bEditMode)
   {
     setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
     setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     horizontalHeader()->setHighlightSections(false);
+    QObject::connect(this,
+                     SIGNAL(doubleClicked(const QModelIndex&)),
+                     this,
+                     SIGNAL(enterKeyPressedSignal()));
   }
-
-  QObject::connect(this,
-                   SIGNAL(doubleClicked(const QModelIndex&)),
-                   this,
-                   SIGNAL(enterKeyPressedSignal()));
 }
 
 void ItemTableView::keyPressEvent(QKeyEvent *event)
 {
-  if (event->key() == Qt::Key_Enter ||
-      event->key() == Qt::Key_Return)
+  if ((event->key() == Qt::Key_Enter ||
+      event->key() == Qt::Key_Return) &&
+      !m_bEditMode)
     emit enterKeyPressedSignal();
   else
     QTableView::keyPressEvent(event);

@@ -7,7 +7,7 @@
 QT       += core gui serialport sql
 CONFIG += c++11
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = BKVale
 TEMPLATE = app
@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     consumptionview.cpp \
     consumptiondatabase.cpp \
     consumptionwidget.cpp \
-    consumptionfilter.cpp
+    consumptionfilter.cpp \
+    qcustomplot.cpp \
+    consumptionchart.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -51,7 +53,9 @@ HEADERS  += mainwindow.h \
     consumptionview.h \
     consumptiondatabase.h \
     consumptionwidget.h \
-    consumptionfilter.h
+    consumptionfilter.h \
+    qcustomplot.h \
+    consumptionchart.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

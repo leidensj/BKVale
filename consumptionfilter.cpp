@@ -56,12 +56,12 @@ ConsumptionFilter::ConsumptionFilter(QWidget* parent)
   }
 
   {
-    m_graph = new QPushButton();
-    m_graph->setFlat(true);
-    m_graph->setText("");
-    m_graph->setIconSize(QSize(24, 24));
-    m_graph->setIcon(QIcon(":/icons/res/chart.png"));
-    m_graph->setDefault(true);
+    m_chart = new QPushButton();
+    m_chart->setFlat(true);
+    m_chart->setText("");
+    m_chart->setIconSize(QSize(24, 24));
+    m_chart->setIcon(QIcon(":/icons/res/chart.png"));
+    m_chart->setDefault(true);
   }
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
@@ -76,7 +76,7 @@ ConsumptionFilter::ConsumptionFilter(QWidget* parent)
 
   QHBoxLayout* hlayout2 = new QHBoxLayout();
   hlayout2->addWidget(m_total);
-  hlayout2->addWidget(m_graph);
+  hlayout2->addWidget(m_chart);
   hlayout2->setContentsMargins(0, 0, 0, 0);
 
   QVBoxLayout* vlayout = new QVBoxLayout();
@@ -107,6 +107,11 @@ ConsumptionFilter::ConsumptionFilter(QWidget* parent)
                    this,
                    SLOT(emitChangedSignal()));
 
+  QObject::connect(m_chart,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(emitChartSignal()));
+
   enableControls();
 }
 
@@ -116,7 +121,7 @@ void ConsumptionFilter::enableControls()
   m_datei->setEnabled(bEnable);
   m_datef->setEnabled(bEnable);
   m_total->setEnabled(bEnable);
-  m_graph->setEnabled(bEnable);
+  m_chart->setEnabled(bEnable);
 }
 
 void ConsumptionFilter::emitChangedSignal()
@@ -132,4 +137,9 @@ void ConsumptionFilter::updateTotal(double total)
     m_total->setText("R$ " + QString::number(total, 'f', 2));
   else
     m_total->setText("");
+}
+
+void ConsumptionFilter::emitChartSignal()
+{
+  emit chartSignal();
 }

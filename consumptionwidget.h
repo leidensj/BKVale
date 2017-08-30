@@ -16,6 +16,9 @@ public:
   explicit ConsumptionWidget(QWidget* parent = 0);
   void setDatabase(QSqlDatabase db);
 
+private slots:
+  void showChart();
+
 private:
   ConsumptionView* m_view;
   ConsumptionDatabase* m_database;

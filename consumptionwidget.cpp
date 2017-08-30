@@ -1,8 +1,10 @@
 #include "consumptionwidget.h"
 #include <QLayout>
+#include <QDialog>
 #include "consumptionview.h"
 #include "consumptiondatabase.h"
 #include "consumptionfilter.h"
+#include "consumptionchart.h"
 
 ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   : QFrame(parent)
@@ -37,9 +39,28 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
                    SIGNAL(totalSignal(double)),
                    m_filter,
                    SLOT(updateTotal(double)));
+
+  QObject::connect(m_filter,
+                   SIGNAL(chartSignal()),
+                   this,
+                   SLOT(showChart()));
 }
 
 void ConsumptionWidget::setDatabase(QSqlDatabase db)
 {
   m_database->setDatabase(db);
+}
+
+void ConsumptionWidget::showChart()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout();
+  dlg.setLayout(layout);
+  ConsumptionChart* chart = new ConsumptionChart();
+  layout->addWidget(chart);
+  dlg.resize(540, 280);
+  dlg.setWindowTitle(tr("Buscar Produto"));
+  dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
+  dlg.setModal(true);
+  dlg.exec();
 }

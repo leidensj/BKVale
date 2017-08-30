@@ -20,11 +20,12 @@ private:
   QDateEdit* m_datei;
   QDateEdit* m_datef;
   QLineEdit* m_total;
-  QPushButton* m_graph;
+  QPushButton* m_chart;
   QCheckBox* m_enable;
 
 private slots:
   void emitChangedSignal();
+  void emitChartSignal();
 
 public slots:
   void enableControls();
@@ -34,6 +35,7 @@ signals:
   void changedSignal(bool bEnable,
                      qint64 datei,
                      qint64 datef);
+  void chartSignal();
 };
 
 #endif // CONSUMPTIONFILTER_H

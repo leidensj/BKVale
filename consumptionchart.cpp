@@ -1,26 +1,24 @@
 #include "consumptionchart.h"
 #include <QLayout>
-#include <QVector>
 
-ConsumptionChart::ConsumptionChart(QWidget* parent)
+ConsumptionChart::ConsumptionChart(const QVector<qint64>& dates,
+                                   const QVector<double>& totals,
+                                   QWidget* parent)
   : QFrame(parent)
 {
   m_plot = new QCustomPlot();
-  QVector<double> x(101), y(101); // initialize with entries 0..100
-  for (int i=0; i<101; ++i)
-  {
-    x[i] = i/50.0 - 1; // x goes from -1 to 1
-    y[i] = x[i]*x[i]; // let's plot a quadratic function
-  }
+  QVector<double> x(dates.size());
+  for (int i=0; i != dates.size(); ++i)
+    x[i] = i;
   // create graph and assign data to it:
   m_plot->addGraph();
-  m_plot->graph(0)->setData(x, y);
+  m_plot->graph(0)->setData(x, totals);
   // give the axes some labels:
   m_plot->xAxis->setLabel("x");
-  m_plot->yAxis->setLabel("y");
+  m_plot->yAxis->setLabel("Total (em R$)");
   // set axes ranges, so we see all data:
-  m_plot->xAxis->setRange(-1, 1);
-  m_plot->yAxis->setRange(0, 1);
+  m_plot->xAxis->setRange(0, 10);
+  m_plot->yAxis->setRange(0, 300);
   m_plot->replot();
 
   QVBoxLayout* vlayout = new QVBoxLayout();

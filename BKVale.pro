@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     consumptionwidget.cpp \
     consumptionfilter.cpp \
     qcustomplot.cpp \
-    consumptionchart.cpp
+    consumptionchart.cpp \
+    calculatorwidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -55,7 +56,8 @@ HEADERS  += mainwindow.h \
     consumptionwidget.h \
     consumptionfilter.h \
     qcustomplot.h \
-    consumptionchart.h
+    consumptionchart.h \
+    calculatorwidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

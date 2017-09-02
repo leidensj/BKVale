@@ -286,6 +286,29 @@ void ConsumptionDatabase::setFilter(bool bEnable,
                     datef);
   }
 }
+
+void ConsumptionDatabase::processChartData(bool bEnable,
+                                           qint64 datei,
+                                           qint64 datef)
+{
+  if (m_table->model() != nullptr)
+  {
+    QVector<double> totals;
+    QVector<qint64> dates;
+    QString error;
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+    ConsumptionSQL::selectTotal(model->database(),
+                                bEnable,
+                                datei,
+                                datef,
+                                dates,
+                                totals,
+                                error);
+    emit chartSignal(dates,
+                    totals);
+  }
+}
+
 void ConsumptionDatabase::emitTotalSignal(bool bEnable,
                                           qint64 datei,
                                           qint64 datef)

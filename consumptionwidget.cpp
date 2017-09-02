@@ -41,9 +41,16 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
                    SLOT(updateTotal(double)));
 
   QObject::connect(m_filter,
-                   SIGNAL(chartSignal()),
+                   SIGNAL(chartSignal(bool, qint64, qint64)),
+                   m_database,
+                   SLOT(processChartData(bool,qint64,qint64)));
+
+  QObject::connect(m_database,
+                   SIGNAL(chartSignal(const QVector<qint64>&,
+                                      const QVector<double>&)),
                    this,
-                   SLOT(showChart()));
+                   SLOT(showChart(const QVector<qint64>&,
+                                  const QVector<double>&)));
 }
 
 void ConsumptionWidget::setDatabase(QSqlDatabase db)
@@ -51,12 +58,13 @@ void ConsumptionWidget::setDatabase(QSqlDatabase db)
   m_database->setDatabase(db);
 }
 
-void ConsumptionWidget::showChart()
+void ConsumptionWidget::showChart(const QVector<qint64>& dates,
+                                  const QVector<double>& totals)
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ConsumptionChart* chart = new ConsumptionChart();
+  ConsumptionChart* chart = new ConsumptionChart(dates, totals);
   layout->addWidget(chart);
   dlg.resize(540, 280);
   dlg.setWindowTitle(tr("Buscar Produto"));

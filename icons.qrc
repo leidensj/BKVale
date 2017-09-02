@@ -37,5 +37,22 @@
         <file>res/favorite.png</file>
         <file>res/calculator.png</file>
         <file>res/process.png</file>
+        <file>res/calc0.png</file>
+        <file>res/calc1.png</file>
+        <file>res/calc2.png</file>
+        <file>res/calc3.png</file>
+        <file>res/calc4.png</file>
+        <file>res/calc5.png</file>
+        <file>res/calc6.png</file>
+        <file>res/calc7.png</file>
+        <file>res/calc8.png</file>
+        <file>res/calc9.png</file>
+        <file>res/calcdiv.png</file>
+        <file>res/calcequal.png</file>
+        <file>res/calcmin.png</file>
+        <file>res/calcmul.png</file>
+        <file>res/calcplus.png</file>
+        <file>res/calcdec.png</file>
+        <file>res/calcclr.png</file>
     </qresource>
 </RCC>

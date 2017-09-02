@@ -141,5 +141,7 @@ void ConsumptionFilter::updateTotal(double total)
 
 void ConsumptionFilter::emitChartSignal()
 {
-  emit chartSignal();
+  emit chartSignal(m_enable->isChecked(),
+                   m_datei->date().toJulianDay(),
+                   m_datef->date().toJulianDay());
 }

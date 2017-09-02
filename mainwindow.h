@@ -8,6 +8,7 @@
 #include "notewidget.h"
 #include "reminderwidget.h"
 #include "consumptionwidget.h"
+#include "calculatorwidget.h"
 
 namespace Ui {
 class BaitaAssistant;
@@ -36,6 +37,7 @@ private:
   NoteWidget m_note;
   ReminderWidget m_reminder;
   ConsumptionWidget m_consumption;
+  CalculatorWidget m_calculator;
   QSerialPort m_printer;
   Settings m_settings;
   bool m_bReady;

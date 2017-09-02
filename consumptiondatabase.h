@@ -31,8 +31,14 @@ public slots:
                  qint64 datei,
                  qint64 datef);
 
+  void processChartData(bool bEnable,
+                        qint64 datei,
+                        qint64 datef);
+
 signals:
   void totalSignal(double total);
+  void chartSignal(const QVector<qint64>& dates,
+                   const QVector<double>& totals);
 
 private:
   QPushButton* m_refresh;

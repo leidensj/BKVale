@@ -17,7 +17,8 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void showChart();
+  void showChart(const QVector<qint64>& dates,
+                 const QVector<double>& totals);
 
 private:
   ConsumptionView* m_view;

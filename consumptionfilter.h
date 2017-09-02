@@ -35,7 +35,10 @@ signals:
   void changedSignal(bool bEnable,
                      qint64 datei,
                      qint64 datef);
-  void chartSignal();
+
+  void chartSignal(bool bEnable,
+                   qint64 datei,
+                   qint64 datef);
 };
 
 #endif // CONSUMPTIONFILTER_H

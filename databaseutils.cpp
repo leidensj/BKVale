@@ -451,3 +451,49 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
 
   return bSuccess;
 }
+
+bool ConsumptionSQL::selectTotal(QSqlDatabase db,
+                                 bool bEnable,
+                                 qint64 datei,
+                                 qint64 datef,
+                                 QVector<qint64>& dates,
+                                 QVector<double>& totals,
+                                 QString &error)
+{
+  dates.clear();
+  totals.clear();
+  error.clear();
+
+  if (!BaitaDatabase::isOpen(db, error))
+    return false;
+
+  QString str("SELECT SUM(_TOTAL), _DATE FROM _CONSUMPTION");
+  if (bEnable)
+  {
+    str += " WHERE _DATE BETWEEN " +
+           QString::number(datei) +
+           " AND " +
+           QString::number(datef);
+  }
+  str += " GROUP BY _DATE";
+
+  QSqlQuery query(db);
+  bool bSuccess = query.exec(str);
+  if (bSuccess)
+  {
+    while (query.next())
+    {
+      totals.push_back(query.value(0).toDouble());
+      dates.push_back(query.value(1).toLongLong());
+      bSuccess = true;
+    }
+    if (!bSuccess)
+      error = "Valor não encontrado.";
+  }
+  else
+  {
+    error = query.lastError().text();
+  }
+
+  return bSuccess;
+}

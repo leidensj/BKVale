@@ -51,7 +51,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="iconSize">
        <size>
@@ -93,6 +93,7 @@
        <attribute name="title">
         <string>Calculadora</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4"/>
       </widget>
       <widget class="QWidget" name="tabShop">
        <attribute name="icon">

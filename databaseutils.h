@@ -2,7 +2,7 @@
 #define DATABASEUTILS_H
 
 #include <QSqlDatabase>
-#include <vector>
+#include <QVector>
 #include "note.h"
 #include "item.h"
 #include "settings.h"
@@ -72,6 +72,14 @@ namespace ConsumptionSQL
                    qint64 datef,
                    double& total,
                    QString& error);
+
+  bool selectTotal(QSqlDatabase db,
+                   bool bEnable,
+                   qint64 datei,
+                   qint64 datef,
+                   QVector<qint64>& dates,
+                   QVector<double>& totals,
+                   QString &error);
 }
 
 #endif // DATABASEUTILS_H

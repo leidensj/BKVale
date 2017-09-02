@@ -18,6 +18,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
   ui->tabNotes->layout()->addWidget(&m_note);
   ui->tabReminder->layout()->addWidget(&m_reminder);
   ui->tabConsumption->layout()->addWidget(&m_consumption);
+  ui->tabCalculator->layout()->addWidget(&m_calculator);
 
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),

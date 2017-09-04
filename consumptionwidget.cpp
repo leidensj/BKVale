@@ -1,6 +1,8 @@
 #include "consumptionwidget.h"
 #include <QLayout>
 #include <QDialog>
+#include <QDockWidget>
+#include <QSplitter>
 #include "consumptionview.h"
 #include "consumptiondatabase.h"
 #include "consumptionfilter.h"
@@ -14,16 +16,30 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   m_view = new ConsumptionView();
   m_database = new ConsumptionDatabase();
   m_filter = new ConsumptionFilter();
+  m_dock = new QDockWidget();
+
+  m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  m_dock->setFeatures(0);
+  m_dock->setFeatures(QDockWidget::DockWidgetClosable);
+  m_dock->setWidget(m_filter);
+  m_filter->layout()->setAlignment(Qt::AlignTop);
+  m_dock->close();
+
+  QVBoxLayout* vlayout = new QVBoxLayout();
+  vlayout->setContentsMargins(0, 0, 0, 0);
+  vlayout->addWidget(m_view);
+  vlayout->addWidget(m_database);
+
+  QWidget* w = new QWidget();
+  w->setLayout(vlayout);
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(m_dock);
+  splitter->addWidget(w);
 
   QHBoxLayout* hlayout = new QHBoxLayout();
   hlayout->setContentsMargins(0, 0, 0, 0);
-  hlayout->addWidget(m_view);
-  hlayout->addWidget(m_filter);
-  QVBoxLayout* vlayout = new QVBoxLayout();
-  vlayout->setContentsMargins(0, 0, 0, 0);
-  vlayout->addLayout(hlayout);
-  vlayout->addWidget(m_database);
-  setLayout(vlayout);
+  hlayout->addWidget(splitter);
+  setLayout(hlayout);
 
   QObject::connect(m_view,
                    SIGNAL(insertSignal(const Consumption&)),
@@ -39,6 +55,11 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
                    SIGNAL(totalSignal(double)),
                    m_filter,
                    SLOT(updateTotal(double)));
+
+  QObject::connect(m_database,
+                   SIGNAL(filterSignal()),
+                   this,
+                   SLOT(showFilter()));
 
   QObject::connect(m_filter,
                    SIGNAL(chartSignal(bool, qint64, qint64)),
@@ -58,6 +79,14 @@ void ConsumptionWidget::setDatabase(QSqlDatabase db)
   m_database->setDatabase(db);
 }
 
+void ConsumptionWidget::showFilter()
+{
+  if (m_dock->isVisible())
+    m_dock->close();
+  else
+    m_dock->show();
+}
+
 void ConsumptionWidget::showChart(const QVector<qint64>& dates,
                                   const QVector<double>& totals)
 {
@@ -66,9 +95,10 @@ void ConsumptionWidget::showChart(const QVector<qint64>& dates,
   dlg.setLayout(layout);
   ConsumptionChart* chart = new ConsumptionChart(dates, totals);
   layout->addWidget(chart);
-  dlg.resize(540, 280);
-  dlg.setWindowTitle(tr("Buscar Produto"));
-  dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
+  dlg.resize(640, 480);
+  dlg.setWindowTitle(tr("Análise de Consumo"));
+  dlg.setWindowIcon(QIcon(":/icons/res/chart.png"));
+  dlg.setWindowFlags(Qt::Window);
   dlg.setModal(true);
   dlg.exec();
 }

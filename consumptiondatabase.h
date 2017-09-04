@@ -25,6 +25,7 @@ private slots:
   void emitTotalSignal(bool bEnable,
                        qint64 datei,
                        qint64 datef);
+  void emitFilterSignal();
 
 public slots:
   void setFilter(bool bEnable,
@@ -36,11 +37,13 @@ public slots:
                         qint64 datef);
 
 signals:
+  void filterSignal();
   void totalSignal(double total);
   void chartSignal(const QVector<qint64>& dates,
                    const QVector<double>& totals);
 
 private:
+  QPushButton* m_filter;
   QPushButton* m_refresh;
   QPushButton* m_remove;
   QTableView* m_table;

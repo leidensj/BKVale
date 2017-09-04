@@ -1,5 +1,4 @@
 #include "consumptiondatabase.h"
-#include "ui_consumptiondatabasewidget.h"
 #include <QDialog>
 #include <QTableView>
 #include <QHeaderView>
@@ -8,6 +7,7 @@
 #include <QSqlTableModel>
 #include <QSqlRecord>
 #include <QMessageBox>
+#include <QDate>
 #include "databaseutils.h"
 
 namespace
@@ -116,6 +116,14 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   , m_table(nullptr)
 {
   {
+    m_filter = new QPushButton();
+    m_filter->setFlat(true);
+    m_filter->setText("");
+    m_filter->setIconSize(QSize(24, 24));
+    m_filter->setIcon(QIcon(":/icons/res/filter.png"));
+  }
+
+  {
     m_refresh = new QPushButton();
     m_refresh->setFlat(true);
     m_refresh->setText("");
@@ -132,6 +140,7 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   }
 
   QHBoxLayout* hlayout = new QHBoxLayout();
+  hlayout->addWidget(m_filter);
   hlayout->addWidget(m_refresh);
   hlayout->addWidget(m_remove);
   hlayout->setAlignment(Qt::AlignLeft);
@@ -156,6 +165,11 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(remove()));
+
+  QObject::connect(m_filter,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(emitFilterSignal()));
 
   QObject::connect(m_refresh,
                    SIGNAL(clicked(bool)),
@@ -307,6 +321,11 @@ void ConsumptionDatabase::processChartData(bool bEnable,
     emit chartSignal(dates,
                     totals);
   }
+}
+
+void ConsumptionDatabase::emitFilterSignal()
+{
+  emit filterSignal();
 }
 
 void ConsumptionDatabase::emitTotalSignal(bool bEnable,

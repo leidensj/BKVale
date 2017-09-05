@@ -18,28 +18,25 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   m_filter = new ConsumptionFilter();
   m_dock = new QDockWidget();
 
+  m_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
   m_dock->setFeatures(0);
   m_dock->setFeatures(QDockWidget::DockWidgetClosable);
+  m_dock->setWindowTitle("Filtros");
   m_dock->setWidget(m_filter);
-  m_filter->layout()->setAlignment(Qt::AlignTop);
-  m_dock->close();
+
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(m_dock);
+  splitter->addWidget(m_database);
 
   QVBoxLayout* vlayout = new QVBoxLayout();
   vlayout->setContentsMargins(0, 0, 0, 0);
   vlayout->addWidget(m_view);
-  vlayout->addWidget(m_database);
+  vlayout->addWidget(splitter);
+  setLayout(vlayout);
 
-  QWidget* w = new QWidget();
-  w->setLayout(vlayout);
-  QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(m_dock);
-  splitter->addWidget(w);
-
-  QHBoxLayout* hlayout = new QHBoxLayout();
-  hlayout->setContentsMargins(0, 0, 0, 0);
-  hlayout->addWidget(splitter);
-  setLayout(hlayout);
+  m_dock->close();
 
   QObject::connect(m_view,
                    SIGNAL(insertSignal(const Consumption&)),

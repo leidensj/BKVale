@@ -651,5 +651,4 @@ void ItemWidget::saveOrDiscard()
         break;
     }
   }
-  event->accept();
 }

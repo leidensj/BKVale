@@ -75,14 +75,10 @@ ConsumptionView::ConsumptionView(QWidget *parent)
   {
     m_date = new QDateEdit();
     m_date->setCalendarPopup(true);
+    m_date->setDisplayFormat("dd/MM/yyyy");
   }
 
-  {
-    m_weekDay = new QLabel();
-    QPalette palette= m_weekDay->palette();
-    palette.setColor(QPalette::WindowText, Qt::red);
-    m_weekDay->setPalette(palette);
-  }
+  m_weekDay = new QLabel();
 
   {
     m_search = new EnterPushButton();

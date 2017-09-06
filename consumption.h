@@ -74,6 +74,21 @@ struct Consumption
     }
     return str;
   }
+
+  struct Filter
+  {
+    Filter()
+      : m_bDate(false)
+      , m_datei(0)
+      , m_datef(0)
+    {
+
+    }
+
+    bool m_bDate;
+    qint64 m_datei;
+    qint64 m_datef;
+  };
 };
 
 #endif // CONSUMPTION_H

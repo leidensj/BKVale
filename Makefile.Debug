@@ -234,6 +234,7 @@ debug/qrc_icons.cpp: icons.qrc \
 		res/printer.png \
 		res/text.png \
 		res/calc3.png \
+		res/filter.png \
 		res/disconnected.png \
 		res/uppercase.png \
 		res/calcdec.png \
@@ -389,6 +390,7 @@ debug/moc_mainwindow.cpp: C:/Qt/5.9/mingw53_32/include/QtWidgets/QMainWindow \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QString \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QStringList \
 		item.h \
+		consumption.h \
 		notewidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QFrame \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qframe.h \
@@ -1747,6 +1749,9 @@ debug/moc_consumptionfilter.cpp: C:/Qt/5.9/mingw53_32/include/QtWidgets/QFrame \
 		C:/Qt/5.9/mingw53_32/include/QtCore/qfiledevice.h \
 		C:/Qt/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		C:/Qt/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
+		consumption.h \
+		C:/Qt/5.9/mingw53_32/include/QtCore/QString \
+		item.h \
 		consumptionfilter.h \
 		debug/moc_predefs.h \
 		C:/Qt/5.9/mingw53_32/bin/moc.exe
@@ -2511,6 +2516,7 @@ debug/main.o: main.cpp mainwindow.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QString \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QStringList \
 		item.h \
+		consumption.h \
 		notewidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QFrame \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qframe.h \
@@ -2674,6 +2680,7 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QString \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QStringList \
 		item.h \
+		consumption.h \
 		notewidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QFrame \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qframe.h \
@@ -3274,6 +3281,7 @@ debug/databaseutils.o: databaseutils.cpp databaseutils.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QString \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QStringList \
 		item.h \
+		consumption.h \
 		settings.h \
 		C:/Qt/5.9/mingw53_32/include/QtSerialPort/QSerialPort \
 		C:/Qt/5.9/mingw53_32/include/QtSerialPort/qserialport.h \
@@ -3491,6 +3499,7 @@ debug/notewidget.o: notewidget.cpp notewidget.h \
 		databaseutils.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QVector \
 		item.h \
+		consumption.h \
 		settings.h \
 		C:/Qt/5.9/mingw53_32/include/QtSerialPort/QSerialPort \
 		C:/Qt/5.9/mingw53_32/include/QtSerialPort/qserialport.h \
@@ -4648,6 +4657,12 @@ debug/consumptiondatabase.o: consumptiondatabase.cpp consumptiondatabase.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QPushButton \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/QLineEdit \
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/qlineedit.h \
+		C:/Qt/5.9/mingw53_32/include/QtGui/qtextcursor.h \
+		C:/Qt/5.9/mingw53_32/include/QtGui/qtextformat.h \
+		C:/Qt/5.9/mingw53_32/include/QtGui/qpen.h \
+		C:/Qt/5.9/mingw53_32/include/QtGui/qtextoption.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QLayout \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qlayout.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qlayoutitem.h \
@@ -4660,6 +4675,8 @@ debug/consumptiondatabase.o: consumptiondatabase.cpp consumptiondatabase.h \
 		C:/Qt/5.9/mingw53_32/include/QtSql/qsqlrecord.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QMessageBox \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qmessagebox.h \
+		C:/Qt/5.9/mingw53_32/include/QtCore/QDate \
+		C:/Qt/5.9/mingw53_32/include/QtCore/qdatetime.h \
 		databaseutils.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/QVector \
 		note.h \
@@ -4782,6 +4799,10 @@ debug/consumptionwidget.o: consumptionwidget.cpp consumptionwidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qgridlayout.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QDialog \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qdialog.h \
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/QDockWidget \
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/qdockwidget.h \
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/QSplitter \
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/qsplitter.h \
 		consumptionview.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QDoubleSpinBox \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qspinbox.h \
@@ -5074,7 +5095,6 @@ debug/consumptionwidget.o: consumptionwidget.cpp consumptionwidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qdialogbuttonbox.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qdirmodel.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qfileiconprovider.h \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/qdockwidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qdrawutil.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qerrormessage.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qfiledialog.h \
@@ -5138,7 +5158,6 @@ debug/consumptionwidget.o: consumptionwidget.cpp consumptionwidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qshortcut.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qsizegrip.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qsplashscreen.h \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/qsplitter.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qstackedlayout.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qstackedwidget.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qstatusbar.h \
@@ -5280,6 +5299,9 @@ debug/consumptionfilter.o: consumptionfilter.cpp consumptionfilter.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/qfiledevice.h \
 		C:/Qt/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		C:/Qt/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
+		consumption.h \
+		C:/Qt/5.9/mingw53_32/include/QtCore/QString \
+		item.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QDateEdit \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qdatetimeedit.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/qdatetime.h \
@@ -5288,23 +5310,15 @@ debug/consumptionfilter.o: consumptionfilter.cpp consumptionfilter.h \
 		C:/Qt/5.9/mingw53_32/include/QtCore/qregularexpression.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QLabel \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qlabel.h \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/QLineEdit \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/qlineedit.h \
-		C:/Qt/5.9/mingw53_32/include/QtGui/qtextcursor.h \
-		C:/Qt/5.9/mingw53_32/include/QtGui/qtextformat.h \
-		C:/Qt/5.9/mingw53_32/include/QtGui/qpen.h \
-		C:/Qt/5.9/mingw53_32/include/QtGui/qtextoption.h \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/QPushButton \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
-		C:/Qt/5.9/mingw53_32/include/QtGui/qicon.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QLayout \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qlayout.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qlayoutitem.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qboxlayout.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/qgridlayout.h \
 		C:/Qt/5.9/mingw53_32/include/QtWidgets/QCheckBox \
-		C:/Qt/5.9/mingw53_32/include/QtWidgets/qcheckbox.h
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/qcheckbox.h \
+		C:/Qt/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
+		C:/Qt/5.9/mingw53_32/include/QtGui/qicon.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\consumptionfilter.o consumptionfilter.cpp
 
 debug/qcustomplot.o: qcustomplot.cpp qcustomplot.h \

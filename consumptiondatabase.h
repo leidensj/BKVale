@@ -7,6 +7,7 @@
 
 class QPushButton;
 class QTableView;
+class QLineEdit;
 
 class ConsumptionDatabase : public QFrame
 {
@@ -21,32 +22,27 @@ private slots:
   void enableControls();
   void insert(const Consumption& consumption);
   void remove();
-  void refresh();
-  void emitTotalSignal(bool bEnable,
-                       qint64 datei,
-                       qint64 datef);
+  void updateTotal();
   void emitFilterSignal();
+  void emitChartSignal();
 
 public slots:
-  void setFilter(bool bEnable,
-                 qint64 datei,
-                 qint64 datef);
-
-  void processChartData(bool bEnable,
-                        qint64 datei,
-                        qint64 datef);
+  void setFilter(const Consumption::Filter& filter);
+  void refresh();
 
 signals:
   void filterSignal();
-  void totalSignal(double total);
   void chartSignal(const QVector<qint64>& dates,
                    const QVector<double>& totals);
 
 private:
-  QPushButton* m_filter;
+  QPushButton* m_openFilter;
   QPushButton* m_refresh;
   QPushButton* m_remove;
   QTableView* m_table;
+  QLineEdit* m_total;
+  QPushButton* m_chart;
+  Consumption::Filter m_filter;
 };
 
 #endif // CONSUMPTIONDATABASE_H

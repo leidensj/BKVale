@@ -19,8 +19,6 @@ ConsumptionChart::ConsumptionChart(const QVector<qint64>& dates,
   QCPBars *bars = new QCPBars(m_plot->xAxis, m_plot->yAxis);
   bars->setAntialiased(false); // gives more crisp, pixel aligned bar borders
   bars->setStackingGap(1);
-  bars->setWidthType(QCPBars::wtPlotCoords);
-  bars->setWidth(0.2);
   // set names and colors:
   bars->setName("Consumo diário");
   bars->setPen(QPen(QColor(0, 168, 140).lighter(130)));
@@ -34,7 +32,7 @@ ConsumptionChart::ConsumptionChart(const QVector<qint64>& dates,
   QVector<QString> labels;
   for (int i = 0; i != dates.size(); ++i)
   {
-    ticks << (i + 1) * 0.3;
+    ticks << (i + 1);
     labels << QDate::fromJulianDay(dates.at(i)).toString("dd/MM/yyyy");
   }
   QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
@@ -75,6 +73,7 @@ ConsumptionChart::ConsumptionChart(const QVector<qint64>& dates,
   QFont legendFont = font();
   legendFont.setPointSize(10);
   customPlot->legend->setFont(legendFont);*/
+  m_plot->yAxis->rescale(true);
   m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
   QVBoxLayout* vlayout = new QVBoxLayout();

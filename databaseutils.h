@@ -5,6 +5,7 @@
 #include <QVector>
 #include "note.h"
 #include "item.h"
+#include "consumption.h"
 #include "settings.h"
 
 #define DEFAULT_NUMBER     1000
@@ -67,16 +68,12 @@ namespace ItemDatabase
 namespace ConsumptionSQL
 {
   bool selectTotal(QSqlDatabase db,
-                   bool bEnable,
-                   qint64 datei,
-                   qint64 datef,
+                   const Consumption::Filter& filter,
                    double& total,
                    QString& error);
 
   bool selectTotal(QSqlDatabase db,
-                   bool bEnable,
-                   qint64 datei,
-                   qint64 datef,
+                   const Consumption::Filter& filter,
                    QVector<qint64>& dates,
                    QVector<double>& totals,
                    QString &error);

@@ -413,9 +413,7 @@ bool ItemDatabase::select(QSqlDatabase db,
 }
 
 bool ConsumptionSQL::selectTotal(QSqlDatabase db,
-                                 bool bEnable,
-                                 qint64 datei,
-                                 qint64 datef,
+                                 const Consumption::Filter& filter,
                                  double& total,
                                  QString& error)
 {
@@ -426,12 +424,12 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
     return false;
 
   QString str("SELECT SUM(_TOTAL) FROM _CONSUMPTION");
-  if (bEnable)
+  if (filter.m_bDate)
   {
     str += " WHERE _DATE BETWEEN " +
-           QString::number(datei) +
+           QString::number(filter.m_datei) +
            " AND " +
-           QString::number(datef);
+           QString::number(filter.m_datef);
   }
 
   QSqlQuery query(db);
@@ -453,9 +451,7 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
 }
 
 bool ConsumptionSQL::selectTotal(QSqlDatabase db,
-                                 bool bEnable,
-                                 qint64 datei,
-                                 qint64 datef,
+                                 const Consumption::Filter& filter,
                                  QVector<qint64>& dates,
                                  QVector<double>& totals,
                                  QString &error)
@@ -468,12 +464,12 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
     return false;
 
   QString str("SELECT SUM(_TOTAL), _DATE FROM _CONSUMPTION");
-  if (bEnable)
+  if (filter.m_bDate)
   {
     str += " WHERE _DATE BETWEEN " +
-           QString::number(datei) +
+           QString::number(filter.m_datei) +
            " AND " +
-           QString::number(datef);
+           QString::number(filter.m_datef);
   }
   str += " GROUP BY _DATE";
 

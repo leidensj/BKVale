@@ -19,6 +19,7 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   m_dock = new QDockWidget();
 
   m_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  m_filter->layout()->setAlignment(Qt::AlignTop);
 
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
   m_dock->setFeatures(0);
@@ -44,24 +45,14 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
                    SLOT(insert(const Consumption&)));
 
   QObject::connect(m_filter,
-                   SIGNAL(changedSignal(bool, qint64, qint64)),
+                   SIGNAL(changedSignal(const Consumption::Filter&)),
                    m_database,
-                   SLOT(setFilter(bool,qint64,qint64)));
-
-  QObject::connect(m_database,
-                   SIGNAL(totalSignal(double)),
-                   m_filter,
-                   SLOT(updateTotal(double)));
+                   SLOT(setFilter(const Consumption::Filter&)));
 
   QObject::connect(m_database,
                    SIGNAL(filterSignal()),
                    this,
                    SLOT(showFilter()));
-
-  QObject::connect(m_filter,
-                   SIGNAL(chartSignal(bool, qint64, qint64)),
-                   m_database,
-                   SLOT(processChartData(bool,qint64,qint64)));
 
   QObject::connect(m_database,
                    SIGNAL(chartSignal(const QVector<qint64>&,

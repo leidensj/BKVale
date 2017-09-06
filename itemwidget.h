@@ -9,6 +9,7 @@
 
 class QCheckBox;
 class QPushButton;
+class ItemTableModel;
 
 class ItemTableView : public QTableView
 {
@@ -61,6 +62,7 @@ public slots:
   void removeSelectedItem();
   void save(bool bSkipConfirmation);
   void discard(bool bSkipConfirmation);
+  void saveOrDiscard();
   void create();
   void setFilter();
   void focusFilter();

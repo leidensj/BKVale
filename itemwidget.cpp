@@ -110,12 +110,45 @@ QString buildFilter(QString text,
 }
 }
 
+class ItemTableModel : public QSqlTableModel
+{
+
+public:
+  ItemTableModel(QObject *parent, QSqlDatabase db)
+   : QSqlTableModel(parent, db)
+  {
+
+  }
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  {
+    if (!index.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlTableModel::data(index, role);
+    if (role == Qt::DisplayRole)
+    {
+      switch ((ItemTableIndex)index.column())
+      {
+        case ItemTableIndex::Price:
+          value = "R$ " + QString::number(value.toDouble(), 'f', 2);;
+          break;
+        default:
+          break;
+      }
+    }
+
+    return value;
+  }
+};
+
 ItemTableView::ItemTableView(bool bEditMode, QWidget *parent)
   : QTableView(parent)
   , m_bEditMode(bEditMode)
 {
   setSelectionBehavior(QAbstractItemView::SelectItems);
   setSelectionMode(QAbstractItemView::SingleSelection);
+  setSortingEnabled(true);
   {
     QFont f = font();
     f.setCapitalization(QFont::AllUppercase);
@@ -147,9 +180,27 @@ void ItemTableView::keyPressEvent(QKeyEvent *event)
   if ((event->key() == Qt::Key_Enter ||
       event->key() == Qt::Key_Return) &&
       !m_bEditMode)
+  {
     emit enterKeyPressedSignal();
+  }
+  else if ((event->key() == Qt::Key_Enter ||
+            event->key() == Qt::Key_Return))
+  {
+    QKeyEvent modEvent(event->type(),
+                       Qt::Key_Tab,
+                       event->modifiers(),
+                       event->nativeScanCode(),
+                       event->nativeVirtualKey(),
+                       event->nativeModifiers(),
+                       event->text(),
+                       event->isAutoRepeat(),
+                       event->count());
+    QTableView::keyPressEvent(&modEvent);
+  }
   else
+  {
     QTableView::keyPressEvent(event);
+  }
 }
 
 FilterLineEdit::FilterLineEdit()
@@ -323,7 +374,7 @@ void ItemWidget::setDatabase(QSqlDatabase db)
   if (m_table->model() != nullptr)
     return;
 
-  QSqlTableModel* model = new QSqlTableModel(this, db);
+  ItemTableModel* model = new ItemTableModel(this, db);
   model->setTable("_ITEMS");
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
@@ -429,6 +480,7 @@ void ItemWidget::save(bool bSkipConfirmation)
       model->submitAll();
     }
   }
+  enableControls();
 }
 
 void ItemWidget::discard(bool bSkipConfirmation)
@@ -449,6 +501,7 @@ void ItemWidget::discard(bool bSkipConfirmation)
       refresh();
     }
   }
+  enableControls();
 }
 
 void ItemWidget::create()
@@ -576,4 +629,27 @@ void ItemWidget::itemSelected()
         parentWidget()->close();
     }
   }
+}
+
+void ItemWidget::saveOrDiscard()
+{
+  if (m_table->model() != nullptr)
+  {
+    int ret = QMessageBox::question(this,
+                                    tr("Salvar Mudanças"),
+                                    tr("Deseja salvar as mudanças realizadas?"),
+                                    QMessageBox::Save | QMessageBox::Discard);
+    switch (ret)
+    {
+      case QMessageBox::Save:
+        save(true);
+        break;
+      case QMessageBox::Discard:
+      discard(true);
+        break;
+      default:
+        break;
+    }
+  }
+  event->accept();
 }

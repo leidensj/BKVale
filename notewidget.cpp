@@ -131,6 +131,7 @@ NoteWidget::NoteWidget(QWidget *parent)
 {
   ui->setupUi(this);
   ui->dockWidgetContents->layout()->addWidget(&m_noteDatabaseWidget);
+  ui->date->setDisplayFormat("dd/MM/yyyy");
   QObject::connect(&m_table,
                    SIGNAL(cellChanged(int, int)),
                    this,

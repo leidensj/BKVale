@@ -1,8 +1,6 @@
 #include "consumptionfilter.h"
 #include <QDateEdit>
 #include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
 #include <QLayout>
 #include <QCheckBox>
 
@@ -37,51 +35,28 @@ ConsumptionFilter::ConsumptionFilter(QWidget* parent)
     m_datei = new QDateEdit();
     m_datei->setCalendarPopup(true);
     m_datei->setDate(QDate::currentDate());
+    m_datei->setDisplayFormat("dd/MM/yyyy");
   }
 
   {
     m_datef = new QDateEdit();
     m_datef->setCalendarPopup(true);
     m_datef->setDate(QDate::currentDate());
+    m_datef->setDisplayFormat("dd/MM/yyyy");
   }
 
-  {
-    m_total = new QLineEdit();
-    m_total->setAlignment(Qt::AlignRight);
-    m_total->setPlaceholderText("Consumo Total");
-    m_total->setReadOnly(true);
-    QPalette palette = m_total->palette();
-    palette.setColor(QPalette::WindowText, Qt::red);
-    m_total->setPalette(palette);
-  }
-
-  {
-    m_chart = new QPushButton();
-    m_chart->setFlat(true);
-    m_chart->setText("");
-    m_chart->setIconSize(QSize(24, 24));
-    m_chart->setIcon(QIcon(":/icons/res/chart.png"));
-    m_chart->setDefault(true);
-  }
-
-  QHBoxLayout* hlayout1 = new QHBoxLayout();
-  hlayout1->addWidget(m_enable);
-  hlayout1->addWidget(vFrame);
-  hlayout1->addWidget(dateli);
-  hlayout1->addWidget(m_datei);
-  hlayout1->addWidget(datelf);
-  hlayout1->addWidget(m_datef);
-  hlayout1->setContentsMargins(0, 0, 0, 0);
-  hlayout1->setAlignment(Qt::AlignLeft);
-
-  QHBoxLayout* hlayout2 = new QHBoxLayout();
-  hlayout2->addWidget(m_total);
-  hlayout2->addWidget(m_chart);
-  hlayout2->setContentsMargins(0, 0, 0, 0);
+  QHBoxLayout* hlayout = new QHBoxLayout();
+  hlayout->addWidget(m_enable);
+  hlayout->addWidget(vFrame);
+  hlayout->addWidget(dateli);
+  hlayout->addWidget(m_datei);
+  hlayout->addWidget(datelf);
+  hlayout->addWidget(m_datef);
+  hlayout->setContentsMargins(0, 0, 0, 0);
+  hlayout->setAlignment(Qt::AlignLeft);
 
   QVBoxLayout* vlayout = new QVBoxLayout();
-  vlayout->addLayout(hlayout1);
-  vlayout->addLayout(hlayout2);
+  vlayout->addLayout(hlayout);
 
   setFrameShape(QFrame::Shape::StyledPanel);
   setFrameShadow(QFrame::Shadow::Plain);
@@ -107,11 +82,6 @@ ConsumptionFilter::ConsumptionFilter(QWidget* parent)
                    this,
                    SLOT(emitChangedSignal()));
 
-  QObject::connect(m_chart,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(emitChartSignal()));
-
   enableControls();
 }
 
@@ -120,28 +90,13 @@ void ConsumptionFilter::enableControls()
   const bool bEnable = m_enable->isChecked();
   m_datei->setEnabled(bEnable);
   m_datef->setEnabled(bEnable);
-  m_total->setEnabled(bEnable);
-  m_chart->setEnabled(bEnable);
 }
 
 void ConsumptionFilter::emitChangedSignal()
 {
-  emit changedSignal(m_enable->isChecked(),
-                     m_datei->date().toJulianDay(),
-                     m_datef->date().toJulianDay());
-}
-
-void ConsumptionFilter::updateTotal(double total)
-{
-  if (m_enable->isChecked())
-    m_total->setText("R$ " + QString::number(total, 'f', 2));
-  else
-    m_total->setText("");
-}
-
-void ConsumptionFilter::emitChartSignal()
-{
-  emit chartSignal(m_enable->isChecked(),
-                   m_datei->date().toJulianDay(),
-                   m_datef->date().toJulianDay());
+  Consumption::Filter filter;
+  filter.m_bDate = m_enable->isChecked();
+  filter.m_datei = m_datei->date().toJulianDay();
+  filter.m_datef = m_datef->date().toJulianDay();
+  emit changedSignal(filter);
 }

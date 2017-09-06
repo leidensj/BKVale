@@ -3,6 +3,7 @@
 #include <QTableView>
 #include <QHeaderView>
 #include <QPushButton>
+#include <QLineEdit>
 #include <QLayout>
 #include <QSqlTableModel>
 #include <QSqlRecord>
@@ -116,11 +117,11 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   , m_table(nullptr)
 {
   {
-    m_filter = new QPushButton();
-    m_filter->setFlat(true);
-    m_filter->setText("");
-    m_filter->setIconSize(QSize(24, 24));
-    m_filter->setIcon(QIcon(":/icons/res/filter.png"));
+    m_openFilter = new QPushButton();
+    m_openFilter->setFlat(true);
+    m_openFilter->setText("");
+    m_openFilter->setIconSize(QSize(24, 24));
+    m_openFilter->setIcon(QIcon(":/icons/res/filter.png"));
   }
 
   {
@@ -139,11 +140,32 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
     m_remove->setIcon(QIcon(":/icons/res/trash.png"));
   }
 
+  {
+    m_total = new QLineEdit();
+    m_total->setAlignment(Qt::AlignRight);
+    m_total->setPlaceholderText("Consumo Total");
+    m_total->setReadOnly(true);
+    QPalette palette = m_total->palette();
+    palette.setColor(QPalette::Text, Qt::red);
+    m_total->setPalette(palette);
+  }
+
+  {
+    m_chart = new QPushButton();
+    m_chart->setFlat(true);
+    m_chart->setText("");
+    m_chart->setIconSize(QSize(24, 24));
+    m_chart->setIcon(QIcon(":/icons/res/chart.png"));
+    m_chart->setDefault(true);
+  }
+
   QHBoxLayout* hlayout = new QHBoxLayout();
-  hlayout->addWidget(m_filter);
+  hlayout->addWidget(m_openFilter);
   hlayout->addWidget(m_refresh);
   hlayout->addWidget(m_remove);
-  hlayout->setAlignment(Qt::AlignLeft);
+  hlayout->addStretch();
+  hlayout->addWidget(m_total);
+  hlayout->addWidget(m_chart);
   hlayout->setContentsMargins(0, 0, 0, 0);
 
   {
@@ -152,6 +174,7 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
     m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
     m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     m_table->horizontalHeader()->setHighlightSections(false);
+    m_table->setSortingEnabled(true);
   }
 
   QVBoxLayout* vlayout = new QVBoxLayout();
@@ -166,7 +189,7 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
                    this,
                    SLOT(remove()));
 
-  QObject::connect(m_filter,
+  QObject::connect(m_openFilter,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitFilterSignal()));
@@ -175,6 +198,11 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(refresh()));
+
+  QObject::connect(m_chart,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(emitChartSignal()));
 }
 
 ConsumptionDatabase::~ConsumptionDatabase()
@@ -201,15 +229,15 @@ void ConsumptionDatabase::setDatabase(QSqlDatabase db)
   m_table->setModel(model);
   m_table->hideColumn((int)ConsumptionTableIndex::ID);
   m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Date,
-                                                      QHeaderView::ResizeToContents);
+                                                    QHeaderView::ResizeToContents);
   m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::ItemID,
-                                                      QHeaderView::Stretch);
+                                                    QHeaderView::Stretch);
   m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Price,
-                                                      QHeaderView::ResizeToContents);
+                                                    QHeaderView::ResizeToContents);
   m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Ammount,
-                                                      QHeaderView::ResizeToContents);
+                                                    QHeaderView::ResizeToContents);
   m_table->horizontalHeader()->setSectionResizeMode((int)ConsumptionTableIndex::Total,
-                                                      QHeaderView::ResizeToContents);
+                                                    QHeaderView::ResizeToContents);
 
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
@@ -222,6 +250,7 @@ void ConsumptionDatabase::setDatabase(QSqlDatabase db)
                                       const QVector<int>&)),
                    this,
                    SLOT(enableControls()));
+  setFilter(Consumption::Filter());
   refresh();
 }
 
@@ -244,6 +273,7 @@ void ConsumptionDatabase::insert(const Consumption& consumption)
     rec.setValue("_TOTAL", consumption.m_total);
     model->insertRecord(-1, rec);
     model->submitAll();
+    updateTotal();
   }
 }
 
@@ -264,6 +294,7 @@ void ConsumptionDatabase::remove()
         model->submitAll();
       }
     }
+    updateTotal();
   }
   enableControls();
 }
@@ -274,36 +305,32 @@ void ConsumptionDatabase::refresh()
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->select();
+    updateTotal();
   }
   enableControls();
 }
 
-void ConsumptionDatabase::setFilter(bool bEnable,
-                                    qint64 datei,
-                                    qint64 datef)
+void ConsumptionDatabase::setFilter(const Consumption::Filter& filter)
 {
   if (m_table->model() != nullptr)
   {
+    m_filter = filter;
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     QString filter;
-    if (bEnable)
+    if (m_filter.m_bDate)
     {
       filter = Consumption::columnName(ConsumptionTableIndex::Date) +
                " BETWEEN " +
-               QString::number(datei) +
+               QString::number(m_filter.m_datei) +
                " AND " +
-               QString::number(datef);
+               QString::number(m_filter.m_datef);
     }
     model->setFilter(filter);
-    emitTotalSignal(bEnable,
-                    datei,
-                    datef);
+    updateTotal();
   }
 }
 
-void ConsumptionDatabase::processChartData(bool bEnable,
-                                           qint64 datei,
-                                           qint64 datef)
+void ConsumptionDatabase::emitChartSignal()
 {
   if (m_table->model() != nullptr)
   {
@@ -312,14 +339,11 @@ void ConsumptionDatabase::processChartData(bool bEnable,
     QString error;
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     ConsumptionSQL::selectTotal(model->database(),
-                                bEnable,
-                                datei,
-                                datef,
+                                m_filter,
                                 dates,
                                 totals,
                                 error);
-    emit chartSignal(dates,
-                    totals);
+    emit chartSignal(dates, totals);
   }
 }
 
@@ -328,24 +352,23 @@ void ConsumptionDatabase::emitFilterSignal()
   emit filterSignal();
 }
 
-void ConsumptionDatabase::emitTotalSignal(bool bEnable,
-                                          qint64 datei,
-                                          qint64 datef)
+void ConsumptionDatabase::updateTotal()
 {
   if (m_table->model() != nullptr)
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     double total = 0.0;
     QString error;
-    if (!ConsumptionSQL::selectTotal(model->database(),
-                                    bEnable,
-                                    datei,
-                                    datef,
+    if (ConsumptionSQL::selectTotal(model->database(),
+                                    m_filter,
                                     total,
                                     error))
     {
-      total = -1.0;
+      m_total->setText("R$ " + QString::number(total, 'f', 2));
     }
-    emit totalSignal(total);
+    else
+    {
+      m_total->setText(error);
+    }
   }
 }

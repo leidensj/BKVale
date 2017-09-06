@@ -288,7 +288,8 @@ void BaitaAssistant::openItemsDialog()
   ItemWidget* itemWidget = new ItemWidget(true);
   itemWidget->setDatabase(m_db);
   layout->addWidget(itemWidget);
-  dlg.resize(width(), height());
+  dlg.resize(640, 480);
+  dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Produtos"));
   dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
   dlg.setModal(true);

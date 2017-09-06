@@ -278,8 +278,8 @@ void FilterLineEdit::changedSignal()
     QMetaObject::activate(this, &staticMetaObject, 2, nullptr);
 }
 struct qt_meta_stringdata_ItemWidget_t {
-    QByteArrayData data[18];
-    char stringdata0[217];
+    QByteArrayData data[19];
+    char stringdata0[231];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -299,21 +299,23 @@ QT_MOC_LITERAL(7, 64, 18), // "removeSelectedItem"
 QT_MOC_LITERAL(8, 83, 4), // "save"
 QT_MOC_LITERAL(9, 88, 17), // "bSkipConfirmation"
 QT_MOC_LITERAL(10, 106, 7), // "discard"
-QT_MOC_LITERAL(11, 114, 6), // "create"
-QT_MOC_LITERAL(12, 121, 9), // "setFilter"
-QT_MOC_LITERAL(13, 131, 11), // "focusFilter"
-QT_MOC_LITERAL(14, 143, 15), // "containsPressed"
-QT_MOC_LITERAL(15, 159, 22), // "filterDownArrowPressed"
-QT_MOC_LITERAL(16, 182, 21), // "filterEnterKeyPressed"
-QT_MOC_LITERAL(17, 204, 12) // "itemSelected"
+QT_MOC_LITERAL(11, 114, 13), // "saveOrDiscard"
+QT_MOC_LITERAL(12, 128, 6), // "create"
+QT_MOC_LITERAL(13, 135, 9), // "setFilter"
+QT_MOC_LITERAL(14, 145, 11), // "focusFilter"
+QT_MOC_LITERAL(15, 157, 15), // "containsPressed"
+QT_MOC_LITERAL(16, 173, 22), // "filterDownArrowPressed"
+QT_MOC_LITERAL(17, 196, 21), // "filterEnterKeyPressed"
+QT_MOC_LITERAL(18, 218, 12) // "itemSelected"
 
     },
     "ItemWidget\0itemSelectedSignal\0\0Item\0"
     "item\0refresh\0enableControls\0"
     "removeSelectedItem\0save\0bSkipConfirmation\0"
-    "discard\0create\0setFilter\0focusFilter\0"
-    "containsPressed\0filterDownArrowPressed\0"
-    "filterEnterKeyPressed\0itemSelected"
+    "discard\0saveOrDiscard\0create\0setFilter\0"
+    "focusFilter\0containsPressed\0"
+    "filterDownArrowPressed\0filterEnterKeyPressed\0"
+    "itemSelected"
 };
 #undef QT_MOC_LITERAL
 
@@ -323,7 +325,7 @@ static const uint qt_meta_data_ItemWidget[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -331,21 +333,22 @@ static const uint qt_meta_data_ItemWidget[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   79,    2, 0x06 /* Public */,
+       1,    1,   84,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       5,    0,   82,    2, 0x0a /* Public */,
-       6,    0,   83,    2, 0x0a /* Public */,
-       7,    0,   84,    2, 0x0a /* Public */,
-       8,    1,   85,    2, 0x0a /* Public */,
-      10,    1,   88,    2, 0x0a /* Public */,
-      11,    0,   91,    2, 0x0a /* Public */,
-      12,    0,   92,    2, 0x0a /* Public */,
-      13,    0,   93,    2, 0x0a /* Public */,
-      14,    0,   94,    2, 0x0a /* Public */,
-      15,    0,   95,    2, 0x0a /* Public */,
-      16,    0,   96,    2, 0x0a /* Public */,
-      17,    0,   97,    2, 0x0a /* Public */,
+       5,    0,   87,    2, 0x0a /* Public */,
+       6,    0,   88,    2, 0x0a /* Public */,
+       7,    0,   89,    2, 0x0a /* Public */,
+       8,    1,   90,    2, 0x0a /* Public */,
+      10,    1,   93,    2, 0x0a /* Public */,
+      11,    0,   96,    2, 0x0a /* Public */,
+      12,    0,   97,    2, 0x0a /* Public */,
+      13,    0,   98,    2, 0x0a /* Public */,
+      14,    0,   99,    2, 0x0a /* Public */,
+      15,    0,  100,    2, 0x0a /* Public */,
+      16,    0,  101,    2, 0x0a /* Public */,
+      17,    0,  102,    2, 0x0a /* Public */,
+      18,    0,  103,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
@@ -356,6 +359,7 @@ static const uint qt_meta_data_ItemWidget[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Bool,    9,
     QMetaType::Void, QMetaType::Bool,    9,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -379,13 +383,14 @@ void ItemWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 3: _t->removeSelectedItem(); break;
         case 4: _t->save((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 5: _t->discard((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 6: _t->create(); break;
-        case 7: _t->setFilter(); break;
-        case 8: _t->focusFilter(); break;
-        case 9: _t->containsPressed(); break;
-        case 10: _t->filterDownArrowPressed(); break;
-        case 11: _t->filterEnterKeyPressed(); break;
-        case 12: _t->itemSelected(); break;
+        case 6: _t->saveOrDiscard(); break;
+        case 7: _t->create(); break;
+        case 8: _t->setFilter(); break;
+        case 9: _t->focusFilter(); break;
+        case 10: _t->containsPressed(); break;
+        case 11: _t->filterDownArrowPressed(); break;
+        case 12: _t->filterEnterKeyPressed(); break;
+        case 13: _t->itemSelected(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -426,13 +431,13 @@ int ItemWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 13)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 13;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 13)
+        if (_id < 14)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 13;
+        _id -= 14;
     }
     return _id;
 }

@@ -247,31 +247,51 @@ ItemWidget::ItemWidget(bool bEditMode, QWidget *parent) :
 {
   QHBoxLayout* buttonLayout = new QHBoxLayout();
   buttonLayout->setContentsMargins(0, 0, 0, 0);
-  m_create = new QPushButton();
-  m_create->setFlat(true);
-  m_create->setText("");
-  m_create->setIconSize(QSize(24, 24));
-  m_create->setIcon(QIcon(":/icons/res/newitem.png"));
-  m_save = new QPushButton();
-  m_save->setFlat(true);
-  m_save->setText("");
-  m_save->setIconSize(QSize(24, 24));
-  m_save->setIcon(QIcon(":/icons/res/save.png"));
-  m_discard = new QPushButton();
-  m_discard->setFlat(true);
-  m_discard->setText("");
-  m_discard->setIconSize(QSize(24, 24));
-  m_discard->setIcon(QIcon(":/icons/res/revert.png"));
-  m_refresh = new QPushButton();
-  m_refresh->setFlat(true);
-  m_refresh->setText("");
-  m_refresh->setIconSize(QSize(24, 24));
-  m_refresh->setIcon(QIcon(":/icons/res/refresh.png"));
-  m_remove = new QPushButton();
-  m_remove->setFlat(true);
-  m_remove->setText("");
-  m_remove->setIconSize(QSize(24, 24));
-  m_remove->setIcon(QIcon(":/icons/res/trash.png"));
+  {
+    m_create = new QPushButton();
+    m_create->setFlat(true);
+    m_create->setText("");
+    m_create->setIconSize(QSize(24, 24));
+    m_create->setIcon(QIcon(":/icons/res/newitem.png"));
+    m_create->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
+  }
+
+  {
+    m_save = new QPushButton();
+    m_save->setFlat(true);
+    m_save->setText("");
+    m_save->setIconSize(QSize(24, 24));
+    m_save->setIcon(QIcon(":/icons/res/save.png"));
+    m_save->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+  }
+
+  {
+    m_discard = new QPushButton();
+    m_discard->setFlat(true);
+    m_discard->setText("");
+    m_discard->setIconSize(QSize(24, 24));
+    m_discard->setIcon(QIcon(":/icons/res/revert.png"));
+    m_discard->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Y));
+  }
+
+  {
+    m_refresh = new QPushButton();
+    m_refresh->setFlat(true);
+    m_refresh->setText("");
+    m_refresh->setIconSize(QSize(24, 24));
+    m_refresh->setIcon(QIcon(":/icons/res/refresh.png"));
+    m_refresh->setShortcut(QKeySequence(Qt::Key_F5));
+  }
+
+  {
+    m_remove = new QPushButton();
+    m_remove->setFlat(true);
+    m_remove->setText("");
+    m_remove->setIconSize(QSize(24, 24));
+    m_remove->setIcon(QIcon(":/icons/res/trash.png"));
+    m_remove->setShortcut(QKeySequence(Qt::Key_Delete));
+  }
+
   buttonLayout->addWidget(m_create);
   buttonLayout->addWidget(m_save);
   buttonLayout->addWidget(m_discard);
@@ -510,6 +530,8 @@ void ItemWidget::create()
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->insertRow(model->rowCount());
+    m_table->setCurrentIndex(m_table->model()->index(model->rowCount() - 1, 0));
+    m_table->setFocus();
   }
   enableControls();
 }

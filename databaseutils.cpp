@@ -401,6 +401,13 @@ bool ItemDatabase::select(QSqlDatabase db,
     }
     else
     {
+      item.m_description = "Item não encontrado.";
+      item.m_unity = "?";
+      item.m_supplier = "?";
+      item.m_price = 0.0;
+      item.m_details = "?";
+      item.m_midasCode = "?";
+      item.m_icon = -1;
       error = "Item não encontrado.";
     }
   }
@@ -477,6 +484,7 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
   bool bSuccess = query.exec(str);
   if (bSuccess)
   {
+    bSuccess = false;
     while (query.next())
     {
       totals.push_back(query.value(0).toDouble());
@@ -485,6 +493,50 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
     }
     if (!bSuccess)
       error = "Valor não encontrado.";
+  }
+  else
+  {
+    error = query.lastError().text();
+  }
+
+  return bSuccess;
+}
+
+bool ConsumptionSQL::selectDate(QSqlDatabase db,
+                                qint64 date,
+                                QVector<Consumption>& consumptions,
+                                QString& error)
+{
+  consumptions.clear();
+  error.clear();
+
+  if (!BaitaDatabase::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  bool bSuccess = query.exec("SELECT "
+                             "_ID,"
+                             "_DATE,"
+                             "_ITEMID,"
+                             "_PRICE,"
+                             "_AMMOUNT,"
+                             "_TOTAL "
+                             "FROM _CONSUMPTION "
+                             "WHERE _DATE = " + QString::number(date));
+
+  if (bSuccess)
+  {
+    while (query.next())
+    {
+      Consumption c;
+      c.m_id = query.value(0).toInt();
+      c.m_date = query.value(1).toLongLong();
+      c.m_itemID = query.value(2).toInt();
+      c.m_price = query.value(3).toDouble();
+      c.m_ammount = query.value(4).toDouble();
+      c.m_total = query.value(5).toDouble();
+      consumptions.push_back(c);
+    }
   }
   else
   {

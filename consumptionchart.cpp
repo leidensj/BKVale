@@ -1,8 +1,8 @@
 #include "consumptionchart.h"
 #include <QLayout>
 
-ConsumptionChart::ConsumptionChart(const QVector<qint64>& dates,
-                                   const QVector<double>& totals,
+ConsumptionChart::ConsumptionChart(const QVector<qint64>& vDate,
+                                   const QVector<double>& vTotal,
                                    QWidget* parent)
   : QFrame(parent)
 {
@@ -30,10 +30,10 @@ ConsumptionChart::ConsumptionChart(const QVector<qint64>& dates,
   // prepare x axis with country labels:
   QVector<double> ticks;
   QVector<QString> labels;
-  for (int i = 0; i != dates.size(); ++i)
+  for (int i = 0; i != vDate.size(); ++i)
   {
     ticks << (i + 1);
-    labels << QDate::fromJulianDay(dates.at(i)).toString("dd/MM/yyyy");
+    labels << QDate::fromJulianDay(vDate.at(i)).toString("dd/MM/yyyy");
   }
   QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
   textTicker->addTicks(ticks, labels);
@@ -63,7 +63,7 @@ ConsumptionChart::ConsumptionChart(const QVector<qint64>& dates,
   m_plot->yAxis->grid()->setSubGridPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
 
   // Add data:
-  bars->setData(ticks, totals);
+  bars->setData(ticks, vTotal);
 
   // setup legend:
   /*customPlot->legend->setVisible(true);

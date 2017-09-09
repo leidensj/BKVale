@@ -184,6 +184,11 @@ void BaitaAssistant::notePrint()
     QString error;
     Printer::print(m_printer, str, error);
   }
+  else if (ui->tabWidget->currentIndex() == (int)Functionality::ConsumptionMode)
+  {
+    QString error;
+    Printer::print(m_printer, m_consumption.printContent(), error);
+  }
 }
 
 void BaitaAssistant::showSettings()
@@ -234,6 +239,10 @@ void BaitaAssistant::enableControls()
     case Functionality::ReminderMode:
     {
       ui->actionPrint->setEnabled(m_reminder.isValid() && bIsOpen && m_bReady);
+    } break;
+    case Functionality::ConsumptionMode:
+    {
+      ui->actionPrint->setEnabled(m_consumption.isValid() && bIsOpen && m_bReady);
     } break;
     case Functionality::ShopMode:
     default:

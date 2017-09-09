@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QSqlDatabase>
 #include "consumption.h"
+#include "item.h"
 
 class QPushButton;
 class QTableView;
@@ -17,6 +18,23 @@ public:
   explicit ConsumptionDatabase(QWidget *parent = 0);
   ~ConsumptionDatabase();
   void setDatabase(QSqlDatabase db);
+  bool isValid() const;
+
+  static void consumption(QSqlDatabase db,
+                          qint64 date,
+                          QVector<Consumption>& vConsumption,
+                          QVector<Item>& vItem);
+
+  static void subTotal(QSqlDatabase db,
+                       const Consumption::Filter& filter,
+                       QVector<qint64>& vDate,
+                       QVector<double>& vSubTotal);
+
+  static double total(QSqlDatabase db,
+                      const Consumption::Filter& filter);
+
+  static double total(QSqlDatabase db,
+                      qint64 date);
 
 private slots:
   void enableControls();
@@ -32,8 +50,8 @@ public slots:
 
 signals:
   void filterSignal();
-  void chartSignal(const QVector<qint64>& dates,
-                   const QVector<double>& totals);
+  void chartSignal(const QVector<qint64>& vDate,
+                   const QVector<double>& vTotal);
 
 private:
   QPushButton* m_openFilter;

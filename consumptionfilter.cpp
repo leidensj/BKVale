@@ -94,9 +94,14 @@ void ConsumptionFilter::enableControls()
 
 void ConsumptionFilter::emitChangedSignal()
 {
-  Consumption::Filter filter;
-  filter.m_bDate = m_enable->isChecked();
-  filter.m_datei = m_datei->date().toJulianDay();
-  filter.m_datef = m_datef->date().toJulianDay();
-  emit changedSignal(filter);
+  emit changedSignal(filter());
+}
+
+Consumption::Filter ConsumptionFilter::filter() const
+{
+  Consumption::Filter f;
+  f.m_bDate = m_enable->isChecked();
+  f.m_datei = m_datei->date().toJulianDay();
+  f.m_datef = m_datef->date().toJulianDay();
+  return f;
 }

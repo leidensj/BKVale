@@ -14,6 +14,7 @@ class ConsumptionFilter : public QFrame
 
 public:
   explicit ConsumptionFilter(QWidget* parent = 0);
+  Consumption::Filter filter() const;
 
 private:
   QDateEdit* m_datei;

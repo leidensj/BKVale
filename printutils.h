@@ -4,6 +4,8 @@
 #include <QtSerialPort/QtSerialPort>
 #include "note.h"
 #include "reminder.h"
+#include "item.h"
+#include "consumption.h"
 
 namespace Printer
 {
@@ -23,5 +25,17 @@ namespace NotePrinter
 namespace ReminderPrinter
 {
   QString build(const Reminder& r);
+}
+
+namespace ConsumptionPrinter
+{
+  QString build(qint64 date,
+                const QVector<Consumption>& consumptions,
+                const QVector<Item>& items,
+                double total);
+
+  QString build(const QVector<qint64>& dates,
+                const QVector<double>& totals,
+                double total);
 }
 #endif // PRINTUTILS_H

@@ -334,16 +334,11 @@ void ConsumptionDatabase::emitChartSignal()
 {
   if (m_table->model() != nullptr)
   {
-    QVector<double> totals;
-    QVector<qint64> dates;
-    QString error;
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-    ConsumptionSQL::selectTotal(model->database(),
-                                m_filter,
-                                dates,
-                                totals,
-                                error);
-    emit chartSignal(dates, totals);
+    QVector<double> vSubTotal;
+    QVector<qint64> vDate;
+    subTotal(model->database(), m_filter, vDate, vSubTotal);
+    emit chartSignal(vDate, vSubTotal);
   }
 }
 
@@ -357,18 +352,74 @@ void ConsumptionDatabase::updateTotal()
   if (m_table->model() != nullptr)
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-    double total = 0.0;
-    QString error;
-    if (ConsumptionSQL::selectTotal(model->database(),
-                                    m_filter,
-                                    total,
-                                    error))
-    {
-      m_total->setText("R$ " + QString::number(total, 'f', 2));
-    }
-    else
-    {
-      m_total->setText(error);
-    }
+    double t = total(model->database(), m_filter);
+    m_total->setText("R$ " + QString::number(t, 'f', 2));
   }
+}
+
+void ConsumptionDatabase::consumption(QSqlDatabase db,
+                                      qint64 date,
+                                      QVector<Consumption>& vConsumption,
+                                      QVector<Item>& vItem)
+{
+  vConsumption.clear();
+  vItem.clear();
+
+  QString error;
+  ConsumptionSQL::selectDate(db,
+                             date,
+                             vConsumption,
+                             error);
+
+  for (int i = 0; i != vConsumption.size(); ++i)
+  {
+    Item item;
+    ItemDatabase::select(db,
+                         vConsumption.at(i).m_id,
+                         item,
+                         error);
+    vItem.push_back(item);
+  }
+}
+
+void ConsumptionDatabase::subTotal(QSqlDatabase db,
+                                   const Consumption::Filter& filter,
+                                   QVector<qint64>& vDate,
+                                   QVector<double>& vTotal)
+{
+  QString error;
+  ConsumptionSQL::selectTotal(db,
+                              filter,
+                              vDate,
+                              vTotal,
+                              error);
+}
+
+double ConsumptionDatabase::total(QSqlDatabase db,
+                                  const Consumption::Filter& filter)
+{
+  double t = 0.0;
+  QString error;
+  ConsumptionSQL::selectTotal(db, filter, t, error);
+  return t;
+}
+
+double ConsumptionDatabase::total(QSqlDatabase db,
+                                         qint64 date)
+{
+  double t = 0.0;
+  QString error;
+  Consumption::Filter filter;
+  filter.m_bDate = true;
+  filter.m_datei = date;
+  filter.m_datef = date;
+  ConsumptionSQL::selectTotal(db, filter, t, error);
+  return t;
+}
+
+bool ConsumptionDatabase::isValid() const
+{
+  if (m_table->model() != nullptr)
+    return m_table->model()->rowCount() != 0;
+  return false;
 }

@@ -67,6 +67,11 @@ namespace ItemDatabase
 
 namespace ConsumptionSQL
 {
+  bool selectDate(QSqlDatabase db,
+                  qint64 date,
+                  QVector<Consumption>& consumptions,
+                  QString& error);
+
   bool selectTotal(QSqlDatabase db,
                    const Consumption::Filter& filter,
                    double& total,

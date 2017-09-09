@@ -20,6 +20,7 @@ enum class Functionality : int
 {
   NoteMode = 0,
   ReminderMode,
+  CalculatorMode,
   ShopMode,
   ConsumptionMode
 };

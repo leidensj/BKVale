@@ -209,5 +209,115 @@ QString ReminderPrinter::build(const Reminder& r)
   return str;
 }
 
+QString ConsumptionPrinter::build(qint64 date,
+                                  const QVector<Consumption>& vConsumption,
+                                  const QVector<Item>& vItem,
+                                  double total)
+{
+  if (vConsumption.size() != vItem.size())
+    return "";
 
+  QString str;
+  str += ESC_EXPAND_ON
+         ESC_ALIGN_CENTER
+         "BAITAKÃO"
+         ESC_LF
+         "RUA SINIMBU 175 LOURDES"
+         ESC_LF
+         "32221034 32281666"
+         ESC_LF
+         "WWW.BAITAKAO.COM.BR"
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_EXPAND_OFF
+         "RELATÓRIO DE CONSUMO"
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_EXPAND_ON +
+         QDate::fromJulianDay(date).toString("dd/MM/yyyy") +
+         QDate::fromJulianDay(date).toString(" (dddd)") +
+         ESC_LF
+         ESC_EXPAND_OFF
+         ESC_ALIGN_LEFT;
+
+  for (int i = 0; i != vConsumption.size(); ++i)
+  {
+    QString subStr;
+    {
+      QString subStr1 = QString::number(vConsumption.at(i).m_ammount, 'f', 3) +
+                        vItem.at(i).m_unity +
+                        " x R$" +
+                        QString::number(vConsumption.at(i).m_price, 'f', 2);
+      QString subStr2 = "R$" + QString::number(vConsumption.at(i).m_total, 'f', 2);
+      const int n = TABLE_WIDTH - (subStr1.length() + subStr2.length());
+      for (int j = 0; j < n; ++j)
+        subStr1 += " ";
+      subStr = subStr1 + ESC_STRESS_ON + subStr2 + ESC_STRESS_OFF;
+    }
+    str += vItem.at(i).m_description + ESC_LF + subStr +
+           ESC_LF "────────────────────────────────────────────────" ESC_LF;
+  }
+
+  str += ESC_LF
+         ESC_ALIGN_CENTER
+         ESC_DOUBLE_FONT_ON
+         "TOTAL R$" +
+         QString::number(total, 'f', 2) +
+         ESC_DOUBLE_FONT_OFF
+         ESC_LF
+         ESC_LF
+         ESC_FULL_CUT;
+
+  return str;
+}
+
+QString ConsumptionPrinter::build(const QVector<qint64>& vDate,
+                                  const QVector<double>& vSubTotal,
+                                  double total)
+{
+  if (vDate.size() != vSubTotal.size())
+    return "";
+
+  QString str;
+  str += ESC_EXPAND_ON
+         ESC_ALIGN_CENTER
+         "BAITAKÃO"
+         ESC_LF
+         "RUA SINIMBU 175 LOURDES"
+         ESC_LF
+         "32221034 32281666"
+         ESC_LF
+         "WWW.BAITAKAO.COM.BR"
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_EXPAND_OFF
+         "RELATÓRIO DE CONSUMO"
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_ALIGN_LEFT;
+
+  for (int i = 0; i != vDate.size(); ++i)
+  {
+    QString pt1 = QDate::fromJulianDay(vDate.at(i)).toString("dd/MM/yyyy") +
+                  QDate::fromJulianDay(vDate.at(i)).toString(" (dddd)");
+    QString pt2 = "R$" + QString::number(vSubTotal.at(i), 'f', 2);
+    const int n = TABLE_WIDTH - (pt1.length() + pt2.length());
+    for (int j = 0; j < n; ++j)
+      pt1 += " ";
+    str += pt1 + pt2 + ESC_LF;
+  }
+
+  str += ESC_LF
+         ESC_LF
+         ESC_ALIGN_CENTER
+         ESC_DOUBLE_FONT_ON
+         "TOTAL R$" +
+         QString::number(total, 'f', 2) +
+         ESC_DOUBLE_FONT_OFF
+         ESC_LF
+         ESC_LF
+         ESC_FULL_CUT;
+
+  return str;
+}
 

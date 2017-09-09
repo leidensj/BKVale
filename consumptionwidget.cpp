@@ -7,6 +7,7 @@
 #include "consumptiondatabase.h"
 #include "consumptionfilter.h"
 #include "consumptionchart.h"
+#include "printutils.h"
 
 ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   : QFrame(parent)
@@ -64,7 +65,8 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
 
 void ConsumptionWidget::setDatabase(QSqlDatabase db)
 {
-  m_database->setDatabase(db);
+  m_db = db;
+  m_database->setDatabase(m_db);
 }
 
 void ConsumptionWidget::showFilter()
@@ -75,13 +77,13 @@ void ConsumptionWidget::showFilter()
     m_dock->show();
 }
 
-void ConsumptionWidget::showChart(const QVector<qint64>& dates,
-                                  const QVector<double>& totals)
+void ConsumptionWidget::showChart(const QVector<qint64>& vDate,
+                                  const QVector<double>& vTotal)
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ConsumptionChart* chart = new ConsumptionChart(dates, totals);
+  ConsumptionChart* chart = new ConsumptionChart(vDate, vTotal);
   layout->addWidget(chart);
   dlg.resize(640, 480);
   dlg.setWindowTitle(tr("Análise de Consumo"));
@@ -89,4 +91,34 @@ void ConsumptionWidget::showChart(const QVector<qint64>& dates,
   dlg.setWindowFlags(Qt::Window);
   dlg.setModal(true);
   dlg.exec();
+}
+
+QString ConsumptionWidget::printContent()
+{
+  if (m_database->isValid())
+  {
+    Consumption::Filter f = m_filter->filter();
+    if (f.m_bDate && (f.m_datei == f.m_datef))
+    {
+      QVector<Consumption> vConsumption;
+      QVector<Item> vItem;
+      m_database->consumption(m_db, f.m_datei, vConsumption, vItem);
+      double t = m_database->total(m_db, f.m_datei);
+      return ConsumptionPrinter::build(f.m_datei, vConsumption, vItem, t);
+    }
+    else
+    {
+      QVector<qint64> vDate;
+      QVector<double> vSubTotal;
+      m_database->subTotal(m_db, f, vDate, vSubTotal);
+      double t = m_database->total(m_db, f);
+      return ConsumptionPrinter::build(vDate, vSubTotal, t);
+    }
+  }
+  return "";
+}
+
+bool ConsumptionWidget::isValid() const
+{
+  return m_database->isValid();
 }

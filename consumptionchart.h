@@ -8,8 +8,8 @@
 class ConsumptionChart : public QFrame
 {
 public:
-  explicit ConsumptionChart(const QVector<qint64>& dates,
-                            const QVector<double>& totals,
+  explicit ConsumptionChart(const QVector<qint64>& vDate,
+                            const QVector<double>& vTotal,
                             QWidget* parent = 0);
 
 private:

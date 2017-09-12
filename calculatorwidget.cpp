@@ -131,14 +131,14 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
     m_btnDec->setText("");
     m_btnDec->setIconSize(QSize(64, 64));
     m_btnDec->setIcon(QIcon(":/icons/res/calcdec.png"));
-    m_btnDec->setShortcut(QKeySequence(Qt::Key_Comma, Qt::Key_Period));
+    m_btnDec->setShortcut(QKeySequence(Qt::Key_Comma));
 
     m_btnEq = new QPushButton();
     m_btnEq->setFlat(true);
     m_btnEq->setText("");
     m_btnEq->setIconSize(QSize(64, 64));
     m_btnEq->setIcon(QIcon(":/icons/res/calcequal.png"));
-    m_btnEq->setShortcut(QKeySequence(Qt::Key_Return, Qt::Key_Enter));
+    m_btnEq->setShortcut(QKeySequence(Qt::Key_Enter));
 
     m_btnPlus = new QPushButton();
     m_btnPlus->setFlat(true);

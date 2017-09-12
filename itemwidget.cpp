@@ -530,7 +530,6 @@ void ItemWidget::create()
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->insertRow(model->rowCount());
-    m_table->setCurrentIndex(m_table->model()->index(model->rowCount() - 1, 0));
     m_table->setFocus();
   }
   enableControls();

@@ -375,7 +375,7 @@ void ConsumptionDatabase::consumption(QSqlDatabase db,
   {
     Item item;
     ItemDatabase::select(db,
-                         vConsumption.at(i).m_id,
+                         vConsumption.at(i).m_itemID,
                          item,
                          error);
     vItem.push_back(item);

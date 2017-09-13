@@ -45,16 +45,14 @@ public:
   Consumption consumption() const;
 
 private:
+  int m_currentItemID;
   QDateEdit* m_date;
   QLabel* m_weekDay;
   EnterPushButton* m_search;
   QLineEdit* m_item;
-  QLabel* m_priceIcon;
   EnterDoubleSpinBox* m_price;
-  QLabel* m_ammountIcon;
   EnterDoubleSpinBox* m_ammount;
   EnterPushButton* m_save;
-  int m_currentItemID;
   QSqlDatabase m_db;
 
 private slots:

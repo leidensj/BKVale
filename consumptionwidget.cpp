@@ -13,11 +13,13 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   : QFrame(parent)
   , m_view(nullptr)
   , m_database(nullptr)
+  , m_filter(nullptr)
+  , m_dock(nullptr)
 {
-  m_view = new ConsumptionView();
-  m_database = new ConsumptionDatabase();
-  m_filter = new ConsumptionFilter();
-  m_dock = new QDockWidget();
+  m_view = new ConsumptionView;
+  m_database = new ConsumptionDatabase;
+  m_filter = new ConsumptionFilter;
+  m_dock = new QDockWidget;
 
   m_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   m_filter->layout()->setAlignment(Qt::AlignTop);
@@ -40,10 +42,10 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
 
   m_dock->close();
 
-  QObject::connect(m_view,
+  /*QObject::connect(m_view,
                    SIGNAL(insertSignal(const Consumption&)),
                    m_database,
-                   SLOT(insert(const Consumption&)));
+                   SLOT(insert(const Consumption&)));*/
 
   QObject::connect(m_filter,
                    SIGNAL(changedSignal(const Consumption::Filter&)),

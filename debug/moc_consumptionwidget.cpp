@@ -36,15 +36,15 @@ QT_MOC_LITERAL(0, 0, 17), // "ConsumptionWidget"
 QT_MOC_LITERAL(1, 18, 9), // "showChart"
 QT_MOC_LITERAL(2, 28, 0), // ""
 QT_MOC_LITERAL(3, 29, 15), // "QVector<qint64>"
-QT_MOC_LITERAL(4, 45, 5), // "dates"
+QT_MOC_LITERAL(4, 45, 5), // "vDate"
 QT_MOC_LITERAL(5, 51, 15), // "QVector<double>"
-QT_MOC_LITERAL(6, 67, 6), // "totals"
+QT_MOC_LITERAL(6, 67, 6), // "vTotal"
 QT_MOC_LITERAL(7, 74, 10) // "showFilter"
 
     },
     "ConsumptionWidget\0showChart\0\0"
-    "QVector<qint64>\0dates\0QVector<double>\0"
-    "totals\0showFilter"
+    "QVector<qint64>\0vDate\0QVector<double>\0"
+    "vTotal\0showFilter"
 };
 #undef QT_MOC_LITERAL
 

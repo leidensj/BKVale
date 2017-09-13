@@ -4,8 +4,6 @@
 #include <QLayout>
 #include <QDateEdit>
 #include <QLabel>
-#include <QPushButton>
-#include <QDoubleSpinBox>
 #include <QLineEdit>
 #include <QKeyEvent>
 
@@ -62,37 +60,30 @@ void EnterDoubleSpinBox::keyPressEvent(QKeyEvent* event)
 
 ConsumptionView::ConsumptionView(QWidget *parent)
   : QFrame(parent)
+  , m_currentItemID(INVALID_ITEM_ID)
   , m_date(nullptr)
   , m_weekDay(nullptr)
   , m_search(nullptr)
   , m_item(nullptr)
-  , m_priceIcon(nullptr)
   , m_price(nullptr)
-  , m_ammountIcon(nullptr)
   , m_ammount(nullptr)
-  , m_currentItemID(INVALID_ITEM_ID)
+  , m_save(nullptr)
 {
-  {
-    m_date = new QDateEdit();
-    m_date->setCalendarPopup(true);
-    m_date->setDisplayFormat("dd/MM/yyyy");
-  }
+  m_date = new QDateEdit();
+  m_date->setCalendarPopup(true);
+  m_date->setDisplayFormat("dd/MM/yyyy");
 
   m_weekDay = new QLabel();
 
-  {
-    m_search = new EnterPushButton();
-    m_search->setFlat(true);
-    m_search->setText("");
-    m_search->setIconSize(QSize(24, 24));
-    m_search->setIcon(QIcon(":/icons/res/search.png"));
-    m_search->setDefault(true);
-  }
+  m_search = new EnterPushButton();
+  m_search->setFlat(true);
+  m_search->setText("");
+  m_search->setIconSize(QSize(24, 24));
+  m_search->setIcon(QIcon(":/icons/res/search.png"));
+  m_search->setDefault(true);
 
-  {
-    m_item = new QLineEdit();
-    m_item->setEnabled(false);
-  }
+  m_item = new QLineEdit();
+  m_item->setEnabled(false);
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->addWidget(m_date);
@@ -101,55 +92,30 @@ ConsumptionView::ConsumptionView(QWidget *parent)
   hlayout1->addWidget(m_item);
   hlayout1->setContentsMargins(0, 0, 0, 0);
 
-  /*{
-    m_priceIcon = new QLabel();
-    m_priceIcon->setText("");
-    m_priceIcon->setPixmap(QPixmap(":/icons/res/price.png"));
-    m_priceIcon->setMinimumSize(24, 24);
-    m_priceIcon->setMaximumSize(24,24);
-    m_priceIcon->setScaledContents(true);
-  }*/
 
-  {
-    m_price = new EnterDoubleSpinBox();
-    m_price->setMinimum(0.0);
-    m_price->setMaximum(9999.99);
-    m_price->setSpecialValueText(tr("Preço"));
-    m_price->setSizePolicy(QSizePolicy::Policy::Expanding,
+  m_price = new EnterDoubleSpinBox();
+  m_price->setMinimum(0.0);
+  m_price->setMaximum(9999.99);
+  m_price->setSpecialValueText(tr("Preço"));
+  m_price->setSizePolicy(QSizePolicy::Policy::Expanding,
+                         QSizePolicy::Policy::Fixed);
+
+  m_ammount = new EnterDoubleSpinBox();
+  m_ammount->setMinimum(0.0);
+  m_ammount->setMaximum(9999.99);
+  m_ammount->setSpecialValueText(tr("Quantidade"));
+  m_ammount->setSizePolicy(QSizePolicy::Policy::Expanding,
                            QSizePolicy::Policy::Fixed);
-  }
 
-  /*{
-    m_ammountIcon = new QLabel();
-    m_ammountIcon->setText("");
-    m_ammountIcon->setPixmap(QPixmap(":/icons/res/ammount.png"));
-    m_ammountIcon->setMinimumSize(24, 24);
-    m_ammountIcon->setMaximumSize(24,24);
-    m_ammountIcon->setScaledContents(true);
-  }*/
-
-  {
-    m_ammount = new EnterDoubleSpinBox();
-    m_ammount->setMinimum(0.0);
-    m_ammount->setMaximum(9999.99);
-    m_ammount->setSpecialValueText(tr("Quantidade"));
-    m_ammount->setSizePolicy(QSizePolicy::Policy::Expanding,
-                           QSizePolicy::Policy::Fixed);
-  }
-
-  {
-    m_save = new EnterPushButton();
-    m_save->setFlat(true);
-    m_save->setText("");
-    m_save->setIconSize(QSize(24, 24));
-    m_save->setIcon(QIcon(":/icons/res/save.png"));
-    m_save->setDefault(true);
-  }
+  m_save = new EnterPushButton();
+  m_save->setFlat(true);
+  m_save->setText("");
+  m_save->setIconSize(QSize(24, 24));
+  m_save->setIcon(QIcon(":/icons/res/save.png"));
+  m_save->setDefault(true);
 
   QHBoxLayout* hlayout2 = new QHBoxLayout();
-  hlayout2->addWidget(m_priceIcon);
   hlayout2->addWidget(m_price);
-  hlayout2->addWidget(m_ammountIcon);
   hlayout2->addWidget(m_ammount);
   hlayout2->addWidget(m_save);
   hlayout2->setContentsMargins(0, 0, 0, 0);

@@ -112,52 +112,45 @@ public:
 
 ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   : QFrame(parent)
+  , m_openFilter(nullptr)
   , m_refresh(nullptr)
   , m_remove(nullptr)
   , m_table(nullptr)
+  , m_total(nullptr)
+  , m_chart(nullptr)
 {
-  {
-    m_openFilter = new QPushButton();
-    m_openFilter->setFlat(true);
-    m_openFilter->setText("");
-    m_openFilter->setIconSize(QSize(24, 24));
-    m_openFilter->setIcon(QIcon(":/icons/res/filter.png"));
-  }
+  m_openFilter = new QPushButton();
+  m_openFilter->setFlat(true);
+  m_openFilter->setText("");
+  m_openFilter->setIconSize(QSize(24, 24));
+  m_openFilter->setIcon(QIcon(":/icons/res/filter.png"));
 
-  {
-    m_refresh = new QPushButton();
-    m_refresh->setFlat(true);
-    m_refresh->setText("");
-    m_refresh->setIconSize(QSize(24, 24));
-    m_refresh->setIcon(QIcon(":/icons/res/refresh.png"));
-  }
+  m_refresh = new QPushButton();
+  m_refresh->setFlat(true);
+  m_refresh->setText("");
+  m_refresh->setIconSize(QSize(24, 24));
+  m_refresh->setIcon(QIcon(":/icons/res/refresh.png"));
 
-  {
-    m_remove = new QPushButton();
-    m_remove->setFlat(true);
-    m_remove->setText("");
-    m_remove->setIconSize(QSize(24, 24));
-    m_remove->setIcon(QIcon(":/icons/res/trash.png"));
-  }
+  m_remove = new QPushButton();
+  m_remove->setFlat(true);
+  m_remove->setText("");
+  m_remove->setIconSize(QSize(24, 24));
+  m_remove->setIcon(QIcon(":/icons/res/trash.png"));
 
-  {
-    m_total = new QLineEdit();
-    m_total->setAlignment(Qt::AlignRight);
-    m_total->setPlaceholderText("Consumo Total");
-    m_total->setReadOnly(true);
-    QPalette palette = m_total->palette();
-    palette.setColor(QPalette::Text, Qt::red);
-    m_total->setPalette(palette);
-  }
+  m_total = new QLineEdit();
+  m_total->setAlignment(Qt::AlignRight);
+  m_total->setPlaceholderText("Consumo Total");
+  m_total->setReadOnly(true);
+  QPalette palette = m_total->palette();
+  palette.setColor(QPalette::Text, Qt::red);
+  m_total->setPalette(palette);
 
-  {
-    m_chart = new QPushButton();
-    m_chart->setFlat(true);
-    m_chart->setText("");
-    m_chart->setIconSize(QSize(24, 24));
-    m_chart->setIcon(QIcon(":/icons/res/chart.png"));
-    m_chart->setDefault(true);
-  }
+  m_chart = new QPushButton();
+  m_chart->setFlat(true);
+  m_chart->setText("");
+  m_chart->setIconSize(QSize(24, 24));
+  m_chart->setIcon(QIcon(":/icons/res/chart.png"));
+  m_chart->setDefault(true);
 
   QHBoxLayout* hlayout = new QHBoxLayout();
   hlayout->addWidget(m_openFilter);
@@ -168,14 +161,12 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   hlayout->addWidget(m_chart);
   hlayout->setContentsMargins(0, 0, 0, 0);
 
-  {
-    m_table = new QTableView();
-    m_table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-    m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-    m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    m_table->horizontalHeader()->setHighlightSections(false);
-    m_table->setSortingEnabled(true);
-  }
+  m_table = new QTableView();
+  m_table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+  m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+  m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+  m_table->horizontalHeader()->setHighlightSections(false);
+  m_table->setSortingEnabled(true);
 
   QVBoxLayout* vlayout = new QVBoxLayout();
   vlayout->setContentsMargins(0, 0, 0, 0);

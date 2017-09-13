@@ -310,9 +310,6 @@ public:
         buttonNew->setToolTip(QApplication::translate("NoteWidget", "Novo", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
         buttonNew->setText(QString());
-#ifndef QT_NO_SHORTCUT
-        buttonNew->setShortcut(QApplication::translate("NoteWidget", "Ctrl+N", Q_NULLPTR));
-#endif // QT_NO_SHORTCUT
 #ifndef QT_NO_TOOLTIP
         buttonSearch->setToolTip(QApplication::translate("NoteWidget", "Pesquisar", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP

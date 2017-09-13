@@ -6,44 +6,37 @@
 
 ConsumptionFilter::ConsumptionFilter(QWidget* parent)
   : QFrame(parent)
+  , m_datei(nullptr)
+  , m_datef(nullptr)
+  , m_enable(nullptr)
 {
-  {
-    m_enable = new QCheckBox();
-    m_enable->setText("");
-  }
+  m_enable = new QCheckBox();
+  m_enable->setText("");
 
   QFrame* vFrame = new QFrame;
   vFrame->setFrameShape(QFrame::VLine);
 
   QLabel* dateli = new QLabel();
-  {
-    dateli->setText("Data inicial:");
-    QFont f = dateli->font();
-    f.setPointSize(8);
-    dateli->setFont(f);
-  }
+  dateli->setText("Data inicial:");
+  QFont f1 = dateli->font();
+  f1.setPointSize(8);
+  dateli->setFont(f1);
 
   QLabel* datelf = new QLabel();
-  {
-    datelf->setText("Data final:");
-    QFont f = datelf->font();
-    f.setPointSize(8);
-    datelf->setFont(f);
-  }
+  datelf->setText("Data final:");
+  QFont f2 = datelf->font();
+  f2.setPointSize(8);
+  datelf->setFont(f2);
 
-  {
-    m_datei = new QDateEdit();
-    m_datei->setCalendarPopup(true);
-    m_datei->setDate(QDate::currentDate());
-    m_datei->setDisplayFormat("dd/MM/yyyy");
-  }
+  m_datei = new QDateEdit();
+  m_datei->setCalendarPopup(true);
+  m_datei->setDate(QDate::currentDate());
+  m_datei->setDisplayFormat("dd/MM/yyyy");
 
-  {
-    m_datef = new QDateEdit();
-    m_datef->setCalendarPopup(true);
-    m_datef->setDate(QDate::currentDate());
-    m_datef->setDisplayFormat("dd/MM/yyyy");
-  }
+  m_datef = new QDateEdit();
+  m_datef->setCalendarPopup(true);
+  m_datef->setDate(QDate::currentDate());
+  m_datef->setDisplayFormat("dd/MM/yyyy");
 
   QHBoxLayout* hlayout = new QHBoxLayout();
   hlayout->addWidget(m_enable);

@@ -8,6 +8,7 @@
 #include "consumptionfilter.h"
 #include "consumptionchart.h"
 #include "printutils.h"
+#include "databaseutils.h"
 
 ConsumptionWidget::ConsumptionWidget(QWidget* parent)
   : QFrame(parent)
@@ -42,10 +43,10 @@ ConsumptionWidget::ConsumptionWidget(QWidget* parent)
 
   m_dock->close();
 
-  /*QObject::connect(m_view,
+  QObject::connect(m_view,
                    SIGNAL(insertSignal(const Consumption&)),
                    m_database,
-                   SLOT(insert(const Consumption&)));*/
+                   SLOT(insert(const Consumption&)));
 
   QObject::connect(m_filter,
                    SIGNAL(changedSignal(const Consumption::Filter&)),
@@ -104,16 +105,20 @@ QString ConsumptionWidget::printContent()
     {
       QVector<Consumption> vConsumption;
       QVector<Item> vItem;
-      m_database->consumption(m_db, f.m_datei, vConsumption, vItem);
-      double t = m_database->total(m_db, f.m_datei);
+      ConsumptionSQL::getConsumption(m_db,
+                                     f.m_datei,
+                                     vConsumption,
+                                     vItem);
+      double t = ConsumptionSQL::getTotal(m_db, f.m_datei);
       return ConsumptionPrinter::build(f.m_datei, vConsumption, vItem, t);
     }
     else
     {
       QVector<qint64> vDate;
       QVector<double> vSubTotal;
-      m_database->subTotal(m_db, f, vDate, vSubTotal);
-      double t = m_database->total(m_db, f);
+      QString error;
+      ConsumptionSQL::selectSubTotal(m_db, f, vDate, vSubTotal, error);
+      double t = ConsumptionSQL::getTotal(m_db, f);
       return ConsumptionPrinter::build(vDate, vSubTotal, t);
     }
   }

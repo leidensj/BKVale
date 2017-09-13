@@ -6,6 +6,7 @@
 #include "note.h"
 #include "item.h"
 #include "consumption.h"
+#include "reminder.h"
 #include "settings.h"
 
 #define DEFAULT_NUMBER     1000
@@ -60,28 +61,56 @@ namespace NoteDatabase
 namespace ItemDatabase
 {
   bool select(QSqlDatabase db,
-              int id,
               Item& item,
               QString& error);
 }
 
+namespace ReminderSQL
+{
+  bool insertOrUpdate(QSqlDatabase db,
+                      const Reminder& r,
+                      QString& error);
+
+  bool select(QSqlDatabase db,
+              Reminder& r,
+              QString error);
+
+  void setFavorite(QSqlDatabase db,
+                   int id,
+                   bool bFav);
+
+  bool isFavorite(QSqlDatabase db,
+                  int id);
+}
+
 namespace ConsumptionSQL
 {
-  bool selectDate(QSqlDatabase db,
-                  qint64 date,
-                  QVector<Consumption>& consumptions,
-                  QString& error);
+  bool selectByDate(QSqlDatabase db,
+                    qint64 date,
+                    QVector<Consumption>& consumptions,
+                    QString& error);
 
   bool selectTotal(QSqlDatabase db,
                    const Consumption::Filter& filter,
                    double& total,
                    QString& error);
 
-  bool selectTotal(QSqlDatabase db,
-                   const Consumption::Filter& filter,
-                   QVector<qint64>& dates,
-                   QVector<double>& totals,
-                   QString &error);
+  bool selectSubTotal(QSqlDatabase db,
+                      const Consumption::Filter& filter,
+                      QVector<qint64>& dates,
+                      QVector<double>& totals,
+                      QString &error);
+
+  void getConsumption(QSqlDatabase db,
+                      qint64 date,
+                      QVector<Consumption>& vConsumption,
+                      QVector<Item>& vItem);
+
+  double getTotal(QSqlDatabase db,
+                  const Consumption::Filter& filter);
+
+  double getTotal(QSqlDatabase db,
+                  qint64 date);
 }
 
 #endif // DATABASEUTILS_H

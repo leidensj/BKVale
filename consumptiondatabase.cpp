@@ -74,11 +74,10 @@ public:
           break;
         case ConsumptionTableIndex::Ammount:
         {
-          int itemID = record(index.row()).value("_ITEMID").toInt();
           Item item;
+          item.m_id = record(index.row()).value("_ITEMID").toInt();
           QString error;
           ItemDatabase::select(database(),
-                               itemID,
                                item,
                                error);
           value = QString::number(value.toDouble(), 'f', 3) + item.m_unity;
@@ -88,9 +87,9 @@ public:
         case ConsumptionTableIndex::ItemID:
         {
           Item item;
+          item.m_id = value.toInt();
           QString error;
           bool bSuccess = ItemDatabase::select(database(),
-                                               value.toInt(),
                                                item,
                                                error);
           value = bSuccess ? item.m_description : error;
@@ -328,7 +327,12 @@ void ConsumptionDatabase::emitChartSignal()
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     QVector<double> vSubTotal;
     QVector<qint64> vDate;
-    subTotal(model->database(), m_filter, vDate, vSubTotal);
+    QString error;
+    ConsumptionSQL::selectSubTotal(model->database(),
+                                   m_filter,
+                                   vDate,
+                                   vSubTotal,
+                                   error);
     emit chartSignal(vDate, vSubTotal);
   }
 }
@@ -343,69 +347,9 @@ void ConsumptionDatabase::updateTotal()
   if (m_table->model() != nullptr)
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-    double t = total(model->database(), m_filter);
-    m_total->setText("R$ " + QString::number(t, 'f', 2));
+    double total = ConsumptionSQL::getTotal(model->database(), m_filter);
+    m_total->setText("R$ " + QString::number(total, 'f', 2));
   }
-}
-
-void ConsumptionDatabase::consumption(QSqlDatabase db,
-                                      qint64 date,
-                                      QVector<Consumption>& vConsumption,
-                                      QVector<Item>& vItem)
-{
-  vConsumption.clear();
-  vItem.clear();
-
-  QString error;
-  ConsumptionSQL::selectDate(db,
-                             date,
-                             vConsumption,
-                             error);
-
-  for (int i = 0; i != vConsumption.size(); ++i)
-  {
-    Item item;
-    ItemDatabase::select(db,
-                         vConsumption.at(i).m_itemID,
-                         item,
-                         error);
-    vItem.push_back(item);
-  }
-}
-
-void ConsumptionDatabase::subTotal(QSqlDatabase db,
-                                   const Consumption::Filter& filter,
-                                   QVector<qint64>& vDate,
-                                   QVector<double>& vTotal)
-{
-  QString error;
-  ConsumptionSQL::selectTotal(db,
-                              filter,
-                              vDate,
-                              vTotal,
-                              error);
-}
-
-double ConsumptionDatabase::total(QSqlDatabase db,
-                                  const Consumption::Filter& filter)
-{
-  double t = 0.0;
-  QString error;
-  ConsumptionSQL::selectTotal(db, filter, t, error);
-  return t;
-}
-
-double ConsumptionDatabase::total(QSqlDatabase db,
-                                         qint64 date)
-{
-  double t = 0.0;
-  QString error;
-  Consumption::Filter filter;
-  filter.m_bDate = true;
-  filter.m_datei = date;
-  filter.m_datef = date;
-  ConsumptionSQL::selectTotal(db, filter, t, error);
-  return t;
 }
 
 bool ConsumptionDatabase::isValid() const

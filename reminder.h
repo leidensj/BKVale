@@ -3,6 +3,8 @@
 
 #include <QString>
 
+#define INVALID_REMINDER_ID -1
+
 enum class ReminderColumn : int
 {
   ID,
@@ -13,24 +15,44 @@ enum class ReminderColumn : int
   Size
 };
 
-enum ReminderCapitalization
-{
-  Normal,
-  AllUppercase,
-  AllLowercase
-};
-
 struct Reminder
 {
-  Reminder()
-    : m_bFontSmall(false)
-    , m_bFavorite(false)
-    , m_capitalization(Normal) {}
+  enum class Capitalization : int
+  {
+    Normal,
+    AllUppercase,
+    AllLowercase
+  };
+
+  enum class Size : int
+  {
+    Normal,
+    Large
+  };
+
+  int m_id;
   QString m_title;
   QString m_message;
-  bool m_bFontSmall;
   bool m_bFavorite;
-  ReminderCapitalization m_capitalization;
+  Size m_size;
+  Capitalization m_capitalization;
+
+  void clear()
+  {
+    m_id = INVALID_REMINDER_ID;
+    m_title.clear();
+    m_message.clear();
+    m_bFavorite = false;
+    m_size = Size::Normal;
+    m_capitalization = Capitalization::Normal;
+  }
+
+  Reminder()
+  {
+    clear();
+  }
+
+  bool isValidID() const { return m_id != INVALID_REMINDER_ID; }
 };
 
 #endif // REMINDER_H

@@ -37,16 +37,20 @@ Reminder ReminderView::reminder() const
   Reminder r;
   r.m_title = ui->editTitle->text();
   r.m_message = ui->editMessage->toPlainText();
-  r.m_bFontSmall = ui->buttonFontSmall->isChecked();
+  r.m_size = ui->buttonFontSmall->isChecked() ? Reminder::Size::Normal
+                                              : Reminder::Size::Large;
   switch(ui->buttonUppercase->checkState())
   {
     case Qt::CheckState::Unchecked:
-      r.m_capitalization = ReminderCapitalization::Normal; break;
+      r.m_capitalization = Reminder::Capitalization::Normal;
+      break;
     case Qt::CheckState::PartiallyChecked:
-      r.m_capitalization = ReminderCapitalization::AllLowercase; break;
+      r.m_capitalization = Reminder::Capitalization::AllLowercase;
+      break;
     case Qt::CheckState::Checked:
     default:
-      r.m_capitalization = ReminderCapitalization::AllUppercase; break;
+      r.m_capitalization = Reminder::Capitalization::AllUppercase;
+      break;
   }
   return r;
 }
@@ -99,17 +103,17 @@ void ReminderView::setReminder(const Reminder r)
 {
   ui->editTitle->setText(r.m_title);
   ui->editMessage->setPlainText(r.m_message);
-  ui->buttonFontBig->setChecked(!r.m_bFontSmall);
-  ui->buttonFontSmall->setChecked(r.m_bFontSmall);
+  ui->buttonFontBig->setChecked(r.m_size == Reminder::Size::Large);
+  ui->buttonFontSmall->setChecked(r.m_size == Reminder::Size::Normal);
   switch(r.m_capitalization)
   {
-    case ReminderCapitalization::AllLowercase:
+    case Reminder::Capitalization::AllLowercase:
       ui->buttonUppercase->setCheckState(Qt::PartiallyChecked);
       break;
-    case ReminderCapitalization::AllUppercase:
+    case Reminder::Capitalization::AllUppercase:
       ui->buttonUppercase->setCheckState(Qt::Checked);
       break;
-    case ReminderCapitalization::Normal:
+    case Reminder::Capitalization::Normal:
     default:
       ui->buttonUppercase->setCheckState(Qt::Unchecked);
       break;

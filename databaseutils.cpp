@@ -361,12 +361,10 @@ void BaitaDatabase::selectSettings(QSqlDatabase db,
 }
 
 bool ItemDatabase::select(QSqlDatabase db,
-                          int id,
                           Item& item,
                           QString& error)
 {
   error.clear();
-  item.clear();
 
   if (!BaitaDatabase::isOpen(db, error))
     return false;
@@ -383,7 +381,7 @@ bool ItemDatabase::select(QSqlDatabase db,
                 "FROM _ITEMS "
                 "WHERE _ID = (:_id)");
 
-  query.bindValue(":_id", id);
+  query.bindValue(":_id", item.m_id);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -401,13 +399,9 @@ bool ItemDatabase::select(QSqlDatabase db,
     }
     else
     {
+      item.clear();
       item.m_description = "Item não encontrado.";
       item.m_unity = "?";
-      item.m_supplier = "?";
-      item.m_price = 0.0;
-      item.m_details = "?";
-      item.m_midasCode = "?";
-      item.m_icon = -1;
       error = "Item não encontrado.";
     }
   }
@@ -417,6 +411,144 @@ bool ItemDatabase::select(QSqlDatabase db,
   }
 
   return bSuccess;
+}
+
+bool ReminderSQL::select(QSqlDatabase db,
+                         Reminder& r,
+                         QString error)
+{
+  error.clear();
+
+  if (!BaitaDatabase::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                "_TITLE,"
+                "_MESSAGE,"
+                "_FAVORITE,"
+                "_CAPITALIZATION,"
+                "_SIZE "
+                "FROM _REMINDERS "
+                "WHERE _ID = (:_id)");
+
+  query.bindValue(":_id", r.m_id);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    bSuccess = query.next();
+    if (bSuccess)
+    {
+      r.m_title = query.value(query.record().indexOf("_TITLE")).toString();
+      r.m_message = query.value(query.record().indexOf("_MESSAGE")).toString();
+      r.m_bFavorite = query.value(query.record().indexOf("_FAVORITE")).toBool();
+      r.m_capitalization = (Reminder::Capitalization)
+                           query.value(query.record().indexOf("_CAPITALIZATION")).toInt();
+      r.m_size = (Reminder::Size)
+                 query.value(query.record().indexOf("_SIZE")).toInt();
+    }
+    else
+    {
+      r.clear();
+      r.m_title = "Lembrete não encontrado.";
+      error = "Lembrete não encontrado.";
+    }
+  }
+  else
+  {
+    error = query.lastError().text();
+  }
+
+  return bSuccess;
+}
+
+bool ReminderSQL::insertOrUpdate(QSqlDatabase db,
+                                 const Reminder& r,
+                                 QString& error)
+{
+  error.clear();
+
+  if (!BaitaDatabase::isOpen(db, error))
+    return false;
+
+  bool bSuccess = false;
+  QSqlQuery query(db);
+  if (r.isValidID())
+  {
+    bSuccess = query.prepare("UPDATE _REMINDERS SET "
+                             "_TITLE = :_text,"
+                             "_MESSAGE = :_msg,"
+                             "_FAVORITE = :_fav,"
+                             "_CAPITALIZATION = :_cap,"
+                             "_SIZE = :_size"
+                             " WHERE _ID = (:_id)");
+    if (bSuccess)
+      query.bindValue(":_id", r.m_id);
+  }
+  else
+  {
+    bSuccess = query.prepare("INSERT INTO _REMINDERS ("
+                             "_TITLE,"
+                             "_MESSAGE,"
+                             "_FAVORITE,"
+                             "_CAPITALIZATION,"
+                             "_SIZE) "
+                             "VALUES ("
+                             "(:_title),"
+                             "(:_msg),"
+                             "(:_fav),"
+                             "(:_cap),"
+                             "(:_size))");
+  }
+
+  if (bSuccess)
+  {
+    query.bindValue(":_id", r.m_id);
+    query.bindValue(":_text", r.m_title);
+    query.bindValue(":_msg", r.m_message);
+    query.bindValue(":_fav", r.m_bFavorite);
+    query.bindValue(":_cap", (int)r.m_capitalization);
+    query.bindValue(":_size", (int)r.m_size);
+    bSuccess = query.exec();
+  }
+
+  if (!bSuccess)
+    error = query.lastError().text();
+
+  return bSuccess;
+}
+
+void ReminderSQL::setFavorite(QSqlDatabase db,
+                              int id,
+                              bool bFav)
+{
+    QSqlQuery query(db);
+    if (query.prepare("UPDATE _REMINDERS SET "
+                      "_FAVORITE = :_fav"
+                      " WHERE _ID = (:_id)"))
+    {
+      query.bindValue(":_id", id);
+      query.bindValue(":_fav", bFav);
+    }
+    query.exec();
+}
+
+bool ReminderSQL::isFavorite(QSqlDatabase db,
+                             int id)
+{
+  QSqlQuery query(db);
+  if (query.prepare("SELECT "
+                    "_FAVORITE "
+                    "FROM _REMINDERS "
+                    "WHERE _ID = (:_id)"))
+  {
+    query.bindValue(":_id", id);
+    if (query.exec())
+      if (query.next())
+        return query.value(0).toBool();
+  }
+  return false;
 }
 
 bool ConsumptionSQL::selectTotal(QSqlDatabase db,
@@ -457,11 +589,11 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
   return bSuccess;
 }
 
-bool ConsumptionSQL::selectTotal(QSqlDatabase db,
-                                 const Consumption::Filter& filter,
-                                 QVector<qint64>& dates,
-                                 QVector<double>& totals,
-                                 QString &error)
+bool ConsumptionSQL::selectSubTotal(QSqlDatabase db,
+                                    const Consumption::Filter& filter,
+                                    QVector<qint64>& dates,
+                                    QVector<double>& totals,
+                                    QString &error)
 {
   dates.clear();
   totals.clear();
@@ -502,10 +634,10 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
   return bSuccess;
 }
 
-bool ConsumptionSQL::selectDate(QSqlDatabase db,
-                                qint64 date,
-                                QVector<Consumption>& consumptions,
-                                QString& error)
+bool ConsumptionSQL::selectByDate(QSqlDatabase db,
+                                  qint64 date,
+                                  QVector<Consumption>& consumptions,
+                                  QString& error)
 {
   consumptions.clear();
   error.clear();
@@ -544,4 +676,46 @@ bool ConsumptionSQL::selectDate(QSqlDatabase db,
   }
 
   return bSuccess;
+}
+
+void ConsumptionSQL::getConsumption(QSqlDatabase db,
+                                    qint64 date,
+                                    QVector<Consumption>& vConsumption,
+                                    QVector<Item>& vItem)
+{
+  vConsumption.clear();
+  vItem.clear();
+
+  QString error;
+  selectByDate(db, date, vConsumption, error);
+
+  for (int i = 0; i != vConsumption.size(); ++i)
+  {
+    Item item;
+    item.m_id = vConsumption.at(i).m_itemID;
+    ItemDatabase::select(db, item, error);
+    vItem.push_back(item);
+  }
+}
+
+double ConsumptionSQL::getTotal(QSqlDatabase db,
+                                const Consumption::Filter& filter)
+{
+  double total = 0.0;
+  QString error;
+  ConsumptionSQL::selectTotal(db, filter, total, error);
+  return total;
+}
+
+double ConsumptionSQL::getTotal(QSqlDatabase db,
+                                qint64 date)
+{
+  double total = 0.0;
+  QString error;
+  Consumption::Filter filter;
+  filter.m_bDate = true;
+  filter.m_datei = date;
+  filter.m_datef = date;
+  ConsumptionSQL::selectTotal(db, filter, total, error);
+  return total;
 }

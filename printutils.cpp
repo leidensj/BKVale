@@ -165,15 +165,15 @@ QString ReminderPrinter::build(const Reminder& r)
 
   switch (r.m_capitalization)
   {
-    case ReminderCapitalization::Normal:
+    case Reminder::Capitalization::Normal:
       title = r.m_title;
       msg = r.m_message;
       break;
-    case ReminderCapitalization::AllLowercase:
+    case Reminder::Capitalization::AllLowercase:
       title = r.m_title.toLower();
       msg = r.m_message.toLower();
       break;
-    case ReminderCapitalization::AllUppercase:
+    case Reminder::Capitalization::AllUppercase:
     default:
       title = r.m_title.toUpper();
       msg = r.m_message.toUpper();
@@ -197,10 +197,10 @@ QString ReminderPrinter::build(const Reminder& r)
 
   if (!msg.isEmpty())
   {
-    if (!r.m_bFontSmall)
+    if (r.m_size == Reminder::Size::Large)
       str += ESC_EXPAND_ON;
     str += msg;
-    if (!r.m_bFontSmall)
+    if (r.m_size == Reminder::Size::Large)
       str += ESC_EXPAND_OFF;
     str += ESC_LF ESC_LF;
   }
@@ -235,7 +235,7 @@ QString ConsumptionPrinter::build(qint64 date,
          ESC_VERT_TAB
          ESC_EXPAND_ON +
          QDate::fromJulianDay(date).toString("dd/MM/yyyy") +
-         QDate::fromJulianDay(date).toString(" (dddd)") +
+         QDate::fromJulianDay(date).toString(" dddd") +
          ESC_LF
          ESC_EXPAND_OFF
          ESC_ALIGN_LEFT;

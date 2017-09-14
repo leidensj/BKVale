@@ -8,6 +8,8 @@
 #include <QSqlTableModel>
 #include "reminder.h"
 
+class QPushButton;
+
 class ReminderTableModel : public QSqlTableModel
 {
   Q_OBJECT
@@ -25,8 +27,15 @@ public:
   ReminderDatabase(QWidget *parent = 0);
   void setDatabase(QSqlDatabase db);
 
+private slots:
+  void enableControls();
+
 private:
   QTableView* m_table;
+  QPushButton* m_btnOpen;
+  QPushButton* m_btnRefresh;
+  QPushButton* m_btnRemove;
+  QPushButton* m_btnFavorite;
 };
 
 #endif // REMINDERDATABASE_H

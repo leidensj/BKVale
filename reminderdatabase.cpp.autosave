@@ -132,7 +132,7 @@ void ReminderDatabase::setDatabase(QSqlDatabase db)
   m_table->horizontalHeader()->setSectionResizeMode((int)ReminderColumn::Favorite,
                                                       QHeaderView::ResizeToContents);
 
-  /*QObject::connect(m_table->selectionModel(),
+  QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
                    SLOT(enableControls()));
@@ -143,8 +143,6 @@ void ReminderDatabase::setDatabase(QSqlDatabase db)
                                       const QVector<int>&)),
                    this,
                    SLOT(enableControls()));
-  refresh();
-  focusFilter();*/
 }
 
 void ReminderDatabase::enableControls()
@@ -153,5 +151,4 @@ void ReminderDatabase::enableControls()
   m_btnOpen->setEnabled(bSelected);
   m_btnRemove->setEnabled(bSelected);
   m_btnFavorite->setEnabled(bSelected);
-
 }

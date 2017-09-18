@@ -180,9 +180,8 @@ void BaitaAssistant::notePrint()
   }
   else if (ui->tabWidget->currentIndex() == (int)Functionality::ReminderMode)
   {
-    QString str(ReminderPrinter::build(m_reminder.reminder()));
-    QString error;
-    Printer::print(m_printer, str, error);
+    if (m_reminder.print(m_printer))
+      m_reminder.save();
   }
   else if (ui->tabWidget->currentIndex() == (int)Functionality::ConsumptionMode)
   {
@@ -279,6 +278,7 @@ void BaitaAssistant::init()
       connect();
     m_note.setHistoryDatabase(m_db);
     m_consumption.setDatabase(m_db);
+    m_reminder.setDatabase(m_db);
     m_note.create();
   }
   enableControls();

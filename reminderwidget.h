@@ -5,6 +5,7 @@
 #include "reminder.h"
 #include "reminderdatabase.h"
 #include "reminderview.h"
+#include <printutils.h>
 
 class ReminderWidget : public QFrame
 {
@@ -16,8 +17,11 @@ private:
 
 public:
   ReminderWidget(QWidget *parent = 0);
-  Reminder reminder() const { return m_view.reminder(); }
   bool isValid() const { return m_view.isValid(); }
+  bool print(QSerialPort& printer);
+  bool save();
+  void setDatabase(QSqlDatabase db);
+  void clear();
 
 private slots:
   void emitChangedSignal();

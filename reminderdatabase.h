@@ -29,6 +29,15 @@ public:
 
 private slots:
   void enableControls();
+  void emitSelectedSignal();
+
+public slots:
+  bool insertOrUpdate(const Reminder& r, QString& error);
+  void remove();
+  void refresh();
+
+signals:
+  void selectedSignal(const Reminder& r);
 
 private:
   QTableView* m_table;

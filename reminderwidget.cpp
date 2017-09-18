@@ -1,6 +1,7 @@
 #include "reminderwidget.h"
 #include <QLayout>
 #include <QSplitter>
+#include <QMessageBox>
 
 ReminderWidget::ReminderWidget(QWidget *parent)
   : QFrame(parent)
@@ -19,9 +20,51 @@ ReminderWidget::ReminderWidget(QWidget *parent)
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(emitChangedSignal()));
+
+  QObject::connect(&m_db,
+                   SIGNAL(selectedSignal(const Reminder&)),
+                   &m_view,
+                   SLOT(setReminder(const Reminder&)));
 }
 
 void ReminderWidget::emitChangedSignal()
 {
   emit changedSignal();
+}
+
+bool ReminderWidget::print(QSerialPort& printer)
+{
+  QString str(ReminderPrinter::build(m_view.reminder()));
+  QString error;
+  if (!Printer::print(printer, str, error))
+  {
+    QMessageBox::warning(this,
+                         tr("Erro"),
+                         tr("Erro '%1' ao imprimir o lembrete.").arg(error),
+                         QMessageBox::Ok);
+  }
+}
+
+bool ReminderWidget::save()
+{
+  QString error;
+  bool bSuccess = m_db.insertOrUpdate(m_view.reminder(), error);
+  if (!bSuccess)
+  {
+    QMessageBox::warning(this,
+                         tr("Erro"),
+                         tr("Erro '%1' ao salvar o lembrete.").arg(error),
+                         QMessageBox::Ok);
+  }
+  return bSuccess;
+}
+
+void ReminderWidget::setDatabase(QSqlDatabase db)
+{
+  m_db.setDatabase(db);
+}
+
+void ReminderWidget::clear()
+{
+  m_view.clear();
 }

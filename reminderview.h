@@ -16,13 +16,16 @@ public:
   explicit ReminderView(QWidget *parent = 0);
   ~ReminderView();
   Reminder reminder() const;
-  void setReminder(const Reminder r);
+
   void clear();
   bool isValid() const;
 
 private slots:
   void emitChangedSignal();
   void setCapitalization(int state);
+
+public slots:
+  void setReminder(const Reminder r);
 
 signals:
   changedSignal();

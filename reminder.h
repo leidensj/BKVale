@@ -5,7 +5,7 @@
 
 #define INVALID_REMINDER_ID -1
 
-enum class ReminderColumn : int
+enum class ReminderTableIndex : int
 {
   ID,
   Title,

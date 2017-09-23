@@ -32,6 +32,7 @@ signals:
 
 private:
   Ui::ReminderView *ui;
+  int m_currentID;
 };
 
 #endif // REMINDERVIEW_H

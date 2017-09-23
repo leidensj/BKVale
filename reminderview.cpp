@@ -1,9 +1,10 @@
 #include "reminderview.h"
 #include "ui_reminderview.h"
 
-ReminderView::ReminderView(QWidget *parent) :
-  QFrame(parent),
-  ui(new Ui::ReminderView)
+ReminderView::ReminderView(QWidget *parent)
+  : QFrame(parent)
+  , ui(new Ui::ReminderView)
+  , m_currentID(INVALID_REMINDER_ID)
 {
   ui->setupUi(this);
   ui->buttonFontBig->setChecked(true);
@@ -35,6 +36,7 @@ ReminderView::~ReminderView()
 Reminder ReminderView::reminder() const
 {
   Reminder r;
+  r.m_id = m_currentID;
   r.m_title = ui->editTitle->text();
   r.m_message = ui->editMessage->toPlainText();
   r.m_size = ui->buttonFontSmall->isChecked() ? Reminder::Size::Normal
@@ -60,6 +62,7 @@ void ReminderView::clear()
   ui->buttonFontSmall->setChecked(true);
   ui->editTitle->clear();
   ui->editMessage->clear();
+  m_currentID = INVALID_REMINDER_ID;
 }
 
 bool ReminderView::isValid() const
@@ -101,6 +104,7 @@ void ReminderView::setCapitalization(int state)
 
 void ReminderView::setReminder(const Reminder r)
 {
+  m_currentID = r.m_id;
   ui->editTitle->setText(r.m_title);
   ui->editMessage->setPlainText(r.m_message);
   ui->buttonFontBig->setChecked(r.m_size == Reminder::Size::Large);

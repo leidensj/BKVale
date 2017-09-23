@@ -35,6 +35,7 @@ public slots:
   bool insertOrUpdate(const Reminder& r, QString& error);
   void remove();
   void refresh();
+  void favorite(bool b);
 
 signals:
   void selectedSignal(const Reminder& r);

@@ -505,7 +505,7 @@ bool ReminderSQL::insertOrUpdate(QSqlDatabase db,
   if (bSuccess)
   {
     query.bindValue(":_id", r.m_id);
-    query.bindValue(":_text", r.m_title);
+    query.bindValue(":_title", r.m_title);
     query.bindValue(":_msg", r.m_message);
     query.bindValue(":_fav", r.m_bFavorite);
     query.bindValue(":_cap", (int)r.m_capitalization);

@@ -42,18 +42,31 @@ QVariant ReminderTableModel::data(const QModelIndex &index, int role) const
     return QModelIndex();
 
   QVariant value = QSqlTableModel::data(index, role);
-  if (role == Qt::DisplayRole)
+  if (role == Qt::DecorationRole)
   {
     if (index.column() == (int)ReminderTableIndex::Favorite)
-      value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
+    {
+      if (QSqlTableModel::data(index, Qt::EditRole).toBool())
+        value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
+      else
+        value = "";
+    }
   }
-
+  else if (role == Qt::DisplayRole)
+  {
+    if (index.column() == (int)ReminderTableIndex::Favorite)
+      value = "";
+  }
   return value;
 }
 
 ReminderDatabase::ReminderDatabase(QWidget *parent)
   : QFrame(parent)
   , m_table(nullptr)
+  , m_btnOpen(nullptr)
+  , m_btnRefresh(nullptr)
+  , m_btnRemove(nullptr)
+  , m_btnFavorite(nullptr)
 {
   QVBoxLayout* vlayout = new QVBoxLayout();
   vlayout->setContentsMargins(0, 0, 0, 0);
@@ -88,8 +101,11 @@ ReminderDatabase::ReminderDatabase(QWidget *parent)
   buttons->setAlignment(Qt::AlignLeft);
 
   m_table = new QTableView(this);
-  m_table->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  m_table->horizontalHeader()->setHighlightSections(false);
+  m_table->setSortingEnabled(true);
 
   vlayout->addLayout(buttons);
   vlayout->addWidget(m_table);
@@ -105,6 +121,21 @@ ReminderDatabase::ReminderDatabase(QWidget *parent)
                    this,
                    SLOT(emitSelectedSignal()));
 
+  QObject::connect(m_btnRefresh,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(refresh()));
+
+  QObject::connect(m_btnRemove,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(remove()));
+
+  QObject::connect(m_btnFavorite,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(favorite(bool)));
+
   enableControls();
 }
 
@@ -113,7 +144,7 @@ void ReminderDatabase::setDatabase(QSqlDatabase db)
   if (m_table->model() != nullptr)
     return;
 
-  QSqlTableModel* model = new QSqlTableModel(this, db);
+  ReminderTableModel* model = new ReminderTableModel(this, db);
   model->setTable("_REMINDERS");
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
@@ -159,6 +190,7 @@ void ReminderDatabase::setDatabase(QSqlDatabase db)
                                       const QVector<int>&)),
                    this,
                    SLOT(enableControls()));
+  refresh();
   enableControls();
 }
 
@@ -168,6 +200,17 @@ void ReminderDatabase::enableControls()
   m_btnOpen->setEnabled(bSelected);
   m_btnRemove->setEnabled(bSelected);
   m_btnFavorite->setEnabled(bSelected);
+  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+  if (bSelected && model != nullptr)
+  {
+    bool bFavorite = model->index(m_table->currentIndex().row(),
+                                  (int)ReminderTableIndex::Favorite).data(Qt::EditRole).toBool();
+    m_btnFavorite->setChecked(bFavorite);
+  }
+  else
+  {
+    m_btnFavorite->setChecked(false);
+  }
 }
 
 bool ReminderDatabase::insertOrUpdate(const Reminder& r, QString& error)
@@ -214,6 +257,20 @@ void ReminderDatabase::refresh()
     model->select();
   }
   enableControls();
+}
+
+void ReminderDatabase::favorite(bool b)
+{
+  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+  if (model != nullptr && m_table->currentIndex().isValid())
+  {
+    const int row = m_table->currentIndex().row();
+    auto idx = model->index(row, (int)ReminderTableIndex::Favorite);
+    model->setData(idx, b);
+    model->submitAll();
+    model->selectRow(row);
+    m_table->selectRow(row);
+  }
 }
 
 void ReminderDatabase::emitSelectedSignal()

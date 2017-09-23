@@ -143,6 +143,9 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   QPalette palette = m_total->palette();
   palette.setColor(QPalette::Text, Qt::red);
   m_total->setPalette(palette);
+  QFont font = m_total->font();
+  font.setBold(true);
+  m_total->setFont(font);
 
   m_chart = new QPushButton();
   m_chart->setFlat(true);

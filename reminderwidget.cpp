@@ -36,13 +36,15 @@ bool ReminderWidget::print(QSerialPort& printer)
 {
   QString str(ReminderPrinter::build(m_view.reminder()));
   QString error;
-  if (!Printer::print(printer, str, error))
+  bool bSuccess = Printer::print(printer, str, error);
+  if (!bSuccess)
   {
     QMessageBox::warning(this,
                          tr("Erro"),
                          tr("Erro '%1' ao imprimir o lembrete.").arg(error),
                          QMessageBox::Ok);
   }
+  return bSuccess;
 }
 
 bool ReminderWidget::save()
@@ -55,6 +57,10 @@ bool ReminderWidget::save()
                          tr("Erro"),
                          tr("Erro '%1' ao salvar o lembrete.").arg(error),
                          QMessageBox::Ok);
+  }
+  else
+  {
+    m_db.refresh();
   }
   return bSuccess;
 }

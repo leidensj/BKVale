@@ -1,30 +1,50 @@
 #include "reminderwidget.h"
+#include "reminderview.h"
+#include "reminderdatabase.h"
 #include <QLayout>
 #include <QSplitter>
 #include <QMessageBox>
+#include <QDockWidget>
 
 ReminderWidget::ReminderWidget(QWidget *parent)
   : QFrame(parent)
-  , m_view(this)
-  , m_db(this)
+  , m_view(nullptr)
+  , m_db(nullptr)
+  , m_dock(nullptr)
 {
+  m_view = new ReminderView();
+  m_db = new ReminderDatabase();
+  m_dock = new QDockWidget();
+  m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  m_dock->setFeatures(0);
+  m_dock->setFeatures(QDockWidget::DockWidgetClosable);
+  m_dock->setWindowTitle("Lembretes");
+  m_dock->setWidget(m_db);
+
   QHBoxLayout* hlayout = new QHBoxLayout();
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  m_db.layout()->setContentsMargins(0, 0, 9, 0);
-  splitter->addWidget(&m_db);
-  splitter->addWidget(&m_view);
+  m_db->layout()->setContentsMargins(9, 9, 9, 9);
+  splitter->addWidget(m_dock);
+  splitter->addWidget(m_view);
   hlayout->addWidget(splitter);
   setLayout(hlayout);
 
-  QObject::connect(&m_view,
+  m_dock->close();
+
+  QObject::connect(m_view,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(emitChangedSignal()));
 
-  QObject::connect(&m_db,
+  QObject::connect(m_db,
                    SIGNAL(selectedSignal(const Reminder&)),
-                   &m_view,
+                   m_view,
                    SLOT(setReminder(const Reminder&)));
+
+  QObject::connect(m_view,
+                   SIGNAL(searchClickedSignal()),
+                   this,
+                   SLOT(showDock()));
 }
 
 void ReminderWidget::emitChangedSignal()
@@ -32,9 +52,17 @@ void ReminderWidget::emitChangedSignal()
   emit changedSignal();
 }
 
+void ReminderWidget::showDock()
+{
+  if (m_dock->isVisible())
+    m_dock->close();
+  else
+    m_dock->show();
+}
+
 bool ReminderWidget::print(QSerialPort& printer)
 {
-  QString str(ReminderPrinter::build(m_view.reminder()));
+  QString str(ReminderPrinter::build(m_view->reminder()));
   QString error;
   bool bSuccess = Printer::print(printer, str, error);
   if (!bSuccess)
@@ -49,8 +77,11 @@ bool ReminderWidget::print(QSerialPort& printer)
 
 bool ReminderWidget::save()
 {
+  if (!m_view->isSaveChecked())
+    return true;
+
   QString error;
-  bool bSuccess = m_db.insertOrUpdate(m_view.reminder(), error);
+  bool bSuccess = m_db->insertOrUpdate(m_view->reminder(), error);
   if (!bSuccess)
   {
     QMessageBox::warning(this,
@@ -60,17 +91,22 @@ bool ReminderWidget::save()
   }
   else
   {
-    m_db.refresh();
+    m_db->refresh();
   }
   return bSuccess;
 }
 
 void ReminderWidget::setDatabase(QSqlDatabase db)
 {
-  m_db.setDatabase(db);
+  m_db->setDatabase(db);
 }
 
 void ReminderWidget::clear()
 {
-  m_view.clear();
+  m_view->clear();
+}
+
+bool ReminderWidget::isValid() const
+{
+  return m_view->isValid();
 }

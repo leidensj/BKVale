@@ -1,47 +1,129 @@
 #include "reminderview.h"
-#include "ui_reminderview.h"
+#include <QLineEdit>
+#include <QPlainTextEdit>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QLayout>
+#include <QPushButton>
 
 ReminderView::ReminderView(QWidget *parent)
   : QFrame(parent)
-  , ui(new Ui::ReminderView)
   , m_currentID(INVALID_REMINDER_ID)
+  , m_title(nullptr)
+  , m_message(nullptr)
+  , m_capitalization(nullptr)
+  , m_size1(nullptr)
+  , m_size2(nullptr)
+  , m_create(nullptr)
+  , m_search(nullptr)
 {
-  ui->setupUi(this);
-  ui->buttonFontBig->setChecked(true);
-  ui->buttonUppercase->setCheckState(Qt::CheckState::Checked);
-  setCapitalization((int)Qt::CheckState::Checked);
+  m_create = new QPushButton();
+  m_create->setFlat(true);
+  m_create->setText("");
+  m_create->setIconSize(QSize(24, 24));
+  m_create->setIcon(QIcon(":/icons/res/file.png"));
+  m_create->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+  m_search = new QPushButton();
+  m_search->setFlat(true);
+  m_search->setText("");
+  m_search->setIconSize(QSize(24, 24));
+  m_search->setIcon(QIcon(":/icons/res/search.png"));
+  m_search->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+  m_save = new QCheckBox();
+  m_save->setText(tr("Salvar lembrete"));
+  m_save->setChecked(true);
+  m_title = new QLineEdit();
+  m_title->setPlaceholderText(tr("Título"));
+  m_message = new QPlainTextEdit();
+  m_message->setPlaceholderText(tr("Mensagem"));
+  m_capitalization = new QCheckBox();
+  m_capitalization->setText("");
+  m_capitalization->setIconSize(QSize(24, 24));
+  m_capitalization->setIcon(QIcon(":/icons/res/uppercase.png"));
+  m_capitalization->setTristate(true);
+  m_capitalization->setCheckState(Qt::CheckState::Checked);
+  m_size1 = new QRadioButton();
+  m_size1->setText("");
+  m_size1->setIconSize(QSize(16, 16));
+  m_size1->setIcon(QIcon(":/icons/res/text.png"));
+  m_size1->setChecked(true);
+  m_size2 = new QRadioButton();
+  m_size2->setIconSize(QSize(24, 24));
+  m_size2->setIcon(QIcon(":/icons/res/text.png"));
 
-  QObject::connect(ui->editTitle,
+  QFrame* vFrame1 = new QFrame;
+  vFrame1->setFrameShape(QFrame::VLine);
+
+  QHBoxLayout* hlayout1 = new QHBoxLayout();
+  hlayout1->setContentsMargins(0, 0, 0, 0);
+  hlayout1->setAlignment(Qt::AlignLeft);
+  hlayout1->addWidget(m_create);
+  hlayout1->addWidget(m_search);
+  hlayout1->addWidget(vFrame1);
+  hlayout1->addWidget(m_save);
+
+  QFrame* vFrame2 = new QFrame;
+  vFrame2->setFrameShape(QFrame::VLine);
+
+  QHBoxLayout* hlayout2 = new QHBoxLayout();
+  hlayout2->setContentsMargins(0, 0, 0, 0);
+  hlayout2->setAlignment(Qt::AlignLeft);
+  hlayout2->addWidget(m_capitalization);
+  hlayout2->addWidget(vFrame2);
+  hlayout2->addWidget(m_size1);
+  hlayout2->addWidget(m_size2);
+
+  QVBoxLayout* vlayout = new QVBoxLayout();
+  vlayout->setContentsMargins(0, 0, 0, 0);
+  vlayout->addLayout(hlayout1);
+  vlayout->addWidget(m_title);
+  vlayout->addLayout(hlayout2);
+  vlayout->addWidget(m_message);
+
+  setLayout(vlayout);
+
+  QObject::connect(m_title,
                    SIGNAL(textEdited(const QString&)),
                    this,
                    SLOT(emitChangedSignal()));
 
-  QObject::connect(ui->editMessage,
+  QObject::connect(m_message,
                    SIGNAL(textChanged()),
                    this,
                    SLOT(emitChangedSignal()));
 
-  QObject::connect(ui->buttonUppercase,
+  QObject::connect(m_capitalization,
                    SIGNAL(stateChanged(int)),
                    this,
                    SLOT(setCapitalization(int)));
 
+  QObject::connect(m_create,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(clear()));
+
+  QObject::connect(m_search,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(emitSearchClickedSignal()));
+
+  setCapitalization(m_capitalization->checkState());
 }
 
 ReminderView::~ReminderView()
 {
-  delete ui;
+
 }
 
 Reminder ReminderView::reminder() const
 {
   Reminder r;
   r.m_id = m_currentID;
-  r.m_title = ui->editTitle->text();
-  r.m_message = ui->editMessage->toPlainText();
-  r.m_size = ui->buttonFontSmall->isChecked() ? Reminder::Size::Normal
-                                              : Reminder::Size::Large;
-  switch(ui->buttonUppercase->checkState())
+  r.m_title = m_title->text();
+  r.m_message = m_message->toPlainText();
+  r.m_size = m_size1->isChecked() ? Reminder::Size::Normal
+                                  : Reminder::Size::Large;
+  switch(m_capitalization->checkState())
   {
     case Qt::CheckState::Unchecked:
       r.m_capitalization = Reminder::Capitalization::Normal;
@@ -59,21 +141,26 @@ Reminder ReminderView::reminder() const
 
 void ReminderView::clear()
 {
-  ui->buttonFontSmall->setChecked(true);
-  ui->editTitle->clear();
-  ui->editMessage->clear();
+  m_size1->setChecked(true);
+  m_title->clear();
+  m_message->clear();
   m_currentID = INVALID_REMINDER_ID;
 }
 
 bool ReminderView::isValid() const
 {
-  return !ui->editTitle->text().isEmpty() ||
-      !ui->editMessage->toPlainText().isEmpty();
+  return !m_title->text().isEmpty() ||
+      !m_message->toPlainText().isEmpty();
 }
 
 void ReminderView::emitChangedSignal()
 {
   emit changedSignal();
+}
+
+void ReminderView::emitSearchClickedSignal()
+{
+  emit searchClickedSignal();
 }
 
 void ReminderView::setCapitalization(int state)
@@ -82,45 +169,50 @@ void ReminderView::setCapitalization(int state)
   switch ((Qt::CheckState)state)
   {
     case Qt::CheckState::Unchecked:
-      cap = QFont::MixedCase; break;
+      cap = QFont::MixedCase;
+      break;
     case Qt::CheckState::PartiallyChecked:
-      cap = QFont::AllLowercase; break;
+      cap = QFont::AllLowercase;
+      break;
+    case Qt::CheckState::Checked:
     default:
       cap = QFont::AllUppercase;
+      break;
   }
 
-  {
-    QFont f = ui->editTitle->font();
-    f.setCapitalization(cap);
-    ui->editTitle->setFont(f);
-  }
+  QFont f1 = m_title->font();
+  f1.setCapitalization(cap);
+  m_title->setFont(f1);
 
-  {
-    QFont f = ui->editMessage->font();
-    f.setCapitalization(cap);
-    ui->editMessage->setFont(f);
-  }
+  QFont f2 = m_message->font();
+  f2.setCapitalization(cap);
+  m_message->setFont(f2);
 }
 
 void ReminderView::setReminder(const Reminder r)
 {
   m_currentID = r.m_id;
-  ui->editTitle->setText(r.m_title);
-  ui->editMessage->setPlainText(r.m_message);
-  ui->buttonFontBig->setChecked(r.m_size == Reminder::Size::Large);
-  ui->buttonFontSmall->setChecked(r.m_size == Reminder::Size::Normal);
+  m_title->setText(r.m_title);
+  m_message->setPlainText(r.m_message);
+  m_size2->setChecked(r.m_size == Reminder::Size::Large);
+  m_size1->setChecked(r.m_size == Reminder::Size::Normal);
   switch(r.m_capitalization)
   {
     case Reminder::Capitalization::AllLowercase:
-      ui->buttonUppercase->setCheckState(Qt::PartiallyChecked);
+      m_capitalization->setCheckState(Qt::PartiallyChecked);
       break;
     case Reminder::Capitalization::AllUppercase:
-      ui->buttonUppercase->setCheckState(Qt::Checked);
+      m_capitalization->setCheckState(Qt::Checked);
       break;
     case Reminder::Capitalization::Normal:
     default:
-      ui->buttonUppercase->setCheckState(Qt::Unchecked);
+      m_capitalization->setCheckState(Qt::Unchecked);
       break;
   }
   //TODO
+}
+
+bool ReminderView::isSaveChecked() const
+{
+  return m_save->isChecked();
 }

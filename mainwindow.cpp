@@ -181,7 +181,10 @@ void BaitaAssistant::notePrint()
   else if (ui->tabWidget->currentIndex() == (int)Functionality::ReminderMode)
   {
     if (m_reminder.print(m_printer))
+    {
       m_reminder.save();
+      m_reminder.clear();
+    }
   }
   else if (ui->tabWidget->currentIndex() == (int)Functionality::ConsumptionMode)
   {

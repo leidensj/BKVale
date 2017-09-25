@@ -62,8 +62,7 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     settingsdlg.ui \
     notewidget.ui \
-    notedatabasewidget.ui \
-    reminderview.ui
+    notedatabasewidget.ui
 
 RESOURCES += \
     icons.qrc

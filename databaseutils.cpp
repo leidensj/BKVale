@@ -477,7 +477,7 @@ bool ReminderSQL::insertOrUpdate(QSqlDatabase db,
   if (r.isValidID())
   {
     bSuccess = query.prepare("UPDATE _REMINDERS SET "
-                             "_TITLE = :_text,"
+                             "_TITLE = :_title,"
                              "_MESSAGE = :_msg,"
                              "_FAVORITE = :_fav,"
                              "_CAPITALIZATION = :_cap,"

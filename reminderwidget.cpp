@@ -18,7 +18,7 @@ ReminderWidget::ReminderWidget(QWidget *parent)
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
   m_dock->setFeatures(0);
   m_dock->setFeatures(QDockWidget::DockWidgetClosable);
-  m_dock->setWindowTitle("Lembretes");
+  m_dock->setWindowTitle("Pesquisar");
   m_dock->setWidget(m_db);
 
   QHBoxLayout* hlayout = new QHBoxLayout();

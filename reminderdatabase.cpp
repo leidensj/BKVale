@@ -5,6 +5,7 @@
 #include <QSpacerItem>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QSqlRecord>
 
 namespace
 {
@@ -36,17 +37,17 @@ ReminderTableModel::ReminderTableModel(QObject *parent, QSqlDatabase db)
 
 }
 
-QVariant ReminderTableModel::data(const QModelIndex &index, int role) const
+QVariant ReminderTableModel::data(const QModelIndex &idx, int role) const
 {
-  if (!index.isValid())
+  if (!idx.isValid())
     return QModelIndex();
 
-  QVariant value = QSqlTableModel::data(index, role);
+  QVariant value = QSqlTableModel::data(idx, role);
   if (role == Qt::DecorationRole)
   {
-    if (index.column() == (int)ReminderTableIndex::Favorite)
+    if (idx.column() == (int)ReminderTableIndex::Favorite)
     {
-      if (QSqlTableModel::data(index, Qt::EditRole).toBool())
+      if (QSqlTableModel::data(idx, Qt::EditRole).toBool())
         value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
       else
         value = "";
@@ -54,8 +55,25 @@ QVariant ReminderTableModel::data(const QModelIndex &index, int role) const
   }
   else if (role == Qt::DisplayRole)
   {
-    if (index.column() == (int)ReminderTableIndex::Favorite)
+    if (idx.column() == (int)ReminderTableIndex::Favorite)
       value = "";
+    else if (idx.column() == (int)ReminderTableIndex::Title)
+    {
+      auto cap = (Reminder::Capitalization)record(idx.row()).value(
+                   (int)ReminderTableIndex::Capitalization).toInt();
+      switch (cap)
+      {
+        case Reminder::Capitalization::AllUppercase:
+          value = value.toString().toUpper();
+          break;
+        case Reminder::Capitalization::AllLowercase:
+          value = value.toString().toLower();
+          break;
+        case Reminder::Capitalization::Normal:
+        default:
+          break;
+      }
+    }
   }
   return value;
 }

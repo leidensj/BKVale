@@ -57,7 +57,8 @@ HEADERS  += mainwindow.h \
     consumptionfilter.h \
     qcustomplot.h \
     consumptionchart.h \
-    calculatorwidget.h
+    calculatorwidget.h \
+    calculator.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui \

@@ -1,5 +1,7 @@
 #include "calculatorwidget.h"
 #include <QLayout>
+#include <QLineEdit>
+#include <QPlainTextEdit>
 
 CalculatorPushButton::CalculatorPushButton(Calculator::Button button, QWidget* parent)
   : QPushButton(parent)
@@ -18,7 +20,60 @@ void CalculatorPushButton::emitCalculatorButtonClickedSignal()
 
 CalculatorWidget::CalculatorWidget(QWidget* parent)
   : QFrame(parent)
+  , m_btn0(nullptr)
+  , m_btn1(nullptr)
+  , m_btn2(nullptr)
+  , m_btn3(nullptr)
+  , m_btn4(nullptr)
+  , m_btn5(nullptr)
+  , m_btn6(nullptr)
+  , m_btn7(nullptr)
+  , m_btn8(nullptr)
+  , m_btn9(nullptr)
+  , m_btnDec(nullptr)
+  , m_btnEq(nullptr)
+  , m_btnPlus(nullptr)
+  , m_btnMin(nullptr)
+  , m_btnMul(nullptr)
+  , m_btnDiv(nullptr)
+  , m_btnClr(nullptr)
+  , m_btnCls(nullptr)
+  , m_edDisplay(nullptr)
+  , m_view(nullptr)
+  , m_total(0.0)
+  , m_lastValue(0.0)
+  , m_currentValue(0.0)
+  , m_lastButton(Calculator::Button::Nop)
 {
+  m_edDisplay = new QLineEdit();
+  m_edDisplay->setAlignment(Qt::AlignLeft);
+  m_edDisplay->setReadOnly(true);
+  m_edDisplay->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+  QFont f = m_edDisplay->font();
+  f.setPointSize(24);
+  m_edDisplay->setFont(f);
+
+  m_btnClr = new QPushButton();
+  m_btnClr->setFlat(true);
+  m_btnClr->setText("");
+  m_btnClr->setIconSize(QSize(64, 64));
+  m_btnClr->setIcon(QIcon(":/icons/res/calcclr.png"));
+  m_btnClr->setShortcut(QKeySequence(Qt::Key_Backspace));
+
+  m_btnCls = new QPushButton();
+  m_btnCls->setFlat(true);
+  m_btnCls->setText("");
+  m_btnCls->setIconSize(QSize(64, 64));
+  m_btnCls->setIcon(QIcon(":/icons/res/calccls.png"));
+  m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
+
+  QHBoxLayout* hline0 = new QHBoxLayout();
+  hline0->addWidget(m_edDisplay);
+  hline0->addWidget(m_btnClr);
+  hline0->addWidget(m_btnCls);
+  hline0->setAlignment(Qt::AlignLeft);
+  hline0->setContentsMargins(0, 0, 0, 0);
+
   m_btn7 = new CalculatorPushButton(Calculator::Button::Num7);
   m_btn7->setFlat(true);
   m_btn7->setText("");
@@ -164,11 +219,20 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline4->setContentsMargins(0, 0, 0, 0);
 
   QVBoxLayout* vlayout = new QVBoxLayout();
+  vlayout->addLayout(hline0);
   vlayout->addLayout(hline1);
   vlayout->addLayout(hline2);
   vlayout->addLayout(hline3);
   vlayout->addLayout(hline4);
-  setLayout(vlayout);
+
+  m_view = new QPlainTextEdit();
+  m_view->setReadOnly(true);
+
+  QHBoxLayout* hlayout = new QHBoxLayout();
+  hlayout->addLayout(vlayout);
+  hlayout->addWidget(m_view);
+  hlayout->setContentsMargins(0, 0, 0, 0);
+  setLayout(hlayout);
 
   QObject::connect(m_btn0,
                    SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
@@ -234,9 +298,101 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
                    SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
                    this,
                    SLOT(calculatorButtonClicked(Calculator::Button)));
+  QObject::connect(m_btnClr,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(clear()));
+  QObject::connect(m_btnCls,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(reset()));
+}
+
+double CalculatorWidget::calculate(double op1, double op2, Calculator::Button button)
+{
+  if (!Calculator::isOP(button))
+    return 0.0;
+
+  switch (button)
+  {
+    case Calculator::Button::Plus:
+      return op1 + op2;
+    case Calculator::Button::Min:
+      return op1 - op2;
+    case Calculator::Button::Div:
+      return op1 / op2;
+    case Calculator::Button::Mul:
+      return op1 * op2;
+    default:
+      return 0.0;
+  }
+}
+
+void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
+{
+  emit printSignal(QString::number(value, 'f') + " " + Calculator::toChar(button));
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
 {
-  //TODO
+  if (Calculator::isOP(button))
+  {
+    double op2 = Calculator::isOP(m_lastButton) ||
+                 Calculator::isEqual(m_lastButton)
+                 ? m_lastValue
+                 : m_currentValue;
+
+    emitPrintSignal(m_lastValue, button);
+    m_total = calculate(m_total, op2, button);
+    m_edDisplay->setText(QString::number(m_total, 'f').
+                         remove(QRegExp("\\.?0*$")));
+    m_currentValue = 0.0;
+    m_lastValue = op2;
+  }
+  else if (Calculator::isEqual(button))
+  {
+    emitPrintSignal(m_total, button);
+  }
+  else if (Calculator::isDecimal(button))
+  {
+    if (Calculator::isOP(m_lastButton) ||
+        Calculator::isEqual(m_lastButton))
+      m_edDisplay->setText("");
+    else
+    {
+      QString strValue = m_edDisplay->text();
+      strValue.replace(Calculator::toChar(button), "");
+      strValue.append(Calculator::toChar(button));
+      m_edDisplay->setText(strValue);
+      m_currentValue = strValue.toDouble();
+    }
+  }
+  else if (Calculator::isDigit(button))
+  {
+    if (Calculator::isOP(m_lastButton) ||
+        Calculator::isEqual(m_lastButton))
+      m_edDisplay->setText("");
+    QString strValue = m_edDisplay->text();
+    strValue.append(Calculator::toChar(button));
+    m_edDisplay->setText(strValue);
+    m_currentValue = strValue.toDouble();
+  }
+  m_lastButton = button;
+}
+
+void CalculatorWidget::clear()
+{
+  m_edDisplay->setText("");
+  m_currentValue = 0.0;
+  m_lastButton = Calculator::Button::Nop;
+}
+
+void CalculatorWidget::reset()
+{
+  m_edDisplay->setText("");
+  m_currentValue = 0.0;
+  m_lastValue = 0.0;
+  m_total = 0.0;
+  m_lastButton = Calculator::Button::Nop;
+  emitPrintSignal(m_total, Calculator::Button::Nop);
 }

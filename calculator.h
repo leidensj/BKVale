@@ -7,6 +7,7 @@ namespace Calculator
 {
 enum class Button
 {
+  Nop,
   Num0,
   Num1,
   Num2,
@@ -33,7 +34,6 @@ inline bool isOP(Button button)
     case Button::Min:
     case Button::Div:
     case Button::Mul:
-    case Button::Eq:
       return true;
     default:
       return false;
@@ -58,6 +58,11 @@ inline bool isDigit(Button button)
     default:
       return false;
   }
+}
+
+inline bool isEqual(Button button)
+{
+  return button == Button::Eq;
 }
 
 inline bool isDecimal(Button button)

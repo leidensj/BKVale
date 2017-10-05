@@ -55,5 +55,6 @@
         <file>res/calcdec.png</file>
         <file>res/calcclr.png</file>
         <file>res/filter.png</file>
+        <file>res/calccls.png</file>
     </qresource>
 </RCC>

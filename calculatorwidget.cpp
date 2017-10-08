@@ -48,7 +48,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_edDisplay = new QLineEdit();
   m_edDisplay->setAlignment(Qt::AlignLeft);
   m_edDisplay->setReadOnly(true);
-  m_edDisplay->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+  m_edDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
   QFont f = m_edDisplay->font();
   f.setPointSize(24);
   m_edDisplay->setFont(f);
@@ -68,9 +68,9 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
 
   QHBoxLayout* hline0 = new QHBoxLayout();
+  hline0->addWidget(m_btnCls);
   hline0->addWidget(m_edDisplay);
   hline0->addWidget(m_btnClr);
-  hline0->addWidget(m_btnCls);
   hline0->setAlignment(Qt::AlignLeft);
   hline0->setContentsMargins(0, 0, 0, 0);
 
@@ -107,7 +107,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline1->addWidget(m_btn8);
   hline1->addWidget(m_btn9);
   hline1->addWidget(m_btnMul);
-  hline1->setAlignment(Qt::AlignLeft);
+  hline1->setAlignment(Qt::AlignCenter);
   hline1->setContentsMargins(0, 0, 0, 0);
 
   m_btn4 = new CalculatorPushButton(Calculator::Button::Num4);
@@ -143,7 +143,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline2->addWidget(m_btn5);
   hline2->addWidget(m_btn6);
   hline2->addWidget(m_btnDiv);
-  hline2->setAlignment(Qt::AlignLeft);
+  hline2->setAlignment(Qt::AlignCenter);
   hline2->setContentsMargins(0, 0, 0, 0);
 
   m_btn1 = new CalculatorPushButton(Calculator::Button::Num1);
@@ -179,7 +179,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline3->addWidget(m_btn2);
   hline3->addWidget(m_btn3);
   hline3->addWidget(m_btnMin);
-  hline3->setAlignment(Qt::AlignLeft);
+  hline3->setAlignment(Qt::AlignCenter);
   hline3->setContentsMargins(0, 0, 0, 0);
 
   m_btn0 = new CalculatorPushButton(Calculator::Button::Num0);
@@ -194,7 +194,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_btnDec->setText("");
   m_btnDec->setIconSize(QSize(64, 64));
   m_btnDec->setIcon(QIcon(":/icons/res/calcdec.png"));
-  m_btnDec->setShortcut(QKeySequence(Qt::Key_Comma));
+  m_btnDec->setShortcut(QKeySequence(Qt::Key_Period));
 
   m_btnEq = new CalculatorPushButton(Calculator::Button::Eq);
   m_btnEq->setFlat(true);
@@ -215,24 +215,29 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline4->addWidget(m_btnDec);
   hline4->addWidget(m_btnEq);
   hline4->addWidget(m_btnPlus);
-  hline4->setAlignment(Qt::AlignLeft);
+  hline4->setAlignment(Qt::AlignCenter);
   hline4->setContentsMargins(0, 0, 0, 0);
 
-  QVBoxLayout* vlayout = new QVBoxLayout();
-  vlayout->addLayout(hline0);
-  vlayout->addLayout(hline1);
-  vlayout->addLayout(hline2);
-  vlayout->addLayout(hline3);
-  vlayout->addLayout(hline4);
+  QVBoxLayout* vlayout1 = new QVBoxLayout();
+  vlayout1->addLayout(hline1);
+  vlayout1->addLayout(hline2);
+  vlayout1->addLayout(hline3);
+  vlayout1->addLayout(hline4);
+  vlayout1->setAlignment(Qt::AlignTop);
 
   m_view = new QPlainTextEdit();
   m_view->setReadOnly(true);
 
   QHBoxLayout* hlayout = new QHBoxLayout();
-  hlayout->addLayout(vlayout);
+  hlayout->addLayout(vlayout1);
   hlayout->addWidget(m_view);
   hlayout->setContentsMargins(0, 0, 0, 0);
-  setLayout(hlayout);
+
+  QVBoxLayout* vlayout2 = new QVBoxLayout();
+  vlayout2->addLayout(hline0);
+  vlayout2->addLayout(hlayout);
+  vlayout2->setAlignment(Qt::AlignTop);
+  setLayout(vlayout2);
 
   QObject::connect(m_btn0,
                    SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
@@ -330,7 +335,13 @@ double CalculatorWidget::calculate(double op1, double op2, Calculator::Button bu
 
 void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
 {
-  emit printSignal(QString::number(value, 'f') + " " + Calculator::toChar(button));
+  QString str = QString::number(value, 'f').remove(QRegExp("\\.?0*$")) +
+                " " +
+                Calculator::toChar(button);
+  QString text = m_view->toPlainText();
+  text += str + '\n';
+  m_view->setPlainText(text);
+  emit printSignal(str);
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
@@ -390,6 +401,7 @@ void CalculatorWidget::clear()
 void CalculatorWidget::reset()
 {
   m_edDisplay->setText("");
+  m_view->setPlainText("");
   m_currentValue = 0.0;
   m_lastValue = 0.0;
   m_total = 0.0;

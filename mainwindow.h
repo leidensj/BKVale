@@ -51,7 +51,9 @@ private slots:
   void enableControls();
   void init();
   void showInfo();
-  void notePrint();
+  void print();
+  bool print(const QString& text);
+  void printPartialCut();
   void openItemsDialog();
 
 signals:

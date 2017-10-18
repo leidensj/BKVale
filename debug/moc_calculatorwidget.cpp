@@ -142,8 +142,8 @@ int CalculatorPushButton::calculatorButtonClickedSignal(Calculator::Button _t1)
     return _t0;
 }
 struct qt_meta_stringdata_CalculatorWidget_t {
-    QByteArrayData data[11];
-    char stringdata0[119];
+    QByteArrayData data[12];
+    char stringdata0[141];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -156,19 +156,20 @@ QT_MOC_LITERAL(0, 0, 16), // "CalculatorWidget"
 QT_MOC_LITERAL(1, 17, 11), // "printSignal"
 QT_MOC_LITERAL(2, 29, 0), // ""
 QT_MOC_LITERAL(3, 30, 4), // "text"
-QT_MOC_LITERAL(4, 35, 23), // "calculatorButtonClicked"
-QT_MOC_LITERAL(5, 59, 18), // "Calculator::Button"
-QT_MOC_LITERAL(6, 78, 6), // "button"
-QT_MOC_LITERAL(7, 85, 15), // "emitPrintSignal"
-QT_MOC_LITERAL(8, 101, 5), // "value"
-QT_MOC_LITERAL(9, 107, 5), // "clear"
-QT_MOC_LITERAL(10, 113, 5) // "reset"
+QT_MOC_LITERAL(4, 35, 21), // "printPartialCutSignal"
+QT_MOC_LITERAL(5, 57, 23), // "calculatorButtonClicked"
+QT_MOC_LITERAL(6, 81, 18), // "Calculator::Button"
+QT_MOC_LITERAL(7, 100, 6), // "button"
+QT_MOC_LITERAL(8, 107, 15), // "emitPrintSignal"
+QT_MOC_LITERAL(9, 123, 5), // "value"
+QT_MOC_LITERAL(10, 129, 5), // "clear"
+QT_MOC_LITERAL(11, 135, 5) // "reset"
 
     },
     "CalculatorWidget\0printSignal\0\0text\0"
-    "calculatorButtonClicked\0Calculator::Button\0"
-    "button\0emitPrintSignal\0value\0clear\0"
-    "reset"
+    "printPartialCutSignal\0calculatorButtonClicked\0"
+    "Calculator::Button\0button\0emitPrintSignal\0"
+    "value\0clear\0reset"
 };
 #undef QT_MOC_LITERAL
 
@@ -178,28 +179,30 @@ static const uint qt_meta_data_CalculatorWidget[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       1,       // signalCount
+       2,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   39,    2, 0x06 /* Public */,
+       1,    1,   44,    2, 0x06 /* Public */,
+       4,    0,   47,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       4,    1,   42,    2, 0x08 /* Private */,
-       7,    2,   45,    2, 0x08 /* Private */,
-       9,    0,   50,    2, 0x08 /* Private */,
-      10,    0,   51,    2, 0x08 /* Private */,
+       5,    1,   48,    2, 0x08 /* Private */,
+       8,    2,   51,    2, 0x08 /* Private */,
+      10,    0,   56,    2, 0x08 /* Private */,
+      11,    0,   57,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Int, QMetaType::QString,    3,
+    QMetaType::Int,
 
  // slots: parameters
-    QMetaType::Void, 0x80000000 | 5,    6,
-    QMetaType::Void, QMetaType::Double, 0x80000000 | 5,    8,    6,
+    QMetaType::Void, 0x80000000 | 6,    7,
+    QMetaType::Void, QMetaType::Double, 0x80000000 | 6,    9,    7,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -214,10 +217,12 @@ void CalculatorWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
         switch (_id) {
         case 0: { int _r = _t->printSignal((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 1: _t->calculatorButtonClicked((*reinterpret_cast< Calculator::Button(*)>(_a[1]))); break;
-        case 2: _t->emitPrintSignal((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< Calculator::Button(*)>(_a[2]))); break;
-        case 3: _t->clear(); break;
-        case 4: _t->reset(); break;
+        case 1: { int _r = _t->printPartialCutSignal();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 2: _t->calculatorButtonClicked((*reinterpret_cast< Calculator::Button(*)>(_a[1]))); break;
+        case 3: _t->emitPrintSignal((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< Calculator::Button(*)>(_a[2]))); break;
+        case 4: _t->clear(); break;
+        case 5: _t->reset(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -227,6 +232,13 @@ void CalculatorWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
             typedef int (CalculatorWidget::*_t)(const QString & );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&CalculatorWidget::printSignal)) {
                 *result = 0;
+                return;
+            }
+        }
+        {
+            typedef int (CalculatorWidget::*_t)();
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&CalculatorWidget::printPartialCutSignal)) {
+                *result = 1;
                 return;
             }
         }
@@ -258,13 +270,13 @@ int CalculatorWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 6)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 5;
+        _id -= 6;
     }
     return _id;
 }
@@ -275,6 +287,15 @@ int CalculatorWidget::printSignal(const QString & _t1)
     int _t0{};
     void *_a[] = { const_cast<void*>(reinterpret_cast<const void*>(&_t0)), const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
+    return _t0;
+}
+
+// SIGNAL 1
+int CalculatorWidget::printPartialCutSignal()
+{
+    int _t0{};
+    void *_a[] = { const_cast<void*>(reinterpret_cast<const void*>(&_t0)) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
     return _t0;
 }
 QT_WARNING_POP

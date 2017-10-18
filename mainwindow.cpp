@@ -33,7 +33,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
   QObject::connect(ui->actionPrint,
                    SIGNAL(triggered(bool)),
                    this,
-                   SLOT(notePrint()));
+                   SLOT(print()));
 
   QObject::connect(ui->actionSettings,
                    SIGNAL(triggered(bool)),
@@ -69,6 +69,16 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openItemsDialog()));
+
+  QObject::connect(&m_calculator,
+                   SIGNAL(printSignal(const QString&)),
+                   this,
+                   SLOT(print(const QString&)));
+
+  QObject::connect(&m_calculator,
+                   SIGNAL(printPartialCutSignal()),
+                   this,
+                   SLOT(printPartialCut()));
 
   m_note.clear();
   emit initSignal();
@@ -146,51 +156,66 @@ void BaitaAssistant::disconnect()
   enableControls();
 }
 
-void BaitaAssistant::notePrint()
+void BaitaAssistant::print()
 {
-  if (ui->tabWidget->currentIndex() == (int)Functionality::NoteMode)
+  switch ((Functionality)ui->tabWidget->currentIndex())
   {
-    Note note = m_note.getNote();
-    QString str(NotePrinter::build(note));
+    case Functionality::NoteMode:
+    {
+      QString text(NotePrinter::build(m_note.getNote()));
+      if (print(text))
+      {
+        if (m_note.save())
+          m_note.create();
+      }
+    } break;
+    case Functionality::ReminderMode:
+    {
+      m_reminder.print(m_printer);
+      m_reminder.save();
+      m_reminder.clear();
+    } break;
+    case Functionality::ConsumptionMode:
+    {
+      print(m_consumption.printContent());
+    } break;
+    case Functionality::CalculatorMode:
+    {
+      print(m_calculator.text());
+    } break;
+  }
+}
+
+bool BaitaAssistant::print(const QString& text)
+{
+  bool bSuccess = m_printer.isOpen();
+  if (bSuccess)
+  {
     QString error;
-    if (!Printer::print(m_printer, str, error))
+    bSuccess = Printer::print(m_printer, text, error);
+    if (!bSuccess)
     {
       QMessageBox msgBox(QMessageBox::Critical,
-                         tr("Erro"),
-                         error,
+                         tr("Erro ao imprimir"),
+                         tr("Erro '%1' ao imprimir.").arg(error),
                          QMessageBox::Ok);
       msgBox.exec();
     }
-    else
-    {
-      QString error;
-      if (!m_note.save(error))
-      {
-        QMessageBox msgBox(QMessageBox::Warning,
-                           tr("Erro ao salvar vale"),
-                           error,
-                           QMessageBox::Ok);
-        msgBox.exec();
-      }
-      else
-      {
-        m_note.create();
-      }
-    }
   }
-  else if (ui->tabWidget->currentIndex() == (int)Functionality::ReminderMode)
+  else
   {
-    if (m_reminder.print(m_printer))
-    {
-      m_reminder.save();
-      m_reminder.clear();
-    }
+    QMessageBox msgBox(QMessageBox::Critical,
+                       tr("Erro ao imprimir"),
+                       "O sistema não conseguiu conectar-se à impressora.",
+                       QMessageBox::Ok);
+    msgBox.exec();
   }
-  else if (ui->tabWidget->currentIndex() == (int)Functionality::ConsumptionMode)
-  {
-    QString error;
-    Printer::print(m_printer, m_consumption.printContent(), error);
-  }
+  return bSuccess;
+}
+
+void BaitaAssistant::printPartialCut()
+{
+  Printer::partialCut(m_printer);
 }
 
 void BaitaAssistant::showSettings()
@@ -231,8 +256,7 @@ void BaitaAssistant::enableControls()
   ui->actionDisconnect->setEnabled(bIsOpen);
   ui->actionSettings->setEnabled(!bIsOpen);
 
-  Functionality func = (Functionality)ui->tabWidget->currentIndex();
-  switch (func)
+  switch ((Functionality)ui->tabWidget->currentIndex())
   {
     case Functionality::NoteMode:
     {
@@ -241,6 +265,10 @@ void BaitaAssistant::enableControls()
     case Functionality::ReminderMode:
     {
       ui->actionPrint->setEnabled(m_reminder.isValid() && bIsOpen && m_bReady);
+    } break;
+      case Functionality::CalculatorMode:
+    {
+      ui->actionPrint->setEnabled(bIsOpen && m_bReady);
     } break;
     case Functionality::ConsumptionMode:
     {

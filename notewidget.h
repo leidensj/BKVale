@@ -57,7 +57,7 @@ public:
   QStringList getItemDescriptions() const;
   bool isValid() const;
   void setHistoryDatabase(QSqlDatabase db);
-  bool save(QString& error);
+  bool save();
   Note getNote() const;
 
 private:

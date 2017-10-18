@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_BaitaAssistant_t {
-    QByteArrayData data[11];
-    char stringdata0[114];
+    QByteArrayData data[13];
+    char stringdata0[131];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -40,13 +40,16 @@ QT_MOC_LITERAL(5, 46, 12), // "showSettings"
 QT_MOC_LITERAL(6, 59, 14), // "enableControls"
 QT_MOC_LITERAL(7, 74, 4), // "init"
 QT_MOC_LITERAL(8, 79, 8), // "showInfo"
-QT_MOC_LITERAL(9, 88, 9), // "notePrint"
-QT_MOC_LITERAL(10, 98, 15) // "openItemsDialog"
+QT_MOC_LITERAL(9, 88, 5), // "print"
+QT_MOC_LITERAL(10, 94, 4), // "text"
+QT_MOC_LITERAL(11, 99, 15), // "printPartialCut"
+QT_MOC_LITERAL(12, 115, 15) // "openItemsDialog"
 
     },
     "BaitaAssistant\0initSignal\0\0connect\0"
     "disconnect\0showSettings\0enableControls\0"
-    "init\0showInfo\0notePrint\0openItemsDialog"
+    "init\0showInfo\0print\0text\0printPartialCut\0"
+    "openItemsDialog"
 };
 #undef QT_MOC_LITERAL
 
@@ -56,7 +59,7 @@ static const uint qt_meta_data_BaitaAssistant[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -64,17 +67,19 @@ static const uint qt_meta_data_BaitaAssistant[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   59,    2, 0x06 /* Public */,
+       1,    0,   69,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    0,   60,    2, 0x08 /* Private */,
-       4,    0,   61,    2, 0x08 /* Private */,
-       5,    0,   62,    2, 0x08 /* Private */,
-       6,    0,   63,    2, 0x08 /* Private */,
-       7,    0,   64,    2, 0x08 /* Private */,
-       8,    0,   65,    2, 0x08 /* Private */,
-       9,    0,   66,    2, 0x08 /* Private */,
-      10,    0,   67,    2, 0x08 /* Private */,
+       3,    0,   70,    2, 0x08 /* Private */,
+       4,    0,   71,    2, 0x08 /* Private */,
+       5,    0,   72,    2, 0x08 /* Private */,
+       6,    0,   73,    2, 0x08 /* Private */,
+       7,    0,   74,    2, 0x08 /* Private */,
+       8,    0,   75,    2, 0x08 /* Private */,
+       9,    0,   76,    2, 0x08 /* Private */,
+       9,    1,   77,    2, 0x08 /* Private */,
+      11,    0,   80,    2, 0x08 /* Private */,
+      12,    0,   81,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void,
@@ -86,6 +91,8 @@ static const uint qt_meta_data_BaitaAssistant[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Bool, QMetaType::QString,   10,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -105,8 +112,11 @@ void BaitaAssistant::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 4: _t->enableControls(); break;
         case 5: _t->init(); break;
         case 6: _t->showInfo(); break;
-        case 7: _t->notePrint(); break;
-        case 8: _t->openItemsDialog(); break;
+        case 7: _t->print(); break;
+        case 8: { bool _r = _t->print((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 9: _t->printPartialCut(); break;
+        case 10: _t->openItemsDialog(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -120,7 +130,6 @@ void BaitaAssistant::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
             }
         }
     }
-    Q_UNUSED(_a);
 }
 
 const QMetaObject BaitaAssistant::staticMetaObject = {
@@ -148,13 +157,13 @@ int BaitaAssistant::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 11;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 11)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 9;
+        _id -= 11;
     }
     return _id;
 }

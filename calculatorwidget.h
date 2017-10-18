@@ -7,6 +7,7 @@
 
 class QLineEdit;
 class QPlainTextEdit;
+class QCheckBox;
 
 class CalculatorPushButton : public QPushButton
 {
@@ -30,6 +31,7 @@ class CalculatorWidget : public QFrame
   Q_OBJECT
 public:
   explicit CalculatorWidget(QWidget* parent = 0);
+  QString text() const;
 
 private slots:
   void calculatorButtonClicked(Calculator::Button button);
@@ -39,8 +41,10 @@ private slots:
 
 signals:
   printSignal(const QString& text);
+  printPartialCutSignal();
 
 private:
+  QCheckBox* m_chkPrint;
   QPushButton* m_btn0;
   QPushButton* m_btn1;
   QPushButton* m_btn2;

@@ -2,6 +2,9 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QPlainTextEdit>
+#include <QCheckBox>
+#include <QScrollBar>
+#include "printutils.h"
 
 CalculatorPushButton::CalculatorPushButton(Calculator::Button button, QWidget* parent)
   : QPushButton(parent)
@@ -45,6 +48,12 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   , m_currentValue(0.0)
   , m_lastButton(Calculator::Button::Nop)
 {
+  m_chkPrint = new QCheckBox();
+  m_chkPrint->setText("");
+  m_chkPrint->setIconSize(QSize(64, 64));
+  m_chkPrint->setIcon(QIcon(":/icons/res/calcprint.png"));
+  m_chkPrint->setChecked(true);
+
   m_edDisplay = new QLineEdit();
   m_edDisplay->setAlignment(Qt::AlignLeft);
   m_edDisplay->setReadOnly(true);
@@ -68,6 +77,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
 
   QHBoxLayout* hline0 = new QHBoxLayout();
+  hline0->addWidget(m_chkPrint);
   hline0->addWidget(m_btnCls);
   hline0->addWidget(m_edDisplay);
   hline0->addWidget(m_btnClr);
@@ -311,6 +321,8 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(reset()));
+
+  clear();
 }
 
 double CalculatorWidget::calculate(double op1, double op2, Calculator::Button button)
@@ -325,7 +337,7 @@ double CalculatorWidget::calculate(double op1, double op2, Calculator::Button bu
     case Calculator::Button::Min:
       return op1 - op2;
     case Calculator::Button::Div:
-      return op1 / op2;
+      return op2 ? op1 / op2 : 0.0;
     case Calculator::Button::Mul:
       return op1 * op2;
     default:
@@ -341,19 +353,20 @@ void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
   QString text = m_view->toPlainText();
   text += str + '\n';
   m_view->setPlainText(text);
-  emit printSignal(str);
+  m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
+  if (m_chkPrint->isChecked())
+    emit printSignal(str);
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
 {
   if (Calculator::isOP(button))
   {
-    double op2 = Calculator::isOP(m_lastButton) ||
-                 Calculator::isEqual(m_lastButton)
+    double op2 = Calculator::isOP(m_lastButton)
                  ? m_lastValue
                  : m_currentValue;
 
-    emitPrintSignal(m_lastValue, button);
+    emitPrintSignal(op2, button);
     m_total = calculate(m_total, op2, button);
     m_edDisplay->setText(QString::number(m_total, 'f').
                          remove(QRegExp("\\.?0*$")));
@@ -396,6 +409,7 @@ void CalculatorWidget::clear()
   m_edDisplay->setText("");
   m_currentValue = 0.0;
   m_lastButton = Calculator::Button::Nop;
+  emitPrintSignal(0.0, Calculator::Button::Nop);
 }
 
 void CalculatorWidget::reset()
@@ -406,5 +420,12 @@ void CalculatorWidget::reset()
   m_lastValue = 0.0;
   m_total = 0.0;
   m_lastButton = Calculator::Button::Nop;
-  emitPrintSignal(m_total, Calculator::Button::Nop);
+  if (m_chkPrint->isChecked())
+    emit printPartialCutSignal();
+  emitPrintSignal(0.0, Calculator::Button::Nop);
+}
+
+QString CalculatorWidget::text() const
+{
+  return m_view->toPlainText();
 }

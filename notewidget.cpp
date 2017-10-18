@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QStringList>
 #include <QKeyEvent>
+#include <QMessageBox>
 
 SupplierComboBox::SupplierComboBox()
 {
@@ -425,23 +426,29 @@ void NoteWidget::enableControls()
   ui->total->setEnabled(bCreated);
 }
 
-bool NoteWidget::save(QString& error)
+bool NoteWidget::save()
 {
-  error.clear();
-
   Q_ASSERT(isValid());
   if (!isValid())
     return false;
 
+  QString error;
   bool bSuccess = NoteDatabase::insertOrUpdate(m_noteDatabaseWidget.getDatabase(),
                                                getNote(),
                                                error);
 
   if (bSuccess)
     m_noteDatabaseWidget.refresh();
+  else
+  {
+    QMessageBox msgBox(QMessageBox::Warning,
+                       tr("Erro ao salvar vale"),
+                       error,
+                       QMessageBox::Ok);
+    msgBox.exec();
+  }
 
   return bSuccess;
-
 }
 
 void NoteWidget::noteRemoved(int id)

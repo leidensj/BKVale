@@ -15,6 +15,8 @@ namespace Printer
   bool print(QSerialPort& printer,
              const QString& msg,
              QString& error);
+
+  void partialCut(QSerialPort& printer);
 }
 
 namespace NotePrinter

@@ -121,8 +121,8 @@ bool Printer::init(QSerialPort& printer,
 }
 
 bool Printer::print(QSerialPort& printer,
-                        const QString& msg,
-                        QString& error)
+                    const QString& msg,
+                    QString& error)
 {
   error.clear();
   QByteArray data(msg.toUtf8());
@@ -145,6 +145,12 @@ bool Printer::print(QSerialPort& printer,
   }
 
   return bSuccess;
+}
+
+void Printer::partialCut(QSerialPort& printer)
+{
+  QString error;
+  print(printer, ESC_PARTIAL_CUT, error);
 }
 
 QString NotePrinter::build(const Note& note)

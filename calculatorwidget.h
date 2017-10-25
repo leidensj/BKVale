@@ -7,7 +7,8 @@
 
 class QLineEdit;
 class QPlainTextEdit;
-class QCheckBox;
+class QRadioButton;
+
 
 class CalculatorPushButton : public QPushButton
 {
@@ -44,7 +45,9 @@ signals:
   printFullCutSignal();
 
 private:
-  QCheckBox* m_chkPrint;
+  QPushButton* m_btnPrint;
+  QRadioButton* m_rdoAlignLeft;
+  QRadioButton* m_rdoAlignCenter;
   QPushButton* m_btn0;
   QPushButton* m_btn1;
   QPushButton* m_btn2;

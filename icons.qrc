@@ -57,5 +57,7 @@
         <file>res/filter.png</file>
         <file>res/calccls.png</file>
         <file>res/calcprint.png</file>
+        <file>res/calcaligncenter.png</file>
+        <file>res/calcalignleft.png</file>
     </qresource>
 </RCC>

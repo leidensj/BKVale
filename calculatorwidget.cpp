@@ -4,10 +4,9 @@
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QScrollBar>
+#include <QRadioButton>
 #include "printutils.h"
-
-#define ESC_EXPAND_ON       "\x1b\x57\x31"
-#define ESC_EXPAND_OFF      "\x1b\x57\x30"
+#include "escpos.h"
 
 CalculatorPushButton::CalculatorPushButton(Calculator::Button button, QWidget* parent)
   : QPushButton(parent)
@@ -51,11 +50,13 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   , m_currentValue(0.0)
   , m_lastButton(Calculator::Button::Nop)
 {
-  m_chkPrint = new QCheckBox();
-  m_chkPrint->setText("");
-  m_chkPrint->setIconSize(QSize(64, 64));
-  m_chkPrint->setIcon(QIcon(":/icons/res/calcprint.png"));
-  m_chkPrint->setChecked(true);
+  m_btnPrint = new QPushButton();
+  m_btnPrint->setText("");
+  m_btnPrint->setIconSize(QSize(64, 64));
+  m_btnPrint->setIcon(QIcon(":/icons/res/calcprint.png"));
+  m_btnPrint->setCheckable(true);
+  m_btnPrint->setFlat(true);
+  m_btnPrint->setChecked(true);
 
   m_edDisplay = new QLineEdit();
   m_edDisplay->setAlignment(Qt::AlignLeft);
@@ -79,11 +80,24 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_btnCls->setIcon(QIcon(":/icons/res/calccls.png"));
   m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
 
+  m_rdoAlignLeft = new QRadioButton();
+  m_rdoAlignLeft->setText("");
+  m_rdoAlignLeft->setIconSize(QSize(64, 64));
+  m_rdoAlignLeft->setIcon(QIcon(":/icons/res/calcalignleft.png"));
+  m_rdoAlignLeft->setChecked(true);
+
+  m_rdoAlignCenter = new QRadioButton();
+  m_rdoAlignCenter->setText("");
+  m_rdoAlignCenter->setIconSize(QSize(64, 64));
+  m_rdoAlignCenter->setIcon(QIcon(":/icons/res/calcaligncenter.png"));
+
   QHBoxLayout* hline0 = new QHBoxLayout();
-  hline0->addWidget(m_chkPrint);
+  hline0->addWidget(m_btnPrint);
   hline0->addWidget(m_btnCls);
   hline0->addWidget(m_edDisplay);
   hline0->addWidget(m_btnClr);
+  hline0->addWidget(m_rdoAlignLeft);
+  hline0->addWidget(m_rdoAlignCenter);
   hline0->setAlignment(Qt::AlignLeft);
   hline0->setContentsMargins(0, 0, 0, 0);
 
@@ -354,8 +368,12 @@ void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
                  " " + Calculator::toChar(button);
   m_view->appendPlainText(text);
   m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
-  if (m_chkPrint->isChecked())
-    emit printSignal(ESC_EXPAND_ON + text + '\n' + ESC_EXPAND_OFF);
+  if (m_btnPrint->isChecked())
+  {
+    QString text2 = m_rdoAlignLeft->isChecked() ? ESC_ALIGN_LEFT : ESC_ALIGN_CENTER;
+    text2 += ESC_EXPAND_ON + text + ESC_LF ESC_EXPAND_OFF;
+    emit printSignal(text2);
+  }
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
@@ -409,7 +427,6 @@ void CalculatorWidget::clear()
   m_edDisplay->setText("");
   m_currentValue = 0.0;
   m_lastButton = Calculator::Button::Nop;
-  emitPrintSignal(0.0, Calculator::Button::Nop);
 }
 
 void CalculatorWidget::reset()
@@ -420,7 +437,7 @@ void CalculatorWidget::reset()
   m_lastValue = 0.0;
   m_total = 0.0;
   m_lastButton = Calculator::Button::Nop;
-  if (m_chkPrint->isChecked())
+  if (m_btnPrint->isChecked())
     emit printFullCutSignal();
 }
 

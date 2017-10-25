@@ -147,10 +147,10 @@ bool Printer::print(QSerialPort& printer,
   return bSuccess;
 }
 
-void Printer::partialCut(QSerialPort& printer)
+void Printer::fullCut(QSerialPort& printer)
 {
   QString error;
-  print(printer, ESC_PARTIAL_CUT, error);
+  print(printer, ESC_FULL_CUT, error);
 }
 
 QString NotePrinter::build(const Note& note)

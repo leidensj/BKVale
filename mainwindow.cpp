@@ -76,9 +76,9 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    SLOT(print(const QString&)));
 
   QObject::connect(&m_calculator,
-                   SIGNAL(printPartialCutSignal()),
+                   SIGNAL(printFullCutSignal()),
                    this,
-                   SLOT(printPartialCut()));
+                   SLOT(printFullCut()));
 
   m_note.clear();
   emit initSignal();
@@ -213,9 +213,9 @@ bool BaitaAssistant::print(const QString& text)
   return bSuccess;
 }
 
-void BaitaAssistant::printPartialCut()
+void BaitaAssistant::printFullCut()
 {
-  Printer::partialCut(m_printer);
+  Printer::fullCut(m_printer);
 }
 
 void BaitaAssistant::showSettings()

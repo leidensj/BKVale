@@ -6,6 +6,9 @@
 #include <QScrollBar>
 #include "printutils.h"
 
+#define ESC_EXPAND_ON       "\x1b\x57\x31"
+#define ESC_EXPAND_OFF      "\x1b\x57\x30"
+
 CalculatorPushButton::CalculatorPushButton(Calculator::Button button, QWidget* parent)
   : QPushButton(parent)
   , m_button(button)
@@ -347,15 +350,12 @@ double CalculatorWidget::calculate(double op1, double op2, Calculator::Button bu
 
 void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
 {
-  QString str = QString::number(value, 'f').remove(QRegExp("\\.?0*$")) +
-                " " +
-                Calculator::toChar(button);
-  QString text = m_view->toPlainText();
-  text += str + '\n';
-  m_view->setPlainText(text);
+  QString text = QString::number(value, 'f').remove(QRegExp("\\.?0*$")) +
+                 " " + Calculator::toChar(button);
+  m_view->appendPlainText(text);
   m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
   if (m_chkPrint->isChecked())
-    emit printSignal(str);
+    emit printSignal(ESC_EXPAND_ON + text + '\n' + ESC_EXPAND_OFF);
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
@@ -421,8 +421,7 @@ void CalculatorWidget::reset()
   m_total = 0.0;
   m_lastButton = Calculator::Button::Nop;
   if (m_chkPrint->isChecked())
-    emit printPartialCutSignal();
-  emitPrintSignal(0.0, Calculator::Button::Nop);
+    emit printFullCutSignal();
 }
 
 QString CalculatorWidget::text() const

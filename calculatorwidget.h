@@ -41,7 +41,7 @@ private slots:
 
 signals:
   printSignal(const QString& text);
-  printPartialCutSignal();
+  printFullCutSignal();
 
 private:
   QCheckBox* m_chkPrint;

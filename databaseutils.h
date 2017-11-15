@@ -36,7 +36,7 @@ namespace BaitaDatabase
                       Settings& settings);
 }
 
-namespace NoteDatabase
+namespace NoteSQL
 {
   int nextNumber(QSqlDatabase db);
 

@@ -1,93 +1,44 @@
-#ifndef BKFRAME_H
-#define BKFRAME_H
+#ifndef NOTEWIDGET_H
+#define NOTEWIDGET_H
 
 #include <QFrame>
-#include <QStringList>
-#include <QComboBox>
-#include <QTableWidget>
 #include "note.h"
-#include "notedatabasewidget.h"
+#include <QSerialPort>
+#include <QSqlDatabase>
 
-#define MAX_ITEMS 100
-
-class QTableWidgetItem;
-
-namespace Ui {
-class NoteWidget;
-}
-
-class SupplierComboBox : public QComboBox
-{
-  Q_OBJECT
-
-public:
-  SupplierComboBox();
-
-protected:
-  void keyPressEvent(QKeyEvent *event);
-
-public slots:
-  void toUpper();
-
-signals:
-  void supplierEnteredSignal();
-};
-
-class NoteTableWidget : public QTableWidget
-{
-  Q_OBJECT
-
-protected:
-  void keyPressEvent(QKeyEvent *event);
-
-public:
-  NoteTableWidget();
-  QString text(int row, int column) const ;
-  void setText(int row, int column, const QString& str);
-  QString serializeItems() const;
-};
+class QDockWidget;
+class NoteView;
+class NoteDatabase;
 
 class NoteWidget : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit NoteWidget(QWidget *parent = 0);
-  ~NoteWidget();
-  QStringList getItemDescriptions() const;
+  explicit NoteWidget(QWidget* parent = 0);
+  void setDatabase(QSqlDatabase db);
   bool isValid() const;
-  void setHistoryDatabase(QSqlDatabase db);
-  bool save();
-  Note getNote() const;
+
 
 private:
-  Ui::NoteWidget *ui;
-  SupplierComboBox m_supplier;
-  NoteTableWidget m_table;
-  QString computeUnitValue(int row) const;
-  QString computeSubTotal(int row) const;
-  QString computeTotal() const;
-  double evaluate(int row, int column) const;
-  NoteDatabaseWidget m_noteDatabaseWidget;
-  int currentNoteID;
-
-private slots:
-  void updateTable(int row, int column);
-  void emitChangedSignal();
-  void noteRemoved(int id);
+  NoteView* m_view;
+  NoteDatabase* m_database;
+  QDockWidget* m_dock; 
 
 public slots:
-  void addItem();
-  void removeItem();
-  void clear();
   void create();
-  void supplierEntered();
-  void showNoteDatabase();
+  bool save();
+  bool print(QSerialPort& printer);
+
+private slots:
+  void emitChangedSignal();
+  void showSearch();
   void setNote(const Note& note);
-  void enableControls();
+  void checkForRemovedNote(int id);
+  void openLast(int id);
 
 signals:
-  void changedSignal();
+  changedSignal();
 };
 
-#endif // BKFRAME_H
+#endif // NOTEWIDGET_H

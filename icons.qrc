@@ -59,5 +59,6 @@
         <file>res/calcprint.png</file>
         <file>res/calcaligncenter.png</file>
         <file>res/calcalignleft.png</file>
+        <file>res/openlast.png</file>
     </qresource>
 </RCC>

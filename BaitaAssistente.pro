@@ -9,7 +9,7 @@ CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-TARGET = BKVale
+TARGET = BaitaAssistente
 TEMPLATE = app
 
 
@@ -19,10 +19,8 @@ SOURCES += main.cpp\
     settingsdlg.cpp \
     printutils.cpp \
     databaseutils.cpp \
-    notewidget.cpp \
     note.cpp \
     settings.cpp \
-    notedatabasewidget.cpp \
     reminderview.cpp \
     reminderwidget.cpp \
     reminderdatabase.cpp \
@@ -33,17 +31,18 @@ SOURCES += main.cpp\
     consumptionfilter.cpp \
     qcustomplot.cpp \
     consumptionchart.cpp \
-    calculatorwidget.cpp
+    calculatorwidget.cpp \
+    notedatabase.cpp \
+    noteview.cpp \
+    notewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
     printutils.h \
     databaseutils.h \
-    notewidget.h \
     note.h \
     settings.h \
-    notedatabasewidget.h \
     reminder.h \
     reminderview.h \
     reminderwidget.h \
@@ -59,12 +58,12 @@ HEADERS  += mainwindow.h \
     consumptionchart.h \
     calculatorwidget.h \
     calculator.h \
-    escpos.h
+    notedatabase.h \
+    noteview.h \
+    notewidget.h
 
 FORMS    += mainwindow.ui \
-    settingsdlg.ui \
-    notewidget.ui \
-    notedatabasewidget.ui
+    settingsdlg.ui
 
 RESOURCES += \
     icons.qrc

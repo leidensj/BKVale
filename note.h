@@ -6,7 +6,7 @@
 #include <vector>
 
 #define NUMBER_OF_COLUMNS 5
-#define INVALID_ID -1
+#define INVALID_NOTE_ID -1
 
 enum class NoteColumn : int
 {
@@ -47,7 +47,7 @@ struct Note
 
   void clear();
 
-  static bool isValidID(int id) { return id > INVALID_ID; }
+  static bool isValidID(int id) { return id != INVALID_NOTE_ID; }
 
   static QString format(const QString& str, bool b3places = false);
   static QString format(double d, bool b3places = false);

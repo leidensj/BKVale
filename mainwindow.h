@@ -5,16 +5,15 @@
 #include <QSerialPort>
 #include "settingsdlg.h"
 #include "databaseutils.h"
-#include "notewidget.h"
-#include "reminderwidget.h"
-#include "consumptionwidget.h"
-#include "calculatorwidget.h"
 
 namespace Ui {
 class BaitaAssistant;
 }
 
 class NoteWidget;
+class ReminderWidget;
+class ConsumptionWidget;
+class CalculatorWidget;
 
 enum class Functionality : int
 {
@@ -35,10 +34,10 @@ public:
 
 private:
   Ui::BaitaAssistant *ui;
-  NoteWidget m_note;
-  ReminderWidget m_reminder;
-  ConsumptionWidget m_consumption;
-  CalculatorWidget m_calculator;
+  NoteWidget* m_note;
+  ReminderWidget* m_reminder;
+  ConsumptionWidget* m_consumption;
+  CalculatorWidget* m_calculator;
   QSerialPort m_printer;
   Settings m_settings;
   bool m_bReady;

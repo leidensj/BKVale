@@ -7,7 +7,7 @@
 
 #define DATABASE_NOT_OPEN_TXT "O arquivo de configuração não foi aberto."
 
-int NoteDatabase::nextNumber(QSqlDatabase db)
+int NoteSQL::nextNumber(QSqlDatabase db)
 {
   if (!db.isOpen())
     return -1;
@@ -17,7 +17,7 @@ int NoteDatabase::nextNumber(QSqlDatabase db)
   return query.next() ? query.value(idx).toInt() : DEFAULT_NUMBER;
 }
 
-QStringList NoteDatabase::suppliers(QSqlDatabase db)
+QStringList NoteSQL::suppliers(QSqlDatabase db)
 {
   QStringList list;
   if (db.isOpen())
@@ -34,7 +34,7 @@ QStringList NoteDatabase::suppliers(QSqlDatabase db)
   return list;
 }
 
-bool NoteDatabase::insertOrUpdate(QSqlDatabase db,
+bool NoteSQL::insertOrUpdate(QSqlDatabase db,
                                   const Note& note,
                                   QString& error)
 {
@@ -93,7 +93,7 @@ bool NoteDatabase::insertOrUpdate(QSqlDatabase db,
   return bSuccess;
 }
 
-void NoteDatabase::incNumber(QSqlDatabase db)
+void NoteSQL::incNumber(QSqlDatabase db)
 {
   int n = nextNumber(db) + 1;
   QSqlQuery query(db);
@@ -102,7 +102,7 @@ void NoteDatabase::incNumber(QSqlDatabase db)
   query.exec();
 }
 
-bool NoteDatabase::select(QSqlDatabase db,
+bool NoteSQL::select(QSqlDatabase db,
                           int id,
                           Note& note,
                           QString& error)
@@ -150,7 +150,7 @@ bool NoteDatabase::select(QSqlDatabase db,
   return bSuccess;
 }
 
-bool NoteDatabase::selectAll(QSqlDatabase db,
+bool NoteSQL::selectAll(QSqlDatabase db,
                              Notes& notes,
                              QString& error)
 {

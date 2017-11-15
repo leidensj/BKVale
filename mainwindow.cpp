@@ -1,24 +1,36 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "notewidget.h"
+#include "noteview.h"
 #include "printutils.h"
 #include "itemwidget.h"
+#include "notewidget.h"
+#include "reminderwidget.h"
+#include "consumptionwidget.h"
+#include "calculatorwidget.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
 #include <QDir>
 
-BaitaAssistant::BaitaAssistant(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::BaitaAssistant),
-    m_bReady(false),
-    m_db(QSqlDatabase::addDatabase("QSQLITE"))
+BaitaAssistant::BaitaAssistant(QWidget *parent)
+  : QMainWindow(parent)
+  , ui(new Ui::BaitaAssistant)
+  , m_note(nullptr)
+  , m_reminder(nullptr)
+  , m_consumption(nullptr)
+  , m_calculator(nullptr)
+  , m_bReady(false)
+  , m_db(QSqlDatabase::addDatabase("QSQLITE"))
 {
   ui->setupUi(this);
-  ui->tabNotes->layout()->addWidget(&m_note);
-  ui->tabReminder->layout()->addWidget(&m_reminder);
-  ui->tabConsumption->layout()->addWidget(&m_consumption);
-  ui->tabCalculator->layout()->addWidget(&m_calculator);
+  m_note = new NoteWidget();
+  m_reminder = new ReminderWidget();
+  m_consumption = new ConsumptionWidget();
+  m_calculator = new CalculatorWidget();
+  ui->tabNotes->layout()->addWidget(m_note);
+  ui->tabReminder->layout()->addWidget(m_reminder);
+  ui->tabConsumption->layout()->addWidget(m_consumption);
+  ui->tabCalculator->layout()->addWidget(m_calculator);
 
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),
@@ -45,7 +57,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    this,
                    SLOT(showInfo()));
 
-  QObject::connect(&m_note,
+  QObject::connect(m_note,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
@@ -60,7 +72,7 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    this,
                    SLOT(enableControls()));
 
-  QObject::connect(&m_reminder,
+  QObject::connect(m_reminder,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(enableControls()));
@@ -70,17 +82,16 @@ BaitaAssistant::BaitaAssistant(QWidget *parent) :
                    this,
                    SLOT(openItemsDialog()));
 
-  QObject::connect(&m_calculator,
+  QObject::connect(m_calculator,
                    SIGNAL(printSignal(const QString&)),
                    this,
                    SLOT(print(const QString&)));
 
-  QObject::connect(&m_calculator,
+  QObject::connect(m_calculator,
                    SIGNAL(printFullCutSignal()),
                    this,
                    SLOT(printFullCut()));
 
-  m_note.clear();
   emit initSignal();
 }
 
@@ -162,27 +173,28 @@ void BaitaAssistant::print()
   {
     case Functionality::NoteMode:
     {
-      QString text(NotePrinter::build(m_note.getNote()));
-      if (print(text))
+      if (m_note->print(m_printer))
       {
-        if (m_note.save())
-          m_note.create();
+        if (m_note->save())
+          m_note->create();
       }
     } break;
     case Functionality::ReminderMode:
     {
-      m_reminder.print(m_printer);
-      m_reminder.save();
-      m_reminder.clear();
+      m_reminder->print(m_printer);
+      m_reminder->save();
+      m_reminder->clear();
     } break;
     case Functionality::ConsumptionMode:
     {
-      print(m_consumption.printContent());
+      print(m_consumption->printContent());
     } break;
     case Functionality::CalculatorMode:
     {
-      print(m_calculator.text());
+      print(m_calculator->text());
     } break;
+    case Functionality::ShopMode:
+      break;
   }
 }
 
@@ -260,11 +272,11 @@ void BaitaAssistant::enableControls()
   {
     case Functionality::NoteMode:
     {
-      ui->actionPrint->setEnabled(m_note.isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_note->isValid() && bIsOpen && m_bReady);
     } break;
     case Functionality::ReminderMode:
     {
-      ui->actionPrint->setEnabled(m_reminder.isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_reminder->isValid() && bIsOpen && m_bReady);
     } break;
       case Functionality::CalculatorMode:
     {
@@ -272,7 +284,7 @@ void BaitaAssistant::enableControls()
     } break;
     case Functionality::ConsumptionMode:
     {
-      ui->actionPrint->setEnabled(m_consumption.isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_consumption->isValid() && bIsOpen && m_bReady);
     } break;
     case Functionality::ShopMode:
     default:
@@ -307,10 +319,10 @@ void BaitaAssistant::init()
     BaitaDatabase::selectSettings(m_db, m_settings);
     if (!m_settings.port.isEmpty())
       connect();
-    m_note.setHistoryDatabase(m_db);
-    m_consumption.setDatabase(m_db);
-    m_reminder.setDatabase(m_db);
-    m_note.create();
+    m_note->setDatabase(m_db);
+     m_note->create();
+    m_consumption->setDatabase(m_db);
+    m_reminder->setDatabase(m_db);
   }
   enableControls();
 }

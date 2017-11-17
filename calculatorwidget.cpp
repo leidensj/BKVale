@@ -5,6 +5,7 @@
 #include <QCheckBox>
 #include <QScrollBar>
 #include <QRadioButton>
+#include <QSplitter>
 #include "printutils.h"
 #include "escpos.h"
 
@@ -50,13 +51,12 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   , m_currentValue(0.0)
   , m_lastButton(Calculator::Button::Nop)
 {
-  m_btnPrint = new QPushButton();
-  m_btnPrint->setText("");
-  m_btnPrint->setIconSize(QSize(64, 64));
-  m_btnPrint->setIcon(QIcon(":/icons/res/calcprint.png"));
-  m_btnPrint->setCheckable(true);
-  m_btnPrint->setFlat(true);
-  m_btnPrint->setChecked(true);
+  m_btnCls = new QPushButton();
+  m_btnCls->setFlat(true);
+  m_btnCls->setText("");
+  m_btnCls->setIconSize(QSize(64, 64));
+  m_btnCls->setIcon(QIcon(":/icons/res/calccls.png"));
+  m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
 
   m_edDisplay = new QLineEdit();
   m_edDisplay->setAlignment(Qt::AlignLeft);
@@ -73,31 +73,10 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_btnClr->setIcon(QIcon(":/icons/res/calcclr.png"));
   m_btnClr->setShortcut(QKeySequence(Qt::Key_Backspace));
 
-  m_btnCls = new QPushButton();
-  m_btnCls->setFlat(true);
-  m_btnCls->setText("");
-  m_btnCls->setIconSize(QSize(64, 64));
-  m_btnCls->setIcon(QIcon(":/icons/res/calccls.png"));
-  m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
-
-  m_rdoAlignLeft = new QRadioButton();
-  m_rdoAlignLeft->setText("");
-  m_rdoAlignLeft->setIconSize(QSize(64, 64));
-  m_rdoAlignLeft->setIcon(QIcon(":/icons/res/calcalignleft.png"));
-  m_rdoAlignLeft->setChecked(true);
-
-  m_rdoAlignCenter = new QRadioButton();
-  m_rdoAlignCenter->setText("");
-  m_rdoAlignCenter->setIconSize(QSize(64, 64));
-  m_rdoAlignCenter->setIcon(QIcon(":/icons/res/calcaligncenter.png"));
-
   QHBoxLayout* hline0 = new QHBoxLayout();
-  hline0->addWidget(m_btnPrint);
   hline0->addWidget(m_btnCls);
   hline0->addWidget(m_edDisplay);
   hline0->addWidget(m_btnClr);
-  hline0->addWidget(m_rdoAlignLeft);
-  hline0->addWidget(m_rdoAlignCenter);
   hline0->setAlignment(Qt::AlignLeft);
   hline0->setContentsMargins(0, 0, 0, 0);
 
@@ -245,26 +224,62 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline4->setAlignment(Qt::AlignCenter);
   hline4->setContentsMargins(0, 0, 0, 0);
 
-  QVBoxLayout* vlayout1 = new QVBoxLayout();
-  vlayout1->addLayout(hline1);
-  vlayout1->addLayout(hline2);
-  vlayout1->addLayout(hline3);
-  vlayout1->addLayout(hline4);
-  vlayout1->setAlignment(Qt::AlignTop);
+  QVBoxLayout* vlayoutl = new QVBoxLayout();
+  vlayoutl->addLayout(hline0);
+  vlayoutl->addLayout(hline1);
+  vlayoutl->addLayout(hline2);
+  vlayoutl->addLayout(hline3);
+  vlayoutl->addLayout(hline4);
+  vlayoutl->setAlignment(Qt::AlignTop);
+
+  m_btnPrint = new QPushButton();
+  m_btnPrint->setText("");
+  m_btnPrint->setIconSize(QSize(24, 24));
+  m_btnPrint->setIcon(QIcon(":/icons/res/calcprint.png"));
+  m_btnPrint->setCheckable(true);
+  m_btnPrint->setFlat(true);
+  m_btnPrint->setChecked(true);
+
+  m_rdoAlignLeft = new QRadioButton();
+  m_rdoAlignLeft->setText("");
+  m_rdoAlignLeft->setIconSize(QSize(24, 24));
+  m_rdoAlignLeft->setIcon(QIcon(":/icons/res/calcalignleft.png"));
+  m_rdoAlignLeft->setChecked(true);
+
+  m_rdoAlignCenter = new QRadioButton();
+  m_rdoAlignCenter->setText("");
+  m_rdoAlignCenter->setIconSize(QSize(24, 24));
+  m_rdoAlignCenter->setIcon(QIcon(":/icons/res/calcaligncenter.png"));
+
+  QHBoxLayout* hline5 = new QHBoxLayout();
+  hline5->addWidget(m_btnPrint);
+  hline5->addWidget(m_rdoAlignLeft);
+  hline5->addWidget(m_rdoAlignCenter);
+  hline5->setAlignment(Qt::AlignLeft);
+  hline5->setContentsMargins(0, 0, 0, 0);
 
   m_view = new QPlainTextEdit();
   m_view->setReadOnly(true);
 
+  QVBoxLayout* vlayoutr = new QVBoxLayout();
+  vlayoutr->addLayout(hline5);
+  vlayoutr->addWidget(m_view);
+
+  QFrame* framl = new QFrame();
+  framl->setLayout(vlayoutl);
+
+  QFrame* framr = new QFrame();
+  framr->setLayout(vlayoutr);
+
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(framl);
+  splitter->addWidget(framr);
+
   QHBoxLayout* hlayout = new QHBoxLayout();
-  hlayout->addLayout(vlayout1);
-  hlayout->addWidget(m_view);
+  hlayout->addWidget(splitter);
   hlayout->setContentsMargins(0, 0, 0, 0);
 
-  QVBoxLayout* vlayout2 = new QVBoxLayout();
-  vlayout2->addLayout(hline0);
-  vlayout2->addLayout(hlayout);
-  vlayout2->setAlignment(Qt::AlignTop);
-  setLayout(vlayout2);
+  setLayout(hlayout);
 
   QObject::connect(m_btn0,
                    SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),

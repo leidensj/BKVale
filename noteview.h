@@ -69,7 +69,7 @@ private:
   QSpinBox* m_snNumber;
   QLabel* m_lblNumberStatus;
   QDateEdit* m_dtDate;
-  QLabel* m_lblDateStatus;
+  QPushButton* m_btnToday;
   QLineEdit* m_edTotal;
   NoteSupplierComboBox* m_cbSupplier;
   NoteTableWidget* m_table;
@@ -82,6 +82,7 @@ private:
 
 private slots:
   void updateTable(int row, int column);
+  void setToday();
   void emitChangedSignal();
   void emitShowSearchSignal();
   void emitCreateSignal();
@@ -93,7 +94,7 @@ public slots:
   void create(int number, const QStringList& suppliers);
   void supplierEntered();
   void setNote(const Note& note, const QStringList& suppliers);
-  void enableControls();
+  void updateControls();
 
 signals:
   void changedSignal();

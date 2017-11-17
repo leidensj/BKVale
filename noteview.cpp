@@ -11,6 +11,8 @@
 #include <QHeaderView>
 #include <QDateEdit>
 #include <QSpinBox>
+#include <QCalendarWidget>
+#include <QTextCharFormat>
 
 NoteSupplierComboBox::NoteSupplierComboBox(QWidget* parent)
   : QComboBox(parent)
@@ -142,7 +144,7 @@ NoteView::NoteView(QWidget *parent)
   , m_snNumber(nullptr)
   , m_lblNumberStatus(nullptr)
   , m_dtDate(nullptr)
-  , m_lblDateStatus(nullptr)
+  , m_btnToday(nullptr)
   , m_edTotal(nullptr)
   , m_cbSupplier(nullptr)
   , m_table(nullptr)
@@ -232,13 +234,18 @@ NoteView::NoteView(QWidget *parent)
   m_dtDate->setCalendarPopup(true);
   m_dtDate->setDisplayFormat("dd/MM/yyyy");
   m_dtDate->setDate(QDate::currentDate());
+  QTextCharFormat fmt;
+  fmt.setForeground(Qt::darkGreen);
+  fmt.setFontWeight(QFont::ExtraBold);
+  fmt.setFontUnderline(true);
+  fmt.setFontOverline(true);
+  m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
-  m_lblDateStatus = new QLabel();
-  m_lblDateStatus->setText("");
-  m_lblDateStatus->setPixmap(QPixmap(":/icons/res/calendarok.png"));
-  m_lblDateStatus->setScaledContents(true);
-  m_lblDateStatus->setMinimumSize(24, 24);
-  m_lblDateStatus->setMaximumSize(24, 24);
+  m_btnToday = new QPushButton();
+  m_btnToday->setFlat(true);
+  m_btnToday->setText("");
+  m_btnToday->setIconSize(QSize(24, 24));
+  m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
 
   QHBoxLayout* hlayout2 = new QHBoxLayout();
   hlayout2->setContentsMargins(0, 0, 0, 0);
@@ -248,7 +255,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(m_lblNumberStatus);
   hlayout2->addWidget(lblDate);
   hlayout2->addWidget(m_dtDate);
-  hlayout2->addWidget(m_lblDateStatus);
+  hlayout2->addWidget(m_btnToday);
 
   m_cbSupplier = new NoteSupplierComboBox();
 
@@ -328,7 +335,7 @@ NoteView::NoteView(QWidget *parent)
   QObject::connect(m_table,
                    SIGNAL(currentCellChanged(int, int, int, int)),
                    this,
-                   SLOT(enableControls()));
+                   SLOT(updateControls()));
 
   QObject::connect(m_btnOpenLast,
                    SIGNAL(clicked(bool)),
@@ -338,10 +345,15 @@ NoteView::NoteView(QWidget *parent)
   QObject::connect(m_dtDate,
                    SIGNAL(dateChanged(const QDate&)),
                    this,
-                   SLOT(enableControls()));
+                   SLOT(updateControls()));
+
+  QObject::connect(m_btnToday,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(setToday()));
 
   create(0, QStringList());
-  enableControls();
+  updateControls();
 }
 
 NoteView::~NoteView()
@@ -440,7 +452,7 @@ void NoteView::addItem()
   m_table->setFocus();
   m_table->blockSignals(false);
   m_edTotal->setText(computeTotal());
-  enableControls();
+  updateControls();
   emitChangedSignal();
 }
 
@@ -456,7 +468,7 @@ void NoteView::removeItem()
     m_edTotal->clear();
     m_cbSupplier->setFocus();
   }
-  enableControls();
+  updateControls();
   emitChangedSignal();
 }
 
@@ -498,7 +510,7 @@ void NoteView::setNote(const Note& note, const QStringList& suppliers)
       m_table->setText(row, column, items.at(row, (NoteColumn)column));
   }
 
-  enableControls();
+  updateControls();
 }
 
 bool NoteView::isValid() const
@@ -522,7 +534,7 @@ void NoteView::create(int number, const QStringList& suppliers)
   m_cbSupplier->addItems(suppliers);
   m_cbSupplier->setCurrentText("");
   m_cbSupplier->setFocus();
-  enableControls();
+  updateControls();
 }
 
 QStringList NoteView::getItemDescriptions() const
@@ -546,7 +558,7 @@ void NoteView::supplierEntered()
   }
 }
 
-void NoteView::enableControls()
+void NoteView::updateControls()
 {
   const bool bCreated = m_snNumber->value() > 0;
   m_btnRemove->setEnabled(bCreated && m_table->currentRow() >= 0);
@@ -560,9 +572,9 @@ void NoteView::enableControls()
   m_lblNumberStatus->setPixmap(QPixmap(Note::isValidID(m_currentID)
                                      ? ":/icons/res/fileedit.png"
                                      : ":/icons/res/filenew.png"));
-  m_lblDateStatus->setPixmap(QPixmap(m_dtDate->date() == QDate::currentDate()
-                                     ? ":/icons/res/calendarok.png"
-                                     : ":/icons/res/calendarwarning.png"));
+  m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
+                            ? ":/icons/res/calendarok.png"
+                            : ":/icons/res/calendarwarning.png"));
 }
 
 void NoteView::emitShowSearchSignal()
@@ -584,10 +596,16 @@ void NoteView::emitOpenLastSignal()
 void NoteView::setLastID(int lastID)
 {
   m_lastID = lastID;
-  enableControls();
+  updateControls();
 }
 
 int NoteView::getLastID() const
 {
   return m_lastID;
+}
+
+void NoteView::setToday()
+{
+  m_dtDate->setDate(QDate::currentDate());
+  updateControls();
 }

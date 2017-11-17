@@ -103,9 +103,9 @@ void NoteSQL::incNumber(QSqlDatabase db)
 }
 
 bool NoteSQL::select(QSqlDatabase db,
-                          int id,
-                          Note& note,
-                          QString& error)
+                     int id,
+                     Note& note,
+                     QString& error)
 {
   error.clear();
   note.clear();
@@ -131,11 +131,12 @@ bool NoteSQL::select(QSqlDatabase db,
     bSuccess = query.next();
     if (bSuccess)
     {
-       note.m_number = query.value(query.record().indexOf("_NUMBER")).toInt();
-       note.m_date = query.value(query.record().indexOf("_DATE")).toLongLong();
-       note.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
-       note.m_items = query.value(query.record().indexOf("_ITEMS")).toString();
-       note.m_total = query.value(query.record().indexOf("_TOTAL")).toDouble();
+      note.m_id = id;
+      note.m_number = query.value(query.record().indexOf("_NUMBER")).toInt();
+      note.m_date = query.value(query.record().indexOf("_DATE")).toLongLong();
+      note.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
+      note.m_items = query.value(query.record().indexOf("_ITEMS")).toString();
+      note.m_total = query.value(query.record().indexOf("_TOTAL")).toDouble();
     }
     else
     {

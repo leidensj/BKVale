@@ -60,5 +60,9 @@
         <file>res/calcaligncenter.png</file>
         <file>res/calcalignleft.png</file>
         <file>res/openlast.png</file>
+        <file>res/calendarwarning.png</file>
+        <file>res/calendarok.png</file>
+        <file>res/filenew.png</file>
+        <file>res/fileedit.png</file>
     </qresource>
 </RCC>

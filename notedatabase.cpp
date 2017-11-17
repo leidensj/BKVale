@@ -76,6 +76,7 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   m_table = new QTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_table->setEditTriggers(QTableView::NoEditTriggers);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->setContentsMargins(0, 0, 0, 0);

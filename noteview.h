@@ -14,6 +14,7 @@ class QDateEdit;
 class QLineEdit;
 class QSpinBox;
 class QPushButton;
+class QLabel;
 
 class NoteSupplierComboBox : public QComboBox
 {
@@ -66,7 +67,9 @@ private:
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;
+  QLabel* m_lblNumberStatus;
   QDateEdit* m_dtDate;
+  QLabel* m_lblDateStatus;
   QLineEdit* m_edTotal;
   NoteSupplierComboBox* m_cbSupplier;
   NoteTableWidget* m_table;

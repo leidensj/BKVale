@@ -140,7 +140,9 @@ NoteView::NoteView(QWidget *parent)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
   , m_snNumber(nullptr)
+  , m_lblNumberStatus(nullptr)
   , m_dtDate(nullptr)
+  , m_lblDateStatus(nullptr)
   , m_edTotal(nullptr)
   , m_cbSupplier(nullptr)
   , m_table(nullptr)
@@ -197,6 +199,9 @@ NoteView::NoteView(QWidget *parent)
   m_snNumber = new QSpinBox();
   m_snNumber->setReadOnly(true);
   m_snNumber->setButtonSymbols(QSpinBox::ButtonSymbols::NoButtons);
+  m_snNumber->setMaximum(999999);
+  m_snNumber->setMinimum(-1);
+  m_snNumber->setMinimumSize(90, 0);
   m_snNumber->setAlignment(Qt::AlignRight);
   m_snNumber->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
   {
@@ -207,6 +212,13 @@ NoteView::NoteView(QWidget *parent)
     palette.setColor(QPalette::ColorRole::Text, Qt::red);
     m_snNumber->setPalette(palette);
   }
+
+  m_lblNumberStatus = new QLabel();
+  m_lblNumberStatus->setText("");
+  m_lblNumberStatus->setPixmap(QPixmap(":/icons/res/filenew.png"));
+  m_lblNumberStatus->setScaledContents(true);
+  m_lblNumberStatus->setMinimumSize(24, 24);
+  m_lblNumberStatus->setMaximumSize(24, 24);
 
   QLabel* lblDate = new QLabel();
   lblDate->setText(tr("Data:"));
@@ -221,13 +233,22 @@ NoteView::NoteView(QWidget *parent)
   m_dtDate->setDisplayFormat("dd/MM/yyyy");
   m_dtDate->setDate(QDate::currentDate());
 
+  m_lblDateStatus = new QLabel();
+  m_lblDateStatus->setText("");
+  m_lblDateStatus->setPixmap(QPixmap(":/icons/res/calendarok.png"));
+  m_lblDateStatus->setScaledContents(true);
+  m_lblDateStatus->setMinimumSize(24, 24);
+  m_lblDateStatus->setMaximumSize(24, 24);
+
   QHBoxLayout* hlayout2 = new QHBoxLayout();
   hlayout2->setContentsMargins(0, 0, 0, 0);
   hlayout2->setAlignment(Qt::AlignLeft);
   hlayout2->addWidget(lblNumber);
   hlayout2->addWidget(m_snNumber);
+  hlayout2->addWidget(m_lblNumberStatus);
   hlayout2->addWidget(lblDate);
   hlayout2->addWidget(m_dtDate);
+  hlayout2->addWidget(m_lblDateStatus);
 
   m_cbSupplier = new NoteSupplierComboBox();
 
@@ -306,6 +327,16 @@ NoteView::NoteView(QWidget *parent)
 
   QObject::connect(m_table,
                    SIGNAL(currentCellChanged(int, int, int, int)),
+                   this,
+                   SLOT(enableControls()));
+
+  QObject::connect(m_btnOpenLast,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(emitOpenLastSignal()));
+
+  QObject::connect(m_dtDate,
+                   SIGNAL(dateChanged(const QDate&)),
                    this,
                    SLOT(enableControls()));
 
@@ -440,7 +471,7 @@ Note NoteView::getNote() const
   note.m_id = m_currentID;
   note.m_date = m_dtDate->date().toJulianDay();
   note.m_supplier = m_cbSupplier->currentText();
-  note.m_number = m_snNumber->text().toInt();
+  note.m_number = m_snNumber->value();
   note.m_total = m_edTotal->text().toDouble();
   note.m_items = m_table->serializeItems();
   return note;
@@ -526,6 +557,12 @@ void NoteView::enableControls()
   m_table->setEnabled(bCreated);
   m_edTotal->setEnabled(bCreated);
   m_btnOpenLast->setEnabled(m_lastID != INVALID_NOTE_ID);
+  m_lblNumberStatus->setPixmap(QPixmap(Note::isValidID(m_currentID)
+                                     ? ":/icons/res/fileedit.png"
+                                     : ":/icons/res/filenew.png"));
+  m_lblDateStatus->setPixmap(QPixmap(m_dtDate->date() == QDate::currentDate()
+                                     ? ":/icons/res/calendarok.png"
+                                     : ":/icons/res/calendarwarning.png"));
 }
 
 void NoteView::emitShowSearchSignal()

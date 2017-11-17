@@ -57,6 +57,12 @@ NoteWidget::NoteWidget(QWidget* parent)
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(emitChangedSignal()));
+
+  QObject::connect(m_view,
+                   SIGNAL(openLastSignal(int)),
+                   this,
+                   SLOT(openLast(int)));
+
   m_dock->close();
 }
 

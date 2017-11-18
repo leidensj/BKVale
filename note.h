@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QStringList>
-#include <vector>
+#include <QVector>
 
 #define NUMBER_OF_COLUMNS 5
 #define INVALID_NOTE_ID -1
@@ -27,13 +27,30 @@ enum class NoteTableIndex : int
   Total
 };
 
+struct NoteItem
+{
+  int m_id;
+  int m_noteId;
+  double m_ammount;
+  double m_price;
+  QString m_unity;
+  QString m_description;
+
+  NoteItem();
+  void clear();
+  double subtotal() const;
+  QString strSubtotal() const;
+  QString strAmmount() const;
+  QString strPrice() const;
+};
+
 struct Note
 {
   int m_id;
   int m_number;
   qint64 m_date;
   QString m_supplier;
-  QString m_items;
+  QVector<NoteItem> m_items;
   double m_total;
 
   Note();
@@ -42,25 +59,11 @@ struct Note
        int number,
        qint64 date,
        QString supplier,
-       QString items,
        double total);
 
   void clear();
 
   static bool isValidID(int id) { return id != INVALID_NOTE_ID; }
-
-  static QString format(const QString& str, bool b3places = false);
-  static QString format(double d, bool b3places = false);
-};
-
-typedef std::vector<Note> Notes;
-
-struct NoteItems
-{
-  const QStringList m_items;
-  int m_size;
-  NoteItems(const QString& items);
-  QString at(int row, NoteColumn column) const;
 };
 
 #endif // COMMON_H

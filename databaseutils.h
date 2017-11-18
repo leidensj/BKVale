@@ -49,13 +49,8 @@ namespace NoteSQL
                       QString& error);
 
   bool select(QSqlDatabase db,
-              int id,
               Note& note,
               QString& error);
-
-  bool selectAll(QSqlDatabase db,
-                 Notes& notes,
-                 QString& error);
 }
 
 namespace ItemDatabase

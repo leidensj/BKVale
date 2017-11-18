@@ -1,6 +1,41 @@
 #include "note.h"
 #include <QStringList>
 
+NoteItem::NoteItem()
+{
+  clear();
+}
+
+void NoteItem::clear()
+{
+  m_id = INVALID_NOTE_ID;
+  m_noteId = INVALID_NOTE_ID;
+  m_ammount = 0.0;
+  m_price = 0.0;
+  m_unity.clear();
+  m_description.clear();
+}
+
+void NoteItem::subtotal() const
+{
+  return m_ammount * m_price;
+}
+
+QString NoteItem::strSubtotal() const
+{
+  return QString::number(subtotal(), 'f', 2);
+}
+
+QString NoteItem::strAmmount() const
+{
+  return QString::number(m_ammount, 'f', 3);
+}
+
+QString NoteItem::strPrice() const
+{
+  return QString::number(m_price, 'f', 2);
+}
+
 Note::Note()
 {
   clear();

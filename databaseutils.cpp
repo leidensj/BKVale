@@ -7,6 +7,108 @@
 
 #define DATABASE_NOT_OPEN_TXT "O arquivo de configuração não foi aberto."
 
+namespace
+{
+bool NoteSelectItems(QSqlDatabase db,
+                     int noteId,
+                     QVector<NoteItem>& items,
+                     QString& error)
+{
+  error.clear();
+  items.clear();
+
+  if (!BaitaDatabase::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                "_ID,"
+                "_AMMOUNT,"
+                "_PRICE,"
+                "_UNITY,"
+                "_DESCRIPTION "
+                "FROM _PROMISSORYNOTESITEMS "
+                "WHERE _NOTEID = (:_noteId)");
+
+  query.bindValue(":_noteId", noteId);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    while (query.next())
+    {
+      NoteItem item;
+      item.m_noteId = noteId;
+      item.m_id = query.value(query.record().indexOf("_ID")).toInt();
+      item.m_ammount = query.value(query.record().indexOf("_AMMOUNT")).toDouble();
+      item.m_price = query.value(query.record().indexOf("_PRICE")).toDouble();
+      item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
+      item.m_description = query.value(query.record().indexOf("_DESCRIPTION")).toString();
+      items.push_back(item);
+    }
+  }
+  else
+  {
+    error = query.lastError().text();
+  }
+
+  return bSuccess;
+}
+
+bool NoteInsertOrUpdateItems(QSqlDatabase db,
+                             const QVector<NoteItem>& note,
+                             QString& error)
+{
+  error.clear();
+
+  QSqlQuery query(db);
+  if (!Note::isValidID(note.m_id))
+  {
+    query.prepare("INSERT INTO _PROMISSORYNOTES ("
+                  "_NUMBER,"
+                  "_DATE,"
+                  "_SUPPLIER,"
+                  "_ITEMS,"
+                  "_TOTAL) "
+                  "VALUES ("
+                  "(:_number),"
+                  "(:_date),"
+                  "(:_supplier),"
+                  "(:_items),"
+                  "(:_total))");
+  }
+  else
+  {
+    query.prepare("UPDATE _PROMISSORYNOTES "
+                  "SET _NUMBER = (:_number),"
+                  "_DATE = (:_date),"
+                  "_SUPPLIER = (:_supplier),"
+                  "_ITEMS = (:_items),"
+                  "_TOTAL = (:_total) "
+                  "WHERE _ID = (:_id)");
+    query.bindValue(":_id", note.m_id);
+  }
+
+  query.bindValue(":_number", note.m_number);
+  query.bindValue(":_date", note.m_date);
+  query.bindValue(":_supplier", note.m_supplier);
+  query.bindValue(":_items", note.m_items);
+  query.bindValue(":_total", note.m_total);
+
+  bool bSuccess = query.exec();
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+  }
+  else if (!Note::isValidID(note.m_id))
+  {
+    incNumber(db);
+  }
+
+  return bSuccess;
+}
+}
+
 int NoteSQL::nextNumber(QSqlDatabase db)
 {
   if (!db.isOpen())
@@ -35,8 +137,8 @@ QStringList NoteSQL::suppliers(QSqlDatabase db)
 }
 
 bool NoteSQL::insertOrUpdate(QSqlDatabase db,
-                                  const Note& note,
-                                  QString& error)
+                             const Note& note,
+                             QString& error)
 {
   error.clear();
 
@@ -103,11 +205,11 @@ void NoteSQL::incNumber(QSqlDatabase db)
 }
 
 bool NoteSQL::select(QSqlDatabase db,
-                     int id,
                      Note& note,
                      QString& error)
 {
   error.clear();
+  int id = note.m_id;
   note.clear();
 
   if (!BaitaDatabase::isOpen(db, error))
@@ -118,7 +220,6 @@ bool NoteSQL::select(QSqlDatabase db,
                 "_NUMBER,"
                 "_DATE,"
                 "_SUPPLIER,"
-                "_ITEMS,"
                 "_TOTAL "
                 "FROM _PROMISSORYNOTES "
                 "WHERE _ID = (:_id)");
@@ -135,52 +236,12 @@ bool NoteSQL::select(QSqlDatabase db,
       note.m_number = query.value(query.record().indexOf("_NUMBER")).toInt();
       note.m_date = query.value(query.record().indexOf("_DATE")).toLongLong();
       note.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
-      note.m_items = query.value(query.record().indexOf("_ITEMS")).toString();
       note.m_total = query.value(query.record().indexOf("_TOTAL")).toDouble();
+      bSuccess = NoteSelectItems(db, note.m_id, note.m_items, error);
     }
     else
     {
       error = "Vale não encontrado.";
-    }
-  }
-  else
-  {
-    error = query.lastError().text();
-  }
-
-  return bSuccess;
-}
-
-bool NoteSQL::selectAll(QSqlDatabase db,
-                             Notes& notes,
-                             QString& error)
-{
-  error.clear();
-  notes.clear();
-
-  if (!BaitaDatabase::isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
-  bool bSuccess = query.exec("SELECT "
-                             "_ID,"
-                             "_NUMBER,"
-                             "_DATE,"
-                             "_SUPPLIER,"
-                             "_ITEMS,"
-                             "_TOTAL "
-                             "FROM _PROMISSORYNOTES");
-
-  if (bSuccess)
-  {
-    while (query.next())
-    {
-      notes.emplace_back(Note(query.value(query.record().indexOf("_ID")).toInt(),
-                              query.value(query.record().indexOf("_NUMBER")).toInt(),
-                              (qint64)query.value(query.record().indexOf("_DATE")).toLongLong(),
-                              query.value(query.record().indexOf("_SUPPLIER")).toString(),
-                              query.value(query.record().indexOf("_ITEMS")).toString(),
-                              query.value(query.record().indexOf("_TOTAL")).toDouble()));
     }
   }
   else
@@ -245,8 +306,15 @@ bool BaitaDatabase::init(QSqlDatabase db,
              "_NUMBER INTEGER NOT NULL,"
              "_DATE INTEGER NOT NULL,"
              "_SUPPLIER TEXT NOT NULL,"
-             "_ITEMS TEXT,"
              "_TOTAL REAL)");
+
+  query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTESITEMS ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_NOTEID INTEGER NOT NULL,"
+             "_AMMOUNT REAL,"
+             "_PRICE REAL,"
+             "_UNITY TEXT,"
+             "_DESCRIPTION TEXT)");
 
   query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"

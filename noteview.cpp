@@ -71,7 +71,7 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Description, QHeaderView::Stretch);
-  horizontalHeader()->setSectionResizeMode((int)NoteColumn::UnitValue, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Price, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::SubTotal, QHeaderView::ResizeToContents);
 }
 
@@ -121,17 +121,18 @@ void NoteTableWidget::setText(int row, int column, const QString& str)
     p->setText(str);
 }
 
-QString NoteTableWidget::serializeItems() const
+void NoteTableWidget::getItems(QVector<NoteItem>& items) const
 {
-  QString str;
+  items.clear();
   for (int i = 0; i != rowCount(); ++i)
-    for (int j = 0; j!= columnCount(); ++j)
-      str += text(i, j) + ";";
-
-  if (!str.isEmpty())
-    str.chop(1);
-
-  return str;
+  {
+    NoteItem item;
+    item.m_ammount = text(i, (int)NoteColumn::Ammount).toDouble();
+    item.m_unity = text(i, (int)NoteColumn::Unity);
+    item.m_description = text(i, (int)NoteColumn::Description);
+    item.m_price = text(i, (int)NoteColumn::Price).toDouble();
+    items.push_back(item);
+  }
 }
 
 NoteView::NoteView(QWidget *parent)
@@ -156,6 +157,7 @@ NoteView::NoteView(QWidget *parent)
   m_btnCreate->setText("");
   m_btnCreate->setIconSize(QSize(24, 24));
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
+  m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 
   m_btnOpenLast = new QPushButton();
   m_btnOpenLast->setFlat(true);
@@ -168,18 +170,21 @@ NoteView::NoteView(QWidget *parent)
   m_btnSearch->setText("");
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
+  m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
 
   m_btnAdd = new QPushButton();
   m_btnAdd->setFlat(true);
   m_btnAdd->setText("");
   m_btnAdd->setIconSize(QSize(24, 24));
   m_btnAdd->setIcon(QIcon(":/icons/res/add.png"));
+  m_btnAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
 
   m_btnRemove = new QPushButton();
   m_btnRemove->setFlat(true);
   m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
+  m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
@@ -366,15 +371,15 @@ QString NoteView::computeUnitValue(int row) const
   const double ammount = m_table->text(row, (int)NoteColumn::Ammount).toDouble();
   const double subTotal = m_table->text(row, (int)NoteColumn::SubTotal).toDouble();
   const double unitValue = ammount ? subTotal / ammount : 0.0;
-  return Note::format(unitValue, false);
+  return QString::number(unitValue, 'f', 2);
 }
 
 QString NoteView::computeSubTotal(int row) const
 {
   const double ammount = m_table->text(row, (int)NoteColumn::Ammount).toDouble();
-  const double unitValue = m_table->text(row, (int)NoteColumn::UnitValue).toDouble();
+  const double unitValue = m_table->text(row, (int)NoteColumn::Price).toDouble();
   const double subTotal = ammount * unitValue;
-  return Note::format(subTotal, false);
+  return QString::number(subTotal, 'f', 2);
 }
 
 QString NoteView::computeTotal() const
@@ -382,7 +387,7 @@ QString NoteView::computeTotal() const
   double total = 0.0;
   for (int row = 0; row != m_table->rowCount(); ++row)
     total += m_table->text(row, (int)NoteColumn::SubTotal).toDouble();
-  return Note::format(total, false);
+  return QString::number(total, 'f', 2);
 }
 
 double NoteView::evaluate(int row, int column) const
@@ -411,23 +416,23 @@ void NoteView::updateTable(int row, int column)
     } break;
     case NoteColumn::Ammount:
     {
-      QString res(Note::format(evaluate(row, column), true));
+      QString res(QString::number(evaluate(row, column), 'f', 3));
       m_table->setText(row, column, res);
       m_table->setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
       m_edTotal->setText(computeTotal());
     } break;
-    case NoteColumn::UnitValue:
+    case NoteColumn::Price:
     {
-      QString res(Note::format(evaluate(row, column), false));
+      QString res(QString::number(evaluate(row, column), 'f', 2));
       m_table->setText(row, column, res);
       m_table->setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
       m_edTotal->setText(computeTotal());
     } break;
     case NoteColumn::SubTotal:
     {
-      QString res(Note::format(evaluate(row, column), false));
+      QString res(QString::number(evaluate(row, column), 'f', 2));
       m_table->setText(row, column, res);
-      m_table->setText(row, (int)NoteColumn::UnitValue, computeUnitValue(row));
+      m_table->setText(row, (int)NoteColumn::Price, computeUnitValue(row));
       m_edTotal->setText(computeTotal());
     } break;
     default:
@@ -446,7 +451,7 @@ void NoteView::addItem()
   m_table->setItem(row, (int)NoteColumn::Ammount, new QTableWidgetItem("0.000"));
   m_table->setItem(row, (int)NoteColumn::Unity, new QTableWidgetItem(""));
   m_table->setItem(row, (int)NoteColumn::Description, new QTableWidgetItem(""));
-  m_table->setItem(row, (int)NoteColumn::UnitValue, new QTableWidgetItem("0.00"));
+  m_table->setItem(row, (int)NoteColumn::Price, new QTableWidgetItem("0.00"));
   m_table->setItem(row, (int)NoteColumn::SubTotal, new QTableWidgetItem("0.00"));
   m_table->setCurrentCell(row, (int)NoteColumn::Ammount);
   m_table->setFocus();
@@ -485,7 +490,7 @@ Note NoteView::getNote() const
   note.m_supplier = m_cbSupplier->currentText();
   note.m_number = m_snNumber->value();
   note.m_total = m_edTotal->text().toDouble();
-  note.m_items = m_table->serializeItems();
+  m_table->getItems(note.m_items);
   return note;
 }
 
@@ -502,12 +507,14 @@ void NoteView::setNote(const Note& note, const QStringList& suppliers)
   m_dtDate->setDate(QDate::fromJulianDay(note.m_date));
   m_cbSupplier->setCurrentText(note.m_supplier);
   m_snNumber->setValue(note.m_number);
-  NoteItems items(note.m_items);
-  for (int row = 0; row != items.m_size; ++row)
+  for (int row = 0; row != note.m_items.size(); ++row)
   {
     addItem();
-    for (int column = 0; column != NUMBER_OF_COLUMNS; ++column)
-      m_table->setText(row, column, items.at(row, (NoteColumn)column));
+    m_table->setText(row, (int)NoteColumn::Ammount, note.m_items.at(row).strAmmount());
+    m_table->setText(row, (int)NoteColumn::Unity, note.m_items.at(row).m_unity);
+    m_table->setText(row, (int)NoteColumn::Description, note.m_items.at(row).m_description);
+    m_table->setText(row, (int)NoteColumn::Price, note.m_items.at(row).strPrice());
+    m_table->setText(row, (int)NoteColumn::SubTotal, note.m_items.at(row).strSubtotal());
   }
 
   updateControls();

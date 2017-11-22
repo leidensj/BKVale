@@ -40,16 +40,22 @@ namespace NoteSQL
 {
   int nextNumber(QSqlDatabase db);
 
-  void incNumber(QSqlDatabase db);
-
   QStringList suppliers(QSqlDatabase db);
 
-  bool insertOrUpdate(QSqlDatabase db,
-                      const Note& note,
-                      QString& error);
+  bool insert(QSqlDatabase db,
+              const Note& note,
+              QString& error);
+
+  bool update(QSqlDatabase db,
+              const Note& note,
+              QString& error);
 
   bool select(QSqlDatabase db,
               Note& note,
+              QString& error);
+
+  bool remove(QSqlDatabase db,
+              int id,
               QString& error);
 }
 

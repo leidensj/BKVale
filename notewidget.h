@@ -33,9 +33,8 @@ public slots:
 private slots:
   void emitChangedSignal();
   void showSearch();
-  void setNote(const Note& note);
-  void checkForRemovedNote(int id);
-  void openLast(int id);
+  void setNote(int id);
+  void removeNote(int id);
 
 signals:
   changedSignal();

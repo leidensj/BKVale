@@ -61,7 +61,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_edDisplay = new QLineEdit();
   m_edDisplay->setAlignment(Qt::AlignLeft);
   m_edDisplay->setReadOnly(true);
-  m_edDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+  m_edDisplay->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
   QFont f = m_edDisplay->font();
   f.setPointSize(24);
   m_edDisplay->setFont(f);
@@ -77,7 +77,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline0->addWidget(m_btnCls);
   hline0->addWidget(m_edDisplay);
   hline0->addWidget(m_btnClr);
-  hline0->setAlignment(Qt::AlignLeft);
+  hline0->setAlignment(Qt::AlignCenter);
   hline0->setContentsMargins(0, 0, 0, 0);
 
   m_btn7 = new CalculatorPushButton(Calculator::Button::Num7);

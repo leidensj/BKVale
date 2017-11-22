@@ -23,7 +23,7 @@ public:
 
 public slots:
   void refresh();
-  void removeSelectedNote();
+  void emitNoteRemoveSignal();
   void enableControls();
 
 private:
@@ -37,8 +37,8 @@ private slots:
   void noteSelected();
 
 signals:
-  void noteSelectedSignal(const Note& note);
-  void noteRemovedSignal(int id);
+  void noteSelectedSignal(int id);
+  void noteRemoveSignal(int id);
 };
 
 #endif // HISTORYWIDGET_H

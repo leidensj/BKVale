@@ -13,7 +13,7 @@ enum class NoteColumn : int
   Ammount,
   Unity,
   Description,
-  UnitValue,
+  Price,
   SubTotal
 };
 
@@ -23,14 +23,12 @@ enum class NoteTableIndex : int
   Number,
   Date,
   Supplier,
-  Items,
   Total
 };
 
 struct NoteItem
 {
-  int m_id;
-  int m_noteId;
+  mutable int m_id;
   double m_ammount;
   double m_price;
   QString m_unity;
@@ -38,15 +36,15 @@ struct NoteItem
 
   NoteItem();
   void clear();
-  double subtotal() const;
-  QString strSubtotal() const;
-  QString strAmmount() const;
-  QString strPrice() const;
+  double subtotal() const { return m_ammount * m_price; }
+  QString strSubtotal() const { return QString::number(subtotal(), 'f', 2); }
+  QString strAmmount() const { return QString::number(m_ammount, 'f', 3); }
+  QString strPrice() const { return QString::number(m_price, 'f', 2); }
 };
 
 struct Note
 {
-  int m_id;
+  mutable int m_id;
   int m_number;
   qint64 m_date;
   QString m_supplier;
@@ -55,14 +53,11 @@ struct Note
 
   Note();
 
-  Note(int id,
-       int number,
-       qint64 date,
-       QString supplier,
-       double total);
-
   void clear();
-
+  QString strDate() const;
+  QString strId() const { return QString::number(m_id); }
+  QString strTotal() const { return QString::number(m_total, 'f', 2); }
+  QString strNumber() const { return QString::number(m_number); }
   static bool isValidID(int id) { return id != INVALID_NOTE_ID; }
 };
 

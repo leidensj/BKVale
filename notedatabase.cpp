@@ -6,9 +6,8 @@
 #include <QTableView>
 #include <QSqlTableModel>
 #include <QComboBox>
-#include <QMessageBox>
 #include <QSqlTableModel>
-
+#include <QHeaderView>
 
 class NoteTableModel : public QSqlTableModel
 {
@@ -32,7 +31,7 @@ public:
         if (index.column() == (int)NoteTableIndex::Date)
           value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
         else if (index.column() == (int)NoteTableIndex::Total)
-          value = "R$ " + Note::format(value.toString());
+          value = "R$ " + QString::number(value.toDouble(), 'f', 2);
       }
 
       return value;
@@ -77,6 +76,8 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_table->setSelectionMode(QAbstractItemView::SingleSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
+  m_table->setSortingEnabled(true);
+  m_table->horizontalHeader()->setHighlightSections(false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->setContentsMargins(0, 0, 0, 0);
@@ -102,7 +103,7 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(removeSelectedNote()));
+                   SLOT(emitNoteRemoveSignal()));
 }
 
 void NoteDatabase::set(QSqlDatabase db)
@@ -117,11 +118,9 @@ void NoteDatabase::set(QSqlDatabase db)
   model->setHeaderData((int)NoteTableIndex::Number, Qt::Horizontal, tr("Número"));
   model->setHeaderData((int)NoteTableIndex::Date, Qt::Horizontal, tr("Data"));
   model->setHeaderData((int)NoteTableIndex::Supplier, Qt::Horizontal, tr("Fornecedor"));
-  model->setHeaderData((int)NoteTableIndex::Items, Qt::Horizontal, tr("Itens"));
   model->setHeaderData((int)NoteTableIndex::Total, Qt::Horizontal, tr("Total"));
   m_table->setModel(model);
   m_table->hideColumn((int)NoteTableIndex::ID);
-  m_table->hideColumn((int)NoteTableIndex::Items);
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
@@ -151,18 +150,10 @@ void NoteDatabase::noteSelected()
 
 void NoteDatabase::noteSelected(const QModelIndex& idx)
 {
-  Note note;
   if (m_table->model() != nullptr && idx.isValid())
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-    const int row = idx.row();
-    note.m_id = model->index(row, (int)NoteTableIndex::ID).data(Qt::EditRole).toInt();
-    note.m_number = model->index(row, (int)NoteTableIndex::Number).data(Qt::EditRole).toInt();
-    note.m_date = model->index(row, (int)NoteTableIndex::Date).data(Qt::EditRole).toLongLong();
-    note.m_supplier = model->index(row, (int)NoteTableIndex::Supplier).data(Qt::EditRole).toString();
-    note.m_items = model->index(row, (int)NoteTableIndex::Items).data(Qt::EditRole).toString();
-    note.m_total = model->index(row, (int)NoteTableIndex::Total).data(Qt::EditRole).toDouble();
-    emit noteSelectedSignal(note);
+    emit noteSelectedSignal(model->index(idx.row(), (int)NoteTableIndex::ID).data(Qt::EditRole).toInt());
   }
 }
 
@@ -183,33 +174,16 @@ void NoteDatabase::enableControls()
   m_btnRemove->setEnabled(bNoteSelected);
 }
 
-void NoteDatabase::removeSelectedNote()
+void NoteDatabase::emitNoteRemoveSignal()
 {
   if (m_table->model())
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     if (m_table->currentIndex().isValid())
     {
-      int row = m_table->currentIndex().row();
-      int id = model->index(row, (int)NoteTableIndex::ID).data(Qt::EditRole).toInt();
-      int number = model->index(row, (int)NoteTableIndex::Number).data(Qt::EditRole).toInt();
-      QDate date = QDate::fromJulianDay(model->index(row, (int)NoteTableIndex::Date).data(Qt::EditRole).toLongLong());
-      QString supplier = model->index(row, (int)NoteTableIndex::Supplier).data(Qt::EditRole).toString();
-      if (QMessageBox::question(this,
-                                tr("Remover vale"),
-                                tr("Tem certeza que deseja remover o seguinte vale:\n"
-                                   "Número: %1\n"
-                                   "Fornecedor: %2\n"
-                                   "Data: %3").arg(QString::number(number),
-                                                   supplier,
-                                                   date.toString("dd/MM/yyyy")),
-                                QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
-      {
-        model->removeRow(row);
-        model->submitAll();
-        emit noteRemovedSignal(id);
-      }
+      int id = model->index(m_table->currentIndex().row(),
+                            (int)NoteTableIndex::ID).data(Qt::EditRole).toInt();
+      emit noteRemoveSignal(id);
     }
   }
-  enableControls();
 }

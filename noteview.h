@@ -41,7 +41,7 @@ public:
   explicit NoteTableWidget(QWidget* parent = 0);
   QString text(int row, int column) const;
   void setText(int row, int column, const QString& str);
-  QString serializeItems() const;
+  void getItems(QVector<NoteItem>& items) const;
 
 protected:
   void keyPressEvent(QKeyEvent *event);

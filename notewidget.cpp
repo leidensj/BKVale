@@ -34,14 +34,14 @@ NoteWidget::NoteWidget(QWidget* parent)
   setLayout(vlayout1);
 
   QObject::connect(m_database,
-                   SIGNAL(noteSelectedSignal(const Note&)),
+                   SIGNAL(noteSelectedSignal(int)),
                    this,
-                   SLOT(setNote(const Note&)));
+                   SLOT(setNote(int)));
 
   QObject::connect(m_database,
-                   SIGNAL(noteRemovedSignal(int)),
+                   SIGNAL(noteRemoveSignal(int)),
                    this,
-                   SLOT(checkForRemovedNote(int)));
+                   SLOT(removeNote(int)));
 
   QObject::connect(m_view,
                    SIGNAL(showSearchSignal()),
@@ -61,7 +61,7 @@ NoteWidget::NoteWidget(QWidget* parent)
   QObject::connect(m_view,
                    SIGNAL(openLastSignal(int)),
                    this,
-                   SLOT(openLast(int)));
+                   SLOT(setNote(int)));
 
   m_dock->close();
 }
@@ -99,7 +99,9 @@ bool NoteWidget::save()
 {
   QString error;
   Note note = m_view->getNote();
-  bool bSuccess = NoteSQL::insertOrUpdate(m_database->get(), note, error);
+  bool bSuccess = Note::isValidID(note.m_id)
+                  ? NoteSQL::update(m_database->get(), note, error)
+                  : NoteSQL::insert(m_database->get(), note, error);
 
   if (bSuccess)
   {
@@ -108,11 +110,10 @@ bool NoteWidget::save()
   }
   else
   {
-    QMessageBox msgBox(QMessageBox::Warning,
-                       tr("Erro"),
-                       tr("Erro '%1' ao salvar vale.").arg(error),
-                       QMessageBox::Ok);
-    msgBox.exec();
+    QMessageBox::critical(this,
+                          tr("Erro"),
+                          tr("Erro '%1' ao salvar vale.").arg(error),
+                          QMessageBox::Ok);
   }
 
   return bSuccess;
@@ -124,10 +125,23 @@ void NoteWidget::create()
                  NoteSQL::suppliers(m_database->get()));
 }
 
-void NoteWidget::setNote(const Note& note)
+void NoteWidget::setNote(int id)
 {
-  m_view->setLastID(note.m_id);
-  m_view->setNote(note, NoteSQL::suppliers(m_database->get()));
+  Note note;
+  note.m_id = id;
+  QString error;
+  if (NoteSQL::select(m_database->get(), note, error))
+  {
+    m_view->setLastID(note.m_id);
+    m_view->setNote(note, NoteSQL::suppliers(m_database->get()));
+  }
+  else
+  {
+    QMessageBox::critical(this,
+                          tr("Erro"),
+                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(note.m_id)),
+                          QMessageBox::Ok);
+  }
 }
 
 void NoteWidget::setDatabase(QSqlDatabase db)
@@ -145,32 +159,38 @@ void NoteWidget::emitChangedSignal()
   emit changedSignal();
 }
 
-void NoteWidget::checkForRemovedNote(int id)
-{
-  if (Note::isValidID(id))
-  {
-    if (id == m_view->getLastID())
-      m_view->setLastID(INVALID_NOTE_ID);
-    Note note = m_view->getNote();
-    if (id == note.m_id)
-      create();
-  }
-}
-
-void NoteWidget::openLast(int id)
+void NoteWidget::removeNote(int id)
 {
   Note note;
+  note.m_id = id;
   QString error;
-  if (NoteSQL::select(m_database->get(), id, note, error))
+  NoteSQL::select(m_database->get(), note, error);
+  if (QMessageBox::question(this,
+                            tr("Remover vale"),
+                            tr("Tem certeza que deseja remover o seguinte vale:\n"
+                               "Número: %1\n"
+                               "Fornecedor: %2\n"
+                               "Data: %3").arg(note.strNumber(),
+                                               note.m_supplier,
+                                               note.strDate()),
+                            QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
   {
-    setNote(note);
-  }
-  else
-  {
-    QMessageBox msgBox(QMessageBox::Warning,
-                       tr("Erro"),
-                       tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(id)),
-                       QMessageBox::Ok);
-    msgBox.exec();
+    if (NoteSQL::remove(m_database->get(), note.m_id, error))
+    {
+      if (id == m_view->getLastID())
+        m_view->setLastID(INVALID_NOTE_ID);
+      Note note = m_view->getNote();
+      if (id == note.m_id)
+        create();
+      m_database->refresh();
+    }
+    else
+    {
+      QMessageBox::critical(this,
+                            tr("Erro"),
+                            tr("Erro '%1' ao remover a nota com ID '%2'.").arg(error,
+                                                                               QString::number(note.m_id)),
+                            QMessageBox::Ok);
+    }
   }
 }

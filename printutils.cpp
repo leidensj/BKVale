@@ -48,7 +48,7 @@ namespace
                ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON
                "TOTAL R$" +
-               Note::format(note.m_total) +
+               note.strTotal() +
                ESC_LF
                ESC_VERT_TAB
                "Emissão: " +
@@ -66,27 +66,25 @@ namespace
 
   void noteAppendBody(const Note& note, QString& strNote)
   {
-    NoteItems items(note.m_items);
-    if (items.m_size == 0)
+    if (note.m_items.size() == 0)
       return;
 
     strNote += ESC_ALIGN_LEFT;
-    for (int i = 0; i != items.m_size; ++i)
+    for (int i = 0; i != note.m_items.size(); ++i)
     {
       QString item;
       {
-        QString itemPt1 = items.at(i, NoteColumn::Ammount) +
-                          items.at(i, NoteColumn::Unity) +
+        QString itemPt1 = note.m_items.at(i).strAmmount() +
+                          note.m_items.at(i).m_unity +
                           " x R$" +
-                          items.at(i, NoteColumn::UnitValue);
-        QString itemPt2 = "R$" +
-                          items.at(i, NoteColumn::SubTotal);
+                          note.m_items.at(i).strPrice();
+        QString itemPt2 = "R$" + note.m_items.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += " ";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      strNote += items.at(i, NoteColumn::Description) + ESC_LF +
+      strNote += note.m_items.at(i).m_description + ESC_LF +
               item + ESC_LF "────────────────────────────────────────────────" ESC_LF;
     }
   }

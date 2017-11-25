@@ -134,7 +134,7 @@ ConsumptionDatabase::ConsumptionDatabase(QWidget *parent)
   m_remove->setFlat(true);
   m_remove->setText("");
   m_remove->setIconSize(QSize(24, 24));
-  m_remove->setIcon(QIcon(":/icons/res/trash.png"));
+  m_remove->setIcon(QIcon(":/icons/res/remove.png"));
 
   m_total = new QLineEdit();
   m_total->setAlignment(Qt::AlignRight);

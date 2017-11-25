@@ -55,6 +55,7 @@ struct Note
 
   void clear();
   QString strDate() const;
+  QString strDayOfWeek() const;
   QString strId() const { return QString::number(m_id); }
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
   QString strNumber() const { return QString::number(m_number); }

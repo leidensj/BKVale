@@ -34,3 +34,8 @@ QString Note::strDate() const
 {
   return QDate::fromJulianDay(m_date).toString("dd/MM/yyyy");
 }
+
+QString Note::strDayOfWeek() const
+{
+  return QDate::fromJulianDay(m_date).toString("dddd");
+}

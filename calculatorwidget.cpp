@@ -58,14 +58,6 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_btnCls->setIcon(QIcon(":/icons/res/calccls.png"));
   m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
 
-  m_edDisplay = new QLineEdit();
-  m_edDisplay->setAlignment(Qt::AlignLeft);
-  m_edDisplay->setReadOnly(true);
-  m_edDisplay->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
-  QFont f = m_edDisplay->font();
-  f.setPointSize(24);
-  m_edDisplay->setFont(f);
-
   m_btnClr = new QPushButton();
   m_btnClr->setFlat(true);
   m_btnClr->setText("");
@@ -75,9 +67,8 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
 
   QHBoxLayout* hline0 = new QHBoxLayout();
   hline0->addWidget(m_btnCls);
-  hline0->addWidget(m_edDisplay);
   hline0->addWidget(m_btnClr);
-  hline0->setAlignment(Qt::AlignCenter);
+  hline0->setAlignment(Qt::AlignLeft);
   hline0->setContentsMargins(0, 0, 0, 0);
 
   m_btn7 = new CalculatorPushButton(Calculator::Button::Num7);
@@ -113,7 +104,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline1->addWidget(m_btn8);
   hline1->addWidget(m_btn9);
   hline1->addWidget(m_btnMul);
-  hline1->setAlignment(Qt::AlignCenter);
+  hline1->setAlignment(Qt::AlignLeft);
   hline1->setContentsMargins(0, 0, 0, 0);
 
   m_btn4 = new CalculatorPushButton(Calculator::Button::Num4);
@@ -149,7 +140,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline2->addWidget(m_btn5);
   hline2->addWidget(m_btn6);
   hline2->addWidget(m_btnDiv);
-  hline2->setAlignment(Qt::AlignCenter);
+  hline2->setAlignment(Qt::AlignLeft);
   hline2->setContentsMargins(0, 0, 0, 0);
 
   m_btn1 = new CalculatorPushButton(Calculator::Button::Num1);
@@ -185,7 +176,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline3->addWidget(m_btn2);
   hline3->addWidget(m_btn3);
   hline3->addWidget(m_btnMin);
-  hline3->setAlignment(Qt::AlignCenter);
+  hline3->setAlignment(Qt::AlignLeft);
   hline3->setContentsMargins(0, 0, 0, 0);
 
   m_btn0 = new CalculatorPushButton(Calculator::Button::Num0);
@@ -221,16 +212,17 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline4->addWidget(m_btnDec);
   hline4->addWidget(m_btnEq);
   hline4->addWidget(m_btnPlus);
-  hline4->setAlignment(Qt::AlignCenter);
+  hline4->setAlignment(Qt::AlignLeft);
   hline4->setContentsMargins(0, 0, 0, 0);
 
-  QVBoxLayout* vlayoutl = new QVBoxLayout();
-  vlayoutl->addLayout(hline0);
-  vlayoutl->addLayout(hline1);
-  vlayoutl->addLayout(hline2);
-  vlayoutl->addLayout(hline3);
-  vlayoutl->addLayout(hline4);
-  vlayoutl->setAlignment(Qt::AlignTop);
+  m_edDisplay = new QLineEdit();
+  m_edDisplay->setAlignment(Qt::AlignLeft);
+  m_edDisplay->setReadOnly(true);
+  QFont f = m_edDisplay->font();
+  f.setPointSize(24);
+  m_edDisplay->setFont(f);
+  m_edDisplay->setAlignment(Qt::AlignRight);
+  m_edDisplay->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
 
   m_btnPrint = new QPushButton();
   m_btnPrint->setText("");
@@ -251,35 +243,33 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_rdoAlignCenter->setIconSize(QSize(24, 24));
   m_rdoAlignCenter->setIcon(QIcon(":/icons/res/calcaligncenter.png"));
 
-  QHBoxLayout* hline5 = new QHBoxLayout();
-  hline5->addWidget(m_btnPrint);
-  hline5->addWidget(m_rdoAlignLeft);
-  hline5->addWidget(m_rdoAlignCenter);
-  hline5->setAlignment(Qt::AlignLeft);
-  hline5->setContentsMargins(0, 0, 0, 0);
+  QHBoxLayout* hlineCmd = new QHBoxLayout();
+  hlineCmd->addWidget(m_btnPrint);
+  hlineCmd->addWidget(m_rdoAlignLeft);
+  hlineCmd->addWidget(m_rdoAlignCenter);
+  hlineCmd->setAlignment(Qt::AlignLeft);
+  hlineCmd->setContentsMargins(0, 0, 0, 0);
+
+  QVBoxLayout* vlayoutl = new QVBoxLayout();
+  vlayoutl->addLayout(hlineCmd);
+  vlayoutl->addWidget(m_edDisplay);
+  vlayoutl->addLayout(hline0);
+  vlayoutl->addLayout(hline1);
+  vlayoutl->addLayout(hline2);
+  vlayoutl->addLayout(hline3);
+  vlayoutl->addLayout(hline4);
+  vlayoutl->setAlignment(Qt::AlignTop);
 
   m_view = new QPlainTextEdit();
   m_view->setReadOnly(true);
 
-  QVBoxLayout* vlayoutr = new QVBoxLayout();
-  vlayoutr->addLayout(hline5);
-  vlayoutr->addWidget(m_view);
-
-  QFrame* framl = new QFrame();
-  framl->setLayout(vlayoutl);
-
-  QFrame* framr = new QFrame();
-  framr->setLayout(vlayoutr);
-
-  QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(framl);
-  splitter->addWidget(framr);
-
   QHBoxLayout* hlayout = new QHBoxLayout();
-  hlayout->addWidget(splitter);
+  hlayout->addLayout(vlayoutl);
+  hlayout->addWidget(m_view);
   hlayout->setContentsMargins(0, 0, 0, 0);
 
   setLayout(hlayout);
+  setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
   QObject::connect(m_btn0,
                    SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),

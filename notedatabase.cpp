@@ -63,7 +63,7 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   m_btnRemove->setFlat(true);
   m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
-  m_btnRemove->setIcon(QIcon(":/icons/res/trash.png"));
+  m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);

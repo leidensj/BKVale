@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/icons">
-        <file>res/add.png</file>
         <file>res/bkvale.png</file>
         <file>res/connected.png</file>
         <file>res/disconnected.png</file>
@@ -19,7 +18,6 @@
         <file>res/postit.png</file>
         <file>res/note.png</file>
         <file>res/shop.png</file>
-        <file>res/trash.png</file>
         <file>res/text.png</file>
         <file>res/stock.png</file>
         <file>res/revert.png</file>
@@ -64,5 +62,7 @@
         <file>res/calendarok.png</file>
         <file>res/filenew.png</file>
         <file>res/fileedit.png</file>
+        <file>res/removeitem.png</file>
+        <file>res/additem.png</file>
     </qresource>
 </RCC>

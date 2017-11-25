@@ -102,7 +102,7 @@ ReminderDatabase::ReminderDatabase(QWidget *parent)
   m_btnRemove->setFlat(true);
   m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
-  m_btnRemove->setIcon(QIcon(":/icons/res/trash.png"));
+  m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
   m_btnFavorite = new QPushButton();
   m_btnFavorite->setFlat(true);
   m_btnFavorite->setText("");

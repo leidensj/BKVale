@@ -49,7 +49,7 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
 {
   setColumnCount(NUMBER_OF_COLUMNS);
   QStringList headers;
-  headers << "Quantidade" << "Unidade" << "Descrição" << "Valor Unitário" << "Subtotal";
+  headers << "Quantidade" << "Unidade" << "Descrição" << "Preço" << "Subtotal";
   setHorizontalHeaderLabels(headers);
   {
     QFont f = font();
@@ -176,14 +176,14 @@ NoteView::NoteView(QWidget *parent)
   m_btnAdd->setFlat(true);
   m_btnAdd->setText("");
   m_btnAdd->setIconSize(QSize(24, 24));
-  m_btnAdd->setIcon(QIcon(":/icons/res/add.png"));
+  m_btnAdd->setIcon(QIcon(":/icons/res/additem.png"));
   m_btnAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
 
   m_btnRemove = new QPushButton();
   m_btnRemove->setFlat(true);
   m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
-  m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
+  m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
   m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();

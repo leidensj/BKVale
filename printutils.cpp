@@ -9,7 +9,7 @@ namespace
   {
     strNote += ESC_EXPAND_ON
                ESC_ALIGN_CENTER
-               "BAITAKÃO"
+               "BAITAKAO"
                ESC_LF
                "RUA SINIMBU 175 LOURDES"
                ESC_LF
@@ -25,15 +25,16 @@ namespace
                ESC_LF
                ESC_VERT_TAB
                ESC_ALIGN_LEFT
-               "Número     "
+               "Numero     "
                ESC_DOUBLE_FONT_ON +
-               QString::number(note.m_number) +
+               note.strNumber() +
                ESC_LF
                "Data       "
                ESC_DOUBLE_FONT_ON +
-               QDate::fromJulianDay(note.m_date).toString("dd/MM/yyyy") +
-               ESC_DOUBLE_FONT_OFF +
-               QDate::fromJulianDay(note.m_date).toString(" (dddd)") +
+               note.strDate() +
+               ESC_LF
+               "           " +
+               note.strDayOfWeek() +
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
@@ -51,14 +52,14 @@ namespace
                note.strTotal() +
                ESC_LF
                ESC_VERT_TAB
-               "Emissão: " +
+               "Emissao: " +
                QDate::currentDate().toString("dd/MM/yyyy ") +
                QTime::currentTime().toString("hh:mm:ss") +
                ESC_LF
                ESC_LF
                ESC_LF
                ESC_ALIGN_CENTER
-               "────────────────────────────────"
+               "________________________________"
                ESC_LF
                "Assinatura"
                ESC_LF;
@@ -81,11 +82,10 @@ namespace
         QString itemPt2 = "R$" + note.m_items.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
-          itemPt1 += " ";
+          itemPt1 += ".";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      strNote += note.m_items.at(i).m_description + ESC_LF +
-              item + ESC_LF "────────────────────────────────────────────────" ESC_LF;
+      strNote += note.m_items.at(i).m_description + ESC_LF + item + ESC_LF;
     }
   }
 }
@@ -94,7 +94,7 @@ bool Printer::init(QSerialPort& printer,
                    QString& error)
 {
   error.clear();
-  QString msg = QString(ESC_INIT) + ESC_PORTUGUESE;
+  QString msg = QString(ESC_INIT) + ESC_CODEPAGE850;
   return print(printer, msg, error);
 }
 
@@ -138,8 +138,8 @@ QString NotePrinter::build(const Note& note)
   noteAppendBody(note, strNote1);
   noteAppendFooter(note, strNote1);
   QString strNote2(strNote1);
-  strNote1 += "1ª via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
-  strNote2 += "2ª via" ESC_LF ESC_LF ESC_FULL_CUT;
+  strNote1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
+  strNote2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
   return strNote1 + strNote2;
 }
 
@@ -173,7 +173,7 @@ QString ReminderPrinter::build(const Reminder& r)
            ESC_DOUBLE_FONT_OFF;
     if (!msg.isEmpty())
     {
-      str += "────────────────────────────────────────────────"
+      str += "________________________________________________"
              ESC_LF;
     }
     str += ESC_ALIGN_LEFT;
@@ -204,7 +204,7 @@ QString ConsumptionPrinter::build(qint64 date,
   QString str;
   str += ESC_EXPAND_ON
          ESC_ALIGN_CENTER
-         "BAITAKÃO"
+         "BAITAKAO"
          ESC_LF
          "RUA SINIMBU 175 LOURDES"
          ESC_LF
@@ -214,7 +214,7 @@ QString ConsumptionPrinter::build(qint64 date,
          ESC_LF
          ESC_VERT_TAB
          ESC_EXPAND_OFF
-         "RELATÓRIO DE CONSUMO"
+         "RELATORIO DE CONSUMO"
          ESC_LF
          ESC_VERT_TAB
          ESC_EXPAND_ON +
@@ -239,7 +239,7 @@ QString ConsumptionPrinter::build(qint64 date,
       subStr = subStr1 + ESC_STRESS_ON + subStr2 + ESC_STRESS_OFF;
     }
     str += vItem.at(i).m_description + ESC_LF + subStr +
-           ESC_LF "────────────────────────────────────────────────" ESC_LF;
+           ESC_LF "________________________________________________" ESC_LF;
   }
 
   str += ESC_LF
@@ -265,7 +265,7 @@ QString ConsumptionPrinter::build(const QVector<qint64>& vDate,
   QString str;
   str += ESC_EXPAND_ON
          ESC_ALIGN_CENTER
-         "BAITAKÃO"
+         "BAITAKAO"
          ESC_LF
          "RUA SINIMBU 175 LOURDES"
          ESC_LF
@@ -275,7 +275,7 @@ QString ConsumptionPrinter::build(const QVector<qint64>& vDate,
          ESC_LF
          ESC_VERT_TAB
          ESC_EXPAND_OFF
-         "RELATÓRIO DE CONSUMO"
+         "RELATORIO DE CONSUMO"
          ESC_LF
          ESC_VERT_TAB
          ESC_ALIGN_LEFT;

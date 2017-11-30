@@ -47,9 +47,9 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   , m_edDisplay(nullptr)
   , m_view(nullptr)
   , m_total(0.0)
-  , m_lastValue(0.0)
   , m_currentValue(0.0)
   , m_lastButton(Calculator::Button::Nop)
+  , m_currentOP(Calculator::Button::Nop)
 {
   m_btnCls = new QPushButton();
   m_btnCls->setFlat(true);
@@ -369,8 +369,7 @@ double CalculatorWidget::calculate(double op1, double op2, Calculator::Button bu
 
 void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
 {
-  QString text = QString::number(value, 'f').remove(QRegExp("\\.?0*$")) +
-                 " " + Calculator::toChar(button);
+  QString text = Calculator::toStr(button) + " " + QString::number(value, 'f').remove(QRegExp("\\.?0*$"));
   m_view->appendPlainText(text);
   m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
   if (m_btnPrint->isChecked())
@@ -385,53 +384,67 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
 {
   if (Calculator::isOP(button))
   {
-    double op2 = Calculator::isOP(m_lastButton)
-                 ? m_lastValue
-                 : m_currentValue;
-
-    emitPrintSignal(op2, button);
-    m_total = calculate(m_total, op2, button);
-    m_edDisplay->setText(QString::number(m_total, 'f').
-                         remove(QRegExp("\\.?0*$")));
+    if (!Calculator::isOP(m_lastButton) &&
+        !Calculator::isEqual(m_lastButton))
+    {
+      m_total = calculate(m_total, m_currentValue, m_currentOP);
+      emitPrintSignal(m_currentValue, m_currentOP);
+    }
+    m_edDisplay->setText(Calculator::toStr(button));
     m_currentValue = 0.0;
-    m_lastValue = op2;
+    m_currentValueStr.clear();
+    m_lastButton = button;
+    m_currentOP = button;
   }
   else if (Calculator::isEqual(button))
   {
-    emitPrintSignal(m_total, button);
-  }
-  else if (Calculator::isDecimal(button))
-  {
-    if (Calculator::isOP(m_lastButton) ||
-        Calculator::isEqual(m_lastButton))
-      m_edDisplay->setText("");
-    else
+    if (!Calculator::isEqual(m_lastButton))
     {
-      QString strValue = m_edDisplay->text();
-      strValue.replace(Calculator::toChar(button), "");
-      strValue.append(Calculator::toChar(button));
-      m_edDisplay->setText(strValue);
-      m_currentValue = strValue.toDouble();
+      m_total = calculate(m_total, m_currentValue, m_currentOP);
+      emitPrintSignal(m_currentValue, m_currentOP);
+      m_edDisplay->setText(QString::number(m_total, 'f').
+                           remove(QRegExp("\\.?0*$")));
+      emitPrintSignal(m_total, button);
+      m_lastButton = button;
     }
   }
   else if (Calculator::isDigit(button))
   {
-    if (Calculator::isOP(m_lastButton) ||
-        Calculator::isEqual(m_lastButton))
-      m_edDisplay->setText("");
-    QString strValue = m_edDisplay->text();
-    strValue.append(Calculator::toChar(button));
-    m_edDisplay->setText(strValue);
-    m_currentValue = strValue.toDouble();
+    if (!Calculator::isEqual(m_lastButton))
+    {
+      if (m_currentValue == 0.0 &&
+          !m_currentValueStr.contains(Calculator::toStr(Calculator::Button::Dec)))
+        m_currentValueStr.clear();
+      m_currentValueStr.append(Calculator::toStr(button));
+      m_edDisplay->setText(Calculator::toStr(m_currentOP) + " " + m_currentValueStr);
+      m_currentValue = m_currentValueStr.toDouble();
+      m_lastButton = button;
+    }
   }
-  m_lastButton = button;
+  else if (Calculator::isDecimal(button))
+  {
+    if (!Calculator::isEqual(m_lastButton))
+    {
+      if (m_currentValue == 0.0)
+        m_currentValueStr.clear();
+      if (m_currentValueStr.contains(Calculator::toStr(Calculator::Button::Dec)))
+        m_currentValueStr.remove(QRegExp("^[0]*"));
+      m_currentValueStr.replace(Calculator::toStr(button), "");
+      if (m_currentValueStr.isEmpty())
+        m_currentValueStr.append("0");
+      m_currentValueStr.append(Calculator::toStr(button));
+      m_edDisplay->setText(Calculator::toStr(m_currentOP) + " " + m_currentValueStr);
+      m_currentValue = m_currentValueStr.toDouble();
+      m_lastButton = button;
+    }
+  }
 }
 
 void CalculatorWidget::clear()
 {
   m_edDisplay->setText("");
   m_currentValue = 0.0;
-  m_lastButton = Calculator::Button::Nop;
+  m_currentValueStr.clear();
 }
 
 void CalculatorWidget::reset()
@@ -439,9 +452,10 @@ void CalculatorWidget::reset()
   m_edDisplay->setText("");
   m_view->setPlainText("");
   m_currentValue = 0.0;
-  m_lastValue = 0.0;
+  m_currentValueStr.clear();
   m_total = 0.0;
   m_lastButton = Calculator::Button::Nop;
+  m_currentOP = Calculator::Button::Nop;
   if (m_btnPrint->isChecked())
     emit printFullCutSignal();
 }

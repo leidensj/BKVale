@@ -64,5 +64,6 @@
         <file>res/fileedit.png</file>
         <file>res/removeitem.png</file>
         <file>res/additem.png</file>
+        <file>res/binoculars.png</file>
     </qresource>
 </RCC>

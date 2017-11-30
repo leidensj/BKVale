@@ -209,7 +209,6 @@ void ReminderView::setReminder(const Reminder r)
       m_capitalization->setCheckState(Qt::Unchecked);
       break;
   }
-  //TODO
 }
 
 bool ReminderView::isSaveChecked() const

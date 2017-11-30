@@ -70,9 +70,10 @@ private:
   QPlainTextEdit* m_view;
   QString m_display;
   double m_total;
-  double m_lastValue;
   double m_currentValue;
+  QString m_currentValueStr;
   Calculator::Button m_lastButton;
+  Calculator::Button m_currentOP;
   double calculate(double op1, double op2, Calculator::Button button);
 };
 

@@ -103,6 +103,7 @@ ReminderDatabase::ReminderDatabase(QWidget *parent)
   m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
+  m_btnRemove->setShortcut(QKeySequence(Qt::Key_Delete));
   m_btnFavorite = new QPushButton();
   m_btnFavorite->setFlat(true);
   m_btnFavorite->setText("");
@@ -260,6 +261,7 @@ void ReminderDatabase::remove()
         QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
         model->removeRow(row);
         model->submitAll();
+        emit removedSignal(model->index(row, (int)ReminderTableIndex::ID).data(Qt::EditRole).toInt());
         refresh();
       }
     }

@@ -70,44 +70,44 @@ inline bool isDecimal(Button button)
   return button == Button::Dec;
 }
 
-inline QChar toChar(Button button)
+inline QString toStr(Button button)
 {
   switch(button)
   {
     case Button::Num0:
-      return '0';
+      return "0";
     case Button::Num1:
-      return '1';
+      return "1";
     case Button::Num2:
-      return '2';
+      return "2";
     case Button::Num3:
-      return '3';
+      return "3";
     case Button::Num4:
-      return '4';
+      return "4";
     case Button::Num5:
-      return '5';
+      return "5";
     case Button::Num6:
-      return '6';
+      return "6";
     case Button::Num7:
-      return '7';
+      return "7";
     case Button::Num8:
-      return '8';
+      return "8";
     case Button::Num9:
-      return '9';
+      return "9";
     case Button::Plus:
-      return '+';
+      return "+";
     case Button::Min:
-      return '-';
+      return "-";
     case Button::Div:
-      return '/';
+      return "/";
     case Button::Mul:
-      return '*';
+      return "*";
     case Button::Eq:
-      return '=';
+      return "=";
     case Button::Dec:
-      return '.';
+      return ".";
     default:
-      return ' ';
+      return " ";
   }
 }
 }

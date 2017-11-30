@@ -45,6 +45,11 @@ ReminderWidget::ReminderWidget(QWidget *parent)
                    SIGNAL(searchClickedSignal()),
                    this,
                    SLOT(showDock()));
+
+  QObject::connect(m_db,
+                   SIGNAL(removedSignal(int)),
+                   this,
+                   SLOT(removed(int)));
 }
 
 void ReminderWidget::emitChangedSignal()
@@ -109,4 +114,10 @@ void ReminderWidget::clear()
 bool ReminderWidget::isValid() const
 {
   return m_view->isValid();
+}
+
+void ReminderWidget::removed(int id)
+{
+  if (m_view->reminder().m_id == id)
+    m_view->clear();
 }

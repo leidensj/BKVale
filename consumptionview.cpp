@@ -79,7 +79,7 @@ ConsumptionView::ConsumptionView(QWidget *parent)
   m_search->setFlat(true);
   m_search->setText("");
   m_search->setIconSize(QSize(24, 24));
-  m_search->setIcon(QIcon(":/icons/res/search.png"));
+  m_search->setIcon(QIcon(":/icons/res/binoculars.png"));
   m_search->setDefault(true);
 
   m_item = new QLineEdit();

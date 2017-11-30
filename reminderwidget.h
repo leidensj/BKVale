@@ -25,6 +25,7 @@ public:
 private slots:
   void emitChangedSignal();
   void showDock();
+  void removed(int id);
 
 signals:
   changedSignal();

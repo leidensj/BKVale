@@ -39,6 +39,7 @@ public slots:
 
 signals:
   void selectedSignal(const Reminder& r);
+  void removedSignal(int id);
 
 private:
   QTableView* m_table;

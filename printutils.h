@@ -1,7 +1,8 @@
 #ifndef PRINTUTILS_H
 #define PRINTUTILS_H
 
-#include <QtSerialPort/QtSerialPort>
+#include <QtSerialPort>
+#include <QTcpSocket>
 #include "note.h"
 #include "reminder.h"
 #include "item.h"
@@ -18,6 +19,18 @@ namespace Printer
 
   void fullCut(QSerialPort& printer);
 }
+
+/*namespace PrinterTCP
+{
+bool init(QTcpSocket& printerTcp,
+          QString& error);
+
+bool print(QTcpSocket& printerTcp,
+           const QString& msg,
+           QString& error);
+
+void fullCut(QSerialPort& printer);
+}*/
 
 namespace NotePrinter
 {

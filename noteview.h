@@ -83,6 +83,7 @@ private:
 private slots:
   void updateTable(int row, int column);
   void setToday();
+  void checkDate();
   void emitChangedSignal();
   void emitShowSearchSignal();
   void emitCreateSignal();

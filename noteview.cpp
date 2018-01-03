@@ -13,6 +13,7 @@
 #include <QSpinBox>
 #include <QCalendarWidget>
 #include <QTextCharFormat>
+#include <QTimer>
 
 NoteSupplierComboBox::NoteSupplierComboBox(QWidget* parent)
   : QComboBox(parent)
@@ -239,12 +240,6 @@ NoteView::NoteView(QWidget *parent)
   m_dtDate->setCalendarPopup(true);
   m_dtDate->setDisplayFormat("dd/MM/yyyy");
   m_dtDate->setDate(QDate::currentDate());
-  QTextCharFormat fmt;
-  fmt.setForeground(Qt::darkGreen);
-  fmt.setFontWeight(QFont::ExtraBold);
-  fmt.setFontUnderline(true);
-  fmt.setFontOverline(true);
-  m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
   m_btnToday = new QPushButton();
   m_btnToday->setFlat(true);
@@ -357,7 +352,15 @@ NoteView::NoteView(QWidget *parent)
                    this,
                    SLOT(setToday()));
 
+  QTimer *timer = new QTimer(this);
+  QObject::connect(timer,
+                   SIGNAL(timeout()),
+                   this,
+                   SLOT(checkDate()));
+  timer->start(60000);
+
   create(0, QStringList());
+  checkDate();
   updateControls();
 }
 
@@ -609,6 +612,23 @@ void NoteView::setLastID(int lastID)
 int NoteView::getLastID() const
 {
   return m_lastID;
+}
+
+void NoteView::checkDate()
+{
+  QTextCharFormat fmt;
+  m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate().addDays(-1), fmt);
+  fmt.setForeground(Qt::darkGreen);
+  fmt.setFontWeight(QFont::ExtraBold);
+  fmt.setFontUnderline(true);
+  fmt.setFontOverline(true);
+  m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
+
+  bool bIsEditMode = Note::isValidID(m_currentID);
+  bool bIsDirty = !m_cbSupplier->currentText().isEmpty() ||
+                  m_table->rowCount() != 0;
+  if (!bIsEditMode && !bIsDirty)
+    setToday();
 }
 
 void NoteView::setToday()

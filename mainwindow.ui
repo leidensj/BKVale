@@ -137,6 +137,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionLogin"/>
+   <addaction name="actionUsers"/>
    <addaction name="actionItems"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
@@ -208,6 +210,30 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar Produtos</string>
+   </property>
+  </action>
+  <action name="actionUsers">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/user.png</normaloff>:/icons/res/user.png</iconset>
+   </property>
+   <property name="text">
+    <string>Usuários</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar usuários</string>
+   </property>
+  </action>
+  <action name="actionLogin">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/login.png</normaloff>:/icons/res/login.png</iconset>
+   </property>
+   <property name="text">
+    <string>Login</string>
+   </property>
+   <property name="toolTip">
+    <string>Fazer login</string>
    </property>
   </action>
  </widget>

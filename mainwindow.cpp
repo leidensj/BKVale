@@ -92,6 +92,14 @@ BaitaAssistant::BaitaAssistant(QWidget *parent)
                    this,
                    SLOT(printFullCut()));
 
+  QObject::connect(&m_printerTCP,
+                   SIGNAL(connected()),
+                   this,
+                   SLOT(connectedTCP()));
+
+  //TODO
+  //connectTCP();
+
   emit initSignal();
 }
 
@@ -158,6 +166,17 @@ void BaitaAssistant::connect()
   }
 
   enableControls();
+}
+
+void BaitaAssistant::connectTCP()
+{
+  m_printerTCP.connectToHost("192.168.0.16", 9100);
+  m_nextBlockSizeTCP = 0;
+}
+
+void BaitaAssistant::connectedTCP()
+{
+  setWindowTitle("CONECTOU");
 }
 
 void BaitaAssistant::disconnect()

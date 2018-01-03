@@ -65,5 +65,13 @@
         <file>res/removeitem.png</file>
         <file>res/additem.png</file>
         <file>res/binoculars.png</file>
+        <file>res/ethernet.png</file>
+        <file>res/user.png</file>
+        <file>res/login.png</file>
+        <file>res/password.png</file>
+        <file>res/exit.png</file>
+        <file>res/enter.png</file>
+        <file>res/capslockon.png</file>
+        <file>res/capslockoff.png</file>
     </qresource>
 </RCC>

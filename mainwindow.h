@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
+#include <QTcpSocket>
 #include "settingsdlg.h"
 #include "databaseutils.h"
 
@@ -39,12 +40,16 @@ private:
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
   QSerialPort m_printer;
+  QTcpSocket m_printerTCP;
+  quint16 m_nextBlockSizeTCP;
   Settings m_settings;
   bool m_bReady;
   QSqlDatabase m_db;
 
 private slots:
   void connect();
+  void connectTCP();
+  void connectedTCP();
   void disconnect();
   void showSettings();
   void enableControls();

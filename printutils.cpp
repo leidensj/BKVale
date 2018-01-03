@@ -51,7 +51,6 @@ namespace
                "TOTAL R$" +
                note.strTotal() +
                ESC_LF
-               ESC_VERT_TAB
                "Emissao: " +
                QDate::currentDate().toString("dd/MM/yyyy ") +
                QTime::currentTime().toString("hh:mm:ss") +
@@ -88,6 +87,19 @@ namespace
       strNote += note.m_items.at(i).m_description + ESC_LF + item + ESC_LF;
     }
   }
+}
+
+void sendRequest(QTcpSocket& printer,
+                 const QString& msg,
+                 QString& error)
+{
+  QByteArray block;
+  QDataStream out(&block, QIODevice::WriteOnly);
+  out.setVersion(QDataStream::Qt_5_0);
+  out << msg;
+  out.device()->seek(0);
+  out << quint16(block.size() - sizeof(quint16));
+  printer.write(block);
 }
 
 bool Printer::init(QSerialPort& printer,

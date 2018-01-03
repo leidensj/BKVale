@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport sql
+QT       += core gui serialport sql network
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     calculatorwidget.cpp \
     notedatabase.cpp \
     noteview.cpp \
-    notewidget.cpp
+    notewidget.cpp \
+    logindialog.cpp \
+    jlineedit.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -60,7 +62,9 @@ HEADERS  += mainwindow.h \
     calculator.h \
     notedatabase.h \
     noteview.h \
-    notewidget.h
+    notewidget.h \
+    logindialog.h \
+    jlineedit.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

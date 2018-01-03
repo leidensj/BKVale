@@ -128,20 +128,46 @@ bool NoteSQL::update(QSqlDatabase db,
 
   for (int i = 0; i != note.m_items.size(); ++i)
   {
-    query.prepare("UPDATE _PROMISSORYNOTESITEMS SET "
-                  "_NOTEID = (:_noteid),"
-                  "_AMMOUNT = (:_ammount),"
-                  "_PRICE = (:_price),"
-                  "_UNITY = (:_price),"
-                  "_DESCRIPTION = (:_description) "
-                  "WHERE _ID = (:_id)");
-    query.bindValue(":_id", note.m_items.at(i).m_id);
-    query.bindValue(":_noteid", note.m_id);
-    query.bindValue(":_ammount", note.m_items.at(i).m_ammount);
-    query.bindValue(":_price", note.m_items.at(i).m_price);
-    query.bindValue(":_unity", note.m_items.at(i).m_unity);
-    query.bindValue(":_description", note.m_items.at(i).m_description);
-    query.exec();
+    if (Note::isValidID(note.m_items.at(i).m_id))
+    {
+      query.prepare("UPDATE _PROMISSORYNOTESITEMS SET "
+                    "_NOTEID = (:_noteid),"
+                    "_AMMOUNT = (:_ammount),"
+                    "_PRICE = (:_price),"
+                    "_UNITY = (:_price),"
+                    "_DESCRIPTION = (:_description) "
+                    "WHERE _ID = (:_id)");
+      query.bindValue(":_id", note.m_items.at(i).m_id);
+      query.bindValue(":_noteid", note.m_id);
+      query.bindValue(":_ammount", note.m_items.at(i).m_ammount);
+      query.bindValue(":_price", note.m_items.at(i).m_price);
+      query.bindValue(":_unity", note.m_items.at(i).m_unity);
+      query.bindValue(":_description", note.m_items.at(i).m_description);
+      query.exec();
+    }
+    else
+    {
+      query.prepare("INSERT INTO _PROMISSORYNOTESITEMS ("
+                    "_NOTEID,"
+                    "_AMMOUNT,"
+                    "_PRICE,"
+                    "_UNITY,"
+                    "_DESCRIPTION) "
+                    "VALUES ("
+                    "(:_noteid),"
+                    "(:_ammount),"
+                    "(:_price),"
+                    "(:_unity),"
+                    "(:_description))");
+      query.bindValue(":_noteid", note.m_id);
+      query.bindValue(":_ammount", note.m_items.at(i).m_ammount);
+      query.bindValue(":_price", note.m_items.at(i).m_price);
+      query.bindValue(":_unity", note.m_items.at(i).m_unity);
+      query.bindValue(":_description", note.m_items.at(i).m_description);
+      query.exec();
+      note.m_items.at(i).m_id = query.lastInsertId().toInt();
+    }
+
   }
 
   if (db.commit())

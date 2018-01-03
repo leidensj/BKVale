@@ -28,6 +28,7 @@ LoginDialog::LoginDialog(QWidget* parent)
   lblPassword->setMaximumSize(24, 24);
   lblPassword->setScaledContents(true);
   m_user = new JLineEdit(true, true);
+  m_user->setPlaceholderText(tr("Usuário"));
   m_user->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9]*"), this));
   m_user->setMinimumHeight(24);
   m_user->setMaximumHeight(24);
@@ -38,6 +39,7 @@ LoginDialog::LoginDialog(QWidget* parent)
   }
 
   m_password = new JLineEdit(false, true);
+  m_password->setPlaceholderText(tr("Senha"));
   m_password->setEchoMode(QLineEdit::EchoMode::Password);
   {
     QFont f = m_password->font();
@@ -49,6 +51,7 @@ LoginDialog::LoginDialog(QWidget* parent)
   m_capsLock->setMinimumSize(24, 24);
   m_capsLock->setMaximumSize(24, 24);
   m_capsLock->setScaledContents(true);
+  m_capsLock->setToolTip("Caps Lock");
 
   QHBoxLayout *h0 = new QHBoxLayout();
   h0->setContentsMargins(0, 0, 0, 0);
@@ -68,7 +71,7 @@ LoginDialog::LoginDialog(QWidget* parent)
   m_status->setText("Mensagem de status");
 
   QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                     | QDialogButtonBox::Cancel);
+                                                     | QDialogButtonBox::Close);
 
   QVBoxLayout *v1 = new QVBoxLayout();
   v1->addLayout(h0);

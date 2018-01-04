@@ -1,5 +1,5 @@
-#ifndef HISTORYWIDGET_H
-#define HISTORYWIDGET_H
+#ifndef USERMGTDATABASE_H
+#define USERMGTDATABASE_H
 
 #include <QFrame>
 #include <note.h>
@@ -10,19 +10,19 @@
 class QPushButton;
 class QTableView;
 
-class NoteDatabase : public QFrame
+class UserMgtDatabase : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit NoteDatabase(QWidget *parent = 0);
-  ~NoteDatabase();
+  explicit UserMgtDatabase(QWidget *parent = 0);
+  ~UserMgtDatabase();
   void set(QSqlDatabase db);
   QSqlDatabase get() const;
 
 public slots:
   void refresh();
-  void emitNoteRemoveSignal();
+  void emitUserRemoveSignal();
   void enableControls();
 
 private:
@@ -32,12 +32,12 @@ private:
   QTableView* m_table;
 
 private slots:
-  void noteSelected(const QModelIndex& idx);
-  void noteSelected();
+  void userSelected(const QModelIndex& idx);
+  void userSelected();
 
 signals:
-  void noteSelectedSignal(int id);
-  void noteRemoveSignal(int id);
+  void userSelectedSignal(int id);
+  void userRemoveSignal(int id);
 };
 
-#endif // HISTORYWIDGET_H
+#endif // USERMGTDATABASE_H

@@ -1,5 +1,5 @@
-#include "notedatabase.h"
-#include <QDate>
+#include "usermgtdatabase.h"
+#include "user.h"
 #include <QLayout>
 #include <QSqlRecord>
 #include <QPushButton>
@@ -7,11 +7,11 @@
 #include <QSqlTableModel>
 #include <QHeaderView>
 
-class NoteTableModel : public QSqlTableModel
+class UserTableModel : public QSqlTableModel
 {
 
 public:
-  NoteTableModel(QObject *parent, QSqlDatabase db)
+  UserTableModel(QObject *parent, QSqlDatabase db)
     : QSqlTableModel(parent, db)
   {
 
@@ -26,19 +26,15 @@ public:
       QVariant value = QSqlTableModel::data(index, role);
       if (role == Qt::DisplayRole)
       {
-        if (index.column() == (int)NoteTableIndex::Date)
-          value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
-        else if (index.column() == (int)NoteTableIndex::Total)
-          value = "R$ " + QString::number(value.toDouble(), 'f', 2);
+        //TODO
       }
-
       return value;
     }
   }
 };
 
 
-NoteDatabase::NoteDatabase(QWidget *parent)
+UserMgtDatabase::UserMgtDatabase(QWidget *parent)
   : QFrame(parent)
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
@@ -104,19 +100,24 @@ NoteDatabase::NoteDatabase(QWidget *parent)
                    SLOT(emitNoteRemoveSignal()));
 }
 
-void NoteDatabase::set(QSqlDatabase db)
+void UserMgtDatabase::set(QSqlDatabase db)
 {
   if (m_table->model() != nullptr)
     return;
 
-  NoteTableModel* model = new NoteTableModel(this, db);
-  model->setTable("_PROMISSORYNOTES");
+  UserTableModel* model = new UserTableModel(this, db);
+  model->setTable("_USERS");
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-  model->setHeaderData((int)NoteTableIndex::ID, Qt::Horizontal, tr("ID"));
-  model->setHeaderData((int)NoteTableIndex::Number, Qt::Horizontal, tr("Número"));
-  model->setHeaderData((int)NoteTableIndex::Date, Qt::Horizontal, tr("Data"));
-  model->setHeaderData((int)NoteTableIndex::Supplier, Qt::Horizontal, tr("Fornecedor"));
-  model->setHeaderData((int)NoteTableIndex::Total, Qt::Horizontal, tr("Total"));
+  model->setHeaderData((int)UserTableIndex::ID, Qt::Horizontal, tr("ID"));
+  model->setHeaderData((int)UserTableIndex::User, Qt::Horizontal, tr("Usuário"));
+  model->setHeaderData((int)UserTableIndex::AccessNote, Qt::Horizontal, tr("Data"));
+  model->setHeaderData((int)UserTableIndex::AccessReminder, Qt::Horizontal, tr("Fornecedor"));
+  model->setHeaderData((int)UserTableIndex::AccessCalculator, Qt::Horizontal, tr("Total"));
+  model->setHeaderData((int)UserTableIndex::AccessShop, Qt::Horizontal, tr("Fornecedor"));
+  model->setHeaderData((int)UserTableIndex::AccessConsumption, Qt::Horizontal, tr("Total"));
+  model->setHeaderData((int)UserTableIndex::AccessUser, Qt::Horizontal, tr("Fornecedor"));
+  model->setHeaderData((int)UserTableIndex::AccessItem, Qt::Horizontal, tr("Total"));
+  model->setHeaderData((int)UserTableIndex::AccessSettings, Qt::Horizontal, tr("Fornecedor"));
   m_table->setModel(model);
   m_table->hideColumn((int)NoteTableIndex::ID);
   QObject::connect(m_table->selectionModel(),
@@ -126,7 +127,7 @@ void NoteDatabase::set(QSqlDatabase db)
   refresh();
 }
 
-QSqlDatabase NoteDatabase::get() const
+QSqlDatabase UserMgtDatabase::get() const
 {
   if (m_table->model() != nullptr)
   {
@@ -136,26 +137,26 @@ QSqlDatabase NoteDatabase::get() const
   return QSqlDatabase();
 }
 
-NoteDatabase::~NoteDatabase()
+UserMgtDatabase::~UserMgtDatabase()
 {
 
 }
 
-void NoteDatabase::noteSelected()
+void UserMgtDatabase::userSelected()
 {
-  noteSelected(m_table->currentIndex());
+  userSelected(m_table->currentIndex());
 }
 
-void NoteDatabase::noteSelected(const QModelIndex& idx)
+void UserMgtDatabase::userSelected(const QModelIndex& idx)
 {
   if (m_table->model() != nullptr && idx.isValid())
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-    emit noteSelectedSignal(model->index(idx.row(), (int)NoteTableIndex::ID).data(Qt::EditRole).toInt());
+    emit userSelectedSignal(model->index(idx.row(), (int)UserTableIndex::ID).data(Qt::EditRole).toInt());
   }
 }
 
-void NoteDatabase::refresh()
+void UserMgtDatabase::refresh()
 {
   if (m_table->model())
   {
@@ -165,14 +166,14 @@ void NoteDatabase::refresh()
   enableControls();
 }
 
-void NoteDatabase::enableControls()
+void UserMgtDatabase::enableControls()
 {
-  bool bNoteSelected = m_table->currentIndex().isValid();
-  m_btnOpen->setEnabled(bNoteSelected);
-  m_btnRemove->setEnabled(bNoteSelected);
+  bool bUserSelected = m_table->currentIndex().isValid();
+  m_btnOpen->setEnabled(bUserSelected);
+  m_btnRemove->setEnabled(bUserSelected);
 }
 
-void NoteDatabase::emitNoteRemoveSignal()
+void UserMgtDatabase::emitUserRemoveSignal()
 {
   if (m_table->model())
   {
@@ -180,8 +181,9 @@ void NoteDatabase::emitNoteRemoveSignal()
     if (m_table->currentIndex().isValid())
     {
       int id = model->index(m_table->currentIndex().row(),
-                            (int)NoteTableIndex::ID).data(Qt::EditRole).toInt();
-      emit noteRemoveSignal(id);
+                            (int)UserTableIndex::ID).data(Qt::EditRole).toInt();
+      emit userRemoveSignal(id);
     }
   }
 }
+

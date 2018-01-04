@@ -36,7 +36,11 @@ SOURCES += main.cpp\
     noteview.cpp \
     notewidget.cpp \
     logindialog.cpp \
-    jlineedit.cpp
+    jlineedit.cpp \
+    user.cpp \
+    usermgtwidget.cpp \
+    usermgtdatabase.cpp \
+    usermgtview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -64,7 +68,11 @@ HEADERS  += mainwindow.h \
     noteview.h \
     notewidget.h \
     logindialog.h \
-    jlineedit.h
+    jlineedit.h \
+    user.h \
+    usermgtwidget.h \
+    usermgtdatabase.h \
+    usermgtview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

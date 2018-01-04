@@ -6,9 +6,8 @@ int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
   LoginDialog l;
-  l.exec();
   BaitaAssistant w;
-  w.show();
-
+  if (l.exec() == QDialog::Accepted)
+    w.show();
   return a.exec();
 }

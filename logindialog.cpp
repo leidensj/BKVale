@@ -1,10 +1,30 @@
 #include "logindialog.h"
 #include "jlineedit.h"
+#include "user.h"
 #include <QLayout>
 #include <QIcon>
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
+#include <QPushButton>
+
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#else
+#include <X11/XKBlib.h>
+#endif
+
+namespace
+{
+  bool checkCapsLock()
+  {
+  #ifdef Q_OS_WIN32
+  return (GetKeyState(VK_CAPITAL) & 0x0001) != 0;
+  #else
+    return false;
+  #endif
+  }
+}
 
 LoginDialog::LoginDialog(QWidget* parent)
   : QDialog(parent)
@@ -68,10 +88,12 @@ LoginDialog::LoginDialog(QWidget* parent)
   h2->addWidget(m_capsLock);
 
   m_status = new QLabel();
-  m_status->setText("Mensagem de status");
 
-  QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                     | QDialogButtonBox::Close);
+  QPushButton* login = new QPushButton(tr("Login"));
+  login->setDefault(true);
+
+  QDialogButtonBox* buttonBox = new QDialogButtonBox(Qt::Horizontal);
+  buttonBox->addButton(login, QDialogButtonBox::ActionRole);
 
   QVBoxLayout *v1 = new QVBoxLayout();
   v1->addLayout(h0);
@@ -81,20 +103,46 @@ LoginDialog::LoginDialog(QWidget* parent)
   v1->addWidget(buttonBox);
 
   setLayout(v1);
-  setWindowFlags(Qt::Window);
+  setWindowFlags(Qt::WindowCloseButtonHint);
   layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-  QObject::connect(buttonBox,
-                   SIGNAL(accepted()),
+  QObject::connect(login,
+                   SIGNAL(clicked(bool)),
                    this,
-                   SLOT(accept()));
-
-  QObject::connect(buttonBox,
-                   SIGNAL(rejected()),
-                   this,
-                   SLOT(reject()));
+                   SLOT(login()));
 
   setWindowTitle(tr("Baita Assistente Login"));
   setWindowIcon(QIcon(":/icons/res/login.png"));
+  updateCapsLock();
   setModal(true);
+}
+
+void LoginDialog::updateCapsLock()
+{
+  QString icon = checkCapsLock()
+                 ? ":/icons/res/capslockon.png"
+                 : ":/icons/res/capslockoff.png";
+  m_capsLock->setPixmap(QIcon(icon).pixmap(QSize(24, 24)));
+}
+
+void LoginDialog::keyPressEvent(QKeyEvent* event)
+{
+  QDialog::keyPressEvent(event);
+  updateCapsLock();
+}
+
+void LoginDialog::login()
+{
+  QString error;
+  User user;
+  if (user.login(m_user->text(),
+                 m_password->text(),
+                 error))
+  {
+    accept();
+  }
+  else
+  {
+    m_status->setText(error);
+  }
 }

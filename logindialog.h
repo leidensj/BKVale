@@ -5,6 +5,7 @@
 
 class JLineEdit;
 class QLabel;
+class QPushButton;
 
 class LoginDialog : public QDialog
 {
@@ -13,7 +14,14 @@ class LoginDialog : public QDialog
 public:
   explicit LoginDialog(QWidget* parent = 0);
 
+private slots:
+  void login();
+
+protected:
+  void keyPressEvent(QKeyEvent *event);
+
 private:
+  void updateCapsLock();
   JLineEdit* m_user;
   JLineEdit* m_password;
   QLabel* m_capsLock;

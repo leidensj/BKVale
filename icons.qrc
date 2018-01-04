@@ -73,5 +73,6 @@
         <file>res/enter.png</file>
         <file>res/capslockon.png</file>
         <file>res/capslockoff.png</file>
+        <file>res/view.png</file>
     </qresource>
 </RCC>

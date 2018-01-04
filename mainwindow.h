@@ -59,6 +59,7 @@ private slots:
   bool print(const QString& text);
   void printFullCut();
   void openItemsDialog();
+  void openUsersDialog();
 
 signals:
   void initSignal();

@@ -7,6 +7,7 @@
 #include "reminderwidget.h"
 #include "consumptionwidget.h"
 #include "calculatorwidget.h"
+#include "usermgtwidget.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -81,6 +82,11 @@ BaitaAssistant::BaitaAssistant(QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openItemsDialog()));
+
+  QObject::connect(ui->actionUsers,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openUsersDialog()));
 
   QObject::connect(m_calculator,
                    SIGNAL(printSignal(const QString&)),
@@ -365,5 +371,21 @@ void BaitaAssistant::openItemsDialog()
   dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
   dlg.setModal(true);
   itemWidget->focusFilter();
+  dlg.exec();
+}
+
+void BaitaAssistant::openUsersDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout();
+  dlg.setLayout(layout);
+  UserMgtWidget* w = new UserMgtWidget();
+  //w->setDatabase(m_db);
+  layout->addWidget(w);
+  dlg.resize(640, 480);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Usuários"));
+  dlg.setWindowIcon(QIcon(":/icons/res/user.png"));
+  dlg.setModal(true);
   dlg.exec();
 }

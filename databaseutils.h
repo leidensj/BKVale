@@ -12,12 +12,10 @@
 #define DEFAULT_NUMBER     1000
 #define DEFAULT_NUMBER_STR "1000"
 
-namespace BaitaDatabase
+namespace BaitaSQL
 {
   bool isOpen(QSqlDatabase db,
               QString& error);
-
-  bool hasConfig(QSqlDatabase db);
 
   bool open(QSqlDatabase db,
             const QString& path,
@@ -59,7 +57,7 @@ namespace NoteSQL
               QString& error);
 }
 
-namespace ItemDatabase
+namespace ItemSQL
 {
   bool select(QSqlDatabase db,
               Item& item,

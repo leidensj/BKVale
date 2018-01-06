@@ -82,12 +82,12 @@ UserMgtDatabase::UserMgtDatabase(QWidget *parent)
   QObject::connect(m_table,
                    SIGNAL(doubleClicked(const QModelIndex&)),
                    this,
-                   SLOT(noteSelected(const QModelIndex&)));
+                   SLOT(userSelected(const QModelIndex&)));
 
   QObject::connect(m_btnOpen,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(noteSelected()));
+                   SLOT(userSelected()));
 
   QObject::connect(m_btnRefresh,
                    SIGNAL(clicked(bool)),
@@ -97,7 +97,7 @@ UserMgtDatabase::UserMgtDatabase(QWidget *parent)
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitNoteRemoveSignal()));
+                   SLOT(emitUserRemoveSignal()));
 }
 
 void UserMgtDatabase::set(QSqlDatabase db)

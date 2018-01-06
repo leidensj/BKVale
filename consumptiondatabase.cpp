@@ -77,9 +77,9 @@ public:
           Item item;
           item.m_id = record(index.row()).value("_ITEMID").toInt();
           QString error;
-          ItemDatabase::select(database(),
-                               item,
-                               error);
+          ItemSQL::select(database(),
+                          item,
+                          error);
           value = QString::number(value.toDouble(), 'f', 3) + item.m_unity;
         }
 
@@ -89,7 +89,7 @@ public:
           Item item;
           item.m_id = value.toInt();
           QString error;
-          bool bSuccess = ItemDatabase::select(database(),
+          bool bSuccess = ItemSQL::select(database(),
                                                item,
                                                error);
           value = bSuccess ? item.m_description : error;

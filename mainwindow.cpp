@@ -264,9 +264,9 @@ void BaitaAssistant::showSettings()
     {
       m_settings = dlg.getSettings();
       QString error;
-      if (!BaitaDatabase::insertSettings(m_db,
-                                         m_settings,
-                                         error))
+      if (!BaitaSQL::insertSettings(m_db,
+                                    m_settings,
+                                    error))
       {
         QMessageBox msgBox(QMessageBox::Critical,
                            tr("Erro ao salvar a configuração"),
@@ -320,13 +320,13 @@ void BaitaAssistant::enableControls()
 void BaitaAssistant::init()
 {
   QString error;
-  bool bSuccess = BaitaDatabase::open(m_db,
-                                      qApp->applicationDirPath() +
-                                      QDir::separator() +
-                                      "setup.db",
-                                      error);
+  bool bSuccess = BaitaSQL::open(m_db,
+                                 qApp->applicationDirPath() +
+                                 QDir::separator() +
+                                 "setup.db",
+                                 error);
   if (bSuccess)
-    bSuccess = BaitaDatabase::init(m_db, error);
+    bSuccess = BaitaSQL::init(m_db, error);
   else
     m_db.close();
 
@@ -341,7 +341,7 @@ void BaitaAssistant::init()
   else
   {
     m_bReady = true;
-    BaitaDatabase::selectSettings(m_db, m_settings);
+    BaitaSQL::selectSettings(m_db, m_settings);
     if (!m_settings.port.isEmpty())
       connect();
     m_note->setDatabase(m_db);
@@ -382,7 +382,6 @@ void BaitaAssistant::openUsersDialog()
   UserMgtWidget* w = new UserMgtWidget();
   //w->setDatabase(m_db);
   layout->addWidget(w);
-  dlg.resize(640, 480);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Usuários"));
   dlg.setWindowIcon(QIcon(":/icons/res/user.png"));

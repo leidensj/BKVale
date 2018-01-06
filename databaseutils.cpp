@@ -40,7 +40,7 @@ bool NoteSQL::insert(QSqlDatabase db,
 {
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   db.transaction();
@@ -108,7 +108,7 @@ bool NoteSQL::update(QSqlDatabase db,
 {
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   db.transaction();
@@ -185,7 +185,7 @@ bool NoteSQL::select(QSqlDatabase db,
   int id = note.m_id;
   note.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   bool bFound = false;
@@ -250,7 +250,7 @@ bool NoteSQL::remove(QSqlDatabase db,
 {
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   db.transaction();
@@ -271,8 +271,8 @@ bool NoteSQL::remove(QSqlDatabase db,
   return false;
 }
 
-bool BaitaDatabase::isOpen(QSqlDatabase db,
-                           QString& error)
+bool BaitaSQL::isOpen(QSqlDatabase db,
+                      QString& error)
 {
   error.clear();
   if (!db.isOpen())
@@ -280,9 +280,9 @@ bool BaitaDatabase::isOpen(QSqlDatabase db,
   return db.isOpen();
 }
 
-bool BaitaDatabase::open(QSqlDatabase db,
-                         const QString& path,
-                         QString& error)
+bool BaitaSQL::open(QSqlDatabase db,
+                    const QString& path,
+                    QString& error)
 {
   error.clear();
   if (db.isOpen())
@@ -294,20 +294,18 @@ bool BaitaDatabase::open(QSqlDatabase db,
   return bSuccess;
 }
 
-void BaitaDatabase::close(QSqlDatabase db)
+void BaitaSQL::close(QSqlDatabase db)
 {
   db.close();
 }
 
-bool BaitaDatabase::init(QSqlDatabase db,
-                         QString& error)
+bool BaitaSQL::init(QSqlDatabase db,
+                    QString& error)
 {
   error.clear();
 
   if (!isOpen(db, error))
     return false;
-
-  bool bHasConfig = BaitaDatabase::hasConfig(db);
 
   db.transaction();
   QSqlQuery query(db);
@@ -319,6 +317,10 @@ bool BaitaDatabase::init(QSqlDatabase db,
              "_FLOWCONTROL INTEGER DEFAULT 0,"
              "_PARITY INTEGER DEFAULT 0,"
              "_STOPBITS INTEGER DEFAULT 1)");
+
+  query.exec("SELECT * FROM _SETTINGS LIMIT 1");
+  if (!query.next())
+    query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
 
   query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -361,30 +363,47 @@ bool BaitaDatabase::init(QSqlDatabase db,
              "_AMMOUNT REAL,"
              "_TOTAL REAL)");
 
-  if (!bHasConfig)
-    query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
+  query.exec("CREATE TABLE IF NOT EXISTS _USERS ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_USER TEXT NOT NULL UNIQUE,"
+             "_PASSWORD TEXT NOT NULL,"
+             "_ACCESS_NOTE INT,"
+             "_ACCESS_REMINDER INT,"
+             "_ACCESS_CALCULATOR INT,"
+             "_ACCESS_SHOP INT,"
+             "_ACCESS_CONSUMPTION INT,"
+             "_ACCESS_USER INT,"
+             "_ACCESS_ITEM INT,"
+             "_ACCESS_SETTINGS INT)");
+
+  query.exec("SELECT * FROM _USERS LIMIT 1");
+  if (!query.next())
+  {
+     query.exec("INSERT INTO _USERS ("
+                "_USER,"
+                "_PASSWORD,"
+                "_ACCESS_NOTE,"
+                "_ACCESS_REMINDER,"
+                "_ACCESS_CALCULATOR,"
+                "_ACCESS_SHOP,"
+                "_ACCESS_CONSUMPTION,"
+                "_ACCESS_USER,"
+                "_ACCESS_ITEM,"
+                "_ACCESS_SETTINGS) "
+                "VALUES ("
+                "'ADMIN',"
+                "'a1b2c3d4',"
+                "1,1,1,1,1,1,1,1)");
+  }
 
   bool bSuccess = db.commit();
   if (!bSuccess)
     error = db.lastError().text();
 
-  return true;
+  return bSuccess;
 }
 
-bool BaitaDatabase::hasConfig(QSqlDatabase db)
-{
-  QString error;
-  if (!isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
-  if (query.exec("SELECT * FROM _SETTINGS LIMIT 1"))
-    return query.next();
-
-  return false;
-}
-
-bool BaitaDatabase::insertSettings(QSqlDatabase db,
+bool BaitaSQL::insertSettings(QSqlDatabase db,
                               const Settings& settings,
                               QString& error)
 {
@@ -415,8 +434,8 @@ bool BaitaDatabase::insertSettings(QSqlDatabase db,
   return bSuccess;
 }
 
-void BaitaDatabase::selectSettings(QSqlDatabase db,
-                                   Settings& settings)
+void BaitaSQL::selectSettings(QSqlDatabase db,
+                              Settings& settings)
 {
   settings.clear();
   QString error;
@@ -448,13 +467,13 @@ void BaitaDatabase::selectSettings(QSqlDatabase db,
   }
 }
 
-bool ItemDatabase::select(QSqlDatabase db,
-                          Item& item,
-                          QString& error)
+bool ItemSQL::select(QSqlDatabase db,
+                     Item& item,
+                     QString& error)
 {
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   QSqlQuery query(db);
@@ -507,7 +526,7 @@ bool ReminderSQL::select(QSqlDatabase db,
 {
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   QSqlQuery query(db);
@@ -557,7 +576,7 @@ bool ReminderSQL::insertOrUpdate(QSqlDatabase db,
 {
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   bool bSuccess = false;
@@ -647,7 +666,7 @@ bool ConsumptionSQL::selectTotal(QSqlDatabase db,
   error.clear();
   total = 0.0;
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   QString str("SELECT SUM(_TOTAL) FROM _CONSUMPTION");
@@ -687,7 +706,7 @@ bool ConsumptionSQL::selectSubTotal(QSqlDatabase db,
   totals.clear();
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   QString str("SELECT SUM(_TOTAL), _DATE FROM _CONSUMPTION");
@@ -730,7 +749,7 @@ bool ConsumptionSQL::selectByDate(QSqlDatabase db,
   consumptions.clear();
   error.clear();
 
-  if (!BaitaDatabase::isOpen(db, error))
+  if (!BaitaSQL::isOpen(db, error))
     return false;
 
   QSqlQuery query(db);
@@ -781,7 +800,7 @@ void ConsumptionSQL::getConsumption(QSqlDatabase db,
   {
     Item item;
     item.m_id = vConsumption.at(i).m_itemID;
-    ItemDatabase::select(db, item, error);
+    ItemSQL::select(db, item, error);
     vItem.push_back(item);
   }
 }

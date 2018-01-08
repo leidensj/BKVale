@@ -141,14 +141,14 @@ User UserMgtView::getUser() const
 }
 void UserMgtView::setUser(const User& user)
 {
-  m_user->setText(user.strUser());
-  m_password->setText(user.strPassword());
-  m_accessNote->setChecked(user.hasAccessToNote());
-  m_accessReminder->setChecked(user.hasAccessToReminder());
-  m_accessCalculator->setChecked(user.hasAccessToCalculator());
-  m_accessShop->setChecked(user.hasAccessToShop());
-  m_accessConsumption->setChecked(user.hasAccessToConsumption());
-  m_accessUser->setChecked(user.hasAccessToUsers());
-  m_accessItem->setChecked(user.hasAccessToItems());
-  m_accessSettings->setChecked(user.hasAccessToSettings());
+  m_user->setText(user.m_strUser);
+  m_password->setText(user.m_strPassword);
+  m_accessNote->setChecked(user.m_bAccessNote);
+  m_accessReminder->setChecked(user.m_bAccessReminder);
+  m_accessCalculator->setChecked(user.m_bAccessCalculator);
+  m_accessShop->setChecked(user.m_bAccessShop);
+  m_accessConsumption->setChecked(user.m_bAccessConsumption);
+  m_accessUser->setChecked(user.m_bAccessUser);
+  m_accessItem->setChecked(user.m_bAccessItem);
+  m_accessSettings->setChecked(user.m_bAccessSettings);
 }

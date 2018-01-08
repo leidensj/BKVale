@@ -21,9 +21,8 @@ enum class UserTableIndex : int
   AccessSettings
 };
 
-class User
+struct User
 {
-public:
   User();
 
   User(const QString& strUser,
@@ -37,18 +36,7 @@ public:
        bool bAccessItem,
        bool bAccessSettings);
 
-  bool login(const QString& strUser,
-             const QString& strPassword,
-             QString& error);
-
-private:
-  static bool st_isAdmin(const QString& strUser);
-  bool loginAdmin(const QString& strUser,
-                  const QString& strPassword,
-                  QString& error);
-  void enableAll(bool bEnable);
-
-  int m_id;
+  mutable int m_id;
   QString m_strUser;
   QString m_strPassword;
   bool m_bAccessNote;
@@ -59,20 +47,38 @@ private:
   bool m_bAccessUser;
   bool m_bAccessItem;
   bool m_bAccessSettings;
+};
+
+class UserLogin
+{
+public:
+  UserLogin();
+
+  bool login(const QString& strUser,
+             const QString& strPassword,
+             QString& error);
+
+private:
+  User m_user;
+  static bool st_isAdmin(const QString& strUser);
+  bool loginAdmin(const QString& strUser,
+                  const QString& strPassword,
+                  QString& error);
+  void enableAll(bool bEnable);
 
 public:
-  bool isValid() const { return m_id != INVALID_USER_ID; }
+  bool isValid() const { return m_user.m_id != INVALID_USER_ID; }
   bool isAdmin() const;
-  QString strUser() const { return m_strUser; }
-  QString strPassword() const { return m_strPassword; }
-  bool hasAccessToNote() const { return m_bAccessNote; }
-  bool hasAccessToReminder() const { return m_bAccessReminder; }
-  bool hasAccessToCalculator() const { return m_bAccessCalculator; }
-  bool hasAccessToShop() const { return m_bAccessShop; }
-  bool hasAccessToConsumption() const { return m_bAccessConsumption; }
-  bool hasAccessToUsers() const { return m_bAccessUser; }
-  bool hasAccessToItems() const { return m_bAccessItem; }
-  bool hasAccessToSettings() const { return m_bAccessSettings; }
+  QString strUser() const { return m_user.m_strUser; }
+  QString strPassword() const { return m_user.m_strPassword; }
+  bool hasAccessToNote() const { return isValid() && m_user.m_bAccessNote; }
+  bool hasAccessToReminder() const { return isValid() && m_user.m_bAccessReminder; }
+  bool hasAccessToCalculator() const { return isValid() && m_user.m_bAccessCalculator; }
+  bool hasAccessToShop() const { return isValid() && m_user.m_bAccessShop; }
+  bool hasAccessToConsumption() const { return isValid() && m_user.m_bAccessConsumption; }
+  bool hasAccessToUsers() const { return isValid() && m_user.m_bAccessUser; }
+  bool hasAccessToItems() const { return isValid() && m_user.m_bAccessItem; }
+  bool hasAccessToSettings() const { return isValid() && m_user.m_bAccessSettings; }
 };
 
 #endif // USER_H

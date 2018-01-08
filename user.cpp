@@ -51,7 +51,12 @@ User::User(const QString& strUser,
 
 }
 
-bool User::login(const QString& strUser,
+UserLogin::UserLogin()
+{
+
+}
+
+bool UserLogin::login(const QString& strUser,
            const QString& strPassword,
            QString& error)
 {
@@ -61,12 +66,12 @@ bool User::login(const QString& strUser,
   return false;
 }
 
-bool User::st_isAdmin(const QString& strUser)
+bool UserLogin::st_isAdmin(const QString& strUser)
 {
   return strUser.compare(ADMIN_USERNAME, Qt::CaseInsensitive) == 0;
 }
 
-bool User::loginAdmin(const QString& strUser,
+bool UserLogin::loginAdmin(const QString& strUser,
                       const QString& strPassword,
                       QString& error)
 {
@@ -84,25 +89,25 @@ bool User::loginAdmin(const QString& strUser,
     return false;
   }
 
-  m_strUser = strUser;
-  m_strPassword = strPassword;
+  m_user.m_strUser = strUser;
+  m_user.m_strPassword = strPassword;
   enableAll(true);
   return true;
 }
 
-void User::enableAll(bool bEnable)
+void UserLogin::enableAll(bool bEnable)
 {
-  m_bAccessNote = bEnable;
-  m_bAccessReminder = bEnable;
-  m_bAccessCalculator = bEnable;
-  m_bAccessShop = bEnable;
-  m_bAccessConsumption = bEnable;
-  m_bAccessUser = bEnable;
-  m_bAccessItem = bEnable;
-  m_bAccessSettings = bEnable;
+  m_user.m_bAccessNote = bEnable;
+  m_user.m_bAccessReminder = bEnable;
+  m_user.m_bAccessCalculator = bEnable;
+  m_user.m_bAccessShop = bEnable;
+  m_user.m_bAccessConsumption = bEnable;
+  m_user.m_bAccessUser = bEnable;
+  m_user.m_bAccessItem = bEnable;
+  m_user.m_bAccessSettings = bEnable;
 }
 
-bool User::isAdmin() const
+bool UserLogin::isAdmin() const
 {
-  return st_isAdmin(m_strUser);
+  return st_isAdmin(m_user.m_strUser);
 }

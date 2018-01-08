@@ -134,10 +134,10 @@ void LoginDialog::keyPressEvent(QKeyEvent* event)
 void LoginDialog::login()
 {
   QString error;
-  User user;
-  if (user.login(m_user->text(),
-                 m_password->text(),
-                 error))
+  UserLogin userLogin;
+  if (userLogin.login(m_user->text(),
+                      m_password->text(),
+                      error))
   {
     accept();
   }

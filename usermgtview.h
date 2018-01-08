@@ -2,6 +2,7 @@
 #define USERMGTVIEW_H
 
 #include <QFrame>
+#include "user.h"
 
 class QCheckBox;
 class JLineEdit;
@@ -14,6 +15,8 @@ class UserMgtView : public QFrame
 
 public:
   explicit UserMgtView(QWidget* parent = 0);
+  User getUser() const;
+  void setUser(const User& user);
 
 private:
   QPushButton* m_create;

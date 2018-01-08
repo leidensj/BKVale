@@ -3,6 +3,9 @@
 
 #include <QString>
 
+#define INVALID_USER_ID     -1
+#define MAX_USERNAME_LENGTH 20
+
 enum class UserTableIndex : int
 {
   ID = 0,
@@ -22,6 +25,18 @@ class User
 {
 public:
   User();
+
+  User(const QString& strUser,
+       const QString& strPassword,
+       bool bAccessNote,
+       bool bAccessReminder,
+       bool bAccessCalculator,
+       bool bAccessShop,
+       bool bAccessConsumption,
+       bool bAccessUser,
+       bool bAccessItem,
+       bool bAccessSettings);
+
   bool login(const QString& strUser,
              const QString& strPassword,
              QString& error);
@@ -33,6 +48,7 @@ private:
                   QString& error);
   void enableAll(bool bEnable);
 
+  int m_id;
   QString m_strUser;
   QString m_strPassword;
   bool m_bAccessNote;
@@ -45,7 +61,10 @@ private:
   bool m_bAccessSettings;
 
 public:
+  bool isValid() const { return m_id != INVALID_USER_ID; }
   bool isAdmin() const;
+  QString strUser() const { return m_strUser; }
+  QString strPassword() const { return m_strPassword; }
   bool hasAccessToNote() const { return m_bAccessNote; }
   bool hasAccessToReminder() const { return m_bAccessReminder; }
   bool hasAccessToCalculator() const { return m_bAccessCalculator; }

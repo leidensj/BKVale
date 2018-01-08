@@ -27,6 +27,30 @@ User::User()
 
 }
 
+User::User(const QString& strUser,
+           const QString& strPassword,
+           bool bAccessNote,
+           bool bAccessReminder,
+           bool bAccessCalculator,
+           bool bAccessShop,
+           bool bAccessConsumption,
+           bool bAccessUser,
+           bool bAccessItem,
+           bool bAccessSettings)
+  : m_strUser(strUser)
+  , m_strPassword(strPassword)
+  , m_bAccessNote(bAccessNote)
+  , m_bAccessReminder(bAccessReminder)
+  , m_bAccessCalculator(bAccessCalculator)
+  , m_bAccessShop(bAccessShop)
+  , m_bAccessConsumption(bAccessConsumption)
+  , m_bAccessUser(bAccessUser)
+  , m_bAccessItem(bAccessItem)
+  , m_bAccessSettings(bAccessSettings)
+{
+
+}
+
 bool User::login(const QString& strUser,
            const QString& strPassword,
            QString& error)

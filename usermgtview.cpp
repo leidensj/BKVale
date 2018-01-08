@@ -125,3 +125,30 @@ UserMgtView::UserMgtView(QWidget* parent)
   v1->addWidget(gbox);
   setLayout(v1);
 }
+
+User UserMgtView::getUser() const
+{
+  return User(m_user->text(),
+              m_password->text(),
+              m_accessNote->isChecked(),
+              m_accessReminder->isChecked(),
+              m_accessCalculator->isChecked(),
+              m_accessShop->isChecked(),
+              m_accessConsumption->isChecked(),
+              m_accessUser->isChecked(),
+              m_accessItem->isChecked(),
+              m_accessSettings->isChecked());
+}
+void UserMgtView::setUser(const User& user)
+{
+  m_user->setText(user.strUser());
+  m_password->setText(user.strPassword());
+  m_accessNote->setChecked(user.hasAccessToNote());
+  m_accessReminder->setChecked(user.hasAccessToReminder());
+  m_accessCalculator->setChecked(user.hasAccessToCalculator());
+  m_accessShop->setChecked(user.hasAccessToShop());
+  m_accessConsumption->setChecked(user.hasAccessToConsumption());
+  m_accessUser->setChecked(user.hasAccessToUsers());
+  m_accessItem->setChecked(user.hasAccessToItems());
+  m_accessSettings->setChecked(user.hasAccessToSettings());
+}

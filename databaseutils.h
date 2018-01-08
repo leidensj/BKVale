@@ -3,6 +3,7 @@
 
 #include <QSqlDatabase>
 #include <QVector>
+#include "user.h"
 #include "note.h"
 #include "item.h"
 #include "consumption.h"
@@ -32,6 +33,25 @@ namespace BaitaSQL
 
   void selectSettings(QSqlDatabase db,
                       Settings& settings);
+}
+
+namespace UserSQL
+{
+  bool insert(QSqlDatabase db,
+              const User& user,
+              QString& error);
+
+  bool update(QSqlDatabase db,
+              const User& user,
+              QString& error);
+
+  bool select(QSqlDatabase db,
+              User& user,
+              QString& error);
+
+  bool remove(QSqlDatabase db,
+              int id,
+              QString& error);
 }
 
 namespace NoteSQL

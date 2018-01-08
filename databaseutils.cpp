@@ -826,3 +826,220 @@ double ConsumptionSQL::getTotal(QSqlDatabase db,
   ConsumptionSQL::selectTotal(db, filter, total, error);
   return total;
 }
+
+bool UserSQL::insert(QSqlDatabase db,
+                     const User& user,
+                     const QString& strPassword,
+                     QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("INSERT INTO _USERS ("
+                "_USER,"
+                "_PASSWORD,"
+                "_ACCESS_NOTE,"
+                "_ACCESS_REMINDER,"
+                "_ACCESS_CALCULATOR,"
+                "_ACCESS_SHOP,"
+                "_ACCESS_CONSUMPTION,"
+                "_ACCESS_USER,"
+                "_ACCESS_ITEM,"
+                "_ACCESS_SETTINGS) "
+                "VALUES ("
+                "(:_user),"
+                "(:_password),"
+                "(:_accessNote),"
+                "(:_accessReminder),"
+                "(:_accessCalculator),"
+                "(:_accessShop),"
+                "(:_accessConsumption),"
+                "(:_accessUser),"
+                "(:_accessItem),"
+                "(:_accessSettings))");
+  query.bindValue(":_user", user.m_strUser);
+  query.bindValue(":_password", user.strEncryptedPassword(strPassword));
+  query.bindValue(":_accessNote", user.m_bAccessNote);
+  query.bindValue(":_accessReminder", user.m_bAccessReminder);
+  query.bindValue(":_accessCalculator", user.m_bAccessCalculator);
+  query.bindValue(":_accessShop", user.m_bAccessShop);
+  query.bindValue(":_accessConsumption", user.m_bAccessConsumption);
+  query.bindValue(":_accessUser", user.m_bAccessUser);
+  query.bindValue(":_accessItem", user.m_bAccessItem);
+  query.bindValue(":_accessSettings", user.m_bAccessSettings);
+
+  if (query.exec())
+  {
+    user.m_id = query.lastInsertId().toInt();
+    return true;
+  }
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool UserSQL::update(QSqlDatabase db,
+                     const User& user,
+                     const QString& strPassword,
+                     QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QString strQuery("UPDATE _USERS SET "
+                   "_USER = (:_user),");
+  if (!strPassword.isEmpty())
+    strQuery += "_PASSWORD = (:_password),";
+  strQuery += "_ACCESS_NOTE = (:_accessNote),"
+              "_ACCESS_REMINDER = (:_accessReminder),"
+              "_ACCESS_CALCULATOR = (:_accessCalculator),"
+              "_ACCESS_SHOP = (:_accessShop),"
+              "_ACCESS_CONSUMPTION = (:_accessConsumption),"
+              "_ACCESS_USER = (:_accessUser),"
+              "_ACCESS_ITEM = (:_accessItem),"
+              "_ACCESS_SETTINGS = (:_accessSettings) "
+              "WHERE _ID = (:_id)";
+
+
+  QSqlQuery query(db);
+  query.prepare(strQuery);
+  query.bindValue(":_id", user.m_id);
+  query.bindValue(":_user", user.m_strUser);
+  if (!strPassword.isEmpty())
+    query.bindValue(":_password", user.strEncryptedPassword(strPassword));
+  query.bindValue(":_accessNote", user.m_bAccessNote);
+  query.bindValue(":_accessReminder", user.m_bAccessReminder);
+  query.bindValue(":_accessCalculator", user.m_bAccessCalculator);
+  query.bindValue(":_accessShop", user.m_bAccessShop);
+  query.bindValue(":_accessConsumption", user.m_bAccessConsumption);
+  query.bindValue(":_accessUser", user.m_bAccessUser);
+  query.bindValue(":_accessItem", user.m_bAccessItem);
+  query.bindValue(":_accessSettings", user.m_bAccessSettings);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool UserSQL::select(QSqlDatabase db,
+                     User& user,
+                     QString& error)
+{
+  error.clear();
+  int id = user.m_id;
+  user.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  bool bFound = false;
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                "_USER,"
+                "_ACCESS_NOTE,"
+                "_ACCESS_REMINDER,"
+                "_ACCESS_CALCULATOR,"
+                "_ACCESS_SHOP,"
+                "_ACCESS_CONSUMPTION,"
+                "_ACCESS_USER,"
+                "_ACCESS_ITEM,"
+                "_ACCESS_SETTINGS "
+                "FROM _USERS "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+  if (query.exec())
+  {
+    if (query.next())
+    {
+      user.m_id = id;
+      user.m_strUser = query.value(query.record().indexOf("_USER")).toString();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_NOTE")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
+      bFound = true;
+    }
+
+    if (!bFound)
+      error = "Usuário não encontrado.";
+    return bFound;
+  }
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool UserSQL::remove(QSqlDatabase db,
+                     int id,
+                     QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM _USERS "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool UserLoginSQL::login(QSqlDatabase db,
+                         const QString& strUser,
+                         const QString& strPassword,
+                         QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("SELECT * FROM _USERS "
+                "WHERE _USER = (:_user) AND "
+                "_PASSWORD = (:_password) LIMIT 1");
+  query.bindValue(":_user", strUser);
+  query.bindValue(":_user", User::strEncryptedPassword(strPassword));
+
+  if (query.exec())
+  {
+    bool bFound = false;
+    if (query.next())
+    {
+      m_user.m_id = query.value(query.record().indexOf("_ID")).toInt();
+      m_user.m_strUser = query.value(query.record().indexOf("_USER")).toString();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_NOTE")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
+      bFound = true;
+    }
+
+    if (!bFound)
+      error = "Usuário ou senha inválidos.";
+    return bFound;
+  }
+
+  error = query.lastError().text();
+  return false;
+}

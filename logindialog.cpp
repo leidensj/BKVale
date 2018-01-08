@@ -26,8 +26,12 @@ namespace
   }
 }
 
-LoginDialog::LoginDialog(QWidget* parent)
+LoginDialog::LoginDialog(QSqlDatabase db,
+                         UserLoginSQL& login,
+                         QWidget* parent)
   : QDialog(parent)
+  , m_db(db)
+  , m_login(login)
   , m_user(nullptr)
   , m_password(nullptr)
   , m_capsLock(nullptr)
@@ -134,10 +138,10 @@ void LoginDialog::keyPressEvent(QKeyEvent* event)
 void LoginDialog::login()
 {
   QString error;
-  UserLogin userLogin;
-  if (userLogin.login(m_user->text(),
-                      m_password->text(),
-                      error))
+  if (m_login.login(m_db,
+                    m_user->text(),
+                    m_password->text(),
+                    error))
   {
     accept();
   }

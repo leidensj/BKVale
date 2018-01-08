@@ -2,6 +2,7 @@
 #define LOGINDIALOG_H
 
 #include <QDialog>
+#include <databaseutils.h>
 
 class JLineEdit;
 class QLabel;
@@ -12,7 +13,9 @@ class LoginDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit LoginDialog(QWidget* parent = 0);
+  explicit LoginDialog(QSqlDatabase db,
+                       UserLoginSQL& login,
+                       QWidget* parent = 0);
 
 private slots:
   void login();
@@ -22,6 +25,8 @@ protected:
 
 private:
   void updateCapsLock();
+  QSqlDatabase m_db;
+  UserLoginSQL& m_login;
   JLineEdit* m_user;
   JLineEdit* m_password;
   QLabel* m_capsLock;

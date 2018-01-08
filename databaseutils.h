@@ -13,6 +13,32 @@
 #define DEFAULT_NUMBER     1000
 #define DEFAULT_NUMBER_STR "1000"
 
+class UserLoginSQL
+{
+public:
+  UserLoginSQL();
+
+  bool login(QSqlDatabase db,
+             const QString& strUser,
+             const QString& strPassword,
+             QString& error);
+
+private:
+  User m_user;
+
+public:
+  bool isValid() const { return m_user.m_id != INVALID_USER_ID; }
+  QString strUser() const { return m_user.m_strUser; }
+  bool hasAccessToNote() const { return isValid() && m_user.m_bAccessNote; }
+  bool hasAccessToReminder() const { return isValid() && m_user.m_bAccessReminder; }
+  bool hasAccessToCalculator() const { return isValid() && m_user.m_bAccessCalculator; }
+  bool hasAccessToShop() const { return isValid() && m_user.m_bAccessShop; }
+  bool hasAccessToConsumption() const { return isValid() && m_user.m_bAccessConsumption; }
+  bool hasAccessToUsers() const { return isValid() && m_user.m_bAccessUser; }
+  bool hasAccessToItems() const { return isValid() && m_user.m_bAccessItem; }
+  bool hasAccessToSettings() const { return isValid() && m_user.m_bAccessSettings; }
+};
+
 namespace BaitaSQL
 {
   bool isOpen(QSqlDatabase db,
@@ -39,10 +65,12 @@ namespace UserSQL
 {
   bool insert(QSqlDatabase db,
               const User& user,
+              const QString& strPassword,
               QString& error);
 
   bool update(QSqlDatabase db,
               const User& user,
+              const QString& strPassword,
               QString& error);
 
   bool select(QSqlDatabase db,

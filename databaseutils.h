@@ -16,14 +16,14 @@
 class UserLoginSQL
 {
 public:
-  UserLoginSQL();
+  UserLoginSQL(QSqlDatabase db);
 
-  bool login(QSqlDatabase db,
-             const QString& strUser,
+  bool login(const QString& strUser,
              const QString& strPassword,
              QString& error);
 
 private:
+  QSqlDatabase m_db;
   User m_user;
 
 public:

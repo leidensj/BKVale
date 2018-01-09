@@ -287,6 +287,7 @@ bool BaitaSQL::open(QSqlDatabase db,
   error.clear();
   if (db.isOpen())
     db.close();
+  db.addDatabase("QSQLITE");
   db.setDatabaseName(path);
   bool bSuccess = db.open();
   if (!bSuccess)
@@ -1000,17 +1001,22 @@ bool UserSQL::remove(QSqlDatabase db,
   return false;
 }
 
-bool UserLoginSQL::login(QSqlDatabase db,
-                         const QString& strUser,
+UserLoginSQL::UserLoginSQL(QSqlDatabase db)
+  : m_db(db)
+{
+
+}
+
+bool UserLoginSQL::login(const QString& strUser,
                          const QString& strPassword,
                          QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(m_db, error))
     return false;
 
-  QSqlQuery query(db);
+  QSqlQuery query(m_db);
   query.prepare("SELECT * FROM _USERS "
                 "WHERE _USER = (:_user) AND "
                 "_PASSWORD = (:_password) LIMIT 1");

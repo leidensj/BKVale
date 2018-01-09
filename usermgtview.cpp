@@ -128,21 +128,21 @@ UserMgtView::UserMgtView(QWidget* parent)
 
 User UserMgtView::getUser() const
 {
-  return User(m_user->text(),
-              m_password->text(),
-              m_accessNote->isChecked(),
-              m_accessReminder->isChecked(),
-              m_accessCalculator->isChecked(),
-              m_accessShop->isChecked(),
-              m_accessConsumption->isChecked(),
-              m_accessUser->isChecked(),
-              m_accessItem->isChecked(),
-              m_accessSettings->isChecked());
+  User user;
+  user.m_strUser = m_user->text();
+  user.m_bAccessNote = m_accessNote->isChecked();
+  user.m_bAccessReminder = m_accessReminder->isChecked();
+  user.m_bAccessCalculator = m_accessCalculator->isChecked();
+  user.m_bAccessShop = m_accessShop->isChecked();
+  user.m_bAccessConsumption = m_accessConsumption->isChecked();
+  user.m_bAccessUser = m_accessUser->isChecked();
+  user.m_bAccessItem = m_accessItem->isChecked();
+  user.m_bAccessSettings = m_accessSettings->isChecked();
+  return user;
 }
 void UserMgtView::setUser(const User& user)
 {
   m_user->setText(user.m_strUser);
-  m_password->setText(user.m_strPassword);
   m_accessNote->setChecked(user.m_bAccessNote);
   m_accessReminder->setChecked(user.m_bAccessReminder);
   m_accessCalculator->setChecked(user.m_bAccessCalculator);

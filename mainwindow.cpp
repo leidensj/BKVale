@@ -20,7 +20,6 @@ BaitaAssistant::BaitaAssistant(QWidget *parent)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
-  , m_bReady(false)
   , m_db(QSqlDatabase::addDatabase("QSQLITE"))
 {
   ui->setupUi(this);
@@ -63,10 +62,6 @@ BaitaAssistant::BaitaAssistant(QWidget *parent)
                    this,
                    SLOT(enableControls()));
 
-  QObject::connect(this,
-                   SIGNAL(initSignal()),
-                   this,
-                   SLOT(init()));
 
   QObject::connect(ui->tabWidget,
                    SIGNAL(currentChanged(int)),
@@ -105,8 +100,6 @@ BaitaAssistant::BaitaAssistant(QWidget *parent)
 
   //TODO
   //connectTCP();
-
-  emit initSignal();
 }
 
 BaitaAssistant::~BaitaAssistant()
@@ -297,19 +290,19 @@ void BaitaAssistant::enableControls()
   {
     case Functionality::NoteMode:
     {
-      ui->actionPrint->setEnabled(m_note->isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_note->isValid() && bIsOpen);
     } break;
     case Functionality::ReminderMode:
     {
-      ui->actionPrint->setEnabled(m_reminder->isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_reminder->isValid() && bIsOpen);
     } break;
       case Functionality::CalculatorMode:
     {
-      ui->actionPrint->setEnabled(bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(bIsOpen);
     } break;
     case Functionality::ConsumptionMode:
     {
-      ui->actionPrint->setEnabled(m_consumption->isValid() && bIsOpen && m_bReady);
+      ui->actionPrint->setEnabled(m_consumption->isValid() && bIsOpen);
     } break;
     case Functionality::ShopMode:
     default:
@@ -319,37 +312,14 @@ void BaitaAssistant::enableControls()
 
 void BaitaAssistant::init()
 {
-  QString error;
-  bool bSuccess = BaitaSQL::open(m_db,
-                                 qApp->applicationDirPath() +
-                                 QDir::separator() +
-                                 "setup.db",
-                                 error);
-  if (bSuccess)
-    bSuccess = BaitaSQL::init(m_db, error);
-  else
-    m_db.close();
-
-  if (!bSuccess)
-  {
-    QMessageBox msgBox(QMessageBox::Critical,
-                       tr("Erro ao inicializar banco de dados"),
-                       error,
-                       QMessageBox::Ok);
-    msgBox.exec();
-  }
-  else
-  {
-    m_bReady = true;
-    BaitaSQL::selectSettings(m_db, m_settings);
-    if (!m_settings.port.isEmpty())
-      connect();
-    m_note->setDatabase(m_db);
-     m_note->create();
-    m_consumption->setDatabase(m_db);
-    m_reminder->setDatabase(m_db);
-  }
-  enableControls();
+  BaitaSQL::selectSettings(m_db, m_settings);
+  if (!m_settings.port.isEmpty())
+    connect();
+   m_note->setDatabase(m_db);
+   m_note->create();
+   m_consumption->setDatabase(m_db);
+   m_reminder->setDatabase(m_db);
+   enableControls();
 }
 
 void BaitaAssistant::showInfo()

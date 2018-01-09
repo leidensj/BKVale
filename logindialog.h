@@ -13,8 +13,7 @@ class LoginDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit LoginDialog(QSqlDatabase db,
-                       UserLoginSQL& login,
+  explicit LoginDialog(UserLoginSQL& userLogin,
                        QWidget* parent = 0);
 
 private slots:
@@ -25,8 +24,7 @@ protected:
 
 private:
   void updateCapsLock();
-  QSqlDatabase m_db;
-  UserLoginSQL& m_login;
+  UserLoginSQL& m_userLogin;
   JLineEdit* m_user;
   JLineEdit* m_password;
   QLabel* m_capsLock;

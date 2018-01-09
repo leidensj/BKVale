@@ -32,6 +32,7 @@ class BaitaAssistant : public QMainWindow
 public:
   explicit BaitaAssistant(QWidget *parent = 0);
   ~BaitaAssistant();
+  void init();
 
 private:
   Ui::BaitaAssistant *ui;
@@ -43,7 +44,6 @@ private:
   QTcpSocket m_printerTCP;
   quint16 m_nextBlockSizeTCP;
   Settings m_settings;
-  bool m_bReady;
   QSqlDatabase m_db;
 
 private slots:
@@ -53,16 +53,12 @@ private slots:
   void disconnect();
   void showSettings();
   void enableControls();
-  void init();
   void showInfo();
   void print();
   bool print(const QString& text);
   void printFullCut();
   void openItemsDialog();
   void openUsersDialog();
-
-signals:
-  void initSignal();
 };
 
 #endif // MAINWINDOW_H

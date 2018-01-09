@@ -38,7 +38,7 @@ struct User
   bool m_bAccessItem;
   bool m_bAccessSettings;
 
-  static QString strEncryptedPassword(const QString strPassword);
+  static QString strEncryptedPassword(const QString& strPassword);
 };
 
 #endif // USER_H

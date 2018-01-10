@@ -287,7 +287,6 @@ bool BaitaSQL::open(QSqlDatabase db,
   error.clear();
   if (db.isOpen())
     db.close();
-  db.addDatabase("QSQLITE");
   db.setDatabaseName(path);
   bool bSuccess = db.open();
   if (!bSuccess)
@@ -380,21 +379,23 @@ bool BaitaSQL::init(QSqlDatabase db,
   query.exec("SELECT * FROM _USERS LIMIT 1");
   if (!query.next())
   {
-     query.exec("INSERT INTO _USERS ("
-                "_USER,"
-                "_PASSWORD,"
-                "_ACCESS_NOTE,"
-                "_ACCESS_REMINDER,"
-                "_ACCESS_CALCULATOR,"
-                "_ACCESS_SHOP,"
-                "_ACCESS_CONSUMPTION,"
-                "_ACCESS_USER,"
-                "_ACCESS_ITEM,"
-                "_ACCESS_SETTINGS) "
-                "VALUES ("
-                "'ADMIN',"
-                "'a1b2c3d4',"
-                "1,1,1,1,1,1,1,1)");
+    query.prepare("INSERT INTO _USERS ("
+                  "_USER,"
+                  "_PASSWORD,"
+                  "_ACCESS_NOTE,"
+                  "_ACCESS_REMINDER,"
+                  "_ACCESS_CALCULATOR,"
+                  "_ACCESS_SHOP,"
+                  "_ACCESS_CONSUMPTION,"
+                  "_ACCESS_USER,"
+                  "_ACCESS_ITEM,"
+                  "_ACCESS_SETTINGS) "
+                  "VALUES ("
+                  "'ADMIN',"
+                  "(:_password),"
+                  "1,1,1,1,1,1,1,1)");
+    query.bindValue(":_password", User::strEncryptedPassword("admin"));
+    query.exec();
   }
 
   bool bSuccess = db.commit();
@@ -1001,10 +1002,14 @@ bool UserSQL::remove(QSqlDatabase db,
   return false;
 }
 
-UserLoginSQL::UserLoginSQL(QSqlDatabase db)
-  : m_db(db)
+UserLoginSQL::UserLoginSQL()
 {
 
+}
+
+void UserLoginSQL::setDatabase(QSqlDatabase db)
+{
+  m_db = db;
 }
 
 bool UserLoginSQL::login(const QString& strUser,
@@ -1021,7 +1026,7 @@ bool UserLoginSQL::login(const QString& strUser,
                 "WHERE _USER = (:_user) AND "
                 "_PASSWORD = (:_password) LIMIT 1");
   query.bindValue(":_user", strUser);
-  query.bindValue(":_user", User::strEncryptedPassword(strPassword));
+  query.bindValue(":_password", User::strEncryptedPassword(strPassword));
 
   if (query.exec())
   {

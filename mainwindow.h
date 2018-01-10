@@ -32,7 +32,7 @@ class BaitaAssistant : public QMainWindow
 public:
   explicit BaitaAssistant(QWidget *parent = 0);
   ~BaitaAssistant();
-  void init();
+  void setDatabase(QSqlDatabase db);
 
 private:
   Ui::BaitaAssistant *ui;

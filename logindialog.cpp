@@ -145,5 +145,7 @@ void LoginDialog::login()
   else
   {
     m_status->setText(error);
+    m_password->selectAll();
+    m_password->setFocus();
   }
 }

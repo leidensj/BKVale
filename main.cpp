@@ -9,8 +9,7 @@
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
-  BaitaAssistant w;
-  QSqlDatabase db;
+  QSqlDatabase db(QSqlDatabase::addDatabase("QSQLITE"));
   QString error;
   bool bSuccess = BaitaSQL::open(db,
                                  qApp->applicationDirPath() +
@@ -24,7 +23,6 @@ int main(int argc, char *argv[])
 
   if (!bSuccess)
   {
-    w.close();
     QMessageBox msgBox(QMessageBox::Critical,
                        QObject::tr("Erro ao inicializar banco de dados"),
                        error,
@@ -33,14 +31,19 @@ int main(int argc, char *argv[])
   }
   else
   {
-    UserLoginSQL userLogin(db);
+    UserLoginSQL userLogin;
+    userLogin.setDatabase(db);
     LoginDialog l(userLogin);
     if (l.exec() == QDialog::Accepted)
     {
-      w.init();
+      BaitaAssistant w;
+      w.setDatabase(db);
       w.show();
+      return a.exec();
+    }
+    else
+    {
+      return 0;
     }
   }
-
-  return a.exec();
 }

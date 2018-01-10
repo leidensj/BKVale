@@ -20,7 +20,6 @@ BaitaAssistant::BaitaAssistant(QWidget *parent)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
-  , m_db(QSqlDatabase::addDatabase("QSQLITE"))
 {
   ui->setupUi(this);
   m_note = new NoteWidget();
@@ -310,18 +309,6 @@ void BaitaAssistant::enableControls()
   }
 }
 
-void BaitaAssistant::init()
-{
-  BaitaSQL::selectSettings(m_db, m_settings);
-  if (!m_settings.port.isEmpty())
-    connect();
-   m_note->setDatabase(m_db);
-   m_note->create();
-   m_consumption->setDatabase(m_db);
-   m_reminder->setDatabase(m_db);
-   enableControls();
-}
-
 void BaitaAssistant::showInfo()
 {
 
@@ -357,4 +344,17 @@ void BaitaAssistant::openUsersDialog()
   dlg.setWindowIcon(QIcon(":/icons/res/user.png"));
   dlg.setModal(true);
   dlg.exec();
+}
+
+void BaitaAssistant::setDatabase(QSqlDatabase db)
+{
+  BaitaSQL::selectSettings(m_db, m_settings);
+  if (!m_settings.port.isEmpty())
+    connect();
+  m_note->setDatabase(m_db);
+  m_note->create();
+  m_consumption->setDatabase(m_db);
+  m_reminder->setDatabase(m_db);
+  enableControls();
+  m_db = db;
 }

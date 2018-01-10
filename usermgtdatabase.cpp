@@ -110,16 +110,28 @@ void UserMgtDatabase::set(QSqlDatabase db)
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
   model->setHeaderData((int)UserTableIndex::ID, Qt::Horizontal, tr("ID"));
   model->setHeaderData((int)UserTableIndex::User, Qt::Horizontal, tr("Usuário"));
-  model->setHeaderData((int)UserTableIndex::AccessNote, Qt::Horizontal, tr("Data"));
-  model->setHeaderData((int)UserTableIndex::AccessReminder, Qt::Horizontal, tr("Fornecedor"));
-  model->setHeaderData((int)UserTableIndex::AccessCalculator, Qt::Horizontal, tr("Total"));
-  model->setHeaderData((int)UserTableIndex::AccessShop, Qt::Horizontal, tr("Fornecedor"));
-  model->setHeaderData((int)UserTableIndex::AccessConsumption, Qt::Horizontal, tr("Total"));
-  model->setHeaderData((int)UserTableIndex::AccessUser, Qt::Horizontal, tr("Fornecedor"));
-  model->setHeaderData((int)UserTableIndex::AccessItem, Qt::Horizontal, tr("Total"));
-  model->setHeaderData((int)UserTableIndex::AccessSettings, Qt::Horizontal, tr("Fornecedor"));
+  model->setHeaderData((int)UserTableIndex::Password, Qt::Horizontal, tr("Senha"));
+  model->setHeaderData((int)UserTableIndex::AccessNote, Qt::Horizontal, tr("Notas"));
+  model->setHeaderData((int)UserTableIndex::AccessReminder, Qt::Horizontal, tr("Lembretes"));
+  model->setHeaderData((int)UserTableIndex::AccessCalculator, Qt::Horizontal, tr("Calculadora"));
+  model->setHeaderData((int)UserTableIndex::AccessShop, Qt::Horizontal, tr("Compras"));
+  model->setHeaderData((int)UserTableIndex::AccessConsumption, Qt::Horizontal, tr("Consumo"));
+  model->setHeaderData((int)UserTableIndex::AccessUser, Qt::Horizontal, tr("Usuários"));
+  model->setHeaderData((int)UserTableIndex::AccessItem, Qt::Horizontal, tr("Produtos"));
+  model->setHeaderData((int)UserTableIndex::AccessSettings, Qt::Horizontal, tr("Configurações"));
   m_table->setModel(model);
-  m_table->hideColumn((int)NoteTableIndex::ID);
+  m_table->hideColumn((int)UserTableIndex::ID);
+  m_table->hideColumn((int)UserTableIndex::Password);
+  m_table->hideColumn((int)UserTableIndex::AccessNote);
+  m_table->hideColumn((int)UserTableIndex::AccessReminder);
+  m_table->hideColumn((int)UserTableIndex::AccessCalculator);
+  m_table->hideColumn((int)UserTableIndex::AccessCalculator);
+  m_table->hideColumn((int)UserTableIndex::AccessShop);
+  m_table->hideColumn((int)UserTableIndex::AccessConsumption);
+  m_table->hideColumn((int)UserTableIndex::AccessUser);
+  m_table->hideColumn((int)UserTableIndex::AccessItem);
+  m_table->hideColumn((int)UserTableIndex::AccessSettings);
+
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,

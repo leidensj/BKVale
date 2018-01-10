@@ -23,12 +23,14 @@ public:
              QString& error);
 
   void setDatabase(QSqlDatabase db);
+  QSqlDatabase getDatabase() const;
 
 private:
   QSqlDatabase m_db;
   User m_user;
 
 public:
+  int getId() const { return m_user.m_id; }
   bool isValid() const { return m_user.m_id != INVALID_USER_ID; }
   QString strUser() const { return m_user.m_strUser; }
   bool hasAccessToNote() const { return isValid() && m_user.m_bAccessNote; }

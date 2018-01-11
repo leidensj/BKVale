@@ -963,13 +963,13 @@ bool UserSQL::select(QSqlDatabase db,
       user.m_id = id;
       user.m_strUser = query.value(query.record().indexOf("_USER")).toString();
       user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_NOTE")).toBool();
-      user.m_bAccessReminder = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
-      user.m_bAccessCalculator = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
-      user.m_bAccessShop = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
-      user.m_bAccessConsumption = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
-      user.m_bAccessUser = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
-      user.m_bAccessItem = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
-      user.m_bAccessSettings = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
+      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
       bFound = true;
     }
 
@@ -1012,11 +1012,6 @@ void UserLoginSQL::setDatabase(QSqlDatabase db)
   m_db = db;
 }
 
-QSqlDatabase UserLoginSQL::getDatabase() const
-{
-  return m_db;
-}
-
 bool UserLoginSQL::login(const QString& strUser,
                          const QString& strPassword,
                          QString& error)
@@ -1041,13 +1036,13 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_id = query.value(query.record().indexOf("_ID")).toInt();
       m_user.m_strUser = query.value(query.record().indexOf("_USER")).toString();
       m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_NOTE")).toBool();
-      m_user.m_bAccessReminder = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
-      m_user.m_bAccessCalculator = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
-      m_user.m_bAccessShop = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
-      m_user.m_bAccessConsumption = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
-      m_user.m_bAccessUser = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
-      m_user.m_bAccessItem = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
-      m_user.m_bAccessSettings = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
+      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
       bFound = true;
     }
 

@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
     LoginDialog l(userLogin);
     if (l.exec() == QDialog::Accepted)
     {
-      BaitaAssistant w(userLogin);
-      w.init();
+      BaitaAssistant w;
+      w.setDatabase(db);
       w.show();
       return a.exec();
     }

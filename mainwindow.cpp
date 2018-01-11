@@ -8,16 +8,14 @@
 #include "consumptionwidget.h"
 #include "calculatorwidget.h"
 #include "usermgtwidget.h"
-#include "logindialog.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
 #include <QDir>
 
-BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
+BaitaAssistant::BaitaAssistant(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::BaitaAssistant)
-  , m_userLogin(userLogin)
   , m_note(nullptr)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
@@ -63,6 +61,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(enableControls()));
 
+
   QObject::connect(ui->tabWidget,
                    SIGNAL(currentChanged(int)),
                    this,
@@ -97,11 +96,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(connected()),
                    this,
                    SLOT(connectedTCP()));
-
-  QObject::connect(ui->actionLogin,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openLoginDialog()));
 
   //TODO
   //connectTCP();
@@ -262,7 +256,7 @@ void BaitaAssistant::showSettings()
     {
       m_settings = dlg.getSettings();
       QString error;
-      if (!BaitaSQL::insertSettings(m_userLogin.getDatabase(),
+      if (!BaitaSQL::insertSettings(m_db,
                                     m_settings,
                                     error))
       {
@@ -286,20 +280,10 @@ void BaitaAssistant::showSettings()
 
 void BaitaAssistant::enableControls()
 {
-  const bool bIsSQLOk = m_userLogin.getDatabase().isOpen();
   const bool bIsOpen = m_printer.isOpen();
-  ui->actionConnect->setEnabled(!bIsOpen && bIsSQLOk);
-  ui->actionDisconnect->setEnabled(bIsOpen && bIsSQLOk);
-  ui->actionSettings->setEnabled(!bIsOpen && bIsSQLOk);
-  ui->actionLogin->setEnabled(bIsSQLOk);
-  ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
-  ui->actionItems->setEnabled(bIsSQLOk && m_userLogin.hasAccessToItems());
-
-  ui->tabNotes->setEnabled(bIsSQLOk && m_userLogin.hasAccessToNote());
-  ui->tabReminder->setEnabled(bIsSQLOk && m_userLogin.hasAccessToReminder());
-  ui->tabCalculator->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCalculator());
-  ui->tabShop->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShop());
-  ui->tabConsumption->setEnabled(bIsSQLOk && m_userLogin.hasAccessToConsumption());
+  ui->actionConnect->setEnabled(!bIsOpen);
+  ui->actionDisconnect->setEnabled(bIsOpen);
+  ui->actionSettings->setEnabled(!bIsOpen);
 
   switch ((Functionality)ui->tabWidget->currentIndex())
   {
@@ -336,7 +320,7 @@ void BaitaAssistant::openItemsDialog()
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
   ItemWidget* itemWidget = new ItemWidget(true);
-  itemWidget->setDatabase(m_userLogin.getDatabase());
+  itemWidget->setDatabase(m_db);
   layout->addWidget(itemWidget);
   dlg.resize(640, 480);
   dlg.setWindowFlags(Qt::Window);
@@ -352,8 +336,8 @@ void BaitaAssistant::openUsersDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  UserMgtWidget* w = new UserMgtWidget(m_userLogin.getId());
-  w->setDatabase(m_userLogin.getDatabase());
+  UserMgtWidget* w = new UserMgtWidget();
+  //w->setDatabase(m_db);
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Usuários"));
@@ -362,24 +346,15 @@ void BaitaAssistant::openUsersDialog()
   dlg.exec();
 }
 
-void BaitaAssistant::init()
+void BaitaAssistant::setDatabase(QSqlDatabase db)
 {
-  BaitaSQL::selectSettings(m_userLogin.getDatabase(), m_settings);
+  BaitaSQL::selectSettings(m_db, m_settings);
   if (!m_settings.port.isEmpty())
     connect();
-  m_note->setDatabase(m_userLogin.getDatabase());
+  m_note->setDatabase(m_db);
   m_note->create();
-  m_consumption->setDatabase(m_userLogin.getDatabase());
-  m_reminder->setDatabase(m_userLogin.getDatabase());
+  m_consumption->setDatabase(m_db);
+  m_reminder->setDatabase(m_db);
   enableControls();
-}
-
-void BaitaAssistant::openLoginDialog()
-{
-  LoginDialog l(m_userLogin);
-  if (l.exec() == QDialog::Accepted)
-  {
-    m_userLogin;
-    enableControls();
-  }
+  m_db = db;
 }

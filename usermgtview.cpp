@@ -9,7 +9,6 @@
 
 UserMgtView::UserMgtView(QWidget* parent)
   : QFrame(parent)
-  , m_currentID(INVALID_USER_ID)
   , m_user(nullptr)
   , m_password(nullptr)
   , m_viewPassword(nullptr)
@@ -50,9 +49,6 @@ UserMgtView::UserMgtView(QWidget* parent)
   m_user = new JLineEdit(true, true);
   m_user->setPlaceholderText(tr("Usuário"));
   m_user->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9]*"), this));
-
-  QLabel* lblPasswordMsg = new QLabel();
-  lblPasswordMsg->setText(tr("Redefinir a senha:"));
 
   m_password = new JLineEdit(true, true);
   m_password->setPlaceholderText(tr("Senha"));
@@ -125,26 +121,14 @@ UserMgtView::UserMgtView(QWidget* parent)
   QVBoxLayout* v1 = new QVBoxLayout();
   v1->addLayout(h0);
   v1->addLayout(h1);
-  v1->addWidget(lblPasswordMsg);
   v1->addLayout(h2);
   v1->addWidget(gbox);
   setLayout(v1);
-
-  QObject::connect(m_create,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(create()));
-
-  QObject::connect(m_save,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(emitSaveSignal()));
 }
 
 User UserMgtView::getUser() const
 {
   User user;
-  user.m_id = m_currentID;
   user.m_strUser = m_user->text();
   user.m_bAccessNote = m_accessNote->isChecked();
   user.m_bAccessReminder = m_accessReminder->isChecked();
@@ -158,9 +142,7 @@ User UserMgtView::getUser() const
 }
 void UserMgtView::setUser(const User& user)
 {
-  m_currentID = user.m_id;
   m_user->setText(user.m_strUser);
-  m_password->setText("");
   m_accessNote->setChecked(user.m_bAccessNote);
   m_accessReminder->setChecked(user.m_bAccessReminder);
   m_accessCalculator->setChecked(user.m_bAccessCalculator);
@@ -169,24 +151,4 @@ void UserMgtView::setUser(const User& user)
   m_accessUser->setChecked(user.m_bAccessUser);
   m_accessItem->setChecked(user.m_bAccessItem);
   m_accessSettings->setChecked(user.m_bAccessSettings);
-}
-
-void UserMgtView::create()
-{
-  m_currentID = INVALID_USER_ID;
-  m_user->setText("");
-  m_accessNote->setChecked(false);
-  m_accessReminder->setChecked(false);
-  m_accessCalculator->setChecked(false);
-  m_accessShop->setChecked(false);
-  m_accessConsumption->setChecked(false);
-  m_accessUser->setChecked(false);
-  m_accessItem->setChecked(false);
-  m_accessSettings->setChecked(false);
-}
-
-void UserMgtView::emitSaveSignal()
-{
-  User user = getUser();
-  emit saveSignal(user);
 }

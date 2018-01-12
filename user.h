@@ -4,7 +4,8 @@
 #include <QString>
 
 #define INVALID_USER_ID     -1
-#define MAX_USERNAME_LENGTH 20
+#define USER_MAX_USERNAME_LENGTH 20
+#define USER_MAX_PASSWORD_LENGTH 20
 
 enum class UserTableIndex : int
 {
@@ -38,6 +39,7 @@ struct User
   bool m_bAccessItem;
   bool m_bAccessSettings;
 
+  static bool isValidID(int id) { return id != INVALID_USER_ID; }
   static QString strEncryptedPassword(const QString& strPassword);
 };
 

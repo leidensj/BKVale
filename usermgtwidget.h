@@ -23,6 +23,7 @@ private:
 private slots:
   void setUser(int id);
   void removeUser(int id);
+  void save();
 };
 
 #endif // USERMGTWIDGET_H

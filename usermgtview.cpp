@@ -6,11 +6,13 @@
 #include <QLayout>
 #include <QRegExpValidator>
 #include <QGroupBox>
+#include <QMessageBox>
 
 UserMgtView::UserMgtView(QWidget* parent)
   : QFrame(parent)
   , m_currentID(INVALID_USER_ID)
   , m_user(nullptr)
+  , m_lblPasswordMsg(nullptr)
   , m_password(nullptr)
   , m_viewPassword(nullptr)
   , m_accessNote(nullptr)
@@ -49,13 +51,15 @@ UserMgtView::UserMgtView(QWidget* parent)
 
   m_user = new JLineEdit(true, true);
   m_user->setPlaceholderText(tr("Usuário"));
+  m_user->setMaxLength(USER_MAX_USERNAME_LENGTH);
   m_user->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9]*"), this));
 
-  QLabel* lblPasswordMsg = new QLabel();
-  lblPasswordMsg->setText(tr("Redefinir a senha:"));
+  m_lblPasswordMsg = new QLabel();
+  m_lblPasswordMsg->setText(tr("Redefinir a senha:"));
 
-  m_password = new JLineEdit(true, true);
+  m_password = new JLineEdit(false, true);
   m_password->setPlaceholderText(tr("Senha"));
+  m_user->setMaxLength(USER_MAX_PASSWORD_LENGTH);
   m_password->setEchoMode(QLineEdit::EchoMode::Password);
 
   m_viewPassword = new QPushButton();
@@ -63,7 +67,7 @@ UserMgtView::UserMgtView(QWidget* parent)
   m_viewPassword->setText("");
   m_viewPassword->setIconSize(QSize(16, 16));
   m_viewPassword->setIcon(QIcon(":/icons/res/view.png"));
-  m_viewPassword->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+  m_viewPassword->setCheckable(true);
 
   m_accessNote = new QCheckBox();
   m_accessNote->setIcon(QIcon(":/icons/res/note.png"));
@@ -125,7 +129,7 @@ UserMgtView::UserMgtView(QWidget* parent)
   QVBoxLayout* v1 = new QVBoxLayout();
   v1->addLayout(h0);
   v1->addLayout(h1);
-  v1->addWidget(lblPasswordMsg);
+  v1->addWidget(m_lblPasswordMsg);
   v1->addLayout(h2);
   v1->addWidget(gbox);
   setLayout(v1);
@@ -139,6 +143,12 @@ UserMgtView::UserMgtView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSaveSignal()));
+
+  QObject::connect(m_viewPassword,
+                   SIGNAL(toggled(bool)),
+                   this,
+                   SLOT(viewPassword(bool)));
+  create();
 }
 
 User UserMgtView::getUser() const
@@ -156,8 +166,10 @@ User UserMgtView::getUser() const
   user.m_bAccessSettings = m_accessSettings->isChecked();
   return user;
 }
+
 void UserMgtView::setUser(const User& user)
 {
+  m_lblPasswordMsg->show();
   m_currentID = user.m_id;
   m_user->setText(user.m_strUser);
   m_password->setText("");
@@ -173,8 +185,10 @@ void UserMgtView::setUser(const User& user)
 
 void UserMgtView::create()
 {
+  m_lblPasswordMsg->hide();
   m_currentID = INVALID_USER_ID;
   m_user->setText("");
+  m_password->setText("");
   m_accessNote->setChecked(false);
   m_accessReminder->setChecked(false);
   m_accessCalculator->setChecked(false);
@@ -183,10 +197,32 @@ void UserMgtView::create()
   m_accessUser->setChecked(false);
   m_accessItem->setChecked(false);
   m_accessSettings->setChecked(false);
+  m_user->setFocus();
 }
 
 void UserMgtView::emitSaveSignal()
 {
-  User user = getUser();
-  emit saveSignal(user);
+  if (m_user->text().isEmpty())
+  {
+
+    QMessageBox::warning(this,
+                          tr("Usuário inválido"),
+                          tr("O nome de usuário é obrigatório."),
+                          QMessageBox::Ok);
+  }
+  else
+  {
+    emit saveSignal();
+  }
+}
+
+QString UserMgtView::getPassword() const
+{
+  return m_password->text();
+}
+
+void UserMgtView::viewPassword(bool b)
+{
+  m_password->setEchoMode( b ? QLineEdit::EchoMode::Normal
+                             : QLineEdit::EchoMode::Password);
 }

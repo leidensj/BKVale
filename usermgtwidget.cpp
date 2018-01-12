@@ -36,6 +36,13 @@ UserMgtWidget::UserMgtWidget(int currentUserID, QWidget* parent)
                    SIGNAL(userRemoveSignal(int)),
                    this,
                    SLOT(removeUser(int)));
+
+  QObject::connect(m_view,
+                   SIGNAL(saveSignal()),
+                   this,
+                   SLOT(save()));
+
+  m_view->create();
 }
 
 void UserMgtWidget::setDatabase(QSqlDatabase db)
@@ -92,9 +99,31 @@ void UserMgtWidget::removeUser(int id)
     {
       QMessageBox::critical(this,
                             tr("Erro"),
-                            tr("Erro '%1' ao remover a nota com ID '%2'.").arg(error, id),
+                            tr("Erro '%1' ao remover usuário com ID '%2'.").arg(error, id),
                             QMessageBox::Ok);
     }
+  }
+}
+
+void UserMgtWidget::save()
+{
+  QString error;
+  User user = m_view->getUser();
+  bool bSuccess = User::isValidID(user.m_id)
+                  ? UserSQL::update(m_database->get(), user, m_view->getPassword(), error)
+                  : UserSQL::insert(m_database->get(), user, m_view->getPassword(), error);
+
+  if (bSuccess)
+  {
+    m_view->create();
+    m_database->refresh();
+  }
+  else
+  {
+    QMessageBox::critical(this,
+                          tr("Erro"),
+                          tr("Erro '%1' ao salvar usuário.").arg(error),
+                          QMessageBox::Ok);
   }
 }
 

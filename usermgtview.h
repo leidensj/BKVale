@@ -17,12 +17,14 @@ public:
   explicit UserMgtView(QWidget* parent = 0);
   User getUser() const;
   void setUser(const User& user);
+  QString getPassword() const;
 
 private:
   int m_currentID;
   QPushButton* m_create;
   QPushButton* m_save;
   JLineEdit* m_user;
+  QLabel* m_lblPasswordMsg;
   JLineEdit* m_password;
   QPushButton* m_viewPassword;
   QCheckBox* m_accessNote;
@@ -39,9 +41,10 @@ public slots:
 
 private slots:
   void emitSaveSignal();
+  void viewPassword(bool b);
 
 signals:
-  saveSignal(const User& user);
+  saveSignal();
 };
 
 #endif // USERMGTVIEW_H

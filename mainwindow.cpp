@@ -290,16 +290,21 @@ void BaitaAssistant::enableControls()
   const bool bIsOpen = m_printer.isOpen();
   ui->actionConnect->setEnabled(!bIsOpen && bIsSQLOk);
   ui->actionDisconnect->setEnabled(bIsOpen && bIsSQLOk);
-  ui->actionSettings->setEnabled(!bIsOpen && bIsSQLOk);
+  ui->actionSettings->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSettings());
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
   ui->actionItems->setEnabled(bIsSQLOk && m_userLogin.hasAccessToItems());
 
-  ui->tabNotes->setEnabled(bIsSQLOk && m_userLogin.hasAccessToNote());
-  ui->tabReminder->setEnabled(bIsSQLOk && m_userLogin.hasAccessToReminder());
-  ui->tabCalculator->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCalculator());
-  ui->tabShop->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShop());
-  ui->tabConsumption->setEnabled(bIsSQLOk && m_userLogin.hasAccessToConsumption());
+  ui->tabWidget->setTabEnabled((int)Functionality::NoteMode,
+                               bIsSQLOk && m_userLogin.hasAccessToNote());
+  ui->tabWidget->setTabEnabled((int)Functionality::ReminderMode,
+                               bIsSQLOk && m_userLogin.hasAccessToReminder());
+  ui->tabWidget->setTabEnabled((int)Functionality::CalculatorMode,
+                               bIsSQLOk && m_userLogin.hasAccessToCalculator());
+  ui->tabWidget->setTabEnabled((int)Functionality::ConsumptionMode,
+                               bIsSQLOk && m_userLogin.hasAccessToShop());
+  ui->tabWidget->setTabEnabled((int)Functionality::ShopMode,
+                               bIsSQLOk && m_userLogin.hasAccessToConsumption());
 
   switch ((Functionality)ui->tabWidget->currentIndex())
   {
@@ -377,9 +382,6 @@ void BaitaAssistant::init()
 void BaitaAssistant::openLoginDialog()
 {
   LoginDialog l(m_userLogin);
-  if (l.exec() == QDialog::Accepted)
-  {
-    m_userLogin;
-    enableControls();
-  }
+  l.exec();
+  enableControls();
 }

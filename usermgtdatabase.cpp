@@ -131,6 +131,8 @@ void UserMgtDatabase::set(QSqlDatabase db)
   m_table->hideColumn((int)UserTableIndex::AccessUser);
   m_table->hideColumn((int)UserTableIndex::AccessItem);
   m_table->hideColumn((int)UserTableIndex::AccessSettings);
+  m_table->horizontalHeader()->setHighlightSections(false);
+  m_table->horizontalHeader()->setSectionResizeMode((int)UserTableIndex::User, QHeaderView::Stretch);
 
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),

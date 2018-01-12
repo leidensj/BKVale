@@ -19,6 +19,7 @@ public:
   void setUser(const User& user);
 
 private:
+  int m_currentID;
   QPushButton* m_create;
   QPushButton* m_save;
   JLineEdit* m_user;
@@ -32,6 +33,15 @@ private:
   QCheckBox* m_accessUser;
   QCheckBox* m_accessItem;
   QCheckBox* m_accessSettings;
+
+public slots:
+  void create();
+
+private slots:
+  void emitSaveSignal();
+
+signals:
+  saveSignal(const User& user);
 };
 
 #endif // USERMGTVIEW_H

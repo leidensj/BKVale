@@ -3,24 +3,16 @@
 
 #include <QSerialPort>
 
-struct Serial
-{
-  QString m_port;
-  QSerialPort::BaudRate m_baudRate;
-  QSerialPort::DataBits m_dataBits;
-  QSerialPort::FlowControl m_flowControl;
-  QSerialPort::Parity m_parity;
-  QSerialPort::StopBits m_stopBits;
-
-  Serial();
-  void clear();
-};
-
 struct Settings
 {
   Settings();
   QString m_filePath;
-  Serial m_serial;
+  QString m_serialPort;
+  QSerialPort::BaudRate m_serialBaudRate;
+  QSerialPort::DataBits m_serialDataBits;
+  QSerialPort::FlowControl m_serialFlowControl;
+  QSerialPort::Parity m_serialParity;
+  QSerialPort::StopBits m_serialStopBits;
 
   void clear();
   void save() const;

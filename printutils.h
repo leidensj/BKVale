@@ -34,7 +34,7 @@ void fullCut(QSerialPort& printer);
 
 namespace NotePrinter
 {
-  QString build(const Note& note);
+  QString build(const Note& note, int number);
 }
 
 namespace ReminderPrinter

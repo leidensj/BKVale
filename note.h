@@ -45,7 +45,6 @@ struct NoteItem
 struct Note
 {
   mutable int m_id;
-  int m_number;
   qint64 m_date;
   QString m_supplier;
   QVector<NoteItem> m_items;
@@ -58,7 +57,7 @@ struct Note
   QString strDayOfWeek() const;
   QString strId() const { return QString::number(m_id); }
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
-  QString strNumber() const { return QString::number(m_number); }
+  static QString strNumber(int number) { return QString::number(number); }
   static bool isValidID(int id) { return id != INVALID_NOTE_ID; }
 };
 

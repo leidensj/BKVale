@@ -116,7 +116,7 @@ void BaitaAssistant::connect()
 {
   if (m_printer.isOpen())
   {
-    if (m_printer.portName() != m_settings.m_serial.m_port)
+    if (m_printer.portName() != m_settings.m_serialPort)
     {
       m_printer.close();
     }
@@ -131,9 +131,9 @@ void BaitaAssistant::connect()
     }
   }
 
-  if (!m_settings.m_serial.m_port.isEmpty())
+  if (!m_settings.m_serialPort.isEmpty())
   {
-    m_printer.setPortName(m_settings.m_serial.m_port);
+    m_printer.setPortName(m_settings.m_serialPort);
     if (!m_printer.open((QIODevice::ReadWrite)))
     {
       QMessageBox msgBox(QMessageBox::Critical,
@@ -196,11 +196,7 @@ void BaitaAssistant::print()
   {
     case Functionality::NoteMode:
     {
-      if (m_note->print(m_printer))
-      {
-        if (m_note->save())
-          m_note->create();
-      }
+      m_note->saveAndPrint(m_printer);
     } break;
     case Functionality::ReminderMode:
     {
@@ -261,17 +257,7 @@ void BaitaAssistant::showSettings()
     if (dlg.exec() == QDialog::Accepted)
     {
       m_settings = dlg.getSettings();
-      QString error;
-      if (!BaitaSQL::insertSettings(m_userLogin.getDatabase(),
-                                    m_settings,
-                                    error))
-      {
-        QMessageBox msgBox(QMessageBox::Critical,
-                           tr("Erro ao salvar a configuração"),
-                           error,
-                           QMessageBox::Ok);
-        msgBox.exec();
-      }
+      m_settings.save();
     }
   }
   else
@@ -365,12 +351,27 @@ void BaitaAssistant::openUsersDialog()
   dlg.setWindowIcon(QIcon(":/icons/res/user.png"));
   dlg.setModal(true);
   dlg.exec();
+  hide();
+  LoginDialog l(m_userLogin);
+  if (!l.exec())
+  {
+    QMessageBox::critical(this,
+                          tr("Login não realizado"),
+                          tr("A aplicação será encerrada."),
+                          QMessageBox::Ok);
+    close();
+  }
+  else
+  {
+    show();
+    enableControls();
+  }
 }
 
 void BaitaAssistant::init()
 {
-  BaitaSQL::selectSettings(m_userLogin.getDatabase(), m_settings);
-  if (!m_settings.port.isEmpty())
+  m_settings.load();
+  if (!m_settings.m_serialPort.isEmpty())
     connect();
   m_note->setDatabase(m_userLogin.getDatabase());
   m_note->create();

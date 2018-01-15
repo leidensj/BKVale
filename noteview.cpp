@@ -491,13 +491,12 @@ Note NoteView::getNote() const
   note.m_id = m_currentID;
   note.m_date = m_dtDate->date().toJulianDay();
   note.m_supplier = m_cbSupplier->currentText();
-  note.m_number = m_snNumber->value();
   note.m_total = m_edTotal->text().toDouble();
   m_table->getItems(note.m_items);
   return note;
 }
 
-void NoteView::setNote(const Note& note, const QStringList& suppliers)
+void NoteView::setNote(const Note& note, int number, const QStringList& suppliers)
 {
   m_table->setRowCount(0);
   m_cbSupplier->clear();
@@ -509,7 +508,7 @@ void NoteView::setNote(const Note& note, const QStringList& suppliers)
   m_currentID = note.m_id;
   m_dtDate->setDate(QDate::fromJulianDay(note.m_date));
   m_cbSupplier->setCurrentText(note.m_supplier);
-  m_snNumber->setValue(note.m_number);
+  m_snNumber->setValue(number);
   for (int row = 0; row != note.m_items.size(); ++row)
   {
     addItem();

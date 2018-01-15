@@ -12,9 +12,9 @@ int NoteSQL::nextNumber(QSqlDatabase db)
   if (!db.isOpen())
     return -1;
 
-  QSqlQuery query("SELECT _LASTNUMBER FROM _SETTINGS", db);
-  int idx = query.record().indexOf("_LASTNUMBER");
-  return query.next() ? query.value(idx).toInt() : DEFAULT_NUMBER;
+  QSqlQuery query("SELECT MAX(_NUMBER) FROM _PROMISSORYNOTES", db);
+  int number = query.next() ? query.value(0).toInt() + 1 : DEFAULT_NUMBER;
+  return number > DEFAULT_NUMBER ? number : DEFAULT_NUMBER;
 }
 
 QStringList NoteSQL::suppliers(QSqlDatabase db)
@@ -45,6 +45,13 @@ bool NoteSQL::insert(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
+
+  query.exec("SELECT MAX(_NUMBER) FROM _PROMISSORYNOTES");
+  int number = query.next()
+               ? query.value(0).toInt() + 1
+               : DEFAULT_NUMBER;
+  number = number > DEFAULT_NUMBER ? number : DEFAULT_NUMBER;
+
   query.prepare("INSERT INTO _PROMISSORYNOTES ("
                 "_NUMBER,"
                 "_DATE,"
@@ -55,7 +62,7 @@ bool NoteSQL::insert(QSqlDatabase db,
                 "(:_date),"
                 "(:_supplier),"
                 "(:_total))");
-  query.bindValue(":_number", note.m_number);
+  query.bindValue(":_number", number);
   query.bindValue(":_date", note.m_date);
   query.bindValue(":_supplier", note.m_supplier);
   query.bindValue(":_total", note.m_total);
@@ -86,15 +93,6 @@ bool NoteSQL::insert(QSqlDatabase db,
     note.m_items.at(i).m_id = query.lastInsertId().toInt();
   }
 
-  query.exec("SELECT _LASTNUMBER FROM _SETTINGS");
-  int n = query.next()
-          ? query.value(query.record().indexOf("_LASTNUMBER")).toInt()
-          : DEFAULT_NUMBER;
-  n++;
-  query.prepare("UPDATE _SETTINGS SET _LASTNUMBER = :_number");
-  query.bindValue(":_number", n);
-  query.exec();
-
   if (db.commit())
     return true;
 
@@ -114,13 +112,11 @@ bool NoteSQL::update(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE _PROMISSORYNOTES SET "
-                "_NUMBER = (:_number),"
                 "_DATE = (:_date),"
                 "_SUPPLIER = (:_supplier),"
                 "_TOTAL = (:_total) "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", note.m_id);
-  query.bindValue(":_number", note.m_number);
   query.bindValue(":_date", note.m_date);
   query.bindValue(":_supplier", note.m_supplier);
   query.bindValue(":_total", note.m_total);
@@ -179,6 +175,7 @@ bool NoteSQL::update(QSqlDatabase db,
 
 bool NoteSQL::select(QSqlDatabase db,
                      Note& note,
+                     int& number,
                      QString& error)
 {
   error.clear();
@@ -203,7 +200,7 @@ bool NoteSQL::select(QSqlDatabase db,
   if (query.next())
   {
     note.m_id = id;
-    note.m_number = query.value(query.record().indexOf("_NUMBER")).toInt();
+    number = query.value(query.record().indexOf("_NUMBER")).toInt();
     note.m_date = query.value(query.record().indexOf("_DATE")).toLongLong();
     note.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
     note.m_total = query.value(query.record().indexOf("_TOTAL")).toDouble();
@@ -309,18 +306,6 @@ bool BaitaSQL::init(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.exec("CREATE TABLE IF NOT EXISTS _SETTINGS ("
-             "_LASTNUMBER INTEGER DEFAULT " DEFAULT_NUMBER_STR ","
-             "_SERIALPORT TEXT,"
-             "_BAUDRATE INTEGER DEFAULT 9600,"
-             "_DATABITS INTEGER DEFAULT 8,"
-             "_FLOWCONTROL INTEGER DEFAULT 0,"
-             "_PARITY INTEGER DEFAULT 0,"
-             "_STOPBITS INTEGER DEFAULT 1)");
-
-  query.exec("SELECT * FROM _SETTINGS LIMIT 1");
-  if (!query.next())
-    query.exec("INSERT INTO _SETTINGS DEFAULT VALUES");
 
   query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -403,70 +388,6 @@ bool BaitaSQL::init(QSqlDatabase db,
     error = db.lastError().text();
 
   return bSuccess;
-}
-
-bool BaitaSQL::insertSettings(QSqlDatabase db,
-                              const Settings& settings,
-                              QString& error)
-{
-  if (!isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
-  bool bSuccess = query.prepare("UPDATE _SETTINGS SET "
-                                "_BAUDRATE = :_baudrate,"
-                                "_DATABITS = :_databits,"
-                                "_FLOWCONTROL = :_flowcontrol,"
-                                "_PARITY = :_parity,"
-                                "_STOPBITS = :_stopbits,"
-                                "_SERIALPORT = :_serialport");
-  if (bSuccess)
-  {
-    query.bindValue(":_baudrate", (int)settings.baudRate);
-    query.bindValue(":_databits", (int)settings.dataBits);
-    query.bindValue(":_flowcontrol", (int)settings.flowControl);
-    query.bindValue(":_parity", (int)settings.parity);
-    query.bindValue(":_stopbits", (int)settings.stopBits);
-    query.bindValue(":_serialport", settings.port);
-    bSuccess = query.exec();
-  }
-
-  if (!bSuccess)
-    error = query.lastError().text();
-  return bSuccess;
-}
-
-void BaitaSQL::selectSettings(QSqlDatabase db,
-                              Settings& settings)
-{
-  settings.clear();
-  QString error;
-  if (isOpen(db, error))
-  {
-    QSqlQuery query(db);
-    query.prepare("SELECT * FROM _SETTINGS LIMIT 1");
-    if (query.exec())
-    {
-      if (query.next())
-      {
-        settings.baudRate = (QSerialPort::BaudRate)
-                            query.value(query.record().indexOf("_BAUDRATE")).toInt();
-        settings.dataBits = (QSerialPort::DataBits)
-                            query.value(query.record().indexOf("_DATABITS")).toInt();
-        settings.flowControl = (QSerialPort::FlowControl)
-                               query.value(query.record().indexOf("_FLOWCONTROL")).toInt();
-        settings.parity = (QSerialPort::Parity)
-                               query.value(query.record().indexOf("_PARITY")).toInt();
-        settings.stopBits = (QSerialPort::StopBits)
-                               query.value(query.record().indexOf("_STOPBITS")).toInt();
-        settings.port = query.value(query.record().indexOf("_SERIALPORT")).toString();
-      }
-    }
-    else
-    {
-      qDebug() << query.lastError().text();
-    }
-  }
 }
 
 bool ItemSQL::select(QSqlDatabase db,

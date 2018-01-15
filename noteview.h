@@ -94,7 +94,7 @@ public slots:
   void removeItem();
   void create(int number, const QStringList& suppliers);
   void supplierEntered();
-  void setNote(const Note& note, const QStringList& suppliers);
+  void setNote(const Note& note, int number, const QStringList& suppliers);
   void updateControls();
 
 signals:

@@ -5,7 +5,7 @@
 
 namespace
 {
-  void noteAppendHeader(const Note& note, QString& strNote)
+  void noteAppendHeader(const Note& note, int number, QString& strNote)
   {
     strNote += ESC_EXPAND_ON
                ESC_ALIGN_CENTER
@@ -27,7 +27,7 @@ namespace
                ESC_ALIGN_LEFT
                "Numero     "
                ESC_DOUBLE_FONT_ON +
-               note.strNumber() +
+               Note::strNumber(number) +
                ESC_LF
                "Data       "
                ESC_DOUBLE_FONT_ON +
@@ -143,10 +143,10 @@ void Printer::fullCut(QSerialPort& printer)
   print(printer, ESC_FULL_CUT, error);
 }
 
-QString NotePrinter::build(const Note& note)
+QString NotePrinter::build(const Note& note, int number)
 {
   QString strNote1;
-  noteAppendHeader(note, strNote1);
+  noteAppendHeader(note, number, strNote1);
   noteAppendBody(note, strNote1);
   noteAppendFooter(note, strNote1);
   QString strNote2(strNote1);

@@ -60,20 +60,20 @@ void SettingsDlg::doDataExchange(bool toUI)
 {
   if (toUI)
   {
-    ui->cbBaudrate->setCurrentIndex(ui->cbBaudrate->findData(m_settings.baudRate));
-    ui->cbFlow->setCurrentIndex(ui->cbFlow->findData(m_settings.flowControl));
-    ui->cbDataBits->setCurrentIndex(ui->cbDataBits->findData(m_settings.dataBits));
-    ui->cbStopBits->setCurrentIndex(ui->cbStopBits->findData(m_settings.stopBits));
-    ui->cbParity->setCurrentIndex(ui->cbParity->findData(m_settings.parity));
+    ui->cbBaudrate->setCurrentIndex(ui->cbBaudrate->findData(m_settings.m_serialBaudRate));
+    ui->cbFlow->setCurrentIndex(ui->cbFlow->findData(m_settings.m_serialFlowControl));
+    ui->cbDataBits->setCurrentIndex(ui->cbDataBits->findData(m_settings.m_serialDataBits));
+    ui->cbStopBits->setCurrentIndex(ui->cbStopBits->findData(m_settings.m_serialStopBits));
+    ui->cbParity->setCurrentIndex(ui->cbParity->findData(m_settings.m_serialParity));
   }
   else
   {
-    m_settings.port = ui->cbPort->currentText();
-    m_settings.baudRate = (QSerialPort::BaudRate)ui->cbBaudrate->currentData().toUInt();
-    m_settings.dataBits = (QSerialPort::DataBits)ui->cbDataBits->currentData().toUInt();
-    m_settings.flowControl = (QSerialPort::FlowControl)ui->cbFlow->currentData().toUInt();
-    m_settings.parity = (QSerialPort::Parity)ui->cbParity->currentData().toUInt();
-    m_settings.stopBits = (QSerialPort::StopBits)ui->cbStopBits->currentData().toUInt();
+    m_settings.m_serialPort = ui->cbPort->currentText();
+    m_settings.m_serialBaudRate = (QSerialPort::BaudRate)ui->cbBaudrate->currentData().toUInt();
+    m_settings.m_serialDataBits = (QSerialPort::DataBits)ui->cbDataBits->currentData().toUInt();
+    m_settings.m_serialFlowControl = (QSerialPort::FlowControl)ui->cbFlow->currentData().toUInt();
+    m_settings.m_serialParity = (QSerialPort::Parity)ui->cbParity->currentData().toUInt();
+    m_settings.m_serialStopBits = (QSerialPort::StopBits)ui->cbStopBits->currentData().toUInt();
   }
 }
 

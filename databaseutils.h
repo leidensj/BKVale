@@ -56,13 +56,6 @@ namespace BaitaSQL
 
   bool init(QSqlDatabase db,
             QString& error);
-
-  bool insertSettings(QSqlDatabase db,
-                      const Settings& settings,
-                      QString& error);
-
-  void selectSettings(QSqlDatabase db,
-                      Settings& settings);
 }
 
 namespace UserSQL
@@ -102,6 +95,7 @@ namespace NoteSQL
 
   bool select(QSqlDatabase db,
               Note& note,
+              int& number,
               QString& error);
 
   bool remove(QSqlDatabase db,

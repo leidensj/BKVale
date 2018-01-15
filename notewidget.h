@@ -23,12 +23,13 @@ public:
 private:
   NoteView* m_view;
   NoteDatabase* m_database;
-  QDockWidget* m_dock; 
+  QDockWidget* m_dock;
+  bool save();
+  bool print(QSerialPort& printer, int id);
 
 public slots:
   void create();
-  bool save();
-  bool print(QSerialPort& printer);
+  void saveAndPrint(QSerialPort& printer);
 
 private slots:
   void emitChangedSignal();

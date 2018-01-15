@@ -23,7 +23,6 @@ Note::Note()
 void Note::clear()
 {
   m_id = INVALID_NOTE_ID;
-  m_number = 0;
   m_date = 0;
   m_supplier.clear();
   m_items.clear();

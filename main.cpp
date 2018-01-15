@@ -5,14 +5,16 @@
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QDir>
+#include <QFileDialog>
 
-int main(int argc, char *argv[])
+namespace
 {
-  QApplication a(argc, argv);
-  QSqlDatabase db(QSqlDatabase::addDatabase("QSQLITE"));
-  QString error;
+bool initDatabase(QSqlDatabase db,
+                  const QString& path,
+                  QString& error)
+{
   bool bSuccess = BaitaSQL::open(db,
-                                 qApp->applicationDirPath() +
+                                 path +
                                  "/" +
                                  "setup.db",
                                  error);
@@ -21,7 +23,31 @@ int main(int argc, char *argv[])
   else
     db.close();
 
-  if (!bSuccess)
+  return bSuccess;
+}
+
+QString getPath()
+{
+  return QFileDialog::getExistingDirectory(nullptr,
+                                           QObject::tr("Selecionar local para salvar seus dados"),
+                                           "/home",
+                                           QFileDialog::ShowDirsOnly
+                                           | QFileDialog::DontResolveSymlinks);
+}
+}
+
+
+int main(int argc, char *argv[])
+{
+  QApplication a(argc, argv);
+
+  QString path = getPath();
+  if (path.isEmpty())
+    return 0;
+
+  QSqlDatabase db(QSqlDatabase::addDatabase("QSQLITE"));
+  QString error;
+  if (!initDatabase(db, path, error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        QObject::tr("Erro ao inicializar banco de dados"),

@@ -116,7 +116,7 @@ void BaitaAssistant::connect()
 {
   if (m_printer.isOpen())
   {
-    if (m_printer.portName() != m_settings.port)
+    if (m_printer.portName() != m_settings.m_serial.m_port)
     {
       m_printer.close();
     }
@@ -131,9 +131,9 @@ void BaitaAssistant::connect()
     }
   }
 
-  if (!m_settings.port.isEmpty())
+  if (!m_settings.m_serial.m_port.isEmpty())
   {
-    m_printer.setPortName(m_settings.port);
+    m_printer.setPortName(m_settings.m_serial.m_port);
     if (!m_printer.open((QIODevice::ReadWrite)))
     {
       QMessageBox msgBox(QMessageBox::Critical,
@@ -290,7 +290,7 @@ void BaitaAssistant::enableControls()
   const bool bIsOpen = m_printer.isOpen();
   ui->actionConnect->setEnabled(!bIsOpen && bIsSQLOk);
   ui->actionDisconnect->setEnabled(bIsOpen && bIsSQLOk);
-  ui->actionSettings->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSettings());
+  ui->actionSettings->setEnabled(bIsSQLOk && !bIsOpen && m_userLogin.hasAccessToSettings());
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
   ui->actionItems->setEnabled(bIsSQLOk && m_userLogin.hasAccessToItems());

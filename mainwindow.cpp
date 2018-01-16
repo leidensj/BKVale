@@ -272,7 +272,7 @@ void BaitaAssistant::openSettingsDialog()
 {
   if (!m_printer.isOpen())
   {
-    SettingsDlg dlg;
+    SettingsDlg dlg(m_settings);
     if (dlg.exec() == QDialog::Accepted)
     {
       m_settings = dlg.getSettings();

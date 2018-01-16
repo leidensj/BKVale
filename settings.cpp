@@ -21,12 +21,15 @@ Settings::Settings()
 void Settings::clear()
 {
   m_fileDir.clear();
+  m_interfaceType = InterfaceType::Serial;
   m_serialPort.clear();
   m_serialBaudRate = QSerialPort::Baud9600;
   m_serialDataBits = QSerialPort::Data8;
   m_serialFlowControl = QSerialPort::NoFlowControl;
   m_serialParity = QSerialPort::NoParity;
   m_serialStopBits = QSerialPort::OneStop;
+  m_ethernetIP.clear();
+  m_ethernetPort = 9100;
 }
 
 void Settings::save() const

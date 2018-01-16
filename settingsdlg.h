@@ -14,19 +14,20 @@ class SettingsDlg : public QDialog
   Q_OBJECT
 
 public:
-  explicit SettingsDlg(QWidget *parent = 0);
+  explicit SettingsDlg(const Settings& settings,
+                       QWidget *parent = 0);
   ~SettingsDlg();
   const Settings& getSettings() const { return m_settings; }
 
 private:
-  Ui::SettingsDlg *ui;
   Settings m_settings;
+  Ui::SettingsDlg *ui;
   void doDataExchange(bool toUI);
 
 private slots:
   void refreshAvailablePorts();
   void update();
-  void restoreDefaults();
+  void selectFileDir();
 };
 
 #endif // SETTINGSDLG_H

@@ -2,10 +2,12 @@
 #include "ui_settingsdlg.h"
 #include <QSerialPortInfo>
 #include <QPushButton>
+#include <QFileDialog>
 
-SettingsDlg::SettingsDlg(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::SettingsDlg)
+SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
+  : QDialog(parent)
+  , m_settings(settings)
+  , ui(new Ui::SettingsDlg)
 {
   ui->setupUi(this);
 
@@ -14,10 +16,10 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
                    this,
                    SLOT(update()));
 
-  QObject::connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults),
-                   SIGNAL(clicked()),
+  QObject::connect(ui->btnFileDir,
+                   SIGNAL(clicked(bool)),
                    this,
-                   SLOT(restoreDefaults()));
+                   SLOT(selectFileDir()));
 
   ui->cbBaudrate->addItem("1200", QSerialPort::Baud1200);
   ui->cbBaudrate->addItem("2400", QSerialPort::Baud2400);
@@ -60,6 +62,9 @@ void SettingsDlg::doDataExchange(bool toUI)
 {
   if (toUI)
   {
+    ui->rdoSerial->setChecked(m_settings.m_interfaceType == InterfaceType::Serial);
+    ui->rdoEthernet->setChecked(m_settings.m_interfaceType == InterfaceType::Ethernet);
+    ui->edFileDir->setText(m_settings.m_fileDir);
     ui->cbBaudrate->setCurrentIndex(ui->cbBaudrate->findData(m_settings.m_serialBaudRate));
     ui->cbFlow->setCurrentIndex(ui->cbFlow->findData(m_settings.m_serialFlowControl));
     ui->cbDataBits->setCurrentIndex(ui->cbDataBits->findData(m_settings.m_serialDataBits));
@@ -68,6 +73,8 @@ void SettingsDlg::doDataExchange(bool toUI)
   }
   else
   {
+    m_settings.m_interfaceType = ui->rdoSerial->isChecked() ? InterfaceType::Serial : InterfaceType::Ethernet;
+    m_settings.m_fileDir = ui->edFileDir->text();
     m_settings.m_serialPort = ui->cbPort->currentText();
     m_settings.m_serialBaudRate = (QSerialPort::BaudRate)ui->cbBaudrate->currentData().toUInt();
     m_settings.m_serialDataBits = (QSerialPort::DataBits)ui->cbDataBits->currentData().toUInt();
@@ -90,8 +97,13 @@ void SettingsDlg::update()
   doDataExchange(false);
 }
 
-void SettingsDlg::restoreDefaults()
+void SettingsDlg::selectFileDir()
 {
-  m_settings.clear();
-  doDataExchange(true);
+  QString fileDir = QFileDialog::getExistingDirectory(this,
+                                                      QObject::tr("Selecionar local para salvar seus dados"),
+                                                      m_settings.m_fileDir,
+                                                      QFileDialog::ShowDirsOnly
+                                                      | QFileDialog::DontResolveSymlinks);
+  if (!fileDir.isEmpty())
+    ui->edFileDir->setText(fileDir);
 }

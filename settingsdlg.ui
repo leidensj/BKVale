@@ -42,47 +42,14 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Interface da Impressora</string>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QRadioButton" name="rdoSerial">
-            <property name="text">
-             <string>Serial</string>
-            </property>
-            <property name="icon">
-             <iconset resource="icons.qrc">
-              <normaloff>:/icons/res/serial.png</normaloff>:/icons/res/serial.png</iconset>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rdoEthernet">
-            <property name="text">
-             <string>Ethernet</string>
-            </property>
-            <property name="icon">
-             <iconset resource="icons.qrc">
-              <normaloff>:/icons/res/ethernet.png</normaloff>:/icons/res/ethernet.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Banco de dados:</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QLineEdit" name="edFileDir">
            <property name="readOnly">
@@ -105,6 +72,62 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Interface da impressora:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rdoSerial">
+           <property name="text">
+            <string>Serial</string>
+           </property>
+           <property name="icon">
+            <iconset resource="icons.qrc">
+             <normaloff>:/icons/res/serial.png</normaloff>:/icons/res/serial.png</iconset>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rdoEthernet">
+           <property name="text">
+            <string>Ethernet</string>
+           </property>
+           <property name="icon">
+            <iconset resource="icons.qrc">
+             <normaloff>:/icons/res/ethernet.png</normaloff>:/icons/res/ethernet.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cbConnectStartup">
+         <property name="text">
+          <string>Conectar automaticamente à impressora ao inicializar</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -138,7 +161,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="cbPort"/>
+        <widget class="QComboBox" name="cbSerialPort"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_2">
@@ -148,7 +171,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="cbBaudrate"/>
+        <widget class="QComboBox" name="cbSerialBaudRate"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_3">
@@ -158,7 +181,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="cbFlow"/>
+        <widget class="QComboBox" name="cbSerialFlowControl"/>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_4">
@@ -168,7 +191,7 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="cbDataBits"/>
+        <widget class="QComboBox" name="cbSerialDataBits"/>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_5">
@@ -178,7 +201,7 @@
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QComboBox" name="cbStopBits"/>
+        <widget class="QComboBox" name="cbSerialStopBits"/>
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_6">
@@ -188,7 +211,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QComboBox" name="cbParity"/>
+        <widget class="QComboBox" name="cbSerialParity"/>
        </item>
       </layout>
      </widget>
@@ -209,7 +232,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="edEthernetIP">
          <property name="inputMask">
           <string>000.000.000.000;_</string>
          </property>
@@ -226,7 +249,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QSpinBox" name="spinBox">
+        <widget class="QSpinBox" name="sbEthernetPort">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>

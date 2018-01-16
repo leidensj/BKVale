@@ -215,7 +215,7 @@ void BaitaAssistant::print()
   {
     case Functionality::NoteMode:
     {
-      m_note->saveAndPrint(m_printer);
+      m_note->saveAndPrint(m_printer, m_userLogin.strUser());
     } break;
     case Functionality::ReminderMode:
     {

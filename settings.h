@@ -14,6 +14,7 @@ struct Settings
   Settings();
   QString m_fileDir;
   InterfaceType m_interfaceType;
+  bool m_bConnectOnStartup;
   QString m_serialPort;
   QSerialPort::BaudRate m_serialBaudRate;
   QSerialPort::DataBits m_serialDataBits;

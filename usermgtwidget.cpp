@@ -11,6 +11,7 @@ UserMgtWidget::UserMgtWidget(int currentUserID, QWidget* parent)
   , m_currentUserID(currentUserID)
   , m_view(nullptr)
   , m_database(nullptr)
+  , m_bHasAnyUserChanged(false)
 {
   m_view = new UserMgtView();
   m_view->layout()->setAlignment(Qt::AlignTop);
@@ -115,6 +116,7 @@ void UserMgtWidget::save()
 
   if (bSuccess)
   {
+    m_bHasAnyUserChanged = true;
     m_view->create();
     m_database->refresh();
   }
@@ -127,3 +129,7 @@ void UserMgtWidget::save()
   }
 }
 
+bool UserMgtWidget::hasAnyUserChanged() const
+{
+  return m_bHasAnyUserChanged;
+}

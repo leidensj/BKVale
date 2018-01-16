@@ -13,6 +13,7 @@
 #include <QInputDialog>
 #include <QByteArray>
 #include <QDir>
+#include <QLabel>
 
 BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   : QMainWindow(parent)
@@ -22,6 +23,8 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
+  , m_statusFilePath(nullptr)
+  , m_statusUserName(nullptr)
 {
   ui->setupUi(this);
   m_note = new NoteWidget();
@@ -32,6 +35,13 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   ui->tabReminder->layout()->addWidget(m_reminder);
   ui->tabConsumption->layout()->addWidget(m_consumption);
   ui->tabCalculator->layout()->addWidget(m_calculator);
+
+  m_statusFilePath = new QLabel();
+  m_statusFilePath->setAlignment(Qt::AlignRight);
+  m_statusUserName = new QLabel();
+  m_statusUserName->setAlignment(Qt::AlignCenter);
+  statusBar()->addWidget(m_statusFilePath);
+  statusBar()->addWidget(m_statusUserName);
 
   QObject::connect(ui->actionConnect,
                    SIGNAL(triggered(bool)),
@@ -51,7 +61,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   QObject::connect(ui->actionSettings,
                    SIGNAL(triggered(bool)),
                    this,
-                   SLOT(showSettings()));
+                   SLOT(openSettingsDialog()));
 
   QObject::connect(ui->actionInfo,
                    SIGNAL(triggered(bool)),
@@ -61,17 +71,17 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   QObject::connect(m_note,
                    SIGNAL(changedSignal()),
                    this,
-                   SLOT(enableControls()));
+                   SLOT(updateControls()));
 
   QObject::connect(ui->tabWidget,
                    SIGNAL(currentChanged(int)),
                    this,
-                   SLOT(enableControls()));
+                   SLOT(updateControls()));
 
   QObject::connect(m_reminder,
                    SIGNAL(changedSignal()),
                    this,
-                   SLOT(enableControls()));
+                   SLOT(updateControls()));
 
   QObject::connect(ui->actionItems,
                    SIGNAL(triggered(bool)),
@@ -103,6 +113,15 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(openLoginDialog()));
 
+  m_settings.load();
+  if (!m_settings.m_serialPort.isEmpty())
+    connect();
+  m_note->setDatabase(m_userLogin.getDatabase());
+  m_note->create();
+  m_consumption->setDatabase(m_userLogin.getDatabase());
+  m_reminder->setDatabase(m_userLogin.getDatabase());
+  updateControls();
+  updateStatusBar();
   //TODO
   //connectTCP();
 }
@@ -169,7 +188,7 @@ void BaitaAssistant::connect()
     msgBox.exec();
   }
 
-  enableControls();
+  updateControls();
 }
 
 void BaitaAssistant::connectTCP()
@@ -187,7 +206,7 @@ void BaitaAssistant::disconnect()
 {
   if (m_printer.isOpen())
       m_printer.close();
-  enableControls();
+  updateControls();
 }
 
 void BaitaAssistant::print()
@@ -249,7 +268,7 @@ void BaitaAssistant::printFullCut()
   Printer::fullCut(m_printer);
 }
 
-void BaitaAssistant::showSettings()
+void BaitaAssistant::openSettingsDialog()
 {
   if (!m_printer.isOpen())
   {
@@ -270,7 +289,13 @@ void BaitaAssistant::showSettings()
   }
 }
 
-void BaitaAssistant::enableControls()
+void BaitaAssistant::updateStatusBar()
+{
+  m_statusUserName->setText(" Usuário: " + m_userLogin.strUser() + " ");
+  m_statusFilePath->setText(" Arquivo: " + m_settings.filePath() + " ");
+}
+
+void BaitaAssistant::updateControls()
 {
   const bool bIsSQLOk = m_userLogin.getDatabase().isOpen();
   const bool bIsOpen = m_printer.isOpen();
@@ -287,9 +312,9 @@ void BaitaAssistant::enableControls()
                                bIsSQLOk && m_userLogin.hasAccessToReminder());
   ui->tabWidget->setTabEnabled((int)Functionality::CalculatorMode,
                                bIsSQLOk && m_userLogin.hasAccessToCalculator());
-  ui->tabWidget->setTabEnabled((int)Functionality::ConsumptionMode,
-                               bIsSQLOk && m_userLogin.hasAccessToShop());
   ui->tabWidget->setTabEnabled((int)Functionality::ShopMode,
+                               bIsSQLOk && m_userLogin.hasAccessToShop());
+  ui->tabWidget->setTabEnabled((int)Functionality::ConsumptionMode,
                                bIsSQLOk && m_userLogin.hasAccessToConsumption());
 
   switch ((Functionality)ui->tabWidget->currentIndex())
@@ -351,38 +376,32 @@ void BaitaAssistant::openUsersDialog()
   dlg.setWindowIcon(QIcon(":/icons/res/user.png"));
   dlg.setModal(true);
   dlg.exec();
-  hide();
-  LoginDialog l(m_userLogin);
-  if (!l.exec())
-  {
-    QMessageBox::critical(this,
-                          tr("Login não realizado"),
-                          tr("A aplicação será encerrada."),
-                          QMessageBox::Ok);
-    close();
-  }
-  else
-  {
-    show();
-    enableControls();
-  }
-}
 
-void BaitaAssistant::init()
-{
-  m_settings.load();
-  if (!m_settings.m_serialPort.isEmpty())
-    connect();
-  m_note->setDatabase(m_userLogin.getDatabase());
-  m_note->create();
-  m_consumption->setDatabase(m_userLogin.getDatabase());
-  m_reminder->setDatabase(m_userLogin.getDatabase());
-  enableControls();
+  if (w->hasAnyUserChanged())
+  {
+    hide();
+    LoginDialog l(m_userLogin);
+    if (!l.exec())
+    {
+      QMessageBox::critical(this,
+                            tr("Login não realizado"),
+                            tr("A aplicação será encerrada."),
+                            QMessageBox::Ok);
+      close();
+    }
+    else
+    {
+      show();
+      updateControls();
+      updateStatusBar();
+    }
+  }
 }
 
 void BaitaAssistant::openLoginDialog()
 {
   LoginDialog l(m_userLogin);
   l.exec();
-  enableControls();
+  updateControls();
+  updateStatusBar();
 }

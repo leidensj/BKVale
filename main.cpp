@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "logindialog.h"
 #include "databaseutils.h"
+#include "settings.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QSqlDatabase>
@@ -10,13 +11,11 @@
 namespace
 {
 bool initDatabase(QSqlDatabase db,
-                  const QString& path,
+                  const QString& filePath,
                   QString& error)
 {
   bool bSuccess = BaitaSQL::open(db,
-                                 path +
-                                 "/" +
-                                 "setup.db",
+                                 filePath,
                                  error);
   if (bSuccess)
     bSuccess = BaitaSQL::init(db, error);
@@ -41,13 +40,18 @@ int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
 
-  QString path = getPath();
-  if (path.isEmpty())
+  Settings settings;
+  settings.load();
+  if (settings.m_fileDir.isEmpty())
+    settings.m_fileDir = getPath();
+
+  if (settings.m_fileDir.isEmpty())
     return 0;
 
+  settings.save();
   QSqlDatabase db(QSqlDatabase::addDatabase("QSQLITE"));
   QString error;
-  if (!initDatabase(db, path, error))
+  if (!initDatabase(db, settings.filePath(), error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        QObject::tr("Erro ao inicializar banco de dados"),
@@ -63,7 +67,6 @@ int main(int argc, char *argv[])
     if (l.exec() == QDialog::Accepted)
     {
       BaitaAssistant w(userLogin);
-      w.init();
       w.show();
       return a.exec();
     }

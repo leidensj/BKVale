@@ -3,6 +3,7 @@
 
 #define COMPANY_NAME "LEICO"
 #define APP_NAME     "BaitaAssistente"
+#define FILE_NAME    "BaitaAssistente.db"
 
 #define FILE_PATH          "filePath"
 #define SERIAL_PORT        "serial/port"
@@ -19,7 +20,7 @@ Settings::Settings()
 
 void Settings::clear()
 {
-  m_filePath.clear();
+  m_fileDir.clear();
   m_serialPort.clear();
   m_serialBaudRate = QSerialPort::Baud9600;
   m_serialDataBits = QSerialPort::Data8;
@@ -31,7 +32,7 @@ void Settings::clear()
 void Settings::save() const
 {
   QSettings settings(COMPANY_NAME, APP_NAME);
-  settings.setValue(FILE_PATH, m_filePath);
+  settings.setValue(FILE_PATH, m_fileDir);
   settings.setValue(SERIAL_PORT, m_serialPort);
   settings.setValue(SERIAL_BAUDRATE, (int)m_serialBaudRate);
   settings.setValue(SERIAL_DATABITS, (int)m_serialDataBits);
@@ -43,7 +44,7 @@ void Settings::save() const
 void Settings::load()
 {
   QSettings settings(COMPANY_NAME, APP_NAME);
-  m_filePath = settings.value(FILE_PATH).toString();
+  m_fileDir = settings.value(FILE_PATH).toString();
   m_serialPort = settings.value(SERIAL_PORT).toString();
   m_serialBaudRate = (QSerialPort::BaudRate)settings.value(SERIAL_BAUDRATE,
                                                            (int)QSerialPort::Baud9600).toInt();
@@ -55,4 +56,9 @@ void Settings::load()
                                                        (int)QSerialPort::NoParity).toInt();
   m_serialStopBits = (QSerialPort::StopBits)settings.value(SERIAL_STOPBITS,
                                                            (int)QSerialPort::OneStop).toInt();
+}
+
+QString Settings::filePath() const
+{
+  return m_fileDir + "/" + FILE_NAME;
 }

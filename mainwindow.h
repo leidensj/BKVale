@@ -11,6 +11,7 @@ namespace Ui {
 class BaitaAssistant;
 }
 
+class QLabel;
 class NoteWidget;
 class ReminderWidget;
 class ConsumptionWidget;
@@ -31,7 +32,6 @@ class BaitaAssistant : public QMainWindow
 
 public:
   explicit BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent = 0);
-  void init();
   ~BaitaAssistant();
 
 private:
@@ -45,18 +45,21 @@ private:
   QTcpSocket m_printerTCP;
   quint16 m_nextBlockSizeTCP;
   Settings m_settings;
+  QLabel* m_statusFilePath;
+  QLabel* m_statusUserName;
 
 private slots:
   void connect();
   void connectTCP();
   void connectedTCP();
   void disconnect();
-  void showSettings();
-  void enableControls();
+  void updateControls();
+  void updateStatusBar();
   void showInfo();
   void print();
   bool print(const QString& text);
   void printFullCut();
+  void openSettingsDialog();
   void openUsersDialog();
   void openItemsDialog();
   void openLoginDialog();

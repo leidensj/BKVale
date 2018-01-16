@@ -14,11 +14,13 @@ class UserMgtWidget : public QFrame
 public:
   explicit UserMgtWidget(int currentUserID, QWidget* parent = 0);
   void setDatabase(QSqlDatabase db);
+  bool hasAnyUserChanged() const;
 
 private:
   const int m_currentUserID;
   UserMgtView* m_view;
   UserMgtDatabase* m_database;
+  bool m_bHasAnyUserChanged;
 
 private slots:
   void setUser(int id);

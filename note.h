@@ -49,6 +49,7 @@ struct Note
   QString m_supplier;
   QVector<NoteItem> m_items;
   double m_total;
+  bool m_bCash;
 
   Note();
 

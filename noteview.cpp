@@ -14,6 +14,7 @@
 #include <QCalendarWidget>
 #include <QTextCharFormat>
 #include <QTimer>
+#include <QCheckBox>
 
 NoteSupplierComboBox::NoteSupplierComboBox(QWidget* parent)
   : QComboBox(parent)
@@ -150,6 +151,7 @@ NoteView::NoteView(QWidget *parent)
   , m_edTotal(nullptr)
   , m_cbSupplier(nullptr)
   , m_table(nullptr)
+  , m_cbCash(nullptr)
   , m_currentID(INVALID_NOTE_ID)
   , m_lastID(INVALID_NOTE_ID)
 {
@@ -247,6 +249,11 @@ NoteView::NoteView(QWidget *parent)
   m_btnToday->setIconSize(QSize(24, 24));
   m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
 
+  m_cbCash = new QCheckBox();
+  m_cbCash->setIconSize(QSize(24, 24));
+  m_cbCash->setIcon(QIcon(":/icons/res/cash.png"));
+  m_cbCash->setText(tr("Pagamento a vista"));
+
   QHBoxLayout* hlayout2 = new QHBoxLayout();
   hlayout2->setContentsMargins(0, 0, 0, 0);
   hlayout2->setAlignment(Qt::AlignLeft);
@@ -256,6 +263,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(lblDate);
   hlayout2->addWidget(m_dtDate);
   hlayout2->addWidget(m_btnToday);
+  hlayout2->addWidget(m_cbCash);
 
   m_cbSupplier = new NoteSupplierComboBox();
 
@@ -492,6 +500,7 @@ Note NoteView::getNote() const
   note.m_date = m_dtDate->date().toJulianDay();
   note.m_supplier = m_cbSupplier->currentText();
   note.m_total = m_edTotal->text().toDouble();
+  note.m_bCash = m_cbCash->isChecked();
   m_table->getItems(note.m_items);
   return note;
 }
@@ -509,6 +518,7 @@ void NoteView::setNote(const Note& note, int number, const QStringList& supplier
   m_dtDate->setDate(QDate::fromJulianDay(note.m_date));
   m_cbSupplier->setCurrentText(note.m_supplier);
   m_snNumber->setValue(number);
+  m_cbCash->setChecked(note.m_bCash);
   for (int row = 0; row != note.m_items.size(); ++row)
   {
     addItem();
@@ -543,6 +553,7 @@ void NoteView::create(int number, const QStringList& suppliers)
   m_cbSupplier->addItems(suppliers);
   m_cbSupplier->setCurrentText("");
   m_cbSupplier->setFocus();
+  m_cbCash->setChecked(false);
   updateControls();
 }
 
@@ -577,6 +588,7 @@ void NoteView::updateControls()
   m_dtDate->setEnabled(bCreated);
   m_table->setEnabled(bCreated);
   m_edTotal->setEnabled(bCreated);
+  m_cbCash->setEnabled(bCreated);
   m_btnOpenLast->setEnabled(m_lastID != INVALID_NOTE_ID);
   m_lblNumberStatus->setPixmap(QPixmap(Note::isValidID(m_currentID)
                                      ? ":/icons/res/fileedit.png"

@@ -58,7 +58,6 @@ namespace
                QDate::currentDate().toString("dd/MM/yyyy ") +
                QTime::currentTime().toString("hh:mm:ss") +
                " @ " +
-               QHostInfo::localHostName() +
                ESC_LF
                ESC_LF
                ESC_LF

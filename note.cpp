@@ -27,6 +27,7 @@ void Note::clear()
   m_supplier.clear();
   m_items.clear();
   m_total = 0.0;
+  m_bCash = false;
 }
 
 QString Note::strDate() const

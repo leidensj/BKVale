@@ -17,26 +17,19 @@ public:
 
   }
 
-  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
   {
     {
-      if (!idx.isValid())
+      if (!index.isValid())
         return QModelIndex();
 
-      QVariant value = QSqlTableModel::data(idx, role);
+      QVariant value = QSqlTableModel::data(index, role);
       if (role == Qt::DisplayRole)
       {
-        if (idx.column() == (int)NoteTableIndex::Date)
+        if (index.column() == (int)NoteTableIndex::Date)
           value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
-        else if (idx.column() == (int)NoteTableIndex::Total)
+        else if (index.column() == (int)NoteTableIndex::Total)
           value = "R$ " + QString::number(value.toDouble(), 'f', 2);
-        if (idx.column() == (int)NoteTableIndex::Cash)
-        {
-          if (QSqlTableModel::data(idx, Qt::EditRole).toBool())
-            value = QVariant::fromValue(QIcon(":/icons/res/cash.png"));
-          else
-            value = "";
-        }
       }
 
       return value;
@@ -124,7 +117,6 @@ void NoteDatabase::set(QSqlDatabase db)
   model->setHeaderData((int)NoteTableIndex::Date, Qt::Horizontal, tr("Data"));
   model->setHeaderData((int)NoteTableIndex::Supplier, Qt::Horizontal, tr("Fornecedor"));
   model->setHeaderData((int)NoteTableIndex::Total, Qt::Horizontal, tr("Total"));
-  model->setHeaderData((int)NoteTableIndex::Cash, Qt::Horizontal, tr("A vista"));
   m_table->setModel(model);
   m_table->hideColumn((int)NoteTableIndex::ID);
   QObject::connect(m_table->selectionModel(),

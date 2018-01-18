@@ -19,20 +19,11 @@ namespace
                "WWW.BAITAKAO.COM.BR"
                ESC_LF
                ESC_VERT_TAB
-               ESC_EXPAND_OFF;
-
-    if (!note.m_bCash)
-    {
-      strNote += "ORDEM DE RECEBIMENTO"
-                 ESC_LF
-                 "DE MERCADORIA";
-    }
-    else
-    {
-      strNote += "PAGAMENTO A VISTA";
-    }
-
-    strNote += ESC_LF
+               ESC_EXPAND_OFF
+               "ORDEM DE RECEBIMENTO"
+               ESC_LF
+               "DE MERCADORIA"
+               ESC_LF
                ESC_VERT_TAB
                ESC_ALIGN_LEFT
                "Numero     "
@@ -42,7 +33,8 @@ namespace
                "Data       "
                ESC_DOUBLE_FONT_ON +
                note.strDate() +
-               ESC_DOUBLE_FONT_OFF +
+               ESC_LF
+               "           " +
                note.strDayOfWeek() +
                ESC_LF
                "Fornecedor "
@@ -66,7 +58,6 @@ namespace
                QDate::currentDate().toString("dd/MM/yyyy ") +
                QTime::currentTime().toString("hh:mm:ss") +
                " @ " +
-               QHostInfo::localHostName().toUpper() +
                ESC_LF
                ESC_LF
                ESC_LF
@@ -76,17 +67,6 @@ namespace
                "Assinatura " +
                user +
                ESC_LF;
-
-    if (note.m_bCash)
-    {
-      strNote += ESC_LF
-                 ESC_LF
-                 ESC_LF
-                 "________________________________"
-                 ESC_LF
-                 "Assinatura Fornecedor"
-                 ESC_LF;
-    }
   }
 
   void noteAppendBody(const Note& note, QString& strNote)
@@ -176,17 +156,10 @@ QString NotePrinter::build(const Note& note,
   noteAppendHeader(note, number, strNote1);
   noteAppendBody(note, strNote1);
   noteAppendFooter(note, user, strNote1);
-  if (!note.m_bCash)
-  {
-    QString strNote2(strNote1);
-    strNote1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
-    strNote2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
-    return strNote1 + strNote2;
-  }
-  else
-  {
-    return strNote1 + ESC_LF ESC_FULL_CUT;
-  }
+  QString strNote2(strNote1);
+  strNote1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
+  strNote2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
+  return strNote1 + strNote2;
 }
 
 QString ReminderPrinter::build(const Reminder& r)

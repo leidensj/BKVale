@@ -56,16 +56,19 @@ bool NoteSQL::insert(QSqlDatabase db,
                 "_NUMBER,"
                 "_DATE,"
                 "_SUPPLIER,"
-                "_TOTAL) "
+                "_TOTAL,"
+                "_CASH) "
                 "VALUES ("
                 "(:_number),"
                 "(:_date),"
                 "(:_supplier),"
-                "(:_total))");
+                "(:_total),"
+                "(:_cash))");
   query.bindValue(":_number", number);
   query.bindValue(":_date", note.m_date);
   query.bindValue(":_supplier", note.m_supplier);
   query.bindValue(":_total", note.m_total);
+  query.bindValue(":_cash", note.m_bCash);
   query.exec();
 
   note.m_id = query.lastInsertId().toInt();
@@ -114,12 +117,14 @@ bool NoteSQL::update(QSqlDatabase db,
   query.prepare("UPDATE _PROMISSORYNOTES SET "
                 "_DATE = (:_date),"
                 "_SUPPLIER = (:_supplier),"
-                "_TOTAL = (:_total) "
+                "_TOTAL = (:_total),"
+                "_CASH = (:_cash) "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", note.m_id);
   query.bindValue(":_date", note.m_date);
   query.bindValue(":_supplier", note.m_supplier);
   query.bindValue(":_total", note.m_total);
+  query.bindValue(":_cash", note.m_bCash);
   query.exec();
 
   for (int i = 0; i != note.m_items.size(); ++i)
@@ -192,7 +197,8 @@ bool NoteSQL::select(QSqlDatabase db,
                 "_NUMBER,"
                 "_DATE,"
                 "_SUPPLIER,"
-                "_TOTAL "
+                "_TOTAL,"
+                "_CASH "
                 "FROM _PROMISSORYNOTES "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
@@ -204,6 +210,7 @@ bool NoteSQL::select(QSqlDatabase db,
     note.m_date = query.value(query.record().indexOf("_DATE")).toLongLong();
     note.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
     note.m_total = query.value(query.record().indexOf("_TOTAL")).toDouble();
+    note.m_bCash = query.value(query.record().indexOf("_CASH")).toBool();
     bFound = true;
   }
 
@@ -312,7 +319,8 @@ bool BaitaSQL::init(QSqlDatabase db,
              "_NUMBER INTEGER NOT NULL,"
              "_DATE INTEGER NOT NULL,"
              "_SUPPLIER TEXT NOT NULL,"
-             "_TOTAL REAL)");
+             "_TOTAL REAL,"
+             "_CASH INT)");
 
   query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTESITEMS ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"

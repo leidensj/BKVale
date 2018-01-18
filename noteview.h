@@ -15,7 +15,6 @@ class QLineEdit;
 class QSpinBox;
 class QPushButton;
 class QLabel;
-class QCheckBox;
 
 class NoteSupplierComboBox : public QComboBox
 {
@@ -72,7 +71,7 @@ private:
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLineEdit* m_edTotal;
-  QCheckBox* m_cbCash;
+  QPushButton* m_btnCash;
   NoteSupplierComboBox* m_cbSupplier;
   NoteTableWidget* m_table;
   int m_currentID;

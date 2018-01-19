@@ -15,6 +15,7 @@ class QLineEdit;
 class QSpinBox;
 class QPushButton;
 class QLabel;
+class QCheckBox;
 
 class NoteSupplierComboBox : public QComboBox
 {
@@ -71,9 +72,9 @@ private:
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLineEdit* m_edTotal;
-  QPushButton* m_btnCash;
   NoteSupplierComboBox* m_cbSupplier;
   NoteTableWidget* m_table;
+  QCheckBox* m_cbCash;
   int m_currentID;
   int m_lastID;
   QString computeUnitValue(int row) const;

@@ -127,6 +127,22 @@ bool NoteSQL::update(QSqlDatabase db,
   query.bindValue(":_cash", note.m_bCash);
   query.exec();
 
+  if (note.m_items.size() != 0)
+  {
+    QString strQuery("DELETE FROM _PROMISSORYNOTESITEMS "
+                     "WHERE _NOTEID = (:_noteid) AND _ID NOT IN (");
+    for (int i = 0; i != note.m_items.size(); ++i)
+      strQuery += "(:_id" + QString::number(i) + "),";
+    strQuery.chop(1);
+    strQuery += ")";
+
+    query.prepare(strQuery);
+    query.bindValue(":_noteid", note.m_id);
+    for (int i = 0; i != note.m_items.size(); ++i)
+      query.bindValue(":_id" + QString::number(i), note.m_items.at(i).m_id);
+    query.exec();
+  }
+
   for (int i = 0; i != note.m_items.size(); ++i)
   {
     if (Note::isValidID(note.m_items.at(i).m_id))
@@ -168,7 +184,6 @@ bool NoteSQL::update(QSqlDatabase db,
       query.exec();
       note.m_items.at(i).m_id = query.lastInsertId().toInt();
     }
-
   }
 
   if (db.commit())

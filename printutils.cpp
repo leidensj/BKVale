@@ -42,7 +42,8 @@ namespace
                "Data       "
                ESC_DOUBLE_FONT_ON +
                note.strDate() +
-               ESC_DOUBLE_FONT_OFF +
+               ESC_LF
+               "           " +
                note.strDayOfWeek() +
                ESC_LF
                "Fornecedor "
@@ -80,7 +81,6 @@ namespace
     if (note.m_bCash)
     {
       strNote += ESC_LF
-                 ESC_LF
                  ESC_LF
                  "________________________________"
                  ESC_LF

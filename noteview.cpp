@@ -151,7 +151,7 @@ NoteView::NoteView(QWidget *parent)
   , m_edTotal(nullptr)
   , m_cbSupplier(nullptr)
   , m_table(nullptr)
-  , m_btnCash(nullptr)
+  , m_cbCash(nullptr)
   , m_currentID(INVALID_NOTE_ID)
   , m_lastID(INVALID_NOTE_ID)
 {
@@ -255,13 +255,13 @@ NoteView::NoteView(QWidget *parent)
   m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
   m_btnToday->setToolTip(tr("Usar a data de hoje"));
 
-  m_btnCash = new QPushButton();
-  m_btnCash->setFlat(true);
-  m_btnCash->setCheckable(true);
-  m_btnCash->setText("");
-  m_btnCash->setIconSize(QSize(24,24));
-  m_btnCash->setIcon(QIcon(":/icons/res/cash.png"));
-  m_btnCash->setToolTip(tr("Pagamento a vista"));
+  m_cbCash = new QCheckBox();
+  m_cbCash->setText(tr("Pagamento à vista"));
+  m_cbCash->setIconSize(QSize(24,24));
+  m_cbCash->setIcon(QIcon(":/icons/res/cash.png"));
+  m_cbCash->setToolTip(tr("Quando o pagamento é a vista,"
+                          " imprime apenas uma via com espaço"
+                          " para a assinatura do fornecedor"));
 
   QFrame* line1 = new QFrame;
   line1->setFrameShape(QFrame::VLine);
@@ -280,7 +280,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(m_dtDate);
   hlayout2->addWidget(m_btnToday);
   hlayout2->addWidget(line2);
-  hlayout2->addWidget(m_btnCash);
+  hlayout2->addWidget(m_cbCash);
 
   m_cbSupplier = new NoteSupplierComboBox();
 
@@ -517,7 +517,7 @@ Note NoteView::getNote() const
   note.m_date = m_dtDate->date().toJulianDay();
   note.m_supplier = m_cbSupplier->currentText();
   note.m_total = m_edTotal->text().toDouble();
-  note.m_bCash = m_btnCash->isChecked();
+  note.m_bCash = m_cbCash->isChecked();
   m_table->getItems(note.m_items);
   return note;
 }
@@ -535,7 +535,7 @@ void NoteView::setNote(const Note& note, int number, const QStringList& supplier
   m_dtDate->setDate(QDate::fromJulianDay(note.m_date));
   m_cbSupplier->setCurrentText(note.m_supplier);
   m_snNumber->setValue(number);
-  m_btnCash->setChecked(note.m_bCash);
+  m_cbCash->setChecked(note.m_bCash);
   for (int row = 0; row != note.m_items.size(); ++row)
   {
     addItem();
@@ -570,7 +570,7 @@ void NoteView::create(int number, const QStringList& suppliers)
   m_cbSupplier->addItems(suppliers);
   m_cbSupplier->setCurrentText("");
   m_cbSupplier->setFocus();
-  m_btnCash->setChecked(false);
+  m_cbCash->setChecked(false);
   updateControls();
 }
 
@@ -605,7 +605,7 @@ void NoteView::updateControls()
   m_dtDate->setEnabled(bCreated);
   m_table->setEnabled(bCreated);
   m_edTotal->setEnabled(bCreated);
-  m_btnCash->setEnabled(bCreated);
+  m_cbCash->setEnabled(bCreated);
   m_btnOpenLast->setEnabled(m_lastID != INVALID_NOTE_ID);
   m_lblNumberStatus->setPixmap(QPixmap(Note::isValidID(m_currentID)
                                      ? ":/icons/res/fileedit.png"

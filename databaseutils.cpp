@@ -127,6 +127,21 @@ bool NoteSQL::update(QSqlDatabase db,
   query.bindValue(":_cash", note.m_bCash);
   query.exec();
 
+  {
+    QString strQuery = "DELETE FROM _PROMISSORYNOTESITEMS "
+                       "WHERE _NOTEID = (:_noteid) AND "
+                       "_ID NOT IN (";
+    for (int i = 0; i != note.m_items.size(); ++i)
+      strQuery += "(:_id" + QString::number(i) + "),";
+    strQuery.replace(strQuery.length() - 1, 1, ")");
+    query.prepare(strQuery);
+  }
+
+  query.bindValue(":_noteid", note.m_id);
+  for (int i = 0; i != note.m_items.size(); ++i)
+    query.bindValue("_id" + QString::number(i), note.m_items.at(i).m_id);
+  query.exec();
+
   for (int i = 0; i != note.m_items.size(); ++i)
   {
     if (Note::isValidID(note.m_items.at(i).m_id))

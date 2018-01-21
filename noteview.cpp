@@ -1,6 +1,6 @@
 #include "noteview.h"
-#include "tinyexpr.h"
 #include "databaseutils.h"
+#include "notetablewidget.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -8,7 +8,6 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QLayout>
-#include <QHeaderView>
 #include <QDateEdit>
 #include <QSpinBox>
 #include <QCalendarWidget>
@@ -46,97 +45,6 @@ void NoteSupplierComboBox::toUpper()
   blockSignals(false);
 }
 
-NoteTableWidget::NoteTableWidget(QWidget* parent)
-  : QTableWidget(parent)
-{
-  setColumnCount(NUMBER_OF_COLUMNS);
-  QStringList headers;
-  headers << "Quantidade" << "Unidade" << "Descrição" << "Preço" << "Subtotal";
-  setHorizontalHeaderLabels(headers);
-  {
-    QFont f = font();
-    f.setPointSize(12);
-    f.setCapitalization(QFont::AllUppercase);
-    setFont(f);
-  }
-  {
-    QFont f = horizontalHeader()->font();
-    f.setPointSize(12);
-    f.setCapitalization(QFont::Capitalize);
-    horizontalHeader()->setFont(f);
-  }
-
-  setSelectionBehavior(QAbstractItemView::SelectItems);
-  setSelectionMode(QAbstractItemView::SingleSelection);
-  horizontalHeader()->setHighlightSections(false);
-  verticalHeader()->setHighlightSections(false);
-  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Ammount, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Unity, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Description, QHeaderView::Stretch);
-  horizontalHeader()->setSectionResizeMode((int)NoteColumn::Price, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)NoteColumn::SubTotal, QHeaderView::ResizeToContents);
-}
-
-void NoteTableWidget::keyPressEvent(QKeyEvent *event)
-{
-  if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-  {
-    QKeyEvent modEvent(event->type(),
-                       Qt::Key_Tab,
-                       event->modifiers(),
-                       event->nativeScanCode(),
-                       event->nativeVirtualKey(),
-                       event->nativeModifiers(),
-                       event->text(),
-                       event->isAutoRepeat(),
-                       event->count());
-    QTableWidget::keyPressEvent(&modEvent);
-  }
-  else
-  {
-    QKeyEvent modEvent(event->type(),
-                       event->key(),
-                       event->modifiers(),
-                       event->nativeScanCode(),
-                       event->nativeVirtualKey(),
-                       event->nativeModifiers(),
-                       event->text().toUpper(),
-                       event->isAutoRepeat(),
-                       event->count());
-    QTableWidget::keyPressEvent(&modEvent);
-  }
-}
-
-QString NoteTableWidget::text(int row, int column) const
-{
-  QString str;
-  auto p = item(row, (int)column);
-  if (p != nullptr)
-    str = p->text();
-  return str;
-}
-
-void NoteTableWidget::setText(int row, int column, const QString& str)
-{
-  auto p = item(row, column);
-  if (p != nullptr)
-    p->setText(str);
-}
-
-void NoteTableWidget::getItems(QVector<NoteItem>& items) const
-{
-  items.clear();
-  for (int i = 0; i != rowCount(); ++i)
-  {
-    NoteItem item;
-    item.m_ammount = text(i, (int)NoteColumn::Ammount).toDouble();
-    item.m_unity = text(i, (int)NoteColumn::Unity);
-    item.m_description = text(i, (int)NoteColumn::Description);
-    item.m_price = text(i, (int)NoteColumn::Price).toDouble();
-    items.push_back(item);
-  }
-}
-
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
   , m_btnCreate(nullptr)
@@ -151,7 +59,7 @@ NoteView::NoteView(QWidget *parent)
   , m_edTotal(nullptr)
   , m_cbSupplier(nullptr)
   , m_table(nullptr)
-  , m_btnCash(nullptr)
+  , m_cbCash(nullptr)
   , m_currentID(INVALID_NOTE_ID)
   , m_lastID(INVALID_NOTE_ID)
 {
@@ -161,7 +69,7 @@ NoteView::NoteView(QWidget *parent)
   m_btnCreate->setIconSize(QSize(24, 24));
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-  m_btnCreate->setToolTip(tr("Novo vale"));
+  m_btnCreate->setToolTip(tr("Novo vale (Ctrl+N)"));
 
   m_btnOpenLast = new QPushButton();
   m_btnOpenLast->setFlat(true);
@@ -176,7 +84,7 @@ NoteView::NoteView(QWidget *parent)
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
-  m_btnSearch->setToolTip(tr("Procurar vales"));
+  m_btnSearch->setToolTip(tr("Procurar vales (Ctrl+F)"));
 
   m_btnAdd = new QPushButton();
   m_btnAdd->setFlat(true);
@@ -184,7 +92,7 @@ NoteView::NoteView(QWidget *parent)
   m_btnAdd->setIconSize(QSize(24, 24));
   m_btnAdd->setIcon(QIcon(":/icons/res/additem.png"));
   m_btnAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
-  m_btnAdd->setToolTip(tr("Adicionar item"));
+  m_btnAdd->setToolTip(tr("Adicionar item (Alt++)"));
 
   m_btnRemove = new QPushButton();
   m_btnRemove->setFlat(true);
@@ -192,7 +100,7 @@ NoteView::NoteView(QWidget *parent)
   m_btnRemove->setIconSize(QSize(24, 24));
   m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
   m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
-  m_btnRemove->setToolTip(tr("Remover item"));
+  m_btnRemove->setToolTip(tr("Remover item (Alt+-)"));
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
@@ -255,13 +163,13 @@ NoteView::NoteView(QWidget *parent)
   m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
   m_btnToday->setToolTip(tr("Usar a data de hoje"));
 
-  m_btnCash = new QPushButton();
-  m_btnCash->setFlat(true);
-  m_btnCash->setCheckable(true);
-  m_btnCash->setText("");
-  m_btnCash->setIconSize(QSize(24,24));
-  m_btnCash->setIcon(QIcon(":/icons/res/cash.png"));
-  m_btnCash->setToolTip(tr("Pagamento a vista"));
+  m_cbCash = new QCheckBox();
+  m_cbCash->setText(tr("À vista"));
+  m_cbCash->setIconSize(QSize(24,24));
+  m_cbCash->setIcon(QIcon(":/icons/res/cash.png"));
+  m_cbCash->setToolTip(tr("Imprime apenas uma via, "
+                          "com espaço para assinatura "
+                          "do fornecedor"));
 
   QFrame* line1 = new QFrame;
   line1->setFrameShape(QFrame::VLine);
@@ -280,7 +188,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(m_dtDate);
   hlayout2->addWidget(m_btnToday);
   hlayout2->addWidget(line2);
-  hlayout2->addWidget(m_btnCash);
+  hlayout2->addWidget(m_cbCash);
 
   m_cbSupplier = new NoteSupplierComboBox();
 
@@ -322,11 +230,6 @@ NoteView::NoteView(QWidget *parent)
   vlayout2->addLayout(hlayout3);
   setLayout(vlayout2);
 
-  QObject::connect(m_table,
-                   SIGNAL(cellChanged(int, int)),
-                   this,
-                   SLOT(updateTable(int, int)));
-
   QObject::connect(m_cbSupplier,
                    SIGNAL(editTextChanged(const QString&)),
                    this,
@@ -358,9 +261,14 @@ NoteView::NoteView(QWidget *parent)
                    SLOT(emitCreateSignal()));
 
   QObject::connect(m_table,
-                   SIGNAL(currentCellChanged(int, int, int, int)),
+                   SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
+
+  QObject::connect(m_table,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(emitChangedSignal()));
 
   QObject::connect(m_btnOpenLast,
                    SIGNAL(clicked(bool)),
@@ -394,113 +302,24 @@ NoteView::~NoteView()
 
 }
 
-QString NoteView::computeUnitValue(int row) const
-{
-  const double ammount = m_table->text(row, (int)NoteColumn::Ammount).toDouble();
-  const double subTotal = m_table->text(row, (int)NoteColumn::SubTotal).toDouble();
-  const double unitValue = ammount ? subTotal / ammount : 0.0;
-  return QString::number(unitValue, 'f', 2);
-}
-
-QString NoteView::computeSubTotal(int row) const
-{
-  const double ammount = m_table->text(row, (int)NoteColumn::Ammount).toDouble();
-  const double unitValue = m_table->text(row, (int)NoteColumn::Price).toDouble();
-  const double subTotal = ammount * unitValue;
-  return QString::number(subTotal, 'f', 2);
-}
-
-QString NoteView::computeTotal() const
-{
-  double total = 0.0;
-  for (int row = 0; row != m_table->rowCount(); ++row)
-    total += m_table->text(row, (int)NoteColumn::SubTotal).toDouble();
-  return QString::number(total, 'f', 2);
-}
-
-double NoteView::evaluate(int row, int column) const
-{
-  auto pt = m_table->item(row, column);
-  if (pt == nullptr)
-    return 0.0;
-  auto exp = pt->text().toStdString();
-  int error = 0;
-  double res = te_interp(exp.c_str(), &error);
-  if (!error)
-    pt->setData(Qt::UserRole, res);
-  return pt->data(Qt::UserRole).toDouble();
-}
-
-void NoteView::updateTable(int row, int column)
-{
-  m_table->blockSignals(true);
-  switch ((NoteColumn)column)
-  {
-    case NoteColumn::Unity:
-    case NoteColumn::Description:
-    {
-      QString str = m_table->text(row, column);
-      m_table->setText(row, column, str.toUpper());
-    } break;
-    case NoteColumn::Ammount:
-    {
-      QString res(QString::number(evaluate(row, column), 'f', 3));
-      m_table->setText(row, column, res);
-      m_table->setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
-      m_edTotal->setText(computeTotal());
-    } break;
-    case NoteColumn::Price:
-    {
-      QString res(QString::number(evaluate(row, column), 'f', 2));
-      m_table->setText(row, column, res);
-      m_table->setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
-      m_edTotal->setText(computeTotal());
-    } break;
-    case NoteColumn::SubTotal:
-    {
-      QString res(QString::number(evaluate(row, column), 'f', 2));
-      m_table->setText(row, column, res);
-      m_table->setText(row, (int)NoteColumn::Price, computeUnitValue(row));
-      m_edTotal->setText(computeTotal());
-    } break;
-    default:
-      break;
-  }
-  m_table->blockSignals(false);
-  emitChangedSignal();
-}
-
 void NoteView::addItem()
 {
-  m_table->insertRow(m_table->rowCount());
-  const int row = m_table->rowCount() - 1;
+  addItem(NoteItem());
+}
 
-  m_table->blockSignals(true);
-  m_table->setItem(row, (int)NoteColumn::Ammount, new QTableWidgetItem("0.000"));
-  m_table->setItem(row, (int)NoteColumn::Unity, new QTableWidgetItem(""));
-  m_table->setItem(row, (int)NoteColumn::Description, new QTableWidgetItem(""));
-  m_table->setItem(row, (int)NoteColumn::Price, new QTableWidgetItem("0.00"));
-  m_table->setItem(row, (int)NoteColumn::SubTotal, new QTableWidgetItem("0.00"));
-  m_table->setCurrentCell(row, (int)NoteColumn::Ammount);
+void NoteView::addItem(const NoteItem& noteItem)
+{
+  m_table->addItem(noteItem);
   m_table->setFocus();
-  m_table->blockSignals(false);
-  m_edTotal->setText(computeTotal());
   updateControls();
   emitChangedSignal();
 }
 
 void NoteView::removeItem()
 {
-  m_table->removeRow(m_table->currentRow());
-  if (m_table->rowCount() != 0)
-  {
-    m_edTotal->setText(computeTotal());
-  }
-  else
-  {
-    m_edTotal->clear();
+  m_table->removeCurrentItem();
+  if (!m_table->hasItems())
     m_cbSupplier->setFocus();
-  }
   updateControls();
   emitChangedSignal();
 }
@@ -517,14 +336,14 @@ Note NoteView::getNote() const
   note.m_date = m_dtDate->date().toJulianDay();
   note.m_supplier = m_cbSupplier->currentText();
   note.m_total = m_edTotal->text().toDouble();
-  note.m_bCash = m_btnCash->isChecked();
+  note.m_bCash = m_cbCash->isChecked();
   m_table->getItems(note.m_items);
   return note;
 }
 
 void NoteView::setNote(const Note& note, int number, const QStringList& suppliers)
 {
-  m_table->setRowCount(0);
+  m_table->removeAllItems();
   m_cbSupplier->clear();
   while (m_cbSupplier->count())
     m_cbSupplier->removeItem(m_cbSupplier->count() - 1);
@@ -535,25 +354,18 @@ void NoteView::setNote(const Note& note, int number, const QStringList& supplier
   m_dtDate->setDate(QDate::fromJulianDay(note.m_date));
   m_cbSupplier->setCurrentText(note.m_supplier);
   m_snNumber->setValue(number);
-  m_btnCash->setChecked(note.m_bCash);
-  for (int row = 0; row != note.m_items.size(); ++row)
-  {
-    addItem();
-    m_table->setText(row, (int)NoteColumn::Ammount, note.m_items.at(row).strAmmount());
-    m_table->setText(row, (int)NoteColumn::Unity, note.m_items.at(row).m_unity);
-    m_table->setText(row, (int)NoteColumn::Description, note.m_items.at(row).m_description);
-    m_table->setText(row, (int)NoteColumn::Price, note.m_items.at(row).strPrice());
-    m_table->setText(row, (int)NoteColumn::SubTotal, note.m_items.at(row).strSubtotal());
-  }
+  m_cbCash->setChecked(note.m_bCash);
+  m_table->setItems(note.m_items);
 
   updateControls();
 }
 
 bool NoteView::isValid() const
 {
-  return !m_cbSupplier->currentText().isEmpty() &&
-      m_table->rowCount() &&
-      computeTotal().toDouble() &&
+  return
+      !m_cbSupplier->currentText().isEmpty() &&
+      m_table->hasItems() &&
+      m_table->computeTotal().toDouble() &&
       m_snNumber->value() > 0;
 }
 
@@ -563,35 +375,27 @@ void NoteView::create(int number, const QStringList& suppliers)
   m_dtDate->setDate(QDate::currentDate());
   m_snNumber->setValue(number);
   m_edTotal->setText("");
-  m_table->setRowCount(0);
+  m_table->removeAllItems();
   m_cbSupplier->clear();
   while (m_cbSupplier->count())
     m_cbSupplier->removeItem(m_cbSupplier->count() - 1);
   m_cbSupplier->addItems(suppliers);
   m_cbSupplier->setCurrentText("");
   m_cbSupplier->setFocus();
-  m_btnCash->setChecked(false);
+  m_cbCash->setChecked(false);
   updateControls();
-}
-
-QStringList NoteView::getItemDescriptions() const
-{
-  QStringList ls;
-  for (auto row = 0; row != m_table->rowCount(); ++row)
-    ls << m_table->text(row, (int)NoteColumn::Description);
-  return ls;
 }
 
 void NoteView::supplierEntered()
 {
-  if (m_table->rowCount() != 0)
+  if (m_table->hasItems() != 0)
   {
     m_table->setCurrentCell(0, 0);
     m_table->setFocus();
   }
   else
   {
-    addItem();
+    addItem(NoteItem());
   }
 }
 
@@ -605,7 +409,7 @@ void NoteView::updateControls()
   m_dtDate->setEnabled(bCreated);
   m_table->setEnabled(bCreated);
   m_edTotal->setEnabled(bCreated);
-  m_btnCash->setEnabled(bCreated);
+  m_cbCash->setEnabled(bCreated);
   m_btnOpenLast->setEnabled(m_lastID != INVALID_NOTE_ID);
   m_lblNumberStatus->setPixmap(QPixmap(Note::isValidID(m_currentID)
                                      ? ":/icons/res/fileedit.png"
@@ -613,6 +417,10 @@ void NoteView::updateControls()
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
                             ? ":/icons/res/calendarok.png"
                             : ":/icons/res/calendarwarning.png"));
+  if (m_table->hasItems())
+    m_edTotal->setText(m_table->computeTotal());
+  else
+  m_edTotal->clear();
 }
 
 void NoteView::emitShowSearchSignal()
@@ -654,7 +462,7 @@ void NoteView::checkDate()
 
   bool bIsEditMode = Note::isValidID(m_currentID);
   bool bIsDirty = !m_cbSupplier->currentText().isEmpty() ||
-                  m_table->rowCount() != 0;
+                  m_table->hasItems();
   if (!bIsEditMode && !bIsDirty)
     setToday();
 }

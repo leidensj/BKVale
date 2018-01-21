@@ -81,7 +81,6 @@ namespace
     {
       strNote += ESC_LF
                  ESC_LF
-                 ESC_LF
                  "________________________________"
                  ESC_LF
                  "Assinatura Fornecedor"

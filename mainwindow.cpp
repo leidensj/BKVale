@@ -321,7 +321,7 @@ void BaitaAssistant::updateControls()
   {
     case Functionality::NoteMode:
     {
-      ui->actionPrint->setEnabled(m_note->isValid() && bIsOpen);
+      ui->actionPrint->setEnabled(m_note->isValid() /*&& bIsOpen*/);
     } break;
     case Functionality::ReminderMode:
     {
@@ -378,30 +378,25 @@ void BaitaAssistant::openUsersDialog()
   dlg.exec();
 
   if (w->hasAnyUserChanged())
-  {
-    hide();
-    LoginDialog l(m_userLogin);
-    if (!l.exec())
-    {
-      QMessageBox::critical(this,
-                            tr("Login não realizado"),
-                            tr("A aplicação será encerrada."),
-                            QMessageBox::Ok);
-      close();
-    }
-    else
-    {
-      show();
-      updateControls();
-      updateStatusBar();
-    }
-  }
+    openLoginDialog();
 }
 
 void BaitaAssistant::openLoginDialog()
 {
+  hide();
   LoginDialog l(m_userLogin);
-  l.exec();
-  updateControls();
-  updateStatusBar();
+  if (!l.exec())
+  {
+    QMessageBox::critical(this,
+                          tr("Login não realizado"),
+                          tr("A aplicação será encerrada."),
+                          QMessageBox::Ok);
+    close();
+  }
+  else
+  {
+    show();
+    updateControls();
+    updateStatusBar();
+  }
 }

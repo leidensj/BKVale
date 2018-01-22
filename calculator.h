@@ -111,7 +111,7 @@ inline QString toStr(Button button)
   }
 }
 
-inline bool removeDecimal(QString& strValue)
+inline void removeDecimal(QString& strValue)
 {
   if (strValue.contains(Calculator::toStr(Calculator::Button::Dec)))
     strValue.remove(QRegExp("^[0]*"));

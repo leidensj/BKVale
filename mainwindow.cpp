@@ -321,7 +321,7 @@ void BaitaAssistant::updateControls()
   {
     case Functionality::NoteMode:
     {
-      ui->actionPrint->setEnabled(m_note->isValid() /*&& bIsOpen*/);
+      ui->actionPrint->setEnabled(m_note->isValid() && bIsOpen);
     } break;
     case Functionality::ReminderMode:
     {

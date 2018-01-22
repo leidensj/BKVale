@@ -67,7 +67,6 @@ namespace
                "Assinatura " +
                user +
                ESC_LF;
-<<<<<<< HEAD
 
     if (note.m_bCash)
     {
@@ -78,8 +77,6 @@ namespace
                  "Assinatura Fornecedor"
                  ESC_LF;
     }
-=======
->>>>>>> parent of 6dc534f... Revert "Revert "note cash feito""
   }
 
   void noteAppendBody(const Note& note, QString& strNote)

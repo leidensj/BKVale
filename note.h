@@ -37,9 +37,12 @@ struct NoteItem
   NoteItem();
   void clear();
   double subtotal() const { return m_ammount * m_price; }
-  QString strSubtotal() const { return QString::number(subtotal(), 'f', 2); }
-  QString strAmmount() const { return QString::number(m_ammount, 'f', 3); }
-  QString strPrice() const { return QString::number(m_price, 'f', 2); }
+  static QString st_strSubTotal(double subtotal) { return QString::number(subtotal, 'f', 2); }
+  static QString st_strAmmount(double ammount) { return QString::number(ammount, 'f', 3); }
+  static QString st_strPrice(double price) { return QString::number(price, 'f', 2); }
+  QString strSubtotal() const { return st_strSubTotal(subtotal()); }
+  QString strAmmount() const { return st_strAmmount(m_ammount); }
+  QString strPrice() const { return st_strPrice(m_price); }
 };
 
 struct Note

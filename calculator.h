@@ -110,6 +110,13 @@ inline QString toStr(Button button)
       return " ";
   }
 }
+
+inline bool removeDecimal(QString& strValue)
+{
+  if (strValue.contains(Calculator::toStr(Calculator::Button::Dec)))
+    strValue.remove(QRegExp("^[0]*"));
+  strValue.replace(Calculator::toStr(Calculator::Button::Dec), "");
+}
 }
 
 #endif // CALCULATOR_H

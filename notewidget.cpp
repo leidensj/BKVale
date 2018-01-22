@@ -126,7 +126,7 @@ void NoteWidget::saveAndPrint(QSerialPort& printer, const QString& user)
   if (save())
   {
     create();
-    print(printer, user, m_view->getLastID());
+    //print(printer, user, m_view->getLastID());
   }
 }
 

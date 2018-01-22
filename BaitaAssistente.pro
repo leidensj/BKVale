@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     user.cpp \
     usermgtwidget.cpp \
     usermgtdatabase.cpp \
-    usermgtview.cpp
+    usermgtview.cpp \
+    notetablewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -72,7 +73,8 @@ HEADERS  += mainwindow.h \
     user.h \
     usermgtwidget.h \
     usermgtdatabase.h \
-    usermgtview.h
+    usermgtview.h \
+    notetablewidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

@@ -23,8 +23,7 @@ enum class NoteTableIndex : int
   Number,
   Date,
   Supplier,
-  Total,
-  Cash
+  Total
 };
 
 struct NoteItem

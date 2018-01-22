@@ -19,20 +19,11 @@ namespace
                "WWW.BAITAKAO.COM.BR"
                ESC_LF
                ESC_VERT_TAB
-               ESC_EXPAND_OFF;
-
-    if (!note.m_bCash)
-    {
-      strNote += "ORDEM DE RECEBIMENTO"
-                 ESC_LF
-                 "DE MERCADORIA";
-    }
-    else
-    {
-      strNote += "PAGAMENTO A VISTA";
-    }
-
-    strNote += ESC_LF
+               ESC_EXPAND_OFF
+               "ORDEM DE RECEBIMENTO"
+               ESC_LF
+               "DE MERCADORIA"
+               ESC_LF
                ESC_VERT_TAB
                ESC_ALIGN_LEFT
                "Numero     "
@@ -67,7 +58,6 @@ namespace
                QDate::currentDate().toString("dd/MM/yyyy ") +
                QTime::currentTime().toString("hh:mm:ss") +
                " @ " +
-               QHostInfo::localHostName().toUpper() +
                ESC_LF
                ESC_LF
                ESC_LF
@@ -77,6 +67,7 @@ namespace
                "Assinatura " +
                user +
                ESC_LF;
+<<<<<<< HEAD
 
     if (note.m_bCash)
     {
@@ -87,6 +78,8 @@ namespace
                  "Assinatura Fornecedor"
                  ESC_LF;
     }
+=======
+>>>>>>> parent of 6dc534f... Revert "Revert "note cash feito""
   }
 
   void noteAppendBody(const Note& note, QString& strNote)
@@ -176,17 +169,10 @@ QString NotePrinter::build(const Note& note,
   noteAppendHeader(note, number, strNote1);
   noteAppendBody(note, strNote1);
   noteAppendFooter(note, user, strNote1);
-  if (!note.m_bCash)
-  {
-    QString strNote2(strNote1);
-    strNote1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
-    strNote2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
-    return strNote1 + strNote2;
-  }
-  else
-  {
-    return strNote1 + ESC_LF ESC_FULL_CUT;
-  }
+  QString strNote2(strNote1);
+  strNote1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
+  strNote2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
+  return strNote1 + strNote2;
 }
 
 QString ReminderPrinter::build(const Reminder& r)

@@ -41,15 +41,15 @@ private:
   ReminderWidget* m_reminder;
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
-  QSerialPort m_printer;
+  QSerialPort m_printerSerial;
   QTcpSocket m_printerTCP;
-  quint16 m_nextBlockSizeTCP;
   Settings m_settings;
   QLabel* m_statusFilePath;
   QLabel* m_statusUserName;
 
 private slots:
   void connect();
+  void connectSerial();
   void connectTCP();
   void connectedTCP();
   void disconnect();

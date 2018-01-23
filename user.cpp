@@ -21,7 +21,7 @@ void User::clear()
   m_bAccessSettings = false;
 }
 
-QString User::strEncryptedPassword(const QString& strPassword)
+QString User::st_strEncryptedPassword(const QString& strPassword)
 {
   return QString(QCryptographicHash::hash(strPassword.toUtf8(),
                                           QCryptographicHash::Md5));

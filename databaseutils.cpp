@@ -402,7 +402,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                   "'ADMIN',"
                   "(:_password),"
                   "1,1,1,1,1,1,1,1)");
-    query.bindValue(":_password", User::strEncryptedPassword("admin"));
+    query.bindValue(":_password", User::st_strEncryptedPassword("admin"));
     query.exec();
   }
 
@@ -807,7 +807,7 @@ bool UserSQL::insert(QSqlDatabase db,
                 "(:_accessItem),"
                 "(:_accessSettings))");
   query.bindValue(":_user", user.m_strUser);
-  query.bindValue(":_password", user.strEncryptedPassword(strPassword));
+  query.bindValue(":_password", user.st_strEncryptedPassword(strPassword));
   query.bindValue(":_accessNote", user.m_bAccessNote);
   query.bindValue(":_accessReminder", user.m_bAccessReminder);
   query.bindValue(":_accessCalculator", user.m_bAccessCalculator);
@@ -857,7 +857,7 @@ bool UserSQL::update(QSqlDatabase db,
   query.bindValue(":_id", user.m_id);
   query.bindValue(":_user", user.m_strUser);
   if (!strPassword.isEmpty())
-    query.bindValue(":_password", user.strEncryptedPassword(strPassword));
+    query.bindValue(":_password", User::st_strEncryptedPassword(strPassword));
   query.bindValue(":_accessNote", user.m_bAccessNote);
   query.bindValue(":_accessReminder", user.m_bAccessReminder);
   query.bindValue(":_accessCalculator", user.m_bAccessCalculator);
@@ -975,7 +975,7 @@ bool UserLoginSQL::login(const QString& strUser,
                 "WHERE _USER = (:_user) AND "
                 "_PASSWORD = (:_password) LIMIT 1");
   query.bindValue(":_user", strUser);
-  query.bindValue(":_password", User::strEncryptedPassword(strPassword));
+  query.bindValue(":_password", User::st_strEncryptedPassword(strPassword));
 
   if (query.exec())
   {

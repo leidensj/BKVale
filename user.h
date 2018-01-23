@@ -39,8 +39,8 @@ struct User
   bool m_bAccessItem;
   bool m_bAccessSettings;
 
-  static bool isValidID(int id) { return id != INVALID_USER_ID; }
-  static QString strEncryptedPassword(const QString& strPassword);
+  static bool st_isValidID(int id) { return id != INVALID_USER_ID; }
+  static QString st_strEncryptedPassword(const QString& strPassword);
 };
 
 #endif // USER_H

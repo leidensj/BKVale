@@ -18,19 +18,16 @@ namespace Printer
              QString& error);
 
   void fullCut(QSerialPort& printer);
+
+  bool init(QTcpSocket& printer,
+            QString& error);
+
+  bool print(QTcpSocket& printer,
+             const QString& msg,
+             QString& error);
+
+  void fullCut(QTcpSocket& printer);
 }
-
-/*namespace PrinterTCP
-{
-bool init(QTcpSocket& printerTcp,
-          QString& error);
-
-bool print(QTcpSocket& printerTcp,
-           const QString& msg,
-           QString& error);
-
-void fullCut(QSerialPort& printer);
-}*/
 
 namespace NotePrinter
 {

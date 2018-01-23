@@ -122,8 +122,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_reminder->setDatabase(m_userLogin.getDatabase());
   updateControls();
   updateStatusBar();
-  //TODO
-  //connectTCP();
 }
 
 BaitaAssistant::~BaitaAssistant()
@@ -132,6 +130,19 @@ BaitaAssistant::~BaitaAssistant()
 }
 
 void BaitaAssistant::connect()
+{
+  switch (m_settings.m_interfaceType)
+  {
+    case InterfaceType::Serial:
+      connectSerial();
+      break;
+    case InterfaceType::Ethernet:
+      connectedTCP();
+      break;
+  }
+}
+
+void BaitaAssistant::connectSerial()
 {
   if (m_printer.isOpen())
   {
@@ -193,8 +204,57 @@ void BaitaAssistant::connect()
 
 void BaitaAssistant::connectTCP()
 {
-  m_printerTCP.connectToHost("192.168.0.16", 9100);
-  m_nextBlockSizeTCP = 0;
+  if (m_printerTCP.isOpen())
+  {
+    else
+    {
+      QMessageBox msgBox(QMessageBox::Information,
+                         tr("Aviso"),
+                         tr("A impressora já está conectada."),
+                         QMessageBox::Ok);
+      msgBox.exec();
+      return;
+    }
+  }
+
+  if (!m_settings.m_ethernetIP.isEmpty())
+  {
+    m_printerTCP.connectToHost(m_settings.m_ethernetIP,
+                               (quint16)m_settings.m_ethernetPort);
+    if (!m_printerTCP.waitForConnected())
+    {
+      QMessageBox::critical(this,
+                            tr("Erro"),
+                            tr("O seguinte erro ocorreu ao conectar à impressora "
+                               "(IP '%2', Porta: '%3'): '%4'.").arg(
+                              m_settings.m_ethernetIP,
+                              QString::number(m_settings.m_ethernetPort),
+                              m_printerTCP.errorString()),
+                            QMessageBox::Ok);
+    }
+    else
+    {
+      QString error;
+      if (!Printer::init(m_printerTCP, error))
+      {
+        QMessageBox::warning(this,
+                             tr("Aviso"),
+                             tr("Erro ao inicializar a impressora: '%1'.").arg(error),
+                             QMessageBox::Ok);
+        m_printerTCP.close();
+      }
+    }
+  }
+  else
+  {
+    QMessageBox msgBox(QMessageBox::Warning,
+                       tr("Atenção"),
+                       tr("É necessário selecionar um IP para se conectar à impressora."),
+                       QMessageBox::Ok);
+    msgBox.exec();
+  }
+
+  updateControls();
 }
 
 void BaitaAssistant::connectedTCP()
@@ -206,6 +266,8 @@ void BaitaAssistant::disconnect()
 {
   if (m_printer.isOpen())
       m_printer.close();
+  if (m_printerTCP.isOpen())
+    m_printerTCP.close();
   updateControls();
 }
 

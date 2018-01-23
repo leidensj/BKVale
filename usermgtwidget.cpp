@@ -110,7 +110,7 @@ void UserMgtWidget::save()
 {
   QString error;
   User user = m_view->getUser();
-  bool bSuccess = User::isValidID(user.m_id)
+  bool bSuccess = User::st_isValidID(user.m_id)
                   ? UserSQL::update(m_database->get(), user, m_view->getPassword(), error)
                   : UserSQL::insert(m_database->get(), user, m_view->getPassword(), error);
 

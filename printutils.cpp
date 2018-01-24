@@ -107,89 +107,52 @@ namespace
   }
 }
 
-void sendRequest(QTcpSocket& printer,
-                 const QString& msg,
-                 QString& error)
-{
-  QByteArray block;
-  QDataStream out(&block, QIODevice::WriteOnly);
-  out.setVersion(QDataStream::Qt_5_0);
-  out << msg;
-  out.device()->seek(0);
-  out << quint16(block.size() - sizeof(quint16));
-  printer.write(block);
-}
-
-bool Printer::init(QSerialPort& printer,
-                   QString& error)
-{
-  error.clear();
-  QString msg = QString(ESC_INIT) + ESC_CODEPAGE850;
-  return print(printer, msg, error);
-}
-
-bool Printer::print(QSerialPort& printer,
+bool Printer::print(QIODevice* printer,
+                    InterfaceType type,
                     const QString& msg,
                     QString& error)
 {
   error.clear();
-  QByteArray data(msg.toUtf8());
-  bool bSuccess = false;
-  auto nBytes = printer.write(data);
 
+  if (printer == nullptr)
+  {
+    error = "Erro interno. Contacte o administrador.";
+    return false;
+  }
+  QByteArray data;
+  QDataStream out(&data, QIODevice::WriteOnly);
+  out.setVersion(QDataStream::Qt_4_3);
+  if (type == InterfaceType::Serial)
+  {
+    out << msg.toUtf8();
+  }
+  else if (type == InterfaceType::Ethernet)
+  {
+    out << quint16(0) << msg;
+    out.device()->seek(0);
+    out << quint16(data.size() - sizeof(quint16));
+  }
+  auto nBytes = printer->write(data);
   if (nBytes != data.size())
   {
-    error = QObject::tr("Erro '%1' ao imprimir: %2").arg(
-              QString::number(printer.error()),
-              printer.errorString());
+    error = QObject::tr("Erro ao imprimir:\n'%1'.").arg(printer->errorString());
   }
-  else if (!printer.waitForBytesWritten(5000))
-  {
+  else if (!printer->waitForBytesWritten(30000))
     error = QObject::tr("Falha de timeout.");
-  }
   else
-  {
-    bSuccess = true;
-  }
+    return true;
 
-  return bSuccess;
+  return false;
 }
 
-void Printer::fullCut(QSerialPort& printer)
+QString Printer::strCmdInit()
 {
-  QString error;
-  print(printer, ESC_FULL_CUT, error);
+  return ESC_INIT ESC_CODEPAGE850;
 }
 
-bool Printer::init(QTcpSocket& printer,
-                   QString& error)
+QString Printer::strCmdFullCut()
 {
-  error.clear();
-  QString msg = QString(ESC_INIT) + ESC_CODEPAGE850;
-  return print(printer, msg, error);
-}
-
-bool Printer::print(QTcpSocket& printer,
-                    const QString& msg,
-                    QString& error)
-{
-  error.clear();
-
-  QByteArray block;
-  QDataStream out(&block, QIODevice::WriteOnly);
-  out.setVersion(QDataStream::Qt_4_3);
-  out << quint16(0) << msg;
-  out.device()->seek(0);
-  out << quint16(block.size() - sizeof(quint16));
-  printer.write(block);
-
-  return bSuccess;
-}
-
-void Printer::fullCut(QTcpSocket& printer)
-{
-  QString error;
-  print(printer, ESC_FULL_CUT, error);
+  return ESC_FULL_CUT;
 }
 
 QString NotePrinter::build(const Note& note,

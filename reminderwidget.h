@@ -4,11 +4,12 @@
 #include <QFrame>
 #include <QSqlDatabase>
 #include "reminder.h"
-#include <printutils.h>
+#include "settings.h"
 
 class QDockWidget;
 class ReminderView;
 class ReminderDatabase;
+class QIODevice;
 
 class ReminderWidget : public QFrame
 {
@@ -17,10 +18,10 @@ class ReminderWidget : public QFrame
 public:
   ReminderWidget(QWidget *parent = 0);
   bool isValid() const;
-  bool print(QSerialPort& printer);
-  bool save();
   void setDatabase(QSqlDatabase db);
-  void clear();
+  void saveAndPrint(QIODevice* printer,
+                    InterfaceType type,
+                    int userId);
 
 private slots:
   void emitChangedSignal();
@@ -34,7 +35,8 @@ private:
   ReminderView* m_view;
   ReminderDatabase* m_db;
   QDockWidget* m_dock;
-
+  bool print(QIODevice* printer, InterfaceType type);
+  bool save(int userId);
 };
 
 #endif // REMINDERWIDGET_H

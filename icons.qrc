@@ -75,5 +75,6 @@
         <file>res/capslockoff.png</file>
         <file>res/view.png</file>
         <file>res/cash.png</file>
+        <file>res/check.png</file>
     </qresource>
 </RCC>

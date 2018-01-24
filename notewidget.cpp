@@ -80,7 +80,10 @@ void NoteWidget::showSearch()
   }
 }
 
-bool NoteWidget::print(QSerialPort& printer, const QString& user, int id)
+bool NoteWidget::print(QIODevice* printer,
+                       InterfaceType type,
+                       const QString& user,
+                       int id)
 {
   Note note;
   note.m_id = id;
@@ -89,7 +92,7 @@ bool NoteWidget::print(QSerialPort& printer, const QString& user, int id)
   if (NoteSQL::select(m_database->get(), note, number, error))
   {
     QString str(NotePrinter::build(note, number, user));
-    if (Printer::print(printer, str, error))
+    if (Printer::print(printer, type, str, error))
       return true;
   }
 
@@ -121,12 +124,14 @@ bool NoteWidget::save()
   return false;
 }
 
-void NoteWidget::saveAndPrint(QSerialPort& printer, const QString& user)
+void NoteWidget::saveAndPrint(QIODevice* printer,
+                              InterfaceType type,
+                              const QString& user)
 {
   if (save())
   {
     create();
-    print(printer, user, m_view->getLastID());
+    print(printer, type, user, m_view->getLastID());
   }
 }
 

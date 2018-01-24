@@ -6,6 +6,7 @@
 #include <QScrollBar>
 #include <QRadioButton>
 #include <QSplitter>
+#include <QMessageBox>
 #include "printutils.h"
 #include "escpos.h"
 
@@ -26,6 +27,8 @@ void CalculatorPushButton::emitCalculatorButtonClickedSignal()
 
 CalculatorWidget::CalculatorWidget(QWidget* parent)
   : QFrame(parent)
+  , m_printer(nullptr)
+  , m_type(InterfaceType::Serial)
   , m_btn0(nullptr)
   , m_btn1(nullptr)
   , m_btn2(nullptr)
@@ -366,9 +369,37 @@ double CalculatorWidget::calculate(double op1, double op2, Calculator::Button bu
   }
 }
 
+void CalculatorWidget::print(QIODevice* printer, InterfaceType type)
+{
+  QString error;
+  if (!Printer::print(printer,
+                      type,
+                      m_view->toPlainText() + Printer::strCmdFullCut(),
+                      error))
+  {
+    QMessageBox::critical(this,
+                          tr("Erro"),
+                          tr("Erro '%1' ao imprimir a conta.").arg(error),
+                          QMessageBox::Ok);
+  }
+}
+
 void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
 {
-   QString text;
+  QString text = buildPrintContent(value, button);
+  m_view->appendPlainText(text);
+  m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
+  if (m_btnPrint->isChecked())
+  {
+    QString text2 = m_rdoAlignLeft->isChecked() ? ESC_ALIGN_LEFT : ESC_ALIGN_CENTER;
+    text2 += ESC_EXPAND_ON + text + ESC_LF ESC_EXPAND_OFF;
+    emit printSignal(text2);
+  }
+}
+
+QString CalculatorWidget::buildPrintContent(double value, Calculator::Button button)
+{
+  QString text;
   if (Calculator::isEqual(button))
   {
     text = Calculator::toStr(button) + " " +
@@ -379,15 +410,7 @@ void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
     text = QString::number(value, 'f').remove(QRegExp("\\.?0*$")) +
            " " + Calculator::toStr(button);
   }
-
-  m_view->appendPlainText(text);
-  m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
-  if (m_btnPrint->isChecked())
-  {
-    QString text2 = m_rdoAlignLeft->isChecked() ? ESC_ALIGN_LEFT : ESC_ALIGN_CENTER;
-    text2 += ESC_EXPAND_ON + text + ESC_LF ESC_EXPAND_OFF;
-    emit printSignal(text2);
-  }
+  return text;
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
@@ -444,10 +467,5 @@ void CalculatorWidget::reset()
   m_lastValue = 0.0;
   m_total = 0.0;
   if (m_btnPrint->isChecked())
-    emit printFullCutSignal();
-}
-
-QString CalculatorWidget::text() const
-{
-  return m_view->toPlainText();
+    emit printSignal(Printer::strCmdFullCut());
 }

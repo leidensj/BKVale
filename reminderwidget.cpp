@@ -1,6 +1,7 @@
 #include "reminderwidget.h"
 #include "reminderview.h"
 #include "reminderdatabase.h"
+#include "printutils.h"
 #include <QLayout>
 #include <QSplitter>
 #include <QMessageBox>
@@ -65,11 +66,11 @@ void ReminderWidget::showDock()
     m_dock->show();
 }
 
-bool ReminderWidget::print(QSerialPort& printer)
+bool ReminderWidget::print(QIODevice* printer, InterfaceType type)
 {
   QString str(ReminderPrinter::build(m_view->reminder()));
   QString error;
-  bool bSuccess = Printer::print(printer, str, error);
+  bool bSuccess = Printer::print(printer, type, str, error);
   if (!bSuccess)
   {
     QMessageBox::warning(this,
@@ -80,7 +81,7 @@ bool ReminderWidget::print(QSerialPort& printer)
   return bSuccess;
 }
 
-bool ReminderWidget::save()
+bool ReminderWidget::save(int userId)
 {
   if (!m_view->isSaveChecked())
     return true;
@@ -106,11 +107,6 @@ void ReminderWidget::setDatabase(QSqlDatabase db)
   m_db->setDatabase(db);
 }
 
-void ReminderWidget::clear()
-{
-  m_view->clear();
-}
-
 bool ReminderWidget::isValid() const
 {
   return m_view->isValid();
@@ -119,5 +115,14 @@ bool ReminderWidget::isValid() const
 void ReminderWidget::removed(int id)
 {
   if (m_view->reminder().m_id == id)
+    m_view->clear();
+}
+
+void ReminderWidget::saveAndPrint(QIODevice* printer,
+                                  InterfaceType type,
+                                  int userId)
+{
+  save(userId);
+  if (print(printer, type))
     m_view->clear();
 }

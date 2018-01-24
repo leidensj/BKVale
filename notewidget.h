@@ -2,13 +2,14 @@
 #define NOTEWIDGET_H
 
 #include <QFrame>
-#include "note.h"
-#include <QSerialPort>
 #include <QSqlDatabase>
+#include "note.h"
+#include "settings.h"
 
 class QDockWidget;
 class NoteView;
 class NoteDatabase;
+class QIODevice;
 
 class NoteWidget : public QFrame
 {
@@ -25,11 +26,16 @@ private:
   NoteDatabase* m_database;
   QDockWidget* m_dock;
   bool save();
-  bool print(QSerialPort& printer, const QString& user, int id);
+  bool print(QIODevice* printer,
+             InterfaceType type,
+             const QString& user,
+             int id);
 
 public slots:
   void create();
-  void saveAndPrint(QSerialPort& printer, const QString& user);
+  void saveAndPrint(QIODevice* printer,
+                    InterfaceType type,
+                    const QString& user);
 
 private slots:
   void emitChangedSignal();

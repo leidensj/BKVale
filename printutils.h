@@ -7,26 +7,17 @@
 #include "reminder.h"
 #include "item.h"
 #include "consumption.h"
+#include "settings.h"
 
 namespace Printer
 {
-  bool init(QSerialPort& printer,
-            QString& error);
-
-  bool print(QSerialPort& printer,
+  bool print(QIODevice* printer,
+             InterfaceType type,
              const QString& msg,
              QString& error);
 
-  void fullCut(QSerialPort& printer);
-
-  bool init(QTcpSocket& printer,
-            QString& error);
-
-  bool print(QTcpSocket& printer,
-             const QString& msg,
-             QString& error);
-
-  void fullCut(QTcpSocket& printer);
+  QString strCmdInit();
+  QString strCmdFullCut();
 }
 
 namespace NotePrinter

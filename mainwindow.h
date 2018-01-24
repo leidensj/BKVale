@@ -49,16 +49,13 @@ private:
 
 private slots:
   void connect();
-  void connectSerial();
-  void connectTCP();
   void connectedTCP();
   void disconnect();
   void updateControls();
   void updateStatusBar();
   void showInfo();
   void print();
-  bool print(const QString& text);
-  void printFullCut();
+  void print(const QString& text);
   void openSettingsDialog();
   void openUsersDialog();
   void openItemsDialog();

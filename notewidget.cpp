@@ -164,12 +164,12 @@ void NoteWidget::setNote(int id)
 void NoteWidget::setDatabase(QSqlDatabase db)
 {
   QVector<SqlTableColumn> columns;
-  columns.push_back(SqlTableColumn(true, "_ID", "Id"));
-  columns.push_back(SqlTableColumn(false, "_NUMBER", "Número"));
-  columns.push_back(SqlTableColumn(false, "_DATE", "Data"));
-  columns.push_back(SqlTableColumn(false, "_SUPPLIER", "Fornecedor"));
-  columns.push_back(SqlTableColumn(false, "_TOTAL", "Total"));
-  columns.push_back(SqlTableColumn(false, "_CASH", "À Vista"));
+  columns.push_back(SqlTableColumn(true, false, "_ID", "Id", QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(false, true, "_NUMBER", "Número", QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(false, false, "_DATE", "Data", QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(false, false, "_SUPPLIER", "Fornecedor", QHeaderView::ResizeMode::Stretch));
+  columns.push_back(SqlTableColumn(false, false, "_TOTAL", "Total", QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(false, false, "_CASH", "À Vista", QHeaderView::ResizeMode::ResizeToContents));
   m_database->set(db, "_PROMISSORYNOTES", columns);
 }
 

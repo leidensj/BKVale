@@ -4,7 +4,6 @@
 #include <QLayout>
 #include <QSqlRecord>
 #include <QPushButton>
-#include <QCheckBox>
 #include <QTableView>
 #include <QSqlTableModel>
 #include <QHeaderView>
@@ -52,7 +51,7 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   , m_btnRemove(nullptr)
   , m_btnFilter(nullptr)
   , m_edFilterSearch(nullptr)
-  , m_cbContains(nullptr)
+  , m_btnContains(nullptr)
   , m_table(nullptr)
 {
   m_btnOpen = new QPushButton();
@@ -80,9 +79,14 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   m_btnFilter->setIcon(QIcon(":/icons/res/filter.png"));
 
   m_edFilterSearch = new JLineEdit(false, false);
+  m_edFilterSearch->setClearButtonEnabled(true);
 
-  m_cbContains = new QCheckBox();
-  m_cbContains->setText(tr("Contendo"));
+  m_btnContains = new QPushButton();
+  m_btnContains->setFlat(true);
+  m_btnContains->setText("");
+  m_btnContains->setIconSize(QSize(24, 24));
+  m_btnContains->setIcon(QIcon(":/icons/res/center.png"));
+  m_btnContains->setCheckable(true);
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
@@ -92,7 +96,7 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   hlayout1->addWidget(m_btnRemove);
   hlayout1->addWidget(m_btnFilter);
   hlayout1->addWidget(m_edFilterSearch);
-  hlayout1->addWidget(m_cbContains);
+  hlayout1->addWidget(m_btnContains);
 
   m_table = new QTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -137,10 +141,18 @@ NoteDatabase::NoteDatabase(QWidget *parent)
                    this,
                    SLOT(filterSearchEnter()));
 
-  QObject::connect(m_cbContains,
+  QObject::connect(m_btnContains,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(containsPressed()));
+
+  QObject::connect(m_table->horizontalHeader(),
+                   SIGNAL(sortIndicatorChanged(int,
+                                               Qt::SortOrder)),
+                   this,
+                   SLOT(filterSearchChanged()));
+
+  filterSearchChanged();
 }
 
 void NoteDatabase::set(QSqlDatabase db,
@@ -156,13 +168,18 @@ void NoteDatabase::set(QSqlDatabase db,
   model->setTable(m_tableName);
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
   for (int i = 0; i != m_columns.size(); ++i)
-  {
     model->setHeaderData(i, Qt::Horizontal, m_columns.at(i).m_friendlyName);
-    if (m_columns.at(i).m_bHidden)
-      m_table->hideColumn(i);
-  }
 
   m_table->setModel(model);
+  for (int i = 0; i != m_columns.size(); ++i)
+  {
+    m_table->horizontalHeader()->setSectionResizeMode(i, m_columns.at(i).m_resizeMode);
+    if (m_columns.at(i).m_bHidden)
+      m_table->hideColumn(i);
+    if (m_columns.at(i).m_bSort)
+      m_table->horizontalHeader()->setSortIndicator(i, Qt::SortOrder::AscendingOrder);
+  }
+
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
@@ -237,22 +254,24 @@ void NoteDatabase::filterSearchChanged()
 
   QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
   QString str = m_edFilterSearch->text();
-  str.toUpper();
-  m_edFilterSearch->setText(str);
+  str = str.toUpper();
+  m_edFilterSearch->setTextBlockingSignals(str);
   int column = m_table->horizontalHeader()->sortIndicatorSection();
   if (str.isEmpty())
   {
-    m_edFilterSearch->setPlaceholderText(tr("Procurar pelo(a) ") + m_columns.at(column).m_friendlyName);
+    m_edFilterSearch->setPlaceholderText(tr("Procurar pelo(a) ") +
+                                         m_columns.at(column).m_friendlyName.toLower());
     model->setFilter("");
   }
   else
   {
-    QString filter = filter = m_columns.at(column).m_sqlName + " LIKE '";
-    if (m_cbContains->isChecked())
+    QString filter = m_columns.at(column).m_sqlName + " LIKE '";
+    if (m_btnContains->isChecked())
         filter += "%";
     filter += str + "%'";
     model->setFilter(filter);
   }
+  enableControls();
 }
 
 void NoteDatabase::filterSearchEnter()

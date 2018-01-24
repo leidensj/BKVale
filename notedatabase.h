@@ -7,33 +7,41 @@
 #include <QModelIndex>
 #include <QSqlTableModel>
 #include <QVector>
+#include <QHeaderView>
 
 class QPushButton;
 class QTableView;
-class QCheckBox;
 class JLineEdit;
 
 struct SqlTableColumn
 {
   SqlTableColumn()
     : m_bHidden(false)
+    , m_resizeMode(QHeaderView::ResizeMode::ResizeToContents)
   {
 
   }
 
   SqlTableColumn(bool bHidden,
+                 bool bSort,
                  const QString& sqlName,
-                 const QString& friendlyName)
+                 const QString& friendlyName,
+                 QHeaderView::ResizeMode resizeMode)
   : m_bHidden(bHidden)
+  , m_bSort(bSort)
   , m_sqlName(sqlName)
   , m_friendlyName(friendlyName)
+  , m_resizeMode(resizeMode)
   {
-
+    if (m_bSort && m_bHidden)
+      m_bSort = false;
   }
 
   bool m_bHidden;
+  bool m_bSort;
   QString m_sqlName;
   QString m_friendlyName;
+  QHeaderView::ResizeMode m_resizeMode;
 };
 
 class NoteDatabase : public QFrame
@@ -59,7 +67,7 @@ private:
   QPushButton* m_btnRemove;
   QPushButton* m_btnFilter;
   JLineEdit* m_edFilterSearch;
-  QCheckBox* m_cbContains;
+  QPushButton* m_btnContains;
   QTableView* m_table;
   QString m_tableName;
   QVector<SqlTableColumn> m_columns;

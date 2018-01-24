@@ -76,5 +76,6 @@
         <file>res/view.png</file>
         <file>res/cash.png</file>
         <file>res/check.png</file>
+        <file>res/center.png</file>
     </qresource>
 </RCC>

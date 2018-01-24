@@ -12,6 +12,8 @@ public:
                      bool enterAsTab,
                      QWidget* parent = 0);
 
+  void setTextBlockingSignals(const QString& str);
+
 protected:
   void keyPressEvent(QKeyEvent *event);
 

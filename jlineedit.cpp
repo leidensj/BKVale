@@ -35,3 +35,10 @@ void JLineEdit::toUpper()
   setText(text().toUpper());
   blockSignals(false);
 }
+
+void JLineEdit::setTextBlockingSignals(const QString& str)
+{
+  blockSignals(true);
+  setText(str);
+  blockSignals(false);
+}

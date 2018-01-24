@@ -77,7 +77,8 @@ namespace
                  ESC_LF
                  "________________________________"
                  ESC_LF
-                 "Assinatura Fornecedor"
+                 "Assinatura " +
+                 note.m_supplier +
                  ESC_LF;
     }
   }
@@ -128,7 +129,7 @@ bool Printer::print(QIODevice* printer,
   }
   else if (type == InterfaceType::Ethernet)
   {
-    out << quint16(0) << msg;
+    out << quint16(0) << msg.toUtf8();
     out.device()->seek(0);
     out << quint16(data.size() - sizeof(quint16));
   }
@@ -147,7 +148,7 @@ bool Printer::print(QIODevice* printer,
 
 QString Printer::strCmdInit()
 {
-  return ESC_INIT ESC_CODEPAGE850;
+  return ESC_INIT;
 }
 
 QString Printer::strCmdFullCut()

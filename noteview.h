@@ -66,7 +66,6 @@ private:
 private slots:
   void setToday();
   void checkDate();
-  void emitChangedSignal();
   void emitShowSearchSignal();
   void emitCreateSignal();
   void emitOpenLastSignal();

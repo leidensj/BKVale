@@ -233,7 +233,7 @@ NoteView::NoteView(QWidget *parent)
   QObject::connect(m_cbSupplier,
                    SIGNAL(editTextChanged(const QString&)),
                    this,
-                   SLOT(emitChangedSignal()));
+                   SLOT(updateControls()));
 
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
@@ -265,11 +265,6 @@ NoteView::NoteView(QWidget *parent)
                    this,
                    SLOT(updateControls()));
 
-  QObject::connect(m_table,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(emitChangedSignal()));
-
   QObject::connect(m_btnOpenLast,
                    SIGNAL(clicked(bool)),
                    this,
@@ -284,6 +279,16 @@ NoteView::NoteView(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(setToday()));
+
+  QObject::connect(m_btnToday,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(setToday()));
+
+  QObject::connect(m_cbCash,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
 
   QTimer *timer = new QTimer(this);
   QObject::connect(timer,
@@ -312,7 +317,6 @@ void NoteView::addItem(const NoteItem& noteItem)
   m_table->addItem(noteItem);
   m_table->setFocus();
   updateControls();
-  emitChangedSignal();
 }
 
 void NoteView::removeItem()
@@ -321,12 +325,6 @@ void NoteView::removeItem()
   if (!m_table->hasItems())
     m_cbSupplier->setFocus();
   updateControls();
-  emitChangedSignal();
-}
-
-void NoteView::emitChangedSignal()
-{
-  emit changedSignal();
 }
 
 Note NoteView::getNote() const
@@ -421,6 +419,8 @@ void NoteView::updateControls()
     m_edTotal->setText(m_table->computeTotal());
   else
   m_edTotal->clear();
+
+  emit changedSignal();
 }
 
 void NoteView::emitShowSearchSignal()

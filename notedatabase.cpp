@@ -1,8 +1,10 @@
 #include "notedatabase.h"
+#include "jlineedit.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QTableView>
 #include <QSqlTableModel>
 #include <QHeaderView>
@@ -17,23 +19,28 @@ public:
 
   }
 
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
   {
+    QVariant value = QSqlTableModel::data(idx, role);
+    if (role == Qt::DisplayRole)
     {
-      if (!index.isValid())
-        return QModelIndex();
-
-      QVariant value = QSqlTableModel::data(index, role);
-      if (role == Qt::DisplayRole)
-      {
-        if (index.column() == (int)NoteTableIndex::Date)
-          value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
-        else if (index.column() == (int)NoteTableIndex::Total)
-          value = "R$ " + QString::number(value.toDouble(), 'f', 2);
-      }
-
-      return value;
+      if (idx.column() == (int)NoteTableIndex::Date)
+        value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
+      else if (idx.column() == (int)NoteTableIndex::Total)
+        value = "R$ " + QString::number(value.toDouble(), 'f', 2);
+      if (idx.column() == (int)NoteTableIndex::Cash)
+        value = "";
     }
+    else if (role == Qt::DecorationRole)
+    {
+      if (idx.column() == (int)NoteTableIndex::Cash)
+      {
+        value = QSqlTableModel::data(idx, Qt::EditRole).toBool()
+                ? QVariant::fromValue(QIcon(":/icons/res/check.png"))
+                : "";
+      }
+    }
+    return value;
   }
 };
 
@@ -43,6 +50,9 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
+  , m_btnFilter(nullptr)
+  , m_edFilterSearch(nullptr)
+  , m_cbContains(nullptr)
   , m_table(nullptr)
 {
   m_btnOpen = new QPushButton();
@@ -63,12 +73,26 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   m_btnRemove->setIconSize(QSize(24, 24));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
+  m_btnFilter = new QPushButton();
+  m_btnFilter->setFlat(true);
+  m_btnFilter->setText("");
+  m_btnFilter->setIconSize(QSize(24, 24));
+  m_btnFilter->setIcon(QIcon(":/icons/res/filter.png"));
+
+  m_edFilterSearch = new JLineEdit(false, false);
+
+  m_cbContains = new QCheckBox();
+  m_cbContains->setText(tr("Contendo"));
+
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
   hlayout1->setAlignment(Qt::AlignLeft);
   hlayout1->addWidget(m_btnOpen);
   hlayout1->addWidget(m_btnRefresh);
   hlayout1->addWidget(m_btnRemove);
+  hlayout1->addWidget(m_btnFilter);
+  hlayout1->addWidget(m_edFilterSearch);
+  hlayout1->addWidget(m_cbContains);
 
   m_table = new QTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -102,23 +126,43 @@ NoteDatabase::NoteDatabase(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitNoteRemoveSignal()));
+
+  QObject::connect(m_edFilterSearch,
+                   SIGNAL(textEdited(const QString&)),
+                   this,
+                   SLOT(filterSearchChanged()));
+
+  QObject::connect(m_edFilterSearch,
+                   SIGNAL(enterSignal()),
+                   this,
+                   SLOT(filterSearchEnter()));
+
+  QObject::connect(m_cbContains,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(containsPressed()));
 }
 
-void NoteDatabase::set(QSqlDatabase db)
+void NoteDatabase::set(QSqlDatabase db,
+                       const QString& tableName,
+                       const QVector<SqlTableColumn>& sqlTableColumns)
 {
   if (m_table->model() != nullptr)
     return;
 
+  m_tableName = tableName;
+  m_columns = sqlTableColumns;
   NoteTableModel* model = new NoteTableModel(this, db);
-  model->setTable("_PROMISSORYNOTES");
+  model->setTable(m_tableName);
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-  model->setHeaderData((int)NoteTableIndex::ID, Qt::Horizontal, tr("ID"));
-  model->setHeaderData((int)NoteTableIndex::Number, Qt::Horizontal, tr("Número"));
-  model->setHeaderData((int)NoteTableIndex::Date, Qt::Horizontal, tr("Data"));
-  model->setHeaderData((int)NoteTableIndex::Supplier, Qt::Horizontal, tr("Fornecedor"));
-  model->setHeaderData((int)NoteTableIndex::Total, Qt::Horizontal, tr("Total"));
+  for (int i = 0; i != m_columns.size(); ++i)
+  {
+    model->setHeaderData(i, Qt::Horizontal, m_columns.at(i).m_friendlyName);
+    if (m_columns.at(i).m_bHidden)
+      m_table->hideColumn(i);
+  }
+
   m_table->setModel(model);
-  m_table->hideColumn((int)NoteTableIndex::ID);
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
@@ -184,4 +228,50 @@ void NoteDatabase::emitNoteRemoveSignal()
       emit noteRemoveSignal(id);
     }
   }
+}
+
+void NoteDatabase::filterSearchChanged()
+{
+  if (m_table->model() == nullptr)
+    return;
+
+  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+  QString str = m_edFilterSearch->text();
+  str.toUpper();
+  m_edFilterSearch->setText(str);
+  int column = m_table->horizontalHeader()->sortIndicatorSection();
+  if (str.isEmpty())
+  {
+    m_edFilterSearch->setPlaceholderText(tr("Procurar pelo(a) ") + m_columns.at(column).m_friendlyName);
+    model->setFilter("");
+  }
+  else
+  {
+    QString filter = filter = m_columns.at(column).m_sqlName + " LIKE '";
+    if (m_cbContains->isChecked())
+        filter += "%";
+    filter += str + "%'";
+    model->setFilter(filter);
+  }
+}
+
+void NoteDatabase::filterSearchEnter()
+{
+  m_table->setFocus();
+  if (m_table->model() != nullptr &&
+      m_table->model()->rowCount() != 0)
+  {
+    m_table->selectRow(0);
+  }
+  else
+  {
+    m_edFilterSearch->setFocus();
+    m_edFilterSearch->selectAll();
+  }
+}
+
+void NoteDatabase::containsPressed()
+{
+  filterSearchChanged();
+  m_edFilterSearch->setFocus();
 }

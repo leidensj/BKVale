@@ -163,7 +163,14 @@ void NoteWidget::setNote(int id)
 
 void NoteWidget::setDatabase(QSqlDatabase db)
 {
-  m_database->set(db);
+  QVector<SqlTableColumn> columns;
+  columns.push_back(SqlTableColumn(true, "_ID", "Id"));
+  columns.push_back(SqlTableColumn(false, "_NUMBER", "Número"));
+  columns.push_back(SqlTableColumn(false, "_DATE", "Data"));
+  columns.push_back(SqlTableColumn(false, "_SUPPLIER", "Fornecedor"));
+  columns.push_back(SqlTableColumn(false, "_TOTAL", "Total"));
+  columns.push_back(SqlTableColumn(false, "_CASH", "À Vista"));
+  m_database->set(db, "_PROMISSORYNOTES", columns);
 }
 
 bool NoteWidget::isValid() const

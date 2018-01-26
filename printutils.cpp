@@ -125,7 +125,7 @@ bool Printer::print(QIODevice* printer,
   out.setVersion(QDataStream::Qt_4_3);
   if (type == InterfaceType::Serial)
   {
-    out << msg.toUtf8();
+    data = msg.toUtf8();
   }
   else if (type == InterfaceType::Ethernet)
   {
@@ -148,7 +148,7 @@ bool Printer::print(QIODevice* printer,
 
 QString Printer::strCmdInit()
 {
-  return ESC_INIT;
+  return ESC_INIT ESC_CODEPAGE850;
 }
 
 QString Printer::strCmdFullCut()
@@ -200,11 +200,10 @@ QString ReminderPrinter::build(const Reminder& r)
 
   if (!title.isEmpty())
   {
-    str += ESC_DOUBLE_FONT_ON
-           ESC_ALIGN_CENTER +
+    str += ESC_ALIGN_CENTER
+           ESC_DOUBLE_FONT_ON +
            title +
-           ESC_LF
-           ESC_DOUBLE_FONT_OFF;
+           ESC_LF;
     if (!msg.isEmpty())
     {
       str += "________________________________________________"
@@ -281,7 +280,6 @@ QString ConsumptionPrinter::build(qint64 date,
          ESC_DOUBLE_FONT_ON
          "TOTAL R$" +
          QString::number(total, 'f', 2) +
-         ESC_DOUBLE_FONT_OFF
          ESC_LF
          ESC_LF
          ESC_FULL_CUT;
@@ -331,7 +329,6 @@ QString ConsumptionPrinter::build(const QVector<qint64>& vDate,
          ESC_DOUBLE_FONT_ON
          "TOTAL R$" +
          QString::number(total, 'f', 2) +
-         ESC_DOUBLE_FONT_OFF
          ESC_LF
          ESC_LF
          ESC_FULL_CUT;

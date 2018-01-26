@@ -150,7 +150,7 @@ bool NoteSQL::update(QSqlDatabase db,
                     "_NOTEID = (:_noteid),"
                     "_AMMOUNT = (:_ammount),"
                     "_PRICE = (:_price),"
-                    "_UNITY = (:_price),"
+                    "_UNITY = (:_unity),"
                     "_DESCRIPTION = (:_description) "
                     "WHERE _ID = (:_id)");
       query.bindValue(":_id", note.m_items.at(i).m_id);

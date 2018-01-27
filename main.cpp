@@ -42,16 +42,16 @@ int main(int argc, char *argv[])
 
   Settings settings;
   settings.load();
-  if (settings.m_fileDir.isEmpty())
-    settings.m_fileDir = getPath();
+  if (settings.m_databaseDir.isEmpty())
+    settings.m_databaseDir = getPath();
 
-  if (settings.m_fileDir.isEmpty())
+  if (settings.m_databaseDir.isEmpty())
     return 0;
 
   settings.save();
   QSqlDatabase db(QSqlDatabase::addDatabase("QSQLITE"));
   QString error;
-  if (!initDatabase(db, settings.filePath(), error))
+  if (!initDatabase(db, settings.databasePath(), error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        QObject::tr("Erro ao inicializar banco de dados"),

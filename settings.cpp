@@ -3,9 +3,9 @@
 
 #define COMPANY_NAME "LEICO"
 #define APP_NAME     "BaitaAssistente"
-#define FILE_NAME    "BaitaAssistente.db"
+#define DATABASE_NAME    "BaitaAssistente.db"
 
-#define FILE_PATH          "filePath"
+#define DATABASE_DIR       "databaseDir"
 #define INTERFACE_TYPE     "interfaceType"
 #define CONNECT_STARTUP    "connectStartup"
 #define SERIAL_PORT        "serial/port"
@@ -24,7 +24,7 @@ Settings::Settings()
 
 void Settings::clear()
 {
-  m_fileDir.clear();
+  m_databaseDir.clear();
   m_interfaceType = InterfaceType::Serial;
   m_bConnectOnStartup = false;
   m_serialPort.clear();
@@ -40,7 +40,7 @@ void Settings::clear()
 void Settings::save() const
 {
   QSettings settings(COMPANY_NAME, APP_NAME);
-  settings.setValue(FILE_PATH, m_fileDir);
+  settings.setValue(DATABASE_DIR, m_databaseDir);
   settings.setValue(INTERFACE_TYPE, (int)m_interfaceType);
   settings.setValue(CONNECT_STARTUP, m_bConnectOnStartup);
   settings.setValue(SERIAL_PORT, m_serialPort);
@@ -56,7 +56,7 @@ void Settings::save() const
 void Settings::load()
 {
   QSettings settings(COMPANY_NAME, APP_NAME);
-  m_fileDir = settings.value(FILE_PATH).toString();
+  m_databaseDir = settings.value(DATABASE_DIR).toString();
   m_interfaceType = (InterfaceType)settings.value(INTERFACE_TYPE, (int)InterfaceType::Serial).toInt();
   m_bConnectOnStartup = settings.value(CONNECT_STARTUP, false).toBool();
   m_serialPort = settings.value(SERIAL_PORT).toString();
@@ -74,7 +74,7 @@ void Settings::load()
   m_ethernetPort = settings.value(ETHERNET_PORT, 9100).toInt();
 }
 
-QString Settings::filePath() const
+QString Settings::databasePath() const
 {
-  return m_fileDir + "/" + FILE_NAME;
+  return m_databaseDir + "/" + DATABASE_NAME;
 }

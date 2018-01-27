@@ -12,7 +12,7 @@ enum class InterfaceType : int
 struct Settings
 {
   Settings();
-  QString m_fileDir;
+  QString m_databaseDir;
   InterfaceType m_interfaceType;
   bool m_bConnectOnStartup;
   QString m_serialPort;
@@ -24,7 +24,7 @@ struct Settings
   QString m_ethernetIP;
   int m_ethernetPort;
 
-  QString filePath() const;
+  QString databasePath() const;
 
   void clear();
   void save() const;

@@ -44,7 +44,7 @@ private:
   QSerialPort m_printerSerial;
   QTcpSocket m_printerTCP;
   Settings m_settings;
-  QLabel* m_statusFilePath;
+  QLabel* m_statusDatabasePath;
   QLabel* m_statusUserName;
 
 private slots:

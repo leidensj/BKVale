@@ -16,7 +16,7 @@ SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
                    this,
                    SLOT(update()));
 
-  QObject::connect(ui->btnFileDir,
+  QObject::connect(ui->btnDatabaseDir,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(selectFileDir()));
@@ -62,7 +62,7 @@ void SettingsDlg::doDataExchange(bool toUI)
 {
   if (toUI)
   {
-    ui->edFileDir->setText(m_settings.m_fileDir);
+    ui->edDatabaseDir->setText(m_settings.m_databaseDir);
     ui->rdoSerial->setChecked(m_settings.m_interfaceType == InterfaceType::Serial);
     ui->rdoEthernet->setChecked(m_settings.m_interfaceType == InterfaceType::Ethernet);
     ui->cbConnectStartup->setChecked(m_settings.m_bConnectOnStartup);
@@ -77,7 +77,7 @@ void SettingsDlg::doDataExchange(bool toUI)
   }
   else
   {
-    m_settings.m_fileDir = ui->edFileDir->text();
+    m_settings.m_databaseDir = ui->edDatabaseDir->text();
     m_settings.m_interfaceType = ui->rdoSerial->isChecked() ? InterfaceType::Serial : InterfaceType::Ethernet;
     m_settings.m_bConnectOnStartup = ui->cbConnectStartup->isChecked();
     m_settings.m_serialPort = ui->cbSerialPort->currentText();
@@ -108,9 +108,9 @@ void SettingsDlg::selectFileDir()
 {
   QString fileDir = QFileDialog::getExistingDirectory(this,
                                                       QObject::tr("Selecionar local para salvar seus dados"),
-                                                      m_settings.m_fileDir,
+                                                      m_settings.m_databaseDir,
                                                       QFileDialog::ShowDirsOnly
                                                       | QFileDialog::DontResolveSymlinks);
   if (!fileDir.isEmpty())
-    ui->edFileDir->setText(fileDir);
+    ui->edDatabaseDir->setText(fileDir);
 }

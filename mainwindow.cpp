@@ -23,7 +23,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
-  , m_statusFilePath(nullptr)
+  , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
 {
   ui->setupUi(this);
@@ -36,11 +36,13 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   ui->tabConsumption->layout()->addWidget(m_consumption);
   ui->tabCalculator->layout()->addWidget(m_calculator);
 
-  m_statusFilePath = new QLabel();
-  m_statusFilePath->setAlignment(Qt::AlignRight);
+  m_statusDatabasePath = new QLabel();
+  m_statusDatabasePath->setAlignment(Qt::AlignRight);
+  m_statusDatabasePath->setTextFormat(Qt::RichText);
   m_statusUserName = new QLabel();
   m_statusUserName->setAlignment(Qt::AlignCenter);
-  statusBar()->addWidget(m_statusFilePath);
+  m_statusUserName->setTextFormat(Qt::RichText);
+  statusBar()->addWidget(m_statusDatabasePath);
   statusBar()->addWidget(m_statusUserName);
 
   QObject::connect(ui->actionConnect,
@@ -264,8 +266,8 @@ void BaitaAssistant::openSettingsDialog()
 
 void BaitaAssistant::updateStatusBar()
 {
-  m_statusUserName->setText(" Usuário: " + m_userLogin.strUser() + " ");
-  m_statusFilePath->setText(" Arquivo: " + m_settings.filePath() + " ");
+  m_statusUserName->setText("<img src=':/icons/res/16user.png'> " + m_userLogin.strUser());
+  m_statusDatabasePath->setText("<img src=':/icons/res/16database.png'> " + m_settings.databasePath());
 }
 
 void BaitaAssistant::updateControls()

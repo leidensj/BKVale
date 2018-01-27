@@ -27,7 +27,6 @@
         <file>res/description.png</file>
         <file>res/details.png</file>
         <file>res/price.png</file>
-        <file>res/supplier.png</file>
         <file>res/unity.png</file>
         <file>res/uppercase.png</file>
         <file>res/chart.png</file>
@@ -77,5 +76,8 @@
         <file>res/cash.png</file>
         <file>res/check.png</file>
         <file>res/center.png</file>
+        <file>res/16database.png</file>
+        <file>res/16user.png</file>
+        <file>res/supplier.png</file>
     </qresource>
 </RCC>

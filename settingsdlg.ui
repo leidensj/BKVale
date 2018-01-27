@@ -51,14 +51,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="edFileDir">
+          <widget class="QLineEdit" name="edDatabaseDir">
            <property name="readOnly">
             <bool>true</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnFileDir">
+          <widget class="QPushButton" name="btnDatabaseDir">
            <property name="text">
             <string/>
            </property>

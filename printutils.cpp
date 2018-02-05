@@ -271,7 +271,7 @@ QString ConsumptionPrinter::build(qint64 date,
         subStr1 += " ";
       subStr = subStr1 + ESC_STRESS_ON + subStr2 + ESC_STRESS_OFF;
     }
-    str += vItem.at(i).m_description + ESC_LF + subStr +
+    str += vItem.at(i).m_name + ESC_LF + subStr +
            ESC_LF "________________________________________________" ESC_LF;
   }
 

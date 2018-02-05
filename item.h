@@ -6,13 +6,20 @@
 #define INVALID_ITEM_ID   -1
 #define INVALID_ITEM_ICON -1
 
+#define MAX_ITEM_NAME_LENGTH            35
+#define MAX_ITEM_UNITY_LENGTH           4
+#define MAX_ITEM_PACKAGE_UNITY_LENGTH   4
+#define MAX_ITEM_PACKAGE_AMMOUNT_LENGTH 9999.99
+#define MAX_ITEM_DETAILS_LENGTH         35
+#define MAX_ITEM_MIDASCODE_LENGTH       35
+
 enum class ItemTableIndex
 {
   ID = 0,
-  Description,
+  Name,
   Unity,
-  Supplier,
-  Price,
+  PackageUnity,
+  PackageAmmount,
   Details,
   MidasCode,
   Icon
@@ -28,10 +35,10 @@ struct Item
   }
 
   int m_id;
-  QString m_description;
+  QString m_name;
   QString m_unity;
-  QString m_supplier;
-  double m_price;
+  QString m_packageUnity;
+  double m_packageAmmount;
   QString m_details;
   QString m_midasCode;
   int m_icon;
@@ -40,10 +47,10 @@ struct Item
   {
     m_id = INVALID_ITEM_ID;
     m_icon = INVALID_ITEM_ICON;
-    m_description.clear();
+    m_name.clear();
     m_unity.clear();
-    m_supplier.clear();
-    m_price = 0.0;
+    m_packageUnity.clear();
+    m_packageAmmount = 0.0;
     m_details.clear();
     m_midasCode.clear();
   }
@@ -60,14 +67,14 @@ struct Item
     {
       case ItemTableIndex::ID:
         str = "_ID"; break;
-      case ItemTableIndex::Description:
-        str = "_DESCRIPTION"; break;
+      case ItemTableIndex::Name:
+        str = "_NAME"; break;
       case ItemTableIndex::Unity:
         str = "_UNITY"; break;
-      case ItemTableIndex::Supplier:
-        str = "_SUPPLIER"; break;
-      case ItemTableIndex::Price:
-        str = "_PRICE"; break;
+      case ItemTableIndex::PackageUnity:
+        str = "_PACKAGE_UNITY"; break;
+      case ItemTableIndex::PackageAmmount:
+        str = "_PACKAGE_AMMOUNT"; break;
       case ItemTableIndex::Details:
         str = "_DETAILS"; break;
       case ItemTableIndex::MidasCode:

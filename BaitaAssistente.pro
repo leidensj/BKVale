@@ -32,7 +32,6 @@ SOURCES += main.cpp\
     qcustomplot.cpp \
     consumptionchart.cpp \
     calculatorwidget.cpp \
-    notedatabase.cpp \
     noteview.cpp \
     notewidget.cpp \
     logindialog.cpp \
@@ -41,7 +40,9 @@ SOURCES += main.cpp\
     usermgtwidget.cpp \
     usermgtdatabase.cpp \
     usermgtview.cpp \
-    notetablewidget.cpp
+    notetablewidget.cpp \
+    itemview.cpp \
+    jdatabase.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -65,7 +66,6 @@ HEADERS  += mainwindow.h \
     consumptionchart.h \
     calculatorwidget.h \
     calculator.h \
-    notedatabase.h \
     noteview.h \
     notewidget.h \
     logindialog.h \
@@ -74,7 +74,9 @@ HEADERS  += mainwindow.h \
     usermgtwidget.h \
     usermgtdatabase.h \
     usermgtview.h \
-    notetablewidget.h
+    notetablewidget.h \
+    itemview.h \
+    jdatabase.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

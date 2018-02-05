@@ -1,12 +1,48 @@
 #include "notewidget.h"
 #include "noteview.h"
-#include "notedatabase.h"
 #include "printutils.h"
 #include "databaseutils.h"
+#include "jdatabase.h"
 #include <QSplitter>
 #include <QDockWidget>
 #include <QLayout>
 #include <QMessageBox>
+#include <QSqlTableModel>
+
+class NoteTableModel : public QSqlTableModel
+{
+
+public:
+  NoteTableModel(QObject *parent, QSqlDatabase db)
+    : QSqlTableModel(parent, db)
+  {
+
+  }
+
+  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
+  {
+    QVariant value = QSqlTableModel::data(idx, role);
+    if (role == Qt::DisplayRole)
+    {
+      if (idx.column() == (int)NoteTableIndex::Date)
+        value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
+      else if (idx.column() == (int)NoteTableIndex::Total)
+        value = "R$ " + QString::number(value.toDouble(), 'f', 2);
+      if (idx.column() == (int)NoteTableIndex::Cash)
+        value = "";
+    }
+    else if (role == Qt::DecorationRole)
+    {
+      if (idx.column() == (int)NoteTableIndex::Cash)
+      {
+        value = QSqlTableModel::data(idx, Qt::EditRole).toBool()
+                ? QVariant::fromValue(QIcon(":/icons/res/check.png"))
+                : "";
+      }
+    }
+    return value;
+  }
+};
 
 NoteWidget::NoteWidget(QWidget* parent)
   : QFrame(parent)
@@ -15,7 +51,7 @@ NoteWidget::NoteWidget(QWidget* parent)
   , m_dock(nullptr)
 {
   m_view = new NoteView();
-  m_database = new NoteDatabase();
+  m_database = new JDatabase();
   m_database->layout()->setContentsMargins(0, 9, 9, 0);
   m_dock = new QDockWidget();
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -34,12 +70,12 @@ NoteWidget::NoteWidget(QWidget* parent)
   setLayout(vlayout1);
 
   QObject::connect(m_database,
-                   SIGNAL(noteSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(int)),
                    this,
                    SLOT(setNote(int)));
 
   QObject::connect(m_database,
-                   SIGNAL(noteRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(int)),
                    this,
                    SLOT(removeNote(int)));
 
@@ -163,6 +199,7 @@ void NoteWidget::setNote(int id)
 
 void NoteWidget::setDatabase(QSqlDatabase db)
 {
+  NoteTableModel* model = new NoteTableModel(m_database, db);
   QVector<SqlTableColumn> columns;
   columns.push_back(SqlTableColumn(true, false, "_ID", "Id", QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(false, true, "_NUMBER", "Número", QHeaderView::ResizeMode::ResizeToContents));
@@ -170,7 +207,7 @@ void NoteWidget::setDatabase(QSqlDatabase db)
   columns.push_back(SqlTableColumn(false, false, "_SUPPLIER", "Fornecedor", QHeaderView::ResizeMode::Stretch));
   columns.push_back(SqlTableColumn(false, false, "_TOTAL", "Total", QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(false, false, "_CASH", "À Vista", QHeaderView::ResizeMode::ResizeToContents));
-  m_database->set(db, "_PROMISSORYNOTES", columns);
+  m_database->set(model, "_PROMISSORYNOTES", columns);
 }
 
 bool NoteWidget::isValid() const

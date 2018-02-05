@@ -1,8 +1,7 @@
-#ifndef HISTORYWIDGET_H
-#define HISTORYWIDGET_H
+#ifndef JDATABASE_H
+#define JDATABASE_H
 
 #include <QFrame>
-#include <note.h>
 #include <QSqlDatabase>
 #include <QModelIndex>
 #include <QSqlTableModel>
@@ -12,6 +11,8 @@
 class QPushButton;
 class QTableView;
 class JLineEdit;
+
+#define ID_COLUMN 0
 
 struct SqlTableColumn
 {
@@ -44,21 +45,21 @@ struct SqlTableColumn
   QHeaderView::ResizeMode m_resizeMode;
 };
 
-class NoteDatabase : public QFrame
+class JDatabase : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit NoteDatabase(QWidget *parent = 0);
-  ~NoteDatabase();
-  void set(QSqlDatabase db,
+  explicit JDatabase(QWidget *parent = 0);
+  ~JDatabase();
+  void set(QSqlTableModel* model,
            const QString& tableName,
            const QVector<SqlTableColumn>& sqlTableColumns);
   QSqlDatabase get() const;
 
 public slots:
   void refresh();
-  void emitNoteRemoveSignal();
+  void emitItemRemoveSignal();
   void enableControls();
 
 private:
@@ -73,15 +74,15 @@ private:
   QVector<SqlTableColumn> m_columns;
 
 private slots:
-  void noteSelected(const QModelIndex& idx);
-  void noteSelected();
+  void itemSelected(const QModelIndex& idx);
+  void itemSelected();
   void filterSearchChanged();
   void filterSearchEnter();
   void containsPressed();
 
 signals:
-  void noteSelectedSignal(int id);
-  void noteRemoveSignal(int id);
+  void itemSelectedSignal(int id);
+  void itemRemoveSignal(int id);
 };
 
-#endif // HISTORYWIDGET_H
+#endif // JDATABASE_H

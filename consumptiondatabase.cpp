@@ -92,7 +92,7 @@ public:
           bool bSuccess = ItemSQL::select(database(),
                                                item,
                                                error);
-          value = bSuccess ? item.m_description : error;
+          value = bSuccess ? item.m_name : error;
         } break;
         case ConsumptionTableIndex::Total:
         {

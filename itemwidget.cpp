@@ -18,21 +18,21 @@ QString friendlyColumnName(ItemTableIndex idx)
   switch (idx)
   {
     case ItemTableIndex::ID:
-      return QObject::tr("ID"); break;
-    case ItemTableIndex::Description:
-      return QObject::tr("Descrição"); break;
+      return QObject::tr("ID");
+    case ItemTableIndex::Name:
+      return QObject::tr("Nome");
     case ItemTableIndex::Unity:
-      return QObject::tr("Unidade"); break;
-    case ItemTableIndex::Supplier:
-      return QObject::tr("Fornecedor"); break;
-    case ItemTableIndex::Price:
-      return QObject::tr("Preço"); break;
+      return QObject::tr("Unidade");
+    case ItemTableIndex::PackageUnity:
+      return QObject::tr("Unidade da Embalagem");
+    case ItemTableIndex::PackageAmmount:
+      return QObject::tr("Quantidade da Embalagem");
     case ItemTableIndex::Details:
-      return QObject::tr("Detalhes"); break;
+      return QObject::tr("Detalhes");
     case ItemTableIndex::MidasCode:
-      return QObject::tr("Código Midas"); break;
+      return QObject::tr("Código Midas");
     case ItemTableIndex::Icon:
-      return QObject::tr("Ícone"); break;
+      return QObject::tr("Ícone");
     default:
       return "";
   }
@@ -40,7 +40,7 @@ QString friendlyColumnName(ItemTableIndex idx)
 
 QString columnIcon(ItemTableIndex idx)
 {
-  switch (idx)
+  /*switch (idx)
   {
     case ItemTableIndex::Description:
       return ":/icons/res/description.png";
@@ -57,7 +57,7 @@ QString columnIcon(ItemTableIndex idx)
     case ItemTableIndex::ID:
     default:
       return "";
-  }
+  }*/
 }
 
 void setColumnText(QSqlTableModel* model,
@@ -130,9 +130,6 @@ public:
     {
       switch ((ItemTableIndex)index.column())
       {
-        case ItemTableIndex::Price:
-          value = "R$ " + QString::number(value.toDouble(), 'f', 2);;
-          break;
         default:
           break;
       }
@@ -391,10 +388,10 @@ void ItemWidget::setDatabase(QSqlDatabase db)
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
   setColumnText(model, ItemTableIndex::ID);
-  setColumnText(model, ItemTableIndex::Description);
+  setColumnText(model, ItemTableIndex::Name);
   setColumnText(model, ItemTableIndex::Unity);
-  setColumnText(model, ItemTableIndex::Supplier);
-  setColumnText(model, ItemTableIndex::Price);
+  setColumnText(model, ItemTableIndex::PackageUnity);
+  setColumnText(model, ItemTableIndex::PackageAmmount);
   setColumnText(model, ItemTableIndex::Details);
   setColumnText(model, ItemTableIndex::MidasCode);
   setColumnText(model, ItemTableIndex::Icon);
@@ -409,17 +406,19 @@ void ItemWidget::setDatabase(QSqlDatabase db)
   m_table->hideColumn((int)ItemTableIndex::ID);
   m_table->hideColumn((int)ItemTableIndex::MidasCode);
   m_table->hideColumn((int)ItemTableIndex::Icon);
-  m_table->horizontalHeader()->setSortIndicator((int)ItemTableIndex::Description,
+  m_table->horizontalHeader()->setSortIndicator((int)ItemTableIndex::Name,
                                                   Qt::SortOrder::AscendingOrder);
-  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::Description,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::Name,
                                                       QHeaderView::Stretch);
   m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::Unity,
                                                       QHeaderView::ResizeToContents);
-  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::Supplier,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::PackageUnity,
                                                       QHeaderView::ResizeToContents);
-  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::Price,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::PackageAmmount,
                                                       QHeaderView::ResizeToContents);
-  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::Price,
+  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::Details,
+                                                      QHeaderView::ResizeToContents);
+  m_table->horizontalHeader()->setSectionResizeMode((int)ItemTableIndex::MidasCode,
                                                       QHeaderView::ResizeToContents);
 
   QObject::connect(m_table->selectionModel(),
@@ -592,10 +591,10 @@ Item ItemWidget::item() const
       QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
       QSqlRecord rec = model->record(m_table->currentIndex().row());
       item.m_id = rec.value((int)ItemTableIndex::ID).toInt();
-      item.m_description = rec.value((int)ItemTableIndex::Description).toString();
+      item.m_name = rec.value((int)ItemTableIndex::Name).toString();
       item.m_unity = rec.value((int)ItemTableIndex::Unity).toString();
-      item.m_supplier = rec.value((int)ItemTableIndex::Supplier).toString();
-      item.m_price = rec.value((int)ItemTableIndex::Price).toDouble();
+      item.m_packageUnity = rec.value((int)ItemTableIndex::PackageUnity).toString();
+      item.m_packageAmmount = rec.value((int)ItemTableIndex::PackageAmmount).toDouble();
       item.m_details = rec.value((int)ItemTableIndex::ID).toString();
       item.m_midasCode = rec.value((int)ItemTableIndex::MidasCode).toString();
       item.m_icon = rec.value((int)ItemTableIndex::Icon).toInt();

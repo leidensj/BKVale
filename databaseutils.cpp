@@ -347,10 +347,10 @@ bool BaitaSQL::init(QSqlDatabase db,
 
   query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_DESCRIPTION TEXT NOT NULL UNIQUE,"
+             "_NAME TEXT NOT NULL UNIQUE,"
              "_UNITY TEXT NOT NULL,"
-             "_SUPPLIER TEXT,"
-             "_PRICE REAL,"
+             "_PACKAGE_UNITY TEXT,"
+             "_PACKAGE_AMMOUNT REAL,"
              "_DETAILS TEXT,"
              "_MIDASCODE TEXT,"
              "_ICON INT)");
@@ -426,8 +426,8 @@ bool ItemSQL::select(QSqlDatabase db,
   query.prepare("SELECT "
                 "_DESCRIPTION,"
                 "_UNITY,"
-                "_SUPPLIER,"
-                "_PRICE,"
+                "_PACKAGE_UNITY,"
+                "_PACKAGE_AMMOUNT,"
                 "_DETAILS,"
                 "_MIDASCODE,"
                 "_ICON "
@@ -442,10 +442,10 @@ bool ItemSQL::select(QSqlDatabase db,
     bSuccess = query.next();
     if (bSuccess)
     {
-      item.m_description = query.value(query.record().indexOf("_DESCRIPTION")).toString();
+      item.m_name = query.value(query.record().indexOf("_NAME")).toString();
       item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
-      item.m_supplier = query.value(query.record().indexOf("_SUPPLIER")).toString();
-      item.m_price = query.value(query.record().indexOf("_PRICE")).toDouble();
+      item.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
+      item.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
       item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
       item.m_midasCode = query.value(query.record().indexOf("_MIDASCODE")).toString();
       item.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
@@ -453,7 +453,7 @@ bool ItemSQL::select(QSqlDatabase db,
     else
     {
       item.clear();
-      item.m_description = "Item não encontrado.";
+      item.m_name = "Item não encontrado.";
       item.m_unity = "?";
       error = "Item não encontrado.";
     }

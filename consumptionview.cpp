@@ -208,11 +208,11 @@ void ConsumptionView::itemSelected(const Item& item)
 {
   if (item.isValid())
   {
-    m_item->setText(item.m_description);
+    m_item->setText(item.m_name);
     m_currentItemID = item.m_id;
     m_ammount->setSuffix(item.m_unity);
     m_price->setSuffix("/" +item.m_unity);
-    m_price->setValue(item.m_price);
+    m_price->setValue(0.0);
     enableControls();
     m_price->setFocus();
     m_price->selectAll();

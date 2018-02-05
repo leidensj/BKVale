@@ -8,7 +8,7 @@
 
 class QDockWidget;
 class NoteView;
-class NoteDatabase;
+class JDatabase;
 class QIODevice;
 
 class NoteWidget : public QFrame
@@ -23,7 +23,7 @@ public:
 
 private:
   NoteView* m_view;
-  NoteDatabase* m_database;
+  JDatabase* m_database;
   QDockWidget* m_dock;
   bool save();
   bool print(QIODevice* printer,

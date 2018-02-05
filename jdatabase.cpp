@@ -1,50 +1,12 @@
-#include "notedatabase.h"
+#include "jdatabase.h"
 #include "jlineedit.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
 #include <QPushButton>
 #include <QTableView>
-#include <QSqlTableModel>
-#include <QHeaderView>
 
-class NoteTableModel : public QSqlTableModel
-{
-
-public:
-  NoteTableModel(QObject *parent, QSqlDatabase db)
-    : QSqlTableModel(parent, db)
-  {
-
-  }
-
-  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
-  {
-    QVariant value = QSqlTableModel::data(idx, role);
-    if (role == Qt::DisplayRole)
-    {
-      if (idx.column() == (int)NoteTableIndex::Date)
-        value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
-      else if (idx.column() == (int)NoteTableIndex::Total)
-        value = "R$ " + QString::number(value.toDouble(), 'f', 2);
-      if (idx.column() == (int)NoteTableIndex::Cash)
-        value = "";
-    }
-    else if (role == Qt::DecorationRole)
-    {
-      if (idx.column() == (int)NoteTableIndex::Cash)
-      {
-        value = QSqlTableModel::data(idx, Qt::EditRole).toBool()
-                ? QVariant::fromValue(QIcon(":/icons/res/check.png"))
-                : "";
-      }
-    }
-    return value;
-  }
-};
-
-
-NoteDatabase::NoteDatabase(QWidget *parent)
+JDatabase::JDatabase(QWidget *parent)
   : QFrame(parent)
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
@@ -114,12 +76,12 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   QObject::connect(m_table,
                    SIGNAL(doubleClicked(const QModelIndex&)),
                    this,
-                   SLOT(noteSelected(const QModelIndex&)));
+                   SLOT(itemSelected(const QModelIndex&)));
 
   QObject::connect(m_btnOpen,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(noteSelected()));
+                   SLOT(itemSelected()));
 
   QObject::connect(m_btnRefresh,
                    SIGNAL(clicked(bool)),
@@ -129,7 +91,7 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitNoteRemoveSignal()));
+                   SLOT(emitItemRemoveSignal()));
 
   QObject::connect(m_edFilterSearch,
                    SIGNAL(textEdited(const QString&)),
@@ -155,16 +117,21 @@ NoteDatabase::NoteDatabase(QWidget *parent)
   filterSearchChanged();
 }
 
-void NoteDatabase::set(QSqlDatabase db,
-                       const QString& tableName,
-                       const QVector<SqlTableColumn>& sqlTableColumns)
+JDatabase::~JDatabase()
 {
-  if (m_table->model() != nullptr)
+
+}
+
+void JDatabase::set(QSqlTableModel* model,
+                    const QString& tableName,
+                    const QVector<SqlTableColumn>& sqlTableColumns)
+{
+  if (m_table->model() != nullptr || model == nullptr)
     return;
 
   m_tableName = tableName;
   m_columns = sqlTableColumns;
-  NoteTableModel* model = new NoteTableModel(this, db);
+
   model->setTable(m_tableName);
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
   for (int i = 0; i != m_columns.size(); ++i)
@@ -187,7 +154,7 @@ void NoteDatabase::set(QSqlDatabase db,
   refresh();
 }
 
-QSqlDatabase NoteDatabase::get() const
+QSqlDatabase JDatabase::get() const
 {
   if (m_table->model() != nullptr)
   {
@@ -197,26 +164,21 @@ QSqlDatabase NoteDatabase::get() const
   return QSqlDatabase();
 }
 
-NoteDatabase::~NoteDatabase()
+void JDatabase::itemSelected()
 {
-
+  itemSelected(m_table->currentIndex());
 }
 
-void NoteDatabase::noteSelected()
-{
-  noteSelected(m_table->currentIndex());
-}
-
-void NoteDatabase::noteSelected(const QModelIndex& idx)
+void JDatabase::itemSelected(const QModelIndex& idx)
 {
   if (m_table->model() != nullptr && idx.isValid())
   {
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-    emit noteSelectedSignal(model->index(idx.row(), (int)NoteTableIndex::ID).data(Qt::EditRole).toInt());
+    emit itemSelectedSignal(model->index(idx.row(), ID_COLUMN).data(Qt::EditRole).toInt());
   }
 }
 
-void NoteDatabase::refresh()
+void JDatabase::refresh()
 {
   if (m_table->model())
   {
@@ -226,14 +188,14 @@ void NoteDatabase::refresh()
   enableControls();
 }
 
-void NoteDatabase::enableControls()
+void JDatabase::enableControls()
 {
-  bool bNoteSelected = m_table->currentIndex().isValid();
-  m_btnOpen->setEnabled(bNoteSelected);
-  m_btnRemove->setEnabled(bNoteSelected);
+  bool bSelected = m_table->currentIndex().isValid();
+  m_btnOpen->setEnabled(bSelected);
+  m_btnRemove->setEnabled(bSelected);
 }
 
-void NoteDatabase::emitNoteRemoveSignal()
+void JDatabase::emitItemRemoveSignal()
 {
   if (m_table->model())
   {
@@ -241,13 +203,13 @@ void NoteDatabase::emitNoteRemoveSignal()
     if (m_table->currentIndex().isValid())
     {
       int id = model->index(m_table->currentIndex().row(),
-                            (int)NoteTableIndex::ID).data(Qt::EditRole).toInt();
-      emit noteRemoveSignal(id);
+                            ID_COLUMN).data(Qt::EditRole).toInt();
+      emit itemRemoveSignal(id);
     }
   }
 }
 
-void NoteDatabase::filterSearchChanged()
+void JDatabase::filterSearchChanged()
 {
   if (m_table->model() == nullptr)
     return;
@@ -274,7 +236,7 @@ void NoteDatabase::filterSearchChanged()
   enableControls();
 }
 
-void NoteDatabase::filterSearchEnter()
+void JDatabase::filterSearchEnter()
 {
   m_table->setFocus();
   if (m_table->model() != nullptr &&
@@ -289,7 +251,7 @@ void NoteDatabase::filterSearchEnter()
   }
 }
 
-void NoteDatabase::containsPressed()
+void JDatabase::containsPressed()
 {
   filterSearchChanged();
   m_edFilterSearch->setFocus();

@@ -9,6 +9,7 @@
 #include "consumption.h"
 #include "reminder.h"
 #include "settings.h"
+#include "category.h"
 
 #define DEFAULT_NUMBER     1000
 #define DEFAULT_NUMBER_STR "1000"
@@ -107,6 +108,25 @@ namespace ItemSQL
 {
   bool select(QSqlDatabase db,
               Item& item,
+              QString& error);
+}
+
+namespace CategorySQL
+{
+  bool select(QSqlDatabase db,
+              Category& category,
+              QString& error);
+
+  bool insert(QSqlDatabase db,
+              const Category& category,
+              QString& error);
+
+  bool update(QSqlDatabase db,
+              const Category& category,
+              QString& error);
+
+  bool remove(QSqlDatabase db,
+              int id,
               QString& error);
 }
 

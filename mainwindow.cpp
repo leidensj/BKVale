@@ -3,6 +3,7 @@
 #include "noteview.h"
 #include "printutils.h"
 #include "itemwidget.h"
+#include "categorywidget.h"
 #include "notewidget.h"
 #include "reminderwidget.h"
 #include "consumptionwidget.h"
@@ -89,6 +90,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openItemsDialog()));
+
+  QObject::connect(ui->actionCategories,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openCategoriesDialog()));
 
   QObject::connect(ui->actionUsers,
                    SIGNAL(triggered(bool)),
@@ -331,6 +337,21 @@ void BaitaAssistant::openItemsDialog()
   dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
   dlg.setModal(true);
   itemWidget->focusFilter();
+  dlg.exec();
+}
+
+void BaitaAssistant::openCategoriesDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout();
+  dlg.setLayout(layout);
+  CategoryWidget* w = new CategoryWidget(this);
+  w->setDatabase(m_userLogin.getDatabase());
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Categorias"));
+  dlg.setWindowIcon(QIcon(":/icons/res/category.png"));
+  dlg.setModal(true);
   dlg.exec();
 }
 

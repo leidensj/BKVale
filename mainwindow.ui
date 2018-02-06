@@ -140,6 +140,7 @@
    <addaction name="actionLogin"/>
    <addaction name="actionUsers"/>
    <addaction name="actionItems"/>
+   <addaction name="actionCategories"/>
    <addaction name="actionFornecedores"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
@@ -247,6 +248,18 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar fornecedores</string>
+   </property>
+  </action>
+  <action name="actionCategories">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/category.png</normaloff>:/icons/res/category.png</iconset>
+   </property>
+   <property name="text">
+    <string>Categorias</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar Categorias</string>
    </property>
   </action>
  </widget>

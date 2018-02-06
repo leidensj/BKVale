@@ -348,11 +348,17 @@ bool BaitaSQL::init(QSqlDatabase db,
   query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
              "_NAME TEXT NOT NULL UNIQUE,"
+             "_CATEGORYID INTEGER NOT NULL,"
              "_UNITY TEXT NOT NULL,"
              "_PACKAGE_UNITY TEXT,"
              "_PACKAGE_AMMOUNT REAL,"
              "_DETAILS TEXT,"
              "_MIDASCODE TEXT,"
+             "_ICON INT)");
+
+  query.exec("CREATE TABLE IF NOT EXISTS _CATEGORIES ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_NAME TEXT NOT NULL UNIQUE,"
              "_ICON INT)");
 
   query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
@@ -464,6 +470,120 @@ bool ItemSQL::select(QSqlDatabase db,
   }
 
   return bSuccess;
+}
+
+bool CategorySQL::select(QSqlDatabase db,
+                         Category& category,
+                         QString& error)
+{
+  error.clear();
+  int id = category.m_id;
+  category.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  bool bFound = false;
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                "_NAME,"
+                "_ICON "
+                "FROM _CATEGORIES "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+  if (query.next())
+  {
+    category.m_id = id;
+    category.m_name = query.value(query.record().indexOf("_NAME")).toString();
+    category.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
+    bFound = true;
+  }
+
+  if (query.exec())
+  {
+    if (!bFound)
+      error = "Categoria não encontrada.";
+    return bFound;
+  }
+  else
+  {
+    error = query.lastError().text();
+    return false;
+  }
+}
+
+bool CategorySQL::insert(QSqlDatabase db,
+                         const Category& category,
+                         QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("INSERT INTO _CATEGORIES ("
+                "_NAME,"
+                "_ICON) "
+                "VALUES ("
+                "(:_name),"
+                "(:_icon))");
+  query.bindValue(":_name", category.m_name);
+  query.bindValue(":_icon", category.m_icon);
+
+  if (query.exec())
+  {
+    category.m_id = query.lastInsertId().toInt();
+    return true;
+  }
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool CategorySQL::update(QSqlDatabase db,
+                         const Category& category,
+                         QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("UPDATE _CATEGORIES SET "
+                "_NAME = (:_name),"
+                "_ICON = (:_icon) "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_name", category.m_id);
+  query.bindValue(":_icon", category.m_icon);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool CategorySQL::remove(QSqlDatabase db,
+                         int id,
+                         QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM _CATEGORIES "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
 }
 
 bool ReminderSQL::select(QSqlDatabase db,

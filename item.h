@@ -35,6 +35,7 @@ struct Item
   }
 
   int m_id;
+  int m_groupId;
   QString m_name;
   QString m_unity;
   QString m_packageUnity;

@@ -42,7 +42,9 @@ SOURCES += main.cpp\
     usermgtview.cpp \
     notetablewidget.cpp \
     itemview.cpp \
-    jdatabase.cpp
+    jdatabase.cpp \
+    categoryview.cpp \
+    categorywidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -76,7 +78,10 @@ HEADERS  += mainwindow.h \
     usermgtview.h \
     notetablewidget.h \
     itemview.h \
-    jdatabase.h
+    jdatabase.h \
+    category.h \
+    categoryview.h \
+    categorywidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

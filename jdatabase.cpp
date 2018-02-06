@@ -4,7 +4,18 @@
 #include <QLayout>
 #include <QSqlRecord>
 #include <QPushButton>
-#include <QTableView>
+
+JTableView::JTableView(QWidget *parent)
+  : QTableView(parent)
+{
+
+}
+
+void JTableView::keyPressEvent(QKeyEvent* event)
+{
+  emit enterKeyPressedSignal();
+  QTableView::keyPressEvent(event);
+}
 
 JDatabase::JDatabase(QWidget *parent)
   : QFrame(parent)
@@ -40,6 +51,14 @@ JDatabase::JDatabase(QWidget *parent)
   m_btnFilter->setIconSize(QSize(24, 24));
   m_btnFilter->setIcon(QIcon(":/icons/res/filter.png"));
 
+  QHBoxLayout* hlayout0 = new QHBoxLayout();
+  hlayout0->setContentsMargins(0, 0, 0, 0);
+  hlayout0->setAlignment(Qt::AlignLeft);
+  hlayout0->addWidget(m_btnOpen);
+  hlayout0->addWidget(m_btnRefresh);
+  hlayout0->addWidget(m_btnRemove);
+  hlayout0->addWidget(m_btnFilter);
+
   m_edFilterSearch = new JLineEdit(false, false);
   m_edFilterSearch->setClearButtonEnabled(true);
 
@@ -52,15 +71,10 @@ JDatabase::JDatabase(QWidget *parent)
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
-  hlayout1->setAlignment(Qt::AlignLeft);
-  hlayout1->addWidget(m_btnOpen);
-  hlayout1->addWidget(m_btnRefresh);
-  hlayout1->addWidget(m_btnRemove);
-  hlayout1->addWidget(m_btnFilter);
   hlayout1->addWidget(m_edFilterSearch);
   hlayout1->addWidget(m_btnContains);
 
-  m_table = new QTableView();
+  m_table = new JTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_table->setSelectionMode(QAbstractItemView::SingleSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
@@ -69,6 +83,7 @@ JDatabase::JDatabase(QWidget *parent)
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->setContentsMargins(0, 0, 0, 0);
+  vlayout1->addLayout(hlayout0);
   vlayout1->addLayout(hlayout1);
   vlayout1->addWidget(m_table);
   setLayout(vlayout1);
@@ -113,6 +128,11 @@ JDatabase::JDatabase(QWidget *parent)
                                                Qt::SortOrder)),
                    this,
                    SLOT(filterSearchChanged()));
+
+  QObject::connect(m_table,
+                   SIGNAL(enterKeyPressedSignal()),
+                   this,
+                   SLOT(emitEnterKeyPressedSignal()));
 
   filterSearchChanged();
 }
@@ -255,4 +275,18 @@ void JDatabase::containsPressed()
 {
   filterSearchChanged();
   m_edFilterSearch->setFocus();
+}
+
+void JDatabase::emitEnterKeyPressedSignal()
+{
+  if (m_table->model())
+  {
+    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+    if (m_table->currentIndex().isValid())
+    {
+      int id = model->index(m_table->currentIndex().row(),
+                            ID_COLUMN).data(Qt::EditRole).toInt();
+      emit enterKeyPressedSignal(id);
+    }
+  }
 }

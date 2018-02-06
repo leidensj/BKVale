@@ -59,6 +59,7 @@ private slots:
   void openSettingsDialog();
   void openUsersDialog();
   void openItemsDialog();
+  void openCategoriesDialog();
   void openLoginDialog();
 };
 

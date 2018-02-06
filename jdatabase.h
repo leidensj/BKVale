@@ -7,9 +7,10 @@
 #include <QSqlTableModel>
 #include <QVector>
 #include <QHeaderView>
+#include <QTableView>
 
 class QPushButton;
-class QTableView;
+class JTableView;
 class JLineEdit;
 
 #define ID_COLUMN 0
@@ -18,6 +19,7 @@ struct SqlTableColumn
 {
   SqlTableColumn()
     : m_bHidden(false)
+    , m_bSort(false)
     , m_resizeMode(QHeaderView::ResizeMode::ResizeToContents)
   {
 
@@ -45,6 +47,20 @@ struct SqlTableColumn
   QHeaderView::ResizeMode m_resizeMode;
 };
 
+class JTableView : public QTableView
+{
+  Q_OBJECT
+
+public:
+  explicit JTableView(QWidget *parent = 0);
+
+signals:
+  void enterKeyPressedSignal();
+
+protected:
+  void keyPressEvent(QKeyEvent* event);
+};
+
 class JDatabase : public QFrame
 {
   Q_OBJECT
@@ -59,8 +75,6 @@ public:
 
 public slots:
   void refresh();
-  void emitItemRemoveSignal();
-  void enableControls();
 
 private:
   QPushButton* m_btnOpen;
@@ -69,7 +83,7 @@ private:
   QPushButton* m_btnFilter;
   JLineEdit* m_edFilterSearch;
   QPushButton* m_btnContains;
-  QTableView* m_table;
+  JTableView* m_table;
   QString m_tableName;
   QVector<SqlTableColumn> m_columns;
 
@@ -79,10 +93,14 @@ private slots:
   void filterSearchChanged();
   void filterSearchEnter();
   void containsPressed();
+  void enableControls();
+  void emitEnterKeyPressedSignal();
+  void emitItemRemoveSignal();
 
 signals:
   void itemSelectedSignal(int id);
   void itemRemoveSignal(int id);
+  void enterKeyPressedSignal(int id);
 };
 
 #endif // JDATABASE_H

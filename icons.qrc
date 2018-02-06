@@ -79,5 +79,6 @@
         <file>res/16database.png</file>
         <file>res/16user.png</file>
         <file>res/supplier.png</file>
+        <file>res/category.png</file>
     </qresource>
 </RCC>

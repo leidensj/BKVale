@@ -20,7 +20,6 @@ public:
   void setDatabase(QSqlDatabase db);
   bool isValid() const;
 
-
 private:
   NoteView* m_view;
   JDatabase* m_database;

@@ -2,6 +2,7 @@
 #define ITEM_H
 
 #include <QString>
+#include "category.h"
 
 #define INVALID_ITEM_ID   -1
 #define INVALID_ITEM_ICON -1
@@ -21,39 +22,54 @@ enum class ItemTableIndex
   PackageUnity,
   PackageAmmount,
   Details,
-  MidasCode,
-  Icon
+  Code,
+  Icon,
+  AvailableAtNotes,
+  AvailableAtShop,
+  AvailableAtConsumption
 };
 
 struct Item
 {
   Item()
     : m_id(INVALID_ITEM_ID)
+    , m_categoryId(INVALID_CATEGORY_ID)
+    , m_packageAmmount(0.0)
     , m_icon(INVALID_ITEM_ICON)
+    , m_bAvailableAtNotes(false)
+    , m_bAvailableAtShop(false)
+    , m_bAvailableAtConsumption(false)
   {
 
   }
 
-  int m_id;
-  int m_groupId;
+  mutable int m_id;
+  int m_categoryId;
   QString m_name;
   QString m_unity;
   QString m_packageUnity;
   double m_packageAmmount;
   QString m_details;
-  QString m_midasCode;
+  QString m_code;
   int m_icon;
+  bool m_bAvailableAtNotes;
+  bool m_bAvailableAtShop;
+  bool m_bAvailableAtConsumption;
 
   void clear()
   {
     m_id = INVALID_ITEM_ID;
     m_icon = INVALID_ITEM_ICON;
+    m_categoryId= INVALID_CATEGORY_ID;
     m_name.clear();
     m_unity.clear();
     m_packageUnity.clear();
     m_packageAmmount = 0.0;
     m_details.clear();
-    m_midasCode.clear();
+    m_code.clear();
+    m_bAvailableAtNotes = false;
+    m_bAvailableAtShop = false;
+    m_bAvailableAtConsumption = false;
   }
 
   bool isValid() const
@@ -63,27 +79,33 @@ struct Item
 
   static QString columnName(ItemTableIndex idx)
   {
-    QString str;
     switch (idx)
     {
       case ItemTableIndex::ID:
-        str = "_ID"; break;
+        return "_ID";
       case ItemTableIndex::Name:
-        str = "_NAME"; break;
+        return "_NAME";
       case ItemTableIndex::Unity:
-        str = "_UNITY"; break;
+        return "_UNITY";
       case ItemTableIndex::PackageUnity:
-        str = "_PACKAGE_UNITY"; break;
+        return "_PACKAGE_UNITY";
       case ItemTableIndex::PackageAmmount:
-        str = "_PACKAGE_AMMOUNT"; break;
+        return "_PACKAGE_AMMOUNT";
       case ItemTableIndex::Details:
-        str = "_DETAILS"; break;
-      case ItemTableIndex::MidasCode:
-        str = "_MIDASCODE"; break;
+        return "_DETAILS";
+      case ItemTableIndex::Code:
+        return "_CODE";
       case ItemTableIndex::Icon:
-        str = "_ICON"; break;
+        return "_ICON";
+      case ItemTableIndex::AvailableAtNotes:
+        return "_AVAILABLE_AT_NOTES";
+      case ItemTableIndex::AvailableAtShop:
+        return "_AVAILABLE_AT_SHOP";
+      case ItemTableIndex::AvailableAtConsumption:
+        return "_AVAILABLE_AT_CONSUMPTION";
+      default:
+        return "";
     }
-    return str;
   }
 };
 

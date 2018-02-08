@@ -154,17 +154,22 @@ void JDatabase::set(QSqlTableModel* model,
 
   model->setTable(m_tableName);
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-  for (int i = 0; i != m_columns.size(); ++i)
-    model->setHeaderData(i, Qt::Horizontal, m_columns.at(i).m_friendlyName);
-
   m_table->setModel(model);
-  for (int i = 0; i != m_columns.size(); ++i)
+
+  int count = m_table->horizontalHeader()->count();
+  if (m_columns.size() == count)
   {
-    m_table->horizontalHeader()->setSectionResizeMode(i, m_columns.at(i).m_resizeMode);
-    if (m_columns.at(i).m_bHidden)
-      m_table->hideColumn(i);
-    if (m_columns.at(i).m_bSort)
-      m_table->horizontalHeader()->setSortIndicator(i, Qt::SortOrder::AscendingOrder);
+    for (int i = 0; i != m_columns.size(); ++i)
+      model->setHeaderData(i, Qt::Horizontal, m_columns.at(i).m_friendlyName);
+
+    for (int i = 0; i != m_columns.size(); ++i)
+    {
+      m_table->horizontalHeader()->setSectionResizeMode(i, m_columns.at(i).m_resizeMode);
+      if (m_columns.at(i).m_bHidden)
+        m_table->hideColumn(i);
+      if (m_columns.at(i).m_bSort)
+        m_table->horizontalHeader()->setSortIndicator(i, Qt::SortOrder::AscendingOrder);
+    }
   }
 
   QObject::connect(m_table->selectionModel(),

@@ -353,8 +353,11 @@ bool BaitaSQL::init(QSqlDatabase db,
              "_PACKAGE_UNITY TEXT,"
              "_PACKAGE_AMMOUNT REAL,"
              "_DETAILS TEXT,"
-             "_MIDASCODE TEXT,"
-             "_ICON INT)");
+             "_CODE TEXT,"
+             "_ICON INT,"
+             "_AVAILABLE_AT_NOTES,"
+             "_AVAILABLE_AT_SHOP,"
+             "AVAILABLE_AT_CONSUMPTION)");
 
   query.exec("CREATE TABLE IF NOT EXISTS _CATEGORIES ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -424,52 +427,177 @@ bool ItemSQL::select(QSqlDatabase db,
                      QString& error)
 {
   error.clear();
+  int id = item.m_id;
+  item.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  bool bFound = false;
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                "_NAME,"
+                "_CATEGORYID,"
+                "_UNITY,"
+                "_PACKAGE_UNITY,"
+                "_PACKAGE_AMMOUNT,"
+                "_DETAILS,"
+                "_CODE,"
+                "_ICON,"
+                "_AVAILABLE_AT_NOTES,"
+                "_AVAILABLE_AT_SHOP,"
+                "_AVAILABLE_AT_CONSUMPTION,"
+                "FROM _ITEMS "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+  if (query.next())
+  {
+    item.m_id = id;
+    item.m_name = query.value(query.record().indexOf("_NAME")).toString();
+    item.m_categoryId = query.value(query.record().indexOf("_CATEGORYID")).toInt();
+    item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
+    item.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
+    item.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
+    item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
+    item.m_code = query.value(query.record().indexOf("_CODE")).toString();
+    item.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
+    item.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
+    item.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
+    item.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
+    bFound = true;
+  }
+
+  if (query.exec())
+  {
+    if (!bFound)
+      error = "Item não encontrado.";
+    return bFound;
+  }
+  else
+  {
+    error = query.lastError().text();
+    return false;
+  }
+}
+
+bool ItemSQL::insert(QSqlDatabase db,
+                     const Item& item,
+                     QString& error)
+{
+  error.clear();
 
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
   QSqlQuery query(db);
-  query.prepare("SELECT "
-                "_DESCRIPTION,"
+  query.prepare("INSERT INTO _ITEMS ("
+                "_NAME,"
+                "_CATEGORYID,"
                 "_UNITY,"
                 "_PACKAGE_UNITY,"
                 "_PACKAGE_AMMOUNT,"
                 "_DETAILS,"
-                "_MIDASCODE,"
-                "_ICON "
-                "FROM _ITEMS "
+                "_CODE,"
+                "_ICON,"
+                "_AVAILABLE_AT_NOTES,"
+                "_AVAILABLE_AT_SHOP,"
+                "_AVAILABLE_AT_CONSUMPTION) "
+                "VALUES ("
+                "(:_name),"
+                "(:_categoryid),"
+                "(:_unity),"
+                "(:_packageunity),"
+                "(:_packageammount),"
+                "(:_details),"
+                "(:_code),"
+                "(:_icon),"
+                "(:_availableatnotes),"
+                "(:_availableatshop),"
+                "(:_availableatconsumption))");
+  query.bindValue(":_name", item.m_name);
+  query.bindValue(":_categoryid", item.m_categoryId);
+  query.bindValue(":_unity", item.m_unity);
+  query.bindValue(":_packageunity", item.m_packageUnity);
+  query.bindValue(":_packageammount", item.m_packageAmmount);
+  query.bindValue(":_details", item.m_details);
+  query.bindValue(":_code", item.m_code);
+  query.bindValue(":_icon", item.m_icon);
+  query.bindValue(":_availableatnotes", item.m_bAvailableAtNotes);
+  query.bindValue(":_availableatshop", item.m_bAvailableAtShop);
+  query.bindValue(":_availableatconsumption", item.m_bAvailableAtConsumption);
+
+  if (query.exec())
+  {
+    item.m_id = query.lastInsertId().toInt();
+    return true;
+  }
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool ItemSQL::update(QSqlDatabase db,
+                     const Item& item,
+                     QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("UPDATE _ITEMS SET "
+                "_NAME = (:_name),"
+                "_CATEGORYID = (:_categoryid),"
+                "_UNITY = (:_unity),"
+                "_PACKAGE_UNITY = (:_packageunity),"
+                "_PACKAGE_AMMOUNT = (:_packageammount),"
+                "_DETAILS = (:_details),"
+                "_CODE = (:_code),"
+                "_ICON = (:_icon),"
+                "_AVAILABLE_AT_NOTES = (:_availableatnotes),"
+                "_AVAILABLE_AT_SHOP = (:_availableatshop),"
+                "_AVAILABLE_AT_CONSUMPTION = (:_availableatconsumption) "
                 "WHERE _ID = (:_id)");
-
   query.bindValue(":_id", item.m_id);
+  query.bindValue(":_name", item.m_name);
+  query.bindValue(":_categoryid", item.m_categoryId);
+  query.bindValue(":_unity", item.m_unity);
+  query.bindValue(":_packageunity", item.m_packageUnity);
+  query.bindValue(":_packageammount", item.m_packageAmmount);
+  query.bindValue(":_details", item.m_details);
+  query.bindValue(":_code", item.m_code);
+  query.bindValue(":_icon", item.m_icon);
+  query.bindValue(":_availableatnotes", item.m_bAvailableAtNotes);
+  query.bindValue(":_availableatshop", item.m_bAvailableAtShop);
+  query.bindValue(":_availableatconsumption", item.m_bAvailableAtConsumption);
 
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    bSuccess = query.next();
-    if (bSuccess)
-    {
-      item.m_name = query.value(query.record().indexOf("_NAME")).toString();
-      item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
-      item.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
-      item.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
-      item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
-      item.m_midasCode = query.value(query.record().indexOf("_MIDASCODE")).toString();
-      item.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
-    }
-    else
-    {
-      item.clear();
-      item.m_name = "Item não encontrado.";
-      item.m_unity = "?";
-      error = "Item não encontrado.";
-    }
-  }
-  else
-  {
-    error = query.lastError().text();
-  }
+  if (query.exec())
+    return true;
 
-  return bSuccess;
+  error = query.lastError().text();
+  return false;
+}
+
+bool ItemSQL::remove(QSqlDatabase db,
+                         int id,
+                         QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM _ITEMS "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
 }
 
 bool CategorySQL::select(QSqlDatabase db,
@@ -555,7 +683,8 @@ bool CategorySQL::update(QSqlDatabase db,
                 "_NAME = (:_name),"
                 "_ICON = (:_icon) "
                 "WHERE _ID = (:_id)");
-  query.bindValue(":_name", category.m_id);
+  query.bindValue(":_id", category.m_id);
+  query.bindValue(":_name", category.m_name);
   query.bindValue(":_icon", category.m_icon);
 
   if (query.exec())

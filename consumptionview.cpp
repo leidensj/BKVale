@@ -173,19 +173,12 @@ void ConsumptionView::search()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ItemWidget* itemWidget = new ItemWidget(false);
-  itemWidget->setDatabase(m_db);
-  layout->addWidget(itemWidget);
-  dlg.resize(540, 280);
+  ItemWidget* w = new ItemWidget();
+  w->setDatabase(m_db);
+  layout->addWidget(w);
   dlg.setWindowTitle(tr("Buscar Produto"));
   dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
   dlg.setModal(true);
-  itemWidget->focusFilter();
-
-  QObject::connect(itemWidget,
-                   SIGNAL(itemSelectedSignal(const Item&)),
-                   this,
-                   SLOT(itemSelected(const Item&)));
 
   dlg.exec();
 }

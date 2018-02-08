@@ -106,9 +106,21 @@ namespace NoteSQL
 
 namespace ItemSQL
 {
-  bool select(QSqlDatabase db,
-              Item& item,
-              QString& error);
+bool select(QSqlDatabase db,
+            Item& item,
+            QString& error);
+
+bool insert(QSqlDatabase db,
+            const Item& item,
+            QString& error);
+
+bool update(QSqlDatabase db,
+            const Item& item,
+            QString& error);
+
+bool remove(QSqlDatabase db,
+            int id,
+            QString& error);
 }
 
 namespace CategorySQL

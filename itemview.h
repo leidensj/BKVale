@@ -3,11 +3,13 @@
 
 #include <QFrame>
 #include "item.h"
+#include "category.h"
 
 class QLabel;
 class JLineEdit;
 class QDoubleSpinBox;
 class QPushButton;
+class QCheckBox;
 
 class ItemView : public QFrame
 {
@@ -15,14 +17,26 @@ class ItemView : public QFrame
 
 public:
   explicit ItemView(QWidget* parent = 0);
+  ~ItemView();
   Item getItem() const;
+  void setCategory(const Category& category);
+
+private slots:
+  void emitSearchCategorySignal();
+  void emitSaveSignal();
 
 public slots:
   void setItem(const Item& item);
   void create();
 
+signals:
+  getCategorySignal(int categoryId);
+  searchCategorySignal();
+  saveSignal();
+
 private:
   int m_currentId;
+  int m_currentCategoryId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edName;
@@ -30,7 +44,12 @@ private:
   JLineEdit* m_edPackageUnity;
   QDoubleSpinBox* m_sbPackageAmmount;
   JLineEdit* m_edDetails;
-  JLineEdit* m_edMidasCode;
+  JLineEdit* m_edCode;
+  QCheckBox* m_cbAvailableAtNotes;
+  QCheckBox* m_cbAvailableAtShop;
+  QCheckBox* m_cbAvailableAtConsumption;
+  JLineEdit* m_edCategory;
+  QPushButton* m_btnSearchCategory;
 };
 
 #endif // ITEMVIEW_H

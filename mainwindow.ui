@@ -139,9 +139,12 @@
    </attribute>
    <addaction name="actionLogin"/>
    <addaction name="actionUsers"/>
+   <addaction name="action_icones"/>
+   <addaction name="separator"/>
    <addaction name="actionItems"/>
    <addaction name="actionCategories"/>
    <addaction name="actionFornecedores"/>
+   <addaction name="actionPrecos"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
@@ -211,7 +214,7 @@
     <string>Produtos</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar Produtos</string>
+    <string>Gerenciar produtos</string>
    </property>
   </action>
   <action name="actionUsers">
@@ -259,7 +262,31 @@
     <string>Categorias</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar Categorias</string>
+    <string>Gerenciar categorias</string>
+   </property>
+  </action>
+  <action name="action_icones">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/icon.png</normaloff>:/icons/res/icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ícones</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar ícones</string>
+   </property>
+  </action>
+  <action name="actionPrecos">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/pricetag.png</normaloff>:/icons/res/pricetag.png</iconset>
+   </property>
+   <property name="text">
+    <string>Preços</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar preços</string>
    </property>
   </action>
  </widget>

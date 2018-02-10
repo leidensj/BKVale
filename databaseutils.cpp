@@ -433,7 +433,6 @@ bool ItemSQL::select(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
-  bool bFound = false;
   QSqlQuery query(db);
   query.prepare("SELECT "
                 "_NAME,"
@@ -450,28 +449,29 @@ bool ItemSQL::select(QSqlDatabase db,
                 "FROM _ITEMS "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
-  if (query.next())
-  {
-    item.m_id = id;
-    item.m_name = query.value(query.record().indexOf("_NAME")).toString();
-    item.m_categoryId = query.value(query.record().indexOf("_CATEGORYID")).toInt();
-    item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
-    item.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
-    item.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
-    item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
-    item.m_code = query.value(query.record().indexOf("_CODE")).toString();
-    item.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
-    item.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
-    item.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
-    item.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
-    bFound = true;
-  }
-
   if (query.exec())
   {
-    if (!bFound)
+    if (query.next())
+    {
+      item.m_id = id;
+      item.m_name = query.value(query.record().indexOf("_NAME")).toString();
+      item.m_categoryId = query.value(query.record().indexOf("_CATEGORYID")).toInt();
+      item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
+      item.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
+      item.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
+      item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
+      item.m_code = query.value(query.record().indexOf("_CODE")).toString();
+      item.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
+      item.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
+      item.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
+      item.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
+      return true;
+    }
+    else
+    {
       error = "Item não encontrado.";
-    return bFound;
+      return false;
+    }
   }
   else
   {
@@ -611,7 +611,6 @@ bool CategorySQL::select(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
-  bool bFound = false;
   QSqlQuery query(db);
   query.prepare("SELECT "
                 "_NAME,"
@@ -619,19 +618,21 @@ bool CategorySQL::select(QSqlDatabase db,
                 "FROM _CATEGORIES "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
-  if (query.next())
-  {
-    category.m_id = id;
-    category.m_name = query.value(query.record().indexOf("_NAME")).toString();
-    category.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
-    bFound = true;
-  }
 
   if (query.exec())
   {
-    if (!bFound)
+    if (query.next())
+    {
+      category.m_id = id;
+      category.m_name = query.value(query.record().indexOf("_NAME")).toString();
+      category.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
+      return true;
+    }
+    else
+    {
       error = "Categoria não encontrada.";
-    return bFound;
+      return false;
+    }
   }
   else
   {

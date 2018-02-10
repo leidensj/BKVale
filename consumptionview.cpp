@@ -199,7 +199,7 @@ void ConsumptionView::enableControls()
 
 void ConsumptionView::itemSelected(const Item& item)
 {
-  if (item.isValid())
+  if (item.isValidId())
   {
     m_item->setText(item.m_name);
     m_currentItemID = item.m_id;

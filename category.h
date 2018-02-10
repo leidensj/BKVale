@@ -26,7 +26,8 @@ struct Category
     m_icon = INVALID_CATEGORY_ICON;
   }
 
-  bool isValidId() const { return m_id != INVALID_CATEGORY_ID; }
+  static bool st_isValidId(int id) { return id != INVALID_CATEGORY_ID; }
+  bool isValidId() const { return st_isValidId(m_id); }
 };
 
 #endif // CATEGORY_H

@@ -72,7 +72,7 @@ struct Item
     m_bAvailableAtConsumption = false;
   }
 
-  bool isValid() const
+  bool isValidId() const
   {
     return m_id != INVALID_ITEM_ID;
   }

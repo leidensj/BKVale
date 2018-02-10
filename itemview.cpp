@@ -177,6 +177,9 @@ void ItemView::create()
 {
   Item item;
   setItem(item);
+  m_currentId = INVALID_ITEM_ID;
+  m_currentCategoryId = INVALID_CATEGORY_ID;
+  m_edCategory->setText("");
   m_edName->setFocus();
 }
 
@@ -192,5 +195,6 @@ void ItemView::emitSaveSignal()
 
 void ItemView::setCategory(const Category& category)
 {
+  m_currentCategoryId = category.m_id;
   m_edCategory->setText(category.m_name);
 }

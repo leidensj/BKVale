@@ -2,6 +2,7 @@
 #define JDATABASE_H
 
 #include <QFrame>
+#include <QDialog>
 #include <QSqlDatabase>
 #include <QModelIndex>
 #include <QSqlTableModel>
@@ -66,7 +67,8 @@ class JDatabase : public QFrame
   Q_OBJECT
 
 public:
-  explicit JDatabase(QWidget *parent = 0);
+  explicit JDatabase(bool bSelectorMode = false,
+                     QWidget *parent = 0);
   ~JDatabase();
   void set(QSqlTableModel* model,
            const QString& tableName,
@@ -77,6 +79,7 @@ public slots:
   void refresh();
 
 private:
+  const bool m_bSelectorMode;
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
@@ -101,6 +104,30 @@ signals:
   void itemSelectedSignal(int id);
   void itemRemoveSignal(int id);
   void enterKeyPressedSignal(int id);
+};
+
+class JDatabaseSelector : public QDialog
+{
+  Q_OBJECT
+
+public:
+  explicit JDatabaseSelector(const QString& title,
+                             const QIcon& icon,
+                             int invalidId,
+                             QWidget* parent = 0);
+
+  void set(QSqlTableModel* model,
+           const QString& tableName,
+           const QVector<SqlTableColumn>& sqlTableColumns);
+
+  int getCurrentId() const;
+
+private slots:
+  void itemSelected(int id);
+
+private:
+  int m_currentId;
+  JDatabase* m_database;
 };
 
 #endif // JDATABASE_H

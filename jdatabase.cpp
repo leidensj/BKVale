@@ -17,8 +17,10 @@ void JTableView::keyPressEvent(QKeyEvent* event)
   QTableView::keyPressEvent(event);
 }
 
-JDatabase::JDatabase(QWidget *parent)
+JDatabase::JDatabase(bool bSelectorMode,
+                     QWidget *parent)
   : QFrame(parent)
+  , m_bSelectorMode(bSelectorMode)
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
@@ -134,7 +136,17 @@ JDatabase::JDatabase(QWidget *parent)
                    this,
                    SLOT(emitEnterKeyPressedSignal()));
 
+  QObject::connect(m_table,
+                   SIGNAL(enterKeyPressedSignal()),
+                   this,
+                   SLOT(itemSelected()));
+
   filterSearchChanged();
+  if (m_bSelectorMode)
+  {
+    m_btnRemove->hide();
+    m_edFilterSearch->setFocus();
+  }
 }
 
 JDatabase::~JDatabase()
@@ -211,6 +223,8 @@ void JDatabase::refresh()
     model->select();
   }
   enableControls();
+  if (m_bSelectorMode)
+    m_edFilterSearch->setFocus();
 }
 
 void JDatabase::enableControls()
@@ -294,4 +308,44 @@ void JDatabase::emitEnterKeyPressedSignal()
       emit enterKeyPressedSignal(id);
     }
   }
+}
+
+JDatabaseSelector::JDatabaseSelector(const QString& title,
+                                     const QIcon& icon,
+                                     int invalidId,
+                                     QWidget* parent)
+  : QDialog(parent)
+  , m_currentId(invalidId)
+  , m_database(nullptr)
+{
+  m_database = new JDatabase(true);
+  QHBoxLayout* hlayout0 = new QHBoxLayout();
+  hlayout0->addWidget(m_database);
+  setLayout(hlayout0);
+
+  setWindowTitle(title);
+  setWindowIcon(icon);
+
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(int)),
+                   this,
+                   SLOT(itemSelected(int)));
+}
+
+void JDatabaseSelector::set(QSqlTableModel* model,
+                            const QString& tableName,
+                            const QVector<SqlTableColumn>& sqlTableColumns)
+{
+  m_database->set(model, tableName, sqlTableColumns);
+}
+
+void JDatabaseSelector::itemSelected(int id)
+{
+  m_currentId = id;
+  close();
+}
+
+int JDatabaseSelector::getCurrentId() const
+{
+  return m_currentId;
 }

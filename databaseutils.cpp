@@ -364,6 +364,11 @@ bool BaitaSQL::init(QSqlDatabase db,
              "_NAME TEXT NOT NULL UNIQUE,"
              "_ICON INT)");
 
+  query.exec("CREATE TABLE IF NOT EXISTS _IMAGES ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_NAME TEXT UNIQUE NOT NULL,"
+             "_IMAGE BLOB)");
+
   query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
              "_TITLE TEXT,"
@@ -706,6 +711,122 @@ bool CategorySQL::remove(QSqlDatabase db,
 
   QSqlQuery query(db);
   query.prepare("DELETE FROM _CATEGORIES "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool ImageSQL::select(QSqlDatabase db,
+                      Image& image,
+                      QString& error)
+{
+  error.clear();
+  int id = image.m_id;
+  image.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                "_NAME,"
+                "_IMAGE "
+                "FROM _IMAGES "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+
+  if (query.exec())
+  {
+    if (query.next())
+    {
+      image.m_id = id;
+      image.m_name = query.value(query.record().indexOf("_NAME")).toString();
+      image.m_image = query.value(query.record().indexOf("_IMAGE")).toByteArray();
+      return true;
+    }
+    else
+    {
+      error = "Imagem não encontrada.";
+      return false;
+    }
+  }
+  else
+  {
+    error = query.lastError().text();
+    return false;
+  }
+}
+
+bool ImageSQL::insert(QSqlDatabase db,
+                      const Image& image,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("INSERT INTO _IMAGES ("
+                "_NAME,"
+                "_IMAGE) "
+                "VALUES ("
+                "(:_name),"
+                "(:_image))");
+  query.bindValue(":_name", image.m_name);
+  query.bindValue(":_image", image.m_image);
+
+  if (query.exec())
+  {
+    image.m_id = query.lastInsertId().toInt();
+    return true;
+  }
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool ImageSQL::update(QSqlDatabase db,
+                      const Image& image,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("UPDATE _IMAGES SET "
+                "_NAME = (:_name),"
+                "_IMAGE = (:_image) "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", image.m_id);
+  query.bindValue(":_name", image.m_name);
+  query.bindValue(":_image", image.m_image);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool ImageSQL::remove(QSqlDatabase db,
+                      int id,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM _IMAGES "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
 

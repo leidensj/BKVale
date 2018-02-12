@@ -43,10 +43,13 @@ JImageView::JImageView(QWidget* parent)
   frame0->setFrameShape(QFrame::Shape::StyledPanel);
   frame0->setFrameShadow(QFrame::Shadow::Plain);
 
-  QHBoxLayout* hlayout0 = new QHBoxLayout();
-  hlayout0->setContentsMargins(0, 0, 0, 0);
-  hlayout0->addWidget(m_lblImage);
-  frame0->setLayout(hlayout0);
+  QHBoxLayout* vlayout1 = new QHBoxLayout();
+  vlayout1->setContentsMargins(0, 0, 0, 0);
+  vlayout1->setAlignment(Qt::AlignTop);
+  vlayout1->addWidget(m_lblImage);
+  frame0->setLayout(vlayout1);
+  frame0->setMinimumSize(66, 66);
+  frame0->setMaximumSize(66, 66);
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
@@ -66,19 +69,23 @@ JImageView::JImageView(QWidget* parent)
                    SLOT(clearImage()));
 
   clearImage();
+  updateControls();
 }
 
 void JImageView::setImage(const QString& fileName)
 {
   m_bHasImage = true;
   m_lblImage->setPixmap(QIcon(fileName).pixmap(QSize(64, 64)));
+  updateControls();
 }
 
 void JImageView::setImage(const QByteArray& bArray)
 {
+  m_bHasImage = true;
   QPixmap pixmap(QSize(64, 64));
   pixmap.loadFromData(bArray);
   m_lblImage->setPixmap(pixmap);
+  updateControls();
 }
 
 QString JImageView::getImagePath()
@@ -114,9 +121,12 @@ void JImageView::openImage()
 QByteArray JImageView::getImage()
 {
   QByteArray bArray;
-  QBuffer buffer(&bArray);
-  buffer.open(QIODevice::WriteOnly);
-  m_lblImage->pixmap()->save(&buffer, "PNG");
+  if (hasImage())
+  {
+    QBuffer buffer(&bArray);
+    buffer.open(QIODevice::WriteOnly);
+    m_lblImage->pixmap()->save(&buffer, "PNG");
+  }
   return bArray;
 }
 
@@ -125,9 +135,15 @@ void JImageView::clearImage()
   m_bHasImage = false;
   m_lblImage->clear();
   m_lblImage->setPixmap(QIcon(":/icons/res/noimage.png").pixmap(QSize(64, 64)));
+  updateControls();
 }
 
 bool JImageView::hasImage() const
 {
   return m_bHasImage;
+}
+
+void JImageView::updateControls()
+{
+  m_btnClear->setEnabled(hasImage());
 }

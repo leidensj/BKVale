@@ -2,6 +2,7 @@
 #define IMAGEVIEW_H
 
 #include <QFrame>
+#include "image.h"
 
 class QPushButton;
 class JLineEdit;
@@ -13,8 +14,20 @@ class ImageView : public QFrame
 
 public:
   explicit ImageView(QWidget* parent = 0);
+  void setImage(const Image& image);
+  Image getImage() const;
+
+public slots:
+  void create();
+
+private slots:
+  void emitSaveSignal();
+
+signals:
+  saveSignal();
 
 private:
+  int m_currentId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edImageName;

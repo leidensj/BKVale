@@ -383,6 +383,7 @@ void BaitaAssistant::openImagesDialog()
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
   ImageWidget* w = new ImageWidget();
+  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Imagens"));

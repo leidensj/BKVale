@@ -16,12 +16,15 @@ public:
   explicit JImageView(QWidget* parent = 0);
   QByteArray getImage();
   bool hasImage() const;
+  void setImage(const QByteArray& bArray);
+
+public slots:
+  void clearImage();
 
 private slots:
   void setImage(const QString& fileName);
-  void setImage(const QByteArray& bArray);
   void openImage();
-  void clearImage();
+  void updateControls();
 
 private:
   bool m_bHasImage;

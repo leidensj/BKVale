@@ -10,6 +10,7 @@
 #include "reminder.h"
 #include "settings.h"
 #include "category.h"
+#include "image.h"
 
 #define DEFAULT_NUMBER     1000
 #define DEFAULT_NUMBER_STR "1000"
@@ -135,6 +136,25 @@ namespace CategorySQL
 
   bool update(QSqlDatabase db,
               const Category& category,
+              QString& error);
+
+  bool remove(QSqlDatabase db,
+              int id,
+              QString& error);
+}
+
+namespace ImageSQL
+{
+  bool select(QSqlDatabase db,
+              Image& image,
+              QString& error);
+
+  bool insert(QSqlDatabase db,
+              const Image& image,
+              QString& error);
+
+  bool update(QSqlDatabase db,
+              const Image& image,
               QString& error);
 
   bool remove(QSqlDatabase db,

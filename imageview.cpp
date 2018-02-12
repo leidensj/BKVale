@@ -6,6 +6,7 @@
 
 ImageView::ImageView(QWidget* parent)
   : QFrame(parent)
+  , m_currentId(INVALID_IMAGE_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edImageName(nullptr)
@@ -41,4 +42,42 @@ ImageView::ImageView(QWidget* parent)
   vlayout0->addWidget(m_edImageName);
   vlayout0->addWidget(m_imageView);
   setLayout(vlayout0);
+
+  QObject::connect(m_btnCreate,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(create()));
+
+  QObject::connect(m_btnSave,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(emitSaveSignal()));
 }
+
+ void ImageView::setImage(const Image& image)
+ {
+   m_currentId = image.m_id;
+   m_edImageName->setText(image.m_name);
+   m_imageView->setImage(image.m_image);
+ }
+
+ Image ImageView::getImage() const
+ {
+   Image image;
+   image.m_id = m_currentId;
+   image.m_name = m_edImageName->text();
+   image.m_image = m_imageView->getImage();
+   return image;
+ }
+
+ void ImageView::create()
+ {
+   m_currentId = INVALID_IMAGE_ID;
+   m_edImageName->clear();
+   m_imageView->clearImage();
+ }
+
+ void ImageView::emitSaveSignal()
+ {
+  emit saveSignal();
+ }

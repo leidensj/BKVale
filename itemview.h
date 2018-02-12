@@ -24,6 +24,7 @@ public:
 private slots:
   void emitSearchCategorySignal();
   void emitSaveSignal();
+  void clearCategory();
 
 public slots:
   void setItem(const Item& item);
@@ -50,6 +51,7 @@ private:
   QCheckBox* m_cbAvailableAtConsumption;
   JLineEdit* m_edCategory;
   QPushButton* m_btnSearchCategory;
+  QPushButton* m_btnClearCategory;
 };
 
 #endif // ITEMVIEW_H

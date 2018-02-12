@@ -139,7 +139,7 @@
    </attribute>
    <addaction name="actionLogin"/>
    <addaction name="actionUsers"/>
-   <addaction name="action_icones"/>
+   <addaction name="actionImages"/>
    <addaction name="separator"/>
    <addaction name="actionItems"/>
    <addaction name="actionCategories"/>
@@ -265,16 +265,16 @@
     <string>Gerenciar categorias</string>
    </property>
   </action>
-  <action name="action_icones">
+  <action name="actionImages">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/icon.png</normaloff>:/icons/res/icon.png</iconset>
    </property>
    <property name="text">
-    <string>Ícones</string>
+    <string>Imagens</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar ícones</string>
+    <string>Gerenciar imagens</string>
    </property>
   </action>
   <action name="actionPrecos">

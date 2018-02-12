@@ -61,7 +61,7 @@ JDatabase::JDatabase(bool bSelectorMode,
   hlayout0->addWidget(m_btnRemove);
   hlayout0->addWidget(m_btnFilter);
 
-  m_edFilterSearch = new JLineEdit(false, false);
+  m_edFilterSearch = new JLineEdit(JValidatorType::All, false, false);
   m_edFilterSearch->setClearButtonEnabled(true);
 
   m_btnContains = new QPushButton();

@@ -3,12 +3,33 @@
 
 #include <QLineEdit>
 #include <QKeyEvent>
+#include <QValidator>
+#include <QRegExpValidator>
+
+enum class JValidatorType : int
+{
+  All,
+  Alphanumeric,
+  AlphanumericAndSpaces,
+  Numeric
+};
+
+class JRegExpValidator: public QRegExpValidator
+{
+public:
+  JRegExpValidator(bool toUpper, const QRegExp & rx, QObject* parent = 0);
+  State validate(QString& input, int& pos) const override;
+
+private:
+  const bool m_toUpper;
+};
 
 class JLineEdit : public QLineEdit
 {
   Q_OBJECT
 public:
-  explicit JLineEdit(bool toUpper,
+  explicit JLineEdit(JValidatorType validator,
+                     bool toUpper,
                      bool enterAsTab,
                      QWidget* parent = 0);
 
@@ -19,9 +40,6 @@ protected:
 
 private:
   const bool m_enterAsTab;
-
-public slots:
-  void toUpper();
 
 signals:
   void enterSignal();

@@ -22,6 +22,7 @@ ItemView::ItemView(QWidget* parent)
   , m_cbAvailableAtConsumption(nullptr)
   , m_edCategory(nullptr)
   , m_btnSearchCategory(nullptr)
+  , m_btnClearCategory(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -37,15 +38,15 @@ ItemView::ItemView(QWidget* parent)
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
-  m_edName = new JLineEdit(true, true);
+  m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edName->setMaxLength(MAX_ITEM_NAME_LENGTH);
   m_edName->setPlaceholderText(tr("Nome"));
 
-  m_edUnity = new JLineEdit(true, true);
+  m_edUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
   m_edUnity->setMaxLength(MAX_ITEM_UNITY_LENGTH);
   m_edUnity->setPlaceholderText(tr("Unidade"));
 
-  m_edPackageUnity = new JLineEdit(true, true);
+  m_edPackageUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
   m_edPackageUnity->setMaxLength(MAX_ITEM_PACKAGE_UNITY_LENGTH);
   m_edPackageUnity->setPlaceholderText(tr("Unidade da Embalagem"));
 
@@ -54,11 +55,11 @@ ItemView::ItemView(QWidget* parent)
   m_sbPackageAmmount->setMinimum(0.0);
   m_sbPackageAmmount->setSpecialValueText(tr("Quantidade da Embalagem"));
 
-  m_edDetails = new JLineEdit(true, true);
+  m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edDetails->setMaxLength(MAX_ITEM_DETAILS_LENGTH);
   m_edDetails->setPlaceholderText(tr("Detalhes"));
 
-  m_edCode = new JLineEdit(true, true);
+  m_edCode = new JLineEdit(JValidatorType::Numeric, true, true);
   m_edCode->setMaxLength(MAX_ITEM_MIDASCODE_LENGTH);
   m_edCode->setPlaceholderText(tr("Código"));
 
@@ -81,9 +82,16 @@ ItemView::ItemView(QWidget* parent)
   m_btnSearchCategory->setIcon(QIcon(":/icons/res/binoculars.png"));
   m_btnSearchCategory->setToolTip(tr("Buscar categoria"));
 
-  m_edCategory = new JLineEdit(true, true);
+  m_edCategory = new JLineEdit(JValidatorType::All, true, true);
   m_edCategory->setReadOnly(true);
   m_edCategory->setPlaceholderText(tr("Categoria"));
+
+  m_btnClearCategory = new QPushButton();
+  m_btnClearCategory->setFlat(true);
+  m_btnClearCategory->setText("");
+  m_btnClearCategory->setIconSize(QSize(16, 16));
+  m_btnClearCategory->setIcon(QIcon(":/icons/res/remove.png"));
+  m_btnClearCategory->setToolTip(tr("Limpar categoria"));
 
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->setContentsMargins(0, 0, 0, 0);
@@ -95,13 +103,14 @@ ItemView::ItemView(QWidget* parent)
   hlayout1->setContentsMargins(0, 0, 0, 0);
   hlayout1->addWidget(m_btnSearchCategory);
   hlayout1->addWidget(m_edCategory);
+  hlayout1->addWidget(m_btnClearCategory);
 
   QVBoxLayout* vlayout0 = new QVBoxLayout();
   vlayout0->addWidget(m_cbAvailableAtNotes);
   vlayout0->addWidget(m_cbAvailableAtShop);
   vlayout0->addWidget(m_cbAvailableAtConsumption);
   QGroupBox* grpAccess = new QGroupBox();
-  grpAccess->setTitle(tr("Disponível nos módulos:"));
+  grpAccess->setTitle(tr("Disponível em:"));
   grpAccess->setLayout(vlayout0);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
@@ -115,6 +124,7 @@ ItemView::ItemView(QWidget* parent)
   vlayout1->addWidget(m_edDetails);
   vlayout1->addWidget(m_edCode);
   vlayout1->addLayout(hlayout1);
+  vlayout1->addWidget(grpAccess);
 
   setLayout(vlayout1);
 
@@ -132,6 +142,11 @@ ItemView::ItemView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSearchCategorySignal()));
+
+  QObject::connect(m_btnClearCategory,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(clearCategory()));
 }
 
 ItemView::~ItemView()
@@ -197,4 +212,10 @@ void ItemView::setCategory(const Category& category)
 {
   m_currentCategoryId = category.m_id;
   m_edCategory->setText(category.m_name);
+}
+
+void ItemView::clearCategory()
+{
+  Category category;
+  setCategory(category);
 }

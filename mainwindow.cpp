@@ -9,6 +9,7 @@
 #include "consumptionwidget.h"
 #include "calculatorwidget.h"
 #include "usermgtwidget.h"
+#include "imagewidget.h"
 #include "logindialog.h"
 #include <QMessageBox>
 #include <QInputDialog>
@@ -100,6 +101,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openUsersDialog()));
+
+  QObject::connect(ui->actionImages,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openImagesDialog()));
 
   QObject::connect(m_calculator,
                    SIGNAL(printSignal(const QString&)),
@@ -369,6 +375,20 @@ void BaitaAssistant::openUsersDialog()
 
   if (w->hasAnyUserChanged())
     openLoginDialog();
+}
+
+void BaitaAssistant::openImagesDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout();
+  dlg.setLayout(layout);
+  ImageWidget* w = new ImageWidget();
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Imagens"));
+  dlg.setWindowIcon(QIcon(":/icons/res/icon.png"));
+  dlg.setModal(true);
+  dlg.exec();
 }
 
 void BaitaAssistant::openLoginDialog()

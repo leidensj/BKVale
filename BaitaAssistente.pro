@@ -44,7 +44,10 @@ SOURCES += main.cpp\
     itemview.cpp \
     jdatabase.cpp \
     categoryview.cpp \
-    categorywidget.cpp
+    categorywidget.cpp \
+    jimageview.cpp \
+    imageview.cpp \
+    imagewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -81,7 +84,11 @@ HEADERS  += mainwindow.h \
     jdatabase.h \
     category.h \
     categoryview.h \
-    categorywidget.h
+    categorywidget.h \
+    jimageview.h \
+    image.h \
+    imageview.h \
+    imagewidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

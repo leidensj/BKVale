@@ -24,7 +24,7 @@ CategoryView::CategoryView(QWidget* parent)
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
-  m_edName = new JLineEdit(true, true);
+  m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edName->setPlaceholderText(tr("Nome"));
   m_edName->setMaxLength(MAX_CATEGORY_NAME_LENGTH);
 

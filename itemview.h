@@ -19,19 +19,21 @@ public:
   explicit ItemView(QWidget* parent = 0);
   ~ItemView();
   Item getItem() const;
-  void setCategory(const Category& category);
+  void setCategory(int categoryId,
+                   const QString& categoryName);
 
 private slots:
   void emitSearchCategorySignal();
   void emitSaveSignal();
   void clearCategory();
+  void updateControls();
 
 public slots:
-  void setItem(const Item& item);
+  void setItem(const Item& item,
+               const QString& categoryName);
   void create();
 
 signals:
-  getCategorySignal(int categoryId);
   searchCategorySignal();
   saveSignal();
 

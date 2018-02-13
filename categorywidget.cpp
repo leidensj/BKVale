@@ -47,7 +47,7 @@ void CategoryWidget::setDatabase(QSqlDatabase db)
   QVector<SqlTableColumn> columns;
   columns.push_back(SqlTableColumn(true, false, "_ID", "Id", QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(false, true, "_NAME", "Nome", QHeaderView::ResizeMode::Stretch));
-  columns.push_back(SqlTableColumn(true, false, "_ICON", "Ícone", QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(true, false, "_IMAGEID", "Imagem", QHeaderView::ResizeMode::ResizeToContents));
   m_database->set(model, "_CATEGORIES", columns);
 }
 
@@ -60,7 +60,11 @@ void CategoryWidget::categorySelected(int id)
                           category,
                           error))
   {
-    m_view->setCategory(category);
+    Image image;
+    image.m_id = category.m_imageId;
+    if (image.isValidId())
+      ImageSQL::select(m_database->get(), image, error);
+    m_view->setCategory(category, image.m_name);
   }
   else
   {

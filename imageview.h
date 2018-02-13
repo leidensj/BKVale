@@ -22,6 +22,7 @@ public slots:
 
 private slots:
   void emitSaveSignal();
+  void updateControls();
 
 signals:
   saveSignal();

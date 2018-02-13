@@ -348,13 +348,13 @@ bool BaitaSQL::init(QSqlDatabase db,
   query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
              "_NAME TEXT NOT NULL UNIQUE,"
-             "_CATEGORYID INTEGER NOT NULL,"
+             "_CATEGORYID INTEGER,"
+             "_IMAGEID INTEGER,"
              "_UNITY TEXT NOT NULL,"
              "_PACKAGE_UNITY TEXT,"
              "_PACKAGE_AMMOUNT REAL,"
              "_DETAILS TEXT,"
              "_CODE TEXT,"
-             "_ICON INT,"
              "_AVAILABLE_AT_NOTES,"
              "_AVAILABLE_AT_SHOP,"
              "AVAILABLE_AT_CONSUMPTION)");
@@ -362,11 +362,11 @@ bool BaitaSQL::init(QSqlDatabase db,
   query.exec("CREATE TABLE IF NOT EXISTS _CATEGORIES ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
              "_NAME TEXT NOT NULL UNIQUE,"
-             "_ICON INT)");
+             "_IMAGEID INTEGER)");
 
   query.exec("CREATE TABLE IF NOT EXISTS _IMAGES ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_NAME TEXT UNIQUE NOT NULL,"
+             "_NAME TEXT NOT NULL UNIQUE,"
              "_IMAGE BLOB)");
 
   query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
@@ -442,12 +442,12 @@ bool ItemSQL::select(QSqlDatabase db,
   query.prepare("SELECT "
                 "_NAME,"
                 "_CATEGORYID,"
+                "_IMAGEID,"
                 "_UNITY,"
                 "_PACKAGE_UNITY,"
                 "_PACKAGE_AMMOUNT,"
                 "_DETAILS,"
                 "_CODE,"
-                "_ICON,"
                 "_AVAILABLE_AT_NOTES,"
                 "_AVAILABLE_AT_SHOP,"
                 "_AVAILABLE_AT_CONSUMPTION,"
@@ -461,12 +461,12 @@ bool ItemSQL::select(QSqlDatabase db,
       item.m_id = id;
       item.m_name = query.value(query.record().indexOf("_NAME")).toString();
       item.m_categoryId = query.value(query.record().indexOf("_CATEGORYID")).toInt();
+      item.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toInt();
       item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
       item.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
       item.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
       item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
       item.m_code = query.value(query.record().indexOf("_CODE")).toString();
-      item.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
       item.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
       item.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
       item.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
@@ -498,35 +498,35 @@ bool ItemSQL::insert(QSqlDatabase db,
   query.prepare("INSERT INTO _ITEMS ("
                 "_NAME,"
                 "_CATEGORYID,"
+                "_IMAGEID,"
                 "_UNITY,"
                 "_PACKAGE_UNITY,"
                 "_PACKAGE_AMMOUNT,"
                 "_DETAILS,"
                 "_CODE,"
-                "_ICON,"
                 "_AVAILABLE_AT_NOTES,"
                 "_AVAILABLE_AT_SHOP,"
                 "_AVAILABLE_AT_CONSUMPTION) "
                 "VALUES ("
                 "(:_name),"
                 "(:_categoryid),"
+                "(:_imageid),"
                 "(:_unity),"
                 "(:_packageunity),"
                 "(:_packageammount),"
                 "(:_details),"
                 "(:_code),"
-                "(:_icon),"
                 "(:_availableatnotes),"
                 "(:_availableatshop),"
                 "(:_availableatconsumption))");
   query.bindValue(":_name", item.m_name);
   query.bindValue(":_categoryid", item.m_categoryId);
+  query.bindValue(":_imageid", item.m_imageId);
   query.bindValue(":_unity", item.m_unity);
   query.bindValue(":_packageunity", item.m_packageUnity);
   query.bindValue(":_packageammount", item.m_packageAmmount);
   query.bindValue(":_details", item.m_details);
   query.bindValue(":_code", item.m_code);
-  query.bindValue(":_icon", item.m_icon);
   query.bindValue(":_availableatnotes", item.m_bAvailableAtNotes);
   query.bindValue(":_availableatshop", item.m_bAvailableAtShop);
   query.bindValue(":_availableatconsumption", item.m_bAvailableAtConsumption);
@@ -554,12 +554,12 @@ bool ItemSQL::update(QSqlDatabase db,
   query.prepare("UPDATE _ITEMS SET "
                 "_NAME = (:_name),"
                 "_CATEGORYID = (:_categoryid),"
+                "_IMAGEID = (:_imageid),"
                 "_UNITY = (:_unity),"
                 "_PACKAGE_UNITY = (:_packageunity),"
                 "_PACKAGE_AMMOUNT = (:_packageammount),"
                 "_DETAILS = (:_details),"
                 "_CODE = (:_code),"
-                "_ICON = (:_icon),"
                 "_AVAILABLE_AT_NOTES = (:_availableatnotes),"
                 "_AVAILABLE_AT_SHOP = (:_availableatshop),"
                 "_AVAILABLE_AT_CONSUMPTION = (:_availableatconsumption) "
@@ -567,12 +567,12 @@ bool ItemSQL::update(QSqlDatabase db,
   query.bindValue(":_id", item.m_id);
   query.bindValue(":_name", item.m_name);
   query.bindValue(":_categoryid", item.m_categoryId);
+  query.bindValue(":_imageid", item.m_imageId);
   query.bindValue(":_unity", item.m_unity);
   query.bindValue(":_packageunity", item.m_packageUnity);
   query.bindValue(":_packageammount", item.m_packageAmmount);
   query.bindValue(":_details", item.m_details);
   query.bindValue(":_code", item.m_code);
-  query.bindValue(":_icon", item.m_icon);
   query.bindValue(":_availableatnotes", item.m_bAvailableAtNotes);
   query.bindValue(":_availableatshop", item.m_bAvailableAtShop);
   query.bindValue(":_availableatconsumption", item.m_bAvailableAtConsumption);
@@ -619,7 +619,7 @@ bool CategorySQL::select(QSqlDatabase db,
   QSqlQuery query(db);
   query.prepare("SELECT "
                 "_NAME,"
-                "_ICON "
+                "_IMAGEID "
                 "FROM _CATEGORIES "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
@@ -630,7 +630,7 @@ bool CategorySQL::select(QSqlDatabase db,
     {
       category.m_id = id;
       category.m_name = query.value(query.record().indexOf("_NAME")).toString();
-      category.m_icon = query.value(query.record().indexOf("_ICON")).toInt();
+      category.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toInt();
       return true;
     }
     else
@@ -658,12 +658,12 @@ bool CategorySQL::insert(QSqlDatabase db,
   QSqlQuery query(db);
   query.prepare("INSERT INTO _CATEGORIES ("
                 "_NAME,"
-                "_ICON) "
+                "_IMAGEID) "
                 "VALUES ("
                 "(:_name),"
-                "(:_icon))");
+                "(:_imageid))");
   query.bindValue(":_name", category.m_name);
-  query.bindValue(":_icon", category.m_icon);
+  query.bindValue(":_imageid", category.m_imageId);
 
   if (query.exec())
   {
@@ -687,11 +687,11 @@ bool CategorySQL::update(QSqlDatabase db,
   QSqlQuery query(db);
   query.prepare("UPDATE _CATEGORIES SET "
                 "_NAME = (:_name),"
-                "_ICON = (:_icon) "
+                "_IMAGEID = (:_imageid) "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", category.m_id);
   query.bindValue(":_name", category.m_name);
-  query.bindValue(":_icon", category.m_icon);
+  query.bindValue(":_imageid", category.m_imageId);
 
   if (query.exec())
     return true;

@@ -16,6 +16,7 @@ public:
   explicit JImageView(QWidget* parent = 0);
   QByteArray getImage();
   bool hasImage() const;
+  bool isDirty() const;
   void setImage(const QByteArray& bArray);
 
 public slots:
@@ -26,8 +27,12 @@ private slots:
   void openImage();
   void updateControls();
 
+signals:
+  changedSignal();
+
 private:
   bool m_bHasImage;
+  bool m_bDirty;
   QPushButton* m_btnOpen;
   QPushButton* m_btnClear;
   QLabel* m_lblImage;

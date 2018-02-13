@@ -104,6 +104,7 @@ void ImageWidget::saveImage()
       : ImageSQL::insert(m_database->get(), image, error))
   {
     m_database->refresh();
+    m_view->create();
   }
   else
   {

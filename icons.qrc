@@ -82,5 +82,6 @@
         <file>res/icon.png</file>
         <file>res/pricetag.png</file>
         <file>res/noimage.png</file>
+        <file>res/saveas.png</file>
     </qresource>
 </RCC>

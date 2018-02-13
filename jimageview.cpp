@@ -10,6 +10,7 @@
 JImageView::JImageView(QWidget* parent)
   : QFrame(parent)
   , m_bHasImage(false)
+  , m_bDirty(false)
   , m_btnOpen(nullptr)
   , m_btnClear(nullptr)
   , m_lblImage(nullptr)
@@ -33,30 +34,35 @@ JImageView::JImageView(QWidget* parent)
   m_lblImage->setMaximumSize(64, 64);
   m_lblImage->setScaledContents(true);
 
-  QVBoxLayout* vlayout0 = new QVBoxLayout();
-  vlayout0->setContentsMargins(0, 0, 0, 0);
-  vlayout0->setAlignment(Qt::AlignTop);
-  vlayout0->addWidget(m_btnOpen);
-  vlayout0->addWidget(m_btnClear);
+  QHBoxLayout* hlayout0 = new QHBoxLayout();
+  hlayout0->setContentsMargins(0, 0, 0, 0);
+  hlayout0->setAlignment(Qt::AlignLeft);
+  hlayout0->addWidget(m_btnOpen);
+  hlayout0->addWidget(m_btnClear);
 
   QFrame* frame0 = new QFrame();
   frame0->setFrameShape(QFrame::Shape::StyledPanel);
   frame0->setFrameShadow(QFrame::Shadow::Plain);
 
-  QHBoxLayout* vlayout1 = new QHBoxLayout();
-  vlayout1->setContentsMargins(0, 0, 0, 0);
-  vlayout1->setAlignment(Qt::AlignTop);
-  vlayout1->addWidget(m_lblImage);
-  frame0->setLayout(vlayout1);
+  QHBoxLayout* hlayout1 = new QHBoxLayout();
+  hlayout1->setContentsMargins(0, 0, 0, 0);
+  hlayout1->addWidget(m_lblImage);
+  frame0->setLayout(hlayout1);
   frame0->setMinimumSize(66, 66);
   frame0->setMaximumSize(66, 66);
 
-  QHBoxLayout* hlayout1 = new QHBoxLayout();
-  hlayout1->setContentsMargins(0, 0, 0, 0);
-  hlayout1->setAlignment(Qt::AlignLeft);
-  hlayout1->addWidget(frame0);
-  hlayout1->addLayout(vlayout0);
-  setLayout(hlayout1);
+  QHBoxLayout* hlayout2 = new QHBoxLayout();
+  hlayout2->setContentsMargins(0, 0, 0, 0);
+  hlayout2->addWidget(frame0);
+  hlayout2->addStretch();
+
+  QVBoxLayout* vlayout0 = new QVBoxLayout();
+  vlayout0->setContentsMargins(0, 0, 0, 0);
+  vlayout0->setAlignment(Qt::AlignTop);
+  vlayout0->addLayout(hlayout0);
+  vlayout0->addLayout(hlayout2);
+  vlayout0->addStretch();
+  setLayout(vlayout0);
 
   QObject::connect(m_btnOpen,
                    SIGNAL(clicked(bool)),
@@ -69,18 +75,22 @@ JImageView::JImageView(QWidget* parent)
                    SLOT(clearImage()));
 
   clearImage();
+  m_bDirty = false;
   updateControls();
 }
 
 void JImageView::setImage(const QString& fileName)
 {
+  m_bDirty = true;
   m_bHasImage = true;
   m_lblImage->setPixmap(QIcon(fileName).pixmap(QSize(64, 64)));
   updateControls();
+  emit changedSignal();
 }
 
 void JImageView::setImage(const QByteArray& bArray)
 {
+  m_bDirty = false;
   m_bHasImage = true;
   QPixmap pixmap(QSize(64, 64));
   pixmap.loadFromData(bArray);
@@ -132,15 +142,22 @@ QByteArray JImageView::getImage()
 
 void JImageView::clearImage()
 {
+  m_bDirty = true;
   m_bHasImage = false;
   m_lblImage->clear();
   m_lblImage->setPixmap(QIcon(":/icons/res/noimage.png").pixmap(QSize(64, 64)));
   updateControls();
+  emit changedSignal();
 }
 
 bool JImageView::hasImage() const
 {
   return m_bHasImage;
+}
+
+bool JImageView::isDirty() const
+{
+  return m_bDirty;
 }
 
 void JImageView::updateControls()

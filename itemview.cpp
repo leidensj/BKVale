@@ -40,11 +40,11 @@ ItemView::ItemView(QWidget* parent)
 
   m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edName->setMaxLength(MAX_ITEM_NAME_LENGTH);
-  m_edName->setPlaceholderText(tr("Nome"));
+  m_edName->setPlaceholderText(tr("Nome *"));
 
   m_edUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
   m_edUnity->setMaxLength(MAX_ITEM_UNITY_LENGTH);
-  m_edUnity->setPlaceholderText(tr("Unidade"));
+  m_edUnity->setPlaceholderText(tr("Unidade *"));
 
   m_edPackageUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
   m_edPackageUnity->setMaxLength(MAX_ITEM_PACKAGE_UNITY_LENGTH);
@@ -147,6 +147,18 @@ ItemView::ItemView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(clearCategory()));
+
+  QObject::connect(m_edName,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+
+  QObject::connect(m_edUnity,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+
+  updateControls();
 }
 
 ItemView::~ItemView()
@@ -164,18 +176,25 @@ Item ItemView::getItem() const
   item.m_packageAmmount = m_sbPackageAmmount->value();
   item.m_details = m_edDetails->text();
   item.m_code = m_edCode->text();
-  item.m_icon = INVALID_ITEM_ICON;
   item.m_bAvailableAtNotes = m_cbAvailableAtNotes->isChecked();
   item.m_bAvailableAtShop = m_cbAvailableAtShop->isChecked();
   item.m_bAvailableAtConsumption = m_cbAvailableAtConsumption->isChecked();
   item.m_categoryId = m_currentCategoryId;
+  //TODO item.m_imageId = INVALID_IMAGE_ID;
   return item;
 }
 
-void ItemView::setItem(const Item &item)
+void ItemView::setCategory(int categoryId,
+                           const QString& categoryName)
+{
+  m_currentCategoryId = categoryId;
+  m_edCategory->setText(categoryName);
+}
+
+void ItemView::setItem(const Item &item,
+                       const QString& categoryName)
 {
   m_currentId = item.m_id;
-  m_currentCategoryId = item.m_categoryId;
   m_edName->setText(item.m_name);
   m_edUnity->setText(item.m_unity);
   m_edPackageUnity->setText(item.m_packageUnity);
@@ -185,17 +204,16 @@ void ItemView::setItem(const Item &item)
   m_cbAvailableAtNotes->setChecked(item.m_bAvailableAtNotes);
   m_cbAvailableAtShop->setChecked(item.m_bAvailableAtShop);
   m_cbAvailableAtConsumption->setChecked(item.m_bAvailableAtConsumption);
-  emit getCategorySignal(item.m_categoryId);
+  setCategory(item.m_categoryId, categoryName);
+  updateControls();
 }
 
 void ItemView::create()
 {
   Item item;
-  setItem(item);
-  m_currentId = INVALID_ITEM_ID;
-  m_currentCategoryId = INVALID_CATEGORY_ID;
-  m_edCategory->setText("");
-  m_edName->setFocus();
+  Category category;
+  setItem(item, category.m_name);
+  updateControls();
 }
 
 void ItemView::emitSearchCategorySignal()
@@ -208,14 +226,20 @@ void ItemView::emitSaveSignal()
   emit saveSignal();
 }
 
-void ItemView::setCategory(const Category& category)
-{
-  m_currentCategoryId = category.m_id;
-  m_edCategory->setText(category.m_name);
-}
-
 void ItemView::clearCategory()
 {
   Category category;
-  setCategory(category);
+  setCategory(category.m_id, category.m_name);
+}
+
+void ItemView::updateControls()
+{
+  bool bEnable = !m_edName->text().isEmpty() &&
+                 !m_edUnity->text().isEmpty();
+  m_btnSave->setEnabled(bEnable);
+  QString saveIcon = Item::st_isValidId(m_currentId)
+                     ? ":/icons/res/saveas.png"
+                     : ":/icons/res/save.png";
+  m_btnSave->setIcon(QIcon(saveIcon));
+
 }

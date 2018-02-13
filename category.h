@@ -2,9 +2,9 @@
 #define CATEGORY_H
 
 #include <QString>
+#include "image.h"
 
 #define INVALID_CATEGORY_ID   -1
-#define INVALID_CATEGORY_ICON -1
 
 #define MAX_CATEGORY_NAME_LENGTH 35
 
@@ -12,7 +12,7 @@ struct Category
 {
   mutable int m_id;
   QString m_name;
-  int m_icon;
+  int m_imageId;
 
   Category()
   {
@@ -23,7 +23,7 @@ struct Category
   {
     m_id = INVALID_CATEGORY_ID;
     m_name.clear();
-    m_icon = INVALID_CATEGORY_ICON;
+    m_imageId = INVALID_IMAGE_ID;
   }
 
   static bool st_isValidId(int id) { return id != INVALID_CATEGORY_ID; }

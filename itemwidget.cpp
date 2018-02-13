@@ -37,11 +37,7 @@ public:
     QVariant value = QSqlTableModel::data(index, role);
     if (role == Qt::DisplayRole)
     {
-      switch ((ItemTableIndex)index.column())
-      {
-        default:
-          break;
-      }
+      //TODO
     }
 
     return value;
@@ -97,12 +93,12 @@ void ItemWidget::setDatabase(QSqlDatabase db)
   columns.push_back(SqlTableColumn(true, false, "_ID", tr("Id"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(false, true, "_NAME", tr("Nome"), QHeaderView::ResizeMode::Stretch));
   columns.push_back(SqlTableColumn(true, false, "_CATEGORYID", tr("Categoria"), QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(true, false, "_IMAGEID", tr("Imagem"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(false, false, "_UNITY", tr("Unidade"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(true, false, "_PACKAGE_UNITY", tr("Unidade da Embalagem"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(true, false, "_PACKAGE_AMMOUNT", tr("Quantidade da Embalagem"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(false, false, "_DETAILS", tr("Detalhes"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(true, false, "_CODE", tr("Código"), QHeaderView::ResizeMode::ResizeToContents));
-  columns.push_back(SqlTableColumn(true, false, "_ICON", tr("Ícone"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(true, false, "_AVAILABLE_AT_NOTES", tr("Notas"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(true, false, "_AVAILABLE_AT_SHOP", tr("Compras"), QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(true, false, "_AVAILABLE_AT_CONSUMPTION", tr("Consumo"), QHeaderView::ResizeMode::ResizeToContents));
@@ -116,7 +112,11 @@ void ItemWidget::itemSelected(int id)
   QString error;
   if (ItemSQL::select(m_database->get(), item, error))
   {
-    m_view->setItem(item);
+    Category category;
+    category.m_id = item.m_categoryId;
+    if (category.isValidId())
+      CategorySQL::select(m_database->get(), category, error);
+    m_view->setItem(item, category.m_name);
   }
   else
   {
@@ -178,7 +178,7 @@ void ItemWidget::searchCategory()
   QVector<SqlTableColumn> columns;
   columns.push_back(SqlTableColumn(true, false, "_ID", "Id", QHeaderView::ResizeMode::ResizeToContents));
   columns.push_back(SqlTableColumn(false, true, "_NAME", "Nome", QHeaderView::ResizeMode::Stretch));
-  columns.push_back(SqlTableColumn(true, false, "_ICON", "Ícone", QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(true, false, "_IMAGEID", "Imagem", QHeaderView::ResizeMode::ResizeToContents));
   QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Escolher Categoria"),
                         QIcon(":/icons/res/category.png"),
@@ -191,6 +191,6 @@ void ItemWidget::searchCategory()
     category.m_id = dlg.getCurrentId();
     QString error;
     CategorySQL::select(m_database->get(), category, error);
-    m_view->setCategory(category);
+    m_view->setCategory(category.m_id, category.m_name);
   }
 }

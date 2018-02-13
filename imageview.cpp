@@ -52,6 +52,18 @@ ImageView::ImageView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSaveSignal()));
+
+  QObject::connect(m_edImageName,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+
+  QObject::connect(m_imageView,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(updateControls()));
+
+  updateControls();
 }
 
  void ImageView::setImage(const Image& image)
@@ -59,6 +71,7 @@ ImageView::ImageView(QWidget* parent)
    m_currentId = image.m_id;
    m_edImageName->setText(image.m_name);
    m_imageView->setImage(image.m_image);
+   updateControls();
  }
 
  Image ImageView::getImage() const
@@ -75,9 +88,22 @@ ImageView::ImageView(QWidget* parent)
    m_currentId = INVALID_IMAGE_ID;
    m_edImageName->clear();
    m_imageView->clearImage();
+   updateControls();
  }
 
  void ImageView::emitSaveSignal()
  {
   emit saveSignal();
+ }
+
+ void ImageView::updateControls()
+ {
+   bool bEnable = !m_edImageName->text().isEmpty() &&
+                  m_imageView->hasImage() &&
+                  m_imageView->isDirty();
+   m_btnSave->setEnabled(bEnable);
+   QString saveIcon = Image::st_isValidId(m_currentId)
+                      ? ":/icons/res/saveas.png"
+                      : ":/icons/res/save.png";
+   m_btnSave->setIcon(QIcon(saveIcon));
  }

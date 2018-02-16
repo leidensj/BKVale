@@ -370,8 +370,6 @@ void BaitaAssistant::openCategoriesDialog()
 
 void BaitaAssistant::openUsersDialog()
 {
-  QString error;
-  Printer::printByteArray(&m_printerSerial, ar, error);
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);

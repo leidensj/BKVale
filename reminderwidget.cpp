@@ -70,7 +70,7 @@ bool ReminderWidget::print(QIODevice* printer, InterfaceType type)
 {
   QString str(ReminderPrinter::build(m_view->reminder()));
   QString error;
-  bool bSuccess = Printer::print(printer, type, str, error);
+  bool bSuccess = Printer::printString(printer, type, str, error);
   if (!bSuccess)
   {
     QMessageBox::warning(this,

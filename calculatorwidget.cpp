@@ -372,10 +372,10 @@ double CalculatorWidget::calculate(double op1, double op2, Calculator::Button bu
 void CalculatorWidget::print(QIODevice* printer, InterfaceType type)
 {
   QString error;
-  if (!Printer::print(printer,
-                      type,
-                      m_view->toPlainText() + Printer::strCmdFullCut(),
-                      error))
+  if (!Printer::printString(printer,
+                            type,
+                            m_view->toPlainText() + Printer::strCmdFullCut(),
+                            error))
   {
     QMessageBox::critical(this,
                           tr("Erro"),

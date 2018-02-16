@@ -128,7 +128,7 @@ bool NoteWidget::print(QIODevice* printer,
   if (NoteSQL::select(m_database->get(), note, number, error))
   {
     QString str(NotePrinter::build(note, number, user));
-    if (Printer::print(printer, type, str, error))
+    if (Printer::printString(printer, type, str, error))
       return true;
   }
 

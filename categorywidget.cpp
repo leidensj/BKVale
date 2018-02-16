@@ -39,6 +39,11 @@ CategoryWidget::CategoryWidget(QWidget* parent)
                    SIGNAL(saveSignal()),
                    this,
                    SLOT(saveCategory()));
+
+  QObject::connect(m_view,
+                   SIGNAL(searchImageSignal()),
+                   this,
+                   SLOT(searchImage()));
 }
 
 void CategoryWidget::setDatabase(QSqlDatabase db)
@@ -115,5 +120,27 @@ void CategoryWidget::saveCategory()
                           tr("Erro"),
                           tr("Erro '%1' ao salvar categoria.").arg(error),
                           QMessageBox::Ok);
+  }
+}
+
+void CategoryWidget::searchImage()
+{
+  QVector<SqlTableColumn> columns;
+  columns.push_back(SqlTableColumn(true, false, "_ID", "Id", QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(false, true, "_NAME", "Nome", QHeaderView::ResizeMode::Stretch));
+  columns.push_back(SqlTableColumn(true, false, "_IMAGE", "Imagem", QHeaderView::ResizeMode::ResizeToContents));
+  QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
+  JDatabaseSelector dlg(tr("Escolher Imagem"),
+                        QIcon(":/icons/res/icon.png"),
+                        INVALID_IMAGE_ID);
+  dlg.set(model, "_IMAGES", columns);
+  dlg.exec();
+  if (Image::st_isValidId(dlg.getCurrentId()))
+  {
+    Image image;
+    image.m_id = dlg.getCurrentId();
+    QString error;
+    ImageSQL::select(m_database->get(), image, error);
+    m_view->setImage(image.m_id, image.m_name);
   }
 }

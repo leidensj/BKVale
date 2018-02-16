@@ -7,6 +7,7 @@
 ImageView::ImageView(QWidget* parent)
   : QFrame(parent)
   , m_currentId(INVALID_IMAGE_ID)
+  , m_bDirty(false)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edImageName(nullptr)
@@ -56,6 +57,11 @@ ImageView::ImageView(QWidget* parent)
   QObject::connect(m_edImageName,
                    SIGNAL(textChanged(const QString&)),
                    this,
+                   SLOT(setDirty()));
+
+  QObject::connect(m_edImageName,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
                    SLOT(updateControls()));
 
   QObject::connect(m_imageView,
@@ -66,13 +72,21 @@ ImageView::ImageView(QWidget* parent)
   updateControls();
 }
 
+void ImageView::setDirty()
+{
+  m_bDirty = true;
+}
+
  void ImageView::setImage(const Image& image)
  {
+   m_bDirty = false;
    m_currentId = image.m_id;
    m_edImageName->setText(image.m_name);
    m_imageView->setImage(image.m_image);
    updateControls();
  }
+
+#include <QBitmap>
 
  Image ImageView::getImage() const
  {
@@ -85,6 +99,7 @@ ImageView::ImageView(QWidget* parent)
 
  void ImageView::create()
  {
+   m_bDirty = false;
    m_currentId = INVALID_IMAGE_ID;
    m_edImageName->clear();
    m_imageView->clearImage();
@@ -100,7 +115,7 @@ ImageView::ImageView(QWidget* parent)
  {
    bool bEnable = !m_edImageName->text().isEmpty() &&
                   m_imageView->hasImage() &&
-                  m_imageView->isDirty();
+                  (m_imageView->isDirty() || m_bDirty);
    m_btnSave->setEnabled(bEnable);
    QString saveIcon = Image::st_isValidId(m_currentId)
                       ? ":/icons/res/saveas.png"

@@ -3,6 +3,7 @@
 
 #include <QtSerialPort>
 #include <QTcpSocket>
+#include <QByteArray>
 #include "note.h"
 #include "reminder.h"
 #include "item.h"
@@ -11,13 +12,20 @@
 
 namespace Printer
 {
-  bool print(QIODevice* printer,
-             InterfaceType type,
-             const QString& msg,
-             QString& error);
+
+  bool printByteArray(QIODevice* printer,
+                      QByteArray& data,
+                      QString& error);
+
+  bool printString(QIODevice* printer,
+                   InterfaceType type,
+                   const QString& msg,
+                   QString& error);
 
   QString strCmdInit();
   QString strCmdFullCut();
+
+  QByteArray imageToPrintVersion(const QByteArray& arImage);
 }
 
 namespace NotePrinter

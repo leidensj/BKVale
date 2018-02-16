@@ -23,12 +23,14 @@ public slots:
 private slots:
   void emitSaveSignal();
   void updateControls();
+  void setDirty();
 
 signals:
   saveSignal();
 
 private:
   int m_currentId;
+  bool m_bDirty;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edImageName;

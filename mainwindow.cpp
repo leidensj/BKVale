@@ -168,7 +168,10 @@ void BaitaAssistant::connect()
     m_printerSerial.setPortName(m_settings.m_serialPort);
     bSuccess = m_printerSerial.open((QIODevice::ReadWrite));
     if (bSuccess)
-      bSuccess = Printer::print(&m_printerSerial, m_settings.m_interfaceType, Printer::strCmdInit(), error);
+      bSuccess = Printer::printString(&m_printerSerial,
+                                      m_settings.m_interfaceType,
+                                      Printer::strCmdInit(),
+                                      error);
     else
       error = m_printerSerial.errorString();
 
@@ -179,7 +182,10 @@ void BaitaAssistant::connect()
                                (quint16)m_settings.m_ethernetPort);
     bSuccess = m_printerTCP.waitForConnected();
     if (bSuccess)
-      bSuccess = Printer::print(&m_printerTCP, m_settings.m_interfaceType, Printer::strCmdInit(), error);
+      bSuccess = Printer::printString(&m_printerTCP,
+                                      m_settings.m_interfaceType,
+                                      Printer::strCmdInit(),
+                                      error);
     else
       error = m_printerTCP.errorString();
   }
@@ -247,7 +253,10 @@ void BaitaAssistant::print(const QString& text)
     printer = &m_printerTCP;
 
   QString error;
-  if (!Printer::print(printer, m_settings.m_interfaceType, text, error))
+  if (!Printer::printString(printer,
+                            m_settings.m_interfaceType,
+                            text,
+                            error))
   {
     QMessageBox::critical(this,
                           tr("Erro"),
@@ -361,6 +370,8 @@ void BaitaAssistant::openCategoriesDialog()
 
 void BaitaAssistant::openUsersDialog()
 {
+  QString error;
+  Printer::printByteArray(&m_printerSerial, ar, error);
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);

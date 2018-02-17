@@ -26,6 +26,13 @@ struct Image
     m_image.clear();
   }
 
+  bool operator !=(const Image& img)
+  {
+    return
+        m_name != img.m_name ||
+        m_image != img.m_image;
+  }
+
   static bool st_isValidId(int id) { return id != INVALID_IMAGE_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
 };

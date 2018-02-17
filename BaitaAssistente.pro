@@ -47,7 +47,8 @@ SOURCES += main.cpp\
     categorywidget.cpp \
     jimageview.cpp \
     imageview.cpp \
-    imagewidget.cpp
+    imagewidget.cpp \
+    jpicker.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -88,7 +89,8 @@ HEADERS  += mainwindow.h \
     jimageview.h \
     image.h \
     imageview.h \
-    imagewidget.h
+    imagewidget.h \
+    jpicker.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

@@ -435,17 +435,17 @@ public:
 
 };
 
-QByteArray Printer::image(const QByteArray& arImage)
+QByteArray Printer::imageToPrintVersion(const QByteArray& arImage)
 {
   QByteArray ar;
   QPixmap pxImage;
   pxImage.loadFromData(arImage);
-  pxImage = px.scaled(96, 96);
+  pxImage = pxImage.scaled(96, 96);
   QImage monoImg = pxImage.toImage().convertToFormat(QImage::Format_Mono,
                                                      Qt::MonoOnly);
   if (!monoImg.isNull())
   {
-    ESCPOSImage posImage(monoimg);
+    ESCPOSImage posImage(monoImg);
     ar = posImage.getGSStar();
     QString str("\x1D\x2F\x38" ESC_FULL_CUT);
     ar.append(str.toUtf8());

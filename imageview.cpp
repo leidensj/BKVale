@@ -6,8 +6,6 @@
 
 ImageView::ImageView(QWidget* parent)
   : QFrame(parent)
-  , m_currentId(INVALID_IMAGE_ID)
-  , m_bDirty(false)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edImageName(nullptr)
@@ -30,7 +28,7 @@ ImageView::ImageView(QWidget* parent)
   m_edImageName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edImageName->setPlaceholderText(tr("Nome"));
 
-  m_imageView = new JImageView();
+  m_imageView = new JImageView(true);
 
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->setContentsMargins(0, 0, 0, 0);
@@ -57,11 +55,6 @@ ImageView::ImageView(QWidget* parent)
   QObject::connect(m_edImageName,
                    SIGNAL(textChanged(const QString&)),
                    this,
-                   SLOT(setDirty()));
-
-  QObject::connect(m_edImageName,
-                   SIGNAL(textChanged(const QString&)),
-                   this,
                    SLOT(updateControls()));
 
   QObject::connect(m_imageView,
@@ -72,35 +65,26 @@ ImageView::ImageView(QWidget* parent)
   updateControls();
 }
 
-void ImageView::setDirty()
-{
-  m_bDirty = true;
-}
-
  void ImageView::setImage(const Image& image)
  {
-   m_bDirty = false;
-   m_currentId = image.m_id;
-   m_edImageName->setText(image.m_name);
-   m_imageView->setImage(image.m_image);
+   m_currentImg = image;
+   m_edImageName->setText(m_currentImg.m_name);
+   m_imageView->setImage(m_currentImg.m_image);
    updateControls();
  }
 
-#include <QBitmap>
-
  Image ImageView::getImage() const
  {
-   Image image;
-   image.m_id = m_currentId;
-   image.m_name = m_edImageName->text();
-   image.m_image = m_imageView->getImage();
-   return image;
+   Image img;
+   img.m_id = m_currentImg.m_id;
+   img.m_name = m_edImageName->text();
+   img.m_image = m_imageView->getImage();
+   return img;
  }
 
  void ImageView::create()
  {
-   m_bDirty = false;
-   m_currentId = INVALID_IMAGE_ID;
+   m_currentImg = Image();
    m_edImageName->clear();
    m_imageView->clearImage();
    updateControls();
@@ -113,11 +97,8 @@ void ImageView::setDirty()
 
  void ImageView::updateControls()
  {
-   bool bEnable = !m_edImageName->text().isEmpty() &&
-                  m_imageView->hasImage() &&
-                  (m_imageView->isDirty() || m_bDirty);
-   m_btnSave->setEnabled(bEnable);
-   QString saveIcon = Image::st_isValidId(m_currentId)
+   m_btnSave->setEnabled(m_currentImg != getImage());
+   QString saveIcon = Image::st_isValidId(m_currentImg.m_id)
                       ? ":/icons/res/saveas.png"
                       : ":/icons/res/save.png";
    m_btnSave->setIcon(QIcon(saveIcon));

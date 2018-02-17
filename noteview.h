@@ -50,6 +50,7 @@ private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnSearch;
+  QPushButton* m_btnSearchItem;
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;

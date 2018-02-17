@@ -50,6 +50,7 @@ NoteView::NoteView(QWidget *parent)
   , m_btnCreate(nullptr)
   , m_btnOpenLast(nullptr)
   , m_btnSearch(nullptr)
+  , m_btnSearchItem(nullptr)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
   , m_snNumber(nullptr)
@@ -71,13 +72,6 @@ NoteView::NoteView(QWidget *parent)
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
   m_btnCreate->setToolTip(tr("Novo vale (Ctrl+N)"));
 
-  m_btnOpenLast = new QPushButton();
-  m_btnOpenLast->setFlat(true);
-  m_btnOpenLast->setText("");
-  m_btnOpenLast->setIconSize(QSize(24, 24));
-  m_btnOpenLast->setIcon(QIcon(":/icons/res/openlast.png"));
-  m_btnOpenLast->setToolTip(tr("Abrir último vale"));
-
   m_btnSearch = new QPushButton();
   m_btnSearch->setFlat(true);
   m_btnSearch->setText("");
@@ -85,6 +79,23 @@ NoteView::NoteView(QWidget *parent)
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
   m_btnSearch->setToolTip(tr("Procurar vales (Ctrl+F)"));
+
+  m_btnOpenLast = new QPushButton();
+  m_btnOpenLast->setFlat(true);
+  m_btnOpenLast->setText("");
+  m_btnOpenLast->setIconSize(QSize(24, 24));
+  m_btnOpenLast->setIcon(QIcon(":/icons/res/openlast.png"));
+  m_btnOpenLast->setToolTip(tr("Abrir último vale"));
+
+  QFrame* vFrame0 = new QFrame;
+  vFrame0->setFrameShape(QFrame::VLine);
+
+  m_btnSearchItem = new QPushButton();
+  m_btnSearchItem->setFlat(true);
+  m_btnSearchItem->setText("");
+  m_btnSearchItem->setIconSize(QSize(24, 24));
+  m_btnSearchItem->setIcon(QIcon(":/icons/res/binoculars.png"));
+  m_btnSearchItem->setToolTip(tr("Procurar item"));
 
   m_btnAdd = new QPushButton();
   m_btnAdd->setFlat(true);
@@ -106,8 +117,10 @@ NoteView::NoteView(QWidget *parent)
   hlayout1->setContentsMargins(0, 0, 0, 0);
   hlayout1->setAlignment(Qt::AlignLeft);
   hlayout1->addWidget(m_btnCreate);
-  hlayout1->addWidget(m_btnOpenLast);
   hlayout1->addWidget(m_btnSearch);
+  hlayout1->addWidget(m_btnOpenLast);
+  hlayout1->addWidget(vFrame0);
+  hlayout1->addWidget(m_btnSearchItem);
   hlayout1->addWidget(m_btnAdd);
   hlayout1->addWidget(m_btnRemove);
 

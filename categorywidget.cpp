@@ -69,7 +69,8 @@ void CategoryWidget::categorySelected(int id)
     image.m_id = category.m_imageId;
     if (image.isValidId())
       ImageSQL::select(m_database->get(), image, error);
-    m_view->setCategory(category, image.m_name);
+
+    m_view->setCategory(category, image.m_name, image.m_image);
   }
   else
   {
@@ -141,6 +142,6 @@ void CategoryWidget::searchImage()
     image.m_id = dlg.getCurrentId();
     QString error;
     ImageSQL::select(m_database->get(), image, error);
-    m_view->setImage(image.m_id, image.m_name);
+    m_view->setImage(image.m_id, image.m_name, image.m_image);
   }
 }

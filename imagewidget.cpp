@@ -7,6 +7,34 @@
 #include <QMessageBox>
 #include <QSqlTableModel>
 
+class ImageTableModel : public QSqlTableModel
+{
+
+public:
+  ImageTableModel(QObject *parent, QSqlDatabase db)
+    : QSqlTableModel(parent, db)
+  {
+
+  }
+
+  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
+  {
+    //TODO remover hard code
+    QVariant value = QSqlTableModel::data(idx, role);
+    if (role == Qt::DecorationRole)
+    {
+      if (idx.column() == 1)
+      {
+        QPixmap px(QSize(16, 16));
+        px.loadFromData(QSqlTableModel::data(createIndex(idx.row(), 2),
+                                             Qt::EditRole).toByteArray());
+        value = QVariant::fromValue(QIcon(px));
+      }
+    }
+    return value;
+  }
+};
+
 ImageWidget::ImageWidget(QWidget* parent)
   : QFrame(parent)
   , m_view(nullptr)
@@ -43,11 +71,11 @@ ImageWidget::ImageWidget(QWidget* parent)
 
 void ImageWidget::setDatabase(QSqlDatabase db)
 {
-  QSqlTableModel* model = new QSqlTableModel(m_database, db);
+  ImageTableModel* model = new ImageTableModel(m_database, db);
   QVector<SqlTableColumn> columns;
   columns.push_back(SqlTableColumn(true, false, "_ID", tr("Id"), QHeaderView::ResizeMode::ResizeToContents));
-  columns.push_back(SqlTableColumn(false, true, "_NAME", tr("Nome"), QHeaderView::ResizeMode::Stretch));
-  columns.push_back(SqlTableColumn(true, false, "_IMAGE", tr("Imagem"), QHeaderView::ResizeMode::ResizeToContents));
+  columns.push_back(SqlTableColumn(false, true, "_NAME", tr("Imagem"), QHeaderView::ResizeMode::Stretch));
+  columns.push_back(SqlTableColumn(true, false, "_IMAGE", tr(""), QHeaderView::ResizeMode::ResizeToContents));
   m_database->set(model, "_IMAGES", columns);
 }
 

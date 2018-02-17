@@ -83,5 +83,6 @@
         <file>res/noimage.png</file>
         <file>res/saveas.png</file>
         <file>res/test.png</file>
+        <file>res/employee.png</file>
     </qresource>
 </RCC>

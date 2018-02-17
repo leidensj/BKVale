@@ -138,12 +138,14 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionLogin"/>
+   <addaction name="separator"/>
    <addaction name="actionUsers"/>
+   <addaction name="actionEmployees"/>
+   <addaction name="actionFornecedores"/>
    <addaction name="separator"/>
    <addaction name="actionItems"/>
    <addaction name="actionCategories"/>
-   <addaction name="actionFornecedores"/>
-   <addaction name="actionPrecos"/>
+   <addaction name="actionPrices"/>
    <addaction name="actionImages"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
@@ -277,7 +279,7 @@
     <string>Gerenciar imagens</string>
    </property>
   </action>
-  <action name="actionPrecos">
+  <action name="actionPrices">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/pricetag.png</normaloff>:/icons/res/pricetag.png</iconset>
@@ -287,6 +289,18 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar preços</string>
+   </property>
+  </action>
+  <action name="actionEmployees">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/employee.png</normaloff>:/icons/res/employee.png</iconset>
+   </property>
+   <property name="text">
+    <string>Funcionários</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar funcionários</string>
    </property>
   </action>
  </widget>

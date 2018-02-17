@@ -1,18 +1,16 @@
 #include "categoryview.h"
 #include "jlineedit.h"
+#include "jpicker.h"
 #include <QPushButton>
 #include <QLayout>
 
 CategoryView::CategoryView(QWidget* parent)
   : QFrame(parent)
   , m_currentId(INVALID_CATEGORY_ID)
-  , m_currentImageId(INVALID_IMAGE_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edName(nullptr)
-  , m_btnSearchImage(nullptr)
-  , m_edImageName(nullptr)
-  , m_btnClearImage(nullptr)
+  , m_imagePicker(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -32,23 +30,7 @@ CategoryView::CategoryView(QWidget* parent)
   m_edName->setPlaceholderText(tr("Nome"));
   m_edName->setMaxLength(MAX_CATEGORY_NAME_LENGTH);
 
-  m_btnSearchImage = new QPushButton();
-  m_btnSearchImage->setFlat(true);
-  m_btnSearchImage->setText("");
-  m_btnSearchImage->setIconSize(QSize(16, 16));
-  m_btnSearchImage->setIcon(QIcon(":/icons/res/binoculars.png"));
-  m_btnSearchImage->setToolTip(tr("Buscar imagem"));
-
-  m_edImageName = new JLineEdit(JValidatorType::All, true, true);
-  m_edImageName->setReadOnly(true);
-  m_edImageName->setPlaceholderText(tr("Imagem"));
-
-  m_btnClearImage = new QPushButton();
-  m_btnClearImage->setFlat(true);
-  m_btnClearImage->setText("");
-  m_btnClearImage->setIconSize(QSize(16, 16));
-  m_btnClearImage->setIcon(QIcon(":/icons/res/remove.png"));
-  m_btnClearImage->setToolTip(tr("Limpar imagem"));
+  m_imagePicker = new JPicker(INVALID_IMAGE_ID, tr("Imagem"), true);
 
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->setContentsMargins(0, 0, 0, 0);
@@ -56,18 +38,12 @@ CategoryView::CategoryView(QWidget* parent)
   hlayout0->addWidget(m_btnSave);
   hlayout0->setAlignment(Qt::AlignLeft);
 
-  QHBoxLayout* hlayout1 = new QHBoxLayout();
-  hlayout1->setContentsMargins(0, 0, 0, 0);
-  hlayout1->addWidget(m_btnSearchImage);
-  hlayout1->addWidget(m_edImageName);
-  hlayout1->addWidget(m_btnClearImage);
-
   QVBoxLayout* vlayout0 = new QVBoxLayout();
   vlayout0->setContentsMargins(0, 0, 0, 0);
   vlayout0->setAlignment(Qt::AlignTop);
   vlayout0->addLayout(hlayout0);
   vlayout0->addWidget(m_edName);
-  vlayout0->addLayout(hlayout1);
+  vlayout0->addWidget(m_imagePicker);
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
@@ -84,8 +60,8 @@ CategoryView::CategoryView(QWidget* parent)
                    this,
                    SLOT(updateControls()));
 
-  QObject::connect(m_btnSearchImage,
-                   SIGNAL(clicked(bool)),
+  QObject::connect(m_imagePicker,
+                   SIGNAL(searchSignal()),
                    this,
                    SLOT(emitSearchImageSignal()));
 
@@ -93,36 +69,38 @@ CategoryView::CategoryView(QWidget* parent)
   updateControls();
 }
 
-void CategoryView::setImage(int imageId, const QString& imageName)
+void CategoryView::setImage(int id, const QString& name, const QByteArray& ar)
 {
-  m_currentImageId = imageId;
-  m_edImageName->setText(imageName);
+  m_imagePicker->setId(id);
+  m_imagePicker->setText(name);
+  m_imagePicker->setImage(ar);
 }
 
 void CategoryView::create()
 {
   m_currentId = INVALID_CATEGORY_ID;
-  m_currentImageId = INVALID_IMAGE_ID;
-  m_edName->setText("");
+  m_edName->clear();
+  m_imagePicker->clear();
   updateControls();
+  m_edName->setFocus();
 }
 
 Category CategoryView::getCategory() const
 {
   Category category;
   category.m_id = m_currentId;
+  category.m_imageId = m_imagePicker->getId();
   category.m_name = m_edName->text();
-  category.m_imageId = INVALID_IMAGE_ID;
   return category;
 }
 
 void CategoryView::setCategory(const Category &category,
-                               const QString& imageName)
+                               const QString& imageName,
+                               const QByteArray& arImage)
 {
   m_currentId = category.m_id;
-  m_currentImageId = category.m_imageId;
   m_edName->setText(category.m_name);
-  setImage(category.m_imageId, imageName);
+  setImage(category.m_imageId, imageName, arImage);
   updateControls();
 }
 

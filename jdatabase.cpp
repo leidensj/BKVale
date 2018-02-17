@@ -34,23 +34,29 @@ JDatabase::JDatabase(bool bSelectorMode,
   m_btnOpen->setText("");
   m_btnOpen->setIconSize(QSize(24, 24));
   m_btnOpen->setIcon(QIcon(":/icons/res/open.png"));
+  m_btnOpen->setToolTip(tr("Abrir (Ctrl+O)"));
+  m_btnOpen->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
 
   m_btnRefresh = new QPushButton();
   m_btnRefresh->setFlat(true);
   m_btnRefresh->setText("");
   m_btnRefresh->setIconSize(QSize(24, 24));
   m_btnRefresh->setIcon(QIcon(":/icons/res/refresh.png"));
+  m_btnOpen->setToolTip(tr("Atualizar (F5)"));
+  m_btnOpen->setShortcut(QKeySequence(Qt::Key_F5));
 
   m_btnRemove = new QPushButton();
   m_btnRemove->setFlat(true);
   m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
+  m_btnOpen->setToolTip(tr("Remover (Del)"));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
   m_btnFilter = new QPushButton();
   m_btnFilter->setFlat(true);
   m_btnFilter->setText("");
   m_btnFilter->setIconSize(QSize(24, 24));
+  m_btnOpen->setToolTip(tr("Filtro"));
   m_btnFilter->setIcon(QIcon(":/icons/res/filter.png"));
 
   QHBoxLayout* hlayout0 = new QHBoxLayout();
@@ -144,6 +150,10 @@ JDatabase::JDatabase(bool bSelectorMode,
   filterSearchChanged();
   if (m_bSelectorMode)
   {
+    m_btnOpen->hide();
+    m_btnRefresh->hide();
+    m_btnFilter->hide();
+    m_btnRemove->setEnabled(false);
     m_btnRemove->hide();
     m_edFilterSearch->setFocus();
   }
@@ -246,6 +256,7 @@ void JDatabase::emitItemRemoveSignal()
       emit itemRemoveSignal(id);
     }
   }
+  refresh();
 }
 
 void JDatabase::filterSearchChanged()

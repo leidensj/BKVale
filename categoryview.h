@@ -6,6 +6,7 @@
 
 class QPushButton;
 class JLineEdit;
+class JPicker;
 
 class CategoryView : public QFrame
 {
@@ -14,7 +15,7 @@ class CategoryView : public QFrame
 public:
   explicit CategoryView(QWidget* parent = 0);
   Category getCategory() const;
-  void setImage(int imageId, const QString& imageName);
+  void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:
   void emitSaveSignal();
@@ -23,7 +24,8 @@ private slots:
 
 public slots:
   void setCategory(const Category& category,
-                   const QString& imageName);
+                   const QString& imageName,
+                   const QByteArray& arImage);
   void create();
 
 signals:
@@ -32,13 +34,10 @@ signals:
 
 private:
   int m_currentId;
-  int m_currentImageId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edName;
-  QPushButton* m_btnSearchImage;
-  JLineEdit* m_edImageName;
-  QPushButton* m_btnClearImage;
+  JPicker* m_imagePicker;
 };
 
 #endif // CATEGORYVIEW_H

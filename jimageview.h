@@ -13,10 +13,9 @@ class JImageView : public QFrame
   Q_OBJECT
 
 public:
-  explicit JImageView(QWidget* parent = 0);
+  explicit JImageView(bool bShowButtons, int size = 64, QWidget* parent = 0);
   QByteArray getImage();
   bool hasImage() const;
-  bool isDirty() const;
   void setImage(const QByteArray& bArray);
 
 public slots:
@@ -31,8 +30,8 @@ signals:
   changedSignal();
 
 private:
+  const int m_size;
   bool m_bHasImage;
-  bool m_bDirty;
   QPushButton* m_btnOpen;
   QPushButton* m_btnClear;
   QLabel* m_lblImage;

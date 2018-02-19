@@ -6,6 +6,7 @@
 
 class UserMgtView;
 class UserMgtDatabase;
+class JDatabase;
 
 class UserMgtWidget : public QFrame
 {
@@ -19,13 +20,13 @@ public:
 private:
   const int m_currentUserID;
   UserMgtView* m_view;
-  UserMgtDatabase* m_database;
+  JDatabase* m_database;
   bool m_bHasAnyUserChanged;
 
 private slots:
-  void setUser(int id);
+  void userSelected(int id);
   void removeUser(int id);
-  void save();
+  void saveUser();
 };
 
 #endif // USERMGTWIDGET_H

@@ -4,7 +4,7 @@
 #include <QFrame>
 #include <QSqlDatabase>
 #include "consumption.h"
-#include "item.h"
+#include "product.h"
 
 class ConsumptionView;
 class ConsumptionDatabase;

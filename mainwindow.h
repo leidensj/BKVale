@@ -58,7 +58,7 @@ private slots:
   void print(const QString& text);
   void openSettingsDialog();
   void openUsersDialog();
-  void openItemsDialog();
+  void openProductsDialog();
   void openCategoriesDialog();
   void openLoginDialog();
   void openImagesDialog();

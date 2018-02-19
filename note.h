@@ -1,9 +1,11 @@
 #ifndef NOTE_H
 #define NOTE_H
 
+#include <QObject>
 #include <QString>
 #include <QStringList>
 #include <QVector>
+#include "jtablecolumn.h"
 
 #define NUMBER_OF_COLUMNS 5
 #define INVALID_NOTE_ID -1
@@ -64,6 +66,18 @@ struct Note
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
   static QString strNumber(int number) { return QString::number(number); }
   static bool isValidID(int id) { return id != INVALID_NOTE_ID; }
+  static QString getTableName() { return "_PROMISSORYNOTES"; }
+  static QVector<JTableColumn> getColumns()
+  {
+    QVector<JTableColumn> c;
+    c.push_back(JTableColumn("_ID", QObject::tr("Id")));
+    c.push_back(JTableColumn("_NUMBER", QObject::tr("Número"), false, true));
+    c.push_back(JTableColumn("_DATE", QObject::tr("Data"), false));
+    c.push_back(JTableColumn("_SUPPLIER", QObject::tr("Fornecedor"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn("_TOTAL", QObject::tr("Total"), false));
+    c.push_back(JTableColumn("_CASH", QObject::tr("À Vista"), false));
+    return c;
+  }
 };
 
 #endif // COMMON_H

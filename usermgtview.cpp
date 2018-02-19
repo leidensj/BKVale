@@ -21,7 +21,7 @@ UserMgtView::UserMgtView(QWidget* parent)
   , m_accessShop(nullptr)
   , m_accessConsumption(nullptr)
   , m_accessUser(nullptr)
-  , m_accessItem(nullptr)
+  , m_accessProduct(nullptr)
   , m_accessSettings(nullptr)
 {
   m_create = new QPushButton();
@@ -87,9 +87,9 @@ UserMgtView::UserMgtView(QWidget* parent)
   m_accessUser = new QCheckBox();
   m_accessUser->setIcon(QIcon(":/icons/res/user.png"));
   m_accessUser->setText(tr("Usuários"));
-  m_accessItem = new QCheckBox();
-  m_accessItem->setIcon(QIcon(":/icons/res/item.png"));
-  m_accessItem->setText(tr("Itens"));
+  m_accessProduct = new QCheckBox();
+  m_accessProduct->setIcon(QIcon(":/icons/res/item.png"));
+  m_accessProduct->setText(tr("Itens"));
   m_accessSettings = new QCheckBox();
   m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
   m_accessSettings->setText(tr("Configurações"));
@@ -118,7 +118,7 @@ UserMgtView::UserMgtView(QWidget* parent)
   v0->addWidget(m_accessShop);
   v0->addWidget(m_accessConsumption);
   v0->addWidget(m_accessUser);
-  v0->addWidget(m_accessItem);
+  v0->addWidget(m_accessProduct);
   v0->addWidget(m_accessSettings);
 
   QGroupBox* gbox = new QGroupBox();
@@ -161,7 +161,7 @@ User UserMgtView::getUser() const
   user.m_bAccessShop = m_accessShop->isChecked();
   user.m_bAccessConsumption = m_accessConsumption->isChecked();
   user.m_bAccessUser = m_accessUser->isChecked();
-  user.m_bAccessItem = m_accessItem->isChecked();
+  user.m_bAccessProduct = m_accessProduct->isChecked();
   user.m_bAccessSettings = m_accessSettings->isChecked();
   return user;
 }
@@ -178,7 +178,7 @@ void UserMgtView::setUser(const User& user)
   m_accessShop->setChecked(user.m_bAccessShop);
   m_accessConsumption->setChecked(user.m_bAccessConsumption);
   m_accessUser->setChecked(user.m_bAccessUser);
-  m_accessItem->setChecked(user.m_bAccessItem);
+  m_accessProduct->setChecked(user.m_bAccessProduct);
   m_accessSettings->setChecked(user.m_bAccessSettings);
 }
 
@@ -194,7 +194,7 @@ void UserMgtView::create()
   m_accessShop->setChecked(false);
   m_accessConsumption->setChecked(false);
   m_accessUser->setChecked(false);
-  m_accessItem->setChecked(false);
+  m_accessProduct->setChecked(false);
   m_accessSettings->setChecked(false);
   m_user->setFocus();
 }

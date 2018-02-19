@@ -33,7 +33,7 @@ private:
   QCheckBox* m_accessShop;
   QCheckBox* m_accessConsumption;
   QCheckBox* m_accessUser;
-  QCheckBox* m_accessItem;
+  QCheckBox* m_accessProduct;
   QCheckBox* m_accessSettings;
 
 public slots:

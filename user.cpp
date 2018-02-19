@@ -17,7 +17,7 @@ void User::clear()
   m_bAccessShop = false;
   m_bAccessConsumption = false;
   m_bAccessUser = false;
-  m_bAccessItem = false;
+  m_bAccessProduct = false;
   m_bAccessSettings = false;
 }
 

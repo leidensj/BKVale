@@ -72,11 +72,7 @@ ImageWidget::ImageWidget(QWidget* parent)
 void ImageWidget::setDatabase(QSqlDatabase db)
 {
   ImageTableModel* model = new ImageTableModel(m_database, db);
-  QVector<SqlTableColumn> columns;
-  columns.push_back(SqlTableColumn(true, false, "_ID", tr("Id"), QHeaderView::ResizeMode::ResizeToContents));
-  columns.push_back(SqlTableColumn(false, true, "_NAME", tr("Imagem"), QHeaderView::ResizeMode::Stretch));
-  columns.push_back(SqlTableColumn(true, false, "_IMAGE", tr(""), QHeaderView::ResizeMode::ResizeToContents));
-  m_database->set(model, "_IMAGES", columns);
+  m_database->set(model, Image::getTableName(), Image::getColumns());
 }
 
 void ImageWidget::imageSelected(int id)

@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "noteview.h"
 #include "printutils.h"
-#include "itemwidget.h"
+#include "productwidget.h"
 #include "categorywidget.h"
 #include "notewidget.h"
 #include "reminderwidget.h"
@@ -87,10 +87,10 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(updateControls()));
 
-  QObject::connect(ui->actionItems,
+  QObject::connect(ui->actionProducts,
                    SIGNAL(triggered(bool)),
                    this,
-                   SLOT(openItemsDialog()));
+                   SLOT(openProductsDialog()));
 
   QObject::connect(ui->actionCategories,
                    SIGNAL(triggered(bool)),
@@ -300,7 +300,7 @@ void BaitaAssistant::updateControls()
   ui->actionSettings->setEnabled(bIsSQLOk && !bIsOpen && m_userLogin.hasAccessToSettings());
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
-  ui->actionItems->setEnabled(bIsSQLOk && m_userLogin.hasAccessToItems());
+  ui->actionProducts->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProducts());
 
   ui->tabWidget->setTabEnabled((int)Functionality::NoteMode,
                                bIsSQLOk && m_userLogin.hasAccessToNote());
@@ -338,12 +338,12 @@ void BaitaAssistant::showInfo()
 
 }
 
-void BaitaAssistant::openItemsDialog()
+void BaitaAssistant::openProductsDialog()
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ItemWidget* w = new ItemWidget();
+  ProductWidget* w = new ProductWidget();
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);

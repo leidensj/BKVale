@@ -49,11 +49,7 @@ CategoryWidget::CategoryWidget(QWidget* parent)
 void CategoryWidget::setDatabase(QSqlDatabase db)
 {
   QSqlTableModel* model = new QSqlTableModel(m_database, db);
-  QVector<SqlTableColumn> columns;
-  columns.push_back(SqlTableColumn(true, false, "_ID", "Id", QHeaderView::ResizeMode::ResizeToContents));
-  columns.push_back(SqlTableColumn(false, true, "_NAME", "Nome", QHeaderView::ResizeMode::Stretch));
-  columns.push_back(SqlTableColumn(true, false, "_IMAGEID", "Imagem", QHeaderView::ResizeMode::ResizeToContents));
-  m_database->set(model, "_CATEGORIES", columns);
+  m_database->set(model, Category::getTableName(), Category::getColumns());
 }
 
 void CategoryWidget::categorySelected(int id)
@@ -114,6 +110,7 @@ void CategoryWidget::saveCategory()
   if (bSuccess)
   {
     m_view->create();
+    m_database->refresh();
   }
   else
   {
@@ -126,15 +123,11 @@ void CategoryWidget::saveCategory()
 
 void CategoryWidget::searchImage()
 {
-  QVector<SqlTableColumn> columns;
-  columns.push_back(SqlTableColumn(true, false, "_ID", "Id", QHeaderView::ResizeMode::ResizeToContents));
-  columns.push_back(SqlTableColumn(false, true, "_NAME", "Nome", QHeaderView::ResizeMode::Stretch));
-  columns.push_back(SqlTableColumn(true, false, "_IMAGE", "Imagem", QHeaderView::ResizeMode::ResizeToContents));
   QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Escolher Imagem"),
                         QIcon(":/icons/res/icon.png"),
                         INVALID_IMAGE_ID);
-  dlg.set(model, "_IMAGES", columns);
+  dlg.set(model, Image::getTableName(), Image::getColumns());
   dlg.exec();
   if (Image::st_isValidId(dlg.getCurrentId()))
   {

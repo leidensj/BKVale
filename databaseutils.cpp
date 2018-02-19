@@ -345,7 +345,7 @@ bool BaitaSQL::init(QSqlDatabase db,
              "_UNITY TEXT,"
              "_DESCRIPTION TEXT)");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _ITEMS ("
+  query.exec("CREATE TABLE IF NOT EXISTS _PRODUCTS ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
              "_NAME TEXT NOT NULL UNIQUE,"
              "_CATEGORYID INTEGER,"
@@ -380,7 +380,7 @@ bool BaitaSQL::init(QSqlDatabase db,
   query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
              "_DATE INTEGER,"
-             "_ITEMID INTEGER,"
+             "_PRODUCTID INTEGER,"
              "_PRICE REAL,"
              "_AMMOUNT REAL,"
              "_TOTAL REAL)");
@@ -395,7 +395,7 @@ bool BaitaSQL::init(QSqlDatabase db,
              "_ACCESS_SHOP INT,"
              "_ACCESS_CONSUMPTION INT,"
              "_ACCESS_USER INT,"
-             "_ACCESS_ITEM INT,"
+             "_ACCESS_PRODUCT INT,"
              "_ACCESS_SETTINGS INT)");
 
   query.exec("SELECT * FROM _USERS LIMIT 1");
@@ -410,7 +410,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                   "_ACCESS_SHOP,"
                   "_ACCESS_CONSUMPTION,"
                   "_ACCESS_USER,"
-                  "_ACCESS_ITEM,"
+                  "_ACCESS_PRODUCT,"
                   "_ACCESS_SETTINGS) "
                   "VALUES ("
                   "'ADMIN',"
@@ -427,13 +427,13 @@ bool BaitaSQL::init(QSqlDatabase db,
   return bSuccess;
 }
 
-bool ItemSQL::select(QSqlDatabase db,
-                     Item& item,
-                     QString& error)
+bool ProductSQL::select(QSqlDatabase db,
+                        Product& product,
+                        QString& error)
 {
   error.clear();
-  int id = item.m_id;
-  item.clear();
+  int id = product.m_id;
+  product.clear();
 
   if (!BaitaSQL::isOpen(db, error))
     return false;
@@ -451,30 +451,30 @@ bool ItemSQL::select(QSqlDatabase db,
                 "_AVAILABLE_AT_NOTES,"
                 "_AVAILABLE_AT_SHOP,"
                 "_AVAILABLE_AT_CONSUMPTION,"
-                "FROM _ITEMS "
+                "FROM _PRODUCTS "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
   if (query.exec())
   {
     if (query.next())
     {
-      item.m_id = id;
-      item.m_name = query.value(query.record().indexOf("_NAME")).toString();
-      item.m_categoryId = query.value(query.record().indexOf("_CATEGORYID")).toInt();
-      item.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toInt();
-      item.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
-      item.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
-      item.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
-      item.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
-      item.m_code = query.value(query.record().indexOf("_CODE")).toString();
-      item.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
-      item.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
-      item.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
+      product.m_id = id;
+      product.m_name = query.value(query.record().indexOf("_NAME")).toString();
+      product.m_categoryId = query.value(query.record().indexOf("_CATEGORYID")).toInt();
+      product.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toInt();
+      product.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
+      product.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
+      product.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
+      product.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
+      product.m_code = query.value(query.record().indexOf("_CODE")).toString();
+      product.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
+      product.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
+      product.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
       return true;
     }
     else
     {
-      error = "Item não encontrado.";
+      error = "Produto não encontrado.";
       return false;
     }
   }
@@ -485,9 +485,9 @@ bool ItemSQL::select(QSqlDatabase db,
   }
 }
 
-bool ItemSQL::insert(QSqlDatabase db,
-                     const Item& item,
-                     QString& error)
+bool ProductSQL::insert(QSqlDatabase db,
+                        const Product& product,
+                        QString& error)
 {
   error.clear();
 
@@ -495,7 +495,7 @@ bool ItemSQL::insert(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("INSERT INTO _ITEMS ("
+  query.prepare("INSERT INTO _PRODUCTS ("
                 "_NAME,"
                 "_CATEGORYID,"
                 "_IMAGEID,"
@@ -519,21 +519,21 @@ bool ItemSQL::insert(QSqlDatabase db,
                 "(:_availableatnotes),"
                 "(:_availableatshop),"
                 "(:_availableatconsumption))");
-  query.bindValue(":_name", item.m_name);
-  query.bindValue(":_categoryid", item.m_categoryId);
-  query.bindValue(":_imageid", item.m_imageId);
-  query.bindValue(":_unity", item.m_unity);
-  query.bindValue(":_packageunity", item.m_packageUnity);
-  query.bindValue(":_packageammount", item.m_packageAmmount);
-  query.bindValue(":_details", item.m_details);
-  query.bindValue(":_code", item.m_code);
-  query.bindValue(":_availableatnotes", item.m_bAvailableAtNotes);
-  query.bindValue(":_availableatshop", item.m_bAvailableAtShop);
-  query.bindValue(":_availableatconsumption", item.m_bAvailableAtConsumption);
+  query.bindValue(":_name", product.m_name);
+  query.bindValue(":_categoryid", product.m_categoryId);
+  query.bindValue(":_imageid", product.m_imageId);
+  query.bindValue(":_unity", product.m_unity);
+  query.bindValue(":_packageunity", product.m_packageUnity);
+  query.bindValue(":_packageammount", product.m_packageAmmount);
+  query.bindValue(":_details", product.m_details);
+  query.bindValue(":_code", product.m_code);
+  query.bindValue(":_availableatnotes", product.m_bAvailableAtNotes);
+  query.bindValue(":_availableatshop", product.m_bAvailableAtShop);
+  query.bindValue(":_availableatconsumption", product.m_bAvailableAtConsumption);
 
   if (query.exec())
   {
-    item.m_id = query.lastInsertId().toInt();
+    product.m_id = query.lastInsertId().toInt();
     return true;
   }
 
@@ -541,9 +541,9 @@ bool ItemSQL::insert(QSqlDatabase db,
   return false;
 }
 
-bool ItemSQL::update(QSqlDatabase db,
-                     const Item& item,
-                     QString& error)
+bool ProductSQL::update(QSqlDatabase db,
+                        const Product& product,
+                        QString& error)
 {
   error.clear();
 
@@ -551,7 +551,7 @@ bool ItemSQL::update(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("UPDATE _ITEMS SET "
+  query.prepare("UPDATE _PRODUCTS SET "
                 "_NAME = (:_name),"
                 "_CATEGORYID = (:_categoryid),"
                 "_IMAGEID = (:_imageid),"
@@ -564,18 +564,18 @@ bool ItemSQL::update(QSqlDatabase db,
                 "_AVAILABLE_AT_SHOP = (:_availableatshop),"
                 "_AVAILABLE_AT_CONSUMPTION = (:_availableatconsumption) "
                 "WHERE _ID = (:_id)");
-  query.bindValue(":_id", item.m_id);
-  query.bindValue(":_name", item.m_name);
-  query.bindValue(":_categoryid", item.m_categoryId);
-  query.bindValue(":_imageid", item.m_imageId);
-  query.bindValue(":_unity", item.m_unity);
-  query.bindValue(":_packageunity", item.m_packageUnity);
-  query.bindValue(":_packageammount", item.m_packageAmmount);
-  query.bindValue(":_details", item.m_details);
-  query.bindValue(":_code", item.m_code);
-  query.bindValue(":_availableatnotes", item.m_bAvailableAtNotes);
-  query.bindValue(":_availableatshop", item.m_bAvailableAtShop);
-  query.bindValue(":_availableatconsumption", item.m_bAvailableAtConsumption);
+  query.bindValue(":_id", product.m_id);
+  query.bindValue(":_name", product.m_name);
+  query.bindValue(":_categoryid", product.m_categoryId);
+  query.bindValue(":_imageid", product.m_imageId);
+  query.bindValue(":_unity", product.m_unity);
+  query.bindValue(":_packageunity", product.m_packageUnity);
+  query.bindValue(":_packageammount", product.m_packageAmmount);
+  query.bindValue(":_details", product.m_details);
+  query.bindValue(":_code", product.m_code);
+  query.bindValue(":_availableatnotes", product.m_bAvailableAtNotes);
+  query.bindValue(":_availableatshop", product.m_bAvailableAtShop);
+  query.bindValue(":_availableatconsumption", product.m_bAvailableAtConsumption);
 
   if (query.exec())
     return true;
@@ -584,9 +584,9 @@ bool ItemSQL::update(QSqlDatabase db,
   return false;
 }
 
-bool ItemSQL::remove(QSqlDatabase db,
-                         int id,
-                         QString& error)
+bool ProductSQL::remove(QSqlDatabase db,
+                        int id,
+                        QString& error)
 {
   error.clear();
 
@@ -594,7 +594,7 @@ bool ItemSQL::remove(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("DELETE FROM _ITEMS "
+  query.prepare("DELETE FROM _PRODUCTS "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
 
@@ -1073,7 +1073,7 @@ bool ConsumptionSQL::selectByDate(QSqlDatabase db,
   bool bSuccess = query.exec("SELECT "
                              "_ID,"
                              "_DATE,"
-                             "_ITEMID,"
+                             "_PRODUCTID,"
                              "_PRICE,"
                              "_AMMOUNT,"
                              "_TOTAL "
@@ -1105,20 +1105,20 @@ bool ConsumptionSQL::selectByDate(QSqlDatabase db,
 void ConsumptionSQL::getConsumption(QSqlDatabase db,
                                     qint64 date,
                                     QVector<Consumption>& vConsumption,
-                                    QVector<Item>& vItem)
+                                    QVector<Product>& vProduct)
 {
   vConsumption.clear();
-  vItem.clear();
+  vProduct.clear();
 
   QString error;
   selectByDate(db, date, vConsumption, error);
 
   for (int i = 0; i != vConsumption.size(); ++i)
   {
-    Item item;
-    item.m_id = vConsumption.at(i).m_itemID;
-    ItemSQL::select(db, item, error);
-    vItem.push_back(item);
+    Product product;
+    product.m_id = vConsumption.at(i).m_itemID;
+    ProductSQL::select(db, product, error);
+    vProduct.push_back(product);
   }
 }
 
@@ -1164,7 +1164,7 @@ bool UserSQL::insert(QSqlDatabase db,
                 "_ACCESS_SHOP,"
                 "_ACCESS_CONSUMPTION,"
                 "_ACCESS_USER,"
-                "_ACCESS_ITEM,"
+                "_ACCESS_PRODUCT,"
                 "_ACCESS_SETTINGS) "
                 "VALUES ("
                 "(:_user),"
@@ -1175,7 +1175,7 @@ bool UserSQL::insert(QSqlDatabase db,
                 "(:_accessShop),"
                 "(:_accessConsumption),"
                 "(:_accessUser),"
-                "(:_accessItem),"
+                "(:_accessProduct),"
                 "(:_accessSettings))");
   query.bindValue(":_user", user.m_strUser);
   query.bindValue(":_password", user.st_strEncryptedPassword(strPassword));
@@ -1185,7 +1185,7 @@ bool UserSQL::insert(QSqlDatabase db,
   query.bindValue(":_accessShop", user.m_bAccessShop);
   query.bindValue(":_accessConsumption", user.m_bAccessConsumption);
   query.bindValue(":_accessUser", user.m_bAccessUser);
-  query.bindValue(":_accessItem", user.m_bAccessItem);
+  query.bindValue(":_accessProduct", user.m_bAccessProduct);
   query.bindValue(":_accessSettings", user.m_bAccessSettings);
 
   if (query.exec())
@@ -1218,7 +1218,7 @@ bool UserSQL::update(QSqlDatabase db,
               "_ACCESS_SHOP = (:_accessShop),"
               "_ACCESS_CONSUMPTION = (:_accessConsumption),"
               "_ACCESS_USER = (:_accessUser),"
-              "_ACCESS_ITEM = (:_accessItem),"
+              "_ACCESS_PRODUCT = (:_accessProduct),"
               "_ACCESS_SETTINGS = (:_accessSettings) "
               "WHERE _ID = (:_id)";
 
@@ -1235,7 +1235,7 @@ bool UserSQL::update(QSqlDatabase db,
   query.bindValue(":_accessShop", user.m_bAccessShop);
   query.bindValue(":_accessConsumption", user.m_bAccessConsumption);
   query.bindValue(":_accessUser", user.m_bAccessUser);
-  query.bindValue(":_accessItem", user.m_bAccessItem);
+  query.bindValue(":_accessProduct", user.m_bAccessProduct);
   query.bindValue(":_accessSettings", user.m_bAccessSettings);
 
   if (query.exec())
@@ -1266,7 +1266,7 @@ bool UserSQL::select(QSqlDatabase db,
                 "_ACCESS_SHOP,"
                 "_ACCESS_CONSUMPTION,"
                 "_ACCESS_USER,"
-                "_ACCESS_ITEM,"
+                "_ACCESS_PRODUCT,"
                 "_ACCESS_SETTINGS "
                 "FROM _USERS "
                 "WHERE _ID = (:_id)");
@@ -1283,7 +1283,7 @@ bool UserSQL::select(QSqlDatabase db,
       user.m_bAccessShop = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
       user.m_bAccessConsumption = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
       user.m_bAccessUser = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
-      user.m_bAccessItem = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
+      user.m_bAccessProduct = query.value(query.record().indexOf("_ACCESS_PRODUCT")).toBool();
       user.m_bAccessSettings = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
       bFound = true;
     }
@@ -1361,7 +1361,7 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessShop = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
       m_user.m_bAccessConsumption = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
       m_user.m_bAccessUser = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
-      m_user.m_bAccessItem = query.value(query.record().indexOf("_ACCESS_ITEM")).toBool();
+      m_user.m_bAccessProduct = query.value(query.record().indexOf("_ACCESS_PRODUCT")).toBool();
       m_user.m_bAccessSettings = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
       bFound = true;
     }

@@ -5,7 +5,7 @@
 #include <QSqlDatabase>
 #include <QDoubleSpinBox>
 #include <QPushButton>
-#include "item.h"
+#include "product.h"
 #include "consumption.h"
 
 class QDateEdit;
@@ -59,7 +59,7 @@ private slots:
   void search();
   void dateChanged(const QDate& date);
   void enableControls();
-  void itemSelected(const Item& item);
+  void itemSelected(const Product& product);
   void save();
   void clear();
 

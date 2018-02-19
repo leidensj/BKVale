@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include "note.h"
 #include "reminder.h"
-#include "item.h"
+#include "product.h"
 #include "consumption.h"
 #include "settings.h"
 
@@ -44,7 +44,7 @@ namespace ConsumptionPrinter
 {
   QString build(qint64 date,
                 const QVector<Consumption>& consumptions,
-                const QVector<Item>& items,
+                const QVector<Product>& vProduct,
                 double total);
 
   QString build(const QVector<qint64>& dates,

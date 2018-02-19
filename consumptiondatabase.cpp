@@ -74,25 +74,12 @@ public:
           break;
         case ConsumptionTableIndex::Ammount:
         {
-          Item item;
-          item.m_id = record(index.row()).value("_ITEMID").toInt();
-          QString error;
-          ItemSQL::select(database(),
-                          item,
-                          error);
-          value = QString::number(value.toDouble(), 'f', 3) + item.m_unity;
+          value = "";
         }
-
           break;
         case ConsumptionTableIndex::ItemID:
         {
-          Item item;
-          item.m_id = value.toInt();
-          QString error;
-          bool bSuccess = ItemSQL::select(database(),
-                                               item,
-                                               error);
-          value = bSuccess ? item.m_name : error;
+          value = "";
         } break;
         case ConsumptionTableIndex::Total:
         {

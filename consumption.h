@@ -2,7 +2,7 @@
 #define CONSUMPTION_H
 
 #include <QString>
-#include <item.h>
+#include <product.h>
 
 #define INVALID_CONSUMPTION_ID   -1
 
@@ -19,7 +19,7 @@ enum class ConsumptionTableIndex
 struct Consumption
 {
   Consumption()
-    : m_id(INVALID_ITEM_ID)
+    : m_id(INVALID_PRODUCT_ID)
   {
     clear();
   }

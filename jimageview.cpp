@@ -39,8 +39,6 @@ JImageView::JImageView(bool bShowButtons, int size, QWidget* parent)
   m_lblImage->setMinimumSize(m_size, m_size);
   m_lblImage->setMaximumSize(m_size, m_size);
   m_lblImage->setScaledContents(true);
-  m_lblImage->setFrameShape(QFrame::Shape::StyledPanel);
-  m_lblImage->setFrameShadow(QFrame::Shadow::Plain);
 
   QVBoxLayout* vlayout0 = new QVBoxLayout();
   vlayout0->setContentsMargins(0, 0, 0, 0);
@@ -66,6 +64,11 @@ JImageView::JImageView(bool bShowButtons, int size, QWidget* parent)
     m_btnOpen->hide();
     m_btnClear->hide();
   }
+  else
+  {
+    m_lblImage->setFrameShape(QFrame::Shape::StyledPanel);
+    m_lblImage->setFrameShadow(QFrame::Shadow::Plain);
+  }
 
   clearImage();
   updateControls();
@@ -81,11 +84,14 @@ void JImageView::setImage(const QString& fileName)
 
 void JImageView::setImage(const QByteArray& bArray)
 {
-  m_bHasImage = true;
-  QPixmap pixmap(QSize(m_size, m_size));
-  pixmap.loadFromData(bArray);
-  m_lblImage->setPixmap(pixmap);
-  updateControls();
+  if (!bArray.isEmpty() && ! bArray.isNull())
+  {
+    m_bHasImage = true;
+    QPixmap pixmap(QSize(m_size, m_size));
+    pixmap.loadFromData(bArray);
+    m_lblImage->setPixmap(pixmap);
+    updateControls();
+  }
 }
 
 QString JImageView::getImagePath()

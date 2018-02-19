@@ -7,46 +7,12 @@
 #include <QModelIndex>
 #include <QSqlTableModel>
 #include <QVector>
-#include <QHeaderView>
 #include <QTableView>
+#include "jtablecolumn.h"
 
 class QPushButton;
 class JTableView;
 class JLineEdit;
-
-#define ID_COLUMN 0
-
-struct SqlTableColumn
-{
-  SqlTableColumn()
-    : m_bHidden(false)
-    , m_bSort(false)
-    , m_resizeMode(QHeaderView::ResizeMode::ResizeToContents)
-  {
-
-  }
-
-  SqlTableColumn(bool bHidden,
-                 bool bSort,
-                 const QString& sqlName,
-                 const QString& friendlyName,
-                 QHeaderView::ResizeMode resizeMode)
-  : m_bHidden(bHidden)
-  , m_bSort(bSort)
-  , m_sqlName(sqlName)
-  , m_friendlyName(friendlyName)
-  , m_resizeMode(resizeMode)
-  {
-    if (m_bSort && m_bHidden)
-      m_bSort = false;
-  }
-
-  bool m_bHidden;
-  bool m_bSort;
-  QString m_sqlName;
-  QString m_friendlyName;
-  QHeaderView::ResizeMode m_resizeMode;
-};
 
 class JTableView : public QTableView
 {
@@ -72,7 +38,7 @@ public:
   ~JDatabase();
   void set(QSqlTableModel* model,
            const QString& tableName,
-           const QVector<SqlTableColumn>& sqlTableColumns);
+           const QVector<JTableColumn>& vColumns);
   QSqlDatabase get() const;
 
 public slots:
@@ -88,7 +54,7 @@ private:
   QPushButton* m_btnContains;
   JTableView* m_table;
   QString m_tableName;
-  QVector<SqlTableColumn> m_columns;
+  QVector<JTableColumn> m_vColumns;
 
 private slots:
   void itemSelected(const QModelIndex& idx);
@@ -118,7 +84,7 @@ public:
 
   void set(QSqlTableModel* model,
            const QString& tableName,
-           const QVector<SqlTableColumn>& sqlTableColumns);
+           const QVector<JTableColumn>& vColumns);
 
   int getCurrentId() const;
 

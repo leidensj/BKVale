@@ -104,7 +104,7 @@ QString ConsumptionWidget::printContent()
     if (f.m_bDate && (f.m_datei == f.m_datef))
     {
       QVector<Consumption> vConsumption;
-      QVector<Item> vItem;
+      QVector<Product> vItem;
       ConsumptionSQL::getConsumption(m_db,
                                      f.m_datei,
                                      vConsumption,

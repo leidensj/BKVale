@@ -4,6 +4,7 @@
 #include <QLayout>
 #include <QSqlRecord>
 #include <QPushButton>
+#include <QHeaderView>
 
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
@@ -166,30 +167,30 @@ JDatabase::~JDatabase()
 
 void JDatabase::set(QSqlTableModel* model,
                     const QString& tableName,
-                    const QVector<SqlTableColumn>& sqlTableColumns)
+                    const QVector<JTableColumn>& vColumns)
 {
   if (m_table->model() != nullptr || model == nullptr)
     return;
 
   m_tableName = tableName;
-  m_columns = sqlTableColumns;
+  m_vColumns = vColumns;
 
   model->setTable(m_tableName);
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
   m_table->setModel(model);
 
   int count = m_table->horizontalHeader()->count();
-  if (m_columns.size() == count)
+  if (m_vColumns.size() == count)
   {
-    for (int i = 0; i != m_columns.size(); ++i)
-      model->setHeaderData(i, Qt::Horizontal, m_columns.at(i).m_friendlyName);
+    for (int i = 0; i != m_vColumns.size(); ++i)
+      model->setHeaderData(i, Qt::Horizontal, m_vColumns.at(i).m_friendlyName);
 
-    for (int i = 0; i != m_columns.size(); ++i)
+    for (int i = 0; i != m_vColumns.size(); ++i)
     {
-      m_table->horizontalHeader()->setSectionResizeMode(i, m_columns.at(i).m_resizeMode);
-      if (m_columns.at(i).m_bHidden)
+      m_table->horizontalHeader()->setSectionResizeMode(i, (QHeaderView::ResizeMode)m_vColumns.at(i).m_resizeMode);
+      if (m_vColumns.at(i).m_bHidden)
         m_table->hideColumn(i);
-      if (m_columns.at(i).m_bSort)
+      if (m_vColumns.at(i).m_bSort)
         m_table->horizontalHeader()->setSortIndicator(i, Qt::SortOrder::AscendingOrder);
     }
   }
@@ -229,8 +230,10 @@ void JDatabase::refresh()
 {
   if (m_table->model())
   {
+    QModelIndex idx = m_table->currentIndex();
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->select();
+    m_table->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
   }
   enableControls();
   if (m_bSelectorMode)
@@ -254,9 +257,9 @@ void JDatabase::emitItemRemoveSignal()
       int id = model->index(m_table->currentIndex().row(),
                             ID_COLUMN).data(Qt::EditRole).toInt();
       emit itemRemoveSignal(id);
+      refresh();
     }
   }
-  refresh();
 }
 
 void JDatabase::filterSearchChanged()
@@ -272,12 +275,12 @@ void JDatabase::filterSearchChanged()
   if (str.isEmpty())
   {
     m_edFilterSearch->setPlaceholderText(tr("Procurar pelo(a) ") +
-                                         m_columns.at(column).m_friendlyName.toLower());
+                                         m_vColumns.at(column).m_friendlyName.toLower());
     model->setFilter("");
   }
   else
   {
-    QString filter = m_columns.at(column).m_sqlName + " LIKE '";
+    QString filter = m_vColumns.at(column).m_sqlName + " LIKE '";
     if (m_btnContains->isChecked())
         filter += "%";
     filter += str + "%'";
@@ -345,9 +348,9 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
 
 void JDatabaseSelector::set(QSqlTableModel* model,
                             const QString& tableName,
-                            const QVector<SqlTableColumn>& sqlTableColumns)
+                            const QVector<JTableColumn>& vColumns)
 {
-  m_database->set(model, tableName, sqlTableColumns);
+  m_database->set(model, tableName, vColumns);
 }
 
 void JDatabaseSelector::itemSelected(int id)

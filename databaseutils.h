@@ -5,7 +5,7 @@
 #include <QVector>
 #include "user.h"
 #include "note.h"
-#include "item.h"
+#include "product.h"
 #include "consumption.h"
 #include "reminder.h"
 #include "settings.h"
@@ -41,7 +41,7 @@ public:
   bool hasAccessToShop() const { return isValid() && m_user.m_bAccessShop; }
   bool hasAccessToConsumption() const { return isValid() && m_user.m_bAccessConsumption; }
   bool hasAccessToUsers() const { return isValid() && m_user.m_bAccessUser; }
-  bool hasAccessToItems() const { return isValid() && m_user.m_bAccessItem; }
+  bool hasAccessToProducts() const { return isValid() && m_user.m_bAccessProduct; }
   bool hasAccessToSettings() const { return isValid() && m_user.m_bAccessSettings; }
 };
 
@@ -105,18 +105,18 @@ namespace NoteSQL
               QString& error);
 }
 
-namespace ItemSQL
+namespace ProductSQL
 {
 bool select(QSqlDatabase db,
-            Item& item,
+            Product& product,
             QString& error);
 
 bool insert(QSqlDatabase db,
-            const Item& item,
+            const Product& product,
             QString& error);
 
 bool update(QSqlDatabase db,
-            const Item& item,
+            const Product& product,
             QString& error);
 
 bool remove(QSqlDatabase db,
@@ -201,7 +201,7 @@ namespace ConsumptionSQL
   void getConsumption(QSqlDatabase db,
                       qint64 date,
                       QVector<Consumption>& vConsumption,
-                      QVector<Item>& vItem);
+                      QVector<Product>& vProduct);
 
   double getTotal(QSqlDatabase db,
                   const Consumption::Filter& filter);

@@ -37,10 +37,14 @@ JPicker::JPicker(int invalidId,
 
   m_imageView = new JImageView(false, 24);
 
+  QFrame* vFrame1 = new QFrame;
+  vFrame1->setFrameShape(QFrame::VLine);
+
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->addWidget(m_btnSearch);
   hlayout0->addWidget(m_edText);
   hlayout0->addWidget(m_btnClear);
+  hlayout0->addWidget(vFrame1);
   hlayout0->addWidget(m_imageView);
 
   QGroupBox* group = new QGroupBox();
@@ -64,7 +68,10 @@ JPicker::JPicker(int invalidId,
                    SLOT(clear()));
 
   if (!bShowImage)
+  {
     m_imageView->hide();
+    vFrame1->hide();
+  }
 }
 
 void JPicker::setId(int id)

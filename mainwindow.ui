@@ -143,7 +143,7 @@
    <addaction name="actionEmployees"/>
    <addaction name="actionFornecedores"/>
    <addaction name="separator"/>
-   <addaction name="actionItems"/>
+   <addaction name="actionProducts"/>
    <addaction name="actionCategories"/>
    <addaction name="actionPrices"/>
    <addaction name="actionImages"/>
@@ -207,7 +207,7 @@
     <string>Informações</string>
    </property>
   </action>
-  <action name="actionItems">
+  <action name="actionProducts">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/item.png</normaloff>:/icons/res/item.png</iconset>

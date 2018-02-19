@@ -1,5 +1,5 @@
 #include "consumptionview.h"
-#include "itemwidget.h"
+#include "productwidget.h"
 #include <QDialog>
 #include <QLayout>
 #include <QDateEdit>
@@ -60,7 +60,7 @@ void EnterDoubleSpinBox::keyPressEvent(QKeyEvent* event)
 
 ConsumptionView::ConsumptionView(QWidget *parent)
   : QFrame(parent)
-  , m_currentItemID(INVALID_ITEM_ID)
+  , m_currentItemID(INVALID_PRODUCT_ID)
   , m_date(nullptr)
   , m_weekDay(nullptr)
   , m_search(nullptr)
@@ -170,17 +170,7 @@ void ConsumptionView::setDatabase(QSqlDatabase db)
 
 void ConsumptionView::search()
 {
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout();
-  dlg.setLayout(layout);
-  ItemWidget* w = new ItemWidget();
-  w->setDatabase(m_db);
-  layout->addWidget(w);
-  dlg.setWindowTitle(tr("Buscar Produto"));
-  dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
-  dlg.setModal(true);
 
-  dlg.exec();
 }
 
 void ConsumptionView::dateChanged(const QDate& date)
@@ -190,26 +180,12 @@ void ConsumptionView::dateChanged(const QDate& date)
 
 void ConsumptionView::enableControls()
 {
-  m_ammount->setEnabled(m_currentItemID != INVALID_ITEM_ID);
-  m_price->setEnabled(m_currentItemID != INVALID_ITEM_ID);
-  m_save->setEnabled(m_currentItemID != INVALID_ITEM_ID &&
-                     m_price->value() &&
-                     m_ammount->value());
+
 }
 
-void ConsumptionView::itemSelected(const Item& item)
+void ConsumptionView::itemSelected(const Product& product)
 {
-  if (item.isValidId())
-  {
-    m_item->setText(item.m_name);
-    m_currentItemID = item.m_id;
-    m_ammount->setSuffix(item.m_unity);
-    m_price->setSuffix("/" +item.m_unity);
-    m_price->setValue(0.0);
-    enableControls();
-    m_price->setFocus();
-    m_price->selectAll();
-  }
+
 }
 
 Consumption ConsumptionView::consumption() const
@@ -233,7 +209,7 @@ void ConsumptionView::save()
 
 void ConsumptionView::clear()
 {
-  m_currentItemID = INVALID_ITEM_ID;
+  m_currentItemID = INVALID_PRODUCT_ID;
   m_item->setText("");
   m_price->setValue(0.0);
   m_ammount->setValue(0.0);

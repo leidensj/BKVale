@@ -24,7 +24,6 @@ SOURCES += main.cpp\
     reminderview.cpp \
     reminderwidget.cpp \
     reminderdatabase.cpp \
-    itemwidget.cpp \
     consumptionview.cpp \
     consumptiondatabase.cpp \
     consumptionwidget.cpp \
@@ -38,17 +37,17 @@ SOURCES += main.cpp\
     jlineedit.cpp \
     user.cpp \
     usermgtwidget.cpp \
-    usermgtdatabase.cpp \
     usermgtview.cpp \
     notetablewidget.cpp \
-    itemview.cpp \
     jdatabase.cpp \
     categoryview.cpp \
     categorywidget.cpp \
     jimageview.cpp \
     imageview.cpp \
     imagewidget.cpp \
-    jpicker.cpp
+    jpicker.cpp \
+    productview.cpp \
+    productwidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -61,8 +60,6 @@ HEADERS  += mainwindow.h \
     reminderview.h \
     reminderwidget.h \
     reminderdatabase.h \
-    item.h \
-    itemwidget.h \
     consumption.h \
     consumptionview.h \
     consumptiondatabase.h \
@@ -78,10 +75,8 @@ HEADERS  += mainwindow.h \
     jlineedit.h \
     user.h \
     usermgtwidget.h \
-    usermgtdatabase.h \
     usermgtview.h \
     notetablewidget.h \
-    itemview.h \
     jdatabase.h \
     category.h \
     categoryview.h \
@@ -90,7 +85,11 @@ HEADERS  += mainwindow.h \
     image.h \
     imageview.h \
     imagewidget.h \
-    jpicker.h
+    jpicker.h \
+    product.h \
+    productview.h \
+    productwidget.h \
+    jtablecolumn.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

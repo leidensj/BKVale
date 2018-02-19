@@ -1,8 +1,11 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <QObject>
 #include <QString>
 #include <QByteArray>
+#include <QVector>
+#include "jtablecolumn.h"
 
 #define INVALID_IMAGE_ID      -1
 #define MAX_IMAGE_NAME_LENGTH 35
@@ -35,6 +38,18 @@ struct Image
 
   static bool st_isValidId(int id) { return id != INVALID_IMAGE_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
+
+  static bool st_isValid(const Image& img) { return !img.m_name.isEmpty() && !img.m_image.isEmpty(); }
+  bool isValid() const { return st_isValid(*this); }
+  static QString getTableName() { return "_IMAGES"; }
+  static QVector<JTableColumn> getColumns()
+  {
+    QVector<JTableColumn> c;
+    c.push_back(JTableColumn("_ID", QObject::tr("Id")));
+    c.push_back(JTableColumn("_NAME", QObject::tr("Imagem"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn("_IMAGE", QObject::tr("Imagem")));
+    return c;
+  }
 };
 
 #endif // IMAGE_H

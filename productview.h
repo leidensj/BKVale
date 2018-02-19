@@ -1,8 +1,8 @@
-#ifndef ITEMVIEW_H
-#define ITEMVIEW_H
+#ifndef PRODUCTVIEW_H
+#define PRODUCTVIEW_H
 
 #include <QFrame>
-#include "item.h"
+#include "product.h"
 #include "category.h"
 
 class QLabel;
@@ -11,14 +11,14 @@ class QDoubleSpinBox;
 class QPushButton;
 class QCheckBox;
 
-class ItemView : public QFrame
+class ProductView : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit ItemView(QWidget* parent = 0);
-  ~ItemView();
-  Item getItem() const;
+  explicit ProductView(QWidget* parent = 0);
+  ~ProductView();
+  Product getProduct() const;
   void setCategory(int categoryId,
                    const QString& categoryName);
 
@@ -29,7 +29,7 @@ private slots:
   void updateControls();
 
 public slots:
-  void setItem(const Item& item,
+  void setProduct(const Product& product,
                const QString& categoryName);
   void create();
 
@@ -56,4 +56,4 @@ private:
   QPushButton* m_btnClearCategory;
 };
 
-#endif // ITEMVIEW_H
+#endif // PRODUCTVIEW_H

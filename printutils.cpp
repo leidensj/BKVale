@@ -241,10 +241,10 @@ QString ReminderPrinter::build(const Reminder& r)
 
 QString ConsumptionPrinter::build(qint64 date,
                                   const QVector<Consumption>& vConsumption,
-                                  const QVector<Item>& vItem,
+                                  const QVector<Product>& vProduct,
                                   double total)
 {
-  if (vConsumption.size() != vItem.size())
+  if (vConsumption.size() != vProduct.size())
     return "";
 
   QString str;
@@ -275,7 +275,7 @@ QString ConsumptionPrinter::build(qint64 date,
     QString subStr;
     {
       QString subStr1 = QString::number(vConsumption.at(i).m_ammount, 'f', 3) +
-                        vItem.at(i).m_unity +
+                        vProduct.at(i).m_unity +
                         " x R$" +
                         QString::number(vConsumption.at(i).m_price, 'f', 2);
       QString subStr2 = "R$" + QString::number(vConsumption.at(i).m_total, 'f', 2);
@@ -284,7 +284,7 @@ QString ConsumptionPrinter::build(qint64 date,
         subStr1 += " ";
       subStr = subStr1 + ESC_STRESS_ON + subStr2 + ESC_STRESS_OFF;
     }
-    str += vItem.at(i).m_name + ESC_LF + subStr +
+    str += vProduct.at(i).m_name + ESC_LF + subStr +
            ESC_LF "________________________________________________" ESC_LF;
   }
 

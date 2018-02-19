@@ -67,6 +67,8 @@ ImageView::ImageView(QWidget* parent)
 
  void ImageView::setImage(const Image& image)
  {
+   m_edImageName->clear();
+   m_imageView->clearImage();
    m_currentImg = image;
    m_edImageName->setText(m_currentImg.m_name);
    m_imageView->setImage(m_currentImg.m_image);
@@ -97,9 +99,15 @@ ImageView::ImageView(QWidget* parent)
 
  void ImageView::updateControls()
  {
-   m_btnSave->setEnabled(m_currentImg != getImage());
-   QString saveIcon = Image::st_isValidId(m_currentImg.m_id)
-                      ? ":/icons/res/saveas.png"
-                      : ":/icons/res/save.png";
+   Image img = getImage();
+   bool bEnable = img.isValid();
+   QString saveIcon(":/icons/res/save.png");
+   if (m_currentImg.isValidId())
+   {
+     saveIcon = ":/icons/res/saveas.png";
+     bEnable = bEnable && m_currentImg != img;
+   }
+
+   m_btnSave->setEnabled(bEnable);
    m_btnSave->setIcon(QIcon(saveIcon));
  }

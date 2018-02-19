@@ -1,7 +1,8 @@
 #include "usermgtwidget.h"
 #include "usermgtview.h"
-#include "usermgtdatabase.h"
+#include "jdatabase.h"
 #include "databaseutils.h"
+#include "jtablecolumn.h"
 #include <QLayout>
 #include <QSplitter>
 #include <QMessageBox>
@@ -15,9 +16,10 @@ UserMgtWidget::UserMgtWidget(int currentUserID, QWidget* parent)
 {
   m_view = new UserMgtView();
   m_view->layout()->setAlignment(Qt::AlignTop);
-  m_view->setContentsMargins(9, 0, 0, 0);
-  m_database = new UserMgtDatabase();
-  m_database->setContentsMargins(0, 0, 0, 0);
+  m_view->layout()->setContentsMargins(9, 0, 0, 0);
+
+  m_database = new JDatabase();
+  m_database->layout()->setContentsMargins(0, 0, 9, 0);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);
@@ -29,29 +31,30 @@ UserMgtWidget::UserMgtWidget(int currentUserID, QWidget* parent)
   setLayout(h1);
 
   QObject::connect(m_database,
-                   SIGNAL(userSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(int)),
                    this,
-                   SLOT(setUser(int)));
+                   SLOT(userSelected(int)));
 
   QObject::connect(m_database,
-                   SIGNAL(userRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(int)),
                    this,
                    SLOT(removeUser(int)));
 
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
                    this,
-                   SLOT(save()));
+                   SLOT(saveUser()));
 
   m_view->create();
 }
 
 void UserMgtWidget::setDatabase(QSqlDatabase db)
 {
-  m_database->set(db);
+  QSqlTableModel* model = new QSqlTableModel(m_database, db);
+  m_database->set(model, User::getTableName(), User::getColumns());
 }
 
-void UserMgtWidget::setUser(int id)
+void UserMgtWidget::userSelected(int id)
 {
   User user;
   user.m_id = id;
@@ -94,7 +97,6 @@ void UserMgtWidget::removeUser(int id)
       User userview = m_view->getUser();
       if (user.m_id == userview.m_id)
         m_view->create();
-      m_database->refresh();
     }
     else
     {
@@ -106,7 +108,7 @@ void UserMgtWidget::removeUser(int id)
   }
 }
 
-void UserMgtWidget::save()
+void UserMgtWidget::saveUser()
 {
   QString error;
   User user = m_view->getUser();

@@ -1,4 +1,4 @@
-#include "itemview.h"
+#include "productview.h"
 #include "jlineedit.h"
 #include <QLayout>
 #include <QPushButton>
@@ -6,9 +6,9 @@
 #include <QCheckBox>
 #include <QGroupBox>
 
-ItemView::ItemView(QWidget* parent)
+ProductView::ProductView(QWidget* parent)
   : QFrame(parent)
-  , m_currentId(INVALID_ITEM_ID)
+  , m_currentId(INVALID_PRODUCT_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edName(nullptr)
@@ -39,28 +39,28 @@ ItemView::ItemView(QWidget* parent)
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
   m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edName->setMaxLength(MAX_ITEM_NAME_LENGTH);
+  m_edName->setMaxLength(MAX_PRODUCT_NAME_LENGTH);
   m_edName->setPlaceholderText(tr("Nome *"));
 
   m_edUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
-  m_edUnity->setMaxLength(MAX_ITEM_UNITY_LENGTH);
+  m_edUnity->setMaxLength(MAX_PRODUCT_UNITY_LENGTH);
   m_edUnity->setPlaceholderText(tr("Unidade *"));
 
   m_edPackageUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
-  m_edPackageUnity->setMaxLength(MAX_ITEM_PACKAGE_UNITY_LENGTH);
+  m_edPackageUnity->setMaxLength(MAX_PRODUCT_PACKAGE_UNITY_LENGTH);
   m_edPackageUnity->setPlaceholderText(tr("Unidade da Embalagem"));
 
   m_sbPackageAmmount = new QDoubleSpinBox();
-  m_sbPackageAmmount->setMaximum(MAX_ITEM_PACKAGE_AMMOUNT_LENGTH);
+  m_sbPackageAmmount->setMaximum(MAX_PRODUCT_PACKAGE_AMMOUNT_LENGTH);
   m_sbPackageAmmount->setMinimum(0.0);
   m_sbPackageAmmount->setSpecialValueText(tr("Quantidade da Embalagem"));
 
   m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edDetails->setMaxLength(MAX_ITEM_DETAILS_LENGTH);
+  m_edDetails->setMaxLength(MAX_PRODUCT_DETAILS_LENGTH);
   m_edDetails->setPlaceholderText(tr("Detalhes"));
 
   m_edCode = new JLineEdit(JValidatorType::Numeric, true, true);
-  m_edCode->setMaxLength(MAX_ITEM_MIDASCODE_LENGTH);
+  m_edCode->setMaxLength(MAX_PRODUCT_MIDASCODE_LENGTH);
   m_edCode->setPlaceholderText(tr("Código"));
 
   m_cbAvailableAtNotes = new QCheckBox();
@@ -161,83 +161,83 @@ ItemView::ItemView(QWidget* parent)
   updateControls();
 }
 
-ItemView::~ItemView()
+ProductView::~ProductView()
 {
 
 }
 
-Item ItemView::getItem() const
+Product ProductView::getProduct() const
 {
-  Item item;
-  item.m_id = m_currentId;
-  item.m_name = m_edName->text();
-  item.m_unity = m_edUnity->text();
-  item.m_packageUnity = m_edPackageUnity->text();
-  item.m_packageAmmount = m_sbPackageAmmount->value();
-  item.m_details = m_edDetails->text();
-  item.m_code = m_edCode->text();
-  item.m_bAvailableAtNotes = m_cbAvailableAtNotes->isChecked();
-  item.m_bAvailableAtShop = m_cbAvailableAtShop->isChecked();
-  item.m_bAvailableAtConsumption = m_cbAvailableAtConsumption->isChecked();
-  item.m_categoryId = m_currentCategoryId;
+  Product product;
+  product.m_id = m_currentId;
+  product.m_name = m_edName->text();
+  product.m_unity = m_edUnity->text();
+  product.m_packageUnity = m_edPackageUnity->text();
+  product.m_packageAmmount = m_sbPackageAmmount->value();
+  product.m_details = m_edDetails->text();
+  product.m_code = m_edCode->text();
+  product.m_bAvailableAtNotes = m_cbAvailableAtNotes->isChecked();
+  product.m_bAvailableAtShop = m_cbAvailableAtShop->isChecked();
+  product.m_bAvailableAtConsumption = m_cbAvailableAtConsumption->isChecked();
+  product.m_categoryId = m_currentCategoryId;
   //TODO item.m_imageId = INVALID_IMAGE_ID;
-  return item;
+  return product;
 }
 
-void ItemView::setCategory(int categoryId,
-                           const QString& categoryName)
+void ProductView::setCategory(int categoryId,
+                              const QString& categoryName)
 {
   m_currentCategoryId = categoryId;
   m_edCategory->setText(categoryName);
 }
 
-void ItemView::setItem(const Item &item,
-                       const QString& categoryName)
+void ProductView::setProduct(const Product &product,
+                             const QString& categoryName)
 {
-  m_currentId = item.m_id;
-  m_edName->setText(item.m_name);
-  m_edUnity->setText(item.m_unity);
-  m_edPackageUnity->setText(item.m_packageUnity);
-  m_sbPackageAmmount->setValue(item.m_packageAmmount);
-  m_edDetails->setText(item.m_details);
-  m_edCode->setText(item.m_code);
-  m_cbAvailableAtNotes->setChecked(item.m_bAvailableAtNotes);
-  m_cbAvailableAtShop->setChecked(item.m_bAvailableAtShop);
-  m_cbAvailableAtConsumption->setChecked(item.m_bAvailableAtConsumption);
-  setCategory(item.m_categoryId, categoryName);
+  m_currentId = product.m_id;
+  m_edName->setText(product.m_name);
+  m_edUnity->setText(product.m_unity);
+  m_edPackageUnity->setText(product.m_packageUnity);
+  m_sbPackageAmmount->setValue(product.m_packageAmmount);
+  m_edDetails->setText(product.m_details);
+  m_edCode->setText(product.m_code);
+  m_cbAvailableAtNotes->setChecked(product.m_bAvailableAtNotes);
+  m_cbAvailableAtShop->setChecked(product.m_bAvailableAtShop);
+  m_cbAvailableAtConsumption->setChecked(product.m_bAvailableAtConsumption);
+  setCategory(product.m_categoryId, categoryName);
   updateControls();
 }
 
-void ItemView::create()
+void ProductView::create()
 {
-  Item item;
+  Product product;
   Category category;
-  setItem(item, category.m_name);
+  setProduct(product, category.m_name);
   updateControls();
 }
 
-void ItemView::emitSearchCategorySignal()
+void ProductView::emitSearchCategorySignal()
 {
   emit searchCategorySignal();
 }
 
-void ItemView::emitSaveSignal()
+void ProductView::emitSaveSignal()
 {
   emit saveSignal();
 }
 
-void ItemView::clearCategory()
+void ProductView::clearCategory()
 {
   Category category;
   setCategory(category.m_id, category.m_name);
 }
 
-void ItemView::updateControls()
+void ProductView::updateControls()
 {
   bool bEnable = !m_edName->text().isEmpty() &&
                  !m_edUnity->text().isEmpty();
   m_btnSave->setEnabled(bEnable);
-  QString saveIcon = Item::st_isValidId(m_currentId)
+  QString saveIcon = Product::st_isValidId(m_currentId)
                      ? ":/icons/res/saveas.png"
                      : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(saveIcon));

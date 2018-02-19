@@ -20,14 +20,14 @@ JImageView::JImageView(bool bShowButtons, int size, QWidget* parent)
   m_btnOpen->setText("");
   m_btnOpen->setIconSize(QSize(16, 16));
   m_btnOpen->setIcon(QIcon(":/icons/res/open.png"));
-  m_btnOpen->setToolTip(tr("Abrir imagem"));
+  m_btnOpen->setToolTip(tr("Selecionar imagem"));
 
   m_btnClear = new QPushButton();
   m_btnClear->setFlat(true);
   m_btnClear->setText("");
   m_btnClear->setIconSize(QSize(16, 16));
   m_btnClear->setIcon(QIcon(":/icons/res/remove.png"));
-  m_btnClear->setToolTip(tr("Apagar imagem"));
+  m_btnClear->setToolTip(tr("Remover imagem"));
 
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->setContentsMargins(0, 0, 0, 0);
@@ -97,7 +97,7 @@ void JImageView::setImage(const QByteArray& bArray)
 QString JImageView::getImagePath()
 {
   return QFileDialog::getOpenFileName(this,
-                                      tr("Abrir Imagem"),
+                                      tr("Selecionar Imagem"),
                                       "/home",
                                       tr("Imagens (*.png)"));
 

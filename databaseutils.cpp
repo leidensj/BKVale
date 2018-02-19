@@ -357,7 +357,9 @@ bool BaitaSQL::init(QSqlDatabase db,
              "_CODE TEXT,"
              "_AVAILABLE_AT_NOTES,"
              "_AVAILABLE_AT_SHOP,"
-             "AVAILABLE_AT_CONSUMPTION)");
+             "_AVAILABLE_AT_CONSUMPTION,"
+             "_AVAILABLE_TO_BUY,"
+             "_AVAILABLE_TO_SELL)");
 
   query.exec("CREATE TABLE IF NOT EXISTS _CATEGORIES ("
              "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -451,6 +453,8 @@ bool ProductSQL::select(QSqlDatabase db,
                 "_AVAILABLE_AT_NOTES,"
                 "_AVAILABLE_AT_SHOP,"
                 "_AVAILABLE_AT_CONSUMPTION,"
+                "_AVAILABLE_TO_BUY,"
+                "_AVAILABLE_TO_SELL "
                 "FROM _PRODUCTS "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", id);
@@ -470,6 +474,8 @@ bool ProductSQL::select(QSqlDatabase db,
       product.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
       product.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
       product.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
+      product.m_bAvailableToBuy = query.value(query.record().indexOf("_AVAILABLE_TO_BUY")).toBool();
+      product.m_bAvailableToSell = query.value(query.record().indexOf("_AVAILABLE_TO_SELL")).toBool();
       return true;
     }
     else
@@ -506,7 +512,9 @@ bool ProductSQL::insert(QSqlDatabase db,
                 "_CODE,"
                 "_AVAILABLE_AT_NOTES,"
                 "_AVAILABLE_AT_SHOP,"
-                "_AVAILABLE_AT_CONSUMPTION) "
+                "_AVAILABLE_AT_CONSUMPTION,"
+                "_AVAILABLE_TO_BUY,"
+                "_AVAILABLE_TO_SELL) "
                 "VALUES ("
                 "(:_name),"
                 "(:_categoryid),"
@@ -518,7 +526,9 @@ bool ProductSQL::insert(QSqlDatabase db,
                 "(:_code),"
                 "(:_availableatnotes),"
                 "(:_availableatshop),"
-                "(:_availableatconsumption))");
+                "(:_availableatconsumption),"
+                "(:_availabletobuy),"
+                "(:_availabletosell))");
   query.bindValue(":_name", product.m_name);
   query.bindValue(":_categoryid", product.m_categoryId);
   query.bindValue(":_imageid", product.m_imageId);
@@ -530,6 +540,8 @@ bool ProductSQL::insert(QSqlDatabase db,
   query.bindValue(":_availableatnotes", product.m_bAvailableAtNotes);
   query.bindValue(":_availableatshop", product.m_bAvailableAtShop);
   query.bindValue(":_availableatconsumption", product.m_bAvailableAtConsumption);
+  query.bindValue(":_availabletobuy", product.m_bAvailableToBuy);
+  query.bindValue(":_availabletosell", product.m_bAvailableToSell);
 
   if (query.exec())
   {
@@ -562,7 +574,9 @@ bool ProductSQL::update(QSqlDatabase db,
                 "_CODE = (:_code),"
                 "_AVAILABLE_AT_NOTES = (:_availableatnotes),"
                 "_AVAILABLE_AT_SHOP = (:_availableatshop),"
-                "_AVAILABLE_AT_CONSUMPTION = (:_availableatconsumption) "
+                "_AVAILABLE_AT_CONSUMPTION = (:_availableatconsumption),"
+                "_AVAILABLE_TO_BUY = (:_availabletobuy),"
+                "_AVAILABLE_TO_SELL = (:_availabletosell) "
                 "WHERE _ID = (:_id)");
   query.bindValue(":_id", product.m_id);
   query.bindValue(":_name", product.m_name);
@@ -576,6 +590,8 @@ bool ProductSQL::update(QSqlDatabase db,
   query.bindValue(":_availableatnotes", product.m_bAvailableAtNotes);
   query.bindValue(":_availableatshop", product.m_bAvailableAtShop);
   query.bindValue(":_availableatconsumption", product.m_bAvailableAtConsumption);
+  query.bindValue(":_availabletobuy", product.m_bAvailableToBuy);
+  query.bindValue(":_availabletosell", product.m_bAvailableToSell);
 
   if (query.exec())
     return true;

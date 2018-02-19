@@ -10,6 +10,7 @@ class JLineEdit;
 class QDoubleSpinBox;
 class QPushButton;
 class QCheckBox;
+class JPicker;
 
 class ProductView : public QFrame
 {
@@ -19,13 +20,11 @@ public:
   explicit ProductView(QWidget* parent = 0);
   ~ProductView();
   Product getProduct() const;
-  void setCategory(int categoryId,
-                   const QString& categoryName);
+  void setCategory(int id, const QString& name);
 
 private slots:
   void emitSearchCategorySignal();
   void emitSaveSignal();
-  void clearCategory();
   void updateControls();
 
 public slots:
@@ -38,8 +37,7 @@ signals:
   saveSignal();
 
 private:
-  int m_currentId;
-  int m_currentCategoryId;
+  Product m_currentProduct;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edName;
@@ -51,9 +49,9 @@ private:
   QCheckBox* m_cbAvailableAtNotes;
   QCheckBox* m_cbAvailableAtShop;
   QCheckBox* m_cbAvailableAtConsumption;
-  JLineEdit* m_edCategory;
-  QPushButton* m_btnSearchCategory;
-  QPushButton* m_btnClearCategory;
+  QCheckBox* m_cbAvailableToBuy;
+  QCheckBox* m_cbAvailableToSell;
+  JPicker* m_categoryPicker;
 };
 
 #endif // PRODUCTVIEW_H

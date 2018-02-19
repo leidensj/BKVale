@@ -30,6 +30,8 @@ struct Product
   bool m_bAvailableAtNotes;
   bool m_bAvailableAtShop;
   bool m_bAvailableAtConsumption;
+  bool m_bAvailableToBuy;
+  bool m_bAvailableToSell;
 
   void clear()
   {
@@ -45,6 +47,8 @@ struct Product
     m_bAvailableAtNotes = false;
     m_bAvailableAtShop = false;
     m_bAvailableAtConsumption = false;
+    m_bAvailableToBuy = false;
+    m_bAvailableToSell = false;
   }
 
   Product()
@@ -52,6 +56,32 @@ struct Product
     clear();
   }
 
+  bool operator !=(const Product& other)
+  {
+    return
+        m_imageId != other.m_imageId ||
+        m_categoryId != other.m_categoryId ||
+        m_name != other.m_name ||
+        m_unity != other.m_unity ||
+        m_packageUnity != other.m_packageUnity ||
+        m_packageAmmount != other.m_packageAmmount ||
+        m_details != other.m_details ||
+        m_code != other.m_code ||
+        m_bAvailableAtNotes != other.m_bAvailableAtNotes ||
+        m_bAvailableAtShop != other.m_bAvailableAtShop ||
+        m_bAvailableAtConsumption != other.m_bAvailableAtConsumption ||
+        m_bAvailableToBuy != other.m_bAvailableToBuy ||
+        m_bAvailableToSell != other.m_bAvailableToSell;
+  }
+
+  static bool st_isValid(const Product& product)
+  {
+    return
+        !product.m_name.isEmpty() &&
+        !product.m_unity.isEmpty();
+  }
+
+  bool isValid() const { return st_isValid(*this); }
   static bool st_isValidId(int id) { return id != INVALID_PRODUCT_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QString getTableName() { return "_PRODUCTS"; }
@@ -70,6 +100,8 @@ struct Product
     c.push_back(JTableColumn("_AVAILABLE_AT_NOTES", QObject::tr("Notas")));
     c.push_back(JTableColumn("_AVAILABLE_AT_SHOP", QObject::tr("Compras")));
     c.push_back(JTableColumn("_AVAILABLE_AT_CONSUMPTION", QObject::tr("Consumo")));
+    c.push_back(JTableColumn("_AVAILABLE_TO_BUY", QObject::tr("Compra")));
+    c.push_back(JTableColumn("_AVAILABLE_TO_SELL", QObject::tr("Venda")));
     return c;
   }
 };

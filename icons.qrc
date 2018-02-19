@@ -84,5 +84,7 @@
         <file>res/saveas.png</file>
         <file>res/test.png</file>
         <file>res/employee.png</file>
+        <file>res/buy.png</file>
+        <file>res/sell.png</file>
     </qresource>
 </RCC>

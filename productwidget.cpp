@@ -50,7 +50,9 @@ ProductWidget::ProductWidget(QWidget *parent)
   , m_view(nullptr)
 {
   m_database = new JDatabase();
+  m_database->layout()->setContentsMargins(0, 0, 9, 0);
   m_view = new ProductView();
+  m_view->layout()->setContentsMargins(9, 0, 0, 0);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);

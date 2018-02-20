@@ -42,6 +42,14 @@ struct Image
   static bool st_isValid(const Image& img) { return !img.m_name.isEmpty() && !img.m_image.isEmpty(); }
   bool isValid() const { return st_isValid(*this); }
   static QString getTableName() { return "_IMAGES"; }
+
+  enum class Column
+  {
+    Id,
+    Name,
+    Image
+  };
+
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

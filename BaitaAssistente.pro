@@ -47,7 +47,10 @@ SOURCES += main.cpp\
     imagewidget.cpp \
     jpicker.cpp \
     productview.cpp \
-    productwidget.cpp
+    productwidget.cpp \
+    imagetablemodel.cpp \
+    personview.cpp \
+    personwidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -89,7 +92,13 @@ HEADERS  += mainwindow.h \
     product.h \
     productview.h \
     productwidget.h \
-    jtablecolumn.h
+    jtablecolumn.h \
+    imagetablemodel.h \
+    person.h \
+    phonenumber.h \
+    address.h \
+    personview.h \
+    personwidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

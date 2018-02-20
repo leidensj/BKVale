@@ -2,38 +2,11 @@
 #include "imageview.h"
 #include "jdatabase.h"
 #include "databaseutils.h"
+#include "imagetablemodel.h"
 #include <QLayout>
 #include <QSplitter>
 #include <QMessageBox>
 #include <QSqlTableModel>
-
-class ImageTableModel : public QSqlTableModel
-{
-
-public:
-  ImageTableModel(QObject *parent, QSqlDatabase db)
-    : QSqlTableModel(parent, db)
-  {
-
-  }
-
-  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
-  {
-    //TODO remover hard code
-    QVariant value = QSqlTableModel::data(idx, role);
-    if (role == Qt::DecorationRole)
-    {
-      if (idx.column() == 1)
-      {
-        QPixmap px(QSize(16, 16));
-        px.loadFromData(QSqlTableModel::data(createIndex(idx.row(), 2),
-                                             Qt::EditRole).toByteArray());
-        value = QVariant::fromValue(QIcon(px));
-      }
-    }
-    return value;
-  }
-};
 
 ImageWidget::ImageWidget(QWidget* parent)
   : QFrame(parent)

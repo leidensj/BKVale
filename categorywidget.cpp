@@ -2,6 +2,7 @@
 #include "categoryview.h"
 #include "databaseutils.h"
 #include "jdatabase.h"
+#include "imagetablemodel.h"
 #include <QSplitter>
 #include <QLayout>
 #include <QMessageBox>
@@ -123,7 +124,7 @@ void CategoryWidget::saveCategory()
 
 void CategoryWidget::searchImage()
 {
-  QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
+  ImageTableModel* model = new ImageTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Escolher Imagem"),
                         QIcon(":/icons/res/icon.png"),
                         INVALID_IMAGE_ID);

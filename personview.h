@@ -5,8 +5,8 @@
 #include "person.h"
 
 class QPushButton;
-class JLineEdit;
-class JPicker;
+class PersonPageView;
+class QTabWidget;
 
 class PersonView : public QFrame
 {
@@ -19,7 +19,7 @@ public:
   void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:
-  void emitSearchImageSignal();
+  //void emitSearchImageSignal();
   void emitSaveSignal();
   void updateControls();
 
@@ -30,16 +30,14 @@ public slots:
   void create();
 
 signals:
-  searchImageSignal();
+  //searchImageSignal();
   saveSignal();
 
 private:
   Person m_currentPerson;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
-  JLineEdit* m_edName;
-  JLineEdit* m_edDetails;
-  JPicker* m_imagePicker;
+  PersonPageView* m_personPage;
 };
 
 #endif // PERSONVIEW_H

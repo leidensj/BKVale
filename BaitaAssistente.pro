@@ -50,7 +50,8 @@ SOURCES += main.cpp\
     productwidget.cpp \
     imagetablemodel.cpp \
     personview.cpp \
-    personwidget.cpp
+    personwidget.cpp \
+    personpageview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -98,7 +99,8 @@ HEADERS  += mainwindow.h \
     phonenumber.h \
     address.h \
     personview.h \
-    personwidget.h
+    personwidget.h \
+    personpageview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

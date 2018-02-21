@@ -140,8 +140,7 @@
    <addaction name="actionLogin"/>
    <addaction name="separator"/>
    <addaction name="actionUsers"/>
-   <addaction name="actionEmployees"/>
-   <addaction name="actionFornecedores"/>
+   <addaction name="actionPersons"/>
    <addaction name="separator"/>
    <addaction name="actionProducts"/>
    <addaction name="actionCategories"/>
@@ -243,18 +242,6 @@
     <string>Fazer login</string>
    </property>
   </action>
-  <action name="actionFornecedores">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/supplier.png</normaloff>:/icons/res/supplier.png</iconset>
-   </property>
-   <property name="text">
-    <string>Fornecedores</string>
-   </property>
-   <property name="toolTip">
-    <string>Gerenciar fornecedores</string>
-   </property>
-  </action>
   <action name="actionCategories">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -291,16 +278,16 @@
     <string>Gerenciar preços</string>
    </property>
   </action>
-  <action name="actionEmployees">
+  <action name="actionPersons">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/employee.png</normaloff>:/icons/res/employee.png</iconset>
+     <normaloff>:/icons/res/person.png</normaloff>:/icons/res/person.png</iconset>
    </property>
    <property name="text">
-    <string>Funcionários</string>
+    <string>Pessoas</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar funcionários</string>
+    <string>Gerenciar pessoas</string>
    </property>
   </action>
  </widget>

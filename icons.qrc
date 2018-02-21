@@ -86,5 +86,10 @@
         <file>res/employee.png</file>
         <file>res/buy.png</file>
         <file>res/sell.png</file>
+        <file>res/building.png</file>
+        <file>res/client.png</file>
+        <file>res/house.png</file>
+        <file>res/person.png</file>
+        <file>res/resume.png</file>
     </qresource>
 </RCC>

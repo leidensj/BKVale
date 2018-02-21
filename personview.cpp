@@ -1,16 +1,17 @@
 #include "personview.h"
 #include "jlineedit.h"
 #include "jpicker.h"
+#include "personpageview.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
+#include <QTabWidget>
 
 PersonView::PersonView(QWidget* parent)
   : QFrame(parent)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
-  , m_edName(nullptr)
-  , m_edDetails(nullptr)
+  , m_personPage(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -26,32 +27,24 @@ PersonView::PersonView(QWidget* parent)
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
-  m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edName->setMaxLength(MAX_PERSON_NAME_LENGTH);
-  m_edName->setPlaceholderText("*");
-
-  m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edDetails->setMaxLength(MAX_PERSON_DETAILS_LENGTH);
-
-  m_imagePicker = new JPicker(INVALID_IMAGE_ID, tr("Imagem"), true);
-
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->setContentsMargins(0, 0, 0, 0);
   hlayout0->setAlignment(Qt::AlignLeft);
   hlayout0->addWidget(m_btnCreate);
   hlayout0->addWidget(m_btnSave);
 
-  QFormLayout* flayout0 = new QFormLayout();
-  flayout0->setContentsMargins(0, 0, 0, 0);
-  flayout0->addRow(tr("Nome:"), m_edName);
-  flayout0->addRow(tr("Detalhes:"), m_edDetails);
+  m_personPage = new PersonPageView();
+
+  QTabWidget* tabWidget = new QTabWidget();
+  tabWidget->addTab(m_personPage,
+                    QIcon(":/icons/res/resume.png"),
+                    tr("Informações"));
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->setContentsMargins(0, 0, 0, 0);
   vlayout1->setAlignment(Qt::AlignTop);
   vlayout1->addLayout(hlayout0);
-  vlayout1->addLayout(flayout0);
-  vlayout1->addWidget(m_imagePicker);
+  vlayout1->addWidget(tabWidget);
   setLayout(vlayout1);
 
   QObject::connect(m_btnCreate,
@@ -64,15 +57,6 @@ PersonView::PersonView(QWidget* parent)
                    this,
                    SLOT(emitSaveSignal()));
 
-  QObject::connect(m_imagePicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(emitSearchImageSignal()));
-
-  QObject::connect(m_edName,
-                   SIGNAL(textChanged(const QString&)),
-                   this,
-                   SLOT(updateControls()));
 
   updateControls();
 }
@@ -88,21 +72,18 @@ Person PersonView::getPerson() const
   return person;
 }
 
-void PersonView::setImage(int id, const QString& name, const QByteArray& ar)
+/*void PersonView::setImage(int id, const QString& name, const QByteArray& ar)
 {
   m_imagePicker->setId(id);
   m_imagePicker->setText(name);
   m_imagePicker->setImage(ar);
-}
+}*/
 
 void PersonView::setPerson(const Person &person,
                            const QString& imageName,
                            const QByteArray& arImage)
 {
   m_currentPerson = person;
-  m_edName->setText(m_currentPerson.m_name);
-  m_edDetails->setText(m_currentPerson.m_details);
-  setImage(m_currentPerson.m_imageId, imageName, arImage);
   updateControls();
 }
 
@@ -113,10 +94,10 @@ void PersonView::create()
   updateControls();
 }
 
-void PersonView::emitSearchImageSignal()
+/*void PersonView::emitSearchImageSignal()
 {
   emit searchImageSignal();
-}
+}*/
 
 void PersonView::emitSaveSignal()
 {

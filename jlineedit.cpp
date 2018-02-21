@@ -13,6 +13,8 @@ QString getRegEx(JValidatorType validator)
       return "^[a-zA-Z0-9 ]*$";
     case JValidatorType::Numeric:
       return "^[0-9]*$";
+    case JValidatorType::Email:
+      return "^[a-zA-Z0-9@]*$";
     case JValidatorType::All:
     default:
       return "";

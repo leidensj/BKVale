@@ -11,6 +11,7 @@
 #include "usermgtwidget.h"
 #include "imagewidget.h"
 #include "logindialog.h"
+#include "personview.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -121,6 +122,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openLoginDialog()));
+
+  QObject::connect(ui->actionPersons,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openPersonsDialog()));
 
   m_settings.load();
   if (!m_settings.m_serialPort.isEmpty() &&
@@ -419,4 +425,18 @@ void BaitaAssistant::openLoginDialog()
     updateControls();
     updateStatusBar();
   }
+}
+
+void BaitaAssistant::openPersonsDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout();
+  dlg.setLayout(layout);
+  PersonView* w = new PersonView();
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Pessoas"));
+  dlg.setWindowIcon(QIcon(":/icons/res/person.png"));
+  dlg.setModal(true);
+  dlg.exec();
 }

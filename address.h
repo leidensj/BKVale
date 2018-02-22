@@ -16,14 +16,14 @@ struct Address
 {
   mutable int m_id;
   int m_personId;
-  QString m_addressCep;
-  QString m_addressNeighborhood;
-  QString m_addressStreet;
-  int m_addressNumber;
-  QString m_addressState;
-  QString m_addressCountry;
-  QString m_addressComplement;
-  QString m_addressReference;
+  QString m_cep;
+  QString m_neighborhood;
+  QString m_street;
+  int m_number;
+  QString m_astate;
+  QString m_country;
+  QString m_complement;
+  QString m_reference;
 
   void clear()
   {

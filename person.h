@@ -6,10 +6,11 @@
 #include <QString>
 #include <QVector>
 
-#define INVALID_PERSON_ID   -1
+#define INVALID_PERSON_ID                 -1
 
 #define MAX_PERSON_NAME_LENGTH            35
 #define MAX_PERSON_DETAILS_LENGTH         35
+#define EMPLOYEE_PINCODE_LENGTH           4
 
 struct Person
 {

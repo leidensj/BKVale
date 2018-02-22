@@ -2,6 +2,8 @@
 #include "jlineedit.h"
 #include "jpicker.h"
 #include "personpageview.h"
+#include "phonenumberpageview.h"
+#include "addresspageview.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
@@ -12,6 +14,8 @@ PersonView::PersonView(QWidget* parent)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_personPage(nullptr)
+  , m_phonePage(nullptr)
+  , m_addressPage(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -34,11 +38,19 @@ PersonView::PersonView(QWidget* parent)
   hlayout0->addWidget(m_btnSave);
 
   m_personPage = new PersonPageView();
+  m_phonePage = new PhoneNumberPageView();
+  m_addressPage = new AddressPageView();
 
   QTabWidget* tabWidget = new QTabWidget();
   tabWidget->addTab(m_personPage,
                     QIcon(":/icons/res/resume.png"),
                     tr("Informações"));
+  tabWidget->addTab(m_phonePage,
+                    QIcon(":/icons/res/phone.png"),
+                    tr("Telefones"));
+  tabWidget->addTab(m_addressPage,
+                    QIcon(":/icons/res/address.png"),
+                    tr("Endereços"));
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->setContentsMargins(0, 0, 0, 0);

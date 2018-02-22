@@ -8,7 +8,6 @@ class JLineEdit;
 class JPicker;
 class QDateEdit;
 class QCheckBox;
-class QLabel;
 class QRadioButton;
 
 class PersonPageView : public QFrame
@@ -33,6 +32,8 @@ private:
   QCheckBox* m_cbClient;
   QCheckBox* m_cbSupplier;
   QCheckBox* m_cbEmployee;
+  QFrame* m_frPinCode;
+  JLineEdit* m_edPinCode;
 };
 
 #endif // PERSONPAGEVIEW_H

@@ -24,6 +24,7 @@ PersonPageView::PersonPageView(QWidget* parent)
  , m_cbClient(nullptr)
  , m_cbSupplier(nullptr)
  , m_cbEmployee(nullptr)
+ , m_frPinCode(nullptr)
 {
   m_rdoPerson = new QRadioButton();
   m_rdoPerson->setText(tr("Fisíca"));
@@ -52,6 +53,21 @@ PersonPageView::PersonPageView(QWidget* parent)
   m_cbEmployee = new QCheckBox();
   m_cbEmployee->setText(tr("Funcionário"));
   m_cbEmployee->setIcon(QIcon(":/icons/res/employee.png"));
+  m_frPinCode = new QFrame();
+  QLabel* lblPinCode = new QLabel();
+  lblPinCode->setPixmap(QIcon(":/icons/res/pincode.png").pixmap(QSize(24, 24)));
+  lblPinCode->setMinimumSize(24, 24);
+  lblPinCode->setMaximumSize(24, 24);
+  lblPinCode->setScaledContents(true);
+  m_edPinCode = new JLineEdit(JValidatorType::Numeric, false, true);
+  m_edPinCode->setMaxLength(EMPLOYEE_PINCODE_LENGTH);
+  m_edPinCode->setEchoMode(QLineEdit::EchoMode::PasswordEchoOnEdit);
+  m_edPinCode->setAlignment(Qt::AlignCenter);
+  {
+    QFont font = m_edPinCode->font();
+    font.setBold(true);
+    m_edPinCode->setFont(font);
+  }
 
   QGroupBox* personGroupBox = new QGroupBox();
   personGroupBox->setTitle(tr("Tipo de pessoa"));
@@ -76,12 +92,19 @@ PersonPageView::PersonPageView(QWidget* parent)
   dateLayout->addWidget(m_dtBirthDate);
   dateGroupBox->setLayout(dateLayout);
 
+  QHBoxLayout* pinCodeLayout = new QHBoxLayout();
+  pinCodeLayout->setContentsMargins(0, 0, 0, 0);
+  pinCodeLayout->addWidget(lblPinCode);
+  pinCodeLayout->addWidget(m_edPinCode);
+  m_frPinCode->setLayout(pinCodeLayout);
+
   QGroupBox* typeGroupBox = new QGroupBox();
   typeGroupBox->setTitle(tr("Disponível como"));
   QVBoxLayout* typeLayout = new QVBoxLayout();
   typeLayout->addWidget(m_cbClient);
   typeLayout->addWidget(m_cbSupplier);
   typeLayout->addWidget(m_cbEmployee);
+  typeLayout->addWidget(m_frPinCode);
   typeGroupBox->setLayout(typeLayout);
 
   QVBoxLayout* vlayout0 = new QVBoxLayout();

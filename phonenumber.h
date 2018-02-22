@@ -58,6 +58,7 @@ struct PhoneNumber
     QVector<JTableColumn> c;
     c.push_back(JTableColumn("_ID", QObject::tr("Id")));
     c.push_back(JTableColumn("_PERSONID", QObject::tr("Pessoa")));
+    c.push_back(JTableColumn("_DESCRIPTION", QObject::tr("Descrição")));
     c.push_back(JTableColumn("_COUNTRYCODE", QObject::tr("País"), false));
     c.push_back(JTableColumn("_CODE", QObject::tr("Código"), false));
     c.push_back(JTableColumn("_NUMBER", QObject::tr("Número"), false, false, JResizeMode::Stretch));

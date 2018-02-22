@@ -91,5 +91,10 @@
         <file>res/house.png</file>
         <file>res/person.png</file>
         <file>res/resume.png</file>
+        <file>res/phonemobile.png</file>
+        <file>res/phonecomercial.png</file>
+        <file>res/phone.png</file>
+        <file>res/address.png</file>
+        <file>res/pincode.png</file>
     </qresource>
 </RCC>

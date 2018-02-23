@@ -2,6 +2,7 @@
 #define ADDRESSPAGEVIEW_H
 
 #include <QFrame>
+#include "address.h"
 
 class JLineEdit;
 class QSpinBox;
@@ -19,8 +20,7 @@ private:
   JLineEdit* m_edNeighborhood;
   JLineEdit* m_edStreet;
   QSpinBox* m_spnNumber;
-  JLineEdit* m_edState;
-  JLineEdit* m_edCountry;
+  QComboBox* m_cbState;
   JLineEdit* m_edComplement;
   JLineEdit* m_edReference;
 };

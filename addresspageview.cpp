@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include <QFormLayout>
+#include <QComboBox>
 
 AddressPageView::AddressPageView(QWidget *parent)
   : QFrame(parent)
@@ -11,8 +12,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   , m_edNeighborhood(nullptr)
   , m_edStreet(nullptr)
   , m_spnNumber(nullptr)
-  , m_edState(nullptr)
-  , m_edCountry(nullptr)
+  , m_cbState(nullptr)
   , m_edComplement(nullptr)
   , m_edReference(nullptr)
 {
@@ -29,9 +29,10 @@ AddressPageView::AddressPageView(QWidget *parent)
   m_spnNumber = new QSpinBox();
   m_spnNumber->setMinimum(0);
   m_spnNumber->setMaximum(999999);
-  m_edState = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
-  m_edCountry = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
-  m_edCountry->setText(tr("Brasil"));
+  m_cbState = new QComboBox();
+  for (int i = 0; i != NUMBER_OF_BRAZILIAN_STATES; ++i)
+    m_cbState->addItem(Address::st_BRState((Address::EBRState)i).m_name);
+  m_cbState->setCurrentIndex((int)Address::EBRState::RS);
   m_edComplement = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
   m_edReference = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
 
@@ -49,8 +50,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   flayout0->addRow(tr("CEP:"), ceplayout);
   flayout0->addRow(tr("Rua:"), streetlayout);
   flayout0->addRow(tr("Bairro:"), m_edNeighborhood);
-  flayout0->addRow(tr("Estado:"), m_edState);
-  flayout0->addRow(tr("País:"), m_edCountry);
+  flayout0->addRow(tr("Estado:"), m_cbState);
   flayout0->addRow(tr("Complemento:"), m_edComplement);
   flayout0->addRow(tr("Referência:"), m_edReference);
   setLayout(flayout0);

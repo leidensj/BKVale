@@ -9,6 +9,7 @@ class JPicker;
 class QDateEdit;
 class QCheckBox;
 class QRadioButton;
+class QComboBox;
 
 class PersonPageView : public QFrame
 {
@@ -17,23 +18,27 @@ class PersonPageView : public QFrame
 public:
   explicit PersonPageView(QWidget* parent = 0);
 
+private slots:
+  void updateControls();
+
 private:
+  Person m_currentPerson;
   QRadioButton* m_rdoPerson;
   QRadioButton* m_rdoCompany;
-  Person m_currentPerson;
   JLineEdit* m_edName;
   JLineEdit* m_edAlias;
   JLineEdit* m_edEmail;
   JLineEdit* m_edCpfCnpj;
-  JLineEdit* m_edRgInsc;
+  JLineEdit* m_edRgIE;
   JLineEdit* m_edDetails;
   QDateEdit* m_dtBirthDate;
   JPicker* m_imagePicker;
-  QCheckBox* m_cbClient;
+  QCheckBox* m_cbCustomer;
   QCheckBox* m_cbSupplier;
   QCheckBox* m_cbEmployee;
   QFrame* m_frPinCode;
   JLineEdit* m_edPinCode;
+  QComboBox* m_cbState;
 };
 
 #endif // PERSONPAGEVIEW_H

@@ -11,6 +11,7 @@
 
 #define MAX_ADDRESS_STREET_LENGTH         35
 #define MAX_ADDRESS_NUMBER                35
+#define NUMBER_OF_BRAZILIAN_STATES        27
 
 struct Address
 {
@@ -20,8 +21,7 @@ struct Address
   QString m_neighborhood;
   QString m_street;
   int m_number;
-  QString m_astate;
-  QString m_country;
+  QString m_state;
   QString m_complement;
   QString m_reference;
 
@@ -29,14 +29,13 @@ struct Address
   {
     m_id = INVALID_ADDRESS_ID;
     m_personId = INVALID_PERSON_ID;
-    m_addressCep.clear();
-    m_addressNeighborhood.clear();
-    m_addressStreet.clear();
-    m_addressNumber = INVALID_ADDRESS_NUMBER;
-    m_addressState.clear();
-    m_addressCountry.clear();
-    m_addressComplement.clear();
-    m_addressReference.clear();
+    m_cep.clear();
+    m_neighborhood.clear();
+    m_street.clear();
+    m_number = INVALID_ADDRESS_NUMBER;
+    m_state.clear();
+    m_complement.clear();
+    m_reference.clear();
   }
 
   Address()
@@ -47,25 +46,23 @@ struct Address
   bool operator !=(const Address& other)
   {
     return
-        m_addressCep != other.m_addressCep ||
-        m_addressNeighborhood != other.m_addressNeighborhood ||
-        m_addressStreet != other.m_addressStreet ||
-        m_addressNumber != other.m_addressNumber ||
-        m_addressState != other.m_addressState ||
-        m_addressCountry != other.m_addressCountry ||
-        m_addressComplement != other.m_addressComplement ||
-        m_addressReference != other.m_addressReference;
+        m_cep != other.m_cep ||
+        m_neighborhood != other.m_neighborhood ||
+        m_street != other.m_street ||
+        m_number != other.m_number ||
+        m_state != other.m_state ||
+        m_complement != other.m_complement ||
+        m_reference != other.m_reference;
   }
 
   static bool st_isValid(const Address& address)
   {
     return
-        m_personId != INVALID_PERSON_ID &&
-        !address.m_addressNeighborhood.isEmpty() &&
-        !address.m_addressStreet.isEmpty() &&
-        address.m_addressNumber != INVALID_ADDRESS_NUMBER &&
-        !address.m_addressState.isEmpty() &&
-        !address.m_addressCountry.isEmpty();
+        address.m_personId != INVALID_PERSON_ID &&
+        !address.m_neighborhood.isEmpty() &&
+        !address.m_street.isEmpty() &&
+        address.m_number != INVALID_ADDRESS_NUMBER &&
+        !address.m_state.isEmpty();
   }
 
   bool isValid() const { return st_isValid(*this); }
@@ -86,6 +83,84 @@ struct Address
     c.push_back(JTableColumn("_COMPLEMENT", QObject::tr("CNPJ")));
     c.push_back(JTableColumn("_REFERENCE", QObject::tr("INSC")));
     return c;
+  }
+
+  enum class EBRState
+  {
+    AC, AL, AP, AM, BA, CE, DF,
+    ES, GO, MA, MT, MS, MG, PA,
+    PB, PR, PE, PI, RJ, RN, RS,
+    RO, RR, SC, SP, SE, TO
+  };
+
+  struct BRState
+  {
+    QString m_abv;
+    QString m_name;
+    QString m_mask;
+  };
+
+  static BRState st_BRState(EBRState s)
+  {
+    switch (s)
+    {
+      case EBRState::RS:
+        return BRState{"RS", "RIO GRANDE DO SUL", "999-9999999;_"};
+      case EBRState::SC:
+        return BRState{"SC", "SANTA CATARINA", "999.999.999;_"};
+      case EBRState::PR:
+        return BRState{"PR", "PARANA", "99999999-99;_"};
+      case EBRState::SP:
+        return BRState{"SP", "SAO PAULO", "999.999.999.999;_"};
+      case EBRState::MG:
+        return BRState{"MG", "MINAS GERAIS", "999.999.999/9999;_"};
+      case EBRState::RJ:
+        return BRState{"RJ", "RIO DE JANEIRO", "99.999.99-9;_"};
+      case EBRState::ES:
+        return BRState{"ES", "ESPIRITO SANTO", "999.999.99-9;_"};
+      case EBRState::BA:
+        return BRState{"BA", "BAHIA", "999.999.99-9;_"};
+      case EBRState::SE:
+        return BRState{"SE", "SERGIPE", "999999999-9;_"};
+      case EBRState::AL:
+        return BRState{"AL", "ALAGOAS", "999999999;_"};
+      case EBRState::PE:
+        return BRState{"PE", "PERNAMBUCO", "99.9.999.9999999-9;_"};
+      case EBRState::PB:
+        return BRState{"PB", "PARAIBA", "99999999-9;_"};
+      case EBRState::RN:
+        return BRState{"RN", "RIO GRANDE DO NORTE", "99.999.999-9;_"};
+      case EBRState::PI:
+        return BRState{"PI", "PIAUI", "999999999;_"};
+      case EBRState::MA:
+        return BRState{"MA", "MARANHAO", "999999999;_"};
+      case EBRState::CE:
+        return BRState{"CE", "CEARA", "99999999-9;_"};
+      case EBRState::GO:
+        return BRState{"GO", "GOIAS", "99.999.999-9;_"};
+      case EBRState::TO:
+        return BRState{"TO", "TOCANTINS", "99999999999;_"};
+      case EBRState::MT:
+        return BRState{"MT", "MATO GROSSO", "999999999;_"};
+      case EBRState::MS:
+        return BRState{"MS", "MATO GROSSO DO SUL", "999999999;_"};
+      case EBRState::DF:
+        return BRState{"DF", "DISTRITO FEDERAL", "99999999999-99;_"};
+      case EBRState::AM:
+        return BRState{"AM", "AMZONAS", "99.999.999-9;_"};
+      case EBRState::AC:
+        return BRState{"AC", "ACRE", "99.999.999/999-99;_"};
+      case EBRState::PA:
+        return BRState{"PA", "PARA", "99-999999-9;_"};
+      case EBRState::RO:
+        return BRState{"RO", "RONDONIA", "999.99999-9;_"};
+      case EBRState::RR:
+        return BRState{"RR", "RORAIMA", "99999999-9;_"};
+      case EBRState::AP:
+        return BRState{"AP", "AMAPA", "999999999;_"};
+      default:
+        return BRState{"", "", ""};
+    }
   }
 };
 

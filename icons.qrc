@@ -96,5 +96,6 @@
         <file>res/phone.png</file>
         <file>res/address.png</file>
         <file>res/pincode.png</file>
+        <file>res/undo.png</file>
     </qresource>
 </RCC>

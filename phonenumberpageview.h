@@ -16,7 +16,7 @@ public:
   explicit PhoneNumberPageView(QWidget* parent = nullptr);
 
 private slots:
-  void setNumberMask();
+  void updateControls();
 
 private:
   JLineEdit* m_edNumber;

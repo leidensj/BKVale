@@ -2,7 +2,6 @@
 #define ADDRESS_H
 
 #include "jtablecolumn.h"
-#include "person.h"
 #include <QObject>
 #include <QString>
 
@@ -16,7 +15,6 @@
 struct Address
 {
   mutable int m_id;
-  int m_personId;
   QString m_cep;
   QString m_neighborhood;
   QString m_street;
@@ -28,7 +26,6 @@ struct Address
   void clear()
   {
     m_id = INVALID_ADDRESS_ID;
-    m_personId = INVALID_PERSON_ID;
     m_cep.clear();
     m_neighborhood.clear();
     m_street.clear();
@@ -58,7 +55,6 @@ struct Address
   static bool st_isValid(const Address& address)
   {
     return
-        address.m_personId != INVALID_PERSON_ID &&
         !address.m_neighborhood.isEmpty() &&
         !address.m_street.isEmpty() &&
         address.m_number != INVALID_ADDRESS_NUMBER &&

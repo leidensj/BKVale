@@ -92,15 +92,17 @@ PhoneNumberPageView::PhoneNumberPageView(QWidget* parent)
   QObject::connect(m_rdoMobile,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(setNumberMask()));
+                   SLOT(updateControls()));
 
   QObject::connect(m_rdoComercial,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(setNumberMask()));
+                   SLOT(updateControls()));
+  updateControls();
+  m_edNumber->setFocus();
 }
 
-void PhoneNumberPageView::setNumberMask()
+void PhoneNumberPageView::updateControls()
 {
   QString mask = m_rdoMobile->isChecked()
                  ? "99999-9999;_"

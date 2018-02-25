@@ -126,6 +126,22 @@ AddressPageView::AddressPageView(QWidget *parent)
                    SIGNAL(currentRowChanged(int)),
                    this,
                    SLOT(updateControls()));
+  QObject::connect(m_list,
+                   SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+                   this,
+                   SLOT(openSelectedAddress()));
+  QObject::connect(m_edStreet,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edNeighborhood,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_spnNumber,
+                   SIGNAL(valueChanged(int)),
+                   this,
+                   SLOT(updateControls()));
   updateControls();
 }
 
@@ -145,6 +161,7 @@ void AddressPageView::updateControls()
                      ? ":/icons/res/saveas.png"
                      : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(saveIcon));
+  m_btnSave->setEnabled(getAddress().isValid());
 }
 
 void AddressPageView::undo()
@@ -181,10 +198,10 @@ void AddressPageView::openSelectedAddress()
 
 void AddressPageView::removeSelectedAddress()
 {
-  QListWidgetItem* p = m_list->item(m_list->currentRow());
+  QListWidgetItem* p = m_list->takeItem(m_list->currentRow());
   if (p != nullptr)
   {
-    m_list->removeItemWidget(m_list->item(m_list->currentRow()));
+    delete p;
     updateControls();
   }
 }
@@ -201,6 +218,7 @@ void AddressPageView::clearInputOnly()
   m_bEditMode = false;
   m_currentAddress = Address();
   setAddress(m_currentAddress);
+  m_cbState->setCurrentIndex((int)Address::EBRState::RS);
   updateControls();
 }
 

@@ -34,7 +34,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   , m_list(nullptr)
 {
   m_edCep = new JLineEdit(JValidatorType::Numeric, false, true);
-  m_edCep->setInputMask("99999-99;_");
+  m_edCep->setInputMask("99999-999;_");
   m_btnCep = new QPushButton();
   m_btnCep->setFlat(true);
   m_btnCep->setIconSize(QSize(16, 16));

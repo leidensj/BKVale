@@ -27,6 +27,7 @@ struct Address
   QString m_neighborhood;
   QString m_street;
   int m_number;
+  QString m_city;
   EBRState m_state;
   QString m_complement;
   QString m_reference;
@@ -94,6 +95,65 @@ struct Address
     QString m_name;
     QString m_mask;
   };
+
+  static EBRState st_getEBRState(const QString& abv)
+  {
+    if (abv == "RS")
+      return EBRState::RS;
+    else if (abv == "AC")
+      return EBRState::AC;
+    else if (abv == "AL")
+      return EBRState::AL;
+    else if (abv == "AP")
+      return EBRState::AP;
+    else if (abv == "AM")
+      return EBRState::AM;
+    else if (abv == "BA")
+      return EBRState::BA;
+    else if (abv == "CE")
+      return EBRState::CE;
+    else if (abv == "DF")
+      return EBRState::DF;
+    else if (abv == "ES")
+      return EBRState::ES;
+    else if (abv == "GO")
+      return EBRState::GO;
+    else if (abv == "MA")
+      return EBRState::MA;
+    else if (abv == "MT")
+      return EBRState::MT;
+    else if (abv == "MS")
+      return EBRState::MS;
+    else if (abv == "MG")
+      return EBRState::MG;
+    else if (abv == "PA")
+      return EBRState::PA;
+    else if (abv == "PB")
+      return EBRState::PB;
+    else if (abv == "PR")
+      return EBRState::PR;
+    else if (abv == "PE")
+      return EBRState::PE;
+    else if (abv == "PI")
+      return EBRState::PI;
+    else if (abv == "RJ")
+      return EBRState::RJ;
+    else if (abv == "RN")
+      return EBRState::RN;
+    else if (abv == "RO")
+      return EBRState::RO;
+    else if (abv == "RR")
+      return EBRState::RR;
+    else if (abv == "SC")
+      return EBRState::SC;
+    else if (abv == "SP")
+      return EBRState::SP;
+    else if (abv == "SE")
+      return EBRState::SE;
+    else if (abv == "TO")
+      return EBRState::TO;
+    else return EBRState::RS;
+  }
 
   static BRState st_getBRState(EBRState s)
   {

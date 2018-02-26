@@ -9,12 +9,61 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 #include <QByteArray>
+#include <QDomDocument>
 
 // Serviço de busca de cep em:
 // http://postmon.com.br/
-
+// Exemplo
+/*
+ * <result>
+ *    <complemento>até 1020/1021</complemento>
+ *    <bairro>Nossa Senhora de Lourdes</bairro>
+ *    <cidade>Caxias do Sul</cidade>
+ *    <logradouro>Rua Sinimbu</logradouro>
+ *    <estado_info>
+ *         <area_km2>281.737,947</area_km2>
+ *         <codigo_ibge>43</codigo_ibge>
+ *         <nome>Rio Grande do Sul</nome>
+ *    </estado_info>
+ *    <cep>95020000</cep>
+ *    <cidade_info>
+ *       <area_km2>1652,308</area_km2>
+ *       <codigo_ibge>4305108</codigo_ibge>
+ *    </cidade_info>
+ *    <estado>RS</estado>
+ * </result>
+*/
 namespace
 {
+  Address parseCepResult(const QString& xml)
+  {
+    Address address;
+    QDomDocument doc;
+    QString error;
+    int row = 0, column = 0;
+    if (doc.setContent(xml, &error, &row, &column))
+    {
+      QDomElement root = doc.documentElement();
+      if (root.tagName() == "result")
+      {
+        QDomNodeList nodes = root.childNodes();
+        for (int i = 0; i != nodes.size(); ++i)
+        {
+          QString strNode = nodes.at(i).toElement().tagName();
+          if (strNode == "bairro")
+            address.m_neighborhood = nodes.at(i).toElement().text();
+          else if (strNode == "cidade")
+            address.m_city = nodes.at(i).toElement().text();
+          else if (strNode == "logradouro")
+            address.m_street = nodes.at(i).toElement().text();
+          else if (strNode == "estado")
+            address.m_state = Address::st_getEBRState(nodes.at(i).toElement().text());
+        }
+      }
+    }
+    return address;
+  }
+
   QString buildAbv(const Address& address)
   {
     return address.m_street + ", " +
@@ -24,7 +73,7 @@ namespace
 
   QString findCep(const QString& cep)
   {
-    QString url("http://api.postmon.com.br/v1/cep/" + cep);
+    QString url("http://api.postmon.com.br/v1/cep/" + cep + "?format=xml");
     QNetworkAccessManager manager;
     QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
 
@@ -292,5 +341,6 @@ Address AddressPageView::getAddress()
 void AddressPageView::searchCep()
 {
   m_edStreet->clear();
-  m_edStreet->setText(findCep(m_edCep->text()));
+  Address address = parseCepResult(findCep(m_edCep->text()));
+  setAddress(address);
 }

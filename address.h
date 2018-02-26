@@ -14,12 +14,20 @@
 
 struct Address
 {
+  enum class EBRState : int
+  {
+    AC, AL, AP, AM, BA, CE, DF,
+    ES, GO, MA, MT, MS, MG, PA,
+    PB, PR, PE, PI, RJ, RN, RS,
+    RO, RR, SC, SP, SE, TO
+  };
+
   mutable int m_id;
   QString m_cep;
   QString m_neighborhood;
   QString m_street;
   int m_number;
-  QString m_state;
+  EBRState m_state;
   QString m_complement;
   QString m_reference;
 
@@ -30,7 +38,7 @@ struct Address
     m_neighborhood.clear();
     m_street.clear();
     m_number = INVALID_ADDRESS_NUMBER;
-    m_state.clear();
+    m_state = EBRState::RS;
     m_complement.clear();
     m_reference.clear();
   }
@@ -57,8 +65,7 @@ struct Address
     return
         !address.m_neighborhood.isEmpty() &&
         !address.m_street.isEmpty() &&
-        address.m_number != INVALID_ADDRESS_NUMBER &&
-        !address.m_state.isEmpty();
+        address.m_number != INVALID_ADDRESS_NUMBER;
   }
 
   bool isValid() const { return st_isValid(*this); }
@@ -81,14 +88,6 @@ struct Address
     return c;
   }
 
-  enum class EBRState
-  {
-    AC, AL, AP, AM, BA, CE, DF,
-    ES, GO, MA, MT, MS, MG, PA,
-    PB, PR, PE, PI, RJ, RN, RS,
-    RO, RR, SC, SP, SE, TO
-  };
-
   struct BRState
   {
     QString m_abv;
@@ -96,7 +95,7 @@ struct Address
     QString m_mask;
   };
 
-  static BRState st_BRState(EBRState s)
+  static BRState st_getBRState(EBRState s)
   {
     switch (s)
     {
@@ -157,6 +156,11 @@ struct Address
       default:
         return BRState{"", "", ""};
     }
+  }
+
+  BRState getBRState() const
+  {
+    return st_getBRState(m_state);
   }
 };
 

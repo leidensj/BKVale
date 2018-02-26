@@ -5,6 +5,13 @@
 #include <QFormLayout>
 #include <QComboBox>
 #include <QListWidget>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QEventLoop>
+#include <QByteArray>
+
+// Serviço de busca de cep em:
+// http://postmon.com.br/
 
 namespace
 {
@@ -12,13 +19,31 @@ namespace
   {
     return address.m_street + ", " +
         QString::number(address.m_number) + ". " +
-        address.m_state + ".";
+        address.getBRState().m_abv + ".";
+  }
+
+  QString findCep(const QString& cep)
+  {
+    QString url("http://api.postmon.com.br/v1/cep/" + cep);
+    QNetworkAccessManager manager;
+    QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
+
+    QEventLoop loop;
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
+    loop.exec();
+
+    QByteArray bts = reply->readAll();
+    QString str(bts);
+
+    delete reply;
+    return str;
   }
 }
 
 AddressPageView::AddressPageView(QWidget *parent)
   : QFrame(parent)
-  , m_bEditMode(false)
+  , m_currentItem(nullptr)
   , m_edCep(nullptr)
   , m_btnCep(nullptr)
   , m_edNeighborhood(nullptr)
@@ -47,7 +72,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   m_spnNumber->setMaximum(999999);
   m_cbState = new QComboBox();
   for (int i = 0; i != NUMBER_OF_BRAZILIAN_STATES; ++i)
-    m_cbState->addItem(Address::st_BRState((Address::EBRState)i).m_name);
+    m_cbState->addItem(Address::st_getBRState((Address::EBRState)i).m_name);
   m_cbState->setCurrentIndex((int)Address::EBRState::RS);
   m_edComplement = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
   m_edReference = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
@@ -142,6 +167,14 @@ AddressPageView::AddressPageView(QWidget *parent)
                    SIGNAL(valueChanged(int)),
                    this,
                    SLOT(updateControls()));
+  QObject::connect(m_cbState,
+                   SIGNAL(currentIndexChanged(int)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_btnCep,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(searchCep()));
   updateControls();
 }
 
@@ -153,21 +186,27 @@ void AddressPageView::save()
 
 void AddressPageView::updateControls()
 {
-  m_list->setEnabled(!m_bEditMode);
-  m_btnCreate->setEnabled(!m_bEditMode);
-  m_btnUndo->setEnabled(m_bEditMode);
-  m_btnRemove->setEnabled(!m_bEditMode && m_list->currentRow() != -1);
-  QString saveIcon = m_bEditMode
+  bool bEditMode = m_currentItem != nullptr;
+  m_list->setEnabled(!bEditMode);
+  m_btnCreate->setEnabled(!bEditMode);
+  m_btnUndo->setEnabled(bEditMode);
+  m_btnRemove->setEnabled(!bEditMode && m_list->currentRow() != -1);
+  QString saveIcon = bEditMode
                      ? ":/icons/res/saveas.png"
                      : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(saveIcon));
-  m_btnSave->setEnabled(getAddress().isValid());
+  Address address = getAddress();
+  bool bEnableSave = address.isValid();
+  if (bEditMode)
+    bEnableSave = bEnableSave &&
+                  m_currentItem->data(Qt::UserRole).value<Address>() != address;
+  m_btnSave->setEnabled(bEnableSave);
 }
 
 void AddressPageView::undo()
 {
-  if (m_bEditMode)
-    saveAddress(m_currentAddress);
+  if (m_currentItem != nullptr)
+    clearInputOnly();
   updateControls();
 }
 
@@ -175,10 +214,14 @@ void AddressPageView::saveAddress(const Address& address)
 {
   QVariant var;
   var.setValue(address);
-  QListWidgetItem* p = new QListWidgetItem;
+  QListWidgetItem* p = m_currentItem != nullptr
+                       ? m_currentItem
+                       : new QListWidgetItem;
   p->setText(buildAbv(address));
   p->setData(Qt::UserRole, var);
-  m_list->addItem(p);
+  if (m_currentItem == nullptr)
+    m_list->addItem(p);
+  m_currentItem = nullptr;
   clearInputOnly();
   updateControls();
 }
@@ -188,10 +231,8 @@ void AddressPageView::openSelectedAddress()
   QListWidgetItem* p = m_list->item(m_list->currentRow());
   if (p != nullptr)
   {
-    m_bEditMode = true;
-    m_currentAddress = p->data(Qt::UserRole).value<Address>();
-    setAddress(m_currentAddress);
-    m_list->removeItemWidget(p);
+    m_currentItem = p;
+    setAddress(p->data(Qt::UserRole).value<Address>());
     updateControls();
   }
 }
@@ -215,21 +256,19 @@ void AddressPageView::clear()
 
 void AddressPageView::clearInputOnly()
 {
-  m_bEditMode = false;
-  m_currentAddress = Address();
-  setAddress(m_currentAddress);
+  m_currentItem = nullptr;
+  setAddress(Address());
   m_cbState->setCurrentIndex((int)Address::EBRState::RS);
   updateControls();
 }
 
 void AddressPageView::setAddress(const Address& address)
 {
-  m_currentAddress = address;
   m_edCep->setText(address.m_cep);
   m_edNeighborhood->setText(address.m_neighborhood);
   m_edStreet->setText(address.m_street);
   m_spnNumber->setValue(address.m_number);
-  m_cbState->setCurrentIndex(m_cbState->findText(address.m_state));
+  m_cbState->setCurrentIndex((int)address.m_state);
   m_edComplement->setText(address.m_complement);
   m_edReference->setText(address.m_reference);
   updateControls();
@@ -238,13 +277,20 @@ void AddressPageView::setAddress(const Address& address)
 Address AddressPageView::getAddress()
 {
   Address address;
-  address.m_id = m_currentAddress.m_id;
+  if (m_currentItem != nullptr)
+    address.m_id = m_currentItem->data(Qt::UserRole).value<Address>().m_id;
   address.m_cep = m_edCep->text();
   address.m_neighborhood = m_edNeighborhood->text();
   address.m_street = m_edStreet->text();
   address.m_number = m_spnNumber->value();
-  address.m_state = Address::st_BRState((Address::EBRState)m_cbState->currentIndex()).m_abv;
+  address.m_state = (Address::EBRState)m_cbState->currentIndex();
   address.m_complement = m_edComplement->text();
   address.m_reference = m_edReference->text();
   return address;
+}
+
+void AddressPageView::searchCep()
+{
+  m_edStreet->clear();
+  m_edStreet->setText(findCep(m_edCep->text()));
 }

@@ -74,7 +74,7 @@ PersonPageView::PersonPageView(QWidget* parent)
   }
   m_cbState = new QComboBox();
   for (int i = 0; i != NUMBER_OF_BRAZILIAN_STATES; ++i)
-    m_cbState->addItem(Address::st_BRState((Address::EBRState)i).m_abv);
+    m_cbState->addItem(Address::st_getBRState((Address::EBRState)i).m_abv);
   m_cbState->setCurrentIndex((int)Address::EBRState::RS);
 
   QGroupBox* personGroupBox = new QGroupBox();
@@ -158,7 +158,7 @@ void PersonPageView::updateControls()
   {
     m_edCpfCnpj->setInputMask("99.999.999/9999-99;_");
     m_cbState->show();
-    m_edRgIE->setInputMask(Address::st_BRState((Address::EBRState)m_cbState->currentIndex()).m_mask);
+    m_edRgIE->setInputMask(Address::st_getBRState((Address::EBRState)m_cbState->currentIndex()).m_mask);
     m_cbEmployee->setChecked(false);
     m_cbEmployee->setEnabled(false);
     m_frPinCode->hide();

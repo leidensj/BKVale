@@ -11,6 +11,7 @@ class QSpinBox;
 class QPushButton;
 class QComboBox;
 class QListWidget;
+class QListWidgetItem;
 
 Q_DECLARE_METATYPE(Address)
 
@@ -35,10 +36,10 @@ private slots:
   void clearInputOnly();
   void updateControls();
   void undo();
+  void searchCep();
 
 private:
-  bool m_bEditMode;
-  Address m_currentAddress;
+  QListWidgetItem* m_currentItem;
   Address getAddress();
   JLineEdit* m_edCep;
   QPushButton* m_btnCep;

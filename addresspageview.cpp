@@ -10,6 +10,7 @@
 #include <QEventLoop>
 #include <QByteArray>
 #include <QDomDocument>
+#include <QMessageBox>
 
 // Serviço de busca de cep em:
 // http://postmon.com.br/
@@ -33,45 +34,18 @@
  *    <estado>RS</estado>
  * </result>
 */
+
 namespace
 {
-  Address parseCepResult(const QString& xml)
-  {
-    Address address;
-    QDomDocument doc;
-    QString error;
-    int row = 0, column = 0;
-    if (doc.setContent(xml, &error, &row, &column))
-    {
-      QDomElement root = doc.documentElement();
-      if (root.tagName() == "result")
-      {
-        QDomNodeList nodes = root.childNodes();
-        for (int i = 0; i != nodes.size(); ++i)
-        {
-          QString strNode = nodes.at(i).toElement().tagName();
-          if (strNode == "bairro")
-            address.m_neighborhood = nodes.at(i).toElement().text();
-          else if (strNode == "cidade")
-            address.m_city = nodes.at(i).toElement().text();
-          else if (strNode == "logradouro")
-            address.m_street = nodes.at(i).toElement().text();
-          else if (strNode == "estado")
-            address.m_state = Address::st_getEBRState(nodes.at(i).toElement().text());
-        }
-      }
-    }
-    return address;
-  }
-
   QString buildAbv(const Address& address)
   {
-    return address.m_street + ", " +
+    return address.m_street + ", Nro " +
         QString::number(address.m_number) + ". " +
+        address.m_city + " - " +
         address.getBRState().m_abv + ".";
   }
 
-  QString findCep(const QString& cep)
+  QString searchCep(const QString& cep)
   {
     QString url("http://api.postmon.com.br/v1/cep/" + cep + "?format=xml");
     QNetworkAccessManager manager;
@@ -98,6 +72,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   , m_edNeighborhood(nullptr)
   , m_edStreet(nullptr)
   , m_spnNumber(nullptr)
+  , m_edCity(nullptr)
   , m_cbState(nullptr)
   , m_edComplement(nullptr)
   , m_edReference(nullptr)
@@ -108,17 +83,21 @@ AddressPageView::AddressPageView(QWidget *parent)
   , m_list(nullptr)
 {
   m_edCep = new JLineEdit(JValidatorType::Numeric, false, true);
-  m_edCep->setInputMask("99999-999;_");
+  m_edCep->setInputMask(CEP_MASK);
   m_btnCep = new QPushButton();
   m_btnCep->setFlat(true);
   m_btnCep->setIconSize(QSize(16, 16));
   m_btnCep->setIcon(QIcon(":/icons/res/process.png"));
   m_btnCep->setToolTip(tr("Buscar CEP"));
   m_edNeighborhood = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
+  m_edNeighborhood->setPlaceholderText(tr("*"));
   m_edStreet = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
+  m_edStreet->setPlaceholderText(tr("*"));
   m_spnNumber = new QSpinBox();
   m_spnNumber->setMinimum(0);
   m_spnNumber->setMaximum(999999);
+  m_edCity = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
+  m_edCity->setPlaceholderText(tr("*"));
   m_cbState = new QComboBox();
   for (int i = 0; i != NUMBER_OF_BRAZILIAN_STATES; ++i)
     m_cbState->addItem(Address::st_getBRState((Address::EBRState)i).m_name);
@@ -170,6 +149,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   flayout0->addRow(tr("CEP:"), ceplayout);
   flayout0->addRow(tr("Rua:"), streetlayout);
   flayout0->addRow(tr("Bairro:"), m_edNeighborhood);
+  flayout0->addRow(tr("Cidade:"), m_edCity);
   flayout0->addRow(tr("Estado:"), m_cbState);
   flayout0->addRow(tr("Complemento:"), m_edComplement);
   flayout0->addRow(tr("Referência:"), m_edReference);
@@ -208,6 +188,14 @@ AddressPageView::AddressPageView(QWidget *parent)
                    SIGNAL(textChanged(const QString&)),
                    this,
                    SLOT(updateControls()));
+  QObject::connect(m_edCity,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edCep,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
   QObject::connect(m_edNeighborhood,
                    SIGNAL(textChanged(const QString&)),
                    this,
@@ -223,7 +211,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   QObject::connect(m_btnCep,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(searchCep()));
+                   SLOT(processCep()));
   updateControls();
 }
 
@@ -240,6 +228,7 @@ void AddressPageView::updateControls()
   m_btnCreate->setEnabled(!bEditMode);
   m_btnUndo->setEnabled(bEditMode);
   m_btnRemove->setEnabled(!bEditMode && m_list->currentRow() != -1);
+  m_btnCep->setEnabled(m_edCep->text().length() >= CEP_LENGTH_WITH_MASK);
   QString saveIcon = bEditMode
                      ? ":/icons/res/saveas.png"
                      : ":/icons/res/save.png";
@@ -317,6 +306,7 @@ void AddressPageView::setAddress(const Address& address)
   m_edNeighborhood->setText(address.m_neighborhood);
   m_edStreet->setText(address.m_street);
   m_spnNumber->setValue(address.m_number);
+  m_edCity->setText(address.m_city);
   m_cbState->setCurrentIndex((int)address.m_state);
   m_edComplement->setText(address.m_complement);
   m_edReference->setText(address.m_reference);
@@ -332,15 +322,47 @@ Address AddressPageView::getAddress()
   address.m_neighborhood = m_edNeighborhood->text();
   address.m_street = m_edStreet->text();
   address.m_number = m_spnNumber->value();
+  address.m_city = m_edCity->text();
   address.m_state = (Address::EBRState)m_cbState->currentIndex();
   address.m_complement = m_edComplement->text();
   address.m_reference = m_edReference->text();
   return address;
 }
 
-void AddressPageView::searchCep()
+void AddressPageView::processCep()
 {
-  m_edStreet->clear();
-  Address address = parseCepResult(findCep(m_edCep->text()));
-  setAddress(address);
+  QDomDocument doc;
+  bool bSuccess = doc.setContent(searchCep(m_edCep->text()));
+  if (bSuccess)
+  {
+    QDomElement root = doc.documentElement();
+    bSuccess = root.tagName() == "result";
+    if (bSuccess)
+    {
+      QDomNodeList nodes = root.childNodes();
+      for (int i = 0; i != nodes.size(); ++i)
+      {
+        QString strNode = nodes.at(i).toElement().tagName();
+        QString text = nodes.at(i).toElement().text().toUpper();
+        if (strNode == "bairro")
+          m_edNeighborhood->setText(text);
+        else if (strNode == "cidade")
+          m_edCity->setText(text);
+        else if (strNode == "logradouro")
+          m_edStreet->setText(text);
+        else if (strNode == "estado")
+          m_cbState->setCurrentIndex((int)Address::st_getEBRState(text));
+      }
+    }
+  }
+
+  if (!bSuccess)
+  {
+    QMessageBox::information(this,
+                             tr("CEP não encontrado"),
+                             tr("Verifique se o CEP '%1' informado "
+                                "está correto e se há conexão com a "
+                                "Internet.").arg(m_edCep->text()),
+                             QMessageBox::Ok);
+  }
 }

@@ -11,6 +11,9 @@
 #define MAX_ADDRESS_STREET_LENGTH         35
 #define MAX_ADDRESS_NUMBER                35
 #define NUMBER_OF_BRAZILIAN_STATES        27
+#define CEP_LENGTH                         8
+#define CEP_MASK               "99999-999;_"
+#define CEP_LENGTH_WITH_MASK  CEP_LENGTH + 1
 
 struct Address
 {

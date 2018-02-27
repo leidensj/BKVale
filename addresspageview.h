@@ -26,7 +26,6 @@ public:
 public slots:
   void clear();
 
-
 private slots:
   void save();
   void openSelectedAddress();
@@ -36,7 +35,7 @@ private slots:
   void clearInputOnly();
   void updateControls();
   void undo();
-  void searchCep();
+  void processCep();
 
 private:
   QListWidgetItem* m_currentItem;
@@ -46,6 +45,7 @@ private:
   JLineEdit* m_edNeighborhood;
   JLineEdit* m_edStreet;
   QSpinBox* m_spnNumber;
+  JLineEdit* m_edCity;
   QComboBox* m_cbState;
   JLineEdit* m_edComplement;
   JLineEdit* m_edReference;

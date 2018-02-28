@@ -7,6 +7,7 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QFormLayout>
+#include <QTabWidget>
 
 ProductView::ProductView(QWidget* parent)
   : QFrame(parent)
@@ -15,7 +16,7 @@ ProductView::ProductView(QWidget* parent)
   , m_edName(nullptr)
   , m_edUnity(nullptr)
   , m_edPackageUnity(nullptr)
-  , m_sbPackageAmmount(nullptr)
+  , m_spnPackageAmmount(nullptr)
   , m_edDetails(nullptr)
   , m_edCode(nullptr)
   , m_cbAvailableAtNotes(nullptr)
@@ -24,14 +25,14 @@ ProductView::ProductView(QWidget* parent)
   , m_cbAvailableToBuy(nullptr)
   , m_cbAvailableToSell(nullptr)
 {
-  m_btnCreate = new QPushButton();
+  m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
   m_btnCreate->setText("");
   m_btnCreate->setIconSize(QSize(24, 24));
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 
-  m_btnSave = new QPushButton();
+  m_btnSave = new QPushButton;
   m_btnSave->setFlat(true);
   m_btnSave->setText("");
   m_btnSave->setIconSize(QSize(24, 24));
@@ -49,10 +50,10 @@ ProductView::ProductView(QWidget* parent)
   m_edPackageUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
   m_edPackageUnity->setMaxLength(MAX_PRODUCT_PACKAGE_UNITY_LENGTH);
 
-  m_sbPackageAmmount = new QDoubleSpinBox();
-  m_sbPackageAmmount->setMaximum(MAX_PRODUCT_PACKAGE_AMMOUNT_LENGTH);
-  m_sbPackageAmmount->setMinimum(0.0);
-  m_sbPackageAmmount->setSingleStep(0.1);
+  m_spnPackageAmmount = new QDoubleSpinBox();
+  m_spnPackageAmmount->setMaximum(MAX_PRODUCT_PACKAGE_AMMOUNT_LENGTH);
+  m_spnPackageAmmount->setMinimum(0.0);
+  m_spnPackageAmmount->setSingleStep(0.1);
 
   m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edDetails->setMaxLength(MAX_PRODUCT_DETAILS_LENGTH);
@@ -60,86 +61,133 @@ ProductView::ProductView(QWidget* parent)
   m_edCode = new JLineEdit(JValidatorType::Numeric, true, true);
   m_edCode->setMaxLength(MAX_PRODUCT_MIDASCODE_LENGTH);
 
-  m_cbAvailableAtNotes = new QCheckBox();
+  m_cbAvailableAtNotes = new QCheckBox;
   m_cbAvailableAtNotes->setText(tr("Vales"));
   m_cbAvailableAtNotes->setIcon(QIcon(":/icons/res/note.png"));
 
-  m_cbAvailableAtShop = new QCheckBox();
+  m_cbAvailableAtShop = new QCheckBox;
   m_cbAvailableAtShop->setText(tr("Compras"));
   m_cbAvailableAtShop->setIcon(QIcon(":/icons/res/shop.png"));
 
-  m_cbAvailableAtConsumption = new QCheckBox();
+  m_cbAvailableAtConsumption = new QCheckBox;
   m_cbAvailableAtConsumption->setText(tr("Consumo"));
   m_cbAvailableAtConsumption->setIcon(QIcon(":/icons/res/stock.png"));
 
-  m_cbAvailableToBuy = new QCheckBox();
+  m_cbAvailableToBuy = new QCheckBox;
   m_cbAvailableToBuy->setText(tr("Compra"));
   m_cbAvailableToBuy->setIcon(QIcon(":/icons/res/buy.png"));
 
-  m_cbAvailableToSell = new QCheckBox();
+  m_cbAvailableToSell = new QCheckBox;
   m_cbAvailableToSell->setText(tr("Venda"));
   m_cbAvailableToSell->setIcon(QIcon(":/icons/res/sell.png"));
 
   m_categoryPicker = new JPicker(INVALID_CATEGORY_ID, tr("Categoria"), false);
 
-  QHBoxLayout* hlayout0 = new QHBoxLayout();
-  hlayout0->setContentsMargins(0, 0, 0, 0);
-  hlayout0->setAlignment(Qt::AlignLeft);
-  hlayout0->addWidget(m_btnCreate);
-  hlayout0->addWidget(m_btnSave);
+  QHBoxLayout* buttonlayout = new QHBoxLayout;
+  buttonlayout->setContentsMargins(0, 0, 0, 0);
+  buttonlayout->setAlignment(Qt::AlignLeft);
+  buttonlayout->addWidget(m_btnCreate);
+  buttonlayout->addWidget(m_btnSave);
 
-  QVBoxLayout* vlayout0 = new QVBoxLayout();
-  vlayout0->addWidget(m_cbAvailableAtNotes);
-  vlayout0->addWidget(m_cbAvailableAtShop);
-  vlayout0->addWidget(m_cbAvailableAtConsumption);
-  vlayout0->addWidget(m_cbAvailableToBuy);
-  vlayout0->addWidget(m_cbAvailableToSell);
+  QVBoxLayout* grplayout = new QVBoxLayout;
+  grplayout->addWidget(m_cbAvailableAtNotes);
+  grplayout->addWidget(m_cbAvailableAtShop);
+  grplayout->addWidget(m_cbAvailableAtConsumption);
+  grplayout->addWidget(m_cbAvailableToBuy);
+  grplayout->addWidget(m_cbAvailableToSell);
 
-  QGroupBox* grpAccess = new QGroupBox();
+  QGroupBox* grpAccess = new QGroupBox;
   grpAccess->setTitle(tr("Disponível em/para:"));
-  grpAccess->setLayout(vlayout0);
+  grpAccess->setLayout(grplayout);
 
-  QFormLayout* flayout0 = new QFormLayout();
-  flayout0->setContentsMargins(0, 0, 0, 0);
-  flayout0->addRow(tr("Nome:"), m_edName);
-  flayout0->addRow(tr("Unidade:"), m_edUnity);
-  flayout0->addRow(tr("Unidade embalagem:"), m_edPackageUnity);
-  flayout0->addRow(tr("Quantidade embalagem:"), m_sbPackageAmmount);
-  flayout0->addRow(tr("Detalhes:"), m_edDetails);
-  flayout0->addRow(tr("Código:"), m_edCode);
+  QFormLayout* formlayout = new QFormLayout;
+  formlayout->setContentsMargins(0, 0, 0, 0);
+  formlayout->addRow(tr("Nome:"), m_edName);
+  formlayout->addRow(tr("Unidade:"), m_edUnity);
+  formlayout->addRow(tr("Unidade embalagem:"), m_edPackageUnity);
+  formlayout->addRow(tr("Quantidade embalagem:"), m_spnPackageAmmount);
+  formlayout->addRow(tr("Detalhes:"), m_edDetails);
+  formlayout->addRow(tr("Código:"), m_edCode);
 
-  QVBoxLayout* vlayout1 = new QVBoxLayout();
-  vlayout1->setContentsMargins(0, 0, 0, 0);
-  vlayout1->setAlignment(Qt::AlignTop);
-  vlayout1->addLayout(hlayout0);
-  vlayout1->addLayout(flayout0);
-  vlayout1->addWidget(m_categoryPicker);
-  vlayout1->addWidget(grpAccess);
+  QVBoxLayout* tablayout = new QVBoxLayout;
+  tablayout->setAlignment(Qt::AlignTop);
+  tablayout->addLayout(formlayout);
+  tablayout->addWidget(m_categoryPicker);
+  tablayout->addWidget(grpAccess);
 
-  setLayout(vlayout1);
+  QFrame* tabframe = new QFrame;
+  tabframe->setLayout(tablayout);
+
+  QTabWidget* tabWidget = new QTabWidget;
+  tabWidget->addTab(tabframe,
+                    QIcon(":/icons/res/item.png"),
+                    tr("Produto"));
+
+  QVBoxLayout* mainlayout = new QVBoxLayout;
+  mainlayout->setContentsMargins(0, 0, 0, 0);
+  mainlayout->setAlignment(Qt::AlignTop);
+  mainlayout->addLayout(buttonlayout);
+  mainlayout->addWidget(tabWidget);
+  setLayout(mainlayout);
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
-
   QObject::connect(m_btnSave,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSaveSignal()));
-
   QObject::connect(m_categoryPicker,
                    SIGNAL(searchSignal()),
                    this,
                    SLOT(emitSearchCategorySignal()));
-
   QObject::connect(m_edName,
                    SIGNAL(textChanged(const QString&)),
                    this,
                    SLOT(updateControls()));
-
   QObject::connect(m_edUnity,
                    SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edPackageUnity,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_spnPackageAmmount,
+                   SIGNAL(valueChanged(double)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edDetails,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edCode,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbAvailableAtNotes,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbAvailableAtShop,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbAvailableAtConsumption,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbAvailableToBuy,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbAvailableToSell,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_categoryPicker,
+                   SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
 
@@ -158,7 +206,7 @@ Product ProductView::getProduct() const
   product.m_name = m_edName->text();
   product.m_unity = m_edUnity->text();
   product.m_packageUnity = m_edPackageUnity->text();
-  product.m_packageAmmount = m_sbPackageAmmount->value();
+  product.m_packageAmmount = m_spnPackageAmmount->value();
   product.m_details = m_edDetails->text();
   product.m_code = m_edCode->text();
   product.m_bAvailableAtNotes = m_cbAvailableAtNotes->isChecked();
@@ -184,7 +232,7 @@ void ProductView::setProduct(const Product &product,
   m_edName->setText(product.m_name);
   m_edUnity->setText(product.m_unity);
   m_edPackageUnity->setText(product.m_packageUnity);
-  m_sbPackageAmmount->setValue(product.m_packageAmmount);
+  m_spnPackageAmmount->setValue(product.m_packageAmmount);
   m_edDetails->setText(product.m_details);
   m_edCode->setText(product.m_code);
   m_cbAvailableAtNotes->setChecked(product.m_bAvailableAtNotes);

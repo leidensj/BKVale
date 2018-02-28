@@ -63,13 +63,13 @@ private slots:
   void filterSearchEnter();
   void containsPressed();
   void enableControls();
-  void emitEnterKeyPressedSignal();
+  void enterKeyPressed();
   void emitItemRemoveSignal();
+  void focusFilterSearch();
 
 signals:
   void itemSelectedSignal(int id);
   void itemRemoveSignal(int id);
-  void enterKeyPressedSignal(int id);
 };
 
 class JDatabaseSelector : public QDialog

@@ -3,23 +3,24 @@
 #include "jpicker.h"
 #include <QPushButton>
 #include <QLayout>
+#include <QFormLayout>
+#include <QTabWidget>
 
 CategoryView::CategoryView(QWidget* parent)
   : QFrame(parent)
-  , m_currentId(INVALID_CATEGORY_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edName(nullptr)
   , m_imagePicker(nullptr)
 {
-  m_btnCreate = new QPushButton();
+  m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
   m_btnCreate->setText("");
   m_btnCreate->setIconSize(QSize(24, 24));
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 
-  m_btnSave = new QPushButton();
+  m_btnSave = new QPushButton;
   m_btnSave->setFlat(true);
   m_btnSave->setText("");
   m_btnSave->setIconSize(QSize(24, 24));
@@ -27,23 +28,40 @@ CategoryView::CategoryView(QWidget* parent)
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
   m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edName->setPlaceholderText(tr("Nome"));
+  m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(MAX_CATEGORY_NAME_LENGTH);
 
   m_imagePicker = new JPicker(INVALID_IMAGE_ID, tr("Imagem"), true);
 
-  QHBoxLayout* hlayout0 = new QHBoxLayout();
-  hlayout0->setContentsMargins(0, 0, 0, 0);
-  hlayout0->addWidget(m_btnCreate);
-  hlayout0->addWidget(m_btnSave);
-  hlayout0->setAlignment(Qt::AlignLeft);
+  QHBoxLayout* buttonlayout = new QHBoxLayout;
+  buttonlayout->setContentsMargins(0, 0, 0, 0);
+  buttonlayout->addWidget(m_btnCreate);
+  buttonlayout->addWidget(m_btnSave);
+  buttonlayout->setAlignment(Qt::AlignLeft);
 
-  QVBoxLayout* vlayout0 = new QVBoxLayout();
-  vlayout0->setContentsMargins(0, 0, 0, 0);
-  vlayout0->setAlignment(Qt::AlignTop);
-  vlayout0->addLayout(hlayout0);
-  vlayout0->addWidget(m_edName);
-  vlayout0->addWidget(m_imagePicker);
+  QFormLayout* namelayout = new QFormLayout;
+  namelayout->setContentsMargins(0, 0, 0, 0);
+  namelayout->addRow(tr("Nome:"), m_edName);
+
+  QVBoxLayout* tablayout = new QVBoxLayout;
+  tablayout->setAlignment(Qt::AlignTop);
+  tablayout->addLayout(namelayout);
+  tablayout->addWidget(m_imagePicker);
+
+  QFrame* tabframe = new QFrame;
+  tabframe->setLayout(tablayout);
+
+  QTabWidget* tabWidget = new QTabWidget;
+  tabWidget->addTab(tabframe,
+                    QIcon(":/icons/res/category.png"),
+                    tr("Categoria"));
+
+  QVBoxLayout* mainlayout = new QVBoxLayout;
+  mainlayout->setContentsMargins(0, 0, 0, 0);
+  mainlayout->setAlignment(Qt::AlignTop);
+  mainlayout->addLayout(buttonlayout);
+  mainlayout->addWidget(tabWidget);
+  setLayout(mainlayout);
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
@@ -65,7 +83,11 @@ CategoryView::CategoryView(QWidget* parent)
                    this,
                    SLOT(emitSearchImageSignal()));
 
-  setLayout(vlayout0);
+  QObject::connect(m_imagePicker,
+                   SIGNAL(searchSignal()),
+                   this,
+                   SLOT(updateControls()));
+
   updateControls();
 }
 
@@ -78,7 +100,7 @@ void CategoryView::setImage(int id, const QString& name, const QByteArray& ar)
 
 void CategoryView::create()
 {
-  m_currentId = INVALID_CATEGORY_ID;
+  m_currentCategory = Category();
   m_edName->clear();
   m_imagePicker->clear();
   updateControls();
@@ -88,7 +110,7 @@ void CategoryView::create()
 Category CategoryView::getCategory() const
 {
   Category category;
-  category.m_id = m_currentId;
+  category.m_id = m_currentCategory.m_id;
   category.m_imageId = m_imagePicker->getId();
   category.m_name = m_edName->text();
   return category;
@@ -98,7 +120,7 @@ void CategoryView::setCategory(const Category &category,
                                const QString& imageName,
                                const QByteArray& arImage)
 {
-  m_currentId = category.m_id;
+  m_currentCategory = category;
   m_edName->setText(category.m_name);
   setImage(category.m_imageId, imageName, arImage);
   updateControls();
@@ -116,10 +138,14 @@ void CategoryView::emitSearchImageSignal()
 
 void CategoryView::updateControls()
 {
-  bool bEnable = !m_edName->text().isEmpty();
+  Category category = getCategory();
+  bool bEnable = category.isValid();
+  QString saveIcon(":/icons/res/save.png");
+  if (m_currentCategory.isValidId())
+  {
+    saveIcon = ":/icons/res/saveas.png";
+    bEnable = bEnable && m_currentCategory != category;
+  }
   m_btnSave->setEnabled(bEnable);
-  QString saveIcon = Category::st_isValidId(m_currentId)
-                     ? ":/icons/res/saveas.png"
-                     : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(saveIcon));
 }

@@ -7,10 +7,11 @@
 #include <QVector>
 
 #define INVALID_PERSON_ID                 -1
+#define INVALID_PERSON_DATE               -1
 
 #define MAX_PERSON_NAME_LENGTH            35
 #define MAX_PERSON_DETAILS_LENGTH         35
-#define EMPLOYEE_PINCODE_LENGTH           4
+#define EMPLOYEE_PINCODE_LENGTH            4
 
 struct Person
 {
@@ -19,14 +20,13 @@ struct Person
   QString m_name;
   QString m_alias;
   QString m_email;
-  QString m_cpf;
-  QString m_rg;
-  QString m_cnpj;
-  QString m_insc;
+  QString m_CPF_CNPJ;
+  QString m_RG_IE;
   QString m_details;
   qint64 m_birthDate;
+  qint64 m_creationDate;
   bool m_bCompany;
-  bool m_bClient;
+  bool m_bCustomer;
   bool m_bSupplier;
   bool m_bEmployee;
 
@@ -37,14 +37,13 @@ struct Person
     m_name.clear();
     m_alias.clear();
     m_email.clear();
-    m_cpf.clear();
-    m_rg.clear();
-    m_cnpj.clear();
-    m_insc.clear();
+    m_CPF_CNPJ.clear();
+    m_RG_IE.clear();
     m_details.clear();
-    m_birthDate = 0;
+    m_birthDate = INVALID_PERSON_DATE;
+    m_creationDate = INVALID_PERSON_DATE;
     m_bCompany = false;
-    m_bClient = false;
+    m_bCustomer = false;
     m_bSupplier = false;
     m_bEmployee = false;
   }
@@ -60,20 +59,17 @@ struct Person
               m_name != other.m_name ||
               m_alias != other.m_alias ||
               m_email != other.m_email ||
-              m_details != other.m_details;
-    if (m_bCompany)
-    {
-      b = b ||
-          m_cnpj != other.m_cnpj ||
-          m_insc != other.m_insc;
-    }
-    else
-    {
-      b = b ||
-          m_cpf != other.m_cpf ||
-          m_rg != other.m_rg ||
-          m_birthDate != other.m_birthDate;
-    }
+              m_CPF_CNPJ != other.m_CPF_CNPJ ||
+              m_RG_IE != other.m_RG_IE ||
+              m_details != other.m_details ||
+              m_bCompany != other.m_bCompany ||
+              m_bCustomer != other.m_bCustomer ||
+              m_bSupplier != other.m_bSupplier ||
+              m_bEmployee != other.m_bEmployee;
+
+    if (!m_bCompany)
+      b = b || m_birthDate != other.m_birthDate;
+
     return b;
   }
 
@@ -101,7 +97,7 @@ struct Person
     c.push_back(JTableColumn("_DETAILS", QObject::tr("Detalhes")));
     c.push_back(JTableColumn("_BIRTHDATE", QObject::tr("Data Nascimento")));
     c.push_back(JTableColumn("_IS_COMPANY", QObject::tr("Jurídica"), false));
-    c.push_back(JTableColumn("_IS_CLIENT", QObject::tr("Cliente"), false));
+    c.push_back(JTableColumn("_IS_CUSTOMER", QObject::tr("Cliente"), false));
     c.push_back(JTableColumn("_IS_SUPPLIER", QObject::tr("Fornecedor"), false));
     c.push_back(JTableColumn("_IS_EMPLOYEE", QObject::tr("Funcionário"), false));
     return c;

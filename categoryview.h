@@ -33,7 +33,7 @@ signals:
   void searchImageSignal();
 
 private:
-  int m_currentId;
+  Category m_currentCategory;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edName;

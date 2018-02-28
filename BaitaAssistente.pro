@@ -52,8 +52,8 @@ SOURCES += main.cpp\
     personview.cpp \
     personwidget.cpp \
     personpageview.cpp \
-    phonenumberpageview.cpp \
-    addresspageview.cpp
+    addresspageview.cpp \
+    phonepageview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -98,13 +98,13 @@ HEADERS  += mainwindow.h \
     jtablecolumn.h \
     imagetablemodel.h \
     person.h \
-    phonenumber.h \
     address.h \
     personview.h \
     personwidget.h \
     personpageview.h \
-    phonenumberpageview.h \
-    addresspageview.h
+    addresspageview.h \
+    phonepageview.h \
+    phone.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

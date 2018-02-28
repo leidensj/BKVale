@@ -43,7 +43,7 @@ private:
   JLineEdit* m_edName;
   JLineEdit* m_edUnity;
   JLineEdit* m_edPackageUnity;
-  QDoubleSpinBox* m_sbPackageAmmount;
+  QDoubleSpinBox* m_spnPackageAmmount;
   JLineEdit* m_edDetails;
   JLineEdit* m_edCode;
   QCheckBox* m_cbAvailableAtNotes;

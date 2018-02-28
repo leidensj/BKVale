@@ -29,8 +29,16 @@ struct Category
     m_imageId = INVALID_IMAGE_ID;
   }
 
+  bool operator != (const Category& other)
+  {
+    return m_name != other.m_name &&
+           m_imageId != other.m_imageId;
+  }
+
   static bool st_isValidId(int id) { return id != INVALID_CATEGORY_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
+  static bool st_isValid(const Category& category) { return !category.m_name.isEmpty(); }
+  bool isValid() const { return st_isValid(*this); }
   static QString getTableName() { return "_CATEGORIES"; }
   static QVector<JTableColumn> getColumns()
   {

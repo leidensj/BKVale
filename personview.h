@@ -6,7 +6,7 @@
 
 class QPushButton;
 class PersonPageView;
-class PhoneNumberPageView;
+class PhonePageView;
 class AddressPageView;
 class QTabWidget;
 
@@ -40,7 +40,7 @@ private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   PersonPageView* m_personPage;
-  PhoneNumberPageView* m_phonePage;
+  PhonePageView* m_phonePage;
   AddressPageView* m_addressPage;
 };
 

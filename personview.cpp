@@ -2,7 +2,7 @@
 #include "jlineedit.h"
 #include "jpicker.h"
 #include "personpageview.h"
-#include "phonenumberpageview.h"
+#include "phonepageview.h"
 #include "addresspageview.h"
 #include <QPushButton>
 #include <QLayout>
@@ -38,7 +38,7 @@ PersonView::PersonView(QWidget* parent)
   hlayout0->addWidget(m_btnSave);
 
   m_personPage = new PersonPageView();
-  m_phonePage = new PhoneNumberPageView();
+  m_phonePage = new PhonePageView();
   m_addressPage = new AddressPageView();
 
   QTabWidget* tabWidget = new QTabWidget();

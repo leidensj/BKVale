@@ -3,6 +3,7 @@
 #include "jimageview.h"
 #include <QPushButton>
 #include <QLayout>
+#include <QTabWidget>
 
 ImageView::ImageView(QWidget* parent)
   : QFrame(parent)
@@ -11,14 +12,14 @@ ImageView::ImageView(QWidget* parent)
   , m_edImageName(nullptr)
   , m_imageView(nullptr)
 {
-  m_btnCreate = new QPushButton();
+  m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
   m_btnCreate->setText("");
   m_btnCreate->setIconSize(QSize(24, 24));
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 
-  m_btnSave = new QPushButton();
+  m_btnSave = new QPushButton;
   m_btnSave->setFlat(true);
   m_btnSave->setText("");
   m_btnSave->setIconSize(QSize(24, 24));
@@ -30,17 +31,29 @@ ImageView::ImageView(QWidget* parent)
 
   m_imageView = new JImageView(true);
 
-  QHBoxLayout* hlayout0 = new QHBoxLayout();
-  hlayout0->setContentsMargins(0, 0, 0, 0);
-  hlayout0->setAlignment(Qt::AlignLeft);
-  hlayout0->addWidget(m_btnCreate);
-  hlayout0->addWidget(m_btnSave);
+  QHBoxLayout* buttonlayout = new QHBoxLayout;
+  buttonlayout->setContentsMargins(0, 0, 0, 0);
+  buttonlayout->setAlignment(Qt::AlignLeft);
+  buttonlayout->addWidget(m_btnCreate);
+  buttonlayout->addWidget(m_btnSave);
 
-  QVBoxLayout* vlayout0 = new QVBoxLayout();
-  vlayout0->addLayout(hlayout0);
-  vlayout0->addWidget(m_edImageName);
-  vlayout0->addWidget(m_imageView);
-  setLayout(vlayout0);
+  QVBoxLayout* tablayout = new QVBoxLayout;
+  tablayout->setAlignment(Qt::AlignTop);
+  tablayout->addWidget(m_edImageName);
+  tablayout->addWidget(m_imageView);
+
+  QFrame* tabframe = new QFrame;
+  tabframe->setLayout(tablayout);
+
+  QTabWidget* tabWidget = new QTabWidget;
+  tabWidget->addTab(tabframe,
+                    QIcon(":/icons/res/icon.png"),
+                    tr("Imagem"));
+
+  QVBoxLayout* mainlayout = new QVBoxLayout;
+  mainlayout->addLayout(buttonlayout);
+  mainlayout->addWidget(tabWidget);
+  setLayout(mainlayout);
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),

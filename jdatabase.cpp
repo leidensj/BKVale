@@ -5,6 +5,7 @@
 #include <QSqlRecord>
 #include <QPushButton>
 #include <QHeaderView>
+#include <QShortcut>
 
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
@@ -14,7 +15,11 @@ JTableView::JTableView(QWidget *parent)
 
 void JTableView::keyPressEvent(QKeyEvent* event)
 {
-  emit enterKeyPressedSignal();
+  if (event->key() == Qt::Key_Enter ||
+      event->key() == Qt::Key_Return)
+  {
+    emit enterKeyPressedSignal();
+  }
   QTableView::keyPressEvent(event);
 }
 
@@ -43,21 +48,21 @@ JDatabase::JDatabase(bool bSelectorMode,
   m_btnRefresh->setText("");
   m_btnRefresh->setIconSize(QSize(24, 24));
   m_btnRefresh->setIcon(QIcon(":/icons/res/refresh.png"));
-  m_btnOpen->setToolTip(tr("Atualizar (F5)"));
-  m_btnOpen->setShortcut(QKeySequence(Qt::Key_F5));
+  m_btnRefresh->setToolTip(tr("Atualizar (F5)"));
+  m_btnRefresh->setShortcut(QKeySequence(Qt::Key_F5));
 
   m_btnRemove = new QPushButton();
   m_btnRemove->setFlat(true);
   m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
-  m_btnOpen->setToolTip(tr("Remover (Del)"));
+  m_btnRemove->setToolTip(tr("Remover (Del)"));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
   m_btnFilter = new QPushButton();
   m_btnFilter->setFlat(true);
   m_btnFilter->setText("");
   m_btnFilter->setIconSize(QSize(24, 24));
-  m_btnOpen->setToolTip(tr("Filtro"));
+  m_btnFilter->setToolTip(tr("Filtro"));
   m_btnFilter->setIcon(QIcon(":/icons/res/filter.png"));
 
   QHBoxLayout* hlayout0 = new QHBoxLayout();
@@ -69,6 +74,7 @@ JDatabase::JDatabase(bool bSelectorMode,
   hlayout0->addWidget(m_btnFilter);
 
   m_edFilterSearch = new JLineEdit(JValidatorType::All, false, false);
+  m_edFilterSearch->setToolTip(tr("Procurar (Ctrl+F)"));
   m_edFilterSearch->setClearButtonEnabled(true);
 
   m_btnContains = new QPushButton();
@@ -76,6 +82,7 @@ JDatabase::JDatabase(bool bSelectorMode,
   m_btnContains->setText("");
   m_btnContains->setIconSize(QSize(24, 24));
   m_btnContains->setIcon(QIcon(":/icons/res/center.png"));
+  m_btnContains->setToolTip(tr("Contendo"));
   m_btnContains->setCheckable(true);
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
@@ -141,12 +148,11 @@ JDatabase::JDatabase(bool bSelectorMode,
   QObject::connect(m_table,
                    SIGNAL(enterKeyPressedSignal()),
                    this,
-                   SLOT(emitEnterKeyPressedSignal()));
+                   SLOT(enterKeyPressed()));
 
-  QObject::connect(m_table,
-                   SIGNAL(enterKeyPressedSignal()),
-                   this,
-                   SLOT(itemSelected()));
+  new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F),
+                this,
+                SLOT(focusFilterSearch()));
 
   filterSearchChanged();
   if (m_bSelectorMode)
@@ -310,7 +316,7 @@ void JDatabase::containsPressed()
   m_edFilterSearch->setFocus();
 }
 
-void JDatabase::emitEnterKeyPressedSignal()
+void JDatabase::enterKeyPressed()
 {
   if (m_table->model())
   {
@@ -319,9 +325,14 @@ void JDatabase::emitEnterKeyPressedSignal()
     {
       int id = model->index(m_table->currentIndex().row(),
                             ID_COLUMN).data(Qt::EditRole).toInt();
-      emit enterKeyPressedSignal(id);
+      emit itemSelectedSignal(id);
     }
   }
+}
+
+void JDatabase::focusFilterSearch()
+{
+  m_edFilterSearch->setFocus();
 }
 
 JDatabaseSelector::JDatabaseSelector(const QString& title,

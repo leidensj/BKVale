@@ -184,6 +184,10 @@ AddressPageView::AddressPageView(QWidget *parent)
                    SIGNAL(itemDoubleClicked(QListWidgetItem*)),
                    this,
                    SLOT(openSelectedAddress()));
+  QObject::connect(m_edCep,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
   QObject::connect(m_edStreet,
                    SIGNAL(textChanged(const QString&)),
                    this,
@@ -206,6 +210,14 @@ AddressPageView::AddressPageView(QWidget *parent)
                    SLOT(updateControls()));
   QObject::connect(m_cbState,
                    SIGNAL(currentIndexChanged(int)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edComplement,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edReference,
+                   SIGNAL(textChanged(const QString&)),
                    this,
                    SLOT(updateControls()));
   QObject::connect(m_btnCep,
@@ -365,4 +377,12 @@ void AddressPageView::processCep()
                                 "Internet.").arg(m_edCep->text()),
                              QMessageBox::Ok);
   }
+}
+
+QVector<Address> AddressPageView::getAddresses()
+{
+  QVector<Address> vAddress;
+  for (int i = 0; i != m_list->count(); ++i)
+    vAddress.push_back(m_list->item(i)->data(Qt::UserRole).value<Address>());
+  return vAddress;
 }

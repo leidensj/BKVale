@@ -7,6 +7,7 @@
 #include <QRegExpValidator>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QTabWidget>
 
 UserMgtView::UserMgtView(QWidget* parent)
   : QFrame(parent)
@@ -24,26 +25,26 @@ UserMgtView::UserMgtView(QWidget* parent)
   , m_accessProduct(nullptr)
   , m_accessSettings(nullptr)
 {
-  m_create = new QPushButton();
+  m_create = new QPushButton;
   m_create->setFlat(true);
   m_create->setText("");
   m_create->setIconSize(QSize(24, 24));
   m_create->setIcon(QIcon(":/icons/res/file.png"));
   m_create->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
 
-  m_save = new QPushButton();
+  m_save = new QPushButton;
   m_save->setFlat(true);
   m_save->setText("");
   m_save->setIconSize(QSize(24, 24));
   m_save->setIcon(QIcon(":/icons/res/save.png"));
   m_save->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
 
-  QLabel* lblUser = new QLabel();
+  QLabel* lblUser = new QLabel;
   lblUser->setPixmap(QIcon(":/icons/res/user.png").pixmap(QSize(24, 24)));
   lblUser->setMinimumSize(24, 24);
   lblUser->setMaximumSize(24, 24);
   lblUser->setScaledContents(true);
-  QLabel* lblPassword = new QLabel();
+  QLabel* lblPassword = new QLabel;
   lblPassword->setPixmap(QIcon(":/icons/res/password.png").pixmap(QSize(24, 24)));
   lblPassword->setMinimumSize(24, 24);
   lblPassword->setMaximumSize(24, 24);
@@ -53,7 +54,7 @@ UserMgtView::UserMgtView(QWidget* parent)
   m_user->setPlaceholderText(tr("Usuário"));
   m_user->setMaxLength(USER_MAX_USERNAME_LENGTH);
 
-  m_lblPasswordMsg = new QLabel();
+  m_lblPasswordMsg = new QLabel;
   m_lblPasswordMsg->setText(tr("Redefinir a senha:"));
 
   m_password = new JLineEdit(JValidatorType::All, false, true);
@@ -61,77 +62,89 @@ UserMgtView::UserMgtView(QWidget* parent)
   m_user->setMaxLength(USER_MAX_PASSWORD_LENGTH);
   m_password->setEchoMode(QLineEdit::EchoMode::Password);
 
-  m_viewPassword = new QPushButton();
+  m_viewPassword = new QPushButton;
   m_viewPassword->setFlat(true);
   m_viewPassword->setText("");
   m_viewPassword->setIconSize(QSize(16, 16));
   m_viewPassword->setIcon(QIcon(":/icons/res/view.png"));
   m_viewPassword->setCheckable(true);
 
-  m_accessNote = new QCheckBox();
+  m_accessNote = new QCheckBox;
   m_accessNote->setIcon(QIcon(":/icons/res/note.png"));
   m_accessNote->setText(tr("Vales"));
-  m_accessReminder = new QCheckBox();
+  m_accessReminder = new QCheckBox;
   m_accessReminder->setIcon(QIcon(":/icons/res/postit.png"));
   m_accessReminder->setText(tr("Lembretes"));
-  m_accessCalculator = new QCheckBox();
+  m_accessCalculator = new QCheckBox;
   m_accessCalculator->setIcon(QIcon(":/icons/res/calculator.png"));
   m_accessCalculator->setText(tr("Calculadora"));
-  m_accessShop = new QCheckBox();
+  m_accessShop = new QCheckBox;
   m_accessShop->setIcon(QIcon(":/icons/res/shop.png"));
   m_accessShop->setText(tr("Compras"));
-  m_accessConsumption = new QCheckBox();
+  m_accessConsumption = new QCheckBox;
   m_accessConsumption->setIcon(QIcon(":/icons/res/stock.png"));
   m_accessConsumption->setText(tr("Consumo"));
 
-  m_accessUser = new QCheckBox();
+  m_accessUser = new QCheckBox;
   m_accessUser->setIcon(QIcon(":/icons/res/user.png"));
   m_accessUser->setText(tr("Usuários"));
-  m_accessProduct = new QCheckBox();
+  m_accessProduct = new QCheckBox;
   m_accessProduct->setIcon(QIcon(":/icons/res/item.png"));
   m_accessProduct->setText(tr("Itens"));
-  m_accessSettings = new QCheckBox();
+  m_accessSettings = new QCheckBox;
   m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
   m_accessSettings->setText(tr("Configurações"));
 
-  QHBoxLayout* h0 = new QHBoxLayout();
-  h0->setContentsMargins(0, 0, 0, 0);
-  h0->addWidget(m_create);
-  h0->addWidget(m_save);
-  h0->setAlignment(Qt::AlignLeft);
+  QHBoxLayout* buttonlayout = new QHBoxLayout;
+  buttonlayout->setContentsMargins(0, 0, 0, 0);
+  buttonlayout->addWidget(m_create);
+  buttonlayout->addWidget(m_save);
+  buttonlayout->setAlignment(Qt::AlignLeft);
 
-  QHBoxLayout* h1 = new QHBoxLayout();
-  h1->setContentsMargins(0, 0, 0, 0);
-  h1->addWidget(lblUser);
-  h1->addWidget(m_user);
+  QHBoxLayout* userlayout = new QHBoxLayout;
+  userlayout->setContentsMargins(0, 0, 0, 0);
+  userlayout->addWidget(lblUser);
+  userlayout->addWidget(m_user);
 
-  QHBoxLayout* h2 = new QHBoxLayout();
-  h2->setContentsMargins(0, 0, 0, 0);
-  h2->addWidget(lblPassword);
-  h2->addWidget(m_password);
-  h2->addWidget(m_viewPassword);
+  QHBoxLayout* passwordlayout = new QHBoxLayout;
+  passwordlayout->setContentsMargins(0, 0, 0, 0);
+  passwordlayout->addWidget(lblPassword);
+  passwordlayout->addWidget(m_password);
+  passwordlayout->addWidget(m_viewPassword);
 
-  QVBoxLayout* v0 = new QVBoxLayout();
-  v0->addWidget(m_accessNote);
-  v0->addWidget(m_accessReminder);
-  v0->addWidget(m_accessCalculator);
-  v0->addWidget(m_accessShop);
-  v0->addWidget(m_accessConsumption);
-  v0->addWidget(m_accessUser);
-  v0->addWidget(m_accessProduct);
-  v0->addWidget(m_accessSettings);
+  QVBoxLayout* grouplayout = new QVBoxLayout;
+  grouplayout->addWidget(m_accessNote);
+  grouplayout->addWidget(m_accessReminder);
+  grouplayout->addWidget(m_accessCalculator);
+  grouplayout->addWidget(m_accessShop);
+  grouplayout->addWidget(m_accessConsumption);
+  grouplayout->addWidget(m_accessUser);
+  grouplayout->addWidget(m_accessProduct);
+  grouplayout->addWidget(m_accessSettings);
 
-  QGroupBox* gbox = new QGroupBox();
-  gbox->setTitle(tr("Permissões"));
-  gbox->setLayout(v0);
+  QGroupBox* groupbox = new QGroupBox;
+  groupbox->setTitle(tr("Permissões"));
+  groupbox->setLayout(grouplayout);
 
-  QVBoxLayout* v1 = new QVBoxLayout();
-  v1->addLayout(h0);
-  v1->addLayout(h1);
-  v1->addWidget(m_lblPasswordMsg);
-  v1->addLayout(h2);
-  v1->addWidget(gbox);
-  setLayout(v1);
+  QVBoxLayout* tablayout = new QVBoxLayout;
+  tablayout->setAlignment(Qt::AlignTop);
+  tablayout->addLayout(userlayout);
+  tablayout->addWidget(m_lblPasswordMsg);
+  tablayout->addLayout(passwordlayout);
+  tablayout->addWidget(groupbox);
+
+  QFrame* tabframe = new QFrame;
+  tabframe->setLayout(tablayout);
+
+  QTabWidget* tabWidget = new QTabWidget;
+  tabWidget->addTab(tabframe,
+                    QIcon(":/icons/res/user.png"),
+                    tr("Usuário"));
+
+  QVBoxLayout* mainlayout = new QVBoxLayout;
+  mainlayout->addLayout(buttonlayout);
+  mainlayout->addWidget(tabWidget);
+  setLayout(mainlayout);
 
   QObject::connect(m_create,
                    SIGNAL(clicked(bool)),

@@ -21,19 +21,19 @@ PersonPageView::PersonPageView(QWidget* parent)
  , m_edCpfCnpj(nullptr)
  , m_edRgIE(nullptr)
  , m_edDetails(nullptr)
+ , m_grpBirthDate(nullptr)
  , m_dtBirthDate(nullptr)
  , m_imagePicker(nullptr)
  , m_cbCustomer(nullptr)
  , m_cbSupplier(nullptr)
  , m_cbEmployee(nullptr)
- , m_frPinCode(nullptr)
- , m_cbState(nullptr)
+ , m_dtCreationDate(nullptr)
 {
-  m_rdoPerson = new QRadioButton();
+  m_rdoPerson = new QRadioButton;
   m_rdoPerson->setText(tr("Fisíca"));
   m_rdoPerson->setIcon(QIcon(":/icons/res/house.png"));
   m_rdoPerson->setChecked(true);
-  m_rdoCompany = new QRadioButton();
+  m_rdoCompany = new QRadioButton;
   m_rdoCompany->setText(tr("Jurídica"));
   m_rdoCompany->setIcon(QIcon(":/icons/res/building.png"));
   m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
@@ -42,88 +42,63 @@ PersonPageView::PersonPageView(QWidget* parent)
   m_edCpfCnpj = new JLineEdit(JValidatorType::Numeric, false, true);
   m_edRgIE= new JLineEdit(JValidatorType::Numeric, false, true);
   m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_dtBirthDate = new QDateEdit();
+  m_dtBirthDate = new QDateEdit;
   m_dtBirthDate->setCalendarPopup(true);
   m_dtBirthDate->setDisplayFormat("dd/MM/yyyy");
   m_dtBirthDate->setDate(QDate::currentDate());
   m_imagePicker = new JPicker(INVALID_IMAGE_ID, tr("Imagem"), true);
-  m_cbCustomer = new QCheckBox();
+  m_cbCustomer = new QCheckBox;
   m_cbCustomer->setText(tr("Cliente"));
   m_cbCustomer->setIcon(QIcon(":/icons/res/client.png"));
-  m_cbSupplier = new QCheckBox();
+  m_cbSupplier = new QCheckBox;
   m_cbSupplier->setText(tr("Fornecedor"));
   m_cbSupplier->setIcon(QIcon(":/icons/res/supplier.png"));
-  m_cbEmployee = new QCheckBox();
+  m_cbEmployee = new QCheckBox;
   m_cbEmployee->setText(tr("Funcionário"));
   m_cbEmployee->setIcon(QIcon(":/icons/res/employee.png"));
-  m_frPinCode = new QFrame();
-  QLabel* lblPinCode = new QLabel();
-  lblPinCode->setPixmap(QIcon(":/icons/res/pincode.png").pixmap(QSize(24, 24)));
-  lblPinCode->setMinimumSize(24, 24);
-  lblPinCode->setMaximumSize(24, 24);
-  lblPinCode->setScaledContents(true);
-  m_edPinCode = new JLineEdit(JValidatorType::Numeric, false, true);
-  m_edPinCode->setMaxLength(EMPLOYEE_PINCODE_LENGTH);
-  m_edPinCode->setPlaceholderText(tr("Código PIN"));
-  m_edPinCode->setEchoMode(QLineEdit::EchoMode::PasswordEchoOnEdit);
-  m_edPinCode->setAlignment(Qt::AlignCenter);
-  {
-    QFont font = m_edPinCode->font();
-    font.setBold(true);
-    m_edPinCode->setFont(font);
-  }
-  m_cbState = new QComboBox();
-  for (int i = 0; i != NUMBER_OF_BRAZILIAN_STATES; ++i)
-    m_cbState->addItem(Address::st_getBRState((Address::EBRState)i).m_abv);
-  m_cbState->setCurrentIndex((int)Address::EBRState::RS);
+  m_dtCreationDate = new QDateEdit;
+  m_dtCreationDate->setCalendarPopup(true);
+  m_dtCreationDate->setDisplayFormat("dd/MM/yyyy");
+  m_dtCreationDate->setDate(QDate::currentDate());
+  m_dtCreationDate->setReadOnly(true);
 
-  QGroupBox* personGroupBox = new QGroupBox();
+  QGroupBox* personGroupBox = new QGroupBox;
   personGroupBox->setTitle(tr("Tipo de pessoa"));
-  QHBoxLayout* personLayout = new QHBoxLayout();
+  QHBoxLayout* personLayout = new QHBoxLayout;
   personLayout->addWidget(m_rdoPerson);
   personLayout->addWidget(m_rdoCompany);
   personGroupBox->setLayout(personLayout);
 
-  QHBoxLayout* stateIElayout = new QHBoxLayout();
-  stateIElayout->setContentsMargins(0, 0, 0, 0);
-  stateIElayout->addWidget(m_cbState);
-  stateIElayout->addWidget(m_edRgIE);
-  QFormLayout* flayout0 = new QFormLayout();
+  QFormLayout* flayout0 = new QFormLayout;
   flayout0->setContentsMargins(0, 0, 0, 0);
+  flayout0->addRow(tr("Data de criação:"), m_dtCreationDate);
   flayout0->addRow(tr("Nome/razão social:"), m_edName);
   flayout0->addRow(tr("Apelido/nome fantasia:"), m_edAlias);
   flayout0->addRow(tr("Email:"), m_edEmail);
   flayout0->addRow(tr("CPF/CNPJ:"), m_edCpfCnpj);
-  flayout0->addRow(tr("RG/IE:"), stateIElayout);
+  flayout0->addRow(tr("RG/IE:"), m_edRgIE);
   flayout0->addRow(tr("Detalhes:"), m_edDetails);
 
-  QGroupBox* dateGroupBox = new QGroupBox();
-  dateGroupBox->setCheckable(true);
-  dateGroupBox->setTitle(tr("Data de aniversário"));
+  m_grpBirthDate = new QGroupBox;
+  m_grpBirthDate->setCheckable(true);
+  m_grpBirthDate->setTitle(tr("Data de aniversário"));
   QVBoxLayout* dateLayout = new QVBoxLayout();
   dateLayout->addWidget(m_dtBirthDate);
-  dateGroupBox->setLayout(dateLayout);
+  m_grpBirthDate->setLayout(dateLayout);
 
-  QHBoxLayout* pinCodeLayout = new QHBoxLayout();
-  pinCodeLayout->setContentsMargins(9, 0, 9, 0);
-  pinCodeLayout->addWidget(lblPinCode);
-  pinCodeLayout->addWidget(m_edPinCode);
-  m_frPinCode->setLayout(pinCodeLayout);
-
-  QGroupBox* typeGroupBox = new QGroupBox();
+  QGroupBox* typeGroupBox = new QGroupBox;
   typeGroupBox->setTitle(tr("Disponível como"));
   QVBoxLayout* typeLayout = new QVBoxLayout();
   typeLayout->addWidget(m_cbCustomer);
   typeLayout->addWidget(m_cbSupplier);
   typeLayout->addWidget(m_cbEmployee);
-  typeLayout->addWidget(m_frPinCode);
   typeGroupBox->setLayout(typeLayout);
 
-  QVBoxLayout* vlayout0 = new QVBoxLayout();
+  QVBoxLayout* vlayout0 = new QVBoxLayout;
   vlayout0->setAlignment(Qt::AlignTop);
   vlayout0->addWidget(personGroupBox);
   vlayout0->addLayout(flayout0);
-  vlayout0->addWidget(dateGroupBox);
+  vlayout0->addWidget(m_grpBirthDate);
   vlayout0->addWidget(m_imagePicker);
   vlayout0->addWidget(typeGroupBox);
   setLayout(vlayout0);
@@ -132,24 +107,128 @@ PersonPageView::PersonPageView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-
   QObject::connect(m_rdoPerson,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-
+  QObject::connect(m_edName,
+                   SIGNAL(textChanged(QString)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edAlias,
+                   SIGNAL(textChanged(QString)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edEmail,
+                   SIGNAL(textChanged(QString)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edCpfCnpj,
+                   SIGNAL(textChanged(QString)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edRgIE,
+                   SIGNAL(textChanged(QString)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edDetails,
+                   SIGNAL(textChanged(QString)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_dtBirthDate,
+                   SIGNAL(dateChanged(const QDate&)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_imagePicker,
+                   SIGNAL(searchSignal()),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbCustomer,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbSupplier,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
   QObject::connect(m_cbEmployee,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-
-  QObject::connect(m_cbState,
-                   SIGNAL(currentIndexChanged(int)),
+  QObject::connect(m_imagePicker,
+                   SIGNAL(searchSignal()),
                    this,
-                   SLOT(updateControls()));
+                   SLOT(emitSearchImageSignal()));
 
   updateControls();
   m_edName->setFocus();
+}
+
+Person PersonPageView::getPerson() const
+{
+  Person person;
+  person.m_id = m_currentPerson.m_id;
+  person.m_imageId = m_imagePicker->getId();
+  person.m_name = m_edName->text();
+  person.m_alias = m_edAlias->text();
+  person.m_email = m_edEmail->text();
+  person.m_CPF_CNPJ = m_edCpfCnpj->text();
+  person.m_RG_IE = m_edRgIE->text();
+  person.m_details = m_edDetails->text();
+  person.m_birthDate = m_grpBirthDate->isChecked()
+                       ? m_dtBirthDate->date().toJulianDay()
+                       : INVALID_PERSON_DATE;
+  person.m_creationDate = m_dtCreationDate->date().toJulianDay();
+  person.m_bCompany = m_rdoCompany->isChecked();
+  person.m_bCustomer = m_cbCustomer->isChecked();
+  person.m_bSupplier = m_cbSupplier->isChecked();
+  person.m_bEmployee = m_cbEmployee->isChecked();
+  return person;
+
+}
+
+void PersonPageView::setPerson(const Person& person,
+                               const QString& imageName,
+                               const QByteArray& arImage)
+{
+  m_currentPerson = person;
+  m_imagePicker->setId(person.m_imageId);
+  m_imagePicker->setText(imageName);
+  m_imagePicker->setImage(arImage);
+  m_edName->setText(person.m_name);
+  m_edAlias->setText(person.m_alias);
+  m_edEmail->setText(person.m_email);
+  m_edCpfCnpj->setText(person.m_CPF_CNPJ);
+  m_edRgIE->setText(person.m_RG_IE);
+  m_edDetails->setText(person.m_details);
+  m_grpBirthDate->setChecked(person.m_birthDate != INVALID_PERSON_DATE);
+  if (person.m_birthDate != INVALID_PERSON_DATE)
+    m_dtBirthDate->setDate(QDate::fromJulianDay(person.m_birthDate));
+  else
+    m_dtBirthDate->setDate(QDate::currentDate());
+  m_dtCreationDate->setDate(QDate::fromJulianDay(person.m_creationDate));
+  m_rdoCompany->setChecked(person.m_bCompany);
+  m_cbCustomer->setChecked(person.m_bCustomer);
+  m_cbSupplier->setChecked(person.m_bSupplier);
+  m_cbEmployee->setChecked(person.m_bEmployee);
+}
+
+void PersonPageView::setImage(int id, const QString& name, const QByteArray& ar)
+{
+  m_imagePicker->setId(id);
+  m_imagePicker->setText(name);
+  m_imagePicker->setImage(ar);
+}
+
+void PersonPageView::emitSearchImageSignal()
+{
+  emit searchImageSignal();
+}
+
+void PersonPageView::create()
+{
+  Person person;
+  setPerson(person, "", QByteArray());
 }
 
 void PersonPageView::updateControls()
@@ -157,21 +236,16 @@ void PersonPageView::updateControls()
   if (m_rdoCompany->isChecked())
   {
     m_edCpfCnpj->setInputMask("99.999.999/9999-99;_");
-    m_cbState->show();
-    m_edRgIE->setInputMask(Address::st_getBRState((Address::EBRState)m_cbState->currentIndex()).m_mask);
+    m_edRgIE->setInputMask("");
     m_cbEmployee->setChecked(false);
     m_cbEmployee->setEnabled(false);
-    m_frPinCode->hide();
   }
   else
   {
     m_edCpfCnpj->setInputMask("999.999.999-99;_");
     m_edRgIE->setInputMask("9999999999;_");
     m_cbEmployee->setEnabled(true);
-    m_cbState->hide();
   }
-  if (m_cbEmployee->isChecked())
-    m_frPinCode->show();
-  else
-    m_frPinCode->hide();
+
+  emit changedSignal();
 }

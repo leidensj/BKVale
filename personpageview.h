@@ -10,6 +10,7 @@ class QDateEdit;
 class QCheckBox;
 class QRadioButton;
 class QComboBox;
+class QGroupBox;
 
 class PersonPageView : public QFrame
 {
@@ -17,9 +18,22 @@ class PersonPageView : public QFrame
 
 public:
   explicit PersonPageView(QWidget* parent = 0);
+  Person getPerson() const;
+  void setPerson(const Person& person,
+                 const QString& imageName,
+                 const QByteArray& arImage);
+  void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:
   void updateControls();
+  void emitSearchImageSignal();
+
+public slots:
+  void create();
+
+signals:
+  void changedSignal();
+  void searchImageSignal();
 
 private:
   Person m_currentPerson;
@@ -31,14 +45,13 @@ private:
   JLineEdit* m_edCpfCnpj;
   JLineEdit* m_edRgIE;
   JLineEdit* m_edDetails;
+  QGroupBox* m_grpBirthDate;
   QDateEdit* m_dtBirthDate;
   JPicker* m_imagePicker;
   QCheckBox* m_cbCustomer;
   QCheckBox* m_cbSupplier;
   QCheckBox* m_cbEmployee;
-  QFrame* m_frPinCode;
-  JLineEdit* m_edPinCode;
-  QComboBox* m_cbState;
+  QDateEdit* m_dtCreationDate;
 };
 
 #endif // PERSONPAGEVIEW_H

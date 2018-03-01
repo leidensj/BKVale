@@ -187,7 +187,7 @@ ProductView::ProductView(QWidget* parent)
                    this,
                    SLOT(updateControls()));
   QObject::connect(m_categoryPicker,
-                   SIGNAL(clicked(bool)),
+                   SIGNAL(searchSignal()),
                    this,
                    SLOT(updateControls()));
 

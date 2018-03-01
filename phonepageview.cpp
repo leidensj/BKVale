@@ -222,3 +222,10 @@ QVector<Phone> PhonePageView::getPhones()
     vPhone.push_back(m_list->item(i)->data(Qt::UserRole).value<Phone>());
   return vPhone;
 }
+
+void PhonePageView::setPhones(const QVector<Phone>& vPhone)
+{
+  clear();
+  for (int i = 0; i != vPhone.size(); ++i)
+    savePhone(vPhone.at(i));
+}

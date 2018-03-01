@@ -225,10 +225,10 @@ void PersonPageView::emitSearchImageSignal()
   emit searchImageSignal();
 }
 
-void PersonPageView::create()
+void PersonPageView::clear()
 {
-  Person person;
-  setPerson(person, "", QByteArray());
+  m_currentPerson.clear();
+  setPerson(m_currentPerson, "", QByteArray());
 }
 
 void PersonPageView::updateControls()

@@ -137,8 +137,7 @@ void PersonView::updateControls()
   Person person = m_personPage->getPerson();
   bool bEnable = person.isValid();
   QString saveIcon(":/icons/res/save.png");
-  if (m_currentPerson
-      .isValidId())
+  if (m_currentPerson.isValidId())
   {
     saveIcon = ":/icons/res/saveas.png";
     bEnable = bEnable && m_currentPerson != person;

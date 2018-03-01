@@ -386,3 +386,9 @@ QVector<Address> AddressPageView::getAddresses()
     vAddress.push_back(m_list->item(i)->data(Qt::UserRole).value<Address>());
   return vAddress;
 }
+
+void AddressPageView::setAddresses(const QVector<Address>& vAddress)
+{
+  for (int i = 0; i != vAddress.size(); ++i)
+    saveAddress(vAddress.at(i));
+}

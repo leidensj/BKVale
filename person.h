@@ -53,7 +53,7 @@ struct Person
     clear();
   }
 
-  bool operator !=(const Person& other)
+  bool operator !=(const Person& other) const
   {
     bool b =  m_imageId != other.m_imageId ||
               m_name != other.m_name ||
@@ -71,6 +71,11 @@ struct Person
       b = b || m_birthDate != other.m_birthDate;
 
     return b;
+  }
+
+  bool operator ==(const Person& other) const
+  {
+    return !(*this != other);
   }
 
   static bool st_isValid(const Person& person)

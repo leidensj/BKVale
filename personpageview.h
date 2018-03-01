@@ -29,7 +29,7 @@ private slots:
   void emitSearchImageSignal();
 
 public slots:
-  void create();
+  void clear();
 
 signals:
   void changedSignal();

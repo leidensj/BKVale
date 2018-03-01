@@ -22,6 +22,7 @@ class AddressPageView : public QFrame
 public:
   explicit AddressPageView(QWidget* parent = nullptr);
   QVector<Address> getAddresses();
+  void setAddresses(const QVector<Address>& vAddress);
 
 public slots:
   void clear();

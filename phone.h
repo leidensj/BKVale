@@ -30,12 +30,17 @@ struct Phone
     clear();
   }
 
-  bool operator !=(const Phone& other)
+  bool operator !=(const Phone& other) const
   {
     return
         m_countryCode != other.m_countryCode ||
         m_code != other.m_code ||
         m_number != other.m_number;
+  }
+
+  bool operator ==(const Phone& other) const
+  {
+    return !(*this != other);
   }
 
   static bool st_isValid(const Phone& phone)

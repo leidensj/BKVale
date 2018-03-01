@@ -141,6 +141,7 @@
    <addaction name="separator"/>
    <addaction name="actionUsers"/>
    <addaction name="actionPersons"/>
+   <addaction name="actionEmployees"/>
    <addaction name="separator"/>
    <addaction name="actionProducts"/>
    <addaction name="actionCategories"/>
@@ -288,6 +289,18 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar pessoas</string>
+   </property>
+  </action>
+  <action name="actionEmployees">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/employee.png</normaloff>:/icons/res/employee.png</iconset>
+   </property>
+   <property name="text">
+    <string>Employees</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar funcionários</string>
    </property>
   </action>
  </widget>

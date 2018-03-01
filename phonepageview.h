@@ -21,6 +21,7 @@ class PhonePageView : public QFrame
 public:
   explicit PhonePageView(QWidget* parent = nullptr);
   QVector<Phone> getPhones();
+  void setPhones(const QVector<Phone>& vPhone);
 
 public slots:
   void clear();

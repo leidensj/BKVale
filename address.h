@@ -52,7 +52,7 @@ struct Address
     clear();
   }
 
-  bool operator !=(const Address& other)
+  bool operator !=(const Address& other) const
   {
     return
         m_cep != other.m_cep ||
@@ -62,6 +62,11 @@ struct Address
         m_state != other.m_state ||
         m_complement != other.m_complement ||
         m_reference != other.m_reference;
+  }
+
+  bool operator ==(const Address& other) const
+  {
+    return !(*this != other);
   }
 
   static bool st_isValid(const Address& address)

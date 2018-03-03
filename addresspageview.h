@@ -27,6 +27,9 @@ public:
 public slots:
   void clear();
 
+signals:
+  void changedSignal();
+
 private slots:
   void save();
   void openSelectedAddress();

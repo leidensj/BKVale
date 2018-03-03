@@ -81,6 +81,7 @@ PersonPageView::PersonPageView(QWidget* parent)
 
   m_grpBirthDate = new QGroupBox;
   m_grpBirthDate->setCheckable(true);
+  m_grpBirthDate->setChecked(false);
   m_grpBirthDate->setTitle(tr("Data de aniversário"));
   QVBoxLayout* dateLayout = new QVBoxLayout();
   dateLayout->addWidget(m_dtBirthDate);

@@ -63,13 +63,26 @@ PersonView::PersonView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
-
   QObject::connect(m_btnSave,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSaveSignal()));
-
-
+  QObject::connect(m_personPage,
+                   SIGNAL(searchImageSignal()),
+                   this,
+                   SLOT(emitSearchImageSignal()));
+  QObject::connect(m_personPage,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_phonePage,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_addressPage,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(updateControls()));
   updateControls();
 }
 
@@ -137,8 +150,7 @@ void PersonView::updateControls()
   Person person = m_personPage->getPerson();
   bool bEnable = person.isValid();
   QString saveIcon(":/icons/res/save.png");
-  if (m_currentPerson
-      .isValidId())
+  if (m_currentPerson.isValidId())
   {
     saveIcon = ":/icons/res/saveas.png";
     bEnable = bEnable && m_currentPerson != person;

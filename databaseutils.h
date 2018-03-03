@@ -11,6 +11,9 @@
 #include "settings.h"
 #include "category.h"
 #include "image.h"
+#include "person.h"
+#include "phone.h"
+#include "address.h"
 
 #define DEFAULT_NUMBER     1000
 #define DEFAULT_NUMBER_STR "1000"
@@ -208,6 +211,31 @@ namespace ConsumptionSQL
 
   double getTotal(QSqlDatabase db,
                   qint64 date);
+}
+
+namespace PersonSQL
+{
+  bool select(QSqlDatabase db,
+              Person& person,
+              QVector<Phone>& vPhone,
+              QVector<Address>& vAddress,
+              QString& error);
+
+  bool insert(QSqlDatabase db,
+              const Person& person,
+              const QVector<Phone>& vPhone,
+              const QVector<Address>& vAddress,
+              QString& error);
+
+  bool update(QSqlDatabase db,
+              const Person& person,
+              const QVector<Phone>& vPhone,
+              const QVector<Address>& vAddress,
+              QString& error);
+
+  bool remove(QSqlDatabase db,
+              int id,
+              QString& error);
 }
 
 #endif // DATABASEUTILS_H

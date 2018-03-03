@@ -400,6 +400,40 @@ bool BaitaSQL::init(QSqlDatabase db,
              "_ACCESS_PRODUCT INT,"
              "_ACCESS_SETTINGS INT)");
 
+  query.exec("CREATE TABLE IF NOT EXISTS _PERSONS ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_IMAGEID INTEGER,"
+             "_NAME TEXT NOT NULL UNIQUE,"
+             "_ALIAS TEXT,"
+             "_EMAIL TEXT,"
+             "_CPF_CNPJ TEXT,"
+             "_RG_IE TEXT,"
+             "_DETAILS TEXT,"
+             "_BIRTH_DATE INTEGER,"
+             "_CREATION_DATE INTEGER,"
+             "_IS_COMPANY INT,"
+             "_IS_CUSTOMER INT,"
+             "_IS_SUPPLIER INT,"
+             "_IS_EMPLOYEE INT)");
+
+  query.exec("CREATE TABLE IF NOT EXISTS _ADDRESSES ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_PERSONID INTEGER,"
+             "_CEP TEXT,"
+             "_NEIGHBORHOOD TEXT,"
+             "_STREET TEXT,"
+             "_NUMBER INT,"
+             "_CITY TEXT,"
+             "_STATE INT,"
+             "_COMPLEMENT TEXT,"
+             "_REFERENCE TEXT)");
+
+  query.exec("CREATE TABLE IF NOT EXISTS _PHONES ("
+             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+             "_COUNTRY_CODE INT DEFAULT " DEFAULT_PHONE_COUNTRY_CODE_VALUE_STR ","
+             "_CODE INT DEFAULT " DEFAULT_PHONE_CODE_VALUE_STR ","
+             "_NUMBER TEXT)");
+
   query.exec("SELECT * FROM _USERS LIMIT 1");
   if (!query.next())
   {
@@ -1386,6 +1420,208 @@ bool UserLoginSQL::login(const QString& strUser,
       error = "Usuário ou senha inválidos.";
     return bFound;
   }
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool PersonSQL::select(QSqlDatabase db,
+                       Person& person,
+                       QVector<Phone>& vPhone,
+                       QVector<Address>& vAddress,
+                       QString& error)
+{
+  error.clear();
+  vPhone.clear();
+  vAddress.clear();
+  int id = person.m_id;
+  person.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("SELECT * "
+                "FROM _PERSONS "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+
+  query.exec();
+  {
+    if (query.next())
+    {
+      person.m_id = id;
+      person.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toLongLong();
+      person.m_name = query.value(query.record().indexOf("_NAME")).toString();
+      person.m_alias = query.value(query.record().indexOf("_ALIAS")).toString();
+      person.m_email = query.value(query.record().indexOf("_EMAIL")).toString();
+      person.m_CPF_CNPJ = query.value(query.record().indexOf("_CPF_CNPJ")).toString();
+      person.m_RG_IE = query.value(query.record().indexOf("_RG_IE")).toString();
+      person.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
+      person.m_birthDate = query.value(query.record().indexOf("_BIRTH_DATE")).toLongLong();
+      person.m_creationDate = query.value(query.record().indexOf("_CREATION_DATE")).toLongLong();
+      person.m_bCompany = query.value(query.record().indexOf("_IS_COMPANY")).toBool();
+      person.m_bCustomer = query.value(query.record().indexOf("_IS_CUSTOMER")).toBool();
+      person.m_bSupplier = query.value(query.record().indexOf("_IS_SUPPLIER")).toBool();
+      person.m_bEmployee = query.value(query.record().indexOf("_IS_EMPLOYEE")).toBool();
+      return true;
+    }
+  }
+
+  query.prepare("SELECT * "
+                "FROM _ADDRESSES "
+                "WHERE _PERSONID = (:_id)");
+  query.bindValue(":_id", id);
+  query.exec();
+  while (query.next())
+  {
+    Address address;
+    address.m_id = query.value(query.record().indexOf("_ID")).toLongLong();
+    address.m_cep = query.value(query.record().indexOf("_CEP")).toString();
+    address.m_neighborhood = query.value(query.record().indexOf("_NEIGHBORHOOD")).toString();
+    address.m_street = query.value(query.record().indexOf("_STREET")).toString();
+    address.m_number = query.value(query.record().indexOf("_NUMBER")).toInt();
+    address.m_city = query.value(query.record().indexOf("_CITY")).toString();
+    address.m_state = query.value(query.record().indexOf("_STATE")).toInt();
+    address.m_complement = query.value(query.record().indexOf("_COMPLEMENT")).toString();
+    address.m_reference = query.value(query.record().indexOf("_REFERENCE")).toString();
+    vAddress.push_back(address);
+  }
+
+  query.prepare("SELECT * "
+                "FROM _PHONES "
+                "WHERE _PERSONID = (:_id)");
+  query.bindValue(":_id", id);
+  query.exec();
+  while (query.next())
+  {
+    Phone phone;
+    phone.m_id = query.value(query.record().indexOf("_ID")).toLongLong();
+    phone.m_countryCode = query.value(query.record().indexOf("_COUNTRY_CODE")).toInt();
+    phone.m_code = query.value(query.record().indexOf("_CODE")).toInt();
+    phone.m_number = query.value(query.record().indexOf("_NUMBER")).toString();
+    vPhone.push_back(phone);
+  }
+
+  bool bSuccess = db.commit();
+  if (!bSuccess)
+    error = query.lastError().text();
+  bSuccess = person.m_id == id;
+  if (!bSuccess)
+    error = "Pessoa não encontrada.";
+
+  if (!bSuccess)
+  {
+    person.clear();
+    vPhone.clear();
+    vAddress.clear();
+  }
+
+  return bSuccess;
+}
+
+bool PersonSQL::insert(QSqlDatabase db,
+                       const Person& person,
+                       const QVector<Phone>& vPhone,
+                       const QVector<Address>& vAddress,
+                       const QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("INSERT INTO _PERSONS ("
+                "_IMAGEID,"
+                "_NAME,"
+                "_ALIAS,"
+                "_EMAIL,"
+                "_CPF_CNPJ,"
+                "_RG_IE,"
+                "_BIRTH_DATE,"
+                "_CREATION_DATE,"
+                "_IS_COMPANY,"
+                "_IS_CUSTOMER,"
+                "_IS_SUPPLIER,"
+                "_IS_EMPLOYEE)"
+                "VALUES ("
+                "(:_imageid),"
+                "(:_name),"
+                "(:_alias),"
+                "(:_email),"
+                "(:_cpfcnpj),"
+                "(:_rgie),"
+                "(:_birthdate),"
+                "(:_creationdate),"
+                "(:_iscompany),"
+                "(:_iscustomer),"
+                "(:_issupplier),"
+                "(:_isemployee))");
+  query.bindValue(":_imageid", person.m_imageId);
+  query.bindValue(":_name", person.m_name);
+  query.bindValue(":_alias", person.m_alias);
+  query.bindValue(":_email", person.m_email);
+  query.bindValue(":_cpfcnpj", person.m_CPF_CNPJ);
+  query.bindValue(":_rgie", person.m_RG_IE);
+  query.bindValue(":_birthdate", person.m_birthDate);
+  query.bindValue(":_creationdate", person.m_creationDate);
+  query.bindValue(":_iscompany", person.m_bCompany);
+  query.bindValue(":_iscustomer", person.m_bCustomer);
+  query.bindValue(":_issupplier", person.m_bSupplier);
+  query.bindValue(":_isemployee", person.m_bEmployee);
+
+  if (query.exec())
+    person.m_id = query.lastInsertId().toInt();
+
+  for (int i = 0; i != vPhone.size(); ++i)
+    ; // TODO
+  return false;
+}
+
+bool ImageSQL::update(QSqlDatabase db,
+                      const Image& image,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("UPDATE _IMAGES SET "
+                "_NAME = (:_name),"
+                "_IMAGE = (:_image) "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", image.m_id);
+  query.bindValue(":_name", image.m_name);
+  query.bindValue(":_image", image.m_image);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
+}
+
+bool ImageSQL::remove(QSqlDatabase db,
+                      int id,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM _IMAGES "
+                "WHERE _ID = (:_id)");
+  query.bindValue(":_id", id);
+
+  if (query.exec())
+    return true;
 
   error = query.lastError().text();
   return false;

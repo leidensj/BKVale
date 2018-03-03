@@ -6,9 +6,11 @@
 #include "jtablecolumn.h"
 #include "person.h"
 
-#define INVALID_PHONE_ID           -1
-#define DEFAULT_COUNTRY_CODE_VALUE 55
-#define DEFAULT_CODE_VALUE         54
+#define INVALID_PHONE_ID                 -1
+#define DEFAULT_PHONE_COUNTRY_CODE_VALUE       55
+#define DEFAULT_PHONE_CODE_VALUE               54
+#define DEFAULT_PHONE_COUNTRY_CODE_VALUE_STR "55"
+#define DEFAULT_PHONE_CODE_VALUE_STR         "54"
 
 struct Phone
 {

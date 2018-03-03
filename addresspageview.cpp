@@ -96,6 +96,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   m_spnNumber = new QSpinBox();
   m_spnNumber->setMinimum(0);
   m_spnNumber->setMaximum(999999);
+  m_spnNumber->setPrefix(tr("Nº "));
   m_edCity = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
   m_edCity->setPlaceholderText(tr("*"));
   m_cbState = new QComboBox();
@@ -251,6 +252,8 @@ void AddressPageView::updateControls()
     bEnableSave = bEnableSave &&
                   m_currentItem->data(Qt::UserRole).value<Address>() != address;
   m_btnSave->setEnabled(bEnableSave);
+
+  emit changedSignal();
 }
 
 void AddressPageView::undo()

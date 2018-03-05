@@ -97,5 +97,9 @@
         <file>res/address.png</file>
         <file>res/pincode.png</file>
         <file>res/undo.png</file>
+        <file>res/brazil.png</file>
+        <file>res/cashier.png</file>
+        <file>res/visit.png</file>
+        <file>res/whatsapp.png</file>
     </qresource>
 </RCC>

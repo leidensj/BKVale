@@ -21,7 +21,8 @@ class AddressPageView : public QFrame
 
 public:
   explicit AddressPageView(QWidget* parent = nullptr);
-  QVector<Address> getAddresses();
+  QVector<Address> getAddresses() const;
+  QVector<int> getRemovedAddresses() const;
   void setAddresses(const QVector<Address>& vAddress);
 
 public slots:
@@ -43,6 +44,7 @@ private slots:
 
 private:
   QListWidgetItem* m_currentItem;
+  QVector<int> m_vRemovedAddressId;
   Address getAddress();
   JLineEdit* m_edCep;
   QPushButton* m_btnCep;

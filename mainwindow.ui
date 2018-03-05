@@ -142,6 +142,7 @@
    <addaction name="actionUsers"/>
    <addaction name="actionPersons"/>
    <addaction name="actionEmployees"/>
+   <addaction name="actionCashRegister"/>
    <addaction name="separator"/>
    <addaction name="actionProducts"/>
    <addaction name="actionCategories"/>
@@ -301,6 +302,18 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar funcionários</string>
+   </property>
+  </action>
+  <action name="actionCashRegister">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/cashier.png</normaloff>:/icons/res/cashier.png</iconset>
+   </property>
+   <property name="text">
+    <string>Caixa</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar caixas</string>
    </property>
   </action>
  </widget>

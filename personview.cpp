@@ -91,9 +91,16 @@ PersonView::~PersonView()
 
 }
 
+Person PersonView::getPerson() const
+{
+  return m_personPage->getPerson();
+}
+
 void PersonView::getPerson(Person& person,
                            QVector<Phone>& vPhone,
-                           QVector<Address>& vAddress) const
+                           QVector<Address>& vAddress,
+                           QVector<int>& vRemovedPhoneId,
+                           QVector<int>& vRemoveAddressId) const
 {
   person.clear();
   vPhone.clear();
@@ -102,6 +109,8 @@ void PersonView::getPerson(Person& person,
   person = m_personPage->getPerson();
   vPhone = m_phonePage->getPhones();
   vAddress = m_addressPage->getAddresses();
+  vRemovedPhoneId = m_phonePage->getRemovedPhones();
+  vRemoveAddressId = m_addressPage->getRemovedAddresses();
 }
 
 void PersonView::setImage(int id, const QString& name, const QByteArray& ar)

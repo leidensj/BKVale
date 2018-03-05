@@ -22,8 +22,8 @@ struct Phone
   void clear()
   {
     m_id = INVALID_PHONE_ID;
-    m_countryCode = DEFAULT_COUNTRY_CODE_VALUE;
-    m_code = DEFAULT_CODE_VALUE;
+    m_countryCode = DEFAULT_PHONE_COUNTRY_CODE_VALUE;
+    m_code = DEFAULT_PHONE_CODE_VALUE;
     m_number.clear();
   }
 

@@ -20,9 +20,12 @@ class PersonView : public QFrame
 public:
   explicit PersonView(QWidget* parent = 0);
   ~PersonView();
+  Person getPerson() const;
   void getPerson(Person& person,
                  QVector<Phone>& vPhone,
-                 QVector<Address>& vAddress) const;
+                 QVector<Address>& vAddress,
+                 QVector<int>& vRemovedPhoneId,
+                 QVector<int>& vRemoveAddressId) const;
   void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:

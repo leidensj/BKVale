@@ -231,6 +231,8 @@ namespace PersonSQL
               const Person& person,
               const QVector<Phone>& vPhone,
               const QVector<Address>& vAddress,
+              const QVector<int>& vRemovedPhoneId,
+              const QVector<int>& vRemovedAddressId,
               QString& error);
 
   bool remove(QSqlDatabase db,

@@ -20,7 +20,8 @@ class PhonePageView : public QFrame
 
 public:
   explicit PhonePageView(QWidget* parent = nullptr);
-  QVector<Phone> getPhones();
+  QVector<Phone> getPhones() const;
+  QVector<int> getRemovedPhones() const;
   void setPhones(const QVector<Phone>& vPhone);
 
 public slots:
@@ -42,6 +43,7 @@ private slots:
 private:
   Phone getPhone();
   QListWidgetItem* m_currentItem;
+  QVector<int> m_vRemovedPhoneId;
   QSpinBox* m_spnCountryCode;
   QSpinBox* m_spnCode;
   JLineEdit* m_edNumber;

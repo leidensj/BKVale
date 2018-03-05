@@ -177,6 +177,7 @@ void PhonePageView::removeSelectedPhone()
   QListWidgetItem* p = m_list->takeItem(m_list->currentRow());
   if (p != nullptr)
   {
+    m_vRemovedPhoneId.push_back(p->data(Qt::UserRole).value<Phone>().m_id);
     delete p;
     updateControls();
   }
@@ -184,6 +185,7 @@ void PhonePageView::removeSelectedPhone()
 
 void PhonePageView::clear()
 {
+  m_vRemovedPhoneId.clear();
   clearInputOnly();
   m_list->clear();
   updateControls();
@@ -215,12 +217,17 @@ Phone PhonePageView::getPhone()
   return phone;
 }
 
-QVector<Phone> PhonePageView::getPhones()
+QVector<Phone> PhonePageView::getPhones() const
 {
   QVector<Phone> vPhone;
   for (int i = 0; i != m_list->count(); ++i)
     vPhone.push_back(m_list->item(i)->data(Qt::UserRole).value<Phone>());
   return vPhone;
+}
+
+QVector<int> PhonePageView::getRemovedPhones() const
+{
+  return m_vRemovedPhoneId;
 }
 
 void PhonePageView::setPhones(const QVector<Phone>& vPhone)

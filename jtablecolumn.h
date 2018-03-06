@@ -27,12 +27,14 @@ struct JTableColumn
                const QString& friendlyName,
                bool bHidden = true,
                bool bSort = false,
-               JResizeMode resizeMode = JResizeMode::ResizeToContents)
+               JResizeMode resizeMode = JResizeMode::ResizeToContents,
+               const QString& icon = "")
   : m_sqlName(sqlName)
   , m_friendlyName(friendlyName)
   , m_bHidden(bHidden)
   , m_bSort(bSort)
   , m_resizeMode(resizeMode)
+  , m_icon(icon)
   {
     if (m_bSort && m_bHidden)
       m_bSort = false;
@@ -43,6 +45,7 @@ struct JTableColumn
   bool m_bHidden;
   bool m_bSort;
   JResizeMode m_resizeMode;
+  QString m_icon;
 };
 
 #endif // JTABLECOLUMN_H

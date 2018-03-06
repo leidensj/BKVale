@@ -50,7 +50,7 @@ CategoryWidget::CategoryWidget(QWidget* parent)
 void CategoryWidget::setDatabase(QSqlDatabase db)
 {
   QSqlTableModel* model = new QSqlTableModel(m_database, db);
-  m_database->set(model, Category::getTableName(), Category::getColumns());
+  m_database->set(model, SQL_CATEGORY_TABLE_NAME, Category::getColumns());
 }
 
 void CategoryWidget::categorySelected(int id)
@@ -128,7 +128,7 @@ void CategoryWidget::searchImage()
   JDatabaseSelector dlg(tr("Escolher Imagem"),
                         QIcon(":/icons/res/icon.png"),
                         INVALID_IMAGE_ID);
-  dlg.set(model, Image::getTableName(), Image::getColumns());
+  dlg.set(model, SQL_IMAGE_TABLE_NAME, Image::getColumns());
   dlg.exec();
   if (Image::st_isValidId(dlg.getCurrentId()))
   {

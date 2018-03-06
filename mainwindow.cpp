@@ -11,7 +11,7 @@
 #include "usermgtwidget.h"
 #include "imagewidget.h"
 #include "logindialog.h"
-#include "personview.h"
+#include "personwidget.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -432,7 +432,8 @@ void BaitaAssistant::openPersonsDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  PersonView* w = new PersonView();
+  PersonWidget* w = new PersonWidget();
+  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Pessoas"));

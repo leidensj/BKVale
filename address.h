@@ -5,6 +5,18 @@
 #include <QObject>
 #include <QString>
 
+#define SQL_ADDRESS_TABLE_NAME "_ADDRESS"
+#define SQL_ADDRESS_COL00 "_ID"
+#define SQL_ADDRESS_COL01 "_PERSONID"
+#define SQL_ADDRESS_COL02 "_CEP"
+#define SQL_ADDRESS_COL03 "_NEIGHBORHOOD"
+#define SQL_ADDRESS_COL04 "_STREET"
+#define SQL_ADDRESS_COL05 "_NUMBER"
+#define SQL_ADDRESS_COL06 "_CITY"
+#define SQL_ADDRESS_COL07 "_STATE"
+#define SQL_ADDRESS_COL08 "_COMPLEMENT"
+#define SQL_ADDRESS_COL09 "_REFERENCE"
+
 #define INVALID_ADDRESS_ID     -1
 #define INVALID_ADDRESS_NUMBER 0
 
@@ -80,20 +92,19 @@ struct Address
   bool isValid() const { return st_isValid(*this); }
   static bool st_isValidId(int id) { return id != INVALID_ADDRESS_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
-  static QString getTableName() { return "_ADDRESSES"; }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn("_ID", QObject::tr("Id")));
-    c.push_back(JTableColumn("_PERSONID", QObject::tr("Pessoa"), false, true));
-    c.push_back(JTableColumn("_CEP", QObject::tr("CEP")));
-    c.push_back(JTableColumn("_NEIGHBORHOOD", QObject::tr("Bairro"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn("_STREET", QObject::tr("Rua"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn("_NUMBER", QObject::tr("Email")));
-    c.push_back(JTableColumn("_STATE", QObject::tr("CPF")));
-    c.push_back(JTableColumn("_COUNTRY", QObject::tr("RG")));
-    c.push_back(JTableColumn("_COMPLEMENT", QObject::tr("CNPJ")));
-    c.push_back(JTableColumn("_REFERENCE", QObject::tr("INSC")));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL01, QObject::tr("Id Pessoa"), false, true));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL02, QObject::tr("CEP")));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL03, QObject::tr("Bairro"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL04, QObject::tr("Rua"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL05, QObject::tr("Número")));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL06, QObject::tr("Cidade")));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL07, QObject::tr("Estado")));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL08, QObject::tr("Complemento")));
+    c.push_back(JTableColumn(SQL_ADDRESS_COL09, QObject::tr("Referência")));
     return c;
   }
 

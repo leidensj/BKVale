@@ -6,8 +6,23 @@
 #include <QString>
 #include <QVector>
 
+#define SQL_PERSON_TABLE_NAME "_PERSONS"
+#define SQL_PERSON_COL00      "_ID"
+#define SQL_PERSON_COL01      "_IMAGEID"
+#define SQL_PERSON_COL02      "_NAME"
+#define SQL_PERSON_COL03      "_ALIAS"
+#define SQL_PERSON_COL04      "_EMAIL"
+#define SQL_PERSON_COL05      "_CPF_CNPJ"
+#define SQL_PERSON_COL06      "_RG_IE"
+#define SQL_PERSON_COL07      "_DETAILS"
+#define SQL_PERSON_COL08      "_BIRTHDATE"
+#define SQL_PERSON_COL09      "_CREATIONDATE"
+#define SQL_PERSON_COL10      "_IS_COMPANY"
+#define SQL_PERSON_COL11      "_IS_CUSTOMER"
+#define SQL_PERSON_COL12      "_IS_SUPPLIER"
+#define SQL_PERSON_COL13      "_IS_EMPLOYEE"
+
 #define INVALID_PERSON_ID                 -1
-#define INVALID_PERSON_DATE               -1
 
 #define MAX_PERSON_NAME_LENGTH            35
 #define MAX_PERSON_DETAILS_LENGTH         35
@@ -23,8 +38,8 @@ struct Person
   QString m_CPF_CNPJ;
   QString m_RG_IE;
   QString m_details;
-  qint64 m_birthDate;
-  qint64 m_creationDate;
+  QString m_birthDate;
+  QString m_creationDate;
   bool m_bCompany;
   bool m_bCustomer;
   bool m_bSupplier;
@@ -40,8 +55,8 @@ struct Person
     m_CPF_CNPJ.clear();
     m_RG_IE.clear();
     m_details.clear();
-    m_birthDate = INVALID_PERSON_DATE;
-    m_creationDate = INVALID_PERSON_DATE;
+    m_birthDate.clear();
+    m_creationDate.clear();
     m_bCompany = false;
     m_bCustomer = false;
     m_bSupplier = false;
@@ -86,25 +101,23 @@ struct Person
   bool isValid() const { return st_isValid(*this); }
   static bool st_isValidId(int id) { return id != INVALID_PERSON_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
-  static QString getTableName() { return "_PERSONS"; }
-  static QVector<JTableColumn> getColumns()
+  static QVector<JTableColumn> getColumns(bool bSearchMode)
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn("_ID", QObject::tr("Id")));
-    c.push_back(JTableColumn("_IMAGEID", QObject::tr("Id Imagem")));
-    c.push_back(JTableColumn("_NAME", QObject::tr("Nome"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn("_ALIAS", QObject::tr("Apelido"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn("_EMAIL", QObject::tr("Email")));
-    c.push_back(JTableColumn("_CPF", QObject::tr("CPF")));
-    c.push_back(JTableColumn("_RG", QObject::tr("RG")));
-    c.push_back(JTableColumn("_CNPJ", QObject::tr("CNPJ")));
-    c.push_back(JTableColumn("_INSC", QObject::tr("INSC")));
-    c.push_back(JTableColumn("_DETAILS", QObject::tr("Detalhes")));
-    c.push_back(JTableColumn("_BIRTHDATE", QObject::tr("Data Nascimento")));
-    c.push_back(JTableColumn("_IS_COMPANY", QObject::tr("Jurídica"), false));
-    c.push_back(JTableColumn("_IS_CUSTOMER", QObject::tr("Cliente"), false));
-    c.push_back(JTableColumn("_IS_SUPPLIER", QObject::tr("Fornecedor"), false));
-    c.push_back(JTableColumn("_IS_EMPLOYEE", QObject::tr("Funcionário"), false));
+    c.push_back(JTableColumn(SQL_PERSON_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(SQL_PERSON_COL01, QObject::tr("Id Imagem")));
+    c.push_back(JTableColumn(SQL_PERSON_COL02, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_PERSON_COL03, QObject::tr("Apelido"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_PERSON_COL04, QObject::tr("Email")));
+    c.push_back(JTableColumn(SQL_PERSON_COL05, QObject::tr("CPF/CNPJ")));
+    c.push_back(JTableColumn(SQL_PERSON_COL06, QObject::tr("RG/IE")));
+    c.push_back(JTableColumn(SQL_PERSON_COL07, QObject::tr("Detalhes")));
+    c.push_back(JTableColumn(SQL_PERSON_COL08, QObject::tr("Data de Nascimento")));
+    c.push_back(JTableColumn(SQL_PERSON_COL09, QObject::tr("Data de Criação")));
+    c.push_back(JTableColumn(SQL_PERSON_COL10, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/building.png"));
+    c.push_back(JTableColumn(SQL_PERSON_COL11, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/client.png"));
+    c.push_back(JTableColumn(SQL_PERSON_COL12, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/supplier.png"));
+    c.push_back(JTableColumn(SQL_PERSON_COL13, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/employee.png"));
     return c;
   }
 };

@@ -334,139 +334,174 @@ bool BaitaSQL::init(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
 
-  query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_NUMBER INTEGER NOT NULL,"
-             "_DATE INTEGER NOT NULL,"
-             "_SUPPLIER TEXT NOT NULL,"
-             "_TOTAL REAL,"
-             "_CASH INT)");
+  bool bSuccess = true;
 
-  query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTESITEMS ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_NOTEID INTEGER NOT NULL,"
-             "_AMMOUNT REAL,"
-             "_PRICE REAL,"
-             "_UNITY TEXT,"
-             "_DESCRIPTION TEXT)");
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
+                        "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        "_NUMBER INTEGER NOT NULL,"
+                        "_DATE INTEGER NOT NULL,"
+                        "_SUPPLIER TEXT NOT NULL,"
+                        "_TOTAL REAL,"
+                        "_CASH INT)");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _PRODUCTS ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_NAME TEXT NOT NULL UNIQUE,"
-             "FOREIGN KEY(_CATEGORYID) REFERENCES _CATEGORIES(_ID),"
-             "FOREIGN KEY(_IMAGEID) REFERENCES _IMAGES(_ID),"
-             "_UNITY TEXT NOT NULL,"
-             "_PACKAGE_UNITY TEXT,"
-             "_PACKAGE_AMMOUNT REAL,"
-             "_DETAILS TEXT,"
-             "_CODE TEXT,"
-             "_AVAILABLE_AT_NOTES,"
-             "_AVAILABLE_AT_SHOP,"
-             "_AVAILABLE_AT_CONSUMPTION,"
-             "_AVAILABLE_TO_BUY,"
-             "_AVAILABLE_TO_SELL)");
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTESITEMS ("
+                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          "_NOTEID INTEGER NOT NULL,"
+                          "_AMMOUNT REAL,"
+                          "_PRICE REAL,"
+                          "_UNITY TEXT,"
+                          "_DESCRIPTION TEXT)");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _CATEGORIES ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_NAME TEXT NOT NULL UNIQUE,"
-             "FOREIGN KEY(_IMAGEID) REFERENCES _IMAGES(_ID))");
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_IMAGE_TABLE_NAME " ("
+                          SQL_IMAGE_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_IMAGE_COL01 " TEXT NOT NULL UNIQUE,"
+                          SQL_IMAGE_COL02 " BLOB)");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _IMAGES ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_NAME TEXT NOT NULL UNIQUE,"
-             "_IMAGE BLOB)");
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_CATEGORY_TABLE_NAME " ("
+                          SQL_CATEGORY_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_CATEGORY_COL01 " INTEGER,"
+                          SQL_CATEGORY_COL02 " TEXT NOT NULL UNIQUE,"
+                          "FOREIGN KEY(" SQL_CATEGORY_COL00 ") REFERENCES "
+                          SQL_IMAGE_TABLE_NAME "(" SQL_IMAGE_COL00 "))");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_TITLE TEXT,"
-             "_MESSAGE TEXT,"
-             "_FAVORITE INT,"
-             "_CAPITALIZATION INT,"
-             "_SIZE INT)");
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
+                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          "_TITLE TEXT,"
+                          "_MESSAGE TEXT,"
+                          "_FAVORITE INT,"
+                          "_CAPITALIZATION INT,"
+                          "_SIZE INT)");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_DATE INTEGER,"
-             "_PRODUCTID INTEGER,"
-             "_PRICE REAL,"
-             "_AMMOUNT REAL,"
-             "_TOTAL REAL)");
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
+                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          "_DATE INTEGER,"
+                          "_PRODUCTID INTEGER,"
+                          "_PRICE REAL,"
+                          "_AMMOUNT REAL,"
+                          "_TOTAL REAL)");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _USERS ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "_USER TEXT NOT NULL UNIQUE,"
-             "_PASSWORD TEXT NOT NULL,"
-             "_ACCESS_NOTE INT,"
-             "_ACCESS_REMINDER INT,"
-             "_ACCESS_CALCULATOR INT,"
-             "_ACCESS_SHOP INT,"
-             "_ACCESS_CONSUMPTION INT,"
-             "_ACCESS_USER INT,"
-             "_ACCESS_PRODUCT INT,"
-             "_ACCESS_SETTINGS INT)");
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_USER_TABLE_NAME " ("
+                          SQL_USER_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_USER_COL01 " TEXT NOT NULL UNIQUE,"
+                          SQL_USER_COL02 " TEXT NOT NULL,"
+                          SQL_USER_COL03 " INT,"
+                          SQL_USER_COL04 " INT,"
+                          SQL_USER_COL05 " INT,"
+                          SQL_USER_COL06 " INT,"
+                          SQL_USER_COL07 " INT,"
+                          SQL_USER_COL08 " INT,"
+                          SQL_USER_COL09 " INT,"
+                          SQL_USER_COL10 " INT)");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _PERSONS ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "FOREIGN KEY(_IMAGEID) REFERENCES _IMAGES(_ID),"
-             "_NAME TEXT NOT NULL UNIQUE,"
-             "_ALIAS TEXT,"
-             "_EMAIL TEXT,"
-             "_CPF_CNPJ TEXT,"
-             "_RG_IE TEXT,"
-             "_DETAILS TEXT,"
-             "_BIRTH_DATE INTEGER,"
-             "_CREATION_DATE INTEGER,"
-             "_IS_COMPANY INT,"
-             "_IS_CUSTOMER INT,"
-             "_IS_SUPPLIER INT,"
-             "_IS_EMPLOYEE INT)");
+  if (bSuccess)
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_PRODUCT_TABLE_NAME " ("
+                        SQL_PRODUCT_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_PRODUCT_COL01 " TEXT NOT NULL UNIQUE,"
+                        SQL_PRODUCT_COL02 " INTEGER,"
+                        SQL_PRODUCT_COL03 " INTEGER,"
+                        SQL_PRODUCT_COL04 " TEXT NOT NULL,"
+                        SQL_PRODUCT_COL05 " TEXT,"
+                        SQL_PRODUCT_COL06 " REAL,"
+                        SQL_PRODUCT_COL07 " TEXT,"
+                        SQL_PRODUCT_COL08 " TEXT,"
+                        SQL_PRODUCT_COL09 " INT,"
+                        SQL_PRODUCT_COL10 " INT,"
+                        SQL_PRODUCT_COL11 " INT,"
+                        SQL_PRODUCT_COL12 " INT,"
+                        SQL_PRODUCT_COL13 " INT,"
+                        "FOREIGN KEY(" SQL_PRODUCT_COL02 ") REFERENCES "
+                        SQL_CATEGORY_TABLE_NAME "(" SQL_CATEGORY_COL00 "),"
+                        "FOREIGN KEY(" SQL_PRODUCT_COL03 ") REFERENCES "
+                        SQL_IMAGE_TABLE_NAME "(" SQL_IMAGE_COL00 "))");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _ADDRESSES ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "FOREIGN KEY(_PERSONID) REFERENCES _PERSONS(_ID),"
-             "_CEP TEXT,"
-             "_NEIGHBORHOOD TEXT,"
-             "_STREET TEXT,"
-             "_NUMBER INT,"
-             "_CITY TEXT,"
-             "_STATE INT,"
-             "_COMPLEMENT TEXT,"
-             "_REFERENCE TEXT)");
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_PERSON_TABLE_NAME " ("
+                          SQL_PERSON_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_PERSON_COL01 " INTEGER,"
+                          SQL_PERSON_COL02 " TEXT NOT NULL UNIQUE,"
+                          SQL_PERSON_COL03 " TEXT,"
+                          SQL_PERSON_COL04 " TEXT,"
+                          SQL_PERSON_COL05 " TEXT,"
+                          SQL_PERSON_COL06 " TEXT,"
+                          SQL_PERSON_COL07 " TEXT,"
+                          SQL_PERSON_COL08 " TEXT,"
+                          SQL_PERSON_COL09 " TEXT,"
+                          SQL_PERSON_COL10 " INT,"
+                          SQL_PERSON_COL11 " INT,"
+                          SQL_PERSON_COL12 " INT,"
+                          SQL_PERSON_COL13 " INT,"
+                          "FOREIGN KEY(" SQL_PERSON_COL01 ") REFERENCES "
+                          SQL_IMAGE_TABLE_NAME "(" SQL_IMAGE_COL00 "))");
 
-  query.exec("CREATE TABLE IF NOT EXISTS _PHONES ("
-             "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "FOREIGN KEY(_PERSONID) REFERENCES _PERSONS(_ID),"
-             "_COUNTRY_CODE INT DEFAULT " DEFAULT_PHONE_COUNTRY_CODE_VALUE_STR ","
-             "_CODE INT DEFAULT " DEFAULT_PHONE_CODE_VALUE_STR ","
-             "_NUMBER TEXT)");
+  if (bSuccess)
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_ADDRESS_TABLE_NAME " ("
+                        SQL_ADDRESS_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_ADDRESS_COL01 " INTEGER,"
+                        SQL_ADDRESS_COL02 " TEXT,"
+                        SQL_ADDRESS_COL03 " TEXT,"
+                        SQL_ADDRESS_COL04 " TEXT,"
+                        SQL_ADDRESS_COL05 " INT,"
+                        SQL_ADDRESS_COL06 " TEXT,"
+                        SQL_ADDRESS_COL07 " INT,"
+                        SQL_ADDRESS_COL08 " TEXT,"
+                        SQL_ADDRESS_COL09 " TEXT,"
+                        "FOREIGN KEY(" SQL_ADDRESS_COL01 ") REFERENCES "
+                        SQL_PERSON_TABLE_NAME "(" SQL_ADDRESS_COL00 "))");
 
-  query.exec("SELECT * FROM _USERS LIMIT 1");
-  if (!query.next())
+  if (bSuccess)
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_PHONE_TABLE_NAME " ("
+                        SQL_PHONE_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_PHONE_COL01 " INTEGER,"
+                        SQL_PHONE_COL02 " INT DEFAULT " DEFAULT_PHONE_COUNTRY_CODE_VALUE_STR ","
+                        SQL_PHONE_COL03 " INT DEFAULT " DEFAULT_PHONE_CODE_VALUE_STR ","
+                        SQL_PHONE_COL04 " TEXT,"
+                        "FOREIGN KEY(" SQL_PHONE_COL01 ") REFERENCES "
+                        SQL_PERSON_TABLE_NAME "(" SQL_PERSON_COL00 "))");
+
+  if (bSuccess)
   {
-    query.prepare("INSERT INTO _USERS ("
-                  "_USER,"
-                  "_PASSWORD,"
-                  "_ACCESS_NOTE,"
-                  "_ACCESS_REMINDER,"
-                  "_ACCESS_CALCULATOR,"
-                  "_ACCESS_SHOP,"
-                  "_ACCESS_CONSUMPTION,"
-                  "_ACCESS_USER,"
-                  "_ACCESS_PRODUCT,"
-                  "_ACCESS_SETTINGS) "
-                  "VALUES ("
-                  "'ADMIN',"
-                  "(:_password),"
-                  "1,1,1,1,1,1,1,1)");
-    query.bindValue(":_password", User::st_strEncryptedPassword("admin"));
-    query.exec();
+    query.exec("SELECT * FROM " SQL_USER_TABLE_NAME " LIMIT 1");
+    if (!query.next())
+    {
+      query.prepare("INSERT INTO " SQL_USER_TABLE_NAME " ("
+                    SQL_USER_COL01 ","
+                    SQL_USER_COL02 ","
+                    SQL_USER_COL03 ","
+                    SQL_USER_COL04 ","
+                    SQL_USER_COL05 ","
+                    SQL_USER_COL06 ","
+                    SQL_USER_COL07 ","
+                    SQL_USER_COL08 ","
+                    SQL_USER_COL09 ","
+                    SQL_USER_COL10 ")"
+                    " VALUES ('"
+                    SQL_USER_DEFAULT_NAME "',"
+                    "(:_password),"
+                    "1,1,1,1,1,1,1,1)");
+      query.bindValue(":_password", User::st_strEncryptedPassword(SQL_USER_DEFAULT_PASSWORD));
+      bSuccess = query.exec();
+    }
   }
 
-  bool bSuccess = db.commit();
   if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+  {
+    bSuccess = db.commit();
+    if (!bSuccess)
+      error = db.lastError().text();
+    return bSuccess;
+  }
 }
 
 bool ProductSQL::select(QSqlDatabase db,
@@ -482,40 +517,40 @@ bool ProductSQL::select(QSqlDatabase db,
 
   QSqlQuery query(db);
   query.prepare("SELECT "
-                "_NAME,"
-                "_CATEGORYID,"
-                "_IMAGEID,"
-                "_UNITY,"
-                "_PACKAGE_UNITY,"
-                "_PACKAGE_AMMOUNT,"
-                "_DETAILS,"
-                "_CODE,"
-                "_AVAILABLE_AT_NOTES,"
-                "_AVAILABLE_AT_SHOP,"
-                "_AVAILABLE_AT_CONSUMPTION,"
-                "_AVAILABLE_TO_BUY,"
-                "_AVAILABLE_TO_SELL "
-                "FROM _PRODUCTS "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+                SQL_PRODUCT_COL01 ","
+                SQL_PRODUCT_COL02 ","
+                SQL_PRODUCT_COL03 ","
+                SQL_PRODUCT_COL04 ","
+                SQL_PRODUCT_COL05 ","
+                SQL_PRODUCT_COL06 ","
+                SQL_PRODUCT_COL07 ","
+                SQL_PRODUCT_COL08 ","
+                SQL_PRODUCT_COL09 ","
+                SQL_PRODUCT_COL10 ","
+                SQL_PRODUCT_COL11 ","
+                SQL_PRODUCT_COL12 ","
+                SQL_PRODUCT_COL13
+                " FROM " SQL_PRODUCT_TABLE_NAME
+                " WHERE " SQL_PRODUCT_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
   if (query.exec())
   {
     if (query.next())
     {
       product.m_id = id;
-      product.m_name = query.value(query.record().indexOf("_NAME")).toString();
-      product.m_categoryId = query.value(query.record().indexOf("_CATEGORYID")).toInt();
-      product.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toInt();
-      product.m_unity = query.value(query.record().indexOf("_UNITY")).toString();
-      product.m_packageUnity = query.value(query.record().indexOf("_PACKAGE_UNITY")).toString();
-      product.m_packageAmmount = query.value(query.record().indexOf("_PACKAGE_AMMOUNT")).toDouble();
-      product.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
-      product.m_code = query.value(query.record().indexOf("_CODE")).toString();
-      product.m_bAvailableAtNotes = query.value(query.record().indexOf("_AVAILABLE_AT_NOTES")).toBool();
-      product.m_bAvailableAtShop = query.value(query.record().indexOf("_AVAILABLE_AT_SHOP")).toBool();
-      product.m_bAvailableAtConsumption = query.value(query.record().indexOf("_AVAILABLE_AT_CONSUMPTION")).toBool();
-      product.m_bAvailableToBuy = query.value(query.record().indexOf("_AVAILABLE_TO_BUY")).toBool();
-      product.m_bAvailableToSell = query.value(query.record().indexOf("_AVAILABLE_TO_SELL")).toBool();
+      product.m_name = query.value(0).toString();
+      product.m_categoryId = query.value(1).toInt();
+      product.m_imageId = query.value(2).toInt();
+      product.m_unity = query.value(3).toString();
+      product.m_packageUnity = query.value(4).toString();
+      product.m_packageAmmount = query.value(5).toDouble();
+      product.m_details = query.value(6).toString();
+      product.m_code = query.value(7).toString();
+      product.m_bAvailableAtNotes = query.value(8).toBool();
+      product.m_bAvailableAtShop = query.value(9).toBool();
+      product.m_bAvailableAtConsumption = query.value(10).toBool();
+      product.m_bAvailableToBuy = query.value(11).toBool();
+      product.m_bAvailableToSell = query.value(12).toBool();
       return true;
     }
     else
@@ -541,47 +576,47 @@ bool ProductSQL::insert(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("INSERT INTO _PRODUCTS ("
-                "_NAME,"
-                "_CATEGORYID,"
-                "_IMAGEID,"
-                "_UNITY,"
-                "_PACKAGE_UNITY,"
-                "_PACKAGE_AMMOUNT,"
-                "_DETAILS,"
-                "_CODE,"
-                "_AVAILABLE_AT_NOTES,"
-                "_AVAILABLE_AT_SHOP,"
-                "_AVAILABLE_AT_CONSUMPTION,"
-                "_AVAILABLE_TO_BUY,"
-                "_AVAILABLE_TO_SELL) "
-                "VALUES ("
-                "(:_name),"
-                "(:_categoryid),"
-                "(:_imageid),"
-                "(:_unity),"
-                "(:_packageunity),"
-                "(:_packageammount),"
-                "(:_details),"
-                "(:_code),"
-                "(:_availableatnotes),"
-                "(:_availableatshop),"
-                "(:_availableatconsumption),"
-                "(:_availabletobuy),"
-                "(:_availabletosell))");
-  query.bindValue(":_name", product.m_name);
-  query.bindValue(":_categoryid", product.m_categoryId);
-  query.bindValue(":_imageid", product.m_imageId);
-  query.bindValue(":_unity", product.m_unity);
-  query.bindValue(":_packageunity", product.m_packageUnity);
-  query.bindValue(":_packageammount", product.m_packageAmmount);
-  query.bindValue(":_details", product.m_details);
-  query.bindValue(":_code", product.m_code);
-  query.bindValue(":_availableatnotes", product.m_bAvailableAtNotes);
-  query.bindValue(":_availableatshop", product.m_bAvailableAtShop);
-  query.bindValue(":_availableatconsumption", product.m_bAvailableAtConsumption);
-  query.bindValue(":_availabletobuy", product.m_bAvailableToBuy);
-  query.bindValue(":_availabletosell", product.m_bAvailableToSell);
+  query.prepare("INSERT INTO " SQL_PRODUCT_TABLE_NAME " ("
+                SQL_PRODUCT_COL01 ","
+                SQL_PRODUCT_COL02 ","
+                SQL_PRODUCT_COL03 ","
+                SQL_PRODUCT_COL04 ","
+                SQL_PRODUCT_COL05 ","
+                SQL_PRODUCT_COL06 ","
+                SQL_PRODUCT_COL07 ","
+                SQL_PRODUCT_COL08 ","
+                SQL_PRODUCT_COL09 ","
+                SQL_PRODUCT_COL10 ","
+                SQL_PRODUCT_COL11 ","
+                SQL_PRODUCT_COL12 ","
+                SQL_PRODUCT_COL13 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04),"
+                "(:_v05),"
+                "(:_v06),"
+                "(:_v07),"
+                "(:_v08),"
+                "(:_v09),"
+                "(:_v10),"
+                "(:_v11),"
+                "(:_v12),"
+                "(:_v13))");
+  query.bindValue(":_v01", product.m_name);
+  query.bindValue(":_v02", product.m_categoryId);
+  query.bindValue(":_v03", product.m_imageId);
+  query.bindValue(":_v04", product.m_unity);
+  query.bindValue(":_v05", product.m_packageUnity);
+  query.bindValue(":_v06", product.m_packageAmmount);
+  query.bindValue(":_v07", product.m_details);
+  query.bindValue(":_v08", product.m_code);
+  query.bindValue(":_v09", product.m_bAvailableAtNotes);
+  query.bindValue(":_v10", product.m_bAvailableAtShop);
+  query.bindValue(":_v11", product.m_bAvailableAtConsumption);
+  query.bindValue(":_v12", product.m_bAvailableToBuy);
+  query.bindValue(":_v13", product.m_bAvailableToSell);
 
   if (query.exec())
   {
@@ -603,35 +638,35 @@ bool ProductSQL::update(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("UPDATE _PRODUCTS SET "
-                "_NAME = (:_name),"
-                "_CATEGORYID = (:_categoryid),"
-                "_IMAGEID = (:_imageid),"
-                "_UNITY = (:_unity),"
-                "_PACKAGE_UNITY = (:_packageunity),"
-                "_PACKAGE_AMMOUNT = (:_packageammount),"
-                "_DETAILS = (:_details),"
-                "_CODE = (:_code),"
-                "_AVAILABLE_AT_NOTES = (:_availableatnotes),"
-                "_AVAILABLE_AT_SHOP = (:_availableatshop),"
-                "_AVAILABLE_AT_CONSUMPTION = (:_availableatconsumption),"
-                "_AVAILABLE_TO_BUY = (:_availabletobuy),"
-                "_AVAILABLE_TO_SELL = (:_availabletosell) "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", product.m_id);
-  query.bindValue(":_name", product.m_name);
-  query.bindValue(":_categoryid", product.m_categoryId);
-  query.bindValue(":_imageid", product.m_imageId);
-  query.bindValue(":_unity", product.m_unity);
-  query.bindValue(":_packageunity", product.m_packageUnity);
-  query.bindValue(":_packageammount", product.m_packageAmmount);
-  query.bindValue(":_details", product.m_details);
-  query.bindValue(":_code", product.m_code);
-  query.bindValue(":_availableatnotes", product.m_bAvailableAtNotes);
-  query.bindValue(":_availableatshop", product.m_bAvailableAtShop);
-  query.bindValue(":_availableatconsumption", product.m_bAvailableAtConsumption);
-  query.bindValue(":_availabletobuy", product.m_bAvailableToBuy);
-  query.bindValue(":_availabletosell", product.m_bAvailableToSell);
+  query.prepare("UPDATE " SQL_PRODUCT_TABLE_NAME " SET "
+                SQL_PRODUCT_COL01 " = (:_v01),"
+                SQL_PRODUCT_COL02 " = (:_v02),"
+                SQL_PRODUCT_COL03 " = (:_v03),"
+                SQL_PRODUCT_COL04 " = (:_v04),"
+                SQL_PRODUCT_COL05 " = (:_v05),"
+                SQL_PRODUCT_COL06 " = (:_v06),"
+                SQL_PRODUCT_COL07 " = (:_v07),"
+                SQL_PRODUCT_COL08 " = (:_v08),"
+                SQL_PRODUCT_COL09 " = (:_v09),"
+                SQL_PRODUCT_COL10 " = (:_v10),"
+                SQL_PRODUCT_COL11 " = (:_v11),"
+                SQL_PRODUCT_COL12 " = (:_v12),"
+                SQL_PRODUCT_COL13 " = (:_v13)"
+                " WHERE " SQL_PRODUCT_COL00 " = (:_v00)");
+  query.bindValue(":_v00", product.m_id);
+  query.bindValue(":_v01", product.m_name);
+  query.bindValue(":_v02", product.m_categoryId);
+  query.bindValue(":_v03", product.m_imageId);
+  query.bindValue(":_v04", product.m_unity);
+  query.bindValue(":_v05", product.m_packageUnity);
+  query.bindValue(":_v06", product.m_packageAmmount);
+  query.bindValue(":_v07", product.m_details);
+  query.bindValue(":_v08", product.m_code);
+  query.bindValue(":_v09", product.m_bAvailableAtNotes);
+  query.bindValue(":_v10", product.m_bAvailableAtShop);
+  query.bindValue(":_v11", product.m_bAvailableAtConsumption);
+  query.bindValue(":_v12", product.m_bAvailableToBuy);
+  query.bindValue(":_v13", product.m_bAvailableToSell);
 
   if (query.exec())
     return true;
@@ -650,9 +685,9 @@ bool ProductSQL::remove(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("DELETE FROM _PRODUCTS "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+  query.prepare("DELETE FROM " SQL_PRODUCT_TABLE_NAME
+                " WHERE " SQL_PRODUCT_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
 
   if (query.exec())
     return true;
@@ -674,19 +709,19 @@ bool CategorySQL::select(QSqlDatabase db,
 
   QSqlQuery query(db);
   query.prepare("SELECT "
-                "_NAME,"
-                "_IMAGEID "
-                "FROM _CATEGORIES "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+                SQL_CATEGORY_COL01 ","
+                SQL_CATEGORY_COL02
+                " FROM " SQL_CATEGORY_TABLE_NAME
+                " WHERE " SQL_CATEGORY_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
 
   if (query.exec())
   {
     if (query.next())
     {
       category.m_id = id;
-      category.m_name = query.value(query.record().indexOf("_NAME")).toString();
-      category.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toInt();
+      category.m_imageId = query.value(0).toInt();
+      category.m_name = query.value(1).toString();
       return true;
     }
     else
@@ -712,14 +747,14 @@ bool CategorySQL::insert(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("INSERT INTO _CATEGORIES ("
-                "_NAME,"
-                "_IMAGEID) "
-                "VALUES ("
-                "(:_name),"
-                "(:_imageid))");
-  query.bindValue(":_name", category.m_name);
-  query.bindValue(":_imageid", category.m_imageId);
+  query.prepare("INSERT INTO " SQL_CATEGORY_TABLE_NAME " ("
+                SQL_CATEGORY_COL01 ","
+                SQL_CATEGORY_COL02 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02))");
+  query.bindValue(":_v01", category.m_imageId);
+  query.bindValue(":_v02", category.m_name);
 
   if (query.exec())
   {
@@ -741,13 +776,13 @@ bool CategorySQL::update(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("UPDATE _CATEGORIES SET "
-                "_NAME = (:_name),"
-                "_IMAGEID = (:_imageid) "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", category.m_id);
-  query.bindValue(":_name", category.m_name);
-  query.bindValue(":_imageid", category.m_imageId);
+  query.prepare("UPDATE " SQL_CATEGORY_TABLE_NAME " SET "
+                SQL_CATEGORY_COL01 " = (:_v01),"
+                SQL_CATEGORY_COL02 " = (:_v02)"
+                " WHERE " SQL_CATEGORY_COL00 " = (:_v00)");
+  query.bindValue(":_v00", category.m_id);
+  query.bindValue(":_v01", category.m_imageId);
+  query.bindValue(":_v02", category.m_name);
 
   if (query.exec())
     return true;
@@ -766,9 +801,9 @@ bool CategorySQL::remove(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("DELETE FROM _CATEGORIES "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+  query.prepare("DELETE FROM " SQL_CATEGORY_TABLE_NAME
+                " WHERE " SQL_CATEGORY_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
 
   if (query.exec())
     return true;
@@ -790,19 +825,19 @@ bool ImageSQL::select(QSqlDatabase db,
 
   QSqlQuery query(db);
   query.prepare("SELECT "
-                "_NAME,"
-                "_IMAGE "
-                "FROM _IMAGES "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+                SQL_IMAGE_COL01 ","
+                SQL_IMAGE_COL02
+                " FROM " SQL_IMAGE_TABLE_NAME
+                " WHERE " SQL_IMAGE_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
 
   if (query.exec())
   {
     if (query.next())
     {
       image.m_id = id;
-      image.m_name = query.value(query.record().indexOf("_NAME")).toString();
-      image.m_image = query.value(query.record().indexOf("_IMAGE")).toByteArray();
+      image.m_name = query.value(0).toString();
+      image.m_image = query.value(1).toByteArray();
       return true;
     }
     else
@@ -828,14 +863,14 @@ bool ImageSQL::insert(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("INSERT INTO _IMAGES ("
-                "_NAME,"
-                "_IMAGE) "
-                "VALUES ("
-                "(:_name),"
-                "(:_image))");
-  query.bindValue(":_name", image.m_name);
-  query.bindValue(":_image", image.m_image);
+  query.prepare("INSERT INTO " SQL_IMAGE_TABLE_NAME " ("
+                SQL_IMAGE_COL00 ","
+                SQL_IMAGE_COL01 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02))");
+  query.bindValue(":_v01", image.m_name);
+  query.bindValue(":_v02", image.m_image);
 
   if (query.exec())
   {
@@ -857,13 +892,13 @@ bool ImageSQL::update(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("UPDATE _IMAGES SET "
-                "_NAME = (:_name),"
-                "_IMAGE = (:_image) "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", image.m_id);
-  query.bindValue(":_name", image.m_name);
-  query.bindValue(":_image", image.m_image);
+  query.prepare("UPDATE " SQL_IMAGE_TABLE_NAME " SET "
+                SQL_IMAGE_COL01 " = (:_v01),"
+                SQL_IMAGE_COL02 " = (:_v02)"
+                " WHERE " SQL_IMAGE_COL00 " = (:_v00)");
+  query.bindValue(":_v00", image.m_id);
+  query.bindValue(":_v01", image.m_name);
+  query.bindValue(":_v02", image.m_image);
 
   if (query.exec())
     return true;
@@ -882,9 +917,9 @@ bool ImageSQL::remove(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("DELETE FROM _IMAGES "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+  query.prepare("DELETE FROM " SQL_IMAGE_TABLE_NAME
+                " WHERE " SQL_IMAGE_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
 
   if (query.exec())
     return true;
@@ -1211,38 +1246,38 @@ bool UserSQL::insert(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("INSERT INTO _USERS ("
-                "_USER,"
-                "_PASSWORD,"
-                "_ACCESS_NOTE,"
-                "_ACCESS_REMINDER,"
-                "_ACCESS_CALCULATOR,"
-                "_ACCESS_SHOP,"
-                "_ACCESS_CONSUMPTION,"
-                "_ACCESS_USER,"
-                "_ACCESS_PRODUCT,"
-                "_ACCESS_SETTINGS) "
-                "VALUES ("
-                "(:_user),"
-                "(:_password),"
-                "(:_accessNote),"
-                "(:_accessReminder),"
-                "(:_accessCalculator),"
-                "(:_accessShop),"
-                "(:_accessConsumption),"
-                "(:_accessUser),"
-                "(:_accessProduct),"
-                "(:_accessSettings))");
-  query.bindValue(":_user", user.m_strUser);
-  query.bindValue(":_password", user.st_strEncryptedPassword(strPassword));
-  query.bindValue(":_accessNote", user.m_bAccessNote);
-  query.bindValue(":_accessReminder", user.m_bAccessReminder);
-  query.bindValue(":_accessCalculator", user.m_bAccessCalculator);
-  query.bindValue(":_accessShop", user.m_bAccessShop);
-  query.bindValue(":_accessConsumption", user.m_bAccessConsumption);
-  query.bindValue(":_accessUser", user.m_bAccessUser);
-  query.bindValue(":_accessProduct", user.m_bAccessProduct);
-  query.bindValue(":_accessSettings", user.m_bAccessSettings);
+  query.prepare("INSERT INTO " SQL_USER_TABLE_NAME " ("
+                SQL_USER_COL01 ","
+                SQL_USER_COL02 ","
+                SQL_USER_COL03 ","
+                SQL_USER_COL04 ","
+                SQL_USER_COL05 ","
+                SQL_USER_COL06 ","
+                SQL_USER_COL07 ","
+                SQL_USER_COL08 ","
+                SQL_USER_COL09 ","
+                SQL_USER_COL10 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04),"
+                "(:_v05),"
+                "(:_v06),"
+                "(:_v07),"
+                "(:_v08),"
+                "(:_v09),"
+                "(:_v10))");
+  query.bindValue(":_v01", user.m_strUser);
+  query.bindValue(":_v02", user.st_strEncryptedPassword(strPassword));
+  query.bindValue(":_v03", user.m_bAccessNote);
+  query.bindValue(":_v04", user.m_bAccessReminder);
+  query.bindValue(":_v05", user.m_bAccessCalculator);
+  query.bindValue(":_v06", user.m_bAccessShop);
+  query.bindValue(":_v07", user.m_bAccessConsumption);
+  query.bindValue(":_v08", user.m_bAccessUser);
+  query.bindValue(":_v09", user.m_bAccessProduct);
+  query.bindValue(":_v10", user.m_bAccessSettings);
 
   if (query.exec())
   {
@@ -1264,35 +1299,35 @@ bool UserSQL::update(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
-  QString strQuery("UPDATE _USERS SET "
-                   "_USER = (:_user),");
+  QString strQuery("UPDATE " SQL_USER_TABLE_NAME " SET "
+                   SQL_USER_COL01 " = (:_v01),");
   if (!strPassword.isEmpty())
-    strQuery += "_PASSWORD = (:_password),";
-  strQuery += "_ACCESS_NOTE = (:_accessNote),"
-              "_ACCESS_REMINDER = (:_accessReminder),"
-              "_ACCESS_CALCULATOR = (:_accessCalculator),"
-              "_ACCESS_SHOP = (:_accessShop),"
-              "_ACCESS_CONSUMPTION = (:_accessConsumption),"
-              "_ACCESS_USER = (:_accessUser),"
-              "_ACCESS_PRODUCT = (:_accessProduct),"
-              "_ACCESS_SETTINGS = (:_accessSettings) "
-              "WHERE _ID = (:_id)";
+    strQuery += SQL_USER_COL02 " = (:_v02),";
+  strQuery += SQL_USER_COL03" = (:_v03),"
+              SQL_USER_COL04" = (:_v04),"
+              SQL_USER_COL05" = (:_v05),"
+              SQL_USER_COL06" = (:_v06),"
+              SQL_USER_COL07" = (:_v07),"
+              SQL_USER_COL08" = (:_v08),"
+              SQL_USER_COL09" = (:_v09),"
+              SQL_USER_COL10" = (:_v10)"
+              " WHERE " SQL_USER_COL00 " = (:_v00)";
 
 
   QSqlQuery query(db);
   query.prepare(strQuery);
-  query.bindValue(":_id", user.m_id);
-  query.bindValue(":_user", user.m_strUser);
+  query.bindValue(":_v00", user.m_id);
+  query.bindValue(":_v01", user.m_strUser);
   if (!strPassword.isEmpty())
-    query.bindValue(":_password", User::st_strEncryptedPassword(strPassword));
-  query.bindValue(":_accessNote", user.m_bAccessNote);
-  query.bindValue(":_accessReminder", user.m_bAccessReminder);
-  query.bindValue(":_accessCalculator", user.m_bAccessCalculator);
-  query.bindValue(":_accessShop", user.m_bAccessShop);
-  query.bindValue(":_accessConsumption", user.m_bAccessConsumption);
-  query.bindValue(":_accessUser", user.m_bAccessUser);
-  query.bindValue(":_accessProduct", user.m_bAccessProduct);
-  query.bindValue(":_accessSettings", user.m_bAccessSettings);
+    query.bindValue(":_v02", User::st_strEncryptedPassword(strPassword));
+  query.bindValue(":_v03", user.m_bAccessNote);
+  query.bindValue(":_v04", user.m_bAccessReminder);
+  query.bindValue(":_v05", user.m_bAccessCalculator);
+  query.bindValue(":_v06", user.m_bAccessShop);
+  query.bindValue(":_v07", user.m_bAccessConsumption);
+  query.bindValue(":_v08", user.m_bAccessUser);
+  query.bindValue(":_v09", user.m_bAccessProduct);
+  query.bindValue(":_v10", user.m_bAccessSettings);
 
   if (query.exec())
     return true;
@@ -1315,32 +1350,34 @@ bool UserSQL::select(QSqlDatabase db,
   bool bFound = false;
   QSqlQuery query(db);
   query.prepare("SELECT "
-                "_USER,"
-                "_ACCESS_NOTE,"
-                "_ACCESS_REMINDER,"
-                "_ACCESS_CALCULATOR,"
-                "_ACCESS_SHOP,"
-                "_ACCESS_CONSUMPTION,"
-                "_ACCESS_USER,"
-                "_ACCESS_PRODUCT,"
-                "_ACCESS_SETTINGS "
-                "FROM _USERS "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+                SQL_USER_COL01 ","
+                SQL_USER_COL02 ","
+                SQL_USER_COL03 ","
+                SQL_USER_COL04 ","
+                SQL_USER_COL05 ","
+                SQL_USER_COL06 ","
+                SQL_USER_COL07 ","
+                SQL_USER_COL08 ","
+                SQL_USER_COL09 ","
+                SQL_USER_COL10
+                " FROM " SQL_USER_TABLE_NAME
+                " WHERE " SQL_ADDRESS_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
   if (query.exec())
   {
     if (query.next())
     {
       user.m_id = id;
-      user.m_strUser = query.value(query.record().indexOf("_USER")).toString();
-      user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_NOTE")).toBool();
-      user.m_bAccessReminder = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
-      user.m_bAccessCalculator = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
-      user.m_bAccessShop = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
-      user.m_bAccessConsumption = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
-      user.m_bAccessUser = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
-      user.m_bAccessProduct = query.value(query.record().indexOf("_ACCESS_PRODUCT")).toBool();
-      user.m_bAccessSettings = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
+      user.m_strUser = query.value(0).toString();
+      query.value(1).toString(); // password nao precisamos
+      user.m_bAccessNote = query.value(2).toBool();
+      user.m_bAccessReminder = query.value(3).toBool();
+      user.m_bAccessCalculator = query.value(4).toBool();
+      user.m_bAccessShop = query.value(5).toBool();
+      user.m_bAccessConsumption = query.value(6).toBool();
+      user.m_bAccessUser = query.value(7).toBool();
+      user.m_bAccessProduct = query.value(8).toBool();
+      user.m_bAccessSettings = query.value(9).toBool();
       bFound = true;
     }
 
@@ -1363,9 +1400,9 @@ bool UserSQL::remove(QSqlDatabase db,
     return false;
 
   QSqlQuery query(db);
-  query.prepare("DELETE FROM _USERS "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+  query.prepare("DELETE FROM " SQL_USER_TABLE_NAME
+                " WHERE " SQL_USER_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
   if (query.exec())
     return true;
 
@@ -1398,27 +1435,40 @@ bool UserLoginSQL::login(const QString& strUser,
     return false;
 
   QSqlQuery query(m_db);
-  query.prepare("SELECT * FROM _USERS "
-                "WHERE _USER = (:_user) AND "
-                "_PASSWORD = (:_password) LIMIT 1");
-  query.bindValue(":_user", strUser);
-  query.bindValue(":_password", User::st_strEncryptedPassword(strPassword));
+  query.prepare("SELECT "
+                SQL_USER_COL00 ","
+                SQL_USER_COL01 ","
+                SQL_USER_COL02 ","
+                SQL_USER_COL03 ","
+                SQL_USER_COL04 ","
+                SQL_USER_COL05 ","
+                SQL_USER_COL06 ","
+                SQL_USER_COL07 ","
+                SQL_USER_COL08 ","
+                SQL_USER_COL09 ","
+                SQL_USER_COL10
+                " FROM " SQL_USER_TABLE_NAME
+                " WHERE " SQL_USER_COL01 " = (:_v01) AND "
+                SQL_USER_COL02 " = (:_v02) LIMIT 1");
+  query.bindValue(":_v01", strUser);
+  query.bindValue(":_v02", User::st_strEncryptedPassword(strPassword));
 
   if (query.exec())
   {
     bool bFound = false;
     if (query.next())
     {
-      m_user.m_id = query.value(query.record().indexOf("_ID")).toInt();
-      m_user.m_strUser = query.value(query.record().indexOf("_USER")).toString();
-      m_user.m_bAccessNote = query.value(query.record().indexOf("_ACCESS_NOTE")).toBool();
-      m_user.m_bAccessReminder = query.value(query.record().indexOf("_ACCESS_REMINDER")).toBool();
-      m_user.m_bAccessCalculator = query.value(query.record().indexOf("_ACCESS_CALCULATOR")).toBool();
-      m_user.m_bAccessShop = query.value(query.record().indexOf("_ACCESS_SHOP")).toBool();
-      m_user.m_bAccessConsumption = query.value(query.record().indexOf("_ACCESS_CONSUMPTION")).toBool();
-      m_user.m_bAccessUser = query.value(query.record().indexOf("_ACCESS_USER")).toBool();
-      m_user.m_bAccessProduct = query.value(query.record().indexOf("_ACCESS_PRODUCT")).toBool();
-      m_user.m_bAccessSettings = query.value(query.record().indexOf("_ACCESS_SETTINGS")).toBool();
+      m_user.m_id = query.value(0).toInt();
+      m_user.m_strUser = query.value(1).toString();
+      query.value(2).toString(); // password nao precisamos
+      m_user.m_bAccessNote = query.value(3).toBool();
+      m_user.m_bAccessReminder = query.value(4).toBool();
+      m_user.m_bAccessCalculator = query.value(5).toBool();
+      m_user.m_bAccessShop = query.value(6).toBool();
+      m_user.m_bAccessConsumption = query.value(7).toBool();
+      m_user.m_bAccessUser = query.value(8).toBool();
+      m_user.m_bAccessProduct = query.value(9).toBool();
+      m_user.m_bAccessSettings = query.value(10).toBool();
       bFound = true;
     }
 
@@ -1448,74 +1498,118 @@ bool PersonSQL::select(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("SELECT * "
-                "FROM _PERSONS "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
+  query.prepare("SELECT "
+                SQL_PERSON_COL01 ","
+                SQL_PERSON_COL02 ","
+                SQL_PERSON_COL03 ","
+                SQL_PERSON_COL04 ","
+                SQL_PERSON_COL05 ","
+                SQL_PERSON_COL06 ","
+                SQL_PERSON_COL07 ","
+                SQL_PERSON_COL08 ","
+                SQL_PERSON_COL09 ","
+                SQL_PERSON_COL10 ","
+                SQL_PERSON_COL11 ","
+                SQL_PERSON_COL12 ","
+                SQL_PERSON_COL13 ","
+                " FROM " SQL_PERSON_TABLE_NAME
+                " WHERE " SQL_PERSON_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
+  bool bSuccess = query.exec();
 
-  query.exec();
+  if (bSuccess && query.next())
   {
-    if (query.next())
+    person.m_id = id;
+    person.m_imageId = query.value(0).toLongLong();
+    person.m_name = query.value(1).toString();
+    person.m_alias = query.value(2).toString();
+    person.m_email = query.value(3).toString();
+    person.m_CPF_CNPJ = query.value(4).toString();
+    person.m_RG_IE = query.value(5).toString();
+    person.m_details = query.value(6).toString();
+    person.m_birthDate = query.value(7).toString();
+    person.m_creationDate = query.value(8).toString();
+    person.m_bCompany = query.value(9).toBool();
+    person.m_bCustomer = query.value(10).toBool();
+    person.m_bSupplier = query.value(11).toBool();
+    person.m_bEmployee = query.value(12).toBool();
+    return true;
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("SELECT "
+                  SQL_ADDRESS_COL00 ","
+                  SQL_ADDRESS_COL01 ","
+                  SQL_ADDRESS_COL02 ","
+                  SQL_ADDRESS_COL03 ","
+                  SQL_ADDRESS_COL04 ","
+                  SQL_ADDRESS_COL05 ","
+                  SQL_ADDRESS_COL06 ","
+                  SQL_ADDRESS_COL07 ","
+                  SQL_ADDRESS_COL08 ","
+                  SQL_ADDRESS_COL09
+                  " FROM " SQL_ADDRESS_TABLE_NAME
+                  " WHERE " SQL_ADDRESS_COL01 " = (:_v01)");
+    query.bindValue(":_v01", id);
+    bSuccess = query.exec();
+    while (bSuccess && query.next())
     {
-      person.m_id = id;
-      person.m_imageId = query.value(query.record().indexOf("_IMAGEID")).toLongLong();
-      person.m_name = query.value(query.record().indexOf("_NAME")).toString();
-      person.m_alias = query.value(query.record().indexOf("_ALIAS")).toString();
-      person.m_email = query.value(query.record().indexOf("_EMAIL")).toString();
-      person.m_CPF_CNPJ = query.value(query.record().indexOf("_CPF_CNPJ")).toString();
-      person.m_RG_IE = query.value(query.record().indexOf("_RG_IE")).toString();
-      person.m_details = query.value(query.record().indexOf("_DETAILS")).toString();
-      person.m_birthDate = query.value(query.record().indexOf("_BIRTH_DATE")).toLongLong();
-      person.m_creationDate = query.value(query.record().indexOf("_CREATION_DATE")).toLongLong();
-      person.m_bCompany = query.value(query.record().indexOf("_IS_COMPANY")).toBool();
-      person.m_bCustomer = query.value(query.record().indexOf("_IS_CUSTOMER")).toBool();
-      person.m_bSupplier = query.value(query.record().indexOf("_IS_SUPPLIER")).toBool();
-      person.m_bEmployee = query.value(query.record().indexOf("_IS_EMPLOYEE")).toBool();
-      return true;
+      Address address;
+      address.m_id = query.value(0).toLongLong();
+      query.value(1).toLongLong(); // personId não usamos
+      address.m_cep = query.value(2).toString();
+      address.m_neighborhood = query.value(3).toString();
+      address.m_street = query.value(4).toString();
+      address.m_number = query.value(5).toInt();
+      address.m_city = query.value(6).toString();
+      address.m_state = (Address::EBRState)query.value(7).toInt();
+      address.m_complement = query.value(8).toString();
+      address.m_reference = query.value(9).toString();
+      vAddress.push_back(address);
     }
   }
 
-  query.prepare("SELECT * "
-                "FROM _ADDRESSES "
-                "WHERE _PERSONID = (:_personid)");
-  query.bindValue(":_personid", id);
-  query.exec();
-  while (query.next())
+  if (bSuccess)
   {
-    Address address;
-    address.m_id = query.value(query.record().indexOf("_ID")).toLongLong();
-    address.m_cep = query.value(query.record().indexOf("_CEP")).toString();
-    address.m_neighborhood = query.value(query.record().indexOf("_NEIGHBORHOOD")).toString();
-    address.m_street = query.value(query.record().indexOf("_STREET")).toString();
-    address.m_number = query.value(query.record().indexOf("_NUMBER")).toInt();
-    address.m_city = query.value(query.record().indexOf("_CITY")).toString();
-    address.m_state = (Address::EBRState)query.value(query.record().indexOf("_STATE")).toInt();
-    address.m_complement = query.value(query.record().indexOf("_COMPLEMENT")).toString();
-    address.m_reference = query.value(query.record().indexOf("_REFERENCE")).toString();
-    vAddress.push_back(address);
+    query.prepare("SELECT "
+                  SQL_PHONE_COL00 ","
+                  SQL_PHONE_COL01 ","
+                  SQL_PHONE_COL02 ","
+                  SQL_PHONE_COL03 ","
+                  SQL_PHONE_COL04
+                  " FROM " SQL_PHONE_TABLE_NAME
+                  " WHERE " SQL_PHONE_COL01 " = (:_v01)");
+    query.bindValue(":_v01", id);
+    bSuccess = query.exec();
+    while (bSuccess && query.next())
+    {
+      Phone phone;
+      phone.m_id = query.value(0).toLongLong();
+      query.value(1).toLongLong(); //personId não usamos
+      phone.m_countryCode = query.value(2).toInt();
+      phone.m_code = query.value(3).toInt();
+      phone.m_number = query.value(4).toString();
+      vPhone.push_back(phone);
+    }
   }
 
-  query.prepare("SELECT * "
-                "FROM _PHONES "
-                "WHERE _PERSONID = (:_personid)");
-  query.bindValue(":_personid", id);
-  query.exec();
-  while (query.next())
-  {
-    Phone phone;
-    phone.m_id = query.value(query.record().indexOf("_ID")).toLongLong();
-    phone.m_countryCode = query.value(query.record().indexOf("_COUNTRY_CODE")).toInt();
-    phone.m_code = query.value(query.record().indexOf("_CODE")).toInt();
-    phone.m_number = query.value(query.record().indexOf("_NUMBER")).toString();
-    vPhone.push_back(phone);
-  }
-
-  bool bSuccess = db.commit();
   if (!bSuccess)
+  {
     error = query.lastError().text();
-  bSuccess = person.m_id == id;
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
+
   if (!bSuccess)
+    error = db.lastError().text();
+  else if (person.m_id != id)
+  {
+    bSuccess = false;
     error = "Pessoa não encontrada.";
+  }
 
   if (!bSuccess)
   {
@@ -1540,107 +1634,139 @@ bool PersonSQL::insert(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("INSERT INTO _PERSONS ("
-                "_IMAGEID,"
-                "_NAME,"
-                "_ALIAS,"
-                "_EMAIL,"
-                "_CPF_CNPJ,"
-                "_RG_IE,"
-                "_BIRTH_DATE,"
-                "_CREATION_DATE,"
-                "_IS_COMPANY,"
-                "_IS_CUSTOMER,"
-                "_IS_SUPPLIER,"
-                "_IS_EMPLOYEE)"
-                "VALUES ("
-                "(:_imageid),"
-                "(:_name),"
-                "(:_alias),"
-                "(:_email),"
-                "(:_cpfcnpj),"
-                "(:_rgie),"
-                "(:_birthdate),"
-                "(:_creationdate),"
-                "(:_iscompany),"
-                "(:_iscustomer),"
-                "(:_issupplier),"
-                "(:_isemployee))");
-  query.bindValue(":_imageid", person.m_imageId);
-  query.bindValue(":_name", person.m_name);
-  query.bindValue(":_alias", person.m_alias);
-  query.bindValue(":_email", person.m_email);
-  query.bindValue(":_cpfcnpj", person.m_CPF_CNPJ);
-  query.bindValue(":_rgie", person.m_RG_IE);
-  query.bindValue(":_birthdate", person.m_birthDate);
-  query.bindValue(":_creationdate", person.m_creationDate);
-  query.bindValue(":_iscompany", person.m_bCompany);
-  query.bindValue(":_iscustomer", person.m_bCustomer);
-  query.bindValue(":_issupplier", person.m_bSupplier);
-  query.bindValue(":_isemployee", person.m_bEmployee);
+  query.prepare("INSERT INTO " SQL_PERSON_TABLE_NAME " ("
+                SQL_PERSON_COL02 ","
+                SQL_PERSON_COL03 ","
+                SQL_PERSON_COL04 ","
+                SQL_PERSON_COL05 ","
+                SQL_PERSON_COL06 ","
+                SQL_PERSON_COL07 ","
+                SQL_PERSON_COL08 ","
+                SQL_PERSON_COL09 ","
+                SQL_PERSON_COL10 ","
+                SQL_PERSON_COL11 ","
+                SQL_PERSON_COL12 ","
+                SQL_PERSON_COL13  ")"
+                " VALUES ("
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04),"
+                "(:_v05),"
+                "(:_v06),"
+                "(:_v07),"
+                "(:_v08),"
+                "(:_v09),"
+                "(:_v10),"
+                "(:_v11),"
+                "(:_v12),"
+                "(:_v13))");
+  query.bindValue(":_v02", person.m_name);
+  query.bindValue(":_v03", person.m_alias);
+  query.bindValue(":_v04", person.m_email);
+  query.bindValue(":_v05", person.m_CPF_CNPJ);
+  query.bindValue(":_v06", person.m_RG_IE);
+  query.bindValue(":_v07", person.m_details);
+  query.bindValue(":_v08", person.m_birthDate);
+  query.bindValue(":_v09", person.m_creationDate);
+  query.bindValue(":_v10", person.m_bCompany);
+  query.bindValue(":_v11", person.m_bCustomer);
+  query.bindValue(":_v12", person.m_bSupplier);
+  query.bindValue(":_v13", person.m_bEmployee);
 
-  if (query.exec())
+  bool bSuccess = query.exec();
+  if (bSuccess)
   {
     person.m_id = query.lastInsertId().toInt();
-    for (int i = 0; i != vPhone.size(); ++i)
+    if (Image::st_isValidId(person.m_imageId))
     {
-      query.prepare("INSER INTO _PHONES ("
-                    "_PERSONID,"
-                    "_COUNTRY_CODE,"
-                    "_CODE,"
-                    "_NUMBER)"
-                    "VALUES ("
-                    "(:_personid),"
-                    "(:_countrycode),"
-                    "(:_code),"
-                    "(:_number))");
-      query.bindValue(":_personid", person.m_id);
-      query.bindValue(":_countrycode", vPhone.at(i).m_countryCode);
-      query.bindValue(":_code", vPhone.at(i).m_code);
-      query.bindValue(":_number", vPhone.at(i).m_number);
-      if (query.exec())
-        vPhone.at(i).m_id = query.lastInsertId().toInt();
-    }
-
-    for (int i = 0; i != vAddress.size(); ++i)
-    {
-      query.prepare("INSER INTO _ADDRESSES ("
-                    "_PERSONID,"
-                    "_CEP,"
-                    "_NEIGHBORHOOD,"
-                    "_STREET,"
-                    "_NUMBER,"
-                    "_CITY,"
-                    "_STATE,"
-                    "_COMPLEMENT,"
-                    "_REFERENCE)"
-                    "VALUES ("
-                    "(:_personid),"
-                    "(:_cep),"
-                    "(:_neighborhood),"
-                    "(:_street),"
-                    "(:_number),"
-                    "(:_city),"
-                    "(:_state),"
-                    "(:_complement),"
-                    "(:_reference))");
-      query.bindValue(":_personid", person.m_id);
-      query.bindValue(":_cep", vAddress.at(i).m_cep);
-      query.bindValue(":_neighborhood", vAddress.at(i).m_neighborhood);
-      query.bindValue(":_street", vAddress.at(i).m_street);
-      query.bindValue(":_number", vAddress.at(i).m_number);
-      query.bindValue(":_city", vAddress.at(i).m_city);
-      query.bindValue(":_state", (int)vAddress.at(i).m_state);
-      query.bindValue(":_complement", vAddress.at(i).m_complement);
-      query.bindValue(":_reference", vAddress.at(i).m_reference);
-      if (query.exec())
-        vAddress.at(i).m_id = query.lastInsertId().toInt();
+      query.prepare("UPDATE " SQL_PERSON_TABLE_NAME " SET "
+                    SQL_PERSON_COL01 " = (:_v01)"
+                    " WHERE " SQL_PERSON_COL00 " = (:_v00)");
+      query.bindValue(":_v00", person.m_id);
+      query.bindValue(":_v01", person.m_imageId);
+      bSuccess = query.exec();
     }
   }
 
-  bool bSuccess = db.commit();
   if (bSuccess)
+  {
+    for (int i = 0; i != vPhone.size(); ++i)
+    {
+      query.prepare("INSER INTO " SQL_PHONE_TABLE_NAME " ("
+                    SQL_PHONE_COL01 ","
+                    SQL_PHONE_COL02 ","
+                    SQL_PHONE_COL03 ","
+                    SQL_PHONE_COL04 ")"
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04))");
+      query.bindValue(":_v01", person.m_id);
+      query.bindValue(":_v02", vPhone.at(i).m_countryCode);
+      query.bindValue(":_v03", vPhone.at(i).m_code);
+      query.bindValue(":_v04", vPhone.at(i).m_number);
+      bSuccess = query.exec();
+      if (bSuccess)
+        vPhone.at(i).m_id = query.lastInsertId().toInt();
+      else
+        break;
+    }
+  }
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != vAddress.size(); ++i)
+    {
+      query.prepare("INSER INTO " SQL_ADDRESS_TABLE_NAME " ("
+                    SQL_ADDRESS_COL01 ","
+                    SQL_ADDRESS_COL02 ","
+                    SQL_ADDRESS_COL03 ","
+                    SQL_ADDRESS_COL04 ","
+                    SQL_ADDRESS_COL05 ","
+                    SQL_ADDRESS_COL06 ","
+                    SQL_ADDRESS_COL07 ","
+                    SQL_ADDRESS_COL08 ","
+                    SQL_ADDRESS_COL09 ")"
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05),"
+                    "(:_v06),"
+                    "(:_v07),"
+                    "(:_v08),"
+                    "(:_v09))");
+      query.bindValue(":_v01", person.m_id);
+      query.bindValue(":_v02", vAddress.at(i).m_cep);
+      query.bindValue(":_v03", vAddress.at(i).m_neighborhood);
+      query.bindValue(":_v04", vAddress.at(i).m_street);
+      query.bindValue(":_v05", vAddress.at(i).m_number);
+      query.bindValue(":_v06", vAddress.at(i).m_city);
+      query.bindValue(":_v07", (int)vAddress.at(i).m_state);
+      query.bindValue(":_v08", vAddress.at(i).m_complement);
+      query.bindValue(":_v09", vAddress.at(i).m_reference);
+      bSuccess = query.exec();
+      if (bSuccess)
+        vAddress.at(i).m_id = query.lastInsertId().toInt();
+      else
+        break;
+    }
+  }
+
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
+
+  if (!bSuccess)
     error = db.lastError().text();
+
   return bSuccess;
 }
 
@@ -1660,94 +1786,126 @@ bool PersonSQL::update(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
 
-  query.prepare("UPDATE _PERSONS SET "
-                "_IMAGEID = (:_imageid),"
-                "_NAME = (:_name),"
-                "_ALIAS = (:_alias),"
-                "_EMAIL = (:_email),"
-                "_CPF_CNPJ = (:_cpfcnpj),"
-                "_RG_IE = (:_rgie),"
-                "_BIRTH_DATE = (:_birthdate),"
-                "_CREATION_DATE = (:_creationdate),"
-                "_IS_COMPANY = (:_iscompany),"
-                "_IS_CUSTOMER = (:_iscustomer),"
-                "_IS_SUPPLIER = (:_issupplier),"
-                "_IS_EMPLOYEE = (:_isemployee) "
-                "WHERE _ID = (:_id)");
-  query.bindValue(":_id", person.m_id);
-  query.bindValue(":_imageid", person.m_imageId);
-  query.bindValue(":_name", person.m_name);
-  query.bindValue(":_alias", person.m_alias);
-  query.bindValue(":_email", person.m_email);
-  query.bindValue(":_cpfcnpj", person.m_CPF_CNPJ);
-  query.bindValue(":_rgie", person.m_RG_IE);
-  query.bindValue(":_birthdate", person.m_birthDate);
-  query.bindValue(":_creationdate", person.m_creationDate);
-  query.bindValue(":_iscompany", person.m_bCompany);
-  query.bindValue(":_iscustomer", person.m_bCustomer);
-  query.bindValue(":_issupplier", person.m_bSupplier);
-  query.bindValue(":_isemployee", person.m_bEmployee);
-  query.exec();
+  query.prepare("UPDATE " SQL_PERSON_TABLE_NAME " SET "
+                SQL_PERSON_COL01 " = (:_v01),"
+                SQL_PERSON_COL02 " = (:_v02),"
+                SQL_PERSON_COL03 " = (:_v03),"
+                SQL_PERSON_COL04 " = (:_v04),"
+                SQL_PERSON_COL05 " = (:_v05),"
+                SQL_PERSON_COL06 " = (:_v06),"
+                SQL_PERSON_COL07 " = (:_v07),"
+                SQL_PERSON_COL08 " = (:_v08),"
+                SQL_PERSON_COL09 " = (:_v09),"
+                SQL_PERSON_COL10 " = (:_v10),"
+                SQL_PERSON_COL11 " = (:_v11),"
+                SQL_PERSON_COL12 " = (:_v12),"
+                SQL_PERSON_COL13 " = (:_v13)"
+                " WHERE " SQL_PERSON_COL00 " = (:_v00)");
+  query.bindValue(":_v00", person.m_id);
+  query.bindValue(":_v01", person.m_imageId);
+  query.bindValue(":_v02", person.m_name);
+  query.bindValue(":_v03", person.m_alias);
+  query.bindValue(":_v04", person.m_email);
+  query.bindValue(":_v05", person.m_CPF_CNPJ);
+  query.bindValue(":_v06", person.m_RG_IE);
+  query.bindValue(":_v07", person.m_details);
+  query.bindValue(":_v08", person.m_birthDate);
+  query.bindValue(":_v09", person.m_creationDate);
+  query.bindValue(":_v10", person.m_bCompany);
+  query.bindValue(":_v11", person.m_bCustomer);
+  query.bindValue(":_v12", person.m_bSupplier);
+  query.bindValue(":_v13", person.m_bEmployee);
+  bool bSuccess = query.exec();
 
-  for (int i = 0; i != vPhone.size(); ++i)
-  {
-    query.prepare("UPDATE _PHONES SET "
-                  "_PERSONID = (:_personid),"
-                  "_COUNTRY_CODE = (:_countrycode),"
-                  "_CODE = (:_code),"
-                  "_NUMBER = (:_number) "
-                  "WHERE _ID = (:_id)");
-    query.bindValue(":_id", vPhone.at(i).m_id);
-    query.bindValue(":_personid", person.m_id);
-    query.bindValue(":_countrycode", vPhone.at(i).m_countryCode);
-    query.bindValue(":_code", vPhone.at(i).m_code);
-    query.bindValue(":_number", vPhone.at(i).m_number);
-    query.exec();
-  }
-
-  for (int i = 0; i != vAddress.size(); ++i)
-  {
-    query.prepare("UPDATE _ADDRESSES SET "
-                  "_PERSONID = (:_personid),"
-                  "_CEP = (:_cep),"
-                  "_NEIGHBORHOOD = (:_neighborhood),"
-                  "_STREET = (:_street),"
-                  "_NUMBER = (:_number),"
-                  "_CITY = (:_city),"
-                  "_STATE = (:_state),"
-                  "_COMPLEMENT = (:_complement),"
-                  "_REFERENCE = (:_reference) "
-                  "WHERE _ID = (:_id)");
-    query.bindValue(":_id", vAddress.at(i).m_id);
-    query.bindValue(":_personid", person.m_id);
-    query.bindValue(":_cep", vAddress.at(i).m_cep);
-    query.bindValue(":_neighborhood", vAddress.at(i).m_neighborhood);
-    query.bindValue(":_street", vAddress.at(i).m_street);
-    query.bindValue(":_number", vAddress.at(i).m_number);
-    query.bindValue(":_city", vAddress.at(i).m_city);
-    query.bindValue(":_state", (int)vAddress.at(i).m_state);
-    query.bindValue(":_complement", vAddress.at(i).m_complement);
-    query.bindValue(":_reference", vAddress.at(i).m_reference);
-    query.exec();
-  }
-
-  for (int i = 0; i != vRemovedPhoneId.size(); ++i)
-  {
-    query.prepare("DELETE FROM _PHONES WHERE _ID = (:_id)");
-    query.bindValue(":_id", vRemovedPhoneId.at(i));
-    query.exec();
-  }
-
-  for (int i = 0; i != vRemovedAddressId.size(); ++i)
-  {
-    query.prepare("DELETE FROM _ADDRESSES WHERE _ID = (:_id)");
-    query.bindValue(":_id", vRemovedAddressId.at(i));
-    query.exec();
-  }
-
-  bool bSuccess = db.commit();
   if (bSuccess)
+  {
+    for (int i = 0; i != vPhone.size(); ++i)
+    {
+      query.prepare("UPDATE " SQL_PHONE_TABLE_NAME " SET "
+                    SQL_PHONE_COL01 " = (:_v01),"
+                    SQL_PHONE_COL02 " = (:_v02),"
+                    SQL_PHONE_COL03 " = (:_v03),"
+                    SQL_PHONE_COL04 " = (:_v04) "
+                    " WHERE " SQL_PHONE_COL00 " = (:_v00)");
+      query.bindValue(":_v00", vPhone.at(i).m_id);
+      query.bindValue(":_v01", person.m_id);
+      query.bindValue(":_v02", vPhone.at(i).m_countryCode);
+      query.bindValue(":_v03", vPhone.at(i).m_code);
+      query.bindValue(":_v04", vPhone.at(i).m_number);
+      bSuccess = query.exec();
+      if (!bSuccess)
+        break;
+    }
+  }
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != vAddress.size(); ++i)
+    {
+      query.prepare("UPDATE " SQL_ADDRESS_TABLE_NAME " SET "
+                    SQL_ADDRESS_COL01 " = (:_v01),"
+                    SQL_ADDRESS_COL02 " = (:_v02),"
+                    SQL_ADDRESS_COL03 " = (:_v03),"
+                    SQL_ADDRESS_COL04 " = (:_v04),"
+                    SQL_ADDRESS_COL05 " = (:_v05),"
+                    SQL_ADDRESS_COL06 " = (:_v06),"
+                    SQL_ADDRESS_COL07 " = (:_v07),"
+                    SQL_ADDRESS_COL08 " = (:_v08),"
+                    SQL_ADDRESS_COL09 " = (:_v09) "
+                    "WHERE " SQL_ADDRESS_COL00 " = (:_v00)");
+      query.bindValue(":_v00", vAddress.at(i).m_id);
+      query.bindValue(":_v01", person.m_id);
+      query.bindValue(":_v02", vAddress.at(i).m_cep);
+      query.bindValue(":_v03", vAddress.at(i).m_neighborhood);
+      query.bindValue(":_v04", vAddress.at(i).m_street);
+      query.bindValue(":_v05", vAddress.at(i).m_number);
+      query.bindValue(":_v06", vAddress.at(i).m_city);
+      query.bindValue(":_v07", (int)vAddress.at(i).m_state);
+      query.bindValue(":_v08", vAddress.at(i).m_complement);
+      query.bindValue(":_v09", vAddress.at(i).m_reference);
+      bSuccess = query.exec();
+      if (!bSuccess)
+        break;
+    }
+  }
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != vRemovedPhoneId.size(); ++i)
+    {
+      query.prepare("DELETE FROM " SQL_PHONE_TABLE_NAME " WHERE " SQL_PHONE_COL00 " = (:_v00)");
+      query.bindValue(":_v00", vRemovedPhoneId.at(i));
+      bSuccess = query.exec();
+      if (!bSuccess)
+        break;
+    }
+  }
+
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != vRemovedAddressId.size(); ++i)
+    {
+      query.prepare("DELETE FROM " SQL_ADDRESS_TABLE_NAME " WHERE " SQL_ADDRESS_COL00 " = (:_v00)");
+      query.bindValue(":_v00", vRemovedAddressId.at(i));
+      bSuccess = query.exec();
+      if (!bSuccess)
+        break;
+    }
+  }
+
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
+
+  if (!bSuccess)
     error = db.lastError().text();
+
   return bSuccess;
 }
 
@@ -1762,18 +1920,33 @@ bool PersonSQL::remove(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("DELETE FROM _PHONES WHERE _PERSONID = (:_personid)");
-  query.bindValue(":_personid", id);
-  query.exec();
-  query.prepare("DELETE FROM _ADDRESSES WHERE _PERSONID = (:_personid)");
-  query.bindValue(":_personid", id);
-  query.exec();
-  query.prepare("DELETE FROM _PERSONS WHERE _ID = (:_id)");
-  query.bindValue(":_id", id);
-  query.exec();
-
-  bool bSuccess = db.commit();
+  query.prepare("DELETE FROM " SQL_PHONE_TABLE_NAME " WHERE " SQL_PHONE_COL01 " = (:_v01)");
+  query.bindValue(":_v01", id);
+  bool bSuccess = query.exec();
   if (bSuccess)
+  {
+    query.prepare("DELETE FROM " SQL_ADDRESS_TABLE_NAME " WHERE " SQL_PHONE_COL01 " = (:_v01)");
+    query.bindValue(":_v01", id);
+    bSuccess = query.exec();
+  }
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " SQL_PERSON_TABLE_NAME " WHERE " SQL_PERSON_COL00 " = (:_v00)");
+    query.bindValue(":_v00", id);
+    bSuccess = query.exec();
+  }
+
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
+
+  if (!bSuccess)
     error = db.lastError().text();
+
   return bSuccess;
 }

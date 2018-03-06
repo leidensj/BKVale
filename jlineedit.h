@@ -11,8 +11,7 @@ enum class JValidatorType : int
   All,
   Alphanumeric,
   AlphanumericAndSpaces,
-  Numeric,
-  Email
+  Numeric
 };
 
 class JRegExpValidator: public QRegExpValidator

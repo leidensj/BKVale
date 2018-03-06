@@ -7,6 +7,22 @@
 #include "category.h"
 #include "jtablecolumn.h"
 
+#define SQL_PRODUCT_TABLE_NAME "_PRODUCTS"
+#define SQL_PRODUCT_COL00 "_ID"
+#define SQL_PRODUCT_COL01 "_NAME"
+#define SQL_PRODUCT_COL02 "_CATEGORYID"
+#define SQL_PRODUCT_COL03 "_IMAGEID"
+#define SQL_PRODUCT_COL04 "_UNITY"
+#define SQL_PRODUCT_COL05 "_PACKAGE_UNITY"
+#define SQL_PRODUCT_COL06 "_PACKAGE_AMMOUNT"
+#define SQL_PRODUCT_COL07 "_DETAILS"
+#define SQL_PRODUCT_COL08 "_CODE"
+#define SQL_PRODUCT_COL09 "_AVAILABLE_AT_NOTES"
+#define SQL_PRODUCT_COL10 "_AVAILABLE_AT_SHOP"
+#define SQL_PRODUCT_COL11 "_AVAILABLE_AT_CONSUMPTION"
+#define SQL_PRODUCT_COL12 "_AVAILABLE_TO_BUY"
+#define SQL_PRODUCT_COL13 "_AVAILABLE_TO_SELL"
+
 #define INVALID_PRODUCT_ID   -1
 
 #define MAX_PRODUCT_NAME_LENGTH            35
@@ -84,24 +100,23 @@ struct Product
   bool isValid() const { return st_isValid(*this); }
   static bool st_isValidId(int id) { return id != INVALID_PRODUCT_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
-  static QString getTableName() { return "_PRODUCTS"; }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn("_ID", QObject::tr("Id")));
-    c.push_back(JTableColumn("_NAME", QObject::tr("Nome"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn("_CATEGORYID", QObject::tr("Categoria")));
-    c.push_back(JTableColumn("_IMAGEID", QObject::tr("Imagem")));
-    c.push_back(JTableColumn("_UNITY", QObject::tr("Unidade"), false));
-    c.push_back(JTableColumn("_PACKAGE_UNITY", QObject::tr("Unidade da Embalagem")));
-    c.push_back(JTableColumn("_PACKAGE_AMMOUNT", QObject::tr("Quantidade da Embalagem")));
-    c.push_back(JTableColumn("_DETAILS", QObject::tr("Detalhes"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn("_CODE", QObject::tr("Código")));
-    c.push_back(JTableColumn("_AVAILABLE_AT_NOTES", QObject::tr("Notas")));
-    c.push_back(JTableColumn("_AVAILABLE_AT_SHOP", QObject::tr("Compras")));
-    c.push_back(JTableColumn("_AVAILABLE_AT_CONSUMPTION", QObject::tr("Consumo")));
-    c.push_back(JTableColumn("_AVAILABLE_TO_BUY", QObject::tr("Compra")));
-    c.push_back(JTableColumn("_AVAILABLE_TO_SELL", QObject::tr("Venda")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL01, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL02, QObject::tr("Categoria")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL03, QObject::tr("Imagem")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL04, QObject::tr("Unidade"), false));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL05, QObject::tr("Unidade da Embalagem")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL06, QObject::tr("Quantidade da Embalagem")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL07, QObject::tr("Detalhes"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL08, QObject::tr("Código")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL09, QObject::tr("Notas")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL10, QObject::tr("Compras")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL11, QObject::tr("Consumo")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL12, QObject::tr("Compra")));
+    c.push_back(JTableColumn(SQL_PRODUCT_COL13, QObject::tr("Venda")));
     return c;
   }
 };

@@ -189,7 +189,14 @@ void JDatabase::set(QSqlTableModel* model,
   if (m_vColumns.size() == count)
   {
     for (int i = 0; i != m_vColumns.size(); ++i)
+    {
       model->setHeaderData(i, Qt::Horizontal, m_vColumns.at(i).m_friendlyName);
+      if (!m_vColumns.at(i).m_icon.isEmpty())
+        model->setHeaderData(i,
+                             Qt::Horizontal,
+                             QVariant::fromValue(QIcon(m_vColumns.at(i).m_icon)),
+                             Qt::DecorationRole);
+    }
 
     for (int i = 0; i != m_vColumns.size(); ++i)
     {

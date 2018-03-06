@@ -7,6 +7,11 @@
 #include <QVector>
 #include "jtablecolumn.h"
 
+#define SQL_IMAGE_TABLE_NAME "_IMAGES"
+#define SQL_IMAGE_COL00      "_ID"
+#define SQL_IMAGE_COL01      "_NAME"
+#define SQL_IMAGE_COL02      "_IMAGE"
+
 #define INVALID_IMAGE_ID      -1
 #define MAX_IMAGE_NAME_LENGTH 35
 #define MAX_IMAGE_SIZE        1048576 //1MB
@@ -41,7 +46,6 @@ struct Image
 
   static bool st_isValid(const Image& img) { return !img.m_name.isEmpty() && !img.m_image.isEmpty(); }
   bool isValid() const { return st_isValid(*this); }
-  static QString getTableName() { return "_IMAGES"; }
 
   enum class Column
   {
@@ -53,9 +57,9 @@ struct Image
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn("_ID", QObject::tr("Id")));
-    c.push_back(JTableColumn("_NAME", QObject::tr("Imagem"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn("_IMAGE", QObject::tr("Imagem")));
+    c.push_back(JTableColumn(SQL_IMAGE_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(SQL_IMAGE_COL01, QObject::tr("Imagem"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_IMAGE_COL02, QObject::tr("Imagem")));
     return c;
   }
 };

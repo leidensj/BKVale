@@ -91,7 +91,7 @@ PersonWidget::~PersonWidget()
 void PersonWidget::setDatabase(QSqlDatabase db)
 {
   PersonTableModel* model = new PersonTableModel(m_database, db);
-  m_database->set(model, Person::getTableName(), Person::getColumns());
+  m_database->set(model, SQL_PERSON_TABLE_NAME, Person::getColumns(false));
 }
 
 void PersonWidget::personSelected(int id)
@@ -175,7 +175,7 @@ void PersonWidget::searchImage()
   JDatabaseSelector dlg(tr("Selecionar Imagem"),
                         QIcon(":/icons/res/image.png"),
                         INVALID_IMAGE_ID);
-  dlg.set(model, Image::getTableName(), Image::getColumns());
+  dlg.set(model, SQL_IMAGE_TABLE_NAME, Image::getColumns());
   dlg.exec();
   if (Image::st_isValidId(dlg.getCurrentId()))
   {

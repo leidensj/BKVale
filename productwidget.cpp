@@ -91,7 +91,7 @@ ProductWidget::~ProductWidget()
 void ProductWidget::setDatabase(QSqlDatabase db)
 {
   ProductTableModel* model = new ProductTableModel(m_database, db);
-  m_database->set(model, Product::getTableName(), Product::getColumns());
+  m_database->set(model, SQL_PRODUCT_TABLE_NAME, Product::getColumns());
 }
 
 void ProductWidget::productSelected(int id)
@@ -169,7 +169,7 @@ void ProductWidget::searchCategory()
   JDatabaseSelector dlg(tr("Selecionar Categoria"),
                         QIcon(":/icons/res/category.png"),
                         INVALID_CATEGORY_ID);
-  dlg.set(model, Category::getTableName(), Category::getColumns());
+  dlg.set(model, SQL_CATEGORY_TABLE_NAME, Category::getColumns());
   dlg.exec();
   if (Category::st_isValidId(dlg.getCurrentId()))
   {

@@ -73,32 +73,30 @@ NoteWidget::NoteWidget(QWidget* parent)
                    SIGNAL(itemSelectedSignal(int)),
                    this,
                    SLOT(setNote(int)));
-
   QObject::connect(m_database,
                    SIGNAL(itemRemoveSignal(int)),
                    this,
                    SLOT(removeNote(int)));
-
   QObject::connect(m_view,
                    SIGNAL(showSearchSignal()),
                    this,
                    SLOT(showSearch()));
-
   QObject::connect(m_view,
                    SIGNAL(createSignal()),
                    this,
                    SLOT(create()));
-
   QObject::connect(m_view,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(emitChangedSignal()));
-
   QObject::connect(m_view,
                    SIGNAL(openLastSignal(int)),
                    this,
                    SLOT(setNote(int)));
-
+  QObject::connect(m_view,
+                   SIGNAL(searchSupplierSignal()),
+                   this,
+                   SLOT(searchSupplier()));
   m_dock->close();
 }
 
@@ -173,8 +171,7 @@ void NoteWidget::saveAndPrint(QIODevice* printer,
 
 void NoteWidget::create()
 {
-  m_view->create(NoteSQL::nextNumber(m_database->get()),
-                 NoteSQL::suppliers(m_database->get()));
+  m_view->create(NoteSQL::nextNumber(m_database->get()));
 }
 
 void NoteWidget::setNote(int id)
@@ -186,7 +183,7 @@ void NoteWidget::setNote(int id)
   if (NoteSQL::select(m_database->get(), note, number, error))
   {
     m_view->setLastID(note.m_id);
-    m_view->setNote(note, number, NoteSQL::suppliers(m_database->get()));
+    m_view->setNote(note, number);
   }
   else
   {
@@ -247,5 +244,27 @@ void NoteWidget::removeNote(int id)
                                                                                QString::number(note.m_id)),
                             QMessageBox::Ok);
     }
+  }
+}
+
+void NoteWidget::searchSupplier()
+{
+  QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
+  JDatabaseSelector dlg(tr("Selecionar Fornecedor"),
+                        QIcon(":/icons/res/supplier.png"),
+                        INVALID_PERSON_ID);
+  dlg.set(model, SQL_PERSON_TABLE_NAME, Person::getColumns());
+  dlg.exec();
+  if (Person::st_isValidId(dlg.getCurrentId()))
+  {
+    Person person;
+    person.m_id = dlg.getCurrentId();
+    QString error;
+    PersonSQL::select(m_database->get(), person, error);
+    Image image;
+    image.m_id = person.m_imageId;
+    if (image.isValidId())
+      ImageSQL::select(m_database->get(), image, error);
+    m_view->setSupplier(person.m_id, person.m_name, image.m_image);
   }
 }

@@ -217,9 +217,9 @@ namespace PersonSQL
 {
   bool select(QSqlDatabase db,
               Person& person,
-              QVector<Phone>& vPhone,
-              QVector<Address>& vAddress,
-              QString& error);
+              QString& error,
+              QVector<Phone>* pvPhone = nullptr,
+              QVector<Address>* pvAddress = nullptr);
 
   bool insert(QSqlDatabase db,
               const Person& person,

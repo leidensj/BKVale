@@ -75,7 +75,7 @@ struct Note
     c.push_back(JTableColumn("_DATE", QObject::tr("Data"), false));
     c.push_back(JTableColumn("_SUPPLIER", QObject::tr("Fornecedor"), false, false, JResizeMode::Stretch));
     c.push_back(JTableColumn("_TOTAL", QObject::tr("Total"), false));
-    c.push_back(JTableColumn("_CASH", QObject::tr("À Vista"), false));
+    c.push_back(JTableColumn("_CASH", QObject::tr("À Vista")));
     return c;
   }
 };

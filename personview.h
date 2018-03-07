@@ -42,8 +42,8 @@ public slots:
   void create();
 
 signals:
-  searchImageSignal();
-  saveSignal();
+  void searchImageSignal();
+  void saveSignal();
 
 private:
   Person m_currentPerson;

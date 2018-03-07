@@ -106,8 +106,8 @@ struct Person
     QVector<JTableColumn> c;
     c.push_back(JTableColumn(SQL_PERSON_COL00, QObject::tr("Id")));
     c.push_back(JTableColumn(SQL_PERSON_COL01, QObject::tr("Id Imagem")));
-    c.push_back(JTableColumn(SQL_PERSON_COL02, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_PERSON_COL03, QObject::tr("Apelido"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(SQL_PERSON_COL02, QObject::tr("Nome"), false, false, JResizeMode::Interactive));
+    c.push_back(JTableColumn(SQL_PERSON_COL03, QObject::tr("Apelido"), false, true, JResizeMode::Stretch));
     c.push_back(JTableColumn(SQL_PERSON_COL04, QObject::tr("Email")));
     c.push_back(JTableColumn(SQL_PERSON_COL05, QObject::tr("CPF/CNPJ")));
     c.push_back(JTableColumn(SQL_PERSON_COL06, QObject::tr("RG/IE")));

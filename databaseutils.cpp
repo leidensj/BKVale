@@ -1550,13 +1550,15 @@ bool UserLoginSQL::login(const QString& strUser,
 
 bool PersonSQL::select(QSqlDatabase db,
                        Person& person,
-                       QVector<Phone>& vPhone,
-                       QVector<Address>& vAddress,
-                       QString& error)
+                       QString& error,
+                       QVector<Phone>* pvPhone,
+                       QVector<Address>* pvAddress)
 {
   error.clear();
-  vPhone.clear();
-  vAddress.clear();
+  if (pvPhone != nullptr)
+    pvPhone->clear();
+  if (pvAddress != nullptr)
+    pvAddress->clear();
   int id = person.m_id;
   person.clear();
 
@@ -1603,7 +1605,7 @@ bool PersonSQL::select(QSqlDatabase db,
     return true;
   }
 
-  if (bSuccess)
+  if (bSuccess && pvAddress != nullptr)
   {
     query.prepare("SELECT "
                   SQL_ADDRESS_COL00 ","
@@ -1633,11 +1635,11 @@ bool PersonSQL::select(QSqlDatabase db,
       address.m_state = (Address::EBRState)query.value(7).toInt();
       address.m_complement = query.value(8).toString();
       address.m_reference = query.value(9).toString();
-      vAddress.push_back(address);
+      pvAddress->push_back(address);
     }
   }
 
-  if (bSuccess)
+  if (bSuccess && pvPhone != nullptr)
   {
     query.prepare("SELECT "
                   SQL_PHONE_COL00 ","
@@ -1657,7 +1659,7 @@ bool PersonSQL::select(QSqlDatabase db,
       phone.m_countryCode = query.value(2).toInt();
       phone.m_code = query.value(3).toInt();
       phone.m_number = query.value(4).toString();
-      vPhone.push_back(phone);
+      pvPhone->push_back(phone);
     }
   }
 
@@ -1681,8 +1683,10 @@ bool PersonSQL::select(QSqlDatabase db,
   if (!bSuccess)
   {
     person.clear();
-    vPhone.clear();
-    vAddress.clear();
+    if (pvPhone != nullptr)
+      pvPhone->clear();
+    if (pvAddress != nullptr)
+      pvAddress->clear();
   }
 
   return bSuccess;

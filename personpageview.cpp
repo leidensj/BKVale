@@ -185,7 +185,7 @@ Person PersonPageView::getPerson() const
   person.m_CPF_CNPJ = m_edCpfCnpj->text();
   person.m_RG_IE = m_edRgIE->text();
   person.m_details = m_edDetails->text();
-  person.m_birthDate = m_grpBirthDate->isChecked()
+  person.m_birthDate = m_grpBirthDate->isChecked() && !m_rdoCompany->isChecked()
                        ? m_dtBirthDate->date().toString(Qt::ISODate)
                        : "";
   person.m_creationDate = m_dtCreationDate->date().toString(Qt::ISODate);
@@ -221,6 +221,7 @@ void PersonPageView::setPerson(const Person& person,
   m_cbCustomer->setChecked(person.m_bCustomer);
   m_cbSupplier->setChecked(person.m_bSupplier);
   m_cbEmployee->setChecked(person.m_bEmployee);
+  switchUserType();
 }
 
 void PersonPageView::setImage(int id, const QString& name, const QByteArray& ar)
@@ -253,6 +254,7 @@ void PersonPageView::switchUserType()
     m_edRgIE->setInputMask("");
     m_cbEmployee->setChecked(false);
     m_cbEmployee->setEnabled(false);
+    m_grpBirthDate->hide();
   }
   else
   {
@@ -263,6 +265,7 @@ void PersonPageView::switchUserType()
     m_edCpfCnpj->setInputMask("999.999.999-99;_");
     m_edRgIE->setInputMask("9999999999;_");
     m_cbEmployee->setEnabled(true);
+    m_grpBirthDate->show();
   }
   emit changedSignal();
 }

@@ -3,7 +3,6 @@
 
 #include <QFrame>
 #include <QStringList>
-#include <QComboBox>
 #include "note.h"
 
 #define MAX_ITEMS 100
@@ -16,23 +15,7 @@ class QPushButton;
 class QLabel;
 class QCheckBox;
 class NoteTableWidget;
-
-class NoteSupplierComboBox : public QComboBox
-{
-  Q_OBJECT
-
-public:
-  explicit NoteSupplierComboBox(QWidget* parent = 0);
-
-protected:
-  void keyPressEvent(QKeyEvent *event);
-
-public slots:
-  void toUpper();
-
-signals:
-  void supplierEnteredSignal();
-};
+class JPicker;
 
 class NoteView : public QFrame
 {
@@ -58,7 +41,7 @@ private:
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLineEdit* m_edTotal;
-  NoteSupplierComboBox* m_cbSupplier;
+  JPicker* m_supplierPicker;
   NoteTableWidget* m_table;
   QCheckBox* m_cbCash;
   int m_currentID;
@@ -70,19 +53,21 @@ private slots:
   void emitShowSearchSignal();
   void emitCreateSignal();
   void emitOpenLastSignal();
+  void emitSearchSupplierSignal();
   void addItem();
   void addItem(const NoteItem& noteItem);
   void removeItem();
 
 public slots:
-  void create(int number, const QStringList& suppliers);
-  void supplierEntered();
-  void setNote(const Note& note, int number, const QStringList& suppliers);
+  void create(int number);
+  void setNote(const Note& note, int number);
   void updateControls();
+  void setSupplier(int id, const QString& name, const QByteArray& arImage);
 
 signals:
   void changedSignal();
   void showSearchSignal();
+  void searchSupplierSignal();
   void createSignal();
   void openLastSignal(int id);
 };

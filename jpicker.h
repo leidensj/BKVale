@@ -17,6 +17,7 @@ public:
                    const QString& itemText,
                    bool bShowImage = false,
                    bool bRequired = false,
+                   bool bDisplayGroup = true,
                    QWidget* parent = 0);
   const QString m_itemText;
   void setId(int id);

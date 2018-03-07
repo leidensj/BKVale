@@ -41,6 +41,7 @@ private slots:
   void showSearch();
   void setNote(int id);
   void removeNote(int id);
+  void searchSupplier();
 
 signals:
   changedSignal();

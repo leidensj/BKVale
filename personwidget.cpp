@@ -101,7 +101,7 @@ void PersonWidget::personSelected(int id)
   QVector<Address> vAddress;
   person.m_id = id;
   QString error;
-  if (PersonSQL::select(m_database->get(), person, vPhone, vAddress, error))
+  if (PersonSQL::select(m_database->get(), person, error, &vPhone, &vAddress))
   {
     Image image;
     image.m_id = person.m_imageId;

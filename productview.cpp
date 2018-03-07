@@ -55,6 +55,7 @@ ProductView::ProductView(QWidget* parent)
   m_spnPackageAmmount = new QDoubleSpinBox();
   m_spnPackageAmmount->setMaximum(MAX_PRODUCT_PACKAGE_AMMOUNT_LENGTH);
   m_spnPackageAmmount->setMinimum(0.0);
+  m_spnPackageAmmount->setValue(1.0);
   m_spnPackageAmmount->setSingleStep(0.1);
 
   m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);

@@ -9,6 +9,7 @@ JPicker::JPicker(int invalidId,
                  const QString& itemText,
                  bool bShowImage,
                  bool bRequired,
+                 bool bDisplayGroup,
                  QWidget* parent)
  : QFrame(parent)
  , m_itemText(itemText)
@@ -28,8 +29,13 @@ JPicker::JPicker(int invalidId,
 
   m_edText = new JLineEdit(JValidatorType::All, true, true);
   m_edText->setReadOnly(true);
+  if (!bDisplayGroup)
+    m_edText->setPlaceholderText(m_itemText);
   if (bRequired)
-    m_edText->setPlaceholderText("*");
+  {
+    QString str = !bDisplayGroup ? " *" : "*";
+    m_edText->setPlaceholderText(m_edText->placeholderText() + str);
+  }
 
   m_btnClear = new QPushButton();
   m_btnClear->setFlat(true);
@@ -44,20 +50,29 @@ JPicker::JPicker(int invalidId,
   vFrame1->setFrameShape(QFrame::VLine);
 
   QHBoxLayout* hlayout0 = new QHBoxLayout();
+
+  QGroupBox* group = nullptr;
+  if (bDisplayGroup)
+  {
+    group = new QGroupBox();
+    group->setTitle(m_itemText);
+    group->setLayout(hlayout0);
+  }
+
   hlayout0->addWidget(m_btnSearch);
   hlayout0->addWidget(m_edText);
   hlayout0->addWidget(m_btnClear);
   hlayout0->addWidget(vFrame1);
   hlayout0->addWidget(m_imageView);
 
-  QGroupBox* group = new QGroupBox();
-  group->setTitle(m_itemText);
-  group->setLayout(hlayout0);
 
   QVBoxLayout* vlayout0 = new QVBoxLayout();
   vlayout0->setContentsMargins(0, 0, 0, 0);
   vlayout0->setAlignment(Qt::AlignTop);
-  vlayout0->addWidget(group);
+  if (bDisplayGroup)
+    vlayout0->addWidget(group);
+  else
+    vlayout0->addLayout(hlayout0);
   setLayout(vlayout0);
 
   QObject::connect(m_btnSearch,
@@ -117,7 +132,4 @@ void JPicker::clear()
 void JPicker::emitSearchSignal()
 {
   emit searchSignal();
-  focusNextChild();
-  focusNextChild();
-  focusNextChild();
 }

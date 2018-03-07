@@ -1,6 +1,8 @@
 #include "noteview.h"
 #include "databaseutils.h"
 #include "notetablewidget.h"
+#include "person.h"
+#include "jpicker.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -15,36 +17,6 @@
 #include <QTimer>
 #include <QCheckBox>
 
-NoteSupplierComboBox::NoteSupplierComboBox(QWidget* parent)
-  : QComboBox(parent)
-{
-  setEditable(true);
-  auto f = font();
-  f.setPointSize(12);
-  setFont(f);
-  lineEdit()->setPlaceholderText(tr("FORNECEDOR"));
-
-  connect(this,
-          SIGNAL(editTextChanged(const QString &)),
-          this,
-          SLOT(toUpper()));
-}
-
-void NoteSupplierComboBox::keyPressEvent(QKeyEvent *event)
-{
-  if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-    emit supplierEnteredSignal();
-  else
-    QComboBox::keyPressEvent(event);
-}
-
-void NoteSupplierComboBox::toUpper()
-{
-  blockSignals(true);
-  setCurrentText(currentText().toUpper());
-  blockSignals(false);
-}
-
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
   , m_btnCreate(nullptr)
@@ -58,7 +30,7 @@ NoteView::NoteView(QWidget *parent)
   , m_dtDate(nullptr)
   , m_btnToday(nullptr)
   , m_edTotal(nullptr)
-  , m_cbSupplier(nullptr)
+  , m_supplierPicker(nullptr)
   , m_table(nullptr)
   , m_cbCash(nullptr)
   , m_currentID(INVALID_NOTE_ID)
@@ -203,11 +175,11 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
 
-  m_cbSupplier = new NoteSupplierComboBox();
+  m_supplierPicker = new JPicker(INVALID_PERSON_ID, tr("Fornecedor"), true, true, false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->addLayout(hlayout2);
-  vlayout1->addWidget(m_cbSupplier);
+  vlayout1->addWidget(m_supplierPicker);
 
   QFrame* frame = new QFrame();
   frame->setFrameShape(QFrame::Shape::StyledPanel);
@@ -243,10 +215,10 @@ NoteView::NoteView(QWidget *parent)
   vlayout2->addLayout(hlayout3);
   setLayout(vlayout2);
 
-  QObject::connect(m_cbSupplier,
-                   SIGNAL(editTextChanged(const QString&)),
+  QObject::connect(m_supplierPicker,
+                   SIGNAL(searchSignal()),
                    this,
-                   SLOT(updateControls()));
+                   SLOT(emitSearchSupplierSignal()));
 
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
@@ -262,11 +234,6 @@ NoteView::NoteView(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(removeItem()));
-
-  QObject::connect(m_cbSupplier,
-                   SIGNAL(supplierEnteredSignal()),
-                   this,
-                   SLOT(supplierEntered()));
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
@@ -310,7 +277,7 @@ NoteView::NoteView(QWidget *parent)
                    SLOT(checkDate()));
   timer->start(60000);
 
-  create(0, QStringList());
+  create(DEFAULT_NUMBER);
   checkDate();
   updateControls();
 }
@@ -336,7 +303,7 @@ void NoteView::removeItem()
 {
   m_table->removeCurrentItem();
   if (!m_table->hasItems())
-    m_cbSupplier->setFocus();
+    m_supplierPicker->setFocus();
   updateControls();
 }
 
@@ -345,25 +312,21 @@ Note NoteView::getNote() const
   Note note;
   note.m_id = m_currentID;
   note.m_date = m_dtDate->date().toJulianDay();
-  note.m_supplier = m_cbSupplier->currentText();
+  note.m_supplier = m_supplierPicker->getText();
   note.m_total = m_edTotal->text().toDouble();
   note.m_bCash = m_cbCash->isChecked();
   m_table->getItems(note.m_items);
   return note;
 }
 
-void NoteView::setNote(const Note& note, int number, const QStringList& suppliers)
+void NoteView::setNote(const Note& note, int number)
 {
   m_table->removeAllItems();
-  m_cbSupplier->clear();
-  while (m_cbSupplier->count())
-    m_cbSupplier->removeItem(m_cbSupplier->count() - 1);
-  m_cbSupplier->addItems(suppliers);
-  m_cbSupplier->setCurrentText("");
-
+  m_supplierPicker->clear();
   m_currentID = note.m_id;
   m_dtDate->setDate(QDate::fromJulianDay(note.m_date));
-  m_cbSupplier->setCurrentText(note.m_supplier);
+  // TODO
+  m_supplierPicker->setText(note.m_supplier);
   m_snNumber->setValue(number);
   m_cbCash->setChecked(note.m_bCash);
   m_table->setItems(note.m_items);
@@ -374,31 +337,36 @@ void NoteView::setNote(const Note& note, int number, const QStringList& supplier
 bool NoteView::isValid() const
 {
   return
-      !m_cbSupplier->currentText().isEmpty() &&
+      !m_supplierPicker->getText().isEmpty() &&
       m_table->hasItems() &&
       m_table->computeTotal().toDouble() &&
       m_snNumber->value() > 0;
 }
 
-void NoteView::create(int number, const QStringList& suppliers)
+void NoteView::create(int number)
 {
   m_currentID = INVALID_NOTE_ID;
   m_dtDate->setDate(QDate::currentDate());
   m_snNumber->setValue(number);
   m_edTotal->setText("");
   m_table->removeAllItems();
-  m_cbSupplier->clear();
-  while (m_cbSupplier->count())
-    m_cbSupplier->removeItem(m_cbSupplier->count() - 1);
-  m_cbSupplier->addItems(suppliers);
-  m_cbSupplier->setCurrentText("");
-  m_cbSupplier->setFocus();
+  m_supplierPicker->clear();
+  m_supplierPicker->setFocus();
   m_cbCash->setChecked(false);
   updateControls();
 }
 
-void NoteView::supplierEntered()
+void NoteView::emitSearchSupplierSignal()
 {
+  emit searchSupplierSignal();
+
+}
+
+void NoteView::setSupplier(int id, const QString& name, const QByteArray& arImage)
+{
+  m_supplierPicker->setId(id);
+  m_supplierPicker->setText(name);
+  m_supplierPicker->setImage(arImage);
   if (m_table->hasItems() != 0)
   {
     m_table->setCurrentCell(0, 0);
@@ -415,7 +383,7 @@ void NoteView::updateControls()
   const bool bCreated = m_snNumber->value() > 0;
   m_btnRemove->setEnabled(bCreated && m_table->currentRow() >= 0);
   m_btnAdd->setEnabled(bCreated);
-  m_cbSupplier->setEnabled(bCreated);
+  m_supplierPicker->setEnabled(bCreated);
   m_snNumber->setEnabled(bCreated);
   m_dtDate->setEnabled(bCreated);
   m_table->setEnabled(bCreated);
@@ -474,7 +442,7 @@ void NoteView::checkDate()
   m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
   bool bIsEditMode = Note::isValidID(m_currentID);
-  bool bIsDirty = !m_cbSupplier->currentText().isEmpty() ||
+  bool bIsDirty = !m_supplierPicker->getText().isEmpty() ||
                   m_table->hasItems();
   if (!bIsEditMode && !bIsDirty)
     setToday();

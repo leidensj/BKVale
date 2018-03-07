@@ -36,7 +36,7 @@ struct Category
 
   bool operator != (const Category& other)
   {
-    return m_name != other.m_name &&
+    return m_name != other.m_name ||
            m_imageId != other.m_imageId;
   }
 
@@ -44,7 +44,6 @@ struct Category
   bool isValidId() const { return st_isValidId(m_id); }
   static bool st_isValid(const Category& category) { return !category.m_name.isEmpty(); }
   bool isValid() const { return st_isValid(*this); }
-  static QString getTableName() { return "_CATEGORIES"; }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

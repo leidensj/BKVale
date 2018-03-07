@@ -101,7 +101,7 @@ struct Person
   bool isValid() const { return st_isValid(*this); }
   static bool st_isValidId(int id) { return id != INVALID_PERSON_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
-  static QVector<JTableColumn> getColumns(bool bSearchMode)
+  static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
     c.push_back(JTableColumn(SQL_PERSON_COL00, QObject::tr("Id")));
@@ -114,10 +114,10 @@ struct Person
     c.push_back(JTableColumn(SQL_PERSON_COL07, QObject::tr("Detalhes")));
     c.push_back(JTableColumn(SQL_PERSON_COL08, QObject::tr("Data de Nascimento")));
     c.push_back(JTableColumn(SQL_PERSON_COL09, QObject::tr("Data de Criação")));
-    c.push_back(JTableColumn(SQL_PERSON_COL10, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/building.png"));
-    c.push_back(JTableColumn(SQL_PERSON_COL11, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/client.png"));
-    c.push_back(JTableColumn(SQL_PERSON_COL12, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/supplier.png"));
-    c.push_back(JTableColumn(SQL_PERSON_COL13, QObject::tr(""), bSearchMode, false, JResizeMode::ResizeToContents, ":/icons/res/employee.png"));
+    c.push_back(JTableColumn(SQL_PERSON_COL10, QObject::tr("Empresa")));
+    c.push_back(JTableColumn(SQL_PERSON_COL11, QObject::tr("Cliente")));
+    c.push_back(JTableColumn(SQL_PERSON_COL12, QObject::tr("Fornecedor")));
+    c.push_back(JTableColumn(SQL_PERSON_COL13, QObject::tr("Funcionário")));
     return c;
   }
 };

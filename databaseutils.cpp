@@ -364,7 +364,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                           SQL_CATEGORY_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
                           SQL_CATEGORY_COL01 " INTEGER,"
                           SQL_CATEGORY_COL02 " TEXT NOT NULL UNIQUE,"
-                          "FOREIGN KEY(" SQL_CATEGORY_COL00 ") REFERENCES "
+                          "FOREIGN KEY(" SQL_CATEGORY_COL01 ") REFERENCES "
                           SQL_IMAGE_TABLE_NAME "(" SQL_IMAGE_COL00 "))");
 
   if (bSuccess)
@@ -403,7 +403,7 @@ bool BaitaSQL::init(QSqlDatabase db,
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_PRODUCT_TABLE_NAME " ("
                         SQL_PRODUCT_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
                         SQL_PRODUCT_COL01 " TEXT NOT NULL UNIQUE,"
-                        SQL_PRODUCT_COL02 " INTEGER,"
+                        SQL_PRODUCT_COL02 " INTEGER NOT NULL,"
                         SQL_PRODUCT_COL03 " INTEGER,"
                         SQL_PRODUCT_COL04 " TEXT NOT NULL,"
                         SQL_PRODUCT_COL05 " TEXT,"
@@ -575,11 +575,11 @@ bool ProductSQL::insert(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " SQL_PRODUCT_TABLE_NAME " ("
                 SQL_PRODUCT_COL01 ","
                 SQL_PRODUCT_COL02 ","
-                SQL_PRODUCT_COL03 ","
                 SQL_PRODUCT_COL04 ","
                 SQL_PRODUCT_COL05 ","
                 SQL_PRODUCT_COL06 ","
@@ -593,7 +593,6 @@ bool ProductSQL::insert(QSqlDatabase db,
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
-                "(:_v03),"
                 "(:_v04),"
                 "(:_v05),"
                 "(:_v06),"
@@ -606,7 +605,6 @@ bool ProductSQL::insert(QSqlDatabase db,
                 "(:_v13))");
   query.bindValue(":_v01", product.m_name);
   query.bindValue(":_v02", product.m_categoryId);
-  query.bindValue(":_v03", product.m_imageId);
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_packageUnity);
   query.bindValue(":_v06", product.m_packageAmmount);
@@ -618,14 +616,33 @@ bool ProductSQL::insert(QSqlDatabase db,
   query.bindValue(":_v12", product.m_bAvailableToBuy);
   query.bindValue(":_v13", product.m_bAvailableToSell);
 
-  if (query.exec())
+  bool bSuccess = query.exec();
+  if (bSuccess)
   {
     product.m_id = query.lastInsertId().toInt();
-    return true;
+    if (Image::st_isValidId(product.m_imageId))
+    {
+      query.prepare("UPDATE " SQL_PRODUCT_TABLE_NAME " SET "
+                    SQL_PRODUCT_COL03 " = (:_v03)"
+                    " WHERE " SQL_PRODUCT_COL00 " = (:_v00)");
+      query.bindValue(":_v03", product.m_imageId);
+      bSuccess = query.exec();
+    }
   }
 
-  error = query.lastError().text();
-  return false;
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
+
+  if (!bSuccess)
+    error = db.lastError().text();
+
+  return bSuccess;
 }
 
 bool ProductSQL::update(QSqlDatabase db,
@@ -637,11 +654,11 @@ bool ProductSQL::update(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " SQL_PRODUCT_TABLE_NAME " SET "
                 SQL_PRODUCT_COL01 " = (:_v01),"
                 SQL_PRODUCT_COL02 " = (:_v02),"
-                SQL_PRODUCT_COL03 " = (:_v03),"
                 SQL_PRODUCT_COL04 " = (:_v04),"
                 SQL_PRODUCT_COL05 " = (:_v05),"
                 SQL_PRODUCT_COL06 " = (:_v06),"
@@ -656,7 +673,6 @@ bool ProductSQL::update(QSqlDatabase db,
   query.bindValue(":_v00", product.m_id);
   query.bindValue(":_v01", product.m_name);
   query.bindValue(":_v02", product.m_categoryId);
-  query.bindValue(":_v03", product.m_imageId);
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_packageUnity);
   query.bindValue(":_v06", product.m_packageAmmount);
@@ -667,12 +683,30 @@ bool ProductSQL::update(QSqlDatabase db,
   query.bindValue(":_v11", product.m_bAvailableAtConsumption);
   query.bindValue(":_v12", product.m_bAvailableToBuy);
   query.bindValue(":_v13", product.m_bAvailableToSell);
+  bool bSuccess = query.exec();
+  if (bSuccess && Image::st_isValidId(product.m_imageId))
+  {
+    query.prepare("UPDATE " SQL_PRODUCT_TABLE_NAME " SET "
+                  SQL_PRODUCT_COL03 " = (:_v03)"
+                  " WHERE " SQL_PRODUCT_COL00 " = (:_v00)");
+    query.bindValue(":_v00", product.m_id);
+    query.bindValue(":_v03", product.m_imageId);
+    bSuccess = query.exec();
+  }
 
-  if (query.exec())
-    return true;
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
 
-  error = query.lastError().text();
-  return false;
+  if (!bSuccess)
+    error = db.lastError().text();
+
+  return bSuccess;
 }
 
 bool ProductSQL::remove(QSqlDatabase db,
@@ -746,24 +780,41 @@ bool CategorySQL::insert(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " SQL_CATEGORY_TABLE_NAME " ("
-                SQL_CATEGORY_COL01 ","
                 SQL_CATEGORY_COL02 ")"
                 " VALUES ("
-                "(:_v01),"
                 "(:_v02))");
-  query.bindValue(":_v01", category.m_imageId);
   query.bindValue(":_v02", category.m_name);
-
-  if (query.exec())
+  bool bSuccess = query.exec();
+  if (bSuccess)
   {
     category.m_id = query.lastInsertId().toInt();
-    return true;
+    if (Image::st_isValidId(category.m_imageId))
+    {
+      query.prepare("UPDATE " SQL_CATEGORY_TABLE_NAME " SET "
+                    SQL_CATEGORY_COL01 " = (:_v01)"
+                    " WHERE " SQL_CATEGORY_COL00 " = (:_v00)");
+      query.bindValue(":_v00", category.m_id);
+      query.bindValue(":_v01", category.m_imageId);
+      bSuccess = query.exec();
+    }
   }
 
-  error = query.lastError().text();
-  return false;
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
+
+  if (!bSuccess)
+    error = db.lastError().text();
+
+  return bSuccess;
 }
 
 bool CategorySQL::update(QSqlDatabase db,
@@ -777,18 +828,34 @@ bool CategorySQL::update(QSqlDatabase db,
 
   QSqlQuery query(db);
   query.prepare("UPDATE " SQL_CATEGORY_TABLE_NAME " SET "
-                SQL_CATEGORY_COL01 " = (:_v01),"
                 SQL_CATEGORY_COL02 " = (:_v02)"
                 " WHERE " SQL_CATEGORY_COL00 " = (:_v00)");
   query.bindValue(":_v00", category.m_id);
-  query.bindValue(":_v01", category.m_imageId);
   query.bindValue(":_v02", category.m_name);
+  bool bSuccess = query.exec();
+  if (bSuccess && Image::st_isValidId(category.m_imageId))
+  {
+    query.prepare("UPDATE " SQL_CATEGORY_TABLE_NAME " SET "
+                  SQL_CATEGORY_COL01 " = (:_v01)"
+                  " WHERE " SQL_CATEGORY_COL00 " = (:_v00)");
+    query.bindValue(":_v00", category.m_id);
+    query.bindValue(":_v01", category.m_imageId);
+    bSuccess = query.exec();
+  }
 
-  if (query.exec())
-    return true;
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
 
-  error = query.lastError().text();
-  return false;
+  if (!bSuccess)
+    error = db.lastError().text();
+
+  return bSuccess;
 }
 
 bool CategorySQL::remove(QSqlDatabase db,
@@ -864,8 +931,8 @@ bool ImageSQL::insert(QSqlDatabase db,
 
   QSqlQuery query(db);
   query.prepare("INSERT INTO " SQL_IMAGE_TABLE_NAME " ("
-                SQL_IMAGE_COL00 ","
-                SQL_IMAGE_COL01 ")"
+                SQL_IMAGE_COL01 ","
+                SQL_IMAGE_COL02 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02))");
@@ -1511,7 +1578,7 @@ bool PersonSQL::select(QSqlDatabase db,
                 SQL_PERSON_COL10 ","
                 SQL_PERSON_COL11 ","
                 SQL_PERSON_COL12 ","
-                SQL_PERSON_COL13 ","
+                SQL_PERSON_COL13
                 " FROM " SQL_PERSON_TABLE_NAME
                 " WHERE " SQL_PERSON_COL00 " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -1692,7 +1759,7 @@ bool PersonSQL::insert(QSqlDatabase db,
   {
     for (int i = 0; i != vPhone.size(); ++i)
     {
-      query.prepare("INSER INTO " SQL_PHONE_TABLE_NAME " ("
+      query.prepare("INSERT INTO " SQL_PHONE_TABLE_NAME " ("
                     SQL_PHONE_COL01 ","
                     SQL_PHONE_COL02 ","
                     SQL_PHONE_COL03 ","
@@ -1718,7 +1785,7 @@ bool PersonSQL::insert(QSqlDatabase db,
   {
     for (int i = 0; i != vAddress.size(); ++i)
     {
-      query.prepare("INSER INTO " SQL_ADDRESS_TABLE_NAME " ("
+      query.prepare("INSERT INTO " SQL_ADDRESS_TABLE_NAME " ("
                     SQL_ADDRESS_COL01 ","
                     SQL_ADDRESS_COL02 ","
                     SQL_ADDRESS_COL03 ","
@@ -1787,7 +1854,6 @@ bool PersonSQL::update(QSqlDatabase db,
   QSqlQuery query(db);
 
   query.prepare("UPDATE " SQL_PERSON_TABLE_NAME " SET "
-                SQL_PERSON_COL01 " = (:_v01),"
                 SQL_PERSON_COL02 " = (:_v02),"
                 SQL_PERSON_COL03 " = (:_v03),"
                 SQL_PERSON_COL04 " = (:_v04),"
@@ -1802,7 +1868,6 @@ bool PersonSQL::update(QSqlDatabase db,
                 SQL_PERSON_COL13 " = (:_v13)"
                 " WHERE " SQL_PERSON_COL00 " = (:_v00)");
   query.bindValue(":_v00", person.m_id);
-  query.bindValue(":_v01", person.m_imageId);
   query.bindValue(":_v02", person.m_name);
   query.bindValue(":_v03", person.m_alias);
   query.bindValue(":_v04", person.m_email);
@@ -1816,6 +1881,16 @@ bool PersonSQL::update(QSqlDatabase db,
   query.bindValue(":_v12", person.m_bSupplier);
   query.bindValue(":_v13", person.m_bEmployee);
   bool bSuccess = query.exec();
+
+  if (bSuccess && Image::st_isValidId(person.m_imageId))
+  {
+    query.prepare("UPDATE " SQL_PERSON_TABLE_NAME " SET "
+                  SQL_PERSON_COL01 " = (:_v01)"
+                                   " WHERE " SQL_PERSON_COL00 " = (:_v00)");
+    query.bindValue(":_v00", person.m_id);
+    query.bindValue(":_v01", person.m_imageId);
+    bSuccess = query.exec();
+  }
 
   if (bSuccess)
   {

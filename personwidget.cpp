@@ -91,7 +91,7 @@ PersonWidget::~PersonWidget()
 void PersonWidget::setDatabase(QSqlDatabase db)
 {
   PersonTableModel* model = new PersonTableModel(m_database, db);
-  m_database->set(model, SQL_PERSON_TABLE_NAME, Person::getColumns(false));
+  m_database->set(model, SQL_PERSON_TABLE_NAME, Person::getColumns());
 }
 
 void PersonWidget::personSelected(int id)

@@ -24,6 +24,8 @@ ProductView::ProductView(QWidget* parent)
   , m_cbAvailableAtConsumption(nullptr)
   , m_cbAvailableToBuy(nullptr)
   , m_cbAvailableToSell(nullptr)
+  , m_categoryPicker(nullptr)
+  , m_imagePicker(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -81,8 +83,8 @@ ProductView::ProductView(QWidget* parent)
   m_cbAvailableToSell->setText(tr("Venda"));
   m_cbAvailableToSell->setIcon(QIcon(":/icons/res/sell.png"));
 
-  m_categoryPicker = new JPicker(INVALID_CATEGORY_ID, tr("Categoria"), false);
-
+  m_categoryPicker = new JPicker(INVALID_CATEGORY_ID, tr("Categoria"), false, true);
+  m_imagePicker = new JPicker(INVALID_IMAGE_ID, tr("Imagem"), true);
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
   buttonlayout->setAlignment(Qt::AlignLeft);
@@ -113,6 +115,7 @@ ProductView::ProductView(QWidget* parent)
   tablayout->setAlignment(Qt::AlignTop);
   tablayout->addLayout(formlayout);
   tablayout->addWidget(m_categoryPicker);
+  tablayout->addWidget(m_imagePicker);
   tablayout->addWidget(grpAccess);
 
   QFrame* tabframe = new QFrame;
@@ -142,6 +145,10 @@ ProductView::ProductView(QWidget* parent)
                    SIGNAL(searchSignal()),
                    this,
                    SLOT(emitSearchCategorySignal()));
+  QObject::connect(m_imagePicker,
+                   SIGNAL(searchSignal()),
+                   this,
+                   SLOT(emitSearchImageSignal()));
   QObject::connect(m_edName,
                    SIGNAL(textChanged(const QString&)),
                    this,
@@ -190,6 +197,10 @@ ProductView::ProductView(QWidget* parent)
                    SIGNAL(searchSignal()),
                    this,
                    SLOT(updateControls()));
+  QObject::connect(m_imagePicker,
+                   SIGNAL(searchSignal()),
+                   this,
+                   SLOT(updateControls()));
 
   updateControls();
 }
@@ -225,8 +236,17 @@ void ProductView::setCategory(int id, const QString& name)
   m_categoryPicker->setText(name);
 }
 
+void ProductView::setImage(int id, const QString& text, const QByteArray& ar)
+{
+  m_imagePicker->setId(id);
+  m_imagePicker->setText(text);
+  m_imagePicker->setImage(ar);
+}
+
 void ProductView::setProduct(const Product &product,
-                             const QString& categoryName)
+                             const QString& categoryName,
+                             const QString& imageName,
+                             const QByteArray& image)
 {
   m_currentProduct = product;
   m_edName->setText(product.m_name);
@@ -241,19 +261,25 @@ void ProductView::setProduct(const Product &product,
   m_cbAvailableToBuy->setChecked(product.m_bAvailableToBuy);
   m_cbAvailableToSell->setChecked(product.m_bAvailableToSell);
   setCategory(product.m_categoryId, categoryName);
+  setImage(product.m_imageId, imageName, image);
   updateControls();
 }
 
 void ProductView::create()
 {
   Product product;
-  setProduct(product, "");
+  setProduct(product, QString(), QString(), QByteArray());
   updateControls();
 }
 
 void ProductView::emitSearchCategorySignal()
 {
   emit searchCategorySignal();
+}
+
+void ProductView::emitSearchImageSignal()
+{
+  emit searchImageSignal();
 }
 
 void ProductView::emitSaveSignal()

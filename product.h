@@ -57,7 +57,7 @@ struct Product
     m_name.clear();
     m_unity.clear();
     m_packageUnity.clear();
-    m_packageAmmount = 0.0;
+    m_packageAmmount = 1.0;
     m_details.clear();
     m_code.clear();
     m_bAvailableAtNotes = false;

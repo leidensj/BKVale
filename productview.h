@@ -21,19 +21,24 @@ public:
   ~ProductView();
   Product getProduct() const;
   void setCategory(int id, const QString& name);
+  void setImage(int id, const QString& text, const QByteArray& ar);
 
 private slots:
   void emitSearchCategorySignal();
+  void emitSearchImageSignal();
   void emitSaveSignal();
   void updateControls();
 
 public slots:
   void setProduct(const Product& product,
-               const QString& categoryName);
+                  const QString& categoryName,
+                  const QString& imageName,
+                  const QByteArray& image);
   void create();
 
 signals:
   searchCategorySignal();
+  searchImageSignal();
   saveSignal();
 
 private:
@@ -52,6 +57,7 @@ private:
   QCheckBox* m_cbAvailableToBuy;
   QCheckBox* m_cbAvailableToSell;
   JPicker* m_categoryPicker;
+  JPicker* m_imagePicker;
 };
 
 #endif // PRODUCTVIEW_H

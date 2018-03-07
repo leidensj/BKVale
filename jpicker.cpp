@@ -8,6 +8,7 @@
 JPicker::JPicker(int invalidId,
                  const QString& itemText,
                  bool bShowImage,
+                 bool bRequired,
                  QWidget* parent)
  : QFrame(parent)
  , m_itemText(itemText)
@@ -27,6 +28,8 @@ JPicker::JPicker(int invalidId,
 
   m_edText = new JLineEdit(JValidatorType::All, true, true);
   m_edText->setReadOnly(true);
+  if (bRequired)
+    m_edText->setPlaceholderText("*");
 
   m_btnClear = new QPushButton();
   m_btnClear->setFlat(true);
@@ -114,4 +117,7 @@ void JPicker::clear()
 void JPicker::emitSearchSignal()
 {
   emit searchSignal();
+  focusNextChild();
+  focusNextChild();
+  focusNextChild();
 }

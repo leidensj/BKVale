@@ -157,7 +157,11 @@ void PersonView::emitSaveSignal()
 void PersonView::updateControls()
 {
   Person person = m_personPage->getPerson();
-  bool bEnable = person.isValid();
+  QVector<Phone> vPhone = m_phonePage->getPhones();
+  QVector<Address> vAddress = m_addressPage->getAddresses();
+  bool bEnable = person.isValid() &&
+                 !vPhone.isEmpty() &&
+                 !vAddress.isEmpty();
   QString saveIcon(":/icons/res/save.png");
   if (m_currentPerson.isValidId())
   {
@@ -165,13 +169,9 @@ void PersonView::updateControls()
     bEnable = bEnable && m_currentPerson != person;
     if (!bEnable)
     {
-      QVector<Phone> vPhone = m_phonePage->getPhones();
-      bEnable = bEnable && m_vCurrentPhone != vPhone;
+      bEnable &= m_vCurrentPhone != vPhone;
       if (!bEnable)
-      {
-        QVector<Address> vAddress = m_addressPage->getAddresses();
-        bEnable = bEnable && m_vCurrentAddress != vAddress;
-      }
+        bEnable &= m_vCurrentAddress != vAddress;
     }
   }
 

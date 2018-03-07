@@ -39,7 +39,7 @@ namespace
 {
   QString buildAbv(const Address& address)
   {
-    return address.m_street + ", Nro " +
+    return address.m_street + ", Nº " +
         QString::number(address.m_number) + ". " +
         address.m_city + " - " +
         address.getBRState().m_abv + ".";

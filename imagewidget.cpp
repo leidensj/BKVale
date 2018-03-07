@@ -22,7 +22,6 @@ ImageWidget::ImageWidget(QWidget* parent)
 
   QVBoxLayout* vlayout0 = new QVBoxLayout();
   vlayout0->setContentsMargins(0, 0, 0, 0);
-  vlayout0->setAlignment(Qt::AlignTop);
   vlayout0->addWidget(splitter);
   setLayout(vlayout0);
 

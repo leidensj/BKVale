@@ -2,22 +2,11 @@
 #include "productview.h"
 #include "jdatabase.h"
 #include "databaseutils.h"
+#include "imagetablemodel.h"
 #include <QMessageBox>
 #include <QSqlTableModel>
 #include <QLayout>
 #include <QSplitter>
-
-/*void setColumnIcon(QSqlTableModel* model,
-                   ItemTableIndex idx)
-{
-  if (model != nullptr)
-  {
-    model->setHeaderData((int)idx,
-                         Qt::Horizontal,
-                         QVariant::fromValue(QIcon(columnIcon(idx))),
-                         Qt::DecorationRole);
-  }
-}*/
 
 class ProductTableModel : public QSqlTableModel
 {
@@ -66,21 +55,22 @@ ProductWidget::ProductWidget(QWidget *parent)
                    SIGNAL(saveSignal()),
                    this,
                    SLOT(saveProduct()));
-
   QObject::connect(m_database,
                    SIGNAL(itemSelectedSignal(int)),
                    this,
                    SLOT(productSelected(int)));
-
   QObject::connect(m_database,
                    SIGNAL(itemRemoveSignal(int)),
                    this,
                    SLOT(removeProduct(int)));
-
   QObject::connect(m_view,
                    SIGNAL(searchCategorySignal()),
                    this,
                    SLOT(searchCategory()));
+  QObject::connect(m_view,
+                   SIGNAL(searchImageSignal()),
+                   this,
+                   SLOT(searchImage()));
 }
 
 ProductWidget::~ProductWidget()
@@ -105,7 +95,11 @@ void ProductWidget::productSelected(int id)
     category.m_id = product.m_categoryId;
     if (category.isValidId())
       CategorySQL::select(m_database->get(), category, error);
-    m_view->setProduct(product, category.m_name);
+    Image image;
+    image.m_id = product.m_imageId;
+    if (image.isValidId())
+      ImageSQL::select(m_database->get(), image, error);
+    m_view->setProduct(product, category.m_name, image.m_name, image.m_image);
   }
   else
   {
@@ -153,6 +147,7 @@ void ProductWidget::saveProduct()
       : ProductSQL::insert(m_database->get(), product, error))
   {
     m_database->refresh();
+    m_view->create();
   }
   else
   {
@@ -178,5 +173,23 @@ void ProductWidget::searchCategory()
     QString error;
     CategorySQL::select(m_database->get(), category, error);
     m_view->setCategory(category.m_id, category.m_name);
+  }
+}
+
+void ProductWidget::searchImage()
+{
+  ImageTableModel* model = new ImageTableModel(0, m_database->get());
+  JDatabaseSelector dlg(tr("Escolher Imagem"),
+                        QIcon(":/icons/res/icon.png"),
+                        INVALID_IMAGE_ID);
+  dlg.set(model, SQL_IMAGE_TABLE_NAME, Image::getColumns());
+  dlg.exec();
+  if (Image::st_isValidId(dlg.getCurrentId()))
+  {
+    Image image;
+    image.m_id = dlg.getCurrentId();
+    QString error;
+    ImageSQL::select(m_database->get(), image, error);
+    m_view->setImage(image.m_id, image.m_name, image.m_image);
   }
 }

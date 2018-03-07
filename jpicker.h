@@ -15,7 +15,8 @@ class JPicker : public QFrame
 public:
   explicit JPicker(int invalidId,
                    const QString& itemText,
-                   bool bShowImage,
+                   bool bShowImage = false,
+                   bool bRequired = false,
                    QWidget* parent = 0);
   const QString m_itemText;
   void setId(int id);
@@ -26,7 +27,7 @@ public:
   QByteArray getImage() const;
 
 signals:
-  searchSignal();
+  void searchSignal();
 
 public slots:
   void clear();

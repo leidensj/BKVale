@@ -22,6 +22,7 @@ private slots:
   void removeProduct(int id);
   void saveProduct();
   void searchCategory();
+  void searchImage();
 
 private:
   JDatabase* m_database;

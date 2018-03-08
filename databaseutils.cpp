@@ -9,12 +9,23 @@
 
 int NoteSQL::nextNumber(QSqlDatabase db)
 {
+  int number = SQL_NOTE_DEFAULT_NUMBER;
   if (!db.isOpen())
-    return -1;
+    return number;
 
-  QSqlQuery query("SELECT MAX(_NUMBER) FROM _PROMISSORYNOTES", db);
-  int number = query.next() ? query.value(0).toInt() + 1 : DEFAULT_NUMBER;
-  return number > DEFAULT_NUMBER ? number : DEFAULT_NUMBER;
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = query.exec("SELECT MAX(" SQL_NOTE_COL01 ") FROM " SQL_NOTE_TABLE_NAME);
+  if (bSuccess)
+    number = query.next() ? query.value(0).toInt() + 1 : SQL_NOTE_DEFAULT_NUMBER;
+  number = number > SQL_NOTE_DEFAULT_NUMBER ? number : SQL_NOTE_DEFAULT_NUMBER;
+
+  if (!bSuccess)
+    db.rollback();
+  else
+    db.commit();
+
+  return number;
 }
 
 bool NoteSQL::insert(QSqlDatabase db,
@@ -29,7 +40,7 @@ bool NoteSQL::insert(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
 
-  query.exec("SELECT MAX(_NUMBER) FROM _PROMISSORYNOTES");
+  query.exec("SELECT MAX(" SQL_NOTE_COL01 ") FROM " SQL_NOTE_TABLE_NAME);
   int number = query.next()
                ? query.value(0).toInt() + 1
                : DEFAULT_NUMBER;
@@ -319,22 +330,27 @@ bool BaitaSQL::init(QSqlDatabase db,
 
   bool bSuccess = true;
 
-  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTES ("
-                        "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                        "_NUMBER INTEGER NOT NULL,"
-                        "_DATE INTEGER NOT NULL,"
-                        "_SUPPLIER TEXT NOT NULL,"
-                        "_TOTAL REAL,"
-                        "_CASH INT)");
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_NOTE_TABLE_NAME " ("
+                        SQL_NOTE_COL00 " _ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_NOTE_COL01 " INTEGER UNIQUE NOT NULL,"
+                        SQL_NOTE_COL02 " TEXT NOT NULL,"
+                        SQL_NOTE_COL03 " INTEGER NOT NULL,"
+                        SQL_NOTE_COL04 " REAL,"
+                        SQL_NOTE_COL05 " INT,"
+                        "FOREIGN KEY(" SQL_NOTE_COL03 ") REFERENCES "
+                        SQL_PERSON_TABLE_NAME "(" SQL_PERSON_COL00 "))");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _PROMISSORYNOTESITEMS ("
-                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "_NOTEID INTEGER NOT NULL,"
-                          "_AMMOUNT REAL,"
-                          "_PRICE REAL,"
-                          "_UNITY TEXT,"
-                          "_DESCRIPTION TEXT)");
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_NOTE_ITEMS_TABLE_NAME " ("
+                          SQL_NOTE_ITEMS_COL00 "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_NOTE_ITEMS_COL01 " INTEGER NOT NULL,"
+                          SQL_NOTE_ITEMS_COL02 " INTEGER NOT NULL,"
+                          SQL_NOTE_ITEMS_COL03 " REAL,"
+                          SQL_NOTE_ITEMS_COL04 " REAL,"
+                          "FOREIGN KEY(" SQL_NOTE_ITEMS_COL01 ") REFERENCES "
+                          SQL_NOTE_TABLE_NAME "(" SQL_NOTE_COL00 "),"
+                          "FOREIGN KEY(" SQL_NOTE_ITEMS_COL02 ") REFERENCES "
+                          SQL_PRODUCT_TABLE_NAME "(" SQL_PRODUCT_COL00 "))");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SQL_IMAGE_TABLE_NAME " ("
@@ -419,6 +435,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                           SQL_PERSON_COL11 " INT,"
                           SQL_PERSON_COL12 " INT,"
                           SQL_PERSON_COL13 " INT,"
+                          SQL_PERSON_COL14 " TEXT,"
                           "FOREIGN KEY(" SQL_PERSON_COL01 ") REFERENCES "
                           SQL_IMAGE_TABLE_NAME "(" SQL_IMAGE_COL00 "))");
 
@@ -1563,7 +1580,8 @@ bool PersonSQL::select(QSqlDatabase db,
                 SQL_PERSON_COL10 ","
                 SQL_PERSON_COL11 ","
                 SQL_PERSON_COL12 ","
-                SQL_PERSON_COL13
+                SQL_PERSON_COL13 ","
+                SQL_PERSON_COL14
                 " FROM " SQL_PERSON_TABLE_NAME
                 " WHERE " SQL_PERSON_COL00 " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -1585,6 +1603,7 @@ bool PersonSQL::select(QSqlDatabase db,
     person.m_bCustomer = query.value(10).toBool();
     person.m_bSupplier = query.value(11).toBool();
     person.m_bEmployee = query.value(12).toBool();
+     person.m_bEmployee = query.value(13).toBool();
     return true;
   }
 
@@ -1700,7 +1719,8 @@ bool PersonSQL::insert(QSqlDatabase db,
                 SQL_PERSON_COL10 ","
                 SQL_PERSON_COL11 ","
                 SQL_PERSON_COL12 ","
-                SQL_PERSON_COL13  ")"
+                SQL_PERSON_COL13 ","
+                SQL_PERSON_COL14  ")"
                 " VALUES ("
                 "(:_v02),"
                 "(:_v03),"
@@ -1713,7 +1733,8 @@ bool PersonSQL::insert(QSqlDatabase db,
                 "(:_v10),"
                 "(:_v11),"
                 "(:_v12),"
-                "(:_v13))");
+                "(:_v13),"
+                "(:_v14))");
   query.bindValue(":_v02", person.m_name);
   query.bindValue(":_v03", person.m_alias);
   query.bindValue(":_v04", person.m_email);
@@ -1726,6 +1747,7 @@ bool PersonSQL::insert(QSqlDatabase db,
   query.bindValue(":_v11", person.m_bCustomer);
   query.bindValue(":_v12", person.m_bSupplier);
   query.bindValue(":_v13", person.m_bEmployee);
+  query.bindValue(":_v14", person.m_employeePinCode);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -1852,7 +1874,8 @@ bool PersonSQL::update(QSqlDatabase db,
                 SQL_PERSON_COL10 " = (:_v10),"
                 SQL_PERSON_COL11 " = (:_v11),"
                 SQL_PERSON_COL12 " = (:_v12),"
-                SQL_PERSON_COL13 " = (:_v13)"
+                SQL_PERSON_COL13 " = (:_v13),"
+                SQL_PERSON_COL14 " = (:_v14)"
                 " WHERE " SQL_PERSON_COL00 " = (:_v00)");
   query.bindValue(":_v00", person.m_id);
   query.bindValue(":_v02", person.m_name);
@@ -1867,6 +1890,7 @@ bool PersonSQL::update(QSqlDatabase db,
   query.bindValue(":_v11", person.m_bCustomer);
   query.bindValue(":_v12", person.m_bSupplier);
   query.bindValue(":_v13", person.m_bEmployee);
+  query.bindValue(":_v14", person.m_employeePinCode);
   bool bSuccess = query.exec();
 
   if (bSuccess && Image::st_isValidId(person.m_imageId))
@@ -1942,7 +1966,6 @@ bool PersonSQL::update(QSqlDatabase db,
         break;
     }
   }
-
 
   if (bSuccess)
   {

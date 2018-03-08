@@ -21,6 +21,7 @@
 #define SQL_PERSON_COL11      "_IS_CUSTOMER"
 #define SQL_PERSON_COL12      "_IS_SUPPLIER"
 #define SQL_PERSON_COL13      "_IS_EMPLOYEE"
+#define SQL_PERSON_COL14      "_EMPLOYEE_PIN_CODE"
 
 #define INVALID_PERSON_ID                 -1
 
@@ -44,6 +45,7 @@ struct Person
   bool m_bCustomer;
   bool m_bSupplier;
   bool m_bEmployee;
+  QString m_employeePinCode;
 
   void clear()
   {
@@ -61,6 +63,7 @@ struct Person
     m_bCustomer = false;
     m_bSupplier = false;
     m_bEmployee = false;
+    m_employeePinCode.clear();
   }
 
   Person()
@@ -85,6 +88,9 @@ struct Person
     if (!m_bCompany)
       b = b || m_birthDate != other.m_birthDate;
 
+    if (m_bEmployee)
+      b = b || m_employeePinCode != other.m_employeePinCode;
+
     return b;
   }
 
@@ -95,7 +101,9 @@ struct Person
 
   static bool st_isValid(const Person& person)
   {
-    return !person.m_name.isEmpty();
+    bool b = !person.m_name.isEmpty();
+    if (m_bEmployee)
+      b = b && !m_employeePinCode.isEmpty();
   }
 
   bool isValid() const { return st_isValid(*this); }
@@ -118,6 +126,7 @@ struct Person
     c.push_back(JTableColumn(SQL_PERSON_COL11, QObject::tr("Cliente")));
     c.push_back(JTableColumn(SQL_PERSON_COL12, QObject::tr("Fornecedor")));
     c.push_back(JTableColumn(SQL_PERSON_COL13, QObject::tr("Funcionário")));
+    c.push_back(JTableColumn(SQL_PERSON_COL14, QObject::tr("Código PIN")));
     return c;
   }
 };

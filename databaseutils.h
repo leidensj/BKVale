@@ -15,9 +15,6 @@
 #include "phone.h"
 #include "address.h"
 
-#define DEFAULT_NUMBER     1000
-#define DEFAULT_NUMBER_STR "1000"
-
 class UserLoginSQL
 {
 public:
@@ -87,8 +84,6 @@ namespace UserSQL
 namespace NoteSQL
 {
   int nextNumber(QSqlDatabase db);
-
-  QStringList suppliers(QSqlDatabase db);
 
   bool insert(QSqlDatabase db,
               const Note& note,

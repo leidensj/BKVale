@@ -31,8 +31,8 @@
 
 struct Person
 {
-  mutable int m_id;
-  int m_imageId;
+  mutable qlonglong m_id;
+  qlonglong m_imageId;
   QString m_name;
   QString m_alias;
   QString m_email;
@@ -102,12 +102,13 @@ struct Person
   static bool st_isValid(const Person& person)
   {
     bool b = !person.m_name.isEmpty();
-    if (m_bEmployee)
-      b = b && !m_employeePinCode.isEmpty();
+    if (person.m_bEmployee)
+      b = b && !person.m_employeePinCode.isEmpty();
+    return b;
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(int id) { return id != INVALID_PERSON_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_PERSON_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QVector<JTableColumn> getColumns()
   {

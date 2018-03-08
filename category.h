@@ -18,9 +18,9 @@
 
 struct Category
 {
-  mutable int m_id;
+  mutable qlonglong m_id;
   QString m_name;
-  int m_imageId;
+  qlonglong m_imageId;
 
   Category()
   {
@@ -40,7 +40,7 @@ struct Category
            m_imageId != other.m_imageId;
   }
 
-  static bool st_isValidId(int id) { return id != INVALID_CATEGORY_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_CATEGORY_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static bool st_isValid(const Category& category) { return !category.m_name.isEmpty(); }
   bool isValid() const { return st_isValid(*this); }

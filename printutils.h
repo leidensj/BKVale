@@ -9,6 +9,7 @@
 #include "product.h"
 #include "consumption.h"
 #include "settings.h"
+#include "person.h"
 
 namespace Printer
 {
@@ -32,6 +33,9 @@ namespace NotePrinter
 {
   QString build(const Note& note,
                 int number,
+                const Person& supplier,
+                const QVector<NoteItem>& vItem,
+                const QVector<Product>& vProduct,
                 const QString& user);
 }
 

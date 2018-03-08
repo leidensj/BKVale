@@ -43,8 +43,8 @@ enum class NoteColumn : int
 
 struct NoteItem
 {
-  mutable int m_id;
-  int m_productId;
+  mutable qlonglong m_id;
+  qlonglong m_productId;
   double m_ammount;
   double m_price;
 
@@ -68,13 +68,21 @@ struct NoteItem
   QString strSubtotal() const { return st_strSubTotal(subtotal()); }
   QString strAmmount() const { return st_strAmmount(m_ammount); }
   QString strPrice() const { return st_strPrice(m_price); }
+  static bool st_isValidID(qlonglong id) { return id != INVALID_NOTE_ID; }
+  bool isValidID() const { return st_isValidID(m_id); }
+};
+
+struct NoteItemProduct
+{
+  NoteItem m_item;
+  Product m_product;
 };
 
 struct Note
 {
-  mutable int m_id;
-  qint64 m_date;
-  int m_supplierId;
+  mutable qlonglong m_id;
+  QString m_date;
+  qlonglong m_supplierId;
   double m_total;
   bool m_bCash;
 
@@ -82,7 +90,7 @@ struct Note
   {
     m_id = INVALID_NOTE_ID;
     m_supplierId = INVALID_PERSON_ID;
-    m_date = 0;
+    m_date.clear();
     m_total = 0.0;
     m_bCash = false;
   }
@@ -92,12 +100,13 @@ struct Note
     clear();
   }
 
-  QString strDate() const { return QDate::fromJulianDay(m_date).toString("dd/MM/yyyy"); }
-  QString strDayOfWeek() const { return QDate::fromJulianDay(m_date).toString("dddd"); }
+  QString strDate() const { return QDate::fromString(m_date, Qt::ISODate).toString("dd/MM/yyyy"); }
+  QString strDayOfWeek() const { return QDate::fromString(m_date, Qt::ISODate).toString("dddd"); }
   QString strId() const { return QString::number(m_id); }
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
-  static QString strNumber(int number) { return QString::number(number); }
-  static bool isValidID(int id) { return id != INVALID_NOTE_ID; }
+  static QString st_strNumber(qlonglong number) { return QString::number(number); }
+  static bool st_isValidID(qlonglong id) { return id != INVALID_NOTE_ID; }
+  bool isValidID() const { return st_isValidID(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

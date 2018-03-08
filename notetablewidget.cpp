@@ -127,9 +127,9 @@ void NoteTableWidget::setText(int row, int column, const QString& str)
     p->setText(str);
 }
 
-void NoteTableWidget::getItems(QVector<NoteItem>& noteItems) const
+QVector<NoteItemProduct>& NoteTableWidget::getItems() const
 {
-  noteItems.clear();
+  QVector<NoteItemProduct> v;
   for (int i = 0; i != rowCount(); ++i)
   {
     NoteItem noteItem;
@@ -138,11 +138,13 @@ void NoteTableWidget::getItems(QVector<NoteItem>& noteItems) const
     noteItem.m_unity = text(i, (int)NoteColumn::Unity);
     noteItem.m_description = text(i, (int)NoteColumn::Description);
     noteItem.m_price = text(i, (int)NoteColumn::Price).toDouble();
-    noteItems.push_back(noteItem);
+    v.push_back(noteItem);
   }
+  return v;
 }
 
-void NoteTableWidget::addItem(const NoteItem& noteItem)
+void NoteTableWidget::addItem(const NoteItem& noteItem,
+                              const Product& product)
 {
   insertRow(rowCount());
   const int row = rowCount() - 1;
@@ -151,23 +153,28 @@ void NoteTableWidget::addItem(const NoteItem& noteItem)
   setItem(row, (int)NoteColumn::Ammount,
           new QTableWidgetItem(noteItem.strAmmount()));
   setItem(row, (int)NoteColumn::Unity,
-          new QTableWidgetItem(noteItem.m_unity));
+          new QTableWidgetItem(product.m_unity));
   setItem(row, (int)NoteColumn::Description,
-          new QTableWidgetItem(noteItem.m_description));
+          new QTableWidgetItem(product.m_name));
   setItem(row, (int)NoteColumn::Price,
           new QTableWidgetItem(noteItem.strPrice()));
   setItem(row, (int)NoteColumn::SubTotal,
           new QTableWidgetItem(noteItem.strSubtotal()));
   item(row, (int)NoteColumn::Description)->setData(Qt::UserRole, noteItem.m_id);
+  item();
   setCurrentCell(row, (int)NoteColumn::Ammount);
   blockSignals(false);
 }
 
-void NoteTableWidget::setItems(const QVector<NoteItem>& noteItems)
+void NoteTableWidget::setItems(const QVector<NoteItem>& vItem,
+                               const QVector<Product>& vProduct)
 {
   removeAllItems();
-  for (int i = 0; i != noteItems.size(); ++i)
-    addItem(noteItems.at(i));
+  if (vItem.size() == vProduct.size())
+  {
+    for (int i = 0; i != vItem.size(); ++i)
+      addItem(vItem.at(i), vProduct.at(i));
+  }
 }
 
 void NoteTableWidget::update(int row, int column)

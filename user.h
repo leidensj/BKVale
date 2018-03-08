@@ -47,7 +47,7 @@ struct User
 
   void clear();
 
-  mutable int m_id;
+  mutable qlonglong m_id;
   QString m_strUser;
   bool m_bAccessNote;
   bool m_bAccessReminder;
@@ -58,7 +58,7 @@ struct User
   bool m_bAccessProduct;
   bool m_bAccessSettings;
 
-  static bool st_isValidID(int id) { return id != INVALID_USER_ID; }
+  static bool st_isValidID(qlonglong id) { return id != INVALID_USER_ID; }
   static QString st_strEncryptedPassword(const QString& strPassword);
   static QVector<JTableColumn> getColumns()
   {

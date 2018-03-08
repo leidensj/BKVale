@@ -92,7 +92,7 @@ JPicker::JPicker(int invalidId,
   }
 }
 
-void JPicker::setId(int id)
+void JPicker::setId(qlonglong id)
 {
   m_id = id;
 }
@@ -107,7 +107,7 @@ void JPicker::setImage(const QByteArray& ar)
   m_imageView->setImage(ar);
 }
 
-int JPicker::getId() const
+qlonglong JPicker::getId() const
 {
   return m_id;
 }

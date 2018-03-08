@@ -37,7 +37,7 @@ struct Address
     RO, RR, SC, SP, SE, TO
   };
 
-  mutable int m_id;
+  mutable qlonglong m_id;
   QString m_cep;
   QString m_neighborhood;
   QString m_street;
@@ -90,7 +90,7 @@ struct Address
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(int id) { return id != INVALID_ADDRESS_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_ADDRESS_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QVector<JTableColumn> getColumns()
   {

@@ -22,7 +22,7 @@
 
 struct Phone
 {
-  mutable int m_id;
+  mutable qlonglong m_id;
   int m_countryCode;
   int m_code;
   QString m_number;
@@ -70,7 +70,7 @@ struct Phone
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(int id) { return id != INVALID_PHONE_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_PHONE_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QVector<JTableColumn> getColumns()
   {

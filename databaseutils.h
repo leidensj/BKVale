@@ -32,7 +32,7 @@ private:
   User m_user;
 
 public:
-  int getId() const { return m_user.m_id; }
+  qlonglong getId() const { return m_user.m_id; }
   bool isValid() const { return User::st_isValidID(m_user.m_id); }
   QString strUser() const { return m_user.m_strUser; }
   bool hasAccessToNote() const { return isValid() && m_user.m_bAccessNote; }
@@ -77,29 +77,32 @@ namespace UserSQL
               QString& error);
 
   bool remove(QSqlDatabase db,
-              int id,
+              qlonglong id,
               QString& error);
 }
 
 namespace NoteSQL
 {
-  int nextNumber(QSqlDatabase db);
+  qlonglong nextNumber(QSqlDatabase db);
 
   bool insert(QSqlDatabase db,
               const Note& note,
+              const QVector<NoteItem>& vItems,
               QString& error);
 
   bool update(QSqlDatabase db,
               const Note& note,
+              const QVector<NoteItem>& vItems,
               QString& error);
 
   bool select(QSqlDatabase db,
               Note& note,
-              int& number,
+              qlonglong& number,
+              QVector<NoteItem>& vItems,
               QString& error);
 
   bool remove(QSqlDatabase db,
-              int id,
+              qlonglong id,
               QString& error);
 }
 
@@ -118,7 +121,7 @@ bool update(QSqlDatabase db,
             QString& error);
 
 bool remove(QSqlDatabase db,
-            int id,
+            qlonglong id,
             QString& error);
 }
 
@@ -137,7 +140,7 @@ namespace CategorySQL
               QString& error);
 
   bool remove(QSqlDatabase db,
-              int id,
+              qlonglong id,
               QString& error);
 }
 
@@ -156,7 +159,7 @@ namespace ImageSQL
               QString& error);
 
   bool remove(QSqlDatabase db,
-              int id,
+              qlonglong id,
               QString& error);
 }
 
@@ -171,11 +174,11 @@ namespace ReminderSQL
               QString error);
 
   void setFavorite(QSqlDatabase db,
-                   int id,
+                   qlonglong id,
                    bool bFav);
 
   bool isFavorite(QSqlDatabase db,
-                  int id);
+                  qlonglong id);
 }
 
 namespace ConsumptionSQL
@@ -226,12 +229,12 @@ namespace PersonSQL
               const Person& person,
               const QVector<Phone>& vPhone,
               const QVector<Address>& vAddress,
-              const QVector<int>& vRemovedPhoneId,
-              const QVector<int>& vRemovedAddressId,
+              const QVector<qlonglong>& vRemovedPhoneId,
+              const QVector<qlonglong>& vRemovedAddressId,
               QString& error);
 
   bool remove(QSqlDatabase db,
-              int id,
+              qlonglong id,
               QString& error);
 }
 

@@ -34,9 +34,9 @@
 
 struct Product
 {
-  mutable int m_id;
-  int m_categoryId;
-  int m_imageId;
+  mutable qlonglong m_id;
+  qlonglong m_categoryId;
+  qlonglong m_imageId;
   QString m_name;
   QString m_unity;
   QString m_packageUnity;
@@ -98,7 +98,7 @@ struct Product
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(int id) { return id != INVALID_PRODUCT_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_PRODUCT_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QVector<JTableColumn> getColumns()
   {

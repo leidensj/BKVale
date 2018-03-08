@@ -18,7 +18,7 @@
 
 struct Image
 {
-  mutable int m_id;
+  mutable qlonglong m_id;
   QString m_name;
   QByteArray m_image;
 
@@ -41,7 +41,7 @@ struct Image
         m_image != img.m_image;
   }
 
-  static bool st_isValidId(int id) { return id != INVALID_IMAGE_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_IMAGE_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
 
   static bool st_isValid(const Image& img) { return !img.m_name.isEmpty() && !img.m_image.isEmpty(); }

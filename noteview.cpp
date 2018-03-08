@@ -277,7 +277,7 @@ NoteView::NoteView(QWidget *parent)
                    SLOT(checkDate()));
   timer->start(60000);
 
-  create(DEFAULT_NUMBER);
+  create(SQL_NOTE_DEFAULT_NUMBER);
   checkDate();
   updateControls();
 }
@@ -312,25 +312,31 @@ Note NoteView::getNote() const
   Note note;
   note.m_id = m_currentID;
   note.m_date = m_dtDate->date().toJulianDay();
-  note.m_supplier = m_supplierPicker->getText();
+  note.m_supplierId = m_supplierPicker->getText();
   note.m_total = m_edTotal->text().toDouble();
   note.m_bCash = m_cbCash->isChecked();
-  m_table->getItems(note.m_items);
   return note;
 }
 
-void NoteView::setNote(const Note& note, int number)
+QVector<NoteItem> NoteView::getNoteItems() const
+{
+  return m_table->getItems();
+}
+
+void NoteView::setNote(const Note& note,
+                       int number,
+                       const Person& supplier,
+                       const QVector<NoteItem>& vItem,
+                       const QVector<Product>& vProduct)
 {
   m_table->removeAllItems();
   m_supplierPicker->clear();
   m_currentID = note.m_id;
-  m_dtDate->setDate(QDate::fromJulianDay(note.m_date));
-  // TODO
-  m_supplierPicker->setText(note.m_supplier);
+  m_dtDate->setDate(QDate::fromString(note.m_date, Qt::ISODate));
+  m_supplierPicker->setText(supplier.m_alias);
   m_snNumber->setValue(number);
   m_cbCash->setChecked(note.m_bCash);
   m_table->setItems(note.m_items);
-
   updateControls();
 }
 
@@ -380,6 +386,7 @@ void NoteView::setSupplier(int id, const QString& name, const QByteArray& arImag
 
 void NoteView::updateControls()
 {
+  // TODO
   const bool bCreated = m_snNumber->value() > 0;
   m_btnRemove->setEnabled(bCreated && m_table->currentRow() >= 0);
   m_btnAdd->setEnabled(bCreated);
@@ -390,7 +397,7 @@ void NoteView::updateControls()
   m_edTotal->setEnabled(bCreated);
   m_cbCash->setEnabled(bCreated);
   m_btnOpenLast->setEnabled(m_lastID != INVALID_NOTE_ID);
-  m_lblNumberStatus->setPixmap(QPixmap(Note::isValidID(m_currentID)
+  m_lblNumberStatus->setPixmap(QPixmap(Note::st_isValidID(m_currentID)
                                      ? ":/icons/res/fileedit.png"
                                      : ":/icons/res/filenew.png"));
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
@@ -441,7 +448,7 @@ void NoteView::checkDate()
   fmt.setFontOverline(true);
   m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
-  bool bIsEditMode = Note::isValidID(m_currentID);
+  bool bIsEditMode = Note::st_isValidID(m_currentID);
   bool bIsDirty = !m_supplierPicker->getText().isEmpty() ||
                   m_table->hasItems();
   if (!bIsEditMode && !bIsDirty)

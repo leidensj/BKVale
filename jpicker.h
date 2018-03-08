@@ -20,10 +20,10 @@ public:
                    bool bDisplayGroup = true,
                    QWidget* parent = 0);
   const QString m_itemText;
-  void setId(int id);
+  void setId(qlonglong id);
   void setText(const QString& text);
   void setImage(const QByteArray& ar);
-  int getId() const;
+  qlonglong getId() const;
   QString getText() const;
   QByteArray getImage() const;
 
@@ -38,7 +38,7 @@ private slots:
 
 private:
   const int m_invalidId;
-  int m_id;
+  qlonglong m_id;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;
   QPushButton* m_btnClear;

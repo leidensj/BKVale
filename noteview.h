@@ -26,6 +26,7 @@ public:
   ~NoteView();
   bool isValid() const;
   Note getNote() const;
+  QVector<NoteItem> getNoteItems() const;
   void setLastID(int lastID);
   int getLastID() const;
 
@@ -60,7 +61,11 @@ private slots:
 
 public slots:
   void create(int number);
-  void setNote(const Note& note, int number);
+  void setNote(const Note& note,
+               int number,
+               const Person& supplier,
+               const QVector<NoteItem>& vItem,
+               const QVector<Product>& vProduct);
   void updateControls();
   void setSupplier(int id, const QString& name, const QByteArray& arImage);
 

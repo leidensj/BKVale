@@ -8,7 +8,10 @@
 
 namespace
 {
-  void noteAppendHeader(const Note& note, int number, QString& strNote)
+  void noteAppendHeader(const Note& note,
+                        int number,
+                        const Person& supplier,
+                        QString& strNote)
   {
     strNote += ESC_EXPAND_ON
                ESC_ALIGN_CENTER
@@ -32,7 +35,7 @@ namespace
                ESC_ALIGN_LEFT
                "Numero     "
                ESC_DOUBLE_FONT_ON +
-               Note::strNumber(number) +
+               Note::st_strNumber(number) +
                ESC_LF
                "Data       "
                ESC_DOUBLE_FONT_ON +
@@ -43,12 +46,13 @@ namespace
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
-               note.m_supplier +
+               supplier.m_alias +
                ESC_LF +
                ESC_VERT_TAB;
   }
 
   void noteAppendFooter(const Note& note,
+                        const Person& person,
                         const QString& user,
                         QString& strNote)
   {
@@ -80,32 +84,35 @@ namespace
                  "________________________________"
                  ESC_LF
                  "Assinatura " +
-                 note.m_supplier +
+                 person.m_alias +
                  ESC_LF;
     }
   }
 
-  void noteAppendBody(const Note& note, QString& strNote)
+  void noteAppendBody(const Note& note,
+                      const QVector<NoteItem>& vItem,
+                      const QVector<Product>& vProduct,
+                      QString& strNote)
   {
-    if (note.m_items.size() == 0)
+    if (vItem.size() == 0 || vItem.size() != vProduct.size())
       return;
 
     strNote += ESC_ALIGN_LEFT;
-    for (int i = 0; i != note.m_items.size(); ++i)
+    for (int i = 0; i != vItem.size(); ++i)
     {
       QString item;
       {
-        QString itemPt1 = note.m_items.at(i).strAmmount() +
-                          note.m_items.at(i).m_unity +
+        QString itemPt1 = vItem.at(i).strAmmount() +
+                          vProduct.at(i).m_unity +
                           " x R$" +
-                          note.m_items.at(i).strPrice();
-        QString itemPt2 = "R$" + note.m_items.at(i).strSubtotal();
+                          vItem.at(i).strPrice();
+        QString itemPt2 = "R$" + vItem.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += ".";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      strNote += note.m_items.at(i).m_description + ESC_LF + item + ESC_LF;
+      strNote += vProduct.at(i).m_name + ESC_LF + item + ESC_LF;
     }
   }
 }
@@ -171,12 +178,15 @@ QString Printer::strCmdFullCut()
 
 QString NotePrinter::build(const Note& note,
                            int number,
+                           const Person& supplier,
+                           const QVector<NoteItem>& vItem,
+                           const QVector<Product>& vProduct,
                            const QString& user)
 {
   QString strNote1;
-  noteAppendHeader(note, number, strNote1);
-  noteAppendBody(note, strNote1);
-  noteAppendFooter(note, user, strNote1);
+  noteAppendHeader(note, number, supplier, strNote1);
+  noteAppendBody(note, vItem, vProduct, strNote1);
+  noteAppendFooter(note, supplier, user, strNote1);
   if (note.m_bCash)
   {
     return strNote1 + ESC_LF ESC_FULL_CUT;

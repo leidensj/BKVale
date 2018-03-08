@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QString>
 
-#define SQL_ADDRESS_TABLE_NAME "_ADDRESS"
+#define SQL_ADDRESS_TABLE_NAME "_ADDRESSES"
 #define SQL_ADDRESS_COL00 "_ID"
 #define SQL_ADDRESS_COL01 "_PERSONID"
 #define SQL_ADDRESS_COL02 "_CEP"

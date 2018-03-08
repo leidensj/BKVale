@@ -5,7 +5,7 @@
 #include <QVariant>
 #include <QDebug>
 
-#define DATABASE_NOT_OPEN_TXT "O arquivo de configuração não foi aberto."
+#define DATABASE_NOT_OPEN_TXT "O banco de dados não foi aberto."
 
 int NoteSQL::nextNumber(QSqlDatabase db)
 {
@@ -15,23 +15,6 @@ int NoteSQL::nextNumber(QSqlDatabase db)
   QSqlQuery query("SELECT MAX(_NUMBER) FROM _PROMISSORYNOTES", db);
   int number = query.next() ? query.value(0).toInt() + 1 : DEFAULT_NUMBER;
   return number > DEFAULT_NUMBER ? number : DEFAULT_NUMBER;
-}
-
-QStringList NoteSQL::suppliers(QSqlDatabase db)
-{
-  QStringList list;
-  if (db.isOpen())
-  {
-    QSqlQuery query(db);
-    if (query.exec("SELECT DISTINCT "
-                   "_SUPPLIER "
-                   "FROM _PROMISSORYNOTES"))
-    {
-      while (query.next())
-        list << query.value(query.record().indexOf("_SUPPLIER")).toString();
-    }
-  }
-  return list;
 }
 
 bool NoteSQL::insert(QSqlDatabase db,

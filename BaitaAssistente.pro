@@ -19,7 +19,6 @@ SOURCES += main.cpp\
     settingsdlg.cpp \
     printutils.cpp \
     databaseutils.cpp \
-    note.cpp \
     settings.cpp \
     reminderview.cpp \
     reminderwidget.cpp \

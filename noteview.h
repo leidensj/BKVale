@@ -55,19 +55,15 @@ private slots:
   void emitCreateSignal();
   void emitOpenLastSignal();
   void emitSearchSupplierSignal();
-  void addItem();
-  void addItem(const NoteItem& noteItem);
+  void addItem(const Product& product);
+  void addItem(const FullNoteItem& fItem);
   void removeItem();
 
 public slots:
   void create(int number);
-  void setNote(const Note& note,
-               int number,
-               const Person& supplier,
-               const QVector<NoteItem>& vItem,
-               const QVector<Product>& vProduct);
+  void setNote(const FullNote& fNote);
   void updateControls();
-  void setSupplier(int id, const QString& name, const QByteArray& arImage);
+  void setSupplier(const FullPerson& fSupplier);
 
 signals:
   void changedSignal();

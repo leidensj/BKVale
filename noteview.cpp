@@ -287,14 +287,15 @@ NoteView::~NoteView()
 
 }
 
-void NoteView::addItem()
+void NoteView::addItem(const Product& product)
 {
-  addItem(NoteItem());
+  FullNoteItem fItem(product);
+  addItem(fItem);
 }
 
-void NoteView::addItem(const NoteItem& noteItem)
+void NoteView::addItem(const FullNoteItem& fItem)
 {
-  m_table->addItem(noteItem);
+  m_table->addItem(fItem);
   m_table->setFocus();
   updateControls();
 }
@@ -312,7 +313,7 @@ Note NoteView::getNote() const
   Note note;
   note.m_id = m_currentID;
   note.m_date = m_dtDate->date().toJulianDay();
-  note.m_supplierId = m_supplierPicker->getText();
+  note.m_supplierId = m_supplierPicker->getId();
   note.m_total = m_edTotal->text().toDouble();
   note.m_bCash = m_cbCash->isChecked();
   return note;
@@ -323,20 +324,16 @@ QVector<NoteItem> NoteView::getNoteItems() const
   return m_table->getItems();
 }
 
-void NoteView::setNote(const Note& note,
-                       int number,
-                       const Person& supplier,
-                       const QVector<NoteItem>& vItem,
-                       const QVector<Product>& vProduct)
+void NoteView::setNote(const FullNote& fNote)
 {
   m_table->removeAllItems();
   m_supplierPicker->clear();
-  m_currentID = note.m_id;
-  m_dtDate->setDate(QDate::fromString(note.m_date, Qt::ISODate));
-  m_supplierPicker->setText(supplier.m_alias);
-  m_snNumber->setValue(number);
-  m_cbCash->setChecked(note.m_bCash);
-  m_table->setItems(note.m_items);
+  m_currentID = fNote.m_note.m_id;
+  m_dtDate->setDate(QDate::fromString(fNote.m_note.m_date, Qt::ISODate));
+  m_supplierPicker->setText(fNote.m_supplier.m_alias);
+  m_snNumber->setValue(fNote.m_number);
+  m_cbCash->setChecked(fNote.m_note.m_bCash);
+  m_table->setItems(fNote.m_vfNoteItem);
   updateControls();
 }
 
@@ -368,11 +365,11 @@ void NoteView::emitSearchSupplierSignal()
 
 }
 
-void NoteView::setSupplier(int id, const QString& name, const QByteArray& arImage)
+void NoteView::setSupplier(const FullPerson& fSupplier)
 {
-  m_supplierPicker->setId(id);
-  m_supplierPicker->setText(name);
-  m_supplierPicker->setImage(arImage);
+  m_supplierPicker->setId(fSupplier.m_person.m_id);
+  m_supplierPicker->setText(fSupplier.m_person.m_alias);
+  m_supplierPicker->setImage(fSupplier.m_image.m_image);
   if (m_table->hasItems() != 0)
   {
     m_table->setCurrentCell(0, 0);
@@ -380,7 +377,7 @@ void NoteView::setSupplier(int id, const QString& name, const QByteArray& arImag
   }
   else
   {
-    addItem(NoteItem());
+    // TODO adicionar item
   }
 }
 

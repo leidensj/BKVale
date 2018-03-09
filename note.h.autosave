@@ -133,7 +133,7 @@ struct FullNote
 {
   Note m_note;
   qlonglong m_number;
-  Person m_supplier;
+  FullPerson m_supplier;
   QVector<FullNoteItem> m_vfNoteItem;
 };
 

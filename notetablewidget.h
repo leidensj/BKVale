@@ -3,8 +3,11 @@
 
 #include <QTableWidget>
 #include "note.h"
+#include <QMetaType>
 
 class QKeyEvent;
+
+Q_DECLARE_METATYPE(Phone)
 
 class NoteTableWidget : public QTableWidget
 {
@@ -12,9 +15,9 @@ class NoteTableWidget : public QTableWidget
 
 public:
   explicit NoteTableWidget(QWidget* parent = 0);
-  QVector<NoteItemProduct>& getItems() const;
-  void setItems(const QVector<NoteItemProduct>& vItemProduct,);
-  void addItem(const NoteItemProduct& itemProduct);
+  QVector<NoteItem>& getItems() const;
+  void setItems(const QVector<FullNoteItem>& v);
+  void addItem(const FullNoteItem& fItem);
   QString computeTotal() const;
 
   void removeCurrentItem() { removeRow(currentRow()); }

@@ -24,21 +24,10 @@ public:
     QVariant value = QSqlTableModel::data(idx, role);
     if (role == Qt::DisplayRole)
     {
-      if (idx.column() == (int)NoteTableIndex::Date)
+      if (idx.column() == 2)
         value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
-      else if (idx.column() == (int)NoteTableIndex::Total)
+      else if (idx.column() == 4)
         value = "R$ " + QString::number(value.toDouble(), 'f', 2);
-      if (idx.column() == (int)NoteTableIndex::Cash)
-        value = "";
-    }
-    else if (role == Qt::DecorationRole)
-    {
-      if (idx.column() == (int)NoteTableIndex::Cash)
-      {
-        value = QSqlTableModel::data(idx, Qt::EditRole).toBool()
-                ? QVariant::fromValue(QIcon(":/icons/res/check.png"))
-                : "";
-      }
     }
     return value;
   }
@@ -121,7 +110,7 @@ bool NoteWidget::print(QIODevice* printer,
 {
   Note note;
   note.m_id = id;
-  int number = 0;
+  qlonglong number = 0;
   QString error;
   if (NoteSQL::select(m_database->get(), note, number, error))
   {

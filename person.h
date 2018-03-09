@@ -2,6 +2,8 @@
 #define PERSON_H
 
 #include "image.h"
+#include "phone.h"
+#include "address.h"
 #include <QObject>
 #include <QString>
 #include <QVector>
@@ -130,6 +132,14 @@ struct Person
     c.push_back(JTableColumn(SQL_PERSON_COL14, QObject::tr("Código PIN")));
     return c;
   }
+};
+
+struct FullPerson
+{
+  Person m_person;
+  Image m_image;
+  QVector<Phone> m_vPhone;
+  QVector<Address> m_vAddress;
 };
 
 #endif // PERSON_H

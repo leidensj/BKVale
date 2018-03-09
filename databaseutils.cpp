@@ -78,16 +78,19 @@ bool NoteSQL::insert(QSqlDatabase db,
                     SQL_NOTE_ITEMS_COL01 ","
                     SQL_NOTE_ITEMS_COL02 ","
                     SQL_NOTE_ITEMS_COL03 ","
-                    SQL_NOTE_ITEMS_COL04
+                    SQL_NOTE_ITEMS_COL04 ","
+                    SQL_NOTE_ITEMS_COL05
                     ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
                     "(:_v03),"
-                    "(:_v04))");
+                    "(:_v04),"
+                    "(:_v05))");
       query.bindValue(":_v01", note.m_id);
       query.bindValue(":_v02", vItems.at(i).m_productId);
       query.bindValue(":_v03", vItems.at(i).m_ammount);
       query.bindValue(":_v04", vItems.at(i).m_price);
+      query.bindValue(":_v05", vItems.at(i).m_bIsPackageAmmount);
       bSuccess = query.exec();
       if (bSuccess)
         vItems.at(i).m_id = query.lastInsertId().toLongLong();
@@ -161,13 +164,15 @@ bool NoteSQL::update(QSqlDatabase db,
                       SQL_NOTE_ITEMS_COL01 " = (:_v01),"
                       SQL_NOTE_ITEMS_COL02 " = (:_v02),"
                       SQL_NOTE_ITEMS_COL03 " = (:_v03),"
-                      SQL_NOTE_ITEMS_COL04 " = (:_v04)"
+                      SQL_NOTE_ITEMS_COL04 " = (:_v04),"
+                      SQL_NOTE_ITEMS_COL05 " = (:_v05)"
                       " WHERE _ID = (:_v00)");
         query.bindValue(":_v00", vItems.at(i).m_id);
         query.bindValue(":_v01", note.m_id);
         query.bindValue(":_v02", vItems.at(i).m_productId);
         query.bindValue(":_v03", vItems.at(i).m_ammount);
         query.bindValue(":_v04", vItems.at(i).m_price);
+        query.bindValue(":_v05", vItems.at(i).m_bIsPackageAmmount);
         bSuccess = query.exec();
       }
       else
@@ -176,16 +181,19 @@ bool NoteSQL::update(QSqlDatabase db,
                       SQL_NOTE_ITEMS_COL01 ","
                       SQL_NOTE_ITEMS_COL02 ","
                       SQL_NOTE_ITEMS_COL03 ","
-                      SQL_NOTE_ITEMS_COL04
+                      SQL_NOTE_ITEMS_COL04 ","
+                      SQL_NOTE_ITEMS_COL05
                       " ) VALUES ("
                       "(:_v01),"
                       "(:_v02),"
                       "(:_v03),"
-                      "(:_v04))");
+                      "(:_v04),"
+                      "(:_v05))");
         query.bindValue(":_v01", note.m_id);
         query.bindValue(":_v02", vItems.at(i).m_productId);
         query.bindValue(":_v03", vItems.at(i).m_ammount);
         query.bindValue(":_v04", vItems.at(i).m_price);
+        query.bindValue(":_v05", vItems.at(i).m_bIsPackageAmmount);
         bSuccess = query.exec();
         if (bSuccess)
           vItems.at(i).m_id = query.lastInsertId().toLongLong();
@@ -253,7 +261,8 @@ bool NoteSQL::select(QSqlDatabase db,
                   SQL_NOTE_ITEMS_COL00 ","
                   SQL_NOTE_ITEMS_COL02 ","
                   SQL_NOTE_ITEMS_COL03 ","
-                  SQL_NOTE_ITEMS_COL04
+                  SQL_NOTE_ITEMS_COL04 ","
+                  SQL_NOTE_ITEMS_COL05
                   " FROM " SQL_NOTE_ITEMS_TABLE_NAME
                   " WHERE " SQL_NOTE_COL01 " = (:_v01)");
     query.bindValue(":_v01", note.m_id);
@@ -265,6 +274,7 @@ bool NoteSQL::select(QSqlDatabase db,
       item.m_productId = query.value(1).toLongLong();
       item.m_ammount = query.value(2).toDouble();
       item.m_price = query.value(3).toDouble();
+      item.m_bIsPackageAmmount = query.value(4).toBool();
       vItems.clear();
     }
   }
@@ -390,6 +400,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                           SQL_NOTE_ITEMS_COL02 " INTEGER NOT NULL,"
                           SQL_NOTE_ITEMS_COL03 " REAL,"
                           SQL_NOTE_ITEMS_COL04 " REAL,"
+                          SQL_NOTE_ITEMS_COL04 " INT,"
                           "FOREIGN KEY(" SQL_NOTE_ITEMS_COL01 ") REFERENCES "
                           SQL_NOTE_TABLE_NAME "(" SQL_NOTE_COL00 "),"
                           "FOREIGN KEY(" SQL_NOTE_ITEMS_COL02 ") REFERENCES "
@@ -922,18 +933,12 @@ bool CategorySQL::remove(QSqlDatabase db,
   return false;
 }
 
-bool ImageSQL::select(QSqlDatabase db,
-                      Image& image,
-                      QString& error)
+bool ImageSQL::execSelect(QSqlQuery& query,
+                          Image& image,
+                          QString& error)
 {
-  error.clear();
   qlonglong id = image.m_id;
   image.clear();
-
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
   query.prepare("SELECT "
                 SQL_IMAGE_COL01 ","
                 SQL_IMAGE_COL02
@@ -961,6 +966,32 @@ bool ImageSQL::select(QSqlDatabase db,
     error = query.lastError().text();
     return false;
   }
+}
+
+bool ImageSQL::select(QSqlDatabase db,
+                      Image& image,
+                      QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execSelect(query, image, error);
+
+  if (!bSuccess)
+  {
+    db.rollback();
+    return false;
+  }
+  else
+    bSuccess = db.commit();
+
+  if (!bSuccess)
+    error = db.lastError().text();
+
+  return bSuccess;
 }
 
 bool ImageSQL::insert(QSqlDatabase db,
@@ -1592,18 +1623,15 @@ bool UserLoginSQL::login(const QString& strUser,
 }
 
 bool PersonSQL::select(QSqlDatabase db,
-                       Person& person,
-                       QString& error,
-                       QVector<Phone>* pvPhone,
-                       QVector<Address>* pvAddress)
+                       FullPerson& fPerson,
+                       QString& error)
 {
   error.clear();
-  if (pvPhone != nullptr)
-    pvPhone->clear();
-  if (pvAddress != nullptr)
-    pvAddress->clear();
-  qlonglong id = person.m_id;
-  person.clear();
+  fPerson.m_image.clear();
+  fPerson.m_vAddress.clear();
+  fPerson.m_vPhone.clear();
+  qlonglong id = fPerson.m_person.m_id;
+  fPerson.m_person.clear();
 
   if (!BaitaSQL::isOpen(db, error))
     return false;
@@ -1632,24 +1660,24 @@ bool PersonSQL::select(QSqlDatabase db,
 
   if (bSuccess && query.next())
   {
-    person.m_id = id;
-    person.m_imageId = query.value(0).toLongLong();
-    person.m_name = query.value(1).toString();
-    person.m_alias = query.value(2).toString();
-    person.m_email = query.value(3).toString();
-    person.m_CPF_CNPJ = query.value(4).toString();
-    person.m_RG_IE = query.value(5).toString();
-    person.m_details = query.value(6).toString();
-    person.m_birthDate = query.value(7).toString();
-    person.m_creationDate = query.value(8).toString();
-    person.m_bCompany = query.value(9).toBool();
-    person.m_bCustomer = query.value(10).toBool();
-    person.m_bSupplier = query.value(11).toBool();
-    person.m_bEmployee = query.value(12).toBool();
-    person.m_bEmployee = query.value(13).toBool();
+    fPerson.m_person.m_id = id;
+    fPerson.m_person.m_imageId = query.value(0).toLongLong();
+    fPerson.m_person.m_name = query.value(1).toString();
+    fPerson.m_person.m_alias = query.value(2).toString();
+    fPerson.m_person.m_email = query.value(3).toString();
+    fPerson.m_person.m_CPF_CNPJ = query.value(4).toString();
+    fPerson.m_person.m_RG_IE = query.value(5).toString();
+    fPerson.m_person.m_details = query.value(6).toString();
+    fPerson.m_person.m_birthDate = query.value(7).toString();
+    fPerson.m_person.m_creationDate = query.value(8).toString();
+    fPerson.m_person.m_bCompany = query.value(9).toBool();
+    fPerson.m_person.m_bCustomer = query.value(10).toBool();
+    fPerson.m_person.m_bSupplier = query.value(11).toBool();
+    fPerson.m_person.m_bEmployee = query.value(12).toBool();
+    fPerson.m_person.m_bEmployee = query.value(13).toBool();
   }
 
-  if (bSuccess && pvAddress != nullptr)
+  if (bSuccess)
   {
     query.prepare("SELECT "
                   SQL_ADDRESS_COL00 ","
@@ -1677,11 +1705,11 @@ bool PersonSQL::select(QSqlDatabase db,
       address.m_state = (Address::EBRState)query.value(6).toInt();
       address.m_complement = query.value(7).toString();
       address.m_reference = query.value(8).toString();
-      pvAddress->push_back(address);
+      fPerson.m_vAddress.push_back(address);
     }
   }
 
-  if (bSuccess && pvPhone != nullptr)
+  if (bSuccess)
   {
     query.prepare("SELECT "
                   SQL_PHONE_COL00 ","
@@ -1701,8 +1729,14 @@ bool PersonSQL::select(QSqlDatabase db,
       phone.m_countryCode = query.value(2).toInt();
       phone.m_code = query.value(3).toInt();
       phone.m_number = query.value(4).toString();
-      pvPhone->push_back(phone);
+      fPerson.m_vPhone.push_back(phone);
     }
+  }
+
+  if (bSuccess)
+  {
+    fPerson.m_image.m_id = fPerson.m_person.m_imageId;
+    bSuccess = ImageSQL::execSelect(query, fPerson.m_image, error);
   }
 
   if (!bSuccess)
@@ -1716,7 +1750,7 @@ bool PersonSQL::select(QSqlDatabase db,
 
   if (!bSuccess)
     error = db.lastError().text();
-  else if (person.m_id != id)
+  else if (fPerson.m_person.m_id != id)
   {
     bSuccess = false;
     error = "Pessoa não encontrada.";
@@ -1724,11 +1758,10 @@ bool PersonSQL::select(QSqlDatabase db,
 
   if (!bSuccess)
   {
-    person.clear();
-    if (pvPhone != nullptr)
-      pvPhone->clear();
-    if (pvAddress != nullptr)
-      pvAddress->clear();
+    fPerson.m_person.clear();
+    fPerson.m_image.clear();
+    fPerson.m_vAddress.clear();
+    fPerson.m_vPhone.clear();
   }
 
   return bSuccess;

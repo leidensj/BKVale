@@ -96,9 +96,7 @@ namespace NoteSQL
               QString& error);
 
   bool select(QSqlDatabase db,
-              Note& note,
-              qlonglong& number,
-              QVector<NoteItem>& vItems,
+              FullNote& note,
               QString& error);
 
   bool remove(QSqlDatabase db,
@@ -146,6 +144,10 @@ namespace CategorySQL
 
 namespace ImageSQL
 {
+  bool execSelect(QSqlQuery& query,
+                  Image& image,
+                  QString& error);
+
   bool select(QSqlDatabase db,
               Image& image,
               QString& error);
@@ -214,10 +216,8 @@ namespace ConsumptionSQL
 namespace PersonSQL
 {
   bool select(QSqlDatabase db,
-              Person& person,
-              QString& error,
-              QVector<Phone>* pvPhone = nullptr,
-              QVector<Address>* pvAddress = nullptr);
+              FullPerson& fPerson,
+              QString& error);
 
   bool insert(QSqlDatabase db,
               const Person& person,

@@ -127,54 +127,61 @@ void NoteTableWidget::setText(int row, int column, const QString& str)
     p->setText(str);
 }
 
-QVector<NoteItemProduct>& NoteTableWidget::getItems() const
+QVector<NoteItem>& NoteTableWidget::getItems() const
 {
-  QVector<NoteItemProduct> v;
+  QVector<NoteItem> v;
   for (int i = 0; i != rowCount(); ++i)
   {
-    NoteItem noteItem;
-    noteItem.m_id = item(i, (int)NoteColumn::Description)->data(Qt::UserRole).toInt();
-    noteItem.m_ammount = text(i, (int)NoteColumn::Ammount).toDouble();
-    noteItem.m_unity = text(i, (int)NoteColumn::Unity);
-    noteItem.m_description = text(i, (int)NoteColumn::Description);
-    noteItem.m_price = text(i, (int)NoteColumn::Price).toDouble();
-    v.push_back(noteItem);
+    FullNoteItem o = item(i, (int)::NoteColumn::Description)->data(Qt::UserRole).value<FullNoteItem>();
+    o.m_item.m_ammount = text(i, (int)NoteColumn::Ammount).toDouble();
+    o.m_item.m_price = text(i, (int)NoteColumn::Price).toDouble();
+    o.m_item.m_bIsPackageAmmount = item(i, (int)NoteColumn::Unity)->checkState() == Qt::Checked
+                                   ? true : false;
+    v.push_back(o.m_item);
   }
   return v;
 }
 
-void NoteTableWidget::addItem(const NoteItem& noteItem,
-                              const Product& product)
+void NoteTableWidget::addItem(const FullNoteItem& fItem)
 {
   insertRow(rowCount());
   const int row = rowCount() - 1;
 
+  add
   blockSignals(true);
   setItem(row, (int)NoteColumn::Ammount,
-          new QTableWidgetItem(noteItem.strAmmount()));
+          new QTableWidgetItem(fItem.m_item.strAmmount()));
   setItem(row, (int)NoteColumn::Unity,
-          new QTableWidgetItem(product.m_unity));
+          new QTableWidgetItem(fItem.m_item.m_bIsPackageAmmount
+                               ? fItem.m_product.m_packageUnity
+                               : fItem.m_product.m_unity));
   setItem(row, (int)NoteColumn::Description,
-          new QTableWidgetItem(product.m_name));
+          new QTableWidgetItem(fItem.m_product.m_name));
   setItem(row, (int)NoteColumn::Price,
-          new QTableWidgetItem(noteItem.strPrice()));
+          new QTableWidgetItem(fItem.m_item.strPrice()));
   setItem(row, (int)NoteColumn::SubTotal,
-          new QTableWidgetItem(noteItem.strSubtotal()));
-  item(row, (int)NoteColumn::Description)->setData(Qt::UserRole, noteItem.m_id);
-  item();
+          new QTableWidgetItem(fItem.m_item.strSubtotal()));
+  item(row, (int)NoteColumn::Description)->setData(Qt::UserRole, fItem);
+
+  item(row, (int)NoteColumn::Unity)->setFlags(Qt::NoItemFlags |
+                                              Qt::ItemIsUserCheckable |
+                                              Qt::ItemIsSelectable |
+                                              Qt::ItemIsEnabled);
+  item(row, (int)NoteColumn::Description)->setFlags(Qt::NoItemFlags |
+                                                    Qt::ItemIsSelectable |
+                                                    Qt::ItemIsEnabled);
+  item(row, (int)NoteColumn::Unity)->setCheckState(fItem.m_item.m_bIsPackageAmmount
+                                                   ? Qt::Checked : Qt::Unchecked);
+
   setCurrentCell(row, (int)NoteColumn::Ammount);
   blockSignals(false);
 }
 
-void NoteTableWidget::setItems(const QVector<NoteItem>& vItem,
-                               const QVector<Product>& vProduct)
+void NoteTableWidget::setItems(const QVector<FullNoteItem>& v)
 {
   removeAllItems();
-  if (vItem.size() == vProduct.size())
-  {
-    for (int i = 0; i != vItem.size(); ++i)
-      addItem(vItem.at(i), vProduct.at(i));
-  }
+  for (int i = 0; i != v.size(); ++i)
+    addItem(v.at(i));
 }
 
 void NoteTableWidget::update(int row, int column)
@@ -182,11 +189,6 @@ void NoteTableWidget::update(int row, int column)
   blockSignals(true);
   switch ((NoteColumn)column)
   {
-    case NoteColumn::Unity:
-    case NoteColumn::Description:
-    {
-      setText(row, column, text(row, column).toUpper());
-    } break;
     case NoteColumn::Ammount:
     {
       setText(row, column, NoteItem::st_strAmmount(evaluate(row, column)));
@@ -202,6 +204,8 @@ void NoteTableWidget::update(int row, int column)
       setText(row, column, NoteItem::st_strSubTotal(evaluate(row, column)));
       setText(row, (int)NoteColumn::Price, computeUnitValue(row));
     } break;
+    case NoteColumn::Unity:
+    case NoteColumn::Description:
     default:
       break;
   }

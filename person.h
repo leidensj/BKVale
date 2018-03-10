@@ -136,10 +136,19 @@ struct Person
 
 struct FullPerson
 {
+  FullPerson() {}
   Person m_person;
   Image m_image;
   QVector<Phone> m_vPhone;
   QVector<Address> m_vAddress;
+
+  void clear()
+  {
+    m_person.clear();
+    m_image.clear();
+    m_vPhone.clear();
+    m_vAddress.clear();
+  }
 };
 
 #endif // PERSON_H

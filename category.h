@@ -54,4 +54,19 @@ struct Category
   }
 };
 
+struct FullCategory
+{
+  Category m_category;
+  Image m_image;
+  void clear()
+  {
+    m_category.clear();
+    m_image.clear();
+  }
+  FullCategory()
+  {
+    clear();
+  }
+};
+
 #endif // CATEGORY_H

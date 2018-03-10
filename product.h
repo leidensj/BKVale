@@ -121,4 +121,21 @@ struct Product
   }
 };
 
+struct FullProduct
+{
+  Product m_product;
+  Image m_image;
+
+  void clear()
+  {
+    m_product.clear();
+    m_image.clear();
+  }
+
+  FullProduct()
+  {
+    clear();
+  }
+};
+
 #endif // PRODUCT_H

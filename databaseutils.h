@@ -106,8 +106,12 @@ namespace NoteSQL
 
 namespace ProductSQL
 {
+bool execSelect(QSqlQuery& query,
+                FullProduct& fProduct,
+                QString& error);
+
 bool select(QSqlDatabase db,
-            Product& product,
+            FullProduct& fProduct,
             QString& error);
 
 bool insert(QSqlDatabase db,
@@ -125,8 +129,12 @@ bool remove(QSqlDatabase db,
 
 namespace CategorySQL
 {
+ bool execSelect(QSqlQuery& query,
+                 FullCategory& fCategory,
+                 QString& error);
+
   bool select(QSqlDatabase db,
-              Category& category,
+              FullCategory& fCategory,
               QString& error);
 
   bool insert(QSqlDatabase db,
@@ -215,6 +223,10 @@ namespace ConsumptionSQL
 
 namespace PersonSQL
 {
+  bool execSelect(QSqlQuery& query,
+                  FullPerson& fPerson,
+                  QString& error);
+
   bool select(QSqlDatabase db,
               FullPerson& fPerson,
               QString& error);

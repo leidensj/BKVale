@@ -7,6 +7,25 @@
 
 #define DATABASE_NOT_OPEN_TXT "O banco de dados não foi aberto."
 
+namespace {
+  bool finishTransaction(QSqlDatabase db,
+                         bool bExecSelectResult,
+                         QString& error)
+  {
+    if (!bExecSelectResult)
+    {
+      db.rollback();
+      return false;
+    }
+    else
+      bExecSelectResult = db.commit();
+
+    if (!bExecSelectResult)
+      error = db.lastError().text();
+
+    return bExecSelectResult;
+  }
+}
 qlonglong NoteSQL::nextNumber(QSqlDatabase db)
 {
   qlonglong number = SQL_NOTE_DEFAULT_NUMBER;
@@ -219,15 +238,12 @@ bool NoteSQL::update(QSqlDatabase db,
 }
 
 bool NoteSQL::select(QSqlDatabase db,
-                     Note& note,
-                     qlonglong& number,
-                     QVector<NoteItem>& vItems,
+                     FullNote& fNote,
                      QString& error)
 {
-  vItems.clear();
   error.clear();
-  qlonglong id = note.m_id;
-  note.clear();
+  qlonglong id = fNote.m_note.m_id;
+  fNote.clear();
 
   if (!BaitaSQL::isOpen(db, error))
     return false;
@@ -245,14 +261,23 @@ bool NoteSQL::select(QSqlDatabase db,
   query.bindValue(":_v00", id);
   bool bSuccess = query.exec();
 
-  if (bSuccess && query.next())
+  if (bSuccess)
   {
-    note.m_id = id;
-    number = query.value(0).toLongLong();
-    note.m_date = query.value(1).toString();
-    note.m_supplierId = query.value(2).toLongLong();
-    note.m_total = query.value(3).toDouble();
-    note.m_bCash = query.value(4).toBool();
+    if (query.next())
+    {
+      fNote.m_note.m_id = id;
+      fNote.m_number = query.value(0).toLongLong();
+      fNote.m_note.m_date = query.value(1).toString();
+      fNote.m_note.m_supplierId = query.value(2).toLongLong();
+      fNote.m_note.m_total = query.value(3).toDouble();
+      fNote.m_note.m_bCash = query.value(4).toBool();
+    }
+    else
+    {
+      error = "Vale não encontrado.";
+      bSuccess = false;
+    }
+
   }
 
   if (bSuccess)
@@ -265,37 +290,42 @@ bool NoteSQL::select(QSqlDatabase db,
                   SQL_NOTE_ITEMS_COL05
                   " FROM " SQL_NOTE_ITEMS_TABLE_NAME
                   " WHERE " SQL_NOTE_COL01 " = (:_v01)");
-    query.bindValue(":_v01", note.m_id);
+    query.bindValue(":_v01", fNote.m_note.m_id);
     bSuccess = query.exec();
     while (bSuccess && query.next())
     {
-      NoteItem item;
-      item.m_id = query.value(0).toLongLong();
-      item.m_productId = query.value(1).toLongLong();
-      item.m_ammount = query.value(2).toDouble();
-      item.m_price = query.value(3).toDouble();
-      item.m_bIsPackageAmmount = query.value(4).toBool();
-      vItems.clear();
+      FullNoteItem fNoteItem;
+      fNoteItem.m_item.m_id = query.value(0).toLongLong();
+      fNoteItem.m_item.m_productId = query.value(1).toLongLong();
+      fNoteItem.m_item.m_ammount = query.value(2).toDouble();
+      fNoteItem.m_item.m_price = query.value(3).toDouble();
+      fNoteItem.m_item.m_bIsPackageAmmount = query.value(4).toBool();
+      fNoteItem.m_fProduct.m_product.m_id = fNoteItem.m_item.m_productId;
+      bSuccess = ProductSQL::execSelect(query, fNoteItem.m_fProduct, error);
+      if (!bSuccess)
+        break;
+      else
+        fNote.m_vfNoteItem.push_back(fNoteItem);
     }
+  }
+
+  if (bSuccess)
+  {
+    fNote.m_fSupplier.m_person.m_id = fNote.m_note.m_supplierId;
+    bSuccess = PersonSQL::execSelect(query, fNote.m_fSupplier, error);
   }
 
   if (!bSuccess)
   {
     error = query.lastError().text();
-    db.rollback();
-    return false;
+    fNote.clear();
   }
   else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-  else if (note.m_id != id)
   {
-    error = "Vale não encontrado.";
-    return false;
+    bSuccess = finishTransaction(db, bSuccess, error);
+    if (!bSuccess)
+      fNote.clear();
   }
-
   return bSuccess;
 }
 
@@ -558,18 +588,14 @@ bool BaitaSQL::init(QSqlDatabase db,
   }
 }
 
-bool ProductSQL::select(QSqlDatabase db,
-                        Product& product,
-                        QString& error)
+bool ProductSQL::execSelect(QSqlQuery& query,
+                            FullProduct& fProduct,
+                            QString& error)
 {
   error.clear();
-  qlonglong id = product.m_id;
-  product.clear();
+  qlonglong id = fProduct.m_product.m_id;
+  fProduct.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
   query.prepare("SELECT "
                 SQL_PRODUCT_COL01 ","
                 SQL_PRODUCT_COL02 ","
@@ -587,37 +613,63 @@ bool ProductSQL::select(QSqlDatabase db,
                 " FROM " SQL_PRODUCT_TABLE_NAME
                 " WHERE " SQL_PRODUCT_COL00 " = (:_v00)");
   query.bindValue(":_v00", id);
-  if (query.exec())
+  bool bSuccess = query.exec();
+  if (bSuccess)
   {
     if (query.next())
     {
-      product.m_id = id;
-      product.m_name = query.value(0).toString();
-      product.m_categoryId = query.value(1).toLongLong();
-      product.m_imageId = query.value(2).toLongLong();
-      product.m_unity = query.value(3).toString();
-      product.m_packageUnity = query.value(4).toString();
-      product.m_packageAmmount = query.value(5).toDouble();
-      product.m_details = query.value(6).toString();
-      product.m_code = query.value(7).toString();
-      product.m_bAvailableAtNotes = query.value(8).toBool();
-      product.m_bAvailableAtShop = query.value(9).toBool();
-      product.m_bAvailableAtConsumption = query.value(10).toBool();
-      product.m_bAvailableToBuy = query.value(11).toBool();
-      product.m_bAvailableToSell = query.value(12).toBool();
-      return true;
+      fProduct.m_product.m_id = id;
+      fProduct.m_product.m_name = query.value(0).toString();
+      fProduct.m_product.m_categoryId = query.value(1).toLongLong();
+      fProduct.m_product.m_imageId = query.value(2).toLongLong();
+      fProduct.m_product.m_unity = query.value(3).toString();
+      fProduct.m_product.m_packageUnity = query.value(4).toString();
+      fProduct.m_product.m_packageAmmount = query.value(5).toDouble();
+      fProduct.m_product.m_details = query.value(6).toString();
+      fProduct.m_product.m_code = query.value(7).toString();
+      fProduct.m_product.m_bAvailableAtNotes = query.value(8).toBool();
+      fProduct.m_product.m_bAvailableAtShop = query.value(9).toBool();
+      fProduct.m_product.m_bAvailableAtConsumption = query.value(10).toBool();
+      fProduct.m_product.m_bAvailableToBuy = query.value(11).toBool();
+      fProduct.m_product.m_bAvailableToSell = query.value(12).toBool();
     }
     else
     {
       error = "Produto não encontrado.";
-      return false;
+      bSuccess = false;
     }
   }
-  else
+
+  if (bSuccess)
+  {
+    fProduct.m_image.m_id = fProduct.m_product.m_imageId;
+    bSuccess = ImageSQL::execSelect(query, fProduct.m_image, error);
+  }
+
+  if (!bSuccess)
   {
     error = query.lastError().text();
-    return false;
+    fProduct.clear();
   }
+
+  return bSuccess;
+}
+
+bool ProductSQL::select(QSqlDatabase db,
+                        FullProduct& fProduct,
+                        QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execSelect(query, fProduct, error);
+  bSuccess = finishTransaction(db, bSuccess, error);
+  if (!bSuccess)
+    fProduct.clear();
+  return bSuccess;
 }
 
 bool ProductSQL::insert(QSqlDatabase db,
@@ -784,18 +836,14 @@ bool ProductSQL::remove(QSqlDatabase db,
   return false;
 }
 
-bool CategorySQL::select(QSqlDatabase db,
-                         Category& category,
-                         QString& error)
+bool CategorySQL::execSelect(QSqlQuery& query,
+                             FullCategory& fCategory,
+                             QString& error)
 {
   error.clear();
-  qlonglong id = category.m_id;
-  category.clear();
+  qlonglong id = fCategory.m_category.m_id;
+  fCategory.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
   query.prepare("SELECT "
                 SQL_CATEGORY_COL01 ","
                 SQL_CATEGORY_COL02
@@ -803,26 +851,53 @@ bool CategorySQL::select(QSqlDatabase db,
                 " WHERE " SQL_CATEGORY_COL00 " = (:_v00)");
   query.bindValue(":_v00", id);
 
-  if (query.exec())
+  bool bSuccess = query.exec();
+  if (bSuccess)
   {
     if (query.next())
     {
-      category.m_id = id;
-      category.m_imageId = query.value(0).toLongLong();
-      category.m_name = query.value(1).toString();
-      return true;
+      fCategory.m_category.m_id = id;
+      fCategory.m_category.m_imageId = query.value(0).toLongLong();
+      fCategory.m_category.m_name = query.value(1).toString();
     }
     else
     {
       error = "Categoria não encontrada.";
-      return false;
+      bSuccess = false;
     }
   }
-  else
+
+  if (bSuccess)
+  {
+    fCategory.m_image.m_id = fCategory.m_category.m_imageId;
+    bSuccess = ImageSQL::execSelect(query, fCategory.m_image, error);
+  }
+
+  if (!bSuccess)
   {
     error = query.lastError().text();
-    return false;
+    fCategory.clear();
   }
+
+  return bSuccess;
+}
+
+bool CategorySQL::select(QSqlDatabase db,
+                         FullCategory& fCategory,
+                         QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+
+  bool bSuccess = execSelect(query, fCategory, error);
+  bSuccess = finishTransaction(db, bSuccess, error);
+  if (!bSuccess)
+    fCategory.clear();
+  return bSuccess;
 }
 
 bool CategorySQL::insert(QSqlDatabase db,
@@ -979,18 +1054,9 @@ bool ImageSQL::select(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, image, error);
-
+  bSuccess = finishTransaction(db, bSuccess, error);
   if (!bSuccess)
-  {
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
+    image.clear();
   return bSuccess;
 }
 
@@ -1347,10 +1413,10 @@ void ConsumptionSQL::getConsumption(QSqlDatabase db,
 
   for (int i = 0; i != vConsumption.size(); ++i)
   {
-    Product product;
-    product.m_id = vConsumption.at(i).m_itemID;
+    FullProduct product;
+    product.m_product.m_id = vConsumption.at(i).m_itemID;
     ProductSQL::select(db, product, error);
-    vProduct.push_back(product);
+    vProduct.push_back(product.m_product);
   }
 }
 
@@ -1622,22 +1688,14 @@ bool UserLoginSQL::login(const QString& strUser,
   return false;
 }
 
-bool PersonSQL::select(QSqlDatabase db,
-                       FullPerson& fPerson,
-                       QString& error)
+bool PersonSQL::execSelect(QSqlQuery& query,
+                           FullPerson& fPerson,
+                           QString& error)
 {
   error.clear();
-  fPerson.m_image.clear();
-  fPerson.m_vAddress.clear();
-  fPerson.m_vPhone.clear();
   qlonglong id = fPerson.m_person.m_id;
-  fPerson.m_person.clear();
+  fPerson.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  db.transaction();
-  QSqlQuery query(db);
   query.prepare("SELECT "
                 SQL_PERSON_COL01 ","
                 SQL_PERSON_COL02 ","
@@ -1658,23 +1716,31 @@ bool PersonSQL::select(QSqlDatabase db,
   query.bindValue(":_v00", id);
   bool bSuccess = query.exec();
 
-  if (bSuccess && query.next())
+  if (bSuccess)
   {
-    fPerson.m_person.m_id = id;
-    fPerson.m_person.m_imageId = query.value(0).toLongLong();
-    fPerson.m_person.m_name = query.value(1).toString();
-    fPerson.m_person.m_alias = query.value(2).toString();
-    fPerson.m_person.m_email = query.value(3).toString();
-    fPerson.m_person.m_CPF_CNPJ = query.value(4).toString();
-    fPerson.m_person.m_RG_IE = query.value(5).toString();
-    fPerson.m_person.m_details = query.value(6).toString();
-    fPerson.m_person.m_birthDate = query.value(7).toString();
-    fPerson.m_person.m_creationDate = query.value(8).toString();
-    fPerson.m_person.m_bCompany = query.value(9).toBool();
-    fPerson.m_person.m_bCustomer = query.value(10).toBool();
-    fPerson.m_person.m_bSupplier = query.value(11).toBool();
-    fPerson.m_person.m_bEmployee = query.value(12).toBool();
-    fPerson.m_person.m_bEmployee = query.value(13).toBool();
+    if (query.next())
+    {
+      fPerson.m_person.m_id = id;
+      fPerson.m_person.m_imageId = query.value(0).toLongLong();
+      fPerson.m_person.m_name = query.value(1).toString();
+      fPerson.m_person.m_alias = query.value(2).toString();
+      fPerson.m_person.m_email = query.value(3).toString();
+      fPerson.m_person.m_CPF_CNPJ = query.value(4).toString();
+      fPerson.m_person.m_RG_IE = query.value(5).toString();
+      fPerson.m_person.m_details = query.value(6).toString();
+      fPerson.m_person.m_birthDate = query.value(7).toString();
+      fPerson.m_person.m_creationDate = query.value(8).toString();
+      fPerson.m_person.m_bCompany = query.value(9).toBool();
+      fPerson.m_person.m_bCustomer = query.value(10).toBool();
+      fPerson.m_person.m_bSupplier = query.value(11).toBool();
+      fPerson.m_person.m_bEmployee = query.value(12).toBool();
+      fPerson.m_person.m_bEmployee = query.value(13).toBool();
+    }
+    else
+    {
+      error = "Pessoa não encontrada.";
+      bSuccess = false;
+    }
   }
 
   if (bSuccess)
@@ -1742,28 +1808,25 @@ bool PersonSQL::select(QSqlDatabase db,
   if (!bSuccess)
   {
     error = query.lastError().text();
-    db.rollback();
+    fPerson.clear();
+  }
+
+  return bSuccess;
+}
+
+bool PersonSQL::select(QSqlDatabase db,
+                       FullPerson& fPerson,
+                       QString& error)
+{
+  if (!BaitaSQL::isOpen(db, error))
     return false;
-  }
-  else
-    bSuccess = db.commit();
 
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execSelect(query, fPerson, error);
+  bSuccess = finishTransaction(db, bSuccess, error);
   if (!bSuccess)
-    error = db.lastError().text();
-  else if (fPerson.m_person.m_id != id)
-  {
-    bSuccess = false;
-    error = "Pessoa não encontrada.";
-  }
-
-  if (!bSuccess)
-  {
-    fPerson.m_person.clear();
-    fPerson.m_image.clear();
-    fPerson.m_vAddress.clear();
-    fPerson.m_vPhone.clear();
-  }
-
+    fPerson.clear();
   return bSuccess;
 }
 

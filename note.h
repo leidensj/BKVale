@@ -119,22 +119,40 @@ struct Note
 
 struct FullNoteItem
 {
-  FullNoteItem(const Product& product)
-    : m_product(product)
+  NoteItem m_item;
+  FullProduct m_fProduct;
+
+  void clear()
   {
-    m_item.m_productId = m_product.m_id;
+    m_item.clear();
+    m_fProduct.clear();
   }
 
-  NoteItem m_item;
-  Product m_product;
+  FullNoteItem()
+  {
+    clear();
+  }
 };
 
 struct FullNote
 {
   Note m_note;
   qlonglong m_number;
-  Person m_supplier;
+  FullPerson m_fSupplier;
   QVector<FullNoteItem> m_vfNoteItem;
+
+  void clear()
+  {
+    m_note.clear();
+    m_number = SQL_NOTE_DEFAULT_NUMBER;
+    m_fSupplier.clear();
+    m_vfNoteItem.clear();
+  }
+
+  FullNote()
+  {
+    clear();
+  }
 };
 
 #endif // COMMON_H

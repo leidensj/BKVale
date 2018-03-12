@@ -31,11 +31,7 @@ namespace Printer
 
 namespace NotePrinter
 {
-  QString build(const Note& note,
-                int number,
-                const Person& supplier,
-                const QVector<NoteItem>& vItem,
-                const QVector<Product>& vProduct,
+  QString build(const FullNote& fNote,
                 const QString& user);
 }
 

@@ -55,7 +55,7 @@ private slots:
   void emitCreateSignal();
   void emitOpenLastSignal();
   void emitSearchSupplierSignal();
-  void addItem(const Product& product);
+  void addItem(const FullProduct& fProduct);
   void addItem(const FullNoteItem& fItem);
   void removeItem();
 

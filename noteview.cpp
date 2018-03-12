@@ -287,9 +287,11 @@ NoteView::~NoteView()
 
 }
 
-void NoteView::addItem(const Product& product)
+void NoteView::addItem(const FullProduct& fProduct)
 {
-  FullNoteItem fItem(product);
+  FullNoteItem fItem;
+  fItem.m_fProduct = fProduct;
+  fItem.m_item.m_productId = fProduct.m_product.m_id;
   addItem(fItem);
 }
 
@@ -330,7 +332,7 @@ void NoteView::setNote(const FullNote& fNote)
   m_supplierPicker->clear();
   m_currentID = fNote.m_note.m_id;
   m_dtDate->setDate(QDate::fromString(fNote.m_note.m_date, Qt::ISODate));
-  m_supplierPicker->setText(fNote.m_supplier.m_alias);
+  m_supplierPicker->setText(fNote.m_fSupplier.m_person.m_alias);
   m_snNumber->setValue(fNote.m_number);
   m_cbCash->setChecked(fNote.m_note.m_bCash);
   m_table->setItems(fNote.m_vfNoteItem);
@@ -377,7 +379,8 @@ void NoteView::setSupplier(const FullPerson& fSupplier)
   }
   else
   {
-    // TODO adicionar item
+    // todo search product
+    m_table->addItem(FullNoteItem());
   }
 }
 

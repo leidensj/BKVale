@@ -8,9 +8,7 @@
 
 namespace
 {
-  void noteAppendHeader(const Note& note,
-                        int number,
-                        const Person& supplier,
+  void noteAppendHeader(const FullNote& fNote,
                         QString& strNote)
   {
     strNote += ESC_EXPAND_ON
@@ -26,7 +24,7 @@ namespace
                ESC_VERT_TAB
                ESC_EXPAND_OFF;
 
-    strNote += note.m_bCash
+    strNote += fNote.m_note.m_bCash
                ? "PAGAMENTO A VISTA"
                : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";
 
@@ -35,24 +33,23 @@ namespace
                ESC_ALIGN_LEFT
                "Numero     "
                ESC_DOUBLE_FONT_ON +
-               Note::st_strNumber(number) +
+               Note::st_strNumber(fNote.m_number) +
                ESC_LF
                "Data       "
                ESC_DOUBLE_FONT_ON +
-               note.strDate() +
+               fNote.m_note.strDate() +
                ESC_LF
                "           " +
-               note.strDayOfWeek() +
+               fNote.m_note.strDayOfWeek() +
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
-               supplier.m_alias +
+               fNote.m_fSupplier.m_person.m_alias +
                ESC_LF +
                ESC_VERT_TAB;
   }
 
-  void noteAppendFooter(const Note& note,
-                        const Person& person,
+  void noteAppendFooter(const FullNote& fNote,
                         const QString& user,
                         QString& strNote)
   {
@@ -60,7 +57,7 @@ namespace
                ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON
                "TOTAL R$" +
-               note.strTotal() +
+               fNote.m_note.strTotal() +
                ESC_LF
                "Emissao: " +
                QDate::currentDate().toString("dd/MM/yyyy ") +
@@ -77,42 +74,37 @@ namespace
                user +
                ESC_LF;
 
-    if (note.m_bCash)
+    if (fNote.m_note.m_bCash)
     {
       strNote += ESC_LF
                  ESC_LF
                  "________________________________"
                  ESC_LF
                  "Assinatura " +
-                 person.m_alias +
+                 fNote.m_fSupplier.m_person.m_alias +
                  ESC_LF;
     }
   }
 
-  void noteAppendBody(const Note& note,
-                      const QVector<NoteItem>& vItem,
-                      const QVector<Product>& vProduct,
+  void noteAppendBody(const FullNote& note,
                       QString& strNote)
   {
-    if (vItem.size() == 0 || vItem.size() != vProduct.size())
-      return;
-
     strNote += ESC_ALIGN_LEFT;
-    for (int i = 0; i != vItem.size(); ++i)
+    for (int i = 0; i != note.m_vfNoteItem.size(); ++i)
     {
       QString item;
       {
-        QString itemPt1 = vItem.at(i).strAmmount() +
-                          vProduct.at(i).m_unity +
+        QString itemPt1 = note.m_vfNoteItem.at(i).m_item.strAmmount() +
+                          note.m_vfNoteItem.at(i).m_fProduct.m_product.m_unity +
                           " x R$" +
-                          vItem.at(i).strPrice();
-        QString itemPt2 = "R$" + vItem.at(i).strSubtotal();
+                          note.m_vfNoteItem.at(i).m_item.strPrice();
+        QString itemPt2 = "R$" + note.m_vfNoteItem.at(i).m_item.strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += ".";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      strNote += vProduct.at(i).m_name + ESC_LF + item + ESC_LF;
+      strNote += note.m_vfNoteItem.at(i).m_fProduct.m_product.m_name + ESC_LF + item + ESC_LF;
     }
   }
 }
@@ -176,18 +168,14 @@ QString Printer::strCmdFullCut()
   return ESC_FULL_CUT;
 }
 
-QString NotePrinter::build(const Note& note,
-                           int number,
-                           const Person& supplier,
-                           const QVector<NoteItem>& vItem,
-                           const QVector<Product>& vProduct,
+QString NotePrinter::build(const FullNote& fNote,
                            const QString& user)
 {
   QString strNote1;
-  noteAppendHeader(note, number, supplier, strNote1);
-  noteAppendBody(note, vItem, vProduct, strNote1);
-  noteAppendFooter(note, supplier, user, strNote1);
-  if (note.m_bCash)
+  noteAppendHeader(fNote, strNote1);
+  noteAppendBody(fNote, strNote1);
+  noteAppendFooter(fNote, user, strNote1);
+  if (fNote.m_note.m_bCash)
   {
     return strNote1 + ESC_LF ESC_FULL_CUT;
   }

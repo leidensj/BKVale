@@ -108,13 +108,13 @@ bool NoteWidget::print(QIODevice* printer,
                        const QString& user,
                        int id)
 {
-  Note note;
-  note.m_id = id;
+  FullNote fNote;
+  fNote.m_note.m_id = id;
   qlonglong number = 0;
   QString error;
-  if (NoteSQL::select(m_database->get(), note, number, error))
+  if (NoteSQL::select(m_database->get(), fNote, error))
   {
-    QString str(NotePrinter::build(note, number, user));
+    QString str(NotePrinter::build(fNote, user));
     if (Printer::printString(printer, type, str, error))
       return true;
   }
@@ -130,10 +130,11 @@ bool NoteWidget::save()
 {
   QString error;
   Note note = m_view->getNote();
+  QVector<NoteItem> vItem = m_view->getNoteItems();
 
-  if (Note::isValidID(note.m_id)
-      ? NoteSQL::update(m_database->get(), note, error)
-      : NoteSQL::insert(m_database->get(), note, error))
+  if (note.isValidID()
+      ? NoteSQL::update(m_database->get(), note, vItem, error)
+      : NoteSQL::insert(m_database->get(), note, vItem, error))
   {
     m_view->setLastID(note.m_id);
     m_database->refresh();
@@ -165,20 +166,19 @@ void NoteWidget::create()
 
 void NoteWidget::setNote(int id)
 {
-  Note note;
-  note.m_id = id;
+  FullNote fNote;
+  fNote.m_note.m_id = id;
   QString error;
-  int number = 0;
-  if (NoteSQL::select(m_database->get(), note, number, error))
+  if (NoteSQL::select(m_database->get(), fNote, error))
   {
     m_view->setLastID(note.m_id);
-    m_view->setNote(note, number);
+    m_view->setNote(fNote);
   }
   else
   {
     QMessageBox::critical(this,
                           tr("Erro"),
-                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(note.m_id)),
+                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(fNote.m_note.m_id)),
                           QMessageBox::Ok);
   }
 }
@@ -186,7 +186,7 @@ void NoteWidget::setNote(int id)
 void NoteWidget::setDatabase(QSqlDatabase db)
 {
   NoteTableModel* model = new NoteTableModel(m_database, db);
-  m_database->set(model, Note::getTableName(), Note::getColumns());
+  m_database->set(model, SQL_NOTE_TABLE_NAME, Note::getColumns());
 }
 
 bool NoteWidget::isValid() const
@@ -201,19 +201,18 @@ void NoteWidget::emitChangedSignal()
 
 void NoteWidget::removeNote(int id)
 {
-  Note note;
-  note.m_id = id;
+  FullNote fNote;
+  fNote.m_note.m_id = id;
   QString error;
-  int number = 0;
-  NoteSQL::select(m_database->get(), note, number, error);
+  NoteSQL::select(m_database->get(), fNote, error);
   if (QMessageBox::question(this,
                             tr("Remover vale"),
                             tr("Tem certeza que deseja remover o seguinte vale:\n"
                                "Número: %1\n"
                                "Fornecedor: %2\n"
-                               "Data: %3").arg(Note::strNumber(number),
-                                               note.m_supplier,
-                                               note.strDate()),
+                               "Data: %3").arg(Note::strNumber(fNote.m_number),
+                                               fNote.m_fSupplier.m_person.m_alias,
+                                               fNote.m_note.strDate()),
                             QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
   {
     if (NoteSQL::remove(m_database->get(), note.m_id, error))
@@ -246,14 +245,10 @@ void NoteWidget::searchSupplier()
   dlg.exec();
   if (Person::st_isValidId(dlg.getCurrentId()))
   {
-    Person person;
-    person.m_id = dlg.getCurrentId();
+    FullPerson fSupplier;
+    fSupplier.m_person.m_id = dlg.getCurrentId();
     QString error;
-    PersonSQL::select(m_database->get(), person, error);
-    Image image;
-    image.m_id = person.m_imageId;
-    if (image.isValidId())
-      ImageSQL::select(m_database->get(), image, error);
-    m_view->setSupplier(person.m_id, person.m_name, image.m_image);
+    PersonSQL::select(m_database->get(), fSupplier, error);
+    m_view->setSupplier(fSupplier);
   }
 }

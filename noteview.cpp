@@ -33,8 +33,8 @@ NoteView::NoteView(QWidget *parent)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
   , m_cbCash(nullptr)
-  , m_currentID(INVALID_NOTE_ID)
-  , m_lastID(INVALID_NOTE_ID)
+  , m_currentID(INVALID_ID)
+  , m_lastID(INVALID_ID)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -175,7 +175,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
 
-  m_supplierPicker = new JPicker(INVALID_PERSON_ID, tr("Fornecedor"), true, true, false);
+  m_supplierPicker = new JPicker(tr("Fornecedor"), true, true, false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->addLayout(hlayout2);
@@ -277,7 +277,7 @@ NoteView::NoteView(QWidget *parent)
                    SLOT(checkDate()));
   timer->start(60000);
 
-  create(SQL_NOTE_DEFAULT_NUMBER);
+  create(NOTE_SQL_DEFAULT_NUMBER);
   checkDate();
   updateControls();
 }
@@ -350,7 +350,7 @@ bool NoteView::isValid() const
 
 void NoteView::create(int number)
 {
-  m_currentID = INVALID_NOTE_ID;
+  m_currentID = INVALID_ID;
   m_dtDate->setDate(QDate::currentDate());
   m_snNumber->setValue(number);
   m_edTotal->setText("");
@@ -396,7 +396,7 @@ void NoteView::updateControls()
   m_table->setEnabled(bCreated);
   m_edTotal->setEnabled(bCreated);
   m_cbCash->setEnabled(bCreated);
-  m_btnOpenLast->setEnabled(m_lastID != INVALID_NOTE_ID);
+  m_btnOpenLast->setEnabled(m_lastID != INVALID_ID);
   m_lblNumberStatus->setPixmap(QPixmap(Note::st_isValidID(m_currentID)
                                      ? ":/icons/res/fileedit.png"
                                      : ":/icons/res/filenew.png"));
@@ -423,7 +423,7 @@ void NoteView::emitCreateSignal()
 
 void NoteView::emitOpenLastSignal()
 {
-  if (m_lastID != INVALID_NOTE_ID)
+  if (m_lastID != INVALID_ID)
     emit openLastSignal(m_lastID);
 }
 

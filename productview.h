@@ -30,10 +30,7 @@ private slots:
   void updateControls();
 
 public slots:
-  void setProduct(const Product& product,
-                  const QString& categoryName,
-                  const QString& imageName,
-                  const QByteArray& image);
+  void setProduct(const FullProduct& fProduct);
   void create();
 
 signals:

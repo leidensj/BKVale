@@ -99,8 +99,8 @@ Person PersonView::getPerson() const
 void PersonView::getPerson(Person& person,
                            QVector<Phone>& vPhone,
                            QVector<Address>& vAddress,
-                           QVector<int>& vRemovedPhoneId,
-                           QVector<int>& vRemoveAddressId) const
+                           QVector<qlonglong>& vRemovedPhoneId,
+                           QVector<qlonglong>& vRemoveAddressId) const
 {
   person.clear();
   vPhone.clear();
@@ -118,18 +118,14 @@ void PersonView::setImage(int id, const QString& name, const QByteArray& ar)
   m_personPage->setImage(id, name, ar);
 }
 
-void PersonView::setPerson(const Person &person,
-                           const QVector<Phone>& vPhone,
-                           const QVector<Address>& vAddress,
-                           const QString& imageName,
-                           const QByteArray& arImage)
+void PersonView::setPerson(const FullPerson &fPerson)
 {
-  m_currentPerson = person;
-  m_vCurrentPhone = vPhone;
-  m_vCurrentAddress = vAddress;
-  m_personPage->setPerson(person, imageName, arImage);
-  m_phonePage->setPhones(vPhone);
-  m_addressPage->setAddresses(vAddress);
+  m_currentPerson = fPerson.m_person;
+  m_vCurrentPhone = fPerson.m_vPhone;
+  m_vCurrentAddress = fPerson.m_vAddress;
+  m_personPage->setPerson(fPerson.m_person, fPerson.m_image.m_name, fPerson.m_image.m_image);
+  m_phonePage->setPhones(m_vCurrentPhone);
+  m_addressPage->setAddresses(m_vCurrentAddress);
   updateControls();
 }
 

@@ -103,7 +103,8 @@ HEADERS  += mainwindow.h \
     personpageview.h \
     addresspageview.h \
     phonepageview.h \
-    phone.h
+    phone.h \
+    defines.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

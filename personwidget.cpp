@@ -91,23 +91,17 @@ PersonWidget::~PersonWidget()
 void PersonWidget::setDatabase(QSqlDatabase db)
 {
   PersonTableModel* model = new PersonTableModel(m_database, db);
-  m_database->set(model, SQL_PERSON_TABLE_NAME, Person::getColumns());
+  m_database->set(model, PERSON_SQL_TABLE_NAME, Person::getColumns());
 }
 
 void PersonWidget::personSelected(int id)
 {
-  Person person;
-  QVector<Phone> vPhone;
-  QVector<Address> vAddress;
-  person.m_id = id;
+  FullPerson fPerson;
+  fPerson.m_person.m_id = id;
   QString error;
-  if (PersonSQL::select(m_database->get(), person, error, &vPhone, &vAddress))
+  if (PersonSQL::select(m_database->get(), fPerson, error))
   {
-    Image image;
-    image.m_id = person.m_imageId;
-    if (image.isValidId())
-      ImageSQL::select(m_database->get(), image, error);
-    m_view->setPerson(person, vPhone, vAddress, image.m_name, image.m_image);
+    m_view->setPerson(fPerson);
   }
   else
   {
@@ -150,8 +144,8 @@ void PersonWidget::savePerson()
   Person person;
   QVector<Phone> vPhone;
   QVector<Address> vAddress;
-  QVector<int> vRemovedPhoneId;
-  QVector<int> vRemovedAddressId;
+  QVector<qlonglong> vRemovedPhoneId;
+  QVector<qlonglong> vRemovedAddressId;
   m_view->getPerson(person, vPhone, vAddress, vRemovedPhoneId, vRemovedAddressId);
 
   if (person.isValidId()
@@ -174,8 +168,8 @@ void PersonWidget::searchImage()
   QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Selecionar Imagem"),
                         QIcon(":/icons/res/image.png"),
-                        INVALID_IMAGE_ID);
-  dlg.set(model, SQL_IMAGE_TABLE_NAME, Image::getColumns());
+                        INVALID_ID);
+  dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
   dlg.exec();
   if (Image::st_isValidId(dlg.getCurrentId()))
   {

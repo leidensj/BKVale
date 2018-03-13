@@ -4,33 +4,9 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
-#include "category.h"
 #include "jtablecolumn.h"
-
-#define SQL_PRODUCT_TABLE_NAME "_PRODUCTS"
-#define SQL_PRODUCT_COL00 "_ID"
-#define SQL_PRODUCT_COL01 "_NAME"
-#define SQL_PRODUCT_COL02 "_CATEGORYID"
-#define SQL_PRODUCT_COL03 "_IMAGEID"
-#define SQL_PRODUCT_COL04 "_UNITY"
-#define SQL_PRODUCT_COL05 "_PACKAGE_UNITY"
-#define SQL_PRODUCT_COL06 "_PACKAGE_AMMOUNT"
-#define SQL_PRODUCT_COL07 "_DETAILS"
-#define SQL_PRODUCT_COL08 "_CODE"
-#define SQL_PRODUCT_COL09 "_AVAILABLE_AT_NOTES"
-#define SQL_PRODUCT_COL10 "_AVAILABLE_AT_SHOP"
-#define SQL_PRODUCT_COL11 "_AVAILABLE_AT_CONSUMPTION"
-#define SQL_PRODUCT_COL12 "_AVAILABLE_TO_BUY"
-#define SQL_PRODUCT_COL13 "_AVAILABLE_TO_SELL"
-
-#define INVALID_PRODUCT_ID   -1
-
-#define MAX_PRODUCT_NAME_LENGTH            35
-#define MAX_PRODUCT_UNITY_LENGTH           4
-#define MAX_PRODUCT_PACKAGE_UNITY_LENGTH   4
-#define MAX_PRODUCT_PACKAGE_AMMOUNT_LENGTH 9999.99
-#define MAX_PRODUCT_DETAILS_LENGTH         35
-#define MAX_PRODUCT_MIDASCODE_LENGTH       35
+#include "defines.h"
+#include "category.h"
 
 struct Product
 {
@@ -51,9 +27,9 @@ struct Product
 
   void clear()
   {
-    m_id = INVALID_PRODUCT_ID;
-    m_imageId = INVALID_IMAGE_ID;
-    m_categoryId= INVALID_CATEGORY_ID;
+    m_id = INVALID_ID;
+    m_imageId = INVALID_ID;
+    m_categoryId= INVALID_ID;
     m_name.clear();
     m_unity.clear();
     m_packageUnity.clear();
@@ -98,25 +74,25 @@ struct Product
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(qlonglong id) { return id != INVALID_PRODUCT_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn(SQL_PRODUCT_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL01, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL02, QObject::tr("Categoria")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL03, QObject::tr("Imagem")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL04, QObject::tr("Unidade"), false));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL05, QObject::tr("Unidade da Embalagem")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL06, QObject::tr("Quantidade da Embalagem")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL07, QObject::tr("Detalhes"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL08, QObject::tr("Código")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL09, QObject::tr("Notas")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL10, QObject::tr("Compras")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL11, QObject::tr("Consumo")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL12, QObject::tr("Compra")));
-    c.push_back(JTableColumn(SQL_PRODUCT_COL13, QObject::tr("Venda")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL01, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL02, QObject::tr("Categoria")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL03, QObject::tr("Imagem")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL04, QObject::tr("Unidade"), false));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL05, QObject::tr("Unidade da Embalagem")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL06, QObject::tr("Quantidade da Embalagem")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL07, QObject::tr("Detalhes"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL08, QObject::tr("Código")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL09, QObject::tr("Notas")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL10, QObject::tr("Compras")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL11, QObject::tr("Consumo")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL12, QObject::tr("Compra")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL13, QObject::tr("Venda")));
     return c;
   }
 };
@@ -125,11 +101,13 @@ struct FullProduct
 {
   Product m_product;
   Image m_image;
+  FullCategory m_fCategory;
 
   void clear()
   {
     m_product.clear();
     m_image.clear();
+    m_fCategory.clear();
   }
 
   FullProduct()

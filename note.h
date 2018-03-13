@@ -6,32 +6,11 @@
 #include <QStringList>
 #include <QVector>
 #include <QDate>
+#include <QMetaType>
 #include "jtablecolumn.h"
 #include "person.h"
 #include "product.h"
-
-#define SQL_NOTE_TABLE_NAME "_NOTES"
-#define SQL_NOTE_COL00 "_ID"
-#define SQL_NOTE_COL01 "_NUMBER"
-#define SQL_NOTE_COL02 "_DATE"
-#define SQL_NOTE_COL03 "_PERSONID"
-#define SQL_NOTE_COL04 "_TOTAL"
-#define SQL_NOTE_COL05 "_CASH"
-
-#define SQL_NOTE_ITEMS_TABLE_NAME "_NOTE_ITEMS"
-#define SQL_NOTE_ITEMS_COL00 "_ID"
-#define SQL_NOTE_ITEMS_COL01 "_NOTEID"
-#define SQL_NOTE_ITEMS_COL02 "_PRODUCTID"
-#define SQL_NOTE_ITEMS_COL03 "_AMMOUNT"
-#define SQL_NOTE_ITEMS_COL04 "_PRICE"
-#define SQL_NOTE_ITEMS_COL05 "_IS_PACKAGE_AMMOUNT"
-
-#define SQL_NOTE_DEFAULT_NUMBER     1000
-#define SQL_NOTE_DEFAULT_NUMBER_STR "1000"
-
-#define NUMBER_OF_COLUMNS 5
-#define NOTE_MAX_NUMBER_OF_ITEMS 100
-#define INVALID_NOTE_ID -1
+#include "defines.h"
 
 enum class NoteColumn : int
 {
@@ -52,8 +31,8 @@ struct NoteItem
 
   void clear()
   {
-    m_id = INVALID_NOTE_ID;
-    m_productId = INVALID_PRODUCT_ID;
+    m_id = INVALID_ID;
+    m_productId = INVALID_ID;
     m_ammount = 0.0;
     m_price = 0.0;
     m_bIsPackageAmmount = false;
@@ -71,7 +50,7 @@ struct NoteItem
   QString strSubtotal() const { return st_strSubTotal(subtotal()); }
   QString strAmmount() const { return st_strAmmount(m_ammount); }
   QString strPrice() const { return st_strPrice(m_price); }
-  static bool st_isValidID(qlonglong id) { return id != INVALID_NOTE_ID; }
+  static bool st_isValidID(qlonglong id) { return id != INVALID_ID; }
   bool isValidID() const { return st_isValidID(m_id); }
 };
 
@@ -85,8 +64,8 @@ struct Note
 
   void clear()
   {
-    m_id = INVALID_NOTE_ID;
-    m_supplierId = INVALID_PERSON_ID;
+    m_id = INVALID_ID;
+    m_supplierId = INVALID_ID;
     m_date.clear();
     m_total = 0.0;
     m_bCash = false;
@@ -102,17 +81,17 @@ struct Note
   QString strId() const { return QString::number(m_id); }
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
   static QString st_strNumber(qlonglong number) { return QString::number(number); }
-  static bool st_isValidID(qlonglong id) { return id != INVALID_NOTE_ID; }
+  static bool st_isValidID(qlonglong id) { return id != INVALID_ID; }
   bool isValidID() const { return st_isValidID(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn(SQL_NOTE_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(SQL_NOTE_COL01, QObject::tr("Número"), false, true));
-    c.push_back(JTableColumn(SQL_NOTE_COL02, QObject::tr("Data"), false));
-    c.push_back(JTableColumn(SQL_NOTE_COL03, QObject::tr("Fornecedor"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_NOTE_COL04, QObject::tr("Total"), false));
-    c.push_back(JTableColumn(SQL_NOTE_COL05, QObject::tr("À Vista")));
+    c.push_back(JTableColumn(NOTE_SQL_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(NOTE_SQL_COL01, QObject::tr("Número"), false, true));
+    c.push_back(JTableColumn(NOTE_SQL_COL02, QObject::tr("Data"), false));
+    c.push_back(JTableColumn(NOTE_SQL_COL03, QObject::tr("Fornecedor"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(NOTE_SQL_COL04, QObject::tr("Total"), false));
+    c.push_back(JTableColumn(NOTE_SQL_COL05, QObject::tr("À Vista")));
     return c;
   }
 };
@@ -134,6 +113,8 @@ struct FullNoteItem
   }
 };
 
+Q_DECLARE_METATYPE(FullNoteItem)
+
 struct FullNote
 {
   Note m_note;
@@ -144,7 +125,7 @@ struct FullNote
   void clear()
   {
     m_note.clear();
-    m_number = SQL_NOTE_DEFAULT_NUMBER;
+    m_number = NOTE_SQL_DEFAULT_NUMBER;
     m_fSupplier.clear();
     m_vfNoteItem.clear();
   }

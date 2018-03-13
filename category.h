@@ -6,15 +6,7 @@
 #include <QVector>
 #include "image.h"
 #include "jtablecolumn.h"
-
-#define SQL_CATEGORY_TABLE_NAME "_CATEGORIES"
-#define SQL_CATEGORY_COL00 "_ID"
-#define SQL_CATEGORY_COL01 "_IMAGEID"
-#define SQL_CATEGORY_COL02 "_NAME"
-
-#define INVALID_CATEGORY_ID   -1
-
-#define MAX_CATEGORY_NAME_LENGTH 35
+#include "defines.h"
 
 struct Category
 {
@@ -29,9 +21,9 @@ struct Category
 
   void clear()
   {
-    m_id = INVALID_CATEGORY_ID;
+    m_id = INVALID_ID;
     m_name.clear();
-    m_imageId = INVALID_IMAGE_ID;
+    m_imageId = INVALID_ID;
   }
 
   bool operator != (const Category& other)
@@ -40,16 +32,16 @@ struct Category
            m_imageId != other.m_imageId;
   }
 
-  static bool st_isValidId(qlonglong id) { return id != INVALID_CATEGORY_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static bool st_isValid(const Category& category) { return !category.m_name.isEmpty(); }
   bool isValid() const { return st_isValid(*this); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn(SQL_CATEGORY_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(SQL_CATEGORY_COL01, QObject::tr("Id Imagem")));
-    c.push_back(JTableColumn(SQL_CATEGORY_COL02, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn(CATEGORY_SQL_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(CATEGORY_SQL_COL01, QObject::tr("Id Imagem")));
+    c.push_back(JTableColumn(CATEGORY_SQL_COL02, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
     return c;
   }
 };

@@ -51,7 +51,7 @@ UserMgtWidget::UserMgtWidget(int currentUserID, QWidget* parent)
 void UserMgtWidget::setDatabase(QSqlDatabase db)
 {
   QSqlTableModel* model = new QSqlTableModel(m_database, db);
-  m_database->set(model, SQL_USER_TABLE_NAME, User::getColumns());
+  m_database->set(model, USER_SQL_TABLE_NAME, User::getColumns());
 }
 
 void UserMgtWidget::userSelected(int id)

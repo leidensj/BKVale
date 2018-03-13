@@ -13,8 +13,7 @@ class JPicker : public QFrame
   Q_OBJECT
 
 public:
-  explicit JPicker(int invalidId,
-                   const QString& itemText,
+  explicit JPicker(const QString& itemText,
                    bool bShowImage = false,
                    bool bRequired = false,
                    bool bDisplayGroup = true,
@@ -37,7 +36,6 @@ private slots:
   void emitSearchSignal();
 
 private:
-  const int m_invalidId;
   qlonglong m_id;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;

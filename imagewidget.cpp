@@ -44,7 +44,7 @@ ImageWidget::ImageWidget(QWidget* parent)
 void ImageWidget::setDatabase(QSqlDatabase db)
 {
   ImageTableModel* model = new ImageTableModel(m_database, db);
-  m_database->set(model, SQL_IMAGE_TABLE_NAME, Image::getColumns());
+  m_database->set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
 }
 
 void ImageWidget::imageSelected(int id)

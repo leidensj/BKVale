@@ -83,7 +83,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   , m_list(nullptr)
 {
   m_edCep = new JLineEdit(JValidatorType::Numeric, false, true);
-  m_edCep->setInputMask(CEP_MASK);
+  m_edCep->setInputMask(ADDRESS_CEP_MASK);
   m_btnCep = new QPushButton();
   m_btnCep->setFlat(true);
   m_btnCep->setIconSize(QSize(16, 16));
@@ -100,7 +100,7 @@ AddressPageView::AddressPageView(QWidget *parent)
   m_edCity = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
   m_edCity->setPlaceholderText(tr("*"));
   m_cbState = new QComboBox();
-  for (int i = 0; i != NUMBER_OF_BRAZILIAN_STATES; ++i)
+  for (int i = 0; i != ADDRESS_NUMBER_OF_BRAZILIAN_STATES; ++i)
     m_cbState->addItem(Address::st_getBRState((Address::EBRState)i).m_name);
   m_cbState->setCurrentIndex((int)Address::EBRState::RS);
   m_edComplement = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
@@ -241,7 +241,7 @@ void AddressPageView::updateControls()
   m_btnCreate->setEnabled(!bEditMode);
   m_btnUndo->setEnabled(bEditMode);
   m_btnRemove->setEnabled(!bEditMode && m_list->currentRow() != -1);
-  m_btnCep->setEnabled(m_edCep->text().length() >= CEP_LENGTH_WITH_MASK);
+  m_btnCep->setEnabled(m_edCep->text().length() >= ADDRESS_CEP_LENGTH_WITH_MASK);
   QString saveIcon = bEditMode
                      ? ":/icons/res/saveas.png"
                      : ":/icons/res/save.png";
@@ -392,7 +392,7 @@ QVector<Address> AddressPageView::getAddresses() const
   return vAddress;
 }
 
-QVector<int> AddressPageView::getRemovedAddresses() const
+QVector<qlonglong> AddressPageView::getRemovedAddresses() const
 {
   return m_vRemovedAddressId;
 }

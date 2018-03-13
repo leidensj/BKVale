@@ -6,7 +6,7 @@
 NoteTableWidget::NoteTableWidget(QWidget* parent)
   : QTableWidget(parent)
 {
-  setColumnCount(NUMBER_OF_COLUMNS);
+  setColumnCount(NOTE_NUMBER_OF_COLUMNS);
   QStringList headers;
   headers << "Quantidade" << "Unidade" << "Descrição" << "Preço" << "Subtotal";
   setHorizontalHeaderLabels(headers);
@@ -127,7 +127,7 @@ void NoteTableWidget::setText(int row, int column, const QString& str)
     p->setText(str);
 }
 
-QVector<NoteItem>& NoteTableWidget::getItems() const
+QVector<NoteItem> NoteTableWidget::getItems() const
 {
   QVector<NoteItem> v;
   for (int i = 0; i != rowCount(); ++i)
@@ -147,21 +147,22 @@ void NoteTableWidget::addItem(const FullNoteItem& fItem)
   insertRow(rowCount());
   const int row = rowCount() - 1;
 
-  add
   blockSignals(true);
   setItem(row, (int)NoteColumn::Ammount,
           new QTableWidgetItem(fItem.m_item.strAmmount()));
   setItem(row, (int)NoteColumn::Unity,
           new QTableWidgetItem(fItem.m_item.m_bIsPackageAmmount
-                               ? fItem.m_product.m_packageUnity
-                               : fItem.m_product.m_unity));
+                               ? fItem.m_fProduct.m_product.m_packageUnity
+                               : fItem.m_fProduct.m_product.m_unity));
   setItem(row, (int)NoteColumn::Description,
-          new QTableWidgetItem(fItem.m_product.m_name));
+          new QTableWidgetItem(fItem.m_fProduct.m_product.m_name));
   setItem(row, (int)NoteColumn::Price,
           new QTableWidgetItem(fItem.m_item.strPrice()));
   setItem(row, (int)NoteColumn::SubTotal,
           new QTableWidgetItem(fItem.m_item.strSubtotal()));
-  item(row, (int)NoteColumn::Description)->setData(Qt::UserRole, fItem);
+  QVariant var;
+  var.setValue(fItem);
+  item(row, (int)NoteColumn::Description)->setData(Qt::UserRole, var);
 
   item(row, (int)NoteColumn::Unity)->setFlags(Qt::NoItemFlags |
                                               Qt::ItemIsUserCheckable |

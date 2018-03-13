@@ -9,7 +9,7 @@ User::User()
 
 void User::clear()
 {
-  m_id = INVALID_USER_ID;
+  m_id = INVALID_ID;
   m_strUser.clear();
   m_bAccessNote = false;
   m_bAccessReminder = false;

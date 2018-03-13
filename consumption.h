@@ -19,7 +19,7 @@ enum class ConsumptionTableIndex
 struct Consumption
 {
   Consumption()
-    : m_id(INVALID_PRODUCT_ID)
+    : m_id(INVALID_ID)
   {
     clear();
   }

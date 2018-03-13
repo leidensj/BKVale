@@ -23,9 +23,7 @@ private slots:
   void updateControls();
 
 public slots:
-  void setCategory(const Category& category,
-                   const QString& imageName,
-                   const QByteArray& arImage);
+  void setCategory(const FullCategory& fCategory);
   void create();
 
 signals:

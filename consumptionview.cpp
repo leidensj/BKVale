@@ -60,7 +60,7 @@ void EnterDoubleSpinBox::keyPressEvent(QKeyEvent* event)
 
 ConsumptionView::ConsumptionView(QWidget *parent)
   : QFrame(parent)
-  , m_currentItemID(INVALID_PRODUCT_ID)
+  , m_currentItemID(INVALID_ID)
   , m_date(nullptr)
   , m_weekDay(nullptr)
   , m_search(nullptr)
@@ -209,7 +209,7 @@ void ConsumptionView::save()
 
 void ConsumptionView::clear()
 {
-  m_currentItemID = INVALID_PRODUCT_ID;
+  m_currentItemID = INVALID_ID;
   m_item->setText("");
   m_price->setValue(0.0);
   m_ammount->setValue(0.0);

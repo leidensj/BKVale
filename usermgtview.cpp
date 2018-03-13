@@ -11,7 +11,7 @@
 
 UserMgtView::UserMgtView(QWidget* parent)
   : QFrame(parent)
-  , m_currentID(INVALID_USER_ID)
+  , m_currentID(INVALID_ID)
   , m_user(nullptr)
   , m_lblPasswordMsg(nullptr)
   , m_password(nullptr)
@@ -198,7 +198,7 @@ void UserMgtView::setUser(const User& user)
 void UserMgtView::create()
 {
   m_lblPasswordMsg->hide();
-  m_currentID = INVALID_USER_ID;
+  m_currentID = INVALID_ID;
   m_user->setText("");
   m_password->setText("");
   m_accessNote->setChecked(false);

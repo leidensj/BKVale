@@ -24,8 +24,8 @@ public:
   void getPerson(Person& person,
                  QVector<Phone>& vPhone,
                  QVector<Address>& vAddress,
-                 QVector<int>& vRemovedPhoneId,
-                 QVector<int>& vRemoveAddressId) const;
+                 QVector<qlonglong>& vRemovedPhoneId,
+                 QVector<qlonglong>& vRemoveAddressId) const;
   void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:
@@ -34,11 +34,7 @@ private slots:
   void updateControls();
 
 public slots:
-  void setPerson(const Person& person,
-                 const QVector<Phone>& vPhone,
-                 const QVector<Address>& vAddress,
-                 const QString& imageName,
-                 const QByteArray& arImage);
+  void setPerson(const FullPerson& fPerson);
   void create();
 
 signals:

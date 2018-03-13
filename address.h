@@ -2,30 +2,9 @@
 #define ADDRESS_H
 
 #include "jtablecolumn.h"
+#include "defines.h"
 #include <QObject>
 #include <QString>
-
-#define SQL_ADDRESS_TABLE_NAME "_ADDRESSES"
-#define SQL_ADDRESS_COL00 "_ID"
-#define SQL_ADDRESS_COL01 "_PERSONID"
-#define SQL_ADDRESS_COL02 "_CEP"
-#define SQL_ADDRESS_COL03 "_NEIGHBORHOOD"
-#define SQL_ADDRESS_COL04 "_STREET"
-#define SQL_ADDRESS_COL05 "_NUMBER"
-#define SQL_ADDRESS_COL06 "_CITY"
-#define SQL_ADDRESS_COL07 "_STATE"
-#define SQL_ADDRESS_COL08 "_COMPLEMENT"
-#define SQL_ADDRESS_COL09 "_REFERENCE"
-
-#define INVALID_ADDRESS_ID     -1
-#define INVALID_ADDRESS_NUMBER 0
-
-#define MAX_ADDRESS_STREET_LENGTH         35
-#define MAX_ADDRESS_NUMBER                35
-#define NUMBER_OF_BRAZILIAN_STATES        27
-#define CEP_LENGTH                         8
-#define CEP_MASK               "99999-999;_"
-#define CEP_LENGTH_WITH_MASK  CEP_LENGTH + 1
 
 struct Address
 {
@@ -49,11 +28,11 @@ struct Address
 
   void clear()
   {
-    m_id = INVALID_ADDRESS_ID;
+    m_id = INVALID_ID;
     m_cep.clear();
     m_neighborhood.clear();
     m_street.clear();
-    m_number = INVALID_ADDRESS_NUMBER;
+    m_number = ADDRESS_INVALID_NUMBER;
     m_state = EBRState::RS;
     m_complement.clear();
     m_reference.clear();
@@ -86,25 +65,25 @@ struct Address
     return
         !address.m_neighborhood.isEmpty() &&
         !address.m_street.isEmpty() &&
-        address.m_number != INVALID_ADDRESS_NUMBER;
+        address.m_number != ADDRESS_INVALID_NUMBER;
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(qlonglong id) { return id != INVALID_ADDRESS_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn(SQL_ADDRESS_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL01, QObject::tr("Id Pessoa"), false, true));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL02, QObject::tr("CEP")));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL03, QObject::tr("Bairro"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL04, QObject::tr("Rua"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL05, QObject::tr("Número")));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL06, QObject::tr("Cidade")));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL07, QObject::tr("Estado")));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL08, QObject::tr("Complemento")));
-    c.push_back(JTableColumn(SQL_ADDRESS_COL09, QObject::tr("Referência")));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL01, QObject::tr("Id Pessoa"), false, true));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL02, QObject::tr("CEP")));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL03, QObject::tr("Bairro"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL04, QObject::tr("Rua"), false, false, JResizeMode::Stretch));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL05, QObject::tr("Número")));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL06, QObject::tr("Cidade")));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL07, QObject::tr("Estado")));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL08, QObject::tr("Complemento")));
+    c.push_back(JTableColumn(ADDRESS_SQL_COL09, QObject::tr("Referência")));
     return c;
   }
 

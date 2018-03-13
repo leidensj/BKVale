@@ -1,20 +1,18 @@
 #include "jpicker.h"
 #include "jlineedit.h"
 #include "jimageview.h"
+#include "defines.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QGroupBox>
 
-JPicker::JPicker(int invalidId,
-                 const QString& itemText,
+JPicker::JPicker(const QString& itemText,
                  bool bShowImage,
                  bool bRequired,
                  bool bDisplayGroup,
                  QWidget* parent)
  : QFrame(parent)
  , m_itemText(itemText)
- , m_invalidId(invalidId)
- , m_id(m_invalidId)
  , m_btnSearch(nullptr)
  , m_edText(nullptr)
  , m_btnClear(nullptr)
@@ -124,7 +122,7 @@ QByteArray JPicker::getImage() const
 
 void JPicker::clear()
 {
-  m_id = m_invalidId;
+  m_id = INVALID_ID;
   m_edText->clear();
   m_imageView->clearImage();
 }

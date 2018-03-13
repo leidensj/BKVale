@@ -110,7 +110,6 @@ bool NoteWidget::print(QIODevice* printer,
 {
   FullNote fNote;
   fNote.m_note.m_id = id;
-  qlonglong number = 0;
   QString error;
   if (NoteSQL::select(m_database->get(), fNote, error))
   {
@@ -171,7 +170,7 @@ void NoteWidget::setNote(int id)
   QString error;
   if (NoteSQL::select(m_database->get(), fNote, error))
   {
-    m_view->setLastID(note.m_id);
+    m_view->setLastID(fNote.m_note.m_id);
     m_view->setNote(fNote);
   }
   else
@@ -186,7 +185,7 @@ void NoteWidget::setNote(int id)
 void NoteWidget::setDatabase(QSqlDatabase db)
 {
   NoteTableModel* model = new NoteTableModel(m_database, db);
-  m_database->set(model, SQL_NOTE_TABLE_NAME, Note::getColumns());
+  m_database->set(model, NOTE_SQL_TABLE_NAME, Note::getColumns());
 }
 
 bool NoteWidget::isValid() const
@@ -210,17 +209,17 @@ void NoteWidget::removeNote(int id)
                             tr("Tem certeza que deseja remover o seguinte vale:\n"
                                "Número: %1\n"
                                "Fornecedor: %2\n"
-                               "Data: %3").arg(Note::strNumber(fNote.m_number),
+                               "Data: %3").arg(Note::st_strNumber(fNote.m_number),
                                                fNote.m_fSupplier.m_person.m_alias,
                                                fNote.m_note.strDate()),
                             QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
   {
-    if (NoteSQL::remove(m_database->get(), note.m_id, error))
+    if (NoteSQL::remove(m_database->get(), fNote.m_note.m_id, error))
     {
       if (id == m_view->getLastID())
-        m_view->setLastID(INVALID_NOTE_ID);
+        m_view->setLastID(INVALID_ID);
       Note note = m_view->getNote();
-      if (id == note.m_id)
+      if (id == fNote.m_note.m_id)
         create();
       m_database->refresh();
     }
@@ -229,7 +228,7 @@ void NoteWidget::removeNote(int id)
       QMessageBox::critical(this,
                             tr("Erro"),
                             tr("Erro '%1' ao remover a nota com ID '%2'.").arg(error,
-                                                                               QString::number(note.m_id)),
+                                                                               QString::number(fNote.m_note.m_id)),
                             QMessageBox::Ok);
     }
   }
@@ -237,11 +236,11 @@ void NoteWidget::removeNote(int id)
 
 void NoteWidget::searchSupplier()
 {
-  QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
+  QSqlTableModel* model = new QSqlTableModel(this, m_database->get());
   JDatabaseSelector dlg(tr("Selecionar Fornecedor"),
                         QIcon(":/icons/res/supplier.png"),
-                        INVALID_PERSON_ID);
-  dlg.set(model, SQL_PERSON_TABLE_NAME, Person::getColumns());
+                        INVALID_ID);
+  dlg.set(model, PERSON_SQL_TABLE_NAME, Person::getColumns());
   dlg.exec();
   if (Person::st_isValidId(dlg.getCurrentId()))
   {

@@ -29,9 +29,9 @@ CategoryView::CategoryView(QWidget* parent)
 
   m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edName->setPlaceholderText(tr("*"));
-  m_edName->setMaxLength(MAX_CATEGORY_NAME_LENGTH);
+  m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
 
-  m_imagePicker = new JPicker(INVALID_IMAGE_ID, tr("Imagem"), true, false);
+  m_imagePicker = new JPicker(tr("Imagem"), true, false);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
@@ -116,13 +116,11 @@ Category CategoryView::getCategory() const
   return category;
 }
 
-void CategoryView::setCategory(const Category &category,
-                               const QString& imageName,
-                               const QByteArray& arImage)
+void CategoryView::setCategory(const FullCategory &fCategory)
 {
-  m_currentCategory = category;
-  m_edName->setText(category.m_name);
-  setImage(category.m_imageId, imageName, arImage);
+  m_currentCategory = fCategory.m_category;
+  m_edName->setText(fCategory.m_category.m_name);
+  setImage(fCategory.m_image.m_id, fCategory.m_image.m_name, fCategory.m_image.m_image);
   updateControls();
 }
 

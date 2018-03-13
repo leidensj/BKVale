@@ -64,11 +64,9 @@ JImageView::JImageView(bool bShowButtons, int size, QWidget* parent)
     m_btnOpen->hide();
     m_btnClear->hide();
   }
-  else
-  {
-    m_lblImage->setFrameShape(QFrame::Shape::StyledPanel);
-    m_lblImage->setFrameShadow(QFrame::Shadow::Plain);
-  }
+
+  m_lblImage->setFrameShape(QFrame::Shape::StyledPanel);
+  m_lblImage->setFrameShadow(QFrame::Shadow::Plain);
 
   clearImage();
   updateControls();
@@ -109,7 +107,7 @@ void JImageView::openImage()
   if (fileName.isEmpty())
     return;
   QFile file(fileName);
-  if (file.size() > MAX_IMAGE_SIZE)
+  if (file.size() > IMAGE_MAX_SIZE)
   {
     QMessageBox::warning(this,
                          tr("Aviso"),

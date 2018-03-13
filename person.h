@@ -4,32 +4,10 @@
 #include "image.h"
 #include "phone.h"
 #include "address.h"
+#include "defines.h"
 #include <QObject>
 #include <QString>
 #include <QVector>
-
-#define SQL_PERSON_TABLE_NAME "_PERSONS"
-#define SQL_PERSON_COL00      "_ID"
-#define SQL_PERSON_COL01      "_IMAGEID"
-#define SQL_PERSON_COL02      "_NAME"
-#define SQL_PERSON_COL03      "_ALIAS"
-#define SQL_PERSON_COL04      "_EMAIL"
-#define SQL_PERSON_COL05      "_CPF_CNPJ"
-#define SQL_PERSON_COL06      "_RG_IE"
-#define SQL_PERSON_COL07      "_DETAILS"
-#define SQL_PERSON_COL08      "_BIRTHDATE"
-#define SQL_PERSON_COL09      "_CREATIONDATE"
-#define SQL_PERSON_COL10      "_IS_COMPANY"
-#define SQL_PERSON_COL11      "_IS_CUSTOMER"
-#define SQL_PERSON_COL12      "_IS_SUPPLIER"
-#define SQL_PERSON_COL13      "_IS_EMPLOYEE"
-#define SQL_PERSON_COL14      "_EMPLOYEE_PIN_CODE"
-
-#define INVALID_PERSON_ID                 -1
-
-#define MAX_PERSON_NAME_LENGTH            35
-#define MAX_PERSON_DETAILS_LENGTH         35
-#define EMPLOYEE_PINCODE_LENGTH            4
 
 struct Person
 {
@@ -51,8 +29,8 @@ struct Person
 
   void clear()
   {
-    m_id = INVALID_PERSON_ID;
-    m_imageId = INVALID_IMAGE_ID;
+    m_id = INVALID_ID;
+    m_imageId = INVALID_ID;
     m_name.clear();
     m_alias.clear();
     m_email.clear();
@@ -110,26 +88,26 @@ struct Person
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(qlonglong id) { return id != INVALID_PERSON_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn(SQL_PERSON_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(SQL_PERSON_COL01, QObject::tr("Id Imagem")));
-    c.push_back(JTableColumn(SQL_PERSON_COL02, QObject::tr("Nome"), false, false, JResizeMode::Interactive));
-    c.push_back(JTableColumn(SQL_PERSON_COL03, QObject::tr("Apelido"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_PERSON_COL04, QObject::tr("Email")));
-    c.push_back(JTableColumn(SQL_PERSON_COL05, QObject::tr("CPF/CNPJ")));
-    c.push_back(JTableColumn(SQL_PERSON_COL06, QObject::tr("RG/IE")));
-    c.push_back(JTableColumn(SQL_PERSON_COL07, QObject::tr("Detalhes")));
-    c.push_back(JTableColumn(SQL_PERSON_COL08, QObject::tr("Data de Nascimento")));
-    c.push_back(JTableColumn(SQL_PERSON_COL09, QObject::tr("Data de Criação")));
-    c.push_back(JTableColumn(SQL_PERSON_COL10, QObject::tr("Empresa")));
-    c.push_back(JTableColumn(SQL_PERSON_COL11, QObject::tr("Cliente")));
-    c.push_back(JTableColumn(SQL_PERSON_COL12, QObject::tr("Fornecedor")));
-    c.push_back(JTableColumn(SQL_PERSON_COL13, QObject::tr("Funcionário")));
-    c.push_back(JTableColumn(SQL_PERSON_COL14, QObject::tr("Código PIN")));
+    c.push_back(JTableColumn(PERSON_SQL_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(PERSON_SQL_COL01, QObject::tr("Id Imagem")));
+    c.push_back(JTableColumn(PERSON_SQL_COL02, QObject::tr("Nome"), false, false, JResizeMode::Interactive));
+    c.push_back(JTableColumn(PERSON_SQL_COL03, QObject::tr("Apelido"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn(PERSON_SQL_COL04, QObject::tr("Email")));
+    c.push_back(JTableColumn(PERSON_SQL_COL05, QObject::tr("CPF/CNPJ")));
+    c.push_back(JTableColumn(PERSON_SQL_COL06, QObject::tr("RG/IE")));
+    c.push_back(JTableColumn(PERSON_SQL_COL07, QObject::tr("Detalhes")));
+    c.push_back(JTableColumn(PERSON_SQL_COL08, QObject::tr("Data de Nascimento")));
+    c.push_back(JTableColumn(PERSON_SQL_COL09, QObject::tr("Data de Criação")));
+    c.push_back(JTableColumn(PERSON_SQL_COL10, QObject::tr("Empresa")));
+    c.push_back(JTableColumn(PERSON_SQL_COL11, QObject::tr("Cliente")));
+    c.push_back(JTableColumn(PERSON_SQL_COL12, QObject::tr("Fornecedor")));
+    c.push_back(JTableColumn(PERSON_SQL_COL13, QObject::tr("Funcionário")));
+    c.push_back(JTableColumn(PERSON_SQL_COL14, QObject::tr("Código PIN")));
     return c;
   }
 };

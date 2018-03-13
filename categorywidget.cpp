@@ -50,24 +50,19 @@ CategoryWidget::CategoryWidget(QWidget* parent)
 void CategoryWidget::setDatabase(QSqlDatabase db)
 {
   QSqlTableModel* model = new QSqlTableModel(m_database, db);
-  m_database->set(model, SQL_CATEGORY_TABLE_NAME, Category::getColumns());
+  m_database->set(model, CATEGORY_SQL_TABLE_NAME, Category::getColumns());
 }
 
 void CategoryWidget::categorySelected(int id)
 {
   QString error;
-  Category category;
-  category.m_id = id;
+  FullCategory fCategory;
+  fCategory.m_category.m_id = id;
   if (CategorySQL::select(m_database->get(),
-                          category,
+                          fCategory,
                           error))
   {
-    Image image;
-    image.m_id = category.m_imageId;
-    if (image.isValidId())
-      ImageSQL::select(m_database->get(), image, error);
-
-    m_view->setCategory(category, image.m_name, image.m_image);
+    m_view->setCategory(fCategory);
   }
   else
   {
@@ -127,8 +122,8 @@ void CategoryWidget::searchImage()
   ImageTableModel* model = new ImageTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Escolher Imagem"),
                         QIcon(":/icons/res/icon.png"),
-                        INVALID_IMAGE_ID);
-  dlg.set(model, SQL_IMAGE_TABLE_NAME, Image::getColumns());
+                        INVALID_ID);
+  dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
   dlg.exec();
   if (Image::st_isValidId(dlg.getCurrentId()))
   {

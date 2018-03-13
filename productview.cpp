@@ -42,27 +42,27 @@ ProductView::ProductView(QWidget* parent)
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
   m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edName->setMaxLength(MAX_PRODUCT_NAME_LENGTH);
+  m_edName->setMaxLength(PRODUCT_MAX_NAME_LENGTH);
   m_edName->setPlaceholderText("*");
 
   m_edUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
-  m_edUnity->setMaxLength(MAX_PRODUCT_UNITY_LENGTH);
+  m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
   m_edUnity->setPlaceholderText("*");
 
   m_edPackageUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
-  m_edPackageUnity->setMaxLength(MAX_PRODUCT_PACKAGE_UNITY_LENGTH);
+  m_edPackageUnity->setMaxLength(PRODUCT_MAX_PACKAGE_UNITY_LENGTH);
 
   m_spnPackageAmmount = new QDoubleSpinBox();
-  m_spnPackageAmmount->setMaximum(MAX_PRODUCT_PACKAGE_AMMOUNT_LENGTH);
+  m_spnPackageAmmount->setMaximum(PRODUCT_MAX_PACKAGE_AMMOUNT_LENGTH);
   m_spnPackageAmmount->setMinimum(0.0);
   m_spnPackageAmmount->setValue(1.0);
   m_spnPackageAmmount->setSingleStep(0.1);
 
   m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edDetails->setMaxLength(MAX_PRODUCT_DETAILS_LENGTH);
+  m_edDetails->setMaxLength(PRODUCT_MAX_DETAILS_LENGTH);
 
   m_edCode = new JLineEdit(JValidatorType::Numeric, true, true);
-  m_edCode->setMaxLength(MAX_PRODUCT_MIDASCODE_LENGTH);
+  m_edCode->setMaxLength(PRODUCT_MAX_MIDASCODE_LENGTH);
 
   m_cbAvailableAtNotes = new QCheckBox;
   m_cbAvailableAtNotes->setText(tr("Vales"));
@@ -84,8 +84,8 @@ ProductView::ProductView(QWidget* parent)
   m_cbAvailableToSell->setText(tr("Venda"));
   m_cbAvailableToSell->setIcon(QIcon(":/icons/res/sell.png"));
 
-  m_categoryPicker = new JPicker(INVALID_CATEGORY_ID, tr("Categoria"), false, true);
-  m_imagePicker = new JPicker(INVALID_IMAGE_ID, tr("Imagem"), true);
+  m_categoryPicker = new JPicker(tr("Categoria"), false, true);
+  m_imagePicker = new JPicker(tr("Imagem"), true);
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
   buttonlayout->setAlignment(Qt::AlignLeft);
@@ -244,32 +244,29 @@ void ProductView::setImage(int id, const QString& text, const QByteArray& ar)
   m_imagePicker->setImage(ar);
 }
 
-void ProductView::setProduct(const Product &product,
-                             const QString& categoryName,
-                             const QString& imageName,
-                             const QByteArray& image)
+void ProductView::setProduct(const FullProduct &fProduct)
 {
-  m_currentProduct = product;
-  m_edName->setText(product.m_name);
-  m_edUnity->setText(product.m_unity);
-  m_edPackageUnity->setText(product.m_packageUnity);
-  m_spnPackageAmmount->setValue(product.m_packageAmmount);
-  m_edDetails->setText(product.m_details);
-  m_edCode->setText(product.m_code);
-  m_cbAvailableAtNotes->setChecked(product.m_bAvailableAtNotes);
-  m_cbAvailableAtShop->setChecked(product.m_bAvailableAtShop);
-  m_cbAvailableAtConsumption->setChecked(product.m_bAvailableAtConsumption);
-  m_cbAvailableToBuy->setChecked(product.m_bAvailableToBuy);
-  m_cbAvailableToSell->setChecked(product.m_bAvailableToSell);
-  setCategory(product.m_categoryId, categoryName);
-  setImage(product.m_imageId, imageName, image);
+  m_currentProduct = fProduct.m_product;
+  m_edName->setText(fProduct.m_product.m_name);
+  m_edUnity->setText(fProduct.m_product.m_unity);
+  m_edPackageUnity->setText(fProduct.m_product.m_packageUnity);
+  m_spnPackageAmmount->setValue(fProduct.m_product.m_packageAmmount);
+  m_edDetails->setText(fProduct.m_product.m_details);
+  m_edCode->setText(fProduct.m_product.m_code);
+  m_cbAvailableAtNotes->setChecked(fProduct.m_product.m_bAvailableAtNotes);
+  m_cbAvailableAtShop->setChecked(fProduct.m_product.m_bAvailableAtShop);
+  m_cbAvailableAtConsumption->setChecked(fProduct.m_product.m_bAvailableAtConsumption);
+  m_cbAvailableToBuy->setChecked(fProduct.m_product.m_bAvailableToBuy);
+  m_cbAvailableToSell->setChecked(fProduct.m_product.m_bAvailableToSell);
+  setCategory(fProduct.m_fCategory.m_category.m_id, fProduct.m_fCategory.m_category.m_name);
+  setImage(fProduct.m_image.m_id, fProduct.m_image.m_name, fProduct.m_image.m_image);
   updateControls();
 }
 
 void ProductView::create()
 {
-  Product product;
-  setProduct(product, QString(), QString(), QByteArray());
+  FullProduct fProduct;
+  setProduct(fProduct);
   updateControls();
 }
 

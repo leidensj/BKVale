@@ -225,7 +225,7 @@ QVector<Phone> PhonePageView::getPhones() const
   return vPhone;
 }
 
-QVector<int> PhonePageView::getRemovedPhones() const
+QVector<qlonglong> PhonePageView::getRemovedPhones() const
 {
   return m_vRemovedPhoneId;
 }

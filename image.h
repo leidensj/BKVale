@@ -6,15 +6,7 @@
 #include <QByteArray>
 #include <QVector>
 #include "jtablecolumn.h"
-
-#define SQL_IMAGE_TABLE_NAME "_IMAGES"
-#define SQL_IMAGE_COL00      "_ID"
-#define SQL_IMAGE_COL01      "_NAME"
-#define SQL_IMAGE_COL02      "_IMAGE"
-
-#define INVALID_IMAGE_ID      -1
-#define MAX_IMAGE_NAME_LENGTH 35
-#define MAX_IMAGE_SIZE        1048576 //1MB
+#include "defines.h"
 
 struct Image
 {
@@ -29,7 +21,7 @@ struct Image
 
   void clear()
   {
-    m_id = INVALID_IMAGE_ID;
+    m_id = INVALID_ID;
     m_name.clear();
     m_image.clear();
   }
@@ -41,7 +33,7 @@ struct Image
         m_image != img.m_image;
   }
 
-  static bool st_isValidId(qlonglong id) { return id != INVALID_IMAGE_ID; }
+  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
   bool isValidId() const { return st_isValidId(m_id); }
 
   static bool st_isValid(const Image& img) { return !img.m_name.isEmpty() && !img.m_image.isEmpty(); }
@@ -57,9 +49,9 @@ struct Image
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
-    c.push_back(JTableColumn(SQL_IMAGE_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(SQL_IMAGE_COL01, QObject::tr("Imagem"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(SQL_IMAGE_COL02, QObject::tr("Imagem")));
+    c.push_back(JTableColumn(IMAGE_SQL_COL00, QObject::tr("Id")));
+    c.push_back(JTableColumn(IMAGE_SQL_COL01, QObject::tr("Imagem"), false, true, JResizeMode::Stretch));
+    c.push_back(JTableColumn(IMAGE_SQL_COL02, QObject::tr("Imagem")));
     return c;
   }
 };

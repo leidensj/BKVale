@@ -42,6 +42,7 @@ private slots:
   void setNote(int id);
   void removeNote(int id);
   void searchSupplier();
+  void searchProduct(int row);
 
 signals:
   changedSignal();

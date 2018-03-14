@@ -154,11 +154,10 @@ void ProductWidget::searchCategory()
 {
   QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Selecionar Categoria"),
-                        QIcon(":/icons/res/category.png"),
-                        INVALID_ID);
+                        QIcon(":/icons/res/category.png"));
   dlg.set(model, CATEGORY_SQL_TABLE_NAME, Category::getColumns());
   dlg.exec();
-  if (Category::st_isValidId(dlg.getCurrentId()))
+  if (IS_VALID_ID(dlg.getCurrentId()))
   {
     FullCategory fCategory;
     fCategory.m_category.m_id = dlg.getCurrentId();
@@ -172,11 +171,10 @@ void ProductWidget::searchImage()
 {
   ImageTableModel* model = new ImageTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Escolher Imagem"),
-                        QIcon(":/icons/res/icon.png"),
-                        INVALID_ID);
+                        QIcon(":/icons/res/icon.png"));
   dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
   dlg.exec();
-  if (Image::st_isValidId(dlg.getCurrentId()))
+  if (IS_VALID_ID(dlg.getCurrentId()))
   {
     Image image;
     image.m_id = dlg.getCurrentId();

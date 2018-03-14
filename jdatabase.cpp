@@ -1,5 +1,6 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
+#include "defines.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
@@ -344,10 +345,9 @@ void JDatabase::focusFilterSearch()
 
 JDatabaseSelector::JDatabaseSelector(const QString& title,
                                      const QIcon& icon,
-                                     int invalidId,
                                      QWidget* parent)
   : QDialog(parent)
-  , m_currentId(invalidId)
+  , m_currentId(INVALID_ID)
   , m_database(nullptr)
 {
   m_database = new JDatabase(true);

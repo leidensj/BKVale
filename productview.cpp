@@ -227,7 +227,7 @@ Product ProductView::getProduct() const
   product.m_bAvailableToBuy = m_cbAvailableToBuy->isChecked();
   product.m_bAvailableToSell = m_cbAvailableToSell->isChecked();
   product.m_categoryId = m_categoryPicker->getId();
-  //TODO item.m_imageId = INVALID_IMAGE_ID;
+  product.m_imageId = m_imagePicker->getId();
   return product;
 }
 

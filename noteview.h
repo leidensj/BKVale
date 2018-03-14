@@ -29,6 +29,8 @@ public:
   QVector<NoteItem> getNoteItems() const;
   void setLastID(int lastID);
   int getLastID() const;
+  void setProduct(int row, const FullProduct& fProduct);
+  void addFullNoteItem(const FullNoteItem& fNoteItem);
 
 private:
   QPushButton* m_btnCreate;
@@ -55,8 +57,7 @@ private slots:
   void emitCreateSignal();
   void emitOpenLastSignal();
   void emitSearchSupplierSignal();
-  void addItem(const FullProduct& fProduct);
-  void addItem(const FullNoteItem& fItem);
+  void emitSearchProductSignal();
   void removeItem();
 
 public slots:
@@ -69,6 +70,7 @@ signals:
   void changedSignal();
   void showSearchSignal();
   void searchSupplierSignal();
+  void searchProductSignal(int row);
   void createSignal();
   void openLastSignal(int id);
 };

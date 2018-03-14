@@ -32,8 +32,7 @@ struct Category
            m_imageId != other.m_imageId;
   }
 
-  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
-  bool isValidId() const { return st_isValidId(m_id); }
+  bool isValidId() const { return IS_VALID_ID(m_id); }
   static bool st_isValid(const Category& category) { return !category.m_name.isEmpty(); }
   bool isValid() const { return st_isValid(*this); }
   static QVector<JTableColumn> getColumns()

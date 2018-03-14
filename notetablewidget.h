@@ -12,9 +12,12 @@ class NoteTableWidget : public QTableWidget
 
 public:
   explicit NoteTableWidget(QWidget* parent = 0);
-  QVector<NoteItem> getItems() const;
-  void setItems(const QVector<FullNoteItem>& v);
-  void addItem(const FullNoteItem& fItem);
+  QVector<NoteItem> getNoteItems() const;
+  void setFullNoteItems(const QVector<FullNoteItem>& v);
+  void setProduct(int row, const FullProduct& fProduct, bool bPackageAmmount = false);
+  void setNoteItem(int row, const NoteItem& noteItem);
+  void setFullNoteItem(int row, const FullNoteItem& fNoteItem);
+  void addFullNoteItem(const FullNoteItem& fNoteItem);
   QString computeTotal() const;
 
   void removeCurrentItem() { removeRow(currentRow()); }

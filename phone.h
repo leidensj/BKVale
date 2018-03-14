@@ -56,8 +56,7 @@ struct Phone
   }
 
   bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
-  bool isValidId() const { return st_isValidId(m_id); }
+  bool isValidId() const { return IS_VALID_ID(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

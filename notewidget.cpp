@@ -86,6 +86,10 @@ NoteWidget::NoteWidget(QWidget* parent)
                    SIGNAL(searchSupplierSignal()),
                    this,
                    SLOT(searchSupplier()));
+  QObject::connect(m_view,
+                   SIGNAL(searchProductSignal(int)),
+                   this,
+                   SLOT(searchProduct(int)));
   m_dock->close();
 }
 
@@ -238,8 +242,7 @@ void NoteWidget::searchSupplier()
 {
   QSqlTableModel* model = new QSqlTableModel(this, m_database->get());
   JDatabaseSelector dlg(tr("Selecionar Fornecedor"),
-                        QIcon(":/icons/res/supplier.png"),
-                        INVALID_ID);
+                        QIcon(":/icons/res/supplier.png"));
   dlg.set(model, PERSON_SQL_TABLE_NAME, Person::getColumns());
   dlg.exec();
   if (Person::st_isValidId(dlg.getCurrentId()))
@@ -249,5 +252,43 @@ void NoteWidget::searchSupplier()
     QString error;
     PersonSQL::select(m_database->get(), fSupplier, error);
     m_view->setSupplier(fSupplier);
+  }
+}
+
+void NoteWidget::searchProduct(int row)
+{
+  QSqlTableModel* model = new QSqlTableModel(this, m_database->get());
+  JDatabaseSelector dlg(tr("Selecionar Produto"),
+                        QIcon(":/icons/res/item.png"));
+  dlg.set(model, PRODUCT_SQL_TABLE_NAME, Product::getColumns());
+  dlg.exec();
+  if (IS_VALID_ID(dlg.getCurrentId()))
+  {
+    FullProduct fProduct;
+    fProduct.m_product.m_id = dlg.getCurrentId();
+    QString error;
+    bool bSuccess = ProductSQL::select(m_database->get(), fProduct, error);
+    if (bSuccess)
+    {
+      if (row < 0)
+      {
+        FullNoteItem fNoteItem;
+        fNoteItem.m_fProduct = fProduct;
+        fNoteItem.m_item.m_productId = dlg.getCurrentId();
+        m_view->addFullNoteItem(fNoteItem);
+      }
+      else
+      {
+        m_view->setProduct(row, fProduct);
+      }
+    }
+    else
+    {
+      QMessageBox::critical(this,
+                            tr("Erro"),
+                            tr("Erro '%1' ao buscar produto com ID '%2'.").arg(error,
+                                                                               QString::number(dlg.getCurrentId())),
+                            QMessageBox::Ok);
+    }
   }
 }

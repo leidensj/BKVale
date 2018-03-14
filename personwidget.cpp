@@ -167,11 +167,10 @@ void PersonWidget::searchImage()
 {
   QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Selecionar Imagem"),
-                        QIcon(":/icons/res/image.png"),
-                        INVALID_ID);
+                        QIcon(":/icons/res/image.png"));
   dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
   dlg.exec();
-  if (Image::st_isValidId(dlg.getCurrentId()))
+  if (IS_VALID_ID(dlg.getCurrentId()))
   {
     Image image;
     image.m_id = dlg.getCurrentId();

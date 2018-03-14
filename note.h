@@ -35,7 +35,7 @@ struct NoteItem
     m_productId = INVALID_ID;
     m_ammount = 0.0;
     m_price = 0.0;
-    m_bIsPackageAmmount = false;
+    m_bIsPackageAmmount = true;
   }
 
   NoteItem()
@@ -50,8 +50,7 @@ struct NoteItem
   QString strSubtotal() const { return st_strSubTotal(subtotal()); }
   QString strAmmount() const { return st_strAmmount(m_ammount); }
   QString strPrice() const { return st_strPrice(m_price); }
-  static bool st_isValidID(qlonglong id) { return id != INVALID_ID; }
-  bool isValidID() const { return st_isValidID(m_id); }
+  bool isValidID() const { return IS_VALID_ID(m_id); }
 };
 
 struct Note
@@ -81,8 +80,7 @@ struct Note
   QString strId() const { return QString::number(m_id); }
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
   static QString st_strNumber(qlonglong number) { return QString::number(number); }
-  static bool st_isValidID(qlonglong id) { return id != INVALID_ID; }
-  bool isValidID() const { return st_isValidID(m_id); }
+  bool isValidID() const { return IS_VALID_ID(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

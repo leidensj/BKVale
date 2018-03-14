@@ -641,7 +641,7 @@ bool ProductSQL::execSelect(QSqlQuery& query,
     }
   }
 
-  if (bSuccess)
+  if (bSuccess && IS_VALID_ID(fProduct.m_product.m_id))
   {
     fProduct.m_image.m_id = fProduct.m_product.m_imageId;
     bSuccess = ImageSQL::execSelect(query, fProduct.m_image, error);
@@ -733,7 +733,7 @@ bool ProductSQL::insert(QSqlDatabase db,
   if (bSuccess)
   {
     product.m_id = query.lastInsertId().toLongLong();
-    if (Image::st_isValidId(product.m_imageId))
+    if (IS_VALID_ID(product.m_imageId))
     {
       query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
                     PRODUCT_SQL_COL03 " = (:_v03)"
@@ -797,7 +797,7 @@ bool ProductSQL::update(QSqlDatabase db,
   query.bindValue(":_v12", product.m_bAvailableToBuy);
   query.bindValue(":_v13", product.m_bAvailableToSell);
   bool bSuccess = query.exec();
-  if (bSuccess && Image::st_isValidId(product.m_imageId))
+  if (bSuccess && IS_VALID_ID(product.m_imageId))
   {
     query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
                   PRODUCT_SQL_COL03 " = (:_v03)"
@@ -927,7 +927,7 @@ bool CategorySQL::insert(QSqlDatabase db,
   if (bSuccess)
   {
     category.m_id = query.lastInsertId().toLongLong();
-    if (Image::st_isValidId(category.m_imageId))
+    if (IS_VALID_ID(category.m_imageId))
     {
       query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
                     CATEGORY_SQL_COL01 " = (:_v01)"
@@ -970,7 +970,7 @@ bool CategorySQL::update(QSqlDatabase db,
   query.bindValue(":_v00", category.m_id);
   query.bindValue(":_v02", category.m_name);
   bool bSuccess = query.exec();
-  if (bSuccess && Image::st_isValidId(category.m_imageId))
+  if (bSuccess && IS_VALID_ID(category.m_imageId))
   {
     query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
                   CATEGORY_SQL_COL01 " = (:_v01)"
@@ -1897,7 +1897,7 @@ bool PersonSQL::insert(QSqlDatabase db,
   if (bSuccess)
   {
     person.m_id = query.lastInsertId().toLongLong();
-    if (Image::st_isValidId(person.m_imageId))
+    if (IS_VALID_ID(person.m_imageId))
     {
       query.prepare("UPDATE " PERSON_SQL_TABLE_NAME " SET "
                     PERSON_SQL_COL01 " = (:_v01)"
@@ -2037,7 +2037,7 @@ bool PersonSQL::update(QSqlDatabase db,
   query.bindValue(":_v14", person.m_employeePinCode);
   bool bSuccess = query.exec();
 
-  if (bSuccess && Image::st_isValidId(person.m_imageId))
+  if (bSuccess && IS_VALID_ID(person.m_imageId))
   {
     query.prepare("UPDATE " PERSON_SQL_TABLE_NAME " SET "
                   PERSON_SQL_COL01 " = (:_v01)"

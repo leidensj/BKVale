@@ -90,6 +90,10 @@ void JImageView::setImage(const QByteArray& bArray)
     m_lblImage->setPixmap(pixmap);
     updateControls();
   }
+  else
+  {
+    clearImage();
+  }
 }
 
 QString JImageView::getImagePath()

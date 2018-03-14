@@ -63,7 +63,6 @@ JPicker::JPicker(const QString& itemText,
   hlayout0->addWidget(vFrame1);
   hlayout0->addWidget(m_imageView);
 
-
   QVBoxLayout* vlayout0 = new QVBoxLayout();
   vlayout0->setContentsMargins(0, 0, 0, 0);
   vlayout0->setAlignment(Qt::AlignTop);

@@ -33,7 +33,7 @@ private:
 
 public:
   qlonglong getId() const { return m_user.m_id; }
-  bool isValid() const { return User::st_isValidID(m_user.m_id); }
+  bool isValid() const { return IS_VALID_ID(m_user.m_id); }
   QString strUser() const { return m_user.m_strUser; }
   bool hasAccessToNote() const { return isValid() && m_user.m_bAccessNote; }
   bool hasAccessToReminder() const { return isValid() && m_user.m_bAccessReminder; }

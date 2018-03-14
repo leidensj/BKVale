@@ -67,7 +67,8 @@ NoteView::NoteView(QWidget *parent)
   m_btnSearchItem->setText("");
   m_btnSearchItem->setIconSize(QSize(24, 24));
   m_btnSearchItem->setIcon(QIcon(":/icons/res/binoculars.png"));
-  m_btnSearchItem->setToolTip(tr("Procurar item"));
+  m_btnSearchItem->setToolTip(tr("Procurar item (F3)"));
+  m_btnSearchItem->setShortcut(QKeySequence(Qt::Key_F3));
 
   m_btnAdd = new QPushButton();
   m_btnAdd->setFlat(true);
@@ -228,7 +229,12 @@ NoteView::NoteView(QWidget *parent)
   QObject::connect(m_btnAdd,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(addItem()));
+                   SLOT(emitSearchProductSignal()));
+
+  QObject::connect(m_btnSearchItem,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(emitSearchProductSignal()));
 
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
@@ -287,17 +293,14 @@ NoteView::~NoteView()
 
 }
 
-void NoteView::addItem(const FullProduct& fProduct)
+void NoteView::setProduct(int row, const FullProduct& fProduct)
 {
-  FullNoteItem fItem;
-  fItem.m_fProduct = fProduct;
-  fItem.m_item.m_productId = fProduct.m_product.m_id;
-  addItem(fItem);
+  m_table->setProduct(row, fProduct);
 }
 
-void NoteView::addItem(const FullNoteItem& fItem)
+void NoteView::addFullNoteItem(const FullNoteItem& fNoteItem)
 {
-  m_table->addItem(fItem);
+  m_table->addFullNoteItem(fNoteItem);
   m_table->setFocus();
   updateControls();
 }
@@ -323,7 +326,7 @@ Note NoteView::getNote() const
 
 QVector<NoteItem> NoteView::getNoteItems() const
 {
-  return m_table->getItems();
+  return m_table->getNoteItems();
 }
 
 void NoteView::setNote(const FullNote& fNote)
@@ -335,7 +338,7 @@ void NoteView::setNote(const FullNote& fNote)
   m_supplierPicker->setText(fNote.m_fSupplier.m_person.m_alias);
   m_snNumber->setValue(fNote.m_number);
   m_cbCash->setChecked(fNote.m_note.m_bCash);
-  m_table->setItems(fNote.m_vfNoteItem);
+  m_table->setFullNoteItems(fNote.m_vfNoteItem);
   updateControls();
 }
 
@@ -379,8 +382,7 @@ void NoteView::setSupplier(const FullPerson& fSupplier)
   }
   else
   {
-    // todo search product
-    m_table->addItem(FullNoteItem());
+    emit searchProductSignal(-1);
   }
 }
 
@@ -389,6 +391,7 @@ void NoteView::updateControls()
   // TODO
   const bool bCreated = m_snNumber->value() > 0;
   m_btnRemove->setEnabled(bCreated && m_table->currentRow() >= 0);
+  m_btnSearchItem->setEnabled(bCreated && m_table->currentRow() >= 0);
   m_btnAdd->setEnabled(bCreated);
   m_supplierPicker->setEnabled(bCreated);
   m_snNumber->setEnabled(bCreated);
@@ -397,7 +400,7 @@ void NoteView::updateControls()
   m_edTotal->setEnabled(bCreated);
   m_cbCash->setEnabled(bCreated);
   m_btnOpenLast->setEnabled(m_lastID != INVALID_ID);
-  m_lblNumberStatus->setPixmap(QPixmap(Note::st_isValidID(m_currentID)
+  m_lblNumberStatus->setPixmap(QPixmap(IS_VALID_ID(m_currentID)
                                      ? ":/icons/res/fileedit.png"
                                      : ":/icons/res/filenew.png"));
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
@@ -448,7 +451,7 @@ void NoteView::checkDate()
   fmt.setFontOverline(true);
   m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
-  bool bIsEditMode = Note::st_isValidID(m_currentID);
+  bool bIsEditMode = IS_VALID_ID(m_currentID);
   bool bIsDirty = !m_supplierPicker->getText().isEmpty() ||
                   m_table->hasItems();
   if (!bIsEditMode && !bIsDirty)
@@ -459,4 +462,9 @@ void NoteView::setToday()
 {
   m_dtDate->setDate(QDate::currentDate());
   updateControls();
+}
+
+void NoteView::emitSearchProductSignal()
+{
+  emit searchProductSignal(m_table->currentRow());
 }

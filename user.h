@@ -39,7 +39,7 @@ struct User
   bool m_bAccessProduct;
   bool m_bAccessSettings;
 
-  static bool st_isValidID(qlonglong id) { return id != INVALID_ID; }
+  bool isValidId() const { return IS_VALID_ID(m_id); }
   static QString st_strEncryptedPassword(const QString& strPassword);
   static QVector<JTableColumn> getColumns()
   {

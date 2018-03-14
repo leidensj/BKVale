@@ -2,6 +2,7 @@
 #define DEFINES_H
 
 #define INVALID_ID -1
+#define IS_VALID_ID(x) (x != INVALID_ID ? true : false)
 
 #define ADDRESS_SQL_TABLE_NAME "_ADDRESSES"
 #define ADDRESS_SQL_COL00 "_ID"

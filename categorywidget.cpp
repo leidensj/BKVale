@@ -121,11 +121,10 @@ void CategoryWidget::searchImage()
 {
   ImageTableModel* model = new ImageTableModel(0, m_database->get());
   JDatabaseSelector dlg(tr("Escolher Imagem"),
-                        QIcon(":/icons/res/icon.png"),
-                        INVALID_ID);
+                        QIcon(":/icons/res/icon.png"));
   dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
   dlg.exec();
-  if (Image::st_isValidId(dlg.getCurrentId()))
+  if (IS_VALID_ID(dlg.getCurrentId()))
   {
     Image image;
     image.m_id = dlg.getCurrentId();

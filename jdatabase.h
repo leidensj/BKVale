@@ -79,7 +79,6 @@ class JDatabaseSelector : public QDialog
 public:
   explicit JDatabaseSelector(const QString& title,
                              const QIcon& icon,
-                             int invalidId,
                              QWidget* parent = 0);
 
   void set(QSqlTableModel* model,

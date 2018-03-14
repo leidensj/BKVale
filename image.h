@@ -33,8 +33,7 @@ struct Image
         m_image != img.m_image;
   }
 
-  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
-  bool isValidId() const { return st_isValidId(m_id); }
+  bool isValidId() const { return IS_VALID_ID(m_id); }
 
   static bool st_isValid(const Image& img) { return !img.m_name.isEmpty() && !img.m_image.isEmpty(); }
   bool isValid() const { return st_isValid(*this); }

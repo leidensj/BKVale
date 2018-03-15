@@ -23,7 +23,7 @@ private slots:
   void updateControls();
 
 public slots:
-  void setCategory(const FullCategory& fCategory);
+  void setCategory(const Category& category);
   void create();
 
 signals:

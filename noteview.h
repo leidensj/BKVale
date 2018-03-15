@@ -24,13 +24,11 @@ class NoteView : public QFrame
 public:
   explicit NoteView(QWidget *parent = 0);
   ~NoteView();
-  bool isValid() const;
   Note getNote() const;
-  QVector<NoteItem> getNoteItems() const;
   void setLastID(int lastID);
   int getLastID() const;
-  void setProduct(int row, const FullProduct& fProduct);
-  void addFullNoteItem(const FullNoteItem& fNoteItem);
+  void setProduct(int row, const Product& product);
+  void addNoteItem(const NoteItem& noteItem);
 
 private:
   QPushButton* m_btnCreate;
@@ -57,14 +55,15 @@ private slots:
   void emitCreateSignal();
   void emitOpenLastSignal();
   void emitSearchSupplierSignal();
+  void emitSearchNewProductSignal();
   void emitSearchProductSignal();
   void removeItem();
 
 public slots:
   void create(int number);
-  void setNote(const FullNote& fNote);
+  void setNote(const Note& note);
   void updateControls();
-  void setSupplier(const FullPerson& fSupplier);
+  void setSupplier(const Person& supplier);
 
 signals:
   void changedSignal();

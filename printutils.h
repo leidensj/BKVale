@@ -31,7 +31,7 @@ namespace Printer
 
 namespace NotePrinter
 {
-  QString build(const FullNote& fNote,
+  QString build(const Note& note,
                 const QString& user);
 }
 

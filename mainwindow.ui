@@ -139,15 +139,8 @@
    </attribute>
    <addaction name="actionLogin"/>
    <addaction name="separator"/>
-   <addaction name="actionUsers"/>
    <addaction name="actionPersons"/>
-   <addaction name="actionEmployees"/>
-   <addaction name="actionCashRegister"/>
-   <addaction name="separator"/>
    <addaction name="actionProducts"/>
-   <addaction name="actionCategories"/>
-   <addaction name="actionPrices"/>
-   <addaction name="actionImages"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
@@ -157,6 +150,64 @@
    <addaction name="actionInfo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuSistema">
+    <property name="title">
+     <string>Sistema</string>
+    </property>
+    <addaction name="actionLogin"/>
+   </widget>
+   <widget class="QMenu" name="menuCadastros">
+    <property name="title">
+     <string>Cadastros</string>
+    </property>
+    <widget class="QMenu" name="menuPessoas">
+     <property name="title">
+      <string>Pessoas</string>
+     </property>
+     <addaction name="actionPersons"/>
+     <addaction name="actionEmployees"/>
+    </widget>
+    <addaction name="menuPessoas"/>
+    <addaction name="actionUsers"/>
+    <addaction name="actionProducts"/>
+    <addaction name="actionCategories"/>
+    <addaction name="actionImages"/>
+   </widget>
+   <widget class="QMenu" name="menuImpressora">
+    <property name="title">
+     <string>Impressora</string>
+    </property>
+    <addaction name="actionConnect"/>
+    <addaction name="actionDisconnect"/>
+    <addaction name="actionPrint"/>
+   </widget>
+   <widget class="QMenu" name="menuConfigura_es">
+    <property name="title">
+     <string>Manutenção</string>
+    </property>
+    <addaction name="actionSettings"/>
+   </widget>
+   <widget class="QMenu" name="menuAjuda">
+    <property name="title">
+     <string>Ajuda</string>
+    </property>
+    <addaction name="actionInfo"/>
+   </widget>
+   <addaction name="menuSistema"/>
+   <addaction name="menuCadastros"/>
+   <addaction name="menuImpressora"/>
+   <addaction name="menuConfigura_es"/>
+   <addaction name="menuAjuda"/>
+  </widget>
   <action name="actionConnect">
    <property name="icon">
     <iconset resource="icons.qrc">

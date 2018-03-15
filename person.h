@@ -12,7 +12,7 @@
 struct Person
 {
   mutable qlonglong m_id;
-  qlonglong m_imageId;
+  Image m_image;
   QString m_name;
   QString m_alias;
   QString m_email;
@@ -26,11 +26,13 @@ struct Person
   bool m_bSupplier;
   bool m_bEmployee;
   QString m_employeePinCode;
+  QVector<Phone> m_vPhone;
+  QVector<Address> m_vAddress;
 
   void clear()
   {
     m_id = INVALID_ID;
-    m_imageId = INVALID_ID;
+    m_image.clear();
     m_name.clear();
     m_alias.clear();
     m_email.clear();
@@ -44,6 +46,8 @@ struct Person
     m_bSupplier = false;
     m_bEmployee = false;
     m_employeePinCode.clear();
+    m_vPhone.clear();
+    m_vAddress.clear();
   }
 
   Person()
@@ -53,7 +57,7 @@ struct Person
 
   bool operator !=(const Person& other) const
   {
-    bool b =  m_imageId != other.m_imageId ||
+    bool b =  m_image != other.m_image ||
               m_name != other.m_name ||
               m_alias != other.m_alias ||
               m_email != other.m_email ||
@@ -63,7 +67,9 @@ struct Person
               m_bCompany != other.m_bCompany ||
               m_bCustomer != other.m_bCustomer ||
               m_bSupplier != other.m_bSupplier ||
-              m_bEmployee != other.m_bEmployee;
+              m_bEmployee != other.m_bEmployee ||
+              m_vPhone != other.m_vPhone ||
+              m_vAddress != other.m_vAddress;
 
     if (!m_bCompany)
       b = b || m_birthDate != other.m_birthDate;
@@ -109,23 +115,6 @@ struct Person
     c.push_back(JTableColumn(PERSON_SQL_COL13, QObject::tr("Funcionário")));
     c.push_back(JTableColumn(PERSON_SQL_COL14, QObject::tr("Código PIN")));
     return c;
-  }
-};
-
-struct FullPerson
-{
-  FullPerson() {}
-  Person m_person;
-  Image m_image;
-  QVector<Phone> m_vPhone;
-  QVector<Address> m_vAddress;
-
-  void clear()
-  {
-    m_person.clear();
-    m_image.clear();
-    m_vPhone.clear();
-    m_vAddress.clear();
   }
 };
 

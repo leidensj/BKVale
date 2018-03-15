@@ -18,7 +18,7 @@ class NoteWidget : public QFrame
 public:
   explicit NoteWidget(QWidget* parent = 0);
   void setDatabase(QSqlDatabase db);
-  bool isValid() const;
+  Note getNote() const;
 
 private:
   NoteView* m_view;

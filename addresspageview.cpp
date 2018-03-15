@@ -295,7 +295,6 @@ void AddressPageView::removeSelectedAddress()
   QListWidgetItem* p = m_list->takeItem(m_list->currentRow());
   if (p != nullptr)
   {
-    m_vRemovedAddressId.push_back(p->data(Qt::UserRole).value<Address>().m_id);
     delete p;
     updateControls();
   }
@@ -303,7 +302,6 @@ void AddressPageView::removeSelectedAddress()
 
 void AddressPageView::clear()
 {
-  m_vRemovedAddressId.clear();
   clearInputOnly();
   m_list->clear();
   updateControls();
@@ -390,11 +388,6 @@ QVector<Address> AddressPageView::getAddresses() const
   for (int i = 0; i != m_list->count(); ++i)
     vAddress.push_back(m_list->item(i)->data(Qt::UserRole).value<Address>());
   return vAddress;
-}
-
-QVector<qlonglong> AddressPageView::getRemovedAddresses() const
-{
-  return m_vRemovedAddressId;
 }
 
 void AddressPageView::setAddresses(const QVector<Address>& vAddress)

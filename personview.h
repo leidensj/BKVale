@@ -21,11 +21,7 @@ public:
   explicit PersonView(QWidget* parent = 0);
   ~PersonView();
   Person getPerson() const;
-  void getPerson(Person& person,
-                 QVector<Phone>& vPhone,
-                 QVector<Address>& vAddress,
-                 QVector<qlonglong>& vRemovedPhoneId,
-                 QVector<qlonglong>& vRemoveAddressId) const;
+  void getPerson(Person& person) const;
   void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:
@@ -34,7 +30,7 @@ private slots:
   void updateControls();
 
 public slots:
-  void setPerson(const FullPerson& fPerson);
+  void setPerson(const Person& person);
   void create();
 
 signals:
@@ -43,8 +39,6 @@ signals:
 
 private:
   Person m_currentPerson;
-  QVector<Phone> m_vCurrentPhone;
-  QVector<Address> m_vCurrentAddress;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   PersonPageView* m_personPage;

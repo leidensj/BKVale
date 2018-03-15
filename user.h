@@ -7,21 +7,6 @@
 #include "jtablecolumn.h"
 #include "defines.h"
 
-enum class UserTableIndex : int
-{
-  ID = 0,
-  User,
-  Password,
-  AccessNote,
-  AccessReminder,
-  AccessCalculator,
-  AccessShop,
-  AccessConsumption,
-  AccessUser,
-  AccessProduct,
-  AccessSettings
-};
-
 struct User
 {
   User();

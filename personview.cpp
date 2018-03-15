@@ -96,21 +96,12 @@ Person PersonView::getPerson() const
   return m_personPage->getPerson();
 }
 
-void PersonView::getPerson(Person& person,
-                           QVector<Phone>& vPhone,
-                           QVector<Address>& vAddress,
-                           QVector<qlonglong>& vRemovedPhoneId,
-                           QVector<qlonglong>& vRemoveAddressId) const
+void PersonView::getPerson(Person& person) const
 {
   person.clear();
-  vPhone.clear();
-  vAddress.clear();
-
   person = m_personPage->getPerson();
-  vPhone = m_phonePage->getPhones();
-  vAddress = m_addressPage->getAddresses();
-  vRemovedPhoneId = m_phonePage->getRemovedPhones();
-  vRemoveAddressId = m_addressPage->getRemovedAddresses();
+  person.m_vAddress = m_addressPage->getAddresses();
+  person.m_vPhone = m_phonePage->getPhones();
 }
 
 void PersonView::setImage(int id, const QString& name, const QByteArray& ar)
@@ -118,22 +109,18 @@ void PersonView::setImage(int id, const QString& name, const QByteArray& ar)
   m_personPage->setImage(id, name, ar);
 }
 
-void PersonView::setPerson(const FullPerson &fPerson)
+void PersonView::setPerson(const Person &person)
 {
-  m_currentPerson = fPerson.m_person;
-  m_vCurrentPhone = fPerson.m_vPhone;
-  m_vCurrentAddress = fPerson.m_vAddress;
-  m_personPage->setPerson(fPerson.m_person, fPerson.m_image.m_name, fPerson.m_image.m_image);
-  m_phonePage->setPhones(m_vCurrentPhone);
-  m_addressPage->setAddresses(m_vCurrentAddress);
+  m_currentPerson = person;
+  m_personPage->setPerson(person, person.m_image.m_name, person.m_image.m_image);
+  m_phonePage->setPhones(person.m_vPhone);
+  m_addressPage->setAddresses(person.m_vAddress);
   updateControls();
 }
 
 void PersonView::create()
 {
   m_currentPerson.clear();
-  m_vCurrentPhone.clear();
-  m_vCurrentAddress.clear();
   m_personPage->clear();
   m_phonePage->clear();
   m_addressPage->clear();
@@ -153,22 +140,14 @@ void PersonView::emitSaveSignal()
 void PersonView::updateControls()
 {
   Person person = m_personPage->getPerson();
-  QVector<Phone> vPhone = m_phonePage->getPhones();
-  QVector<Address> vAddress = m_addressPage->getAddresses();
-  bool bEnable = person.isValid() &&
-                 !vPhone.isEmpty() &&
-                 !vAddress.isEmpty();
+  person.m_vPhone = m_phonePage->getPhones();
+  person.m_vAddress = m_addressPage->getAddresses();
+  bool bEnable = person.isValid();
   QString saveIcon(":/icons/res/save.png");
   if (m_currentPerson.isValidId())
   {
     saveIcon = ":/icons/res/saveas.png";
     bEnable = bEnable && m_currentPerson != person;
-    if (!bEnable)
-    {
-      bEnable &= m_vCurrentPhone != vPhone;
-      if (!bEnable)
-        bEnable &= m_vCurrentAddress != vAddress;
-    }
   }
 
   m_btnSave->setEnabled(bEnable);

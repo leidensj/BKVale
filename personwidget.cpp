@@ -96,12 +96,12 @@ void PersonWidget::setDatabase(QSqlDatabase db)
 
 void PersonWidget::personSelected(int id)
 {
-  FullPerson fPerson;
-  fPerson.m_person.m_id = id;
+  Person person;
+  person.m_id = id;
   QString error;
-  if (PersonSQL::select(m_database->get(), fPerson, error))
+  if (PersonSQL::select(m_database->get(), person, error))
   {
-    m_view->setPerson(fPerson);
+    m_view->setPerson(person);
   }
   else
   {
@@ -142,15 +142,11 @@ void PersonWidget::savePerson()
 {
   QString error;
   Person person;
-  QVector<Phone> vPhone;
-  QVector<Address> vAddress;
-  QVector<qlonglong> vRemovedPhoneId;
-  QVector<qlonglong> vRemovedAddressId;
-  m_view->getPerson(person, vPhone, vAddress, vRemovedPhoneId, vRemovedAddressId);
+  m_view->getPerson(person);
 
   if (person.isValidId()
-      ? PersonSQL::update(m_database->get(), person, vPhone, vAddress, vRemovedPhoneId, vRemovedAddressId, error)
-      : PersonSQL::insert(m_database->get(), person, vPhone, vAddress, error))
+      ? PersonSQL::update(m_database->get(), person, error)
+      : PersonSQL::insert(m_database->get(), person, error))
   {
     m_database->refresh();
   }

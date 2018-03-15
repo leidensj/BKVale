@@ -12,7 +12,7 @@ struct Category
 {
   mutable qlonglong m_id;
   QString m_name;
-  qlonglong m_imageId;
+  Image m_image;
 
   Category()
   {
@@ -23,13 +23,13 @@ struct Category
   {
     m_id = INVALID_ID;
     m_name.clear();
-    m_imageId = INVALID_ID;
+    m_image.clear();
   }
 
   bool operator != (const Category& other)
   {
     return m_name != other.m_name ||
-           m_imageId != other.m_imageId;
+           m_image != other.m_image;
   }
 
   bool isValidId() const { return IS_VALID_ID(m_id); }
@@ -42,21 +42,6 @@ struct Category
     c.push_back(JTableColumn(CATEGORY_SQL_COL01, QObject::tr("Id Imagem")));
     c.push_back(JTableColumn(CATEGORY_SQL_COL02, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
     return c;
-  }
-};
-
-struct FullCategory
-{
-  Category m_category;
-  Image m_image;
-  void clear()
-  {
-    m_category.clear();
-    m_image.clear();
-  }
-  FullCategory()
-  {
-    clear();
   }
 };
 

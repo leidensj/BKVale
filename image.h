@@ -26,7 +26,7 @@ struct Image
     m_image.clear();
   }
 
-  bool operator !=(const Image& img)
+  bool operator !=(const Image& img) const
   {
     return
         m_name != img.m_name ||

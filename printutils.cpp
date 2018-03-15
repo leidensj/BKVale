@@ -8,7 +8,7 @@
 
 namespace
 {
-  void noteAppendHeader(const FullNote& fNote,
+  void noteAppendHeader(const Note& note,
                         QString& strNote)
   {
     strNote += ESC_EXPAND_ON
@@ -24,7 +24,7 @@ namespace
                ESC_VERT_TAB
                ESC_EXPAND_OFF;
 
-    strNote += fNote.m_note.m_bCash
+    strNote += note.m_bCash
                ? "PAGAMENTO A VISTA"
                : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";
 
@@ -33,23 +33,23 @@ namespace
                ESC_ALIGN_LEFT
                "Numero     "
                ESC_DOUBLE_FONT_ON +
-               Note::st_strNumber(fNote.m_number) +
+               note.strNumber() +
                ESC_LF
                "Data       "
                ESC_DOUBLE_FONT_ON +
-               fNote.m_note.strDate() +
+               note.strDate() +
                ESC_LF
                "           " +
-               fNote.m_note.strDayOfWeek() +
+               note.strDayOfWeek() +
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
-               fNote.m_fSupplier.m_person.m_alias +
+               note.m_supplier.m_alias +
                ESC_LF +
                ESC_VERT_TAB;
   }
 
-  void noteAppendFooter(const FullNote& fNote,
+  void noteAppendFooter(const Note& note,
                         const QString& user,
                         QString& strNote)
   {
@@ -57,7 +57,7 @@ namespace
                ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON
                "TOTAL R$" +
-               fNote.m_note.strTotal() +
+               note.strTotal() +
                ESC_LF
                "Emissao: " +
                QDate::currentDate().toString("dd/MM/yyyy ") +
@@ -74,37 +74,39 @@ namespace
                user +
                ESC_LF;
 
-    if (fNote.m_note.m_bCash)
+    if (note.m_bCash)
     {
       strNote += ESC_LF
                  ESC_LF
                  "________________________________"
                  ESC_LF
                  "Assinatura " +
-                 fNote.m_fSupplier.m_person.m_alias +
+                 note.m_supplier.m_alias +
                  ESC_LF;
     }
   }
 
-  void noteAppendBody(const FullNote& note,
+  void noteAppendBody(const Note& note,
                       QString& strNote)
   {
     strNote += ESC_ALIGN_LEFT;
-    for (int i = 0; i != note.m_vfNoteItem.size(); ++i)
+    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
     {
       QString item;
       {
-        QString itemPt1 = note.m_vfNoteItem.at(i).m_item.strAmmount() +
-                          note.m_vfNoteItem.at(i).m_fProduct.m_product.m_unity +
-                          " x R$" +
-                          note.m_vfNoteItem.at(i).m_item.strPrice();
-        QString itemPt2 = "R$" + note.m_vfNoteItem.at(i).m_item.strSubtotal();
+        QString itemPt1 = note.m_vNoteItem.at(i).strAmmount();
+        if (note.m_vNoteItem.at(i).m_bIsPackageAmmount)
+          itemPt1 += note.m_vNoteItem.at(i).m_product.m_packageUnity;
+        else
+          itemPt1 += note.m_vNoteItem.at(i).m_product.m_unity;
+        itemPt1 += " x R$" + note.m_vNoteItem.at(i).strPrice();
+        QString itemPt2 = "R$" + note.m_vNoteItem.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += ".";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      strNote += note.m_vfNoteItem.at(i).m_fProduct.m_product.m_name + ESC_LF + item + ESC_LF;
+      strNote += note.m_vNoteItem.at(i).m_product.m_name + ESC_LF + item + ESC_LF;
     }
   }
 }
@@ -168,14 +170,14 @@ QString Printer::strCmdFullCut()
   return ESC_FULL_CUT;
 }
 
-QString NotePrinter::build(const FullNote& fNote,
+QString NotePrinter::build(const Note& note,
                            const QString& user)
 {
   QString strNote1;
-  noteAppendHeader(fNote, strNote1);
-  noteAppendBody(fNote, strNote1);
-  noteAppendFooter(fNote, user, strNote1);
-  if (fNote.m_note.m_bCash)
+  noteAppendHeader(note, strNote1);
+  noteAppendBody(note, strNote1);
+  noteAppendFooter(note, user, strNote1);
+  if (note.m_bCash)
   {
     return strNote1 + ESC_LF ESC_FULL_CUT;
   }

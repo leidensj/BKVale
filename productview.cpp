@@ -226,8 +226,8 @@ Product ProductView::getProduct() const
   product.m_bAvailableAtConsumption = m_cbAvailableAtConsumption->isChecked();
   product.m_bAvailableToBuy = m_cbAvailableToBuy->isChecked();
   product.m_bAvailableToSell = m_cbAvailableToSell->isChecked();
-  product.m_categoryId = m_categoryPicker->getId();
-  product.m_imageId = m_imagePicker->getId();
+  product.m_category.m_id = m_categoryPicker->getId();
+  product.m_image.m_id = m_imagePicker->getId();
   return product;
 }
 
@@ -244,29 +244,29 @@ void ProductView::setImage(int id, const QString& text, const QByteArray& ar)
   m_imagePicker->setImage(ar);
 }
 
-void ProductView::setProduct(const FullProduct &fProduct)
+void ProductView::setProduct(const Product &product)
 {
-  m_currentProduct = fProduct.m_product;
-  m_edName->setText(fProduct.m_product.m_name);
-  m_edUnity->setText(fProduct.m_product.m_unity);
-  m_edPackageUnity->setText(fProduct.m_product.m_packageUnity);
-  m_spnPackageAmmount->setValue(fProduct.m_product.m_packageAmmount);
-  m_edDetails->setText(fProduct.m_product.m_details);
-  m_edCode->setText(fProduct.m_product.m_code);
-  m_cbAvailableAtNotes->setChecked(fProduct.m_product.m_bAvailableAtNotes);
-  m_cbAvailableAtShop->setChecked(fProduct.m_product.m_bAvailableAtShop);
-  m_cbAvailableAtConsumption->setChecked(fProduct.m_product.m_bAvailableAtConsumption);
-  m_cbAvailableToBuy->setChecked(fProduct.m_product.m_bAvailableToBuy);
-  m_cbAvailableToSell->setChecked(fProduct.m_product.m_bAvailableToSell);
-  setCategory(fProduct.m_fCategory.m_category.m_id, fProduct.m_fCategory.m_category.m_name);
-  setImage(fProduct.m_image.m_id, fProduct.m_image.m_name, fProduct.m_image.m_image);
+  m_currentProduct = product;
+  m_edName->setText(product.m_name);
+  m_edUnity->setText(product.m_unity);
+  m_edPackageUnity->setText(product.m_packageUnity);
+  m_spnPackageAmmount->setValue(product.m_packageAmmount);
+  m_edDetails->setText(product.m_details);
+  m_edCode->setText(product.m_code);
+  m_cbAvailableAtNotes->setChecked(product.m_bAvailableAtNotes);
+  m_cbAvailableAtShop->setChecked(product.m_bAvailableAtShop);
+  m_cbAvailableAtConsumption->setChecked(product.m_bAvailableAtConsumption);
+  m_cbAvailableToBuy->setChecked(product.m_bAvailableToBuy);
+  m_cbAvailableToSell->setChecked(product.m_bAvailableToSell);
+  setCategory(product.m_category.m_id, product.m_category.m_name);
+  setImage(product.m_image.m_id, product.m_image.m_name, product.m_image.m_image);
   updateControls();
 }
 
 void ProductView::create()
 {
-  FullProduct fProduct;
-  setProduct(fProduct);
+  Product product;
+  setProduct(product);
   updateControls();
 }
 

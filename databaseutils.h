@@ -87,16 +87,14 @@ namespace NoteSQL
 
   bool insert(QSqlDatabase db,
               const Note& note,
-              const QVector<NoteItem>& vItems,
               QString& error);
 
   bool update(QSqlDatabase db,
               const Note& note,
-              const QVector<NoteItem>& vItems,
               QString& error);
 
   bool select(QSqlDatabase db,
-              FullNote& note,
+              Note& note,
               QString& error);
 
   bool remove(QSqlDatabase db,
@@ -107,11 +105,11 @@ namespace NoteSQL
 namespace ProductSQL
 {
 bool execSelect(QSqlQuery& query,
-                FullProduct& fProduct,
+                Product& product,
                 QString& error);
 
 bool select(QSqlDatabase db,
-            FullProduct& fProduct,
+            Product& product,
             QString& error);
 
 bool insert(QSqlDatabase db,
@@ -130,11 +128,11 @@ bool remove(QSqlDatabase db,
 namespace CategorySQL
 {
  bool execSelect(QSqlQuery& query,
-                 FullCategory& fCategory,
+                 Category& category,
                  QString& error);
 
   bool select(QSqlDatabase db,
-              FullCategory& fCategory,
+              Category& category,
               QString& error);
 
   bool insert(QSqlDatabase db,
@@ -224,25 +222,19 @@ namespace ConsumptionSQL
 namespace PersonSQL
 {
   bool execSelect(QSqlQuery& query,
-                  FullPerson& fPerson,
+                  Person& person,
                   QString& error);
 
   bool select(QSqlDatabase db,
-              FullPerson& fPerson,
+              Person& person,
               QString& error);
 
   bool insert(QSqlDatabase db,
               const Person& person,
-              const QVector<Phone>& vPhone,
-              const QVector<Address>& vAddress,
               QString& error);
 
   bool update(QSqlDatabase db,
               const Person& person,
-              const QVector<Phone>& vPhone,
-              const QVector<Address>& vAddress,
-              const QVector<qlonglong>& vRemovedPhoneId,
-              const QVector<qlonglong>& vRemovedAddressId,
               QString& error);
 
   bool remove(QSqlDatabase db,

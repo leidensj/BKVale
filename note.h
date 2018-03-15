@@ -24,7 +24,7 @@ enum class NoteColumn : int
 struct NoteItem
 {
   mutable qlonglong m_id;
-  qlonglong m_productId;
+  Product m_product;
   double m_ammount;
   double m_price;
   bool m_bIsPackageAmmount;
@@ -32,7 +32,7 @@ struct NoteItem
   void clear()
   {
     m_id = INVALID_ID;
-    m_productId = INVALID_ID;
+    m_product.clear();
     m_ammount = 0.0;
     m_price = 0.0;
     m_bIsPackageAmmount = true;
@@ -43,6 +43,9 @@ struct NoteItem
     clear();
   }
 
+  QString strUnity() const { return m_bIsPackageAmmount
+                                    ? m_product.m_packageUnity
+                                    : m_product.m_unity; }
   double subtotal() const { return m_ammount * m_price; }
   static QString st_strSubTotal(double subtotal) { return QString::number(subtotal, 'f', 2); }
   static QString st_strAmmount(double ammount) { return QString::number(ammount, 'f', 3); }
@@ -50,24 +53,36 @@ struct NoteItem
   QString strSubtotal() const { return st_strSubTotal(subtotal()); }
   QString strAmmount() const { return st_strAmmount(m_ammount); }
   QString strPrice() const { return st_strPrice(m_price); }
-  bool isValidID() const { return IS_VALID_ID(m_id); }
+  bool isValidId() const { return IS_VALID_ID(m_id); }
+  bool isValid() const
+  {
+    return m_product.isValidId() &&
+        m_ammount != 0.0 &&
+        m_price != 0.0;
+  }
 };
+
+Q_DECLARE_METATYPE(NoteItem)
 
 struct Note
 {
   mutable qlonglong m_id;
+  qlonglong m_number;
   QString m_date;
-  qlonglong m_supplierId;
+  Person m_supplier;
   double m_total;
   bool m_bCash;
+  QVector<NoteItem> m_vNoteItem;
 
   void clear()
   {
     m_id = INVALID_ID;
-    m_supplierId = INVALID_ID;
+    m_number = NOTE_SQL_DEFAULT_NUMBER;
+    m_supplier.clear();
     m_date.clear();
     m_total = 0.0;
     m_bCash = false;
+    m_vNoteItem.clear();
   }
 
   Note()
@@ -80,7 +95,17 @@ struct Note
   QString strId() const { return QString::number(m_id); }
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
   static QString st_strNumber(qlonglong number) { return QString::number(number); }
+  QString strNumber() const { return st_strNumber(m_number); }
   bool isValidID() const { return IS_VALID_ID(m_id); }
+  bool isValid() const
+  {
+    bool b = m_supplier.isValidId() &&
+             m_total != 0.0 &&
+             !m_vNoteItem.isEmpty();
+    for (int i = 0; i != m_vNoteItem.size(); ++i)
+      b &= m_vNoteItem.at(i).isValid();
+    return b;
+  }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;
@@ -91,46 +116,6 @@ struct Note
     c.push_back(JTableColumn(NOTE_SQL_COL04, QObject::tr("Total"), false));
     c.push_back(JTableColumn(NOTE_SQL_COL05, QObject::tr("À Vista")));
     return c;
-  }
-};
-
-struct FullNoteItem
-{
-  NoteItem m_item;
-  FullProduct m_fProduct;
-
-  void clear()
-  {
-    m_item.clear();
-    m_fProduct.clear();
-  }
-
-  FullNoteItem()
-  {
-    clear();
-  }
-};
-
-Q_DECLARE_METATYPE(FullNoteItem)
-
-struct FullNote
-{
-  Note m_note;
-  qlonglong m_number;
-  FullPerson m_fSupplier;
-  QVector<FullNoteItem> m_vfNoteItem;
-
-  void clear()
-  {
-    m_note.clear();
-    m_number = NOTE_SQL_DEFAULT_NUMBER;
-    m_fSupplier.clear();
-    m_vfNoteItem.clear();
-  }
-
-  FullNote()
-  {
-    clear();
   }
 };
 

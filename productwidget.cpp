@@ -86,19 +86,19 @@ void ProductWidget::setDatabase(QSqlDatabase db)
 
 void ProductWidget::productSelected(int id)
 {
-  FullProduct fProduct;
-  fProduct.m_product.m_id = id;
+  Product product;
+  product.m_id = id;
   QString error;
-  if (ProductSQL::select(m_database->get(), fProduct, error))
+  if (ProductSQL::select(m_database->get(), product, error))
   {
-    m_view->setProduct(fProduct);
+    m_view->setProduct(product);
   }
   else
   {
     QMessageBox::critical(this,
                           tr("Erro"),
                           tr("Erro '%1' ao abrir o produto com ID '%2'.").arg(error,
-                                                                              QString::number(fProduct.m_product.m_id)),
+                                                                              QString::number(product.m_id)),
                           QMessageBox::Ok);
   }
 }
@@ -159,11 +159,11 @@ void ProductWidget::searchCategory()
   dlg.exec();
   if (IS_VALID_ID(dlg.getCurrentId()))
   {
-    FullCategory fCategory;
-    fCategory.m_category.m_id = dlg.getCurrentId();
+    Category category;
+    category.m_id = dlg.getCurrentId();
     QString error;
-    CategorySQL::select(m_database->get(), fCategory, error);
-    m_view->setCategory(fCategory.m_category.m_id, fCategory.m_category.m_name);
+    CategorySQL::select(m_database->get(), category, error);
+    m_view->setCategory(category.m_id, category.m_name);
   }
 }
 

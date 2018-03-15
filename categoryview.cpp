@@ -111,16 +111,16 @@ Category CategoryView::getCategory() const
 {
   Category category;
   category.m_id = m_currentCategory.m_id;
-  category.m_imageId = m_imagePicker->getId();
+  category.m_image.m_id = m_imagePicker->getId();
   category.m_name = m_edName->text();
   return category;
 }
 
-void CategoryView::setCategory(const FullCategory &fCategory)
+void CategoryView::setCategory(const Category &category)
 {
-  m_currentCategory = fCategory.m_category;
-  m_edName->setText(fCategory.m_category.m_name);
-  setImage(fCategory.m_image.m_id, fCategory.m_image.m_name, fCategory.m_image.m_image);
+  m_currentCategory = category;
+  m_edName->setText(category.m_name);
+  setImage(category.m_image.m_id, category.m_image.m_name, category.m_image.m_image);
   updateControls();
 }
 

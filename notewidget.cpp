@@ -112,12 +112,12 @@ bool NoteWidget::print(QIODevice* printer,
                        const QString& user,
                        int id)
 {
-  FullNote fNote;
-  fNote.m_note.m_id = id;
+  Note note;
+  note.m_id = id;
   QString error;
-  if (NoteSQL::select(m_database->get(), fNote, error))
+  if (NoteSQL::select(m_database->get(), note, error))
   {
-    QString str(NotePrinter::build(fNote, user));
+    QString str(NotePrinter::build(note, user));
     if (Printer::printString(printer, type, str, error))
       return true;
   }
@@ -133,11 +133,10 @@ bool NoteWidget::save()
 {
   QString error;
   Note note = m_view->getNote();
-  QVector<NoteItem> vItem = m_view->getNoteItems();
 
   if (note.isValidID()
-      ? NoteSQL::update(m_database->get(), note, vItem, error)
-      : NoteSQL::insert(m_database->get(), note, vItem, error))
+      ? NoteSQL::update(m_database->get(), note, error)
+      : NoteSQL::insert(m_database->get(), note, error))
   {
     m_view->setLastID(note.m_id);
     m_database->refresh();
@@ -169,19 +168,19 @@ void NoteWidget::create()
 
 void NoteWidget::setNote(int id)
 {
-  FullNote fNote;
-  fNote.m_note.m_id = id;
+  Note note;
+  note.m_id = id;
   QString error;
-  if (NoteSQL::select(m_database->get(), fNote, error))
+  if (NoteSQL::select(m_database->get(), note, error))
   {
-    m_view->setLastID(fNote.m_note.m_id);
-    m_view->setNote(fNote);
+    m_view->setLastID(note.m_id);
+    m_view->setNote(note);
   }
   else
   {
     QMessageBox::critical(this,
                           tr("Erro"),
-                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(fNote.m_note.m_id)),
+                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(note.m_id)),
                           QMessageBox::Ok);
   }
 }
@@ -192,11 +191,6 @@ void NoteWidget::setDatabase(QSqlDatabase db)
   m_database->set(model, NOTE_SQL_TABLE_NAME, Note::getColumns());
 }
 
-bool NoteWidget::isValid() const
-{
-  return m_view->isValid();
-}
-
 void NoteWidget::emitChangedSignal()
 {
   emit changedSignal();
@@ -204,26 +198,26 @@ void NoteWidget::emitChangedSignal()
 
 void NoteWidget::removeNote(int id)
 {
-  FullNote fNote;
-  fNote.m_note.m_id = id;
+  Note note;
+  note.m_id = id;
   QString error;
-  NoteSQL::select(m_database->get(), fNote, error);
+  NoteSQL::select(m_database->get(), note, error);
   if (QMessageBox::question(this,
                             tr("Remover vale"),
                             tr("Tem certeza que deseja remover o seguinte vale:\n"
                                "Número: %1\n"
                                "Fornecedor: %2\n"
-                               "Data: %3").arg(Note::st_strNumber(fNote.m_number),
-                                               fNote.m_fSupplier.m_person.m_alias,
-                                               fNote.m_note.strDate()),
+                               "Data: %3").arg(Note::st_strNumber(note.m_number),
+                                               note.m_supplier.m_alias,
+                                               note.strDate()),
                             QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
   {
-    if (NoteSQL::remove(m_database->get(), fNote.m_note.m_id, error))
+    if (NoteSQL::remove(m_database->get(), note.m_id, error))
     {
       if (id == m_view->getLastID())
         m_view->setLastID(INVALID_ID);
       Note note = m_view->getNote();
-      if (id == fNote.m_note.m_id)
+      if (id == note.m_id)
         create();
       m_database->refresh();
     }
@@ -232,7 +226,7 @@ void NoteWidget::removeNote(int id)
       QMessageBox::critical(this,
                             tr("Erro"),
                             tr("Erro '%1' ao remover a nota com ID '%2'.").arg(error,
-                                                                               QString::number(fNote.m_note.m_id)),
+                                                                               QString::number(note.m_id)),
                             QMessageBox::Ok);
     }
   }
@@ -247,11 +241,11 @@ void NoteWidget::searchSupplier()
   dlg.exec();
   if (Person::st_isValidId(dlg.getCurrentId()))
   {
-    FullPerson fSupplier;
-    fSupplier.m_person.m_id = dlg.getCurrentId();
+    Person supplier;
+    supplier.m_id = dlg.getCurrentId();
     QString error;
-    PersonSQL::select(m_database->get(), fSupplier, error);
-    m_view->setSupplier(fSupplier);
+    PersonSQL::select(m_database->get(), supplier, error);
+    m_view->setSupplier(supplier);
   }
 }
 
@@ -264,22 +258,21 @@ void NoteWidget::searchProduct(int row)
   dlg.exec();
   if (IS_VALID_ID(dlg.getCurrentId()))
   {
-    FullProduct fProduct;
-    fProduct.m_product.m_id = dlg.getCurrentId();
+    Product product;
+    product.m_id = dlg.getCurrentId();
     QString error;
-    bool bSuccess = ProductSQL::select(m_database->get(), fProduct, error);
+    bool bSuccess = ProductSQL::select(m_database->get(), product, error);
     if (bSuccess)
     {
       if (row < 0)
       {
-        FullNoteItem fNoteItem;
-        fNoteItem.m_fProduct = fProduct;
-        fNoteItem.m_item.m_productId = dlg.getCurrentId();
-        m_view->addFullNoteItem(fNoteItem);
+        NoteItem noteItem;
+        noteItem.m_product = product;
+        m_view->addNoteItem(noteItem);
       }
       else
       {
-        m_view->setProduct(row, fProduct);
+        m_view->setProduct(row, product);
       }
     }
     else
@@ -291,4 +284,9 @@ void NoteWidget::searchProduct(int row)
                             QMessageBox::Ok);
     }
   }
+}
+
+Note NoteWidget::getNote() const
+{
+  return m_view->getNote();
 }

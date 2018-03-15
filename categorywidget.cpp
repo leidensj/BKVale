@@ -56,13 +56,13 @@ void CategoryWidget::setDatabase(QSqlDatabase db)
 void CategoryWidget::categorySelected(int id)
 {
   QString error;
-  FullCategory fCategory;
-  fCategory.m_category.m_id = id;
+  Category category;
+  category.m_id = id;
   if (CategorySQL::select(m_database->get(),
-                          fCategory,
+                          category,
                           error))
   {
-    m_view->setCategory(fCategory);
+    m_view->setCategory(category);
   }
   else
   {

@@ -178,7 +178,7 @@ Person PersonPageView::getPerson() const
 {
   Person person;
   person.m_id = m_currentPerson.m_id;
-  person.m_imageId = m_imagePicker->getId();
+  person.m_image.m_id = m_imagePicker->getId();
   person.m_name = m_edName->text();
   person.m_alias = m_edAlias->text();
   person.m_email = m_edEmail->text();
@@ -202,7 +202,7 @@ void PersonPageView::setPerson(const Person& person,
                                const QByteArray& arImage)
 {
   m_currentPerson = person;
-  m_imagePicker->setId(person.m_imageId);
+  m_imagePicker->setId(person.m_image.m_id);
   m_imagePicker->setText(imageName);
   m_imagePicker->setImage(arImage);
   m_edName->setText(person.m_name);

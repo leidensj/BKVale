@@ -11,8 +11,8 @@
 struct Product
 {
   mutable qlonglong m_id;
-  qlonglong m_categoryId;
-  qlonglong m_imageId;
+  Category m_category;
+  Image m_image;
   QString m_name;
   QString m_unity;
   QString m_packageUnity;
@@ -28,8 +28,8 @@ struct Product
   void clear()
   {
     m_id = INVALID_ID;
-    m_imageId = INVALID_ID;
-    m_categoryId= INVALID_ID;
+    m_category.clear();
+    m_image.clear();
     m_name.clear();
     m_unity.clear();
     m_packageUnity.clear();
@@ -51,8 +51,8 @@ struct Product
   bool operator !=(const Product& other)
   {
     return
-        m_imageId != other.m_imageId ||
-        m_categoryId != other.m_categoryId ||
+        m_image != other.m_image ||
+        m_category != other.m_category ||
         m_name != other.m_name ||
         m_unity != other.m_unity ||
         m_packageUnity != other.m_packageUnity ||
@@ -93,25 +93,6 @@ struct Product
     c.push_back(JTableColumn(PRODUCT_SQL_COL12, QObject::tr("Compra")));
     c.push_back(JTableColumn(PRODUCT_SQL_COL13, QObject::tr("Venda")));
     return c;
-  }
-};
-
-struct FullProduct
-{
-  Product m_product;
-  Image m_image;
-  FullCategory m_fCategory;
-
-  void clear()
-  {
-    m_product.clear();
-    m_image.clear();
-    m_fCategory.clear();
-  }
-
-  FullProduct()
-  {
-    clear();
   }
 };
 

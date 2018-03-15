@@ -30,7 +30,7 @@ private slots:
   void updateControls();
 
 public slots:
-  void setProduct(const FullProduct& fProduct);
+  void setProduct(const Product& product);
   void create();
 
 signals:

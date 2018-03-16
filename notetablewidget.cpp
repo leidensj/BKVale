@@ -147,6 +147,7 @@ QVector<NoteItem> NoteTableWidget::getNoteItems() const
 
 void NoteTableWidget::addNoteItem(const NoteItem& noteItem)
 {
+  blockSignals(true);
   insertRow(rowCount());
   int row = rowCount() - 1;
   setItem(row, (int)NoteColumn::Ammount, new QTableWidgetItem);
@@ -155,7 +156,6 @@ void NoteTableWidget::addNoteItem(const NoteItem& noteItem)
   setItem(row, (int)NoteColumn::SubTotal, new QTableWidgetItem);
   setItem(row, (int)NoteColumn::Unity, new QTableWidgetItem);
   setNoteItem(row, noteItem);
-  blockSignals(true);
   setCurrentCell(row, (int)NoteColumn::Ammount);
   blockSignals(false);
 }

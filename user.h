@@ -4,16 +4,15 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
-#include "jtablecolumn.h"
+#include "jitem.h"
 #include "defines.h"
 
-struct User
+struct User : public JItem
 {
   User();
 
   void clear();
 
-  mutable qlonglong m_id;
   QString m_strUser;
   bool m_bAccessNote;
   bool m_bAccessReminder;
@@ -24,7 +23,31 @@ struct User
   bool m_bAccessProduct;
   bool m_bAccessSettings;
 
-  bool isValidId() const { return IS_VALID_ID(m_id); }
+  bool operator != (const JItem& other) const
+  {
+    const User& another = dynamic_cast<const User&>(other);
+    return
+        m_strUser != another.m_strUser ||
+        m_bAccessNote != another.m_bAccessNote ||
+        m_bAccessReminder != another.m_bAccessReminder ||
+        m_bAccessCalculator != another.m_bAccessCalculator ||
+        m_bAccessShop != another.m_bAccessCalculator ||
+        m_bAccessConsumption != another.m_bAccessConsumption ||
+        m_bAccessUser != another.m_bAccessUser ||
+        m_bAccessProduct != another.m_bAccessProduct ||
+        m_bAccessSettings != another.m_bAccessSettings;
+  }
+
+  bool operator == (const JItem& other) const
+  {
+    return !(*this != other);
+  }
+
+  bool isValid() const
+  {
+    return m_strUser.length() > 4;
+  }
+
   static QString st_strEncryptedPassword(const QString& strPassword);
   static QVector<JTableColumn> getColumns()
   {

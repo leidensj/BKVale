@@ -134,7 +134,7 @@ bool NoteWidget::save()
   QString error;
   Note note = m_view->getNote();
 
-  if (note.isValidID()
+  if (note.isValidId()
       ? NoteSQL::update(m_database->get(), note, error)
       : NoteSQL::insert(m_database->get(), note, error))
   {
@@ -239,7 +239,7 @@ void NoteWidget::searchSupplier()
                         QIcon(":/icons/res/supplier.png"));
   dlg.set(model, PERSON_SQL_TABLE_NAME, Person::getColumns());
   dlg.exec();
-  if (Person::st_isValidId(dlg.getCurrentId()))
+  if (IS_VALID_ID(dlg.getCurrentId()))
   {
     Person supplier;
     supplier.m_id = dlg.getCurrentId();

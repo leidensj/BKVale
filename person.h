@@ -5,13 +5,13 @@
 #include "phone.h"
 #include "address.h"
 #include "defines.h"
+#include "jitem.h"
 #include <QObject>
 #include <QString>
 #include <QVector>
 
-struct Person
+struct Person : public JItem
 {
-  mutable qlonglong m_id;
   Image m_image;
   QString m_name;
   QString m_alias;
@@ -55,47 +55,48 @@ struct Person
     clear();
   }
 
-  bool operator !=(const Person& other) const
+  bool operator !=(const JItem& other) const
   {
-    bool b =  m_image != other.m_image ||
-              m_name != other.m_name ||
-              m_alias != other.m_alias ||
-              m_email != other.m_email ||
-              m_CPF_CNPJ != other.m_CPF_CNPJ ||
-              m_RG_IE != other.m_RG_IE ||
-              m_details != other.m_details ||
-              m_bCompany != other.m_bCompany ||
-              m_bCustomer != other.m_bCustomer ||
-              m_bSupplier != other.m_bSupplier ||
-              m_bEmployee != other.m_bEmployee ||
-              m_vPhone != other.m_vPhone ||
-              m_vAddress != other.m_vAddress;
+    const Person& another = dynamic_cast<const Person&>(other);
+    bool b =  m_image.m_id != another.m_image.m_id ||
+              m_name != another.m_name ||
+              m_alias != another.m_alias ||
+              m_email != another.m_email ||
+              m_CPF_CNPJ != another.m_CPF_CNPJ ||
+              m_RG_IE != another.m_RG_IE ||
+              m_details != another.m_details ||
+              m_bCompany != another.m_bCompany ||
+              m_bCustomer != another.m_bCustomer ||
+              m_bSupplier != another.m_bSupplier ||
+              m_bEmployee != another.m_bEmployee ||
+              m_vPhone != another.m_vPhone ||
+              m_vAddress != another.m_vAddress;
 
     if (!m_bCompany)
-      b = b || m_birthDate != other.m_birthDate;
+      b = b || m_birthDate != another.m_birthDate;
 
     if (m_bEmployee)
-      b = b || m_employeePinCode != other.m_employeePinCode;
+      b = b || m_employeePinCode != another.m_employeePinCode;
 
     return b;
   }
 
-  bool operator ==(const Person& other) const
+  bool operator ==(const JItem& other) const
   {
     return !(*this != other);
   }
 
-  static bool st_isValid(const Person& person)
+  bool isValid() const
   {
-    bool b = !person.m_name.isEmpty();
-    if (person.m_bEmployee)
-      b = b && !person.m_employeePinCode.isEmpty();
+    bool b = !m_name.isEmpty();
+    if (m_bEmployee)
+      b = b && !m_employeePinCode.isEmpty();
     return b;
   }
 
-  bool isValid() const { return st_isValid(*this); }
-  static bool st_isValidId(qlonglong id) { return id != INVALID_ID; }
-  bool isValidId() const { return st_isValidId(m_id); }
+  QString getStrName() const { return m_alias; }
+  QByteArray getArImage() const { return m_image.m_image; }
+
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

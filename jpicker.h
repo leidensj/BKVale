@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QString>
+#include <category.h>
 
 class QPushButton;
 class JLineEdit;

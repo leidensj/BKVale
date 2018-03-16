@@ -7,17 +7,12 @@
 #include "image.h"
 #include "jtablecolumn.h"
 #include "defines.h"
+#include "jitem.h"
 
-struct Category
+struct Category : public JItem
 {
-  mutable qlonglong m_id;
   QString m_name;
   Image m_image;
-
-  Category()
-  {
-    clear();
-  }
 
   void clear()
   {
@@ -26,15 +21,38 @@ struct Category
     m_image.clear();
   }
 
-  bool operator != (const Category& other)
+  Category()
   {
-    return m_name != other.m_name ||
-           m_image != other.m_image;
+    clear();
   }
 
-  bool isValidId() const { return IS_VALID_ID(m_id); }
-  static bool st_isValid(const Category& category) { return !category.m_name.isEmpty(); }
-  bool isValid() const { return st_isValid(*this); }
+  bool operator != (const JItem& other) const
+  {
+    const Category& another = dynamic_cast<const Category&>(other);
+    return m_name != another.m_name ||
+           m_image.m_id != another.m_image.m_id;
+  }
+
+  bool operator == (const JItem& other) const
+  {
+    return !(*this != other);
+  }
+
+  bool isValid() const
+  {
+    return !m_name.isEmpty();
+  }
+
+  QString getStrName() const
+  {
+    return m_name;
+  }
+
+  QByteArray getArImage() const
+  {
+    return m_image.m_image;
+  }
+
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

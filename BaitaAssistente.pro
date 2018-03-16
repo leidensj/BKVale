@@ -104,7 +104,8 @@ HEADERS  += mainwindow.h \
     addresspageview.h \
     phonepageview.h \
     phone.h \
-    defines.h
+    defines.h \
+    jitem.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

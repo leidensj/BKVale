@@ -9,6 +9,7 @@
 #include <QVector>
 #include <QTableView>
 #include "jtablecolumn.h"
+#include "jitem.h"
 
 class QPushButton;
 class JTableView;

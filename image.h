@@ -7,10 +7,10 @@
 #include <QVector>
 #include "jtablecolumn.h"
 #include "defines.h"
+#include "jitem.h"
 
-struct Image
+struct Image : public JItem
 {
-  mutable qlonglong m_id;
   QString m_name;
   QByteArray m_image;
 
@@ -26,24 +26,23 @@ struct Image
     m_image.clear();
   }
 
-  bool operator !=(const Image& img) const
+  bool operator !=(const JItem& other) const
   {
+    const Image& another = dynamic_cast<const Image&>(other);
     return
-        m_name != img.m_name ||
-        m_image != img.m_image;
+        m_name != another.m_name ||
+        m_image != another.m_image;
   }
 
-  bool isValidId() const { return IS_VALID_ID(m_id); }
-
-  static bool st_isValid(const Image& img) { return !img.m_name.isEmpty() && !img.m_image.isEmpty(); }
-  bool isValid() const { return st_isValid(*this); }
-
-  enum class Column
+  bool operator ==(const JItem& other) const
   {
-    Id,
-    Name,
-    Image
-  };
+    return !(*this != other);
+  }
+
+  bool isValid() const { return !m_name.isEmpty() && !m_image.isEmpty(); }
+
+  QString getStrName() const { return m_name; }
+  QByteArray getArImage() const { return m_image; }
 
   static QVector<JTableColumn> getColumns()
   {
@@ -53,6 +52,13 @@ struct Image
     c.push_back(JTableColumn(IMAGE_SQL_COL02, QObject::tr("Imagem")));
     return c;
   }
+
+  enum class Column
+  {
+    Id,
+    Name,
+    Image
+  };
 };
 
 #endif // IMAGE_H

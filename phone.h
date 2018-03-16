@@ -3,12 +3,11 @@
 
 #include <QObject>
 #include <QString>
-#include "jtablecolumn.h"
 #include "defines.h"
+#include "jitem.h"
 
-struct Phone
+struct Phone : public JItem
 {
-  mutable qlonglong m_id;
   int m_countryCode;
   int m_code;
   QString m_number;
@@ -26,22 +25,23 @@ struct Phone
     clear();
   }
 
-  bool operator !=(const Phone& other) const
+  bool operator !=(const JItem& other) const
   {
+    const Phone& another = dynamic_cast<const Phone&>(other);
     return
-        m_countryCode != other.m_countryCode ||
-        m_code != other.m_code ||
-        m_number != other.m_number;
+        m_countryCode != another.m_countryCode ||
+        m_code != another.m_code ||
+        m_number != another.m_number;
   }
 
-  bool operator ==(const Phone& other) const
+  bool operator ==(const JItem& other) const
   {
     return !(*this != other);
   }
 
-  static bool st_isValid(const Phone& phone)
+  bool isValid() const
   {
-    return !phone.m_number.isEmpty();
+    return !m_number.isEmpty();
   }
 
   QString getFormattedPhone() const
@@ -55,8 +55,6 @@ struct Phone
       m_number;
   }
 
-  bool isValid() const { return st_isValid(*this); }
-  bool isValidId() const { return IS_VALID_ID(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

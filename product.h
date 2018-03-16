@@ -4,13 +4,12 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
-#include "jtablecolumn.h"
+#include "jitem.h"
 #include "defines.h"
 #include "category.h"
 
-struct Product
+struct Product : public JItem
 {
-  mutable qlonglong m_id;
   Category m_category;
   Image m_image;
   QString m_name;
@@ -48,33 +47,37 @@ struct Product
     clear();
   }
 
-  bool operator !=(const Product& other)
+  bool operator != (const JItem& other) const
   {
+    const Product& another = dynamic_cast<const Product&>(other);
     return
-        m_image != other.m_image ||
-        m_category != other.m_category ||
-        m_name != other.m_name ||
-        m_unity != other.m_unity ||
-        m_packageUnity != other.m_packageUnity ||
-        m_packageAmmount != other.m_packageAmmount ||
-        m_details != other.m_details ||
-        m_code != other.m_code ||
-        m_bAvailableAtNotes != other.m_bAvailableAtNotes ||
-        m_bAvailableAtShop != other.m_bAvailableAtShop ||
-        m_bAvailableAtConsumption != other.m_bAvailableAtConsumption ||
-        m_bAvailableToBuy != other.m_bAvailableToBuy ||
-        m_bAvailableToSell != other.m_bAvailableToSell;
+        m_image.m_id != another.m_image.m_id ||
+        m_category.m_id != another.m_category.m_id ||
+        m_name != another.m_name ||
+        m_unity != another.m_unity ||
+        m_packageUnity != another.m_packageUnity ||
+        m_packageAmmount != another.m_packageAmmount ||
+        m_details != another.m_details ||
+        m_code != another.m_code ||
+        m_bAvailableAtNotes != another.m_bAvailableAtNotes ||
+        m_bAvailableAtShop != another.m_bAvailableAtShop ||
+        m_bAvailableAtConsumption != another.m_bAvailableAtConsumption ||
+        m_bAvailableToBuy != another.m_bAvailableToBuy ||
+        m_bAvailableToSell != another.m_bAvailableToSell;
   }
 
-  static bool st_isValid(const Product& product)
+  bool operator == (const JItem& other) const
   {
-    return
-        !product.m_name.isEmpty() &&
-        !product.m_unity.isEmpty();
+    return !(*this != other);
   }
 
-  bool isValid() const { return st_isValid(*this); }
-  bool isValidId() const { return IS_VALID_ID(m_id); }
+  bool isValid() const
+  {
+    return
+        !m_name.isEmpty() &&
+        !m_unity.isEmpty();
+  }
+
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

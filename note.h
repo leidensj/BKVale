@@ -11,6 +11,7 @@
 #include "person.h"
 #include "product.h"
 #include "defines.h"
+#include "jitem.h"
 
 enum class NoteColumn : int
 {
@@ -21,9 +22,8 @@ enum class NoteColumn : int
   SubTotal
 };
 
-struct NoteItem
+struct NoteItem : JItem
 {
-  mutable qlonglong m_id;
   Product m_product;
   double m_ammount;
   double m_price;
@@ -53,20 +53,33 @@ struct NoteItem
   QString strSubtotal() const { return st_strSubTotal(subtotal()); }
   QString strAmmount() const { return st_strAmmount(m_ammount); }
   QString strPrice() const { return st_strPrice(m_price); }
-  bool isValidId() const { return IS_VALID_ID(m_id); }
   bool isValid() const
   {
     return m_product.isValidId() &&
         m_ammount != 0.0 &&
         m_price != 0.0;
   }
+
+  bool operator !=(const JItem& other) const
+  {
+    const NoteItem& another = dynamic_cast<const NoteItem&>(other);
+    return
+        m_product.m_id != another.m_product.m_id ||
+        m_ammount != another.m_ammount ||
+        m_price != another.m_price ||
+        m_bIsPackageAmmount != another.m_bIsPackageAmmount;
+  }
+
+  bool operator ==(const JItem& other) const
+  {
+    return !(*this != other);
+  }
 };
 
 Q_DECLARE_METATYPE(NoteItem)
 
-struct Note
+struct Note : public JItem
 {
-  mutable qlonglong m_id;
   qlonglong m_number;
   QString m_date;
   Person m_supplier;
@@ -96,7 +109,7 @@ struct Note
   QString strTotal() const { return QString::number(m_total, 'f', 2); }
   static QString st_strNumber(qlonglong number) { return QString::number(number); }
   QString strNumber() const { return st_strNumber(m_number); }
-  bool isValidID() const { return IS_VALID_ID(m_id); }
+
   bool isValid() const
   {
     bool b = m_supplier.isValidId() &&
@@ -106,6 +119,24 @@ struct Note
       b &= m_vNoteItem.at(i).isValid();
     return b;
   }
+
+  bool operator !=(const JItem& other) const
+  {
+    const Note& another = dynamic_cast<const Note&>(other);
+    return
+        m_number != another.m_number ||
+        m_date != another.m_date ||
+        m_supplier.m_id != another.m_supplier.m_id ||
+        m_total != another.m_total ||
+        m_bCash != another.m_bCash ||
+        m_vNoteItem != another.m_vNoteItem;
+  }
+
+  bool operator ==(const JItem& other) const
+  {
+    return !(*this != other);
+  }
+
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

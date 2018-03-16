@@ -37,14 +37,6 @@
 
 namespace
 {
-  QString buildAbv(const Address& address)
-  {
-    return address.m_street + ", Nº " +
-        QString::number(address.m_number) + ". " +
-        address.m_city + " - " +
-        address.getBRState().m_abv + ".";
-  }
-
   QString searchCep(const QString& cep)
   {
     QString url("http://api.postmon.com.br/v1/cep/" + cep + "?format=xml");
@@ -270,7 +262,7 @@ void AddressPageView::saveAddress(const Address& address)
   QListWidgetItem* p = m_currentItem != nullptr
                        ? m_currentItem
                        : new QListWidgetItem;
-  p->setText(buildAbv(address));
+  p->setText(address.getStrName());
   p->setData(Qt::UserRole, var);
   if (m_currentItem == nullptr)
     m_list->addItem(p);

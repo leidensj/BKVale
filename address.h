@@ -3,10 +3,11 @@
 
 #include "jtablecolumn.h"
 #include "defines.h"
+#include "jitem.h"
 #include <QObject>
 #include <QString>
 
-struct Address
+struct Address : public JItem
 {
   enum class EBRState : int
   {
@@ -16,7 +17,6 @@ struct Address
     RO, RR, SC, SP, SE, TO
   };
 
-  mutable qlonglong m_id;
   QString m_cep;
   QString m_neighborhood;
   QString m_street;
@@ -43,33 +43,45 @@ struct Address
     clear();
   }
 
-  bool operator !=(const Address& other) const
+  QString getStrName() const
   {
-    return
-        m_cep != other.m_cep ||
-        m_neighborhood != other.m_neighborhood ||
-        m_street != other.m_street ||
-        m_number != other.m_number ||
-        m_state != other.m_state ||
-        m_complement != other.m_complement ||
-        m_reference != other.m_reference;
+    return m_street + ", Nº " +
+        QString::number(m_number) + ". " +
+        m_city + " - " +
+        getBRState().m_abv + ".";
   }
 
-  bool operator ==(const Address& other) const
+  QByteArray getArImage() const
+  {
+    return QByteArray();
+  }
+
+  bool operator !=(const JItem& other) const
+  {
+    const Address& another = dynamic_cast<const Address&>(other);
+    return
+        m_cep != another.m_cep ||
+        m_neighborhood != another.m_neighborhood ||
+        m_street != another.m_street ||
+        m_number != another.m_number ||
+        m_state != another.m_state ||
+        m_complement != another.m_complement ||
+        m_reference != another.m_reference;
+  }
+
+  bool operator ==(const JItem& other) const
   {
     return !(*this != other);
   }
 
-  static bool st_isValid(const Address& address)
+  bool isValid() const
   {
     return
-        !address.m_neighborhood.isEmpty() &&
-        !address.m_street.isEmpty() &&
-        address.m_number != ADDRESS_INVALID_NUMBER;
+        !m_neighborhood.isEmpty() &&
+        !m_street.isEmpty() &&
+        m_number != ADDRESS_INVALID_NUMBER;
   }
 
-  bool isValid() const { return st_isValid(*this); }
-  bool isValidId() const { return IS_VALID_ID(m_id); }
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

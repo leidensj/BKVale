@@ -18,8 +18,8 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void productSelected(int id);
-  void removeProduct(int id);
+  void productSelected(qlonglong id);
+  void removeProduct(qlonglong id);
   void saveProduct();
 
 private:

@@ -17,8 +17,8 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void personSelected(int id);
-  void removePerson(int id);
+  void personSelected(qlonglong id);
+  void removePerson(qlonglong id);
   void savePerson();
 
 private:

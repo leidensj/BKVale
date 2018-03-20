@@ -178,7 +178,7 @@ NoteView::NoteView(QWidget *parent)
 
 
   m_supplierPicker =
-      new JDatabasePicker(tr("fornecedor"),
+      new JDatabasePicker(tr("Fornecedor"),
                           QIcon(":/icons/res/supplier.png"),
                           true,
                           true,
@@ -346,7 +346,7 @@ void NoteView::setNote(const Note& note)
   updateControls();
 }
 
-void NoteView::create(int number)
+void NoteView::create(qlonglong number)
 {
   m_currentID = INVALID_ID;
   m_dtDate->setDate(QDate::currentDate());
@@ -416,13 +416,13 @@ void NoteView::emitOpenLastSignal()
     emit openLastSignal(m_lastID);
 }
 
-void NoteView::setLastID(int lastID)
+void NoteView::setLastID(qlonglong lastID)
 {
   m_lastID = lastID;
   updateControls();
 }
 
-int NoteView::getLastID() const
+qlonglong NoteView::getLastID() const
 {
   return m_lastID;
 }

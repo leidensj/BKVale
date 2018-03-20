@@ -26,14 +26,14 @@ ImageWidget::ImageWidget(QWidget* parent)
   setLayout(vlayout0);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(qlonglong)),
                    this,
-                   SLOT(imageSelected(int)));
+                   SLOT(imageSelected(qlonglong)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(qlonglong)),
                    this,
-                   SLOT(removeImage(int)));
+                   SLOT(removeImage(qlonglong)));
 
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
@@ -47,7 +47,7 @@ void ImageWidget::setDatabase(QSqlDatabase db)
   m_database->set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
 }
 
-void ImageWidget::imageSelected(int id)
+void ImageWidget::imageSelected(qlonglong id)
 {
   Image image;
   image.m_id = id;
@@ -65,7 +65,7 @@ void ImageWidget::imageSelected(int id)
   }
 }
 
-void ImageWidget::removeImage(int id)
+void ImageWidget::removeImage(qlonglong id)
 {
   QString error;
   if (QMessageBox::question(this,

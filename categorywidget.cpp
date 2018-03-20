@@ -32,9 +32,9 @@ CategoryWidget::CategoryWidget(QWidget* parent)
                    SLOT(categorySelected(int)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(qlonglong)),
                    this,
-                   SLOT(removeCategory(int)));
+                   SLOT(removeCategory(qlonglong)));
 
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
@@ -53,7 +53,7 @@ void CategoryWidget::setDatabase(QSqlDatabase db)
   m_database->set(model, CATEGORY_SQL_TABLE_NAME, Category::getColumns());
 }
 
-void CategoryWidget::categorySelected(int id)
+void CategoryWidget::categorySelected(qlonglong id)
 {
   QString error;
   Category category;
@@ -74,7 +74,7 @@ void CategoryWidget::categorySelected(int id)
   }
 }
 
-void CategoryWidget::removeCategory(int id)
+void CategoryWidget::removeCategory(qlonglong id)
 {
   QString error;
   if (!CategorySQL::remove(m_database->get(),

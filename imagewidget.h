@@ -16,8 +16,8 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void imageSelected(int id);
-  void removeImage(int id);
+  void imageSelected(qlonglong id);
+  void removeImage(qlonglong id);
   void saveImage();
 
 private:

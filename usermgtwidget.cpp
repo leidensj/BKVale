@@ -7,7 +7,7 @@
 #include <QSplitter>
 #include <QMessageBox>
 
-UserMgtWidget::UserMgtWidget(int currentUserID, QWidget* parent)
+UserMgtWidget::UserMgtWidget(qlonglong currentUserID, QWidget* parent)
   : QFrame(parent)
   , m_currentUserID(currentUserID)
   , m_view(nullptr)
@@ -31,14 +31,14 @@ UserMgtWidget::UserMgtWidget(int currentUserID, QWidget* parent)
   setLayout(h1);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(qlonglong)),
                    this,
-                   SLOT(userSelected(int)));
+                   SLOT(userSelected(qlonglong)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(qlonglong)),
                    this,
-                   SLOT(removeUser(int)));
+                   SLOT(removeUser(qlonglong)));
 
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
@@ -54,7 +54,7 @@ void UserMgtWidget::setDatabase(QSqlDatabase db)
   m_database->set(model, USER_SQL_TABLE_NAME, User::getColumns());
 }
 
-void UserMgtWidget::userSelected(int id)
+void UserMgtWidget::userSelected(qlonglong id)
 {
   User user;
   user.m_id = id;
@@ -72,7 +72,7 @@ void UserMgtWidget::userSelected(int id)
   }
 }
 
-void UserMgtWidget::removeUser(int id)
+void UserMgtWidget::removeUser(qlonglong id)
 {
   if (id == m_currentUserID)
   {

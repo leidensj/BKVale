@@ -27,8 +27,8 @@ public:
   ~NoteView();
   void setDatabase(QSqlDatabase db);
   Note getNote() const;
-  void setLastID(int lastID);
-  int getLastID() const;
+  void setLastID(qlonglong lastID);
+  qlonglong getLastID() const;
   void setProduct(int row, const Product& product);
   void addNoteItem(const NoteItem& noteItem);
 
@@ -48,8 +48,8 @@ private:
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
   QCheckBox* m_cbCash;
-  int m_currentID;
-  int m_lastID;
+  qlonglong m_currentID;
+  qlonglong m_lastID;
 
 private slots:
   void setToday();
@@ -63,7 +63,7 @@ private slots:
   void supplierEntered();
 
 public slots:
-  void create(int number);
+  void create(qlonglong number);
   void setNote(const Note& note);
   void updateControls();
 
@@ -72,7 +72,7 @@ signals:
   void showSearchSignal();
   void searchProductSignal(int row);
   void createSignal();
-  void openLastSignal(int id);
+  void openLastSignal(qlonglong id);
 };
 
 #endif // BKFRAME_H

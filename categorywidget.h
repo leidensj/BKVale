@@ -16,8 +16,8 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void categorySelected(int id);
-  void removeCategory(int id);
+  void categorySelected(qlonglong id);
+  void removeCategory(qlonglong id);
   void saveCategory();
 
 private:

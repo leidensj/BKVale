@@ -72,7 +72,7 @@ bool NoteSQL::insert(QSqlDatabase db,
                     NOTE_SQL_COL02 ","
                     NOTE_SQL_COL03 ","
                     NOTE_SQL_COL04 ","
-                    NOTE_SQL_COL05 ")"
+                    NOTE_SQL_COL05
                     ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
@@ -293,7 +293,7 @@ bool NoteSQL::select(QSqlDatabase db,
                   NOTE_ITEMS_SQL_COL04 ","
                   NOTE_ITEMS_SQL_COL05
                   " FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                  " WHERE " NOTE_SQL_COL01 " = (:_v01)");
+                  " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", note.m_id);
     bSuccess = query.exec();
     while (bSuccess && query.next())
@@ -1799,7 +1799,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     }
   }
 
-  if (bSuccess)
+  if (bSuccess && person.m_image.isValidId())
     bSuccess = ImageSQL::execSelect(query, person.m_image, error);
 
   if (!bSuccess)

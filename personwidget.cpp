@@ -68,14 +68,14 @@ PersonWidget::PersonWidget(QWidget *parent)
                    SLOT(savePerson()));
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(qlonglong)),
                    this,
-                   SLOT(personSelected(int)));
+                   SLOT(personSelected(qlonglong)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(qlonglong)),
                    this,
-                   SLOT(removePerson(int)));
+                   SLOT(removePerson(qlonglong)));
 }
 
 PersonWidget::~PersonWidget()
@@ -90,7 +90,7 @@ void PersonWidget::setDatabase(QSqlDatabase db)
   m_view->setDatabase(db);
 }
 
-void PersonWidget::personSelected(int id)
+void PersonWidget::personSelected(qlonglong id)
 {
   Person person;
   person.m_id = id;
@@ -109,7 +109,7 @@ void PersonWidget::personSelected(int id)
   }
 }
 
-void PersonWidget::removePerson(int id)
+void PersonWidget::removePerson(qlonglong id)
 {
   QString error;
   if (QMessageBox::question(this,

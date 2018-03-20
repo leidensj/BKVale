@@ -88,7 +88,7 @@ JDatabasePicker::JDatabasePicker(const QString& text,
   QObject::connect(m_selector,
                    SIGNAL(itemSelectedSignal(qlonglong)),
                    this,
-                   SLOT(setItem(qlonglong)));
+                   SLOT(searchItem(qlonglong)));
 
   if (!bShowImage)
   {
@@ -103,6 +103,7 @@ void JDatabasePicker::setDatabase(QSqlDatabase db,
                                   const QString& tableName,
                                   const QString& filter)
 {
+  m_db = db;
   m_tableName = tableName;
   QSqlTableModel* model = new QSqlTableModel(this, db);
   QVector<JTableColumn> vColumns;

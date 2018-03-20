@@ -56,13 +56,13 @@ ProductWidget::ProductWidget(QWidget *parent)
                    this,
                    SLOT(saveProduct()));
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(qlonglong)),
                    this,
-                   SLOT(productSelected(int)));
+                   SLOT(productSelected(qlonglong)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(qlonglong)),
                    this,
-                   SLOT(removeProduct(int)));
+                   SLOT(removeProduct(qlonglong)));
 }
 
 ProductWidget::~ProductWidget()
@@ -77,7 +77,7 @@ void ProductWidget::setDatabase(QSqlDatabase db)
   m_view->setDatabase(db);
 }
 
-void ProductWidget::productSelected(int id)
+void ProductWidget::productSelected(qlonglong id)
 {
   Product product;
   product.m_id = id;
@@ -96,7 +96,7 @@ void ProductWidget::productSelected(int id)
   }
 }
 
-void ProductWidget::removeProduct(int id)
+void ProductWidget::removeProduct(qlonglong id)
 {
   QString error;
   if (QMessageBox::question(this,

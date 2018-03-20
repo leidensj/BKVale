@@ -127,11 +127,6 @@ void PersonView::create()
   updateControls();
 }
 
-void PersonView::emitSearchImageSignal()
-{
-  emit searchImageSignal();
-}
-
 void PersonView::emitSaveSignal()
 {
   emit saveSignal();

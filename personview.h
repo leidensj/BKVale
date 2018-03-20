@@ -26,7 +26,6 @@ public:
   void getPerson(Person& person) const;
 
 private slots:
-  void emitSearchImageSignal();
   void emitSaveSignal();
   void updateControls();
 
@@ -35,7 +34,6 @@ public slots:
   void create();
 
 signals:
-  void searchImageSignal();
   void saveSignal();
 
 private:

@@ -69,8 +69,8 @@ private slots:
   void focusFilterSearch();
 
 signals:
-  void itemSelectedSignal(int id);
-  void itemRemoveSignal(int id);
+  void itemSelectedSignal(qlonglong id);
+  void itemRemoveSignal(qlonglong id);
 };
 
 class JDatabaseSelector : public QDialog

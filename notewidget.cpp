@@ -59,13 +59,13 @@ NoteWidget::NoteWidget(QWidget* parent)
   setLayout(vlayout1);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(qlonglong)),
                    this,
-                   SLOT(setNote(int)));
+                   SLOT(setNote(qlonglong)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(int)),
+                   SIGNAL(itemRemoveSignal(qlonglong)),
                    this,
-                   SLOT(removeNote(int)));
+                   SLOT(removeNote(qlonglong)));
   QObject::connect(m_view,
                    SIGNAL(showSearchSignal()),
                    this,
@@ -79,9 +79,9 @@ NoteWidget::NoteWidget(QWidget* parent)
                    this,
                    SLOT(emitChangedSignal()));
   QObject::connect(m_view,
-                   SIGNAL(openLastSignal(int)),
+                   SIGNAL(openLastSignal(qlonglong)),
                    this,
-                   SLOT(setNote(int)));
+                   SLOT(setNote(qlonglong)));
   QObject::connect(m_view,
                    SIGNAL(searchProductSignal(int)),
                    this,
@@ -162,21 +162,21 @@ void NoteWidget::create()
   m_view->create(NoteSQL::nextNumber(m_database->get()));
 }
 
-void NoteWidget::setNote(int id)
+void NoteWidget::setNote(qlonglong id)
 {
   Note note;
   note.m_id = id;
   QString error;
   if (NoteSQL::select(m_database->get(), note, error))
   {
-    m_view->setLastID(note.m_id);
+    m_view->setLastID(id);
     m_view->setNote(note);
   }
   else
   {
     QMessageBox::critical(this,
                           tr("Erro"),
-                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(note.m_id)),
+                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(id)),
                           QMessageBox::Ok);
   }
 }
@@ -193,7 +193,7 @@ void NoteWidget::emitChangedSignal()
   emit changedSignal();
 }
 
-void NoteWidget::removeNote(int id)
+void NoteWidget::removeNote(qlonglong id)
 {
   Note note;
   note.m_id = id;

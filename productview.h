@@ -2,6 +2,7 @@
 #define PRODUCTVIEW_H
 
 #include <QFrame>
+#include <QSqlDatabase>
 #include "product.h"
 #include "category.h"
 
@@ -10,7 +11,7 @@ class JLineEdit;
 class QDoubleSpinBox;
 class QPushButton;
 class QCheckBox;
-class JPicker;
+class JDatabasePicker;
 
 class ProductView : public QFrame
 {
@@ -19,13 +20,10 @@ class ProductView : public QFrame
 public:
   explicit ProductView(QWidget* parent = 0);
   ~ProductView();
+  void setDatabase(QSqlDatabase db);
   Product getProduct() const;
-  void setCategory(int id, const QString& name);
-  void setImage(int id, const QString& text, const QByteArray& ar);
 
 private slots:
-  void emitSearchCategorySignal();
-  void emitSearchImageSignal();
   void emitSaveSignal();
   void updateControls();
 
@@ -34,8 +32,6 @@ public slots:
   void create();
 
 signals:
-  searchCategorySignal();
-  searchImageSignal();
   saveSignal();
 
 private:
@@ -53,8 +49,8 @@ private:
   QCheckBox* m_cbAvailableAtConsumption;
   QCheckBox* m_cbAvailableToBuy;
   QCheckBox* m_cbAvailableToSell;
-  JPicker* m_categoryPicker;
-  JPicker* m_imagePicker;
+  JDatabasePicker* m_categoryPicker;
+  JDatabasePicker* m_imagePicker;
 };
 
 #endif // PRODUCTVIEW_H

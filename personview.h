@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QVector>
+#include <QSqlDatabase>
 #include "address.h"
 #include "phone.h"
 #include "person.h"
@@ -19,10 +20,10 @@ class PersonView : public QFrame
 
 public:
   explicit PersonView(QWidget* parent = 0);
+  void setDatabase(QSqlDatabase db);
   ~PersonView();
   Person getPerson() const;
   void getPerson(Person& person) const;
-  void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:
   void emitSearchImageSignal();

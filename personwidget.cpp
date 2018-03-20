@@ -76,11 +76,6 @@ PersonWidget::PersonWidget(QWidget *parent)
                    SIGNAL(itemRemoveSignal(int)),
                    this,
                    SLOT(removePerson(int)));
-
-  QObject::connect(m_view,
-                   SIGNAL(searchImageSignal()),
-                   this,
-                   SLOT(searchImage()));
 }
 
 PersonWidget::~PersonWidget()
@@ -92,6 +87,7 @@ void PersonWidget::setDatabase(QSqlDatabase db)
 {
   PersonTableModel* model = new PersonTableModel(m_database, db);
   m_database->set(model, PERSON_SQL_TABLE_NAME, Person::getColumns());
+  m_view->setDatabase(db);
 }
 
 void PersonWidget::personSelected(int id)
@@ -156,22 +152,5 @@ void PersonWidget::savePerson()
                           tr("Erro"),
                           tr("Erro '%1' ao salvar pessoa.").arg(error),
                           QMessageBox::Ok);
-  }
-}
-
-void PersonWidget::searchImage()
-{
-  QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
-  JDatabaseSelector dlg(tr("Selecionar Imagem"),
-                        QIcon(":/icons/res/image.png"));
-  dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
-  dlg.exec();
-  if (IS_VALID_ID(dlg.getCurrentId()))
-  {
-    Image image;
-    image.m_id = dlg.getCurrentId();
-    QString error;
-    ImageSQL::select(m_database->get(), image, error);
-    m_view->setImage(image.m_id, image.m_name, image.m_image);
   }
 }

@@ -19,7 +19,6 @@ private slots:
   void categorySelected(int id);
   void removeCategory(int id);
   void saveCategory();
-  void searchImage();
 
 private:
   CategoryView* m_view;

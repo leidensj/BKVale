@@ -359,9 +359,9 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
   setWindowIcon(icon);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(qlonglong)),
                    this,
-                   SLOT(itemSelected(int)));
+                   SLOT(itemSelected(qlonglong)));
 }
 
 void JDatabaseSelector::set(QSqlTableModel* model,
@@ -371,9 +371,10 @@ void JDatabaseSelector::set(QSqlTableModel* model,
   m_database->set(model, tableName, vColumns);
 }
 
-void JDatabaseSelector::itemSelected(int id)
+void JDatabaseSelector::itemSelected(qlonglong id)
 {
   m_currentId = id;
+  emit itemSelectedSignal(id);
   close();
 }
 

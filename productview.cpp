@@ -1,6 +1,6 @@
 #include "productview.h"
 #include "jlineedit.h"
-#include "jpicker.h"
+#include "jdatabasepicker.h"
 #include <QLayout>
 #include <QPushButton>
 #include <QDoubleSpinBox>
@@ -84,8 +84,15 @@ ProductView::ProductView(QWidget* parent)
   m_cbAvailableToSell->setText(tr("Venda"));
   m_cbAvailableToSell->setIcon(QIcon(":/icons/res/sell.png"));
 
-  m_categoryPicker = new JPicker(tr("Categoria"), false, true);
-  m_imagePicker = new JPicker(tr("Imagem"), true);
+  m_categoryPicker = new JDatabasePicker(tr("Categoria"),
+                                         QIcon(":/icons/res/category.png"),
+                                         true, true, true);
+
+
+  m_imagePicker = new JDatabasePicker(tr("Imagem"),
+                                      QIcon(":/icons/res/icon.png"),
+                                      true, false, true);
+
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
   buttonlayout->setAlignment(Qt::AlignLeft);
@@ -142,14 +149,6 @@ ProductView::ProductView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSaveSignal()));
-  QObject::connect(m_categoryPicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(emitSearchCategorySignal()));
-  QObject::connect(m_imagePicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(emitSearchImageSignal()));
   QObject::connect(m_edName,
                    SIGNAL(textChanged(const QString&)),
                    this,
@@ -194,14 +193,6 @@ ProductView::ProductView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_categoryPicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_imagePicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(updateControls()));
 
   updateControls();
 }
@@ -209,6 +200,12 @@ ProductView::ProductView(QWidget* parent)
 ProductView::~ProductView()
 {
 
+}
+
+void ProductView::setDatabase(QSqlDatabase db)
+{
+  m_categoryPicker->setDatabase(db, CATEGORY_SQL_TABLE_NAME);
+  m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
 }
 
 Product ProductView::getProduct() const
@@ -231,19 +228,6 @@ Product ProductView::getProduct() const
   return product;
 }
 
-void ProductView::setCategory(int id, const QString& name)
-{
-  m_categoryPicker->setId(id);
-  m_categoryPicker->setText(name);
-}
-
-void ProductView::setImage(int id, const QString& text, const QByteArray& ar)
-{
-  m_imagePicker->setId(id);
-  m_imagePicker->setText(text);
-  m_imagePicker->setImage(ar);
-}
-
 void ProductView::setProduct(const Product &product)
 {
   m_currentProduct = product;
@@ -258,8 +242,8 @@ void ProductView::setProduct(const Product &product)
   m_cbAvailableAtConsumption->setChecked(product.m_bAvailableAtConsumption);
   m_cbAvailableToBuy->setChecked(product.m_bAvailableToBuy);
   m_cbAvailableToSell->setChecked(product.m_bAvailableToSell);
-  setCategory(product.m_category.m_id, product.m_category.m_name);
-  setImage(product.m_image.m_id, product.m_image.m_name, product.m_image.m_image);
+  m_categoryPicker->setItem(product.m_category.m_id, product.m_category.m_name, product.m_category.m_image.m_image);
+  m_imagePicker->setItem(product.m_image.m_id, product.m_image.m_name, product.m_image.m_image);
   updateControls();
 }
 
@@ -268,16 +252,6 @@ void ProductView::create()
   Product product;
   setProduct(product);
   updateControls();
-}
-
-void ProductView::emitSearchCategorySignal()
-{
-  emit searchCategorySignal();
-}
-
-void ProductView::emitSearchImageSignal()
-{
-  emit searchImageSignal();
 }
 
 void ProductView::emitSaveSignal()

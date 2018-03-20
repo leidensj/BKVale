@@ -20,7 +20,6 @@ private slots:
   void personSelected(int id);
   void removePerson(int id);
   void savePerson();
-  void searchImage();
 
 private:
   JDatabase* m_database;

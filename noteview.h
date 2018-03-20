@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QStringList>
+#include <QSqlDatabase>
 #include "note.h"
 
 #define MAX_ITEMS 100
@@ -15,7 +16,7 @@ class QPushButton;
 class QLabel;
 class QCheckBox;
 class NoteTableWidget;
-class JPicker;
+class JDatabasePicker;
 
 class NoteView : public QFrame
 {
@@ -24,6 +25,7 @@ class NoteView : public QFrame
 public:
   explicit NoteView(QWidget *parent = 0);
   ~NoteView();
+  void setDatabase(QSqlDatabase db);
   Note getNote() const;
   void setLastID(int lastID);
   int getLastID() const;
@@ -31,6 +33,7 @@ public:
   void addNoteItem(const NoteItem& noteItem);
 
 private:
+  QSqlDatabase m_db;
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnSearch;
@@ -42,7 +45,7 @@ private:
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLineEdit* m_edTotal;
-  JPicker* m_supplierPicker;
+  JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
   QCheckBox* m_cbCash;
   int m_currentID;
@@ -54,21 +57,19 @@ private slots:
   void emitShowSearchSignal();
   void emitCreateSignal();
   void emitOpenLastSignal();
-  void emitSearchSupplierSignal();
   void emitSearchNewProductSignal();
   void emitSearchProductSignal();
   void removeItem();
+  void supplierEntered();
 
 public slots:
   void create(int number);
   void setNote(const Note& note);
   void updateControls();
-  void setSupplier(const Person& supplier);
 
 signals:
   void changedSignal();
   void showSearchSignal();
-  void searchSupplierSignal();
   void searchProductSignal(int row);
   void createSignal();
   void openLastSignal(int id);

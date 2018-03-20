@@ -2,10 +2,11 @@
 #define PERSONPAGEVIEW_H
 
 #include <QFrame>
+#include <QSqlDatabase>
 #include "person.h"
 
 class JLineEdit;
-class JPicker;
+class JDatabasePicker;
 class QDateEdit;
 class QCheckBox;
 class QRadioButton;
@@ -19,23 +20,19 @@ class PersonPageView : public QFrame
 
 public:
   explicit PersonPageView(QWidget* parent = 0);
+  void setDatabase(QSqlDatabase db);
   Person getPerson() const;
-  void setPerson(const Person& person,
-                 const QString& imageName,
-                 const QByteArray& arImage);
-  void setImage(int id, const QString& name, const QByteArray& ar);
+  void setPerson(const Person& person);
 
 private slots:
   void switchUserType();
   void updateControls();
-  void emitSearchImageSignal();
 
 public slots:
   void clear();
 
 signals:
   void changedSignal();
-  void searchImageSignal();
 
 private:
   Person m_currentPerson;
@@ -53,7 +50,7 @@ private:
   JLineEdit* m_edDetails;
   QGroupBox* m_grpBirthDate;
   QDateEdit* m_dtBirthDate;
-  JPicker* m_imagePicker;
+  JDatabasePicker* m_imagePicker;
   QCheckBox* m_cbCustomer;
   QCheckBox* m_cbSupplier;
   QCheckBox* m_cbEmployee;

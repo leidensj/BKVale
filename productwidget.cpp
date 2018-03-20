@@ -63,14 +63,6 @@ ProductWidget::ProductWidget(QWidget *parent)
                    SIGNAL(itemRemoveSignal(int)),
                    this,
                    SLOT(removeProduct(int)));
-  QObject::connect(m_view,
-                   SIGNAL(searchCategorySignal()),
-                   this,
-                   SLOT(searchCategory()));
-  QObject::connect(m_view,
-                   SIGNAL(searchImageSignal()),
-                   this,
-                   SLOT(searchImage()));
 }
 
 ProductWidget::~ProductWidget()
@@ -82,6 +74,7 @@ void ProductWidget::setDatabase(QSqlDatabase db)
 {
   ProductTableModel* model = new ProductTableModel(m_database, db);
   m_database->set(model, PRODUCT_SQL_TABLE_NAME, Product::getColumns());
+  m_view->setDatabase(db);
 }
 
 void ProductWidget::productSelected(int id)
@@ -147,39 +140,5 @@ void ProductWidget::saveProduct()
                           tr("Erro"),
                           tr("Erro '%1' ao salvar produto.").arg(error),
                           QMessageBox::Ok);
-  }
-}
-
-void ProductWidget::searchCategory()
-{
-  QSqlTableModel* model = new QSqlTableModel(0, m_database->get());
-  JDatabaseSelector dlg(tr("Selecionar Categoria"),
-                        QIcon(":/icons/res/category.png"));
-  dlg.set(model, CATEGORY_SQL_TABLE_NAME, Category::getColumns());
-  dlg.exec();
-  if (IS_VALID_ID(dlg.getCurrentId()))
-  {
-    Category category;
-    category.m_id = dlg.getCurrentId();
-    QString error;
-    CategorySQL::select(m_database->get(), category, error);
-    m_view->setCategory(category.m_id, category.m_name);
-  }
-}
-
-void ProductWidget::searchImage()
-{
-  ImageTableModel* model = new ImageTableModel(0, m_database->get());
-  JDatabaseSelector dlg(tr("Escolher Imagem"),
-                        QIcon(":/icons/res/icon.png"));
-  dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
-  dlg.exec();
-  if (IS_VALID_ID(dlg.getCurrentId()))
-  {
-    Image image;
-    image.m_id = dlg.getCurrentId();
-    QString error;
-    ImageSQL::select(m_database->get(), image, error);
-    m_view->setImage(image.m_id, image.m_name, image.m_image);
   }
 }

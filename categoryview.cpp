@@ -1,6 +1,6 @@
 #include "categoryview.h"
 #include "jlineedit.h"
-#include "jpicker.h"
+#include "jdatabasepicker.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
@@ -31,7 +31,11 @@ CategoryView::CategoryView(QWidget* parent)
   m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
 
-  m_imagePicker = new JPicker(tr("Imagem"), true, false);
+  m_imagePicker = new JDatabasePicker(tr("Imagem"),
+                                      QIcon(":/icons/res/icon.png"),
+                                      true,
+                                      false,
+                                      true);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
@@ -78,24 +82,12 @@ CategoryView::CategoryView(QWidget* parent)
                    this,
                    SLOT(updateControls()));
 
-  QObject::connect(m_imagePicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(emitSearchImageSignal()));
-
-  QObject::connect(m_imagePicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(updateControls()));
-
   updateControls();
 }
 
-void CategoryView::setImage(int id, const QString& name, const QByteArray& ar)
+void CategoryView::setDatabase(QSqlDatabase db)
 {
-  m_imagePicker->setId(id);
-  m_imagePicker->setText(name);
-  m_imagePicker->setImage(ar);
+  m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
 }
 
 void CategoryView::create()
@@ -120,18 +112,15 @@ void CategoryView::setCategory(const Category &category)
 {
   m_currentCategory = category;
   m_edName->setText(category.m_name);
-  setImage(category.m_image.m_id, category.m_image.m_name, category.m_image.m_image);
+  m_imagePicker->setItem(category.m_image.m_id,
+                         category.m_image.m_name,
+                         category.m_image.m_image);
   updateControls();
 }
 
 void CategoryView::emitSaveSignal()
 {
   emit saveSignal();
-}
-
-void CategoryView::emitSearchImageSignal()
-{
-  emit searchImageSignal();
 }
 
 void CategoryView::updateControls()

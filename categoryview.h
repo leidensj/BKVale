@@ -2,11 +2,12 @@
 #define CATEGORYVIEW_H
 
 #include <QFrame>
+#include <QSqlDatabase>
 #include "category.h"
 
 class QPushButton;
 class JLineEdit;
-class JPicker;
+class JDatabasePicker;
 
 class CategoryView : public QFrame
 {
@@ -14,12 +15,11 @@ class CategoryView : public QFrame
 
 public:
   explicit CategoryView(QWidget* parent = 0);
+  void setDatabase(QSqlDatabase db);
   Category getCategory() const;
-  void setImage(int id, const QString& name, const QByteArray& ar);
 
 private slots:
   void emitSaveSignal();
-  void emitSearchImageSignal();
   void updateControls();
 
 public slots:
@@ -28,14 +28,13 @@ public slots:
 
 signals:
   void saveSignal();
-  void searchImageSignal();
 
 private:
   Category m_currentCategory;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edName;
-  JPicker* m_imagePicker;
+  JDatabasePicker* m_imagePicker;
 };
 
 #endif // CATEGORYVIEW_H

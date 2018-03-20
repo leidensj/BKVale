@@ -1,6 +1,6 @@
 #include "personview.h"
 #include "jlineedit.h"
-#include "jpicker.h"
+#include "jdatabasepicker.h"
 #include "personpageview.h"
 #include "phonepageview.h"
 #include "addresspageview.h"
@@ -91,6 +91,11 @@ PersonView::~PersonView()
 
 }
 
+void PersonView::setDatabase(QSqlDatabase db)
+{
+  m_personPage->setDatabase(db);
+}
+
 Person PersonView::getPerson() const
 {
   return m_personPage->getPerson();
@@ -104,15 +109,10 @@ void PersonView::getPerson(Person& person) const
   person.m_vPhone = m_phonePage->getPhones();
 }
 
-void PersonView::setImage(int id, const QString& name, const QByteArray& ar)
-{
-  m_personPage->setImage(id, name, ar);
-}
-
 void PersonView::setPerson(const Person &person)
 {
   m_currentPerson = person;
-  m_personPage->setPerson(person, person.m_image.m_name, person.m_image.m_image);
+  m_personPage->setPerson(person);
   m_phonePage->setPhones(person.m_vPhone);
   m_addressPage->setAddresses(person.m_vAddress);
   updateControls();

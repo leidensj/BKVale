@@ -2,7 +2,7 @@
 #include "databaseutils.h"
 #include "notetablewidget.h"
 #include "person.h"
-#include "jpicker.h"
+#include "jdatabasepicker.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -176,7 +176,13 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
 
-  m_supplierPicker = new JPicker(tr("Fornecedor"), true, true, false);
+
+  m_supplierPicker =
+      new JDatabasePicker(tr("fornecedor"),
+                          QIcon(":/icons/res/supplier.png"),
+                          true,
+                          true,
+                          false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->addLayout(hlayout2);
@@ -215,11 +221,6 @@ NoteView::NoteView(QWidget *parent)
   vlayout2->addWidget(m_table);
   vlayout2->addLayout(hlayout3);
   setLayout(vlayout2);
-
-  QObject::connect(m_supplierPicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(emitSearchSupplierSignal()));
 
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
@@ -293,6 +294,11 @@ NoteView::~NoteView()
 
 }
 
+void NoteView::setDatabase(QSqlDatabase db)
+{
+  m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
+}
+
 void NoteView::setProduct(int row, const Product& product)
 {
   m_table->setProduct(row, product);
@@ -331,7 +337,9 @@ void NoteView::setNote(const Note& note)
   m_supplierPicker->clear();
   m_currentID = note.m_id;
   m_dtDate->setDate(QDate::fromString(note.m_date, Qt::ISODate));
-  m_supplierPicker->setText(note.m_supplier.m_alias);
+  m_supplierPicker->setItem(note.m_supplier.m_id,
+                            note.m_supplier.m_alias,
+                            note.m_supplier.m_image.m_image);
   m_snNumber->setValue(note.m_number);
   m_cbCash->setChecked(note.m_bCash);
   m_table->setNoteItems(note.m_vNoteItem);
@@ -351,17 +359,8 @@ void NoteView::create(int number)
   updateControls();
 }
 
-void NoteView::emitSearchSupplierSignal()
+void NoteView::supplierEntered()
 {
-  emit searchSupplierSignal();
-
-}
-
-void NoteView::setSupplier(const Person& supplier)
-{
-  m_supplierPicker->setId(supplier.m_id);
-  m_supplierPicker->setText(supplier.m_alias);
-  m_supplierPicker->setImage(supplier.m_image.m_image);
   if (m_table->hasItems() != 0)
   {
     m_table->setCurrentCell(0, 0);
@@ -439,8 +438,7 @@ void NoteView::checkDate()
   m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
   bool bIsEditMode = IS_VALID_ID(m_currentID);
-  bool bIsDirty = !m_supplierPicker->getText().isEmpty() ||
-                  m_table->hasItems();
+  bool bIsDirty = IS_VALID_ID(m_supplierPicker->getId()) || m_table->hasItems();
   if (!bIsEditMode && !bIsDirty)
     setToday();
 }

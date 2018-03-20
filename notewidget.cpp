@@ -83,10 +83,6 @@ NoteWidget::NoteWidget(QWidget* parent)
                    this,
                    SLOT(setNote(int)));
   QObject::connect(m_view,
-                   SIGNAL(searchSupplierSignal()),
-                   this,
-                   SLOT(searchSupplier()));
-  QObject::connect(m_view,
                    SIGNAL(searchProductSignal(int)),
                    this,
                    SLOT(searchProduct(int)));
@@ -189,6 +185,7 @@ void NoteWidget::setDatabase(QSqlDatabase db)
 {
   NoteTableModel* model = new NoteTableModel(m_database, db);
   m_database->set(model, NOTE_SQL_TABLE_NAME, Note::getColumns());
+  m_view->setDatabase(db);
 }
 
 void NoteWidget::emitChangedSignal()
@@ -229,23 +226,6 @@ void NoteWidget::removeNote(int id)
                                                                                QString::number(note.m_id)),
                             QMessageBox::Ok);
     }
-  }
-}
-
-void NoteWidget::searchSupplier()
-{
-  QSqlTableModel* model = new QSqlTableModel(this, m_database->get());
-  JDatabaseSelector dlg(tr("Selecionar Fornecedor"),
-                        QIcon(":/icons/res/supplier.png"));
-  dlg.set(model, PERSON_SQL_TABLE_NAME, Person::getColumns());
-  dlg.exec();
-  if (IS_VALID_ID(dlg.getCurrentId()))
-  {
-    Person supplier;
-    supplier.m_id = dlg.getCurrentId();
-    QString error;
-    PersonSQL::select(m_database->get(), supplier, error);
-    m_view->setSupplier(supplier);
   }
 }
 

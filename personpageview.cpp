@@ -1,6 +1,6 @@
 #include "personpageview.h"
 #include "jlineedit.h"
-#include "jpicker.h"
+#include "jdatabasepicker.h"
 #include "QDateEdit"
 #include "address.h"
 #include <QCheckBox>
@@ -54,7 +54,9 @@ PersonPageView::PersonPageView(QWidget* parent)
   m_dtBirthDate->setCalendarPopup(true);
   m_dtBirthDate->setDisplayFormat("dd/MM/yyyy");
   m_dtBirthDate->setDate(QDate::currentDate());
-  m_imagePicker = new JPicker(tr("Imagem"), true);
+  m_imagePicker = new JDatabasePicker(tr("Imagem"),
+                                      QIcon(":/icons/res/icon.png"),
+                                      true, false, true);
   m_cbCustomer = new QCheckBox;
   m_cbCustomer->setText(tr("Cliente"));
   m_cbCustomer->setIcon(QIcon(":/icons/res/client.png"));
@@ -148,10 +150,6 @@ PersonPageView::PersonPageView(QWidget* parent)
                    SIGNAL(dateChanged(const QDate&)),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_imagePicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(updateControls()));
   QObject::connect(m_cbCustomer,
                    SIGNAL(clicked(bool)),
                    this,
@@ -164,14 +162,15 @@ PersonPageView::PersonPageView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_imagePicker,
-                   SIGNAL(searchSignal()),
-                   this,
-                   SLOT(emitSearchImageSignal()));
 
   switchUserType();
   updateControls();
   m_edName->setFocus();
+}
+
+void PersonPageView::setDatabase(QSqlDatabase db)
+{
+  m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
 }
 
 Person PersonPageView::getPerson() const
@@ -197,14 +196,10 @@ Person PersonPageView::getPerson() const
 
 }
 
-void PersonPageView::setPerson(const Person& person,
-                               const QString& imageName,
-                               const QByteArray& arImage)
+void PersonPageView::setPerson(const Person& person)
 {
   m_currentPerson = person;
-  m_imagePicker->setId(person.m_image.m_id);
-  m_imagePicker->setText(imageName);
-  m_imagePicker->setImage(arImage);
+  m_imagePicker->setItem(person.m_image.m_id, person.m_image.m_name, person.m_image.m_image);
   m_edName->setText(person.m_name);
   m_edAlias->setText(person.m_alias);
   m_edEmail->setText(person.m_email);
@@ -224,22 +219,10 @@ void PersonPageView::setPerson(const Person& person,
   switchUserType();
 }
 
-void PersonPageView::setImage(int id, const QString& name, const QByteArray& ar)
-{
-  m_imagePicker->setId(id);
-  m_imagePicker->setText(name);
-  m_imagePicker->setImage(ar);
-}
-
-void PersonPageView::emitSearchImageSignal()
-{
-  emit searchImageSignal();
-}
-
 void PersonPageView::clear()
 {
   m_currentPerson.clear();
-  setPerson(m_currentPerson, "", QByteArray());
+  setPerson(m_currentPerson);
 }
 
 void PersonPageView::switchUserType()

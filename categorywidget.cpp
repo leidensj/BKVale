@@ -116,20 +116,3 @@ void CategoryWidget::saveCategory()
                           QMessageBox::Ok);
   }
 }
-
-void CategoryWidget::searchImage()
-{
-  ImageTableModel* model = new ImageTableModel(0, m_database->get());
-  JDatabaseSelector dlg(tr("Escolher Imagem"),
-                        QIcon(":/icons/res/icon.png"));
-  dlg.set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
-  dlg.exec();
-  if (IS_VALID_ID(dlg.getCurrentId()))
-  {
-    Image image;
-    image.m_id = dlg.getCurrentId();
-    QString error;
-    ImageSQL::select(m_database->get(), image, error);
-    m_view->setImage(image.m_id, image.m_name, image.m_image);
-  }
-}

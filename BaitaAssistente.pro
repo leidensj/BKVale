@@ -44,7 +44,6 @@ SOURCES += main.cpp\
     jimageview.cpp \
     imageview.cpp \
     imagewidget.cpp \
-    jpicker.cpp \
     productview.cpp \
     productwidget.cpp \
     imagetablemodel.cpp \
@@ -52,7 +51,8 @@ SOURCES += main.cpp\
     personwidget.cpp \
     personpageview.cpp \
     addresspageview.cpp \
-    phonepageview.cpp
+    phonepageview.cpp \
+    jdatabasepicker.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -90,7 +90,6 @@ HEADERS  += mainwindow.h \
     image.h \
     imageview.h \
     imagewidget.h \
-    jpicker.h \
     product.h \
     productview.h \
     productwidget.h \
@@ -105,7 +104,8 @@ HEADERS  += mainwindow.h \
     phonepageview.h \
     phone.h \
     defines.h \
-    jitem.h
+    jitem.h \
+    jdatabasepicker.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

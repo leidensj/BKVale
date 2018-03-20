@@ -24,6 +24,7 @@ private:
   NoteView* m_view;
   JDatabase* m_database;
   QDockWidget* m_dock;
+
   bool save();
   bool print(QIODevice* printer,
              InterfaceType type,
@@ -41,7 +42,6 @@ private slots:
   void showSearch();
   void setNote(int id);
   void removeNote(int id);
-  void searchSupplier();
   void searchProduct(int row);
 
 signals:

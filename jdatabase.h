@@ -89,10 +89,13 @@ public:
   int getCurrentId() const;
 
 private slots:
-  void itemSelected(int id);
+  void itemSelected(qlonglong id);
+
+signals:
+  void itemSelectedSignal(qlonglong id);
 
 private:
-  int m_currentId;
+  qlonglong m_currentId;
   JDatabase* m_database;
 };
 

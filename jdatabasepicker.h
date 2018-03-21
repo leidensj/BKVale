@@ -42,6 +42,9 @@ public slots:
 private slots:
   void searchItem();
 
+signals:
+  void changedSignal();
+
 private:
   QSqlDatabase m_db;
   JDatabaseSelector* m_selector;

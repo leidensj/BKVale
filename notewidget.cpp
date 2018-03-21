@@ -25,7 +25,15 @@ public:
     if (role == Qt::DisplayRole)
     {
       if (idx.column() == 2)
-        value = QDate::fromJulianDay(value.toLongLong()).toString("dd/MM/yyyy");
+        value = QDate::fromString(value.toString(), Qt::ISODate).toString("dd/MM/yyyy");
+      else if (idx.column() == 3)
+      {
+        Person person;
+        person.m_id = value.toLongLong();
+        QString error;
+        PersonSQL::select(database(), person, error);
+        value = person.m_alias;
+      }
       else if (idx.column() == 4)
         value = "R$ " + QString::number(value.toDouble(), 'f', 2);
     }

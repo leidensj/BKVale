@@ -90,13 +90,16 @@ JDatabasePicker::JDatabasePicker(const QString& text,
                    this,
                    SLOT(searchItem(qlonglong)));
 
+  QObject::connect(m_btnClear,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(clear()));
+
   if (!bShowImage)
   {
     m_imageView->hide();
     vFrame1->hide();
   }
-
-
 }
 
 void JDatabasePicker::setDatabase(QSqlDatabase db,
@@ -121,6 +124,7 @@ void JDatabasePicker::setDatabase(QSqlDatabase db,
 
 void JDatabasePicker::searchItem(qlonglong id)
 {
+  m_selector->hide();
   bool bSuccess = false;
   QString error;
   if (m_tableName == IMAGE_SQL_TABLE_NAME)
@@ -164,17 +168,18 @@ void JDatabasePicker::searchItem(qlonglong id)
                           tr("O seguinte erro ocorreu ao selecionar o item com ID "
                              "'%1':\n'%2'").arg(QString::number(id), error));
   }
-
-
 }
 
 void JDatabasePicker::setItem(qlonglong id,
                               const QString& name,
                               const QByteArray& arImage)
 {
+  qlonglong previousId = m_id;
   m_id = id;
   m_edText->setText(name);
   m_imageView->setImage(arImage);
+  if (previousId != m_id)
+    emit changedSignal();
 }
 
 void JDatabasePicker::searchItem()
@@ -184,9 +189,12 @@ void JDatabasePicker::searchItem()
 
 void JDatabasePicker::clear()
 {
+  qlonglong previousId = m_id;
   m_id = INVALID_ID;
   m_edText->clear();
   m_imageView->clearImage();
+  if (previousId != m_id)
+    emit changedSignal();
 }
 
 qlonglong JDatabasePicker::getId() const

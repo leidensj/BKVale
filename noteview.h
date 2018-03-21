@@ -60,7 +60,7 @@ private slots:
   void emitSearchNewProductSignal();
   void emitSearchProductSignal();
   void removeItem();
-  void supplierEntered();
+  void supplierChanged();
 
 public slots:
   void create(qlonglong number);

@@ -176,7 +176,6 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
 
-
   m_supplierPicker =
       new JDatabasePicker(tr("Fornecedor"),
                           QIcon(":/icons/res/supplier.png"),
@@ -226,56 +225,50 @@ NoteView::NoteView(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitShowSearchSignal()));
-
   QObject::connect(m_btnAdd,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSearchNewProductSignal()));
-
   QObject::connect(m_btnSearchItem,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitSearchProductSignal()));
-
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(removeItem()));
-
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitCreateSignal()));
-
   QObject::connect(m_table,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
-
   QObject::connect(m_btnOpenLast,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(emitOpenLastSignal()));
-
   QObject::connect(m_dtDate,
                    SIGNAL(dateChanged(const QDate&)),
                    this,
                    SLOT(updateControls()));
-
   QObject::connect(m_btnToday,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(setToday()));
-
   QObject::connect(m_btnToday,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(setToday()));
-
   QObject::connect(m_cbCash,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
+  QObject::connect(m_supplierPicker,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(supplierChanged()));
 
   QTimer *timer = new QTimer(this);
   QObject::connect(timer,
@@ -323,7 +316,7 @@ Note NoteView::getNote() const
 {
   Note note;
   note.m_id = m_currentID;
-  note.m_date = m_dtDate->date().toJulianDay();
+  note.m_date = m_dtDate->date().toString(Qt::ISODate);
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_total = m_edTotal->text().toDouble();
   note.m_bCash = m_cbCash->isChecked();
@@ -333,16 +326,16 @@ Note NoteView::getNote() const
 
 void NoteView::setNote(const Note& note)
 {
+  m_currentID = note.m_id;
   m_table->removeAllItems();
   m_supplierPicker->clear();
-  m_currentID = note.m_id;
   m_dtDate->setDate(QDate::fromString(note.m_date, Qt::ISODate));
-  m_supplierPicker->setItem(note.m_supplier.m_id,
-                            note.m_supplier.m_alias,
-                            note.m_supplier.m_image.m_image);
   m_snNumber->setValue(note.m_number);
   m_cbCash->setChecked(note.m_bCash);
   m_table->setNoteItems(note.m_vNoteItem);
+  m_supplierPicker->setItem(note.m_supplier.m_id,
+                            note.m_supplier.m_alias,
+                            note.m_supplier.m_image.m_image);
   updateControls();
 }
 
@@ -359,32 +352,28 @@ void NoteView::create(qlonglong number)
   updateControls();
 }
 
-void NoteView::supplierEntered()
+void NoteView::supplierChanged()
 {
-  if (m_table->hasItems() != 0)
+  if (IS_VALID_ID(m_supplierPicker->getId()))
   {
-    m_table->setCurrentCell(0, 0);
-    m_table->setFocus();
+    if (m_table->hasItems() != 0)
+    {
+      m_table->setCurrentCell(0, 0);
+      m_table->setFocus();
+    }
+    else
+    {
+      emit searchProductSignal(-1);
+    }
   }
-  else
-  {
-    emit searchProductSignal(-1);
-  }
+  updateControls();
 }
 
 void NoteView::updateControls()
 {
-  // TODO
-  const bool bCreated = m_snNumber->value() > 0;
-  m_btnRemove->setEnabled(bCreated && m_table->currentRow() >= 0);
-  m_btnSearchItem->setEnabled(bCreated && m_table->currentRow() >= 0);
-  m_btnAdd->setEnabled(bCreated);
-  m_supplierPicker->setEnabled(bCreated);
-  m_snNumber->setEnabled(bCreated);
-  m_dtDate->setEnabled(bCreated);
-  m_table->setEnabled(bCreated);
-  m_edTotal->setEnabled(bCreated);
-  m_cbCash->setEnabled(bCreated);
+
+  m_btnRemove->setEnabled(m_table->currentRow() >= 0);
+  m_btnSearchItem->setEnabled(m_table->currentRow() >= 0);
   m_btnOpenLast->setEnabled(m_lastID != INVALID_ID);
   m_lblNumberStatus->setPixmap(QPixmap(IS_VALID_ID(m_currentID)
                                      ? ":/icons/res/fileedit.png"

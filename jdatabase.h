@@ -58,19 +58,18 @@ private:
   QVector<JTableColumn> m_vColumns;
 
 private slots:
-  void itemSelected(const QModelIndex& idx);
-  void itemSelected();
+  void selectItem();
   void filterSearchChanged();
   void filterSearchEnter();
   void containsPressed();
   void enableControls();
   void enterKeyPressed();
-  void emitItemRemoveSignal();
+  void removeItem();
   void focusFilterSearch();
 
 signals:
-  void itemSelectedSignal(qlonglong id);
-  void itemRemoveSignal(qlonglong id);
+  void itemSelectedSignal(const JItem& jItem);
+  void itemRemovedSignal(qlonglong id);
 };
 
 class JDatabaseSelector : public QDialog
@@ -89,13 +88,13 @@ public:
   int getCurrentId() const;
 
 private slots:
-  void itemSelected(qlonglong id);
+  void itemSelected(const JItem& jItem);
 
 signals:
-  void itemSelectedSignal(qlonglong id);
+  void itemSelectedSignal(const JItem& jItem);
 
 private:
-  qlonglong m_currentId;
+  JItem m_currentItem;
   JDatabase* m_database;
 };
 

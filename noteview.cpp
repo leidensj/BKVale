@@ -371,10 +371,9 @@ void NoteView::supplierChanged()
 
 void NoteView::updateControls()
 {
-
   m_btnRemove->setEnabled(m_table->currentRow() >= 0);
   m_btnSearchItem->setEnabled(m_table->currentRow() >= 0);
-  m_btnOpenLast->setEnabled(m_lastID != INVALID_ID);
+  m_btnOpenLast->setEnabled(IS_VALID_ID(m_lastID));
   m_lblNumberStatus->setPixmap(QPixmap(IS_VALID_ID(m_currentID)
                                      ? ":/icons/res/fileedit.png"
                                      : ":/icons/res/filenew.png"));

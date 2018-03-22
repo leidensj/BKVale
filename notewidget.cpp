@@ -67,13 +67,13 @@ NoteWidget::NoteWidget(QWidget* parent)
   setLayout(vlayout1);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(qlonglong)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(setNote(qlonglong)));
+                   SLOT(setNote(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(qlonglong)),
+                   SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
-                   SLOT(removeNote(qlonglong)));
+                   SLOT(checkRemovedNote(qlonglong)));
   QObject::connect(m_view,
                    SIGNAL(showSearchSignal()),
                    this,
@@ -170,23 +170,11 @@ void NoteWidget::create()
   m_view->create(NoteSQL::nextNumber(m_database->get()));
 }
 
-void NoteWidget::setNote(qlonglong id)
+void NoteWidget::setNote(const JItem& jItem)
 {
-  Note note;
-  note.m_id = id;
-  QString error;
-  if (NoteSQL::select(m_database->get(), note, error))
-  {
-    m_view->setLastID(id);
-    m_view->setNote(note);
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao abrir a nota com ID '%2'.").arg(error, QString::number(id)),
-                          QMessageBox::Ok);
-  }
+  const Note& note = dynamic_cast<const Note&>(jItem);
+  m_view->setLastID(note.m_id);
+  m_view->setNote(note);
 }
 
 void NoteWidget::setDatabase(QSqlDatabase db)
@@ -201,40 +189,13 @@ void NoteWidget::emitChangedSignal()
   emit changedSignal();
 }
 
-void NoteWidget::removeNote(qlonglong id)
+void NoteWidget::checkRemovedNote(qlonglong id)
 {
-  Note note;
-  note.m_id = id;
-  QString error;
-  NoteSQL::select(m_database->get(), note, error);
-  if (QMessageBox::question(this,
-                            tr("Remover vale"),
-                            tr("Tem certeza que deseja remover o seguinte vale:\n"
-                               "Número: %1\n"
-                               "Fornecedor: %2\n"
-                               "Data: %3").arg(Note::st_strNumber(note.m_number),
-                                               note.m_supplier.m_alias,
-                                               note.strDate()),
-                            QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
-  {
-    if (NoteSQL::remove(m_database->get(), note.m_id, error))
-    {
-      if (id == m_view->getLastID())
-        m_view->setLastID(INVALID_ID);
-      Note note = m_view->getNote();
-      if (id == note.m_id)
-        create();
-      m_database->refresh();
-    }
-    else
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("Erro '%1' ao remover a nota com ID '%2'.").arg(error,
-                                                                               QString::number(note.m_id)),
-                            QMessageBox::Ok);
-    }
-  }
+  if (id == m_view->getLastID())
+    m_view->setLastID(INVALID_ID);
+  Note note = m_view->getNote();
+  if (id == note.m_id)
+    create();
 }
 
 void NoteWidget::searchProduct(int row)

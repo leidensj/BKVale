@@ -40,8 +40,8 @@ public slots:
 private slots:
   void emitChangedSignal();
   void showSearch();
-  void setNote(qlonglong id);
-  void removeNote(qlonglong id);
+  void setNote(const JItem& jItem);
+  void checkRemovedNote(qlonglong id);
   void searchProduct(int row);
 
 signals:

@@ -32,6 +32,7 @@ PersonPageView::PersonPageView(QWidget* parent)
  , m_cbSupplier(nullptr)
  , m_cbEmployee(nullptr)
  , m_dtCreationDate(nullptr)
+ , m_edPinCode(nullptr)
 {
   m_rdoPerson = new QRadioButton;
   m_rdoPerson->setText(tr("Fisíca"));
@@ -71,6 +72,8 @@ PersonPageView::PersonPageView(QWidget* parent)
   m_dtCreationDate->setDisplayFormat("dd/MM/yyyy");
   m_dtCreationDate->setDate(QDate::currentDate());
   m_dtCreationDate->setReadOnly(true);
+  m_edPinCode = new JLineEdit(JValidatorType::Numeric, false, true);
+  m_edPinCode->setEchoMode(QLineEdit::EchoMode::PasswordEchoOnEdit);
 
   QGroupBox* personGroupBox = new QGroupBox;
   personGroupBox->setTitle(tr("Tipo de pessoa"));
@@ -102,7 +105,11 @@ PersonPageView::PersonPageView(QWidget* parent)
   QVBoxLayout* typeLayout = new QVBoxLayout();
   typeLayout->addWidget(m_cbCustomer);
   typeLayout->addWidget(m_cbSupplier);
-  typeLayout->addWidget(m_cbEmployee);
+  QHBoxLayout* employeeLayout = new QHBoxLayout;
+  employeeLayout->setContentsMargins(0, 0, 0, 0);
+  employeeLayout->addWidget(m_cbEmployee);
+  employeeLayout->addWidget(m_edPinCode);
+  typeLayout->addLayout(employeeLayout);
   typeGroupBox->setLayout(typeLayout);
 
   QVBoxLayout* vlayout0 = new QVBoxLayout;
@@ -236,7 +243,7 @@ void PersonPageView::switchUserType()
     m_edCpfCnpj->setInputMask("99.999.999/9999-99;_");
     m_edRgIE->setInputMask("");
     m_cbEmployee->setChecked(false);
-    m_cbEmployee->setEnabled(false);
+    m_edPinCode->setEnabled(false);
     m_grpBirthDate->hide();
   }
   else
@@ -255,5 +262,6 @@ void PersonPageView::switchUserType()
 
 void PersonPageView::updateControls()
 {
+  m_edPinCode->setEnabled(m_cbEmployee->isChecked());
   emit changedSignal();
 }

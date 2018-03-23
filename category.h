@@ -43,16 +43,6 @@ struct Category : public JItem
     return !m_name.isEmpty();
   }
 
-  QString getStrName() const
-  {
-    return m_name;
-  }
-
-  QByteArray getArImage() const
-  {
-    return m_image.m_image;
-  }
-
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

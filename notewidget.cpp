@@ -3,6 +3,7 @@
 #include "printutils.h"
 #include "databaseutils.h"
 #include "jdatabase.h"
+#include "pincodeview.h"
 #include <QSplitter>
 #include <QDockWidget>
 #include <QLayout>
@@ -113,7 +114,6 @@ void NoteWidget::showSearch()
 
 bool NoteWidget::print(QIODevice* printer,
                        InterfaceType type,
-                       const QString& user,
                        int id)
 {
   Note note;
@@ -121,9 +121,15 @@ bool NoteWidget::print(QIODevice* printer,
   QString error;
   if (NoteSQL::select(m_database->get(), note, error))
   {
-    QString str(NotePrinter::build(note, user));
-    if (Printer::printString(printer, type, str, error))
-      return true;
+    PinCodeView w(this);
+    w.exec();
+    if (w.getCurrentPerson().isValidId())
+    {
+      QString str(NotePrinter::build(note, w.getCurrentPerson().m_alias));
+      if (Printer::printString(printer, type, str, error))
+        return true;
+    }
+
   }
 
   QMessageBox::warning(this,
@@ -135,39 +141,31 @@ bool NoteWidget::print(QIODevice* printer,
 
 bool NoteWidget::save()
 {
-  QString error;
   Note note = m_view->getNote();
-
-  if (note.isValidId()
-      ? NoteSQL::update(m_database->get(), note, error)
-      : NoteSQL::insert(m_database->get(), note, error))
-  {
+  bool bSuccess = m_database->save(note);
+  if (bSuccess)
     m_view->setLastID(note.m_id);
-    m_database->refresh();
-    return true;
-  }
-
-  QMessageBox::critical(this,
-                        tr("Erro"),
-                        tr("Erro '%1' ao salvar vale.").arg(error),
-                        QMessageBox::Ok);
-  return false;
+  return bSuccess;
 }
 
 void NoteWidget::saveAndPrint(QIODevice* printer,
-                              InterfaceType type,
-                              const QString& user)
+                              InterfaceType type)
 {
   if (save())
   {
     create();
-    print(printer, type, user, m_view->getLastID());
+    print(printer, type, m_view->getLastID());
   }
 }
 
 void NoteWidget::create()
 {
   m_view->create(NoteSQL::nextNumber(m_database->get()));
+}
+
+void NoteWidget::setNote(qlonglong id)
+{
+  m_database->selectItem(id);
 }
 
 void NoteWidget::setNote(const JItem& jItem)
@@ -205,14 +203,9 @@ void NoteWidget::searchProduct(int row)
                         QIcon(":/icons/res/item.png"));
   dlg.set(model, PRODUCT_SQL_TABLE_NAME, Product::getColumns());
   dlg.exec();
-  if (IS_VALID_ID(dlg.getCurrentId()))
+  Product product = dlg.getCurrentProduct();
+  if (product.isValidId())
   {
-    Product product;
-    product.m_id = dlg.getCurrentId();
-    QString error;
-    bool bSuccess = ProductSQL::select(m_database->get(), product, error);
-    if (bSuccess)
-    {
       if (row < 0)
       {
         NoteItem noteItem;
@@ -223,15 +216,6 @@ void NoteWidget::searchProduct(int row)
       {
         m_view->setProduct(row, product);
       }
-    }
-    else
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("Erro '%1' ao buscar produto com ID '%2'.").arg(error,
-                                                                               QString::number(dlg.getCurrentId())),
-                            QMessageBox::Ok);
-    }
   }
 }
 

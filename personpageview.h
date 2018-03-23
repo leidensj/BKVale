@@ -55,6 +55,7 @@ private:
   QCheckBox* m_cbSupplier;
   QCheckBox* m_cbEmployee;
   QDateEdit* m_dtCreationDate;
+  JLineEdit* m_edPinCode;
 };
 
 #endif // PERSONPAGEVIEW_H

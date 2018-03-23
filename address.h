@@ -43,17 +43,12 @@ struct Address : public JItem
     clear();
   }
 
-  QString getStrName() const
+  QString getFormattedAddress() const
   {
     return m_street + ", Nº " +
         QString::number(m_number) + ". " +
         m_city + " - " +
         getBRState().m_abv + ".";
-  }
-
-  QByteArray getArImage() const
-  {
-    return QByteArray();
   }
 
   bool operator !=(const JItem& other) const

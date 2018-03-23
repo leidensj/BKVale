@@ -262,7 +262,7 @@ void AddressPageView::saveAddress(const Address& address)
   QListWidgetItem* p = m_currentItem != nullptr
                        ? m_currentItem
                        : new QListWidgetItem;
-  p->setText(address.getStrName());
+  p->setText(address.getFormattedAddress());
   p->setData(Qt::UserRole, var);
   if (m_currentItem == nullptr)
     m_list->addItem(p);

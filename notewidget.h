@@ -28,18 +28,17 @@ private:
   bool save();
   bool print(QIODevice* printer,
              InterfaceType type,
-             const QString& user,
              int id);
 
 public slots:
   void create();
   void saveAndPrint(QIODevice* printer,
-                    InterfaceType type,
-                    const QString& user);
+                    InterfaceType type);
 
 private slots:
   void emitChangedSignal();
   void showSearch();
+  void setNote(qlonglong id);
   void setNote(const JItem& jItem);
   void checkRemovedNote(qlonglong id);
   void searchProduct(int row);

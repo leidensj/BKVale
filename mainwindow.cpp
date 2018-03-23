@@ -234,7 +234,7 @@ void BaitaAssistant::print()
   switch ((Functionality)ui->tabWidget->currentIndex())
   {
     case Functionality::NoteMode:
-      m_note->saveAndPrint(printer, m_settings.m_interfaceType, m_userLogin.strUser());
+      m_note->saveAndPrint(printer, m_settings.m_interfaceType);
       break;
     case Functionality::ReminderMode:
       m_reminder->saveAndPrint(printer, m_settings.m_interfaceType, m_userLogin.getId());

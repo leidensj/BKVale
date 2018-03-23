@@ -56,11 +56,11 @@ ProductWidget::ProductWidget(QWidget *parent)
                    this,
                    SLOT(saveProduct()));
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(qlonglong)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(productSelected(qlonglong)));
+                   SLOT(productSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(qlonglong)),
+                   SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
                    SLOT(removeProduct(qlonglong)));
 }
@@ -77,23 +77,11 @@ void ProductWidget::setDatabase(QSqlDatabase db)
   m_view->setDatabase(db);
 }
 
-void ProductWidget::productSelected(qlonglong id)
+void ProductWidget::productSelected(const JItem& jItem)
 {
-  Product product;
-  product.m_id = id;
-  QString error;
-  if (ProductSQL::select(m_database->get(), product, error))
-  {
+  const Product& product = dynamic_cast<const Product&>(jItem);
+  if (product.isValidId())
     m_view->setProduct(product);
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao abrir o produto com ID '%2'.").arg(error,
-                                                                              QString::number(product.m_id)),
-                          QMessageBox::Ok);
-  }
 }
 
 void ProductWidget::removeProduct(qlonglong id)

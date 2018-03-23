@@ -1,8 +1,6 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
 #include "defines.h"
-#include "product.h"
-#include "person.h"
 #include "databaseutils.h"
 #include <QDate>
 #include <QLayout>
@@ -113,48 +111,39 @@ JDatabase::JDatabase(bool bSelectorMode,
                    SIGNAL(doubleClicked(const QModelIndex&)),
                    this,
                    SLOT(selectItem()));
-
   QObject::connect(m_btnOpen,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(selectItem()));
-
   QObject::connect(m_btnRefresh,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(refresh()));
-
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(removeItem()));
-
   QObject::connect(m_edFilterSearch,
                    SIGNAL(textEdited(const QString&)),
                    this,
                    SLOT(filterSearchChanged()));
-
   QObject::connect(m_edFilterSearch,
                    SIGNAL(enterSignal()),
                    this,
                    SLOT(filterSearchEnter()));
-
   QObject::connect(m_btnContains,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(containsPressed()));
-
   QObject::connect(m_table->horizontalHeader(),
                    SIGNAL(sortIndicatorChanged(int,
                                                Qt::SortOrder)),
                    this,
                    SLOT(filterSearchChanged()));
-
   QObject::connect(m_table,
                    SIGNAL(enterKeyPressedSignal()),
                    this,
-                   SLOT(enterKeyPressed()));
-
+                   SLOT(selectItem()));
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F),
                 this,
                 SLOT(focusFilterSearch()));
@@ -232,18 +221,27 @@ QSqlDatabase JDatabase::get() const
 
 void JDatabase::selectItem()
 {
-  int row = m_table->currentIndex();
+  int row = m_table->currentIndex().row();
   QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
   if (model != nullptr && row >= 0)
   {
     qlonglong id = model->index(row, ID_COLUMN).data(Qt::EditRole).toLongLong();
+    selectItem(id);
+  }
+}
+
+void JDatabase::selectItem(qlonglong id)
+{
+  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+  if (model != nullptr)
+  {
     bool bSuccess = false;
     QString error;
     if (m_tableName == IMAGE_SQL_TABLE_NAME)
     {
       Image o;
       o.m_id = id;
-      bSuccess = ImageSQL::select(m_db, o, error);
+      bSuccess = ImageSQL::select(model->database(), o, error);
       if (bSuccess)
         emit itemSelectedSignal(o);
     }
@@ -251,7 +249,7 @@ void JDatabase::selectItem()
     {
       Person o;
       o.m_id = id;
-      bSuccess = PersonSQL::select(m_db, o, error);
+      bSuccess = PersonSQL::select(model->database(), o, error);
       if (bSuccess)
         emit itemSelectedSignal(o);
     }
@@ -259,7 +257,7 @@ void JDatabase::selectItem()
     {
       Category o;
       o.m_id = id;
-      bSuccess = CategorySQL::select(m_db, o, error);
+      bSuccess = CategorySQL::select(model->database(), o, error);
       if (bSuccess)
         emit itemSelectedSignal(o);
     }
@@ -267,7 +265,7 @@ void JDatabase::selectItem()
     {
       Product o;
       o.m_id = id;
-      bSuccess = ProductSQL::select(m_db, o, error);
+      bSuccess = ProductSQL::select(model->database(), o, error);
       if (bSuccess)
         emit itemSelectedSignal(o);
     }
@@ -278,7 +276,6 @@ void JDatabase::selectItem()
 
     if (!bSuccess)
     {
-      clear();
       QMessageBox::critical(this,
                             tr("Erro"),
                             tr("O seguinte erro ocorreu ao selecionar o item com ID "
@@ -308,9 +305,9 @@ void JDatabase::enableControls()
   m_btnRemove->setEnabled(bSelected);
 }
 
-void JDatabase::emitItemRemoveSignal()
+void JDatabase::removeItem()
 {
-  int row = m_table->currentIndex();
+  int row = m_table->currentIndex().row();
   QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
   if (model != nullptr && row >= 0)
   {
@@ -318,13 +315,13 @@ void JDatabase::emitItemRemoveSignal()
     bool bSuccess = false;
     QString error;
     if (m_tableName == IMAGE_SQL_TABLE_NAME)
-      bSuccess = ImageSQL::remove(m_db, id, error);
+      bSuccess = ImageSQL::remove(model->database(), id, error);
     else if (m_tableName == PERSON_SQL_TABLE_NAME)
-      bSuccess = PersonSQL::select(m_db, id, error);
+      bSuccess = PersonSQL::remove(model->database(), id, error);
     else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
-      bSuccess = CategorySQL::select(m_db, id, error);
+      bSuccess = CategorySQL::remove(model->database(), id, error);
     else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
-      bSuccess = ProductSQL::select(m_db, id, error);
+      bSuccess = ProductSQL::remove(model->database(), id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -332,7 +329,6 @@ void JDatabase::emitItemRemoveSignal()
       emit itemRemovedSignal(id);
     else
     {
-      clear();
       QMessageBox::critical(this,
                             tr("Erro"),
                             tr("O seguinte erro ocorreu ao remover o item com ID "
@@ -389,23 +385,65 @@ void JDatabase::containsPressed()
   m_edFilterSearch->setFocus();
 }
 
-void JDatabase::enterKeyPressed()
-{
-  if (m_table->model())
-  {
-    QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-    if (m_table->currentIndex().isValid())
-    {
-      int id = model->index(m_table->currentIndex().row(),
-                            ID_COLUMN).data(Qt::EditRole).toInt();
-      emit itemSelectedSignal(id);
-    }
-  }
-}
-
 void JDatabase::focusFilterSearch()
 {
   m_edFilterSearch->setFocus();
+}
+
+QString JDatabase::getTableName() const
+{
+  return m_tableName;
+}
+
+bool JDatabase::save(const JItem& jItem)
+{
+  QString error;
+  bool bSuccess = false;
+  QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
+  if (model != nullptr)
+  {
+    if (m_tableName == IMAGE_SQL_TABLE_NAME)
+    {
+      const Image& o = dynamic_cast<const Image&>(jItem);
+      bSuccess = o.isValidId()
+                 ? ImageSQL::update(model->database(), o, error)
+                 : ImageSQL::insert(model->database(), o, error);
+    }
+    else if (m_tableName == PERSON_SQL_TABLE_NAME)
+    {
+      const Person& o = dynamic_cast<const Person&>(jItem);
+      bSuccess = o.isValidId()
+                 ? PersonSQL::update(model->database(), o, error)
+                 : PersonSQL::insert(model->database(), o, error);
+    }
+    else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
+    {
+      const Category& o = dynamic_cast<const Category&>(jItem);
+      bSuccess = o.isValidId()
+                 ? CategorySQL::update(model->database(), o, error)
+                 : CategorySQL::insert(model->database(), o, error);
+    }
+    else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
+    {
+      const Product& o = dynamic_cast<const Product&>(jItem);
+      bSuccess = o.isValidId()
+                 ? ProductSQL::update(model->database(), o, error)
+                 : ProductSQL::insert(model->database(), o, error);
+    }
+    else
+      error = tr("Item ainda não implementado.");
+  }
+
+  if (bSuccess)
+    refresh();
+  else
+  {
+    QMessageBox::critical(this,
+                          tr("Erro"),
+                          tr("Erro '%1' ao salvar o item.").arg(error),
+                          QMessageBox::Ok);
+  }
+  return bSuccess;
 }
 
 JDatabaseSelector::JDatabaseSelector(const QString& title,
@@ -423,9 +461,9 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
   setWindowIcon(icon);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(qlonglong)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(itemSelected(qlonglong)));
+                   SLOT(itemSelected(const JItem&)));
 }
 
 void JDatabaseSelector::set(QSqlTableModel* model,
@@ -437,12 +475,39 @@ void JDatabaseSelector::set(QSqlTableModel* model,
 
 void JDatabaseSelector::itemSelected(const JItem& jItem)
 {
-  m_currentItem = jItem;
+  if (m_database->getTableName() == IMAGE_SQL_TABLE_NAME)
+    m_currentImage = dynamic_cast<const Image&>(jItem);
+  else if (m_database->getTableName() == PERSON_SQL_TABLE_NAME)
+    m_currentPerson = dynamic_cast<const Person&>(jItem);
+  else if (m_database->getTableName() == CATEGORY_SQL_TABLE_NAME)
+    m_currentCategory = dynamic_cast<const Category&>(jItem);
+  else if (m_database->getTableName() == PRODUCT_SQL_TABLE_NAME)
+    m_currentProduct = dynamic_cast<const Product&>(jItem);
   emit itemSelectedSignal(jItem);
   close();
 }
 
-int JDatabaseSelector::getCurrentItem() const
+Product JDatabaseSelector::getCurrentProduct() const
 {
-  return m_currentItem;
+  return m_currentProduct;
+}
+
+Person JDatabaseSelector::getCurrentPerson() const
+{
+  return m_currentPerson;
+}
+
+Category JDatabaseSelector::getCurrentCategory() const
+{
+  return m_currentCategory;
+}
+
+Image JDatabaseSelector::getCurrentImage() const
+{
+  return m_currentImage;
+}
+
+QString JDatabaseSelector::getTableName() const
+{
+  return m_database->getTableName();
 }

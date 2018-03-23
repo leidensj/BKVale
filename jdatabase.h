@@ -9,7 +9,8 @@
 #include <QVector>
 #include <QTableView>
 #include "jtablecolumn.h"
-#include "jitem.h"
+#include "product.h"
+#include "person.h"
 
 class QPushButton;
 class JTableView;
@@ -41,9 +42,12 @@ public:
            const QString& tableName,
            const QVector<JTableColumn>& vColumns);
   QSqlDatabase get() const;
+  QString getTableName() const;
+  bool save(const JItem& jItem);
 
 public slots:
   void refresh();
+  void selectItem(qlonglong id);
 
 private:
   const bool m_bSelectorMode;
@@ -63,7 +67,6 @@ private slots:
   void filterSearchEnter();
   void containsPressed();
   void enableControls();
-  void enterKeyPressed();
   void removeItem();
   void focusFilterSearch();
 
@@ -85,7 +88,11 @@ public:
            const QString& tableName,
            const QVector<JTableColumn>& vColumns);
 
-  int getCurrentId() const;
+  Product getCurrentProduct() const;
+  Person getCurrentPerson() const;
+  Category getCurrentCategory() const;
+  Image getCurrentImage() const;
+  QString getTableName() const;
 
 private slots:
   void itemSelected(const JItem& jItem);
@@ -94,7 +101,10 @@ signals:
   void itemSelectedSignal(const JItem& jItem);
 
 private:
-  JItem m_currentItem;
+  Product m_currentProduct;
+  Person m_currentPerson;
+  Category m_currentCategory;
+  Image m_currentImage;
   JDatabase* m_database;
 };
 

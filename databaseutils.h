@@ -225,6 +225,11 @@ namespace PersonSQL
                   Person& person,
                   QString& error);
 
+  bool execByPinCodeSelect(QSqlQuery& query,
+                           const QString& pincode,
+                           Person& person,
+                           QString& error);
+
   bool select(QSqlDatabase db,
               Person& person,
               QString& error);
@@ -240,6 +245,11 @@ namespace PersonSQL
   bool remove(QSqlDatabase db,
               qlonglong id,
               QString& error);
+
+  bool isValidPinCode(QSqlDatabase db,
+                      const QString& pincode,
+                      Person& person,
+                      QString& error);
 }
 
 #endif // DATABASEUTILS_H

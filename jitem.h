@@ -10,12 +10,10 @@ struct JItem
   mutable qlonglong m_id;
   JItem() : m_id(INVALID_ID) {}
   bool isValidId() const { return IS_VALID_ID(m_id); }
-  virtual bool isValid() const = 0;
-  virtual void clear() = 0;
-  virtual bool operator ==(const JItem& other) const = 0;
-  virtual bool operator !=(const JItem& other) const = 0;
-  virtual QString getStrName() const { return ""; }
-  virtual QByteArray getArImage() const { return QByteArray(); }
+  virtual bool isValid() { return IS_VALID_ID(m_id); }
+  virtual void clear() { m_id = INVALID_ID; }
+  virtual bool operator ==(const JItem& other) { return m_id == other.m_id; }
+  virtual bool operator !=(const JItem& other) { return m_id != other.m_id; }
   static QVector<JTableColumn> getColumns() { return QVector<JTableColumn>(); }
 };
 

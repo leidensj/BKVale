@@ -94,9 +94,6 @@ struct Person : public JItem
     return b;
   }
 
-  QString getStrName() const { return m_alias; }
-  QByteArray getArImage() const { return m_image.m_image; }
-
   static QVector<JTableColumn> getColumns()
   {
     QVector<JTableColumn> c;

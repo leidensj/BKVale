@@ -3,7 +3,8 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 
-#define NOTE_TABLE_UNITY_FLAGS Qt::NoItemFlags | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled
+#define NOTE_TABLE_SAME_UNITY_FLAGS Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled
+#define NOTE_TABLE_DIFF_UNITY_FLAGS NOTE_TABLE_SAME_UNITY_FLAGS | Qt::ItemIsUserCheckable
 #define NOTE_TABLE_DESCRIPTION_FLAGS Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled
 
 NoteTableWidget::NoteTableWidget(QWidget* parent)
@@ -138,8 +139,11 @@ QVector<NoteItem> NoteTableWidget::getNoteItems() const
     NoteItem noteItem = item(i, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
     noteItem.m_ammount = text(i, (int)NoteColumn::Ammount).toDouble();
     noteItem.m_price = text(i, (int)NoteColumn::Price).toDouble();
-    noteItem.m_bIsPackageAmmount = item(i, (int)NoteColumn::Unity)->checkState() == Qt::Checked
-                                   ? true : false;
+    if (noteItem.m_product.m_unity != noteItem.m_product.m_packageUnity)
+      noteItem.m_bIsPackageAmmount = item(i, (int)NoteColumn::Unity)->checkState() == Qt::Checked
+                                     ? true : false;
+    else
+      noteItem.m_bIsPackageAmmount = false;
     vNoteItem.push_back(noteItem);
   }
   return vNoteItem;
@@ -176,7 +180,10 @@ void NoteTableWidget::setProduct(int row, const Product& product)
 
     item(row, (int)NoteColumn::Description)->setText(product.m_name);
     item(row, (int)NoteColumn::Description)->setIcon(ico);
-    item(row, (int)NoteColumn::Unity)->setFlags(NOTE_TABLE_UNITY_FLAGS);
+    if (product.m_unity != product.m_packageUnity)
+      item(row, (int)NoteColumn::Unity)->setFlags(NOTE_TABLE_DIFF_UNITY_FLAGS);
+    else
+      item(row, (int)NoteColumn::Unity)->setFlags(NOTE_TABLE_SAME_UNITY_FLAGS);
     item(row, (int)NoteColumn::Description)->setFlags(NOTE_TABLE_DESCRIPTION_FLAGS);
     blockSignals(false);
   }

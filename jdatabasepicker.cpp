@@ -3,7 +3,6 @@
 #include "jimageview.h"
 #include "defines.h"
 #include "jdatabase.h"
-#include "databaseutils.h"
 #include <QSqlTableModel>
 #include <QPushButton>
 #include <QLayout>
@@ -86,9 +85,9 @@ JDatabasePicker::JDatabasePicker(const QString& text,
                    SLOT(searchItem()));
 
   QObject::connect(m_selector,
-                   SIGNAL(itemSelectedSignal(qlonglong)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(searchItem(qlonglong)));
+                   SLOT(setItem(const JItem&)));
 
   QObject::connect(m_btnClear,
                    SIGNAL(clicked(bool)),
@@ -107,7 +106,6 @@ void JDatabasePicker::setDatabase(QSqlDatabase db,
                                   const QString& filter)
 {
   m_db = db;
-  m_tableName = tableName;
   QSqlTableModel* model = new QSqlTableModel(this, db);
   QVector<JTableColumn> vColumns;
   if (tableName == IMAGE_SQL_TABLE_NAME)
@@ -122,51 +120,28 @@ void JDatabasePicker::setDatabase(QSqlDatabase db,
   m_selector->set(model, tableName, vColumns);
 }
 
-void JDatabasePicker::searchItem(qlonglong id)
+void JDatabasePicker::setItem(const JItem& jItem)
 {
   m_selector->hide();
-  bool bSuccess = false;
-  QString error;
-  if (m_tableName == IMAGE_SQL_TABLE_NAME)
+  if (m_selector->getTableName() == IMAGE_SQL_TABLE_NAME)
   {
-    Image o;
-    o.m_id = id;
-    bSuccess = ImageSQL::select(m_db, o, error);
-    if (bSuccess)
-      setItem(o.m_id, o.m_name, o.m_image);
+    const Image& o = dynamic_cast<const Image&>(jItem);
+    setItem(o.m_id, o.m_name, o.m_image);
   }
-  else if (m_tableName == PERSON_SQL_TABLE_NAME)
+  else if (m_selector->getTableName() == PERSON_SQL_TABLE_NAME)
   {
-    Person o;
-    o.m_id = id;
-    bSuccess = PersonSQL::select(m_db, o, error);
-    if (bSuccess)
-      setItem(o.m_id, o.m_alias, o.m_image.m_image);
+    const Person& o = dynamic_cast<const Person&>(jItem);
+    setItem(o.m_id, o.m_alias, o.m_image.m_image);
   }
-  else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
+  else if (m_selector->getTableName() == CATEGORY_SQL_TABLE_NAME)
   {
-    Category o;
-    o.m_id = id;
-    bSuccess = CategorySQL::select(m_db, o, error);
-    if (bSuccess)
-      setItem(o.m_id, o.m_name, o.m_image.m_image);
+    const Category& o = dynamic_cast<const Category&>(jItem);
+    setItem(o.m_id, o.m_name, o.m_image.m_image);
   }
-  else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
+  else if (m_selector->getTableName() == PRODUCT_SQL_TABLE_NAME)
   {
-    Product o;
-    o.m_id = id;
-    bSuccess = ProductSQL::select(m_db, o, error);
-    if (bSuccess)
-      setItem(o.m_id, o.m_name, o.m_image.m_image);
-  }
-
-  if (!bSuccess)
-  {
-    clear();
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("O seguinte erro ocorreu ao selecionar o item com ID "
-                             "'%1':\n'%2'").arg(QString::number(id), error));
+    const Product& o = dynamic_cast<const Product&>(jItem);
+    setItem(o.m_id, o.m_name, o.m_image.m_image);
   }
 }
 

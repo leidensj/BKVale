@@ -1734,7 +1734,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
       person.m_bCustomer = query.value(10).toBool();
       person.m_bSupplier = query.value(11).toBool();
       person.m_bEmployee = query.value(12).toBool();
-      person.m_bEmployee = query.value(13).toBool();
+      person.m_employeePinCode = query.value(13).toString();
     }
     else
     {
@@ -1802,7 +1802,47 @@ bool PersonSQL::execSelect(QSqlQuery& query,
   if (bSuccess && person.m_image.isValidId())
     bSuccess = ImageSQL::execSelect(query, person.m_image, error);
 
-  if (!bSuccess)
+  if (!bSuccess && error.isEmpty())
+  {
+    error = query.lastError().text();
+    person.clear();
+  }
+
+  return bSuccess;
+}
+
+bool PersonSQL::execByPinCodeSelect(QSqlQuery& query,
+                                    const QString& pincode,
+                                    Person& person,
+                                    QString& error)
+{
+  person.clear();
+  error.clear();
+
+  query.prepare("SELECT "
+                PERSON_SQL_COL00
+                " FROM " PERSON_SQL_TABLE_NAME
+                " WHERE " PERSON_SQL_COL14 " = (:_v14) AND "
+                PERSON_SQL_COL13 " <> 0 AND "
+                PERSON_SQL_COL13 " IS NOT NULL");
+  query.bindValue(":_v14", pincode);
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      person.m_id = query.value(0).toLongLong();
+      bSuccess = execSelect(query, person, error);
+    }
+    else
+    {
+      error = "Pin informado não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  if (!bSuccess && error.isEmpty())
   {
     error = query.lastError().text();
     person.clear();
@@ -2178,5 +2218,22 @@ bool PersonSQL::remove(QSqlDatabase db,
   if (!bSuccess)
     error = db.lastError().text();
 
+  return bSuccess;
+}
+
+bool PersonSQL::isValidPinCode(QSqlDatabase db,
+                               const QString& pincode,
+                               Person& person,
+                               QString& error)
+{
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execByPinCodeSelect(query, pincode, person, error);
+  bSuccess = finishTransaction(db, bSuccess, error);
+  if (!bSuccess)
+    person.clear();
   return bSuccess;
 }

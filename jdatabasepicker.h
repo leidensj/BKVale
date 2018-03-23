@@ -34,7 +34,7 @@ public:
 
 public slots:
   void clear();
-  void searchItem(qlonglong id);
+  void setItem(const JItem& jItem);
   void setItem(qlonglong id,
                const QString& name,
                const QByteArray& arImage);
@@ -48,7 +48,6 @@ signals:
 private:
   QSqlDatabase m_db;
   JDatabaseSelector* m_selector;
-  QString m_tableName;
   qlonglong m_id;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;

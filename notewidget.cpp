@@ -122,6 +122,7 @@ bool NoteWidget::print(QIODevice* printer,
   if (NoteSQL::select(m_database->get(), note, error))
   {
     PinCodeView w(this);
+    w.setDatabase(m_database->get());
     w.exec();
     if (w.getCurrentPerson().isValidId())
     {

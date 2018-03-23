@@ -21,6 +21,23 @@ protected:
   void keyPressEvent(QKeyEvent *event);
 
 private:
+  void append(QChar c);
+
+private slots:
+  void search();
+  void erase();
+  void pressed0() { append('0'); }
+  void pressed1() { append('1'); }
+  void pressed2() { append('2'); }
+  void pressed3() { append('3'); }
+  void pressed4() { append('4'); }
+  void pressed5() { append('5'); }
+  void pressed6() { append('6'); }
+  void pressed7() { append('7'); }
+  void pressed8() { append('8'); }
+  void pressed9() { append('9'); }
+
+private:
   Person m_currentPerson;
   QSqlDatabase m_db;
   QLineEdit* m_edPinCode;
@@ -35,6 +52,7 @@ private:
   QPushButton* m_btn8;
   QPushButton* m_btn9;
   QPushButton* m_btnEnter;
+  QPushButton* m_btnClr;
 };
 
 #endif // PINCODEVIEW_H

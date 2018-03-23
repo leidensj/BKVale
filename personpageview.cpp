@@ -74,6 +74,13 @@ PersonPageView::PersonPageView(QWidget* parent)
   m_dtCreationDate->setReadOnly(true);
   m_edPinCode = new JLineEdit(JValidatorType::Numeric, false, true);
   m_edPinCode->setEchoMode(QLineEdit::EchoMode::PasswordEchoOnEdit);
+  m_edPinCode->setAlignment(Qt::AlignCenter);
+  m_edPinCode->setPlaceholderText(tr("Código PIN"));
+  {
+    QFont f = m_edPinCode->font();
+    f.setBold(true);
+    m_edPinCode->setFont(f);
+  }
 
   QGroupBox* personGroupBox = new QGroupBox;
   personGroupBox->setTitle(tr("Tipo de pessoa"));

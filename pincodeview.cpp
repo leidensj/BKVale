@@ -58,7 +58,6 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn6->setIcon(QIcon(":/icons/res/calc6.png"));
   m_btn6->setShortcut(QKeySequence(Qt::Key_6));
 
-
   QHBoxLayout* hline2 = new QHBoxLayout;
   hline2->addWidget(m_btn4);
   hline2->addWidget(m_btn5);
@@ -92,6 +91,13 @@ PinCodeView::PinCodeView(QWidget* parent)
   hline3->addWidget(m_btn3);
   hline3->setContentsMargins(0, 0, 0, 0);
 
+  m_btnClr = new QPushButton;
+  m_btnClr->setFlat(true);
+  m_btnClr->setText("");
+  m_btnClr->setIconSize(QSize(64, 64));
+  m_btnClr->setIcon(QIcon(":/icons/res/calcclr.png"));
+  m_btnClr->setShortcut(QKeySequence(Qt::Key_Backspace));
+
   m_btn0 = new QPushButton;
   m_btn0->setFlat(true);
   m_btn0->setText("");
@@ -103,13 +109,12 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btnEnter->setFlat(true);
   m_btnEnter->setText("");
   m_btnEnter->setIconSize(QSize(64, 64));
-  m_btnEnter->setIcon(QIcon(":/icons/res/calcdec.png"));
-  m_btnEnter->setShortcut(QKeySequence(Qt::Key_Period));
+  m_btnEnter->setIcon(QIcon(":/icons/res/enter.png"));
 
   QHBoxLayout* hline4 = new QHBoxLayout();
+  hline4->addWidget(m_btnClr);
   hline4->addWidget(m_btn0);
   hline4->addWidget(m_btnEnter);
-  hline4->setAlignment(Qt::AlignRight);
   hline4->setContentsMargins(0, 0, 0, 0);
 
   m_edPinCode = new QLineEdit;
@@ -126,8 +131,25 @@ PinCodeView::PinCodeView(QWidget* parent)
   vlayoutl->addLayout(hline2);
   vlayoutl->addLayout(hline3);
   vlayoutl->addLayout(hline4);
+  vlayoutl->addStretch();
 
   setLayout(vlayoutl);
+  m_edPinCode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  setFixedSize(vlayoutl->sizeHint());
+
+  QObject::connect(m_btnEnter, SIGNAL(clicked(bool)), this, SLOT(search()));
+  QObject::connect(m_btn0, SIGNAL(clicked(bool)), this, SLOT(pressed0()));
+  QObject::connect(m_btn1, SIGNAL(clicked(bool)), this, SLOT(pressed1()));
+  QObject::connect(m_btn2, SIGNAL(clicked(bool)), this, SLOT(pressed2()));
+  QObject::connect(m_btn3, SIGNAL(clicked(bool)), this, SLOT(pressed3()));
+  QObject::connect(m_btn4, SIGNAL(clicked(bool)), this, SLOT(pressed4()));
+  QObject::connect(m_btn5, SIGNAL(clicked(bool)), this, SLOT(pressed5()));
+  QObject::connect(m_btn6, SIGNAL(clicked(bool)), this, SLOT(pressed6()));
+  QObject::connect(m_btn7, SIGNAL(clicked(bool)), this, SLOT(pressed7()));
+  QObject::connect(m_btn8, SIGNAL(clicked(bool)), this, SLOT(pressed8()));
+  QObject::connect(m_btn9, SIGNAL(clicked(bool)), this, SLOT(pressed9()));
+  QObject::connect(m_btnClr, SIGNAL(clicked(bool)), this, SLOT(erase()));
 }
 
 void PinCodeView::setDatabase(QSqlDatabase db)
@@ -135,60 +157,43 @@ void PinCodeView::setDatabase(QSqlDatabase db)
   m_db = db;
 }
 
-void PinCodeView::keyPressEvent(QKeyEvent *event)
+void PinCodeView::append(QChar c)
 {
-  switch (event->key())
+  m_edPinCode->setText(m_edPinCode->text().append(c));
+}
+
+void PinCodeView::search()
+{
+  QString error;
+  if (!PersonSQL::select(m_db, m_currentPerson, error))
   {
-    case Qt::Key_Enter:
-    case Qt::Key_Return:
-    {
-      QString error;
-      if (!PersonSQL::select(m_db, m_currentPerson, error))
-      {
-        QMessageBox::warning(this,
-                             tr("Aviso"),
-                             error,
-                             QMessageBox::Ok);
-      }
-      else
-      {
-        close();
-      }
-    };
-    case Qt::Key_0:
-      m_edPinCode->setText(m_edPinCode->text() + "0");
-      break;
-    case Qt::Key_1:
-      m_edPinCode->setText(m_edPinCode->text() + "1");
-      break;
-    case Qt::Key_2:
-      m_edPinCode->setText(m_edPinCode->text() + "2");
-      break;
-    case Qt::Key_3:
-      m_edPinCode->setText(m_edPinCode->text() + "3");
-      break;
-    case Qt::Key_4:
-      m_edPinCode->setText(m_edPinCode->text() + "4");
-      break;
-    case Qt::Key_5:
-      m_edPinCode->setText(m_edPinCode->text() + "5");
-      break;
-    case Qt::Key_6:
-      m_edPinCode->setText(m_edPinCode->text() + "6");
-      break;
-    case Qt::Key_7:
-      m_edPinCode->setText(m_edPinCode->text() + "7");
-      break;
-    case Qt::Key_8:
-      m_edPinCode->setText(m_edPinCode->text() + "8");
-      break;
-    case Qt::Key_9:
-      m_edPinCode->setText(m_edPinCode->text() + "9");
-      break;
+    QMessageBox::warning(this,
+                         tr("Aviso"),
+                         error,
+                         QMessageBox::Ok);
   }
+  else
+  {
+    close();
+  }
+}
+
+void PinCodeView::erase()
+{
+  QString str = m_edPinCode->text();
+  str.chop(1);
+  m_edPinCode->setText(str);
 }
 
 Person PinCodeView::getCurrentPerson() const
 {
   return m_currentPerson;
+}
+
+void PinCodeView::keyPressEvent(QKeyEvent *event)
+{
+  if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    m_btnEnter->animateClick();
+  else
+    QDialog::keyPressEvent(event);
 }

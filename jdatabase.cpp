@@ -269,6 +269,14 @@ void JDatabase::selectItem(qlonglong id)
       if (bSuccess)
         emit itemSelectedSignal(o);
     }
+    else if (m_tableName == NOTE_SQL_TABLE_NAME)
+    {
+      Note o;
+      o.m_id = id;
+      bSuccess = NoteSQL::select(model->database(), o, error);
+      if (bSuccess)
+        emit itemSelectedSignal(o);
+    }
     else
     {
       error = tr("Item ainda não implementado.");
@@ -322,6 +330,8 @@ void JDatabase::removeItem()
       bSuccess = CategorySQL::remove(model->database(), id, error);
     else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
       bSuccess = ProductSQL::remove(model->database(), id, error);
+    else if (m_tableName == NOTE_SQL_TABLE_NAME)
+      bSuccess = NoteSQL::remove(model->database(), id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -429,6 +439,13 @@ bool JDatabase::save(const JItem& jItem)
       bSuccess = o.isValidId()
                  ? ProductSQL::update(model->database(), o, error)
                  : ProductSQL::insert(model->database(), o, error);
+    }
+    else if (m_tableName == NOTE_SQL_TABLE_NAME)
+    {
+      const Note& o = dynamic_cast<const Note&>(jItem);
+      bSuccess = o.isValidId()
+                 ? NoteSQL::update(model->database(), o, error)
+                 : NoteSQL::insert(model->database(), o, error);
     }
     else
       error = tr("Item ainda não implementado.");

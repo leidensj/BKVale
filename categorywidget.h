@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QSqlDatabase>
+#include "jitem.h"
 
 class JDatabase;
 class CategoryView;
@@ -16,9 +17,9 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void categorySelected(qlonglong id);
-  void removeCategory(qlonglong id);
-  void saveCategory();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 
 private:
   CategoryView* m_view;

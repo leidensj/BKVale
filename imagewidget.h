@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QSqlDatabase>
+#include "jitem.h"
 
 class ImageView;
 class JDatabase;
@@ -16,9 +17,9 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void imageSelected(qlonglong id);
-  void removeImage(qlonglong id);
-  void saveImage();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 
 private:
   ImageView* m_view;

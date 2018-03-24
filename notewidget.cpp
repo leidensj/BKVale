@@ -114,6 +114,7 @@ void NoteWidget::showSearch()
 
 bool NoteWidget::print(QIODevice* printer,
                        InterfaceType type,
+                       const QString& userName,
                        int id)
 {
   Note note;
@@ -121,16 +122,9 @@ bool NoteWidget::print(QIODevice* printer,
   QString error;
   if (NoteSQL::select(m_database->get(), note, error))
   {
-    PinCodeView w(this);
-    w.setDatabase(m_database->get());
-    w.exec();
-    if (w.getCurrentPerson().isValidId())
-    {
-      QString str(NotePrinter::build(note, w.getCurrentPerson().m_alias));
-      if (Printer::printString(printer, type, str, error))
-        return true;
-    }
-
+    QString str(NotePrinter::build(note, userName));
+    if (Printer::printString(printer, type, str, error))
+      return true;
   }
 
   QMessageBox::warning(this,
@@ -152,10 +146,18 @@ bool NoteWidget::save()
 void NoteWidget::saveAndPrint(QIODevice* printer,
                               InterfaceType type)
 {
-  if (save())
+  PinCodeView w(this);
+  w.setDatabase(m_database->get());
+  if (w.exec())
   {
-    create();
-    print(printer, type, m_view->getLastID());
+    if (w.getCurrentPerson().isValidId())
+    {
+      if (save())
+      {
+        create();
+        print(printer, type, w.getCurrentPerson().m_alias, m_view->getLastID());
+      }
+    }
   }
 }
 

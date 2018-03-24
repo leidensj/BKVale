@@ -26,19 +26,19 @@ ImageWidget::ImageWidget(QWidget* parent)
   setLayout(vlayout0);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(qlonglong)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(imageSelected(qlonglong)));
+                   SLOT(itemSelected(const JItem&)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(qlonglong)),
+                   SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
-                   SLOT(removeImage(qlonglong)));
+                   SLOT(itemRemoved(qlonglong)));
 
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
                    this,
-                   SLOT(saveImage()));
+                   SLOT(save()));
 }
 
 void ImageWidget::setDatabase(QSqlDatabase db)
@@ -47,66 +47,22 @@ void ImageWidget::setDatabase(QSqlDatabase db)
   m_database->set(model, IMAGE_SQL_TABLE_NAME, Image::getColumns());
 }
 
-void ImageWidget::imageSelected(qlonglong id)
+void ImageWidget::itemSelected(const JItem& jItem)
 {
-  Image image;
-  image.m_id = id;
-  QString error;
-  if (ImageSQL::select(m_database->get(), image, error))
-  {
+  const Image& image = dynamic_cast<const Image&>(jItem);
+  if (image.isValidId())
     m_view->setImage(image);
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao abrir a imagem com ID '%2'.").arg(error, QString::number(image.m_id)),
-                          QMessageBox::Ok);
-  }
 }
 
-void ImageWidget::removeImage(qlonglong id)
+void ImageWidget::itemRemoved(qlonglong id)
 {
-  QString error;
-  if (QMessageBox::question(this,
-                            tr("Remover imagem"),
-                            tr("Tem certeza que deseja remover a imagem selecionada?"),
-                            QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
-  {
-    if (ImageSQL::remove(m_database->get(), id, error))
-    {
-      Image image = m_view->getImage();
-      if (id == image.m_id)
-        m_view->create();
-      m_database->refresh();
-    }
-    else
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("Erro '%1' ao remover a imagem com ID '%2'.").arg(error, QString::number(id)),
-                            QMessageBox::Ok);
-    }
-  }
-}
-
-void ImageWidget::saveImage()
-{
-  QString error;
-  Image image = m_view->getImage();
-
-  if (image.isValidId()
-      ? ImageSQL::update(m_database->get(), image, error)
-      : ImageSQL::insert(m_database->get(), image, error))
-  {
-    m_database->refresh();
+  if (m_view->getImage().m_id == id)
     m_view->create();
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao salvar imagem.").arg(error),
-                          QMessageBox::Ok);
-  }
+}
+
+void ImageWidget::save()
+{
+  Image image = m_view->getImage();
+  if (m_database->save(image))
+    m_view->create();
 }

@@ -68,10 +68,6 @@ PersonView::PersonView(QWidget* parent)
                    this,
                    SLOT(emitSaveSignal()));
   QObject::connect(m_personPage,
-                   SIGNAL(searchImageSignal()),
-                   this,
-                   SLOT(emitSearchImageSignal()));
-  QObject::connect(m_personPage,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));

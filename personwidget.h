@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QSqlDatabase>
+#include "jitem.h"
 
 class JDatabase;
 class PersonView;
@@ -17,9 +18,9 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void personSelected(qlonglong id);
-  void removePerson(qlonglong id);
-  void savePerson();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 
 private:
   JDatabase* m_database;

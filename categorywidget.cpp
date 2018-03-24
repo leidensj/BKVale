@@ -27,19 +27,19 @@ CategoryWidget::CategoryWidget(QWidget* parent)
   setLayout(vlayout0);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(int)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(categorySelected(int)));
+                   SLOT(itemSelected(const JItem&)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(qlonglong)),
+                   SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
-                   SLOT(removeCategory(qlonglong)));
+                   SLOT(itemRemoved(qlonglong)));
 
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
                    this,
-                   SLOT(saveCategory()));
+                   SLOT(save()));
 
   QObject::connect(m_view,
                    SIGNAL(searchImageSignal()),
@@ -53,66 +53,22 @@ void CategoryWidget::setDatabase(QSqlDatabase db)
   m_database->set(model, CATEGORY_SQL_TABLE_NAME, Category::getColumns());
 }
 
-void CategoryWidget::categorySelected(qlonglong id)
+void CategoryWidget::itemSelected(const JItem& jItem)
 {
-  QString error;
-  Category category;
-  category.m_id = id;
-  if (CategorySQL::select(m_database->get(),
-                          category,
-                          error))
-  {
+  const Category& category = dynamic_cast<const Category&>(jItem);
+  if (category.isValidId())
     m_view->setCategory(category);
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao abrir categoria com ID '%2'.").arg(error,
-                                                                              QString::number(id)),
-                          QMessageBox::Ok);
-  }
 }
 
-void CategoryWidget::removeCategory(qlonglong id)
+void CategoryWidget::itemRemoved(qlonglong id)
 {
-  QString error;
-  if (!CategorySQL::remove(m_database->get(),
-                          id,
-                          error))
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao remover categoria com ID '%2'.").arg(error,
-                                                                                QString::number(id)),
-                          QMessageBox::Ok);
-  }
-  else
-  {
-    Category category = m_view->getCategory();
-    if (category.m_id == id)
-      m_view->create();
-  }
-}
-
-void CategoryWidget::saveCategory()
-{
-  QString error;
-  Category category = m_view->getCategory();
-  bool bSuccess = category.isValidId()
-                  ? CategorySQL::update(m_database->get(), category, error)
-                  : CategorySQL::insert(m_database->get(), category, error);
-
-  if (bSuccess)
-  {
+  if (m_view->getCategory().m_id == id)
     m_view->create();
-    m_database->refresh();
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao salvar categoria.").arg(error),
-                          QMessageBox::Ok);
-  }
+}
+
+void CategoryWidget::save()
+{
+  Category category = m_view->getCategory();
+  if (m_database->save(category))
+    m_view->create();
 }

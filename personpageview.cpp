@@ -206,6 +206,7 @@ Person PersonPageView::getPerson() const
   person.m_bCustomer = m_cbCustomer->isChecked();
   person.m_bSupplier = m_cbSupplier->isChecked();
   person.m_bEmployee = m_cbEmployee->isChecked();
+  person.m_employeePinCode = m_edPinCode->text();
   return person;
 
 }

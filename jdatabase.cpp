@@ -332,6 +332,8 @@ void JDatabase::removeItem()
       bSuccess = ProductSQL::remove(model->database(), id, error);
     else if (m_tableName == NOTE_SQL_TABLE_NAME)
       bSuccess = NoteSQL::remove(model->database(), id, error);
+    else if (m_tableName == USER_SQL_TABLE_NAME)
+      bSuccess = UserSQL::remove(model->database(), id, error);
     else
       error = tr("Item ainda não implementado.");
 

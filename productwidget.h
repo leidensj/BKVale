@@ -18,9 +18,9 @@ public:
   void setDatabase(QSqlDatabase db);
 
 private slots:
-  void productSelected(const JItem& jItem);
-  void removeProduct(qlonglong id);
-  void saveProduct();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 
 private:
   JDatabase* m_database;

@@ -28,6 +28,7 @@ private:
   bool save();
   bool print(QIODevice* printer,
              InterfaceType type,
+             const QString& userName,
              int id);
 
 public slots:

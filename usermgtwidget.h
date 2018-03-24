@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QSqlDatabase>
+#include "jitem.h"
 
 class UserMgtView;
 class UserMgtDatabase;
@@ -24,9 +25,9 @@ private:
   bool m_bHasAnyUserChanged;
 
 private slots:
-  void userSelected(qlonglong id);
-  void removeUser(qlonglong id);
-  void saveUser();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 };
 
 #endif // USERMGTWIDGET_H

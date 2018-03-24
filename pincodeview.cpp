@@ -6,10 +6,13 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QLabel>
 
 PinCodeView::PinCodeView(QWidget* parent)
   : QDialog(parent)
 {
+  setWindowIcon(QIcon(":/icons/res/employee.png"));
+  setWindowTitle(tr("Selecionar Funcionário"));
   m_btn7 = new QPushButton;
   m_btn7->setFlat(true);
   m_btn7->setText("");
@@ -109,7 +112,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btnEnter->setFlat(true);
   m_btnEnter->setText("");
   m_btnEnter->setIconSize(QSize(64, 64));
-  m_btnEnter->setIcon(QIcon(":/icons/res/enter.png"));
+  m_btnEnter->setIcon(QIcon(":/icons/res/pincode.png"));
 
   QHBoxLayout* hline4 = new QHBoxLayout();
   hline4->addWidget(m_btnClr);
@@ -117,16 +120,30 @@ PinCodeView::PinCodeView(QWidget* parent)
   hline4->addWidget(m_btnEnter);
   hline4->setContentsMargins(0, 0, 0, 0);
 
+  QLabel* lbl = new QLabel();
+  lbl->setPixmap(QIcon(":/icons/res/employee.png").pixmap(QSize(32, 32)));
+  lbl->setMinimumSize(32, 32);
+  lbl->setMaximumSize(32, 32);
+  lbl->setScaledContents(true);
+
   m_edPinCode = new QLineEdit;
   m_edPinCode->setAlignment(Qt::AlignCenter);
   m_edPinCode->setReadOnly(true);
   m_edPinCode->setEchoMode(QLineEdit::EchoMode::Password);
   QFont f = m_edPinCode->font();
   f.setPointSize(24);
+  f.setBold(true);
   m_edPinCode->setFont(f);
+  m_edPinCode->setPlaceholderText(tr("Código PIN"));
+  m_edPinCode->setReadOnly(true);
+
+  QHBoxLayout* hline5 = new QHBoxLayout();
+  hline5->addWidget(lbl);
+  hline5->addWidget(m_edPinCode);
+  hline5->setContentsMargins(0, 0, 0, 0);
 
   QVBoxLayout* vlayoutl = new QVBoxLayout();
-  vlayoutl->addWidget(m_edPinCode);
+  vlayoutl->addLayout(hline5);
   vlayoutl->addLayout(hline1);
   vlayoutl->addLayout(hline2);
   vlayoutl->addLayout(hline3);
@@ -134,9 +151,20 @@ PinCodeView::PinCodeView(QWidget* parent)
   vlayoutl->addStretch();
 
   setLayout(vlayoutl);
-  m_edPinCode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-  setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-  setFixedSize(vlayoutl->sizeHint());
+  setFixedSize(vlayoutl->minimumSize());
+
+  m_edPinCode->installEventFilter(this);
+  m_btnClr->installEventFilter(this);
+  m_btn0->installEventFilter(this);
+  m_btn1->installEventFilter(this);
+  m_btn2->installEventFilter(this);
+  m_btn3->installEventFilter(this);
+  m_btn4->installEventFilter(this);
+  m_btn5->installEventFilter(this);
+  m_btn6->installEventFilter(this);
+  m_btn7->installEventFilter(this);
+  m_btn8->installEventFilter(this);
+  m_btn9->installEventFilter(this);
 
   QObject::connect(m_btnEnter, SIGNAL(clicked(bool)), this, SLOT(search()));
   QObject::connect(m_btn0, SIGNAL(clicked(bool)), this, SLOT(pressed0()));
@@ -150,6 +178,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   QObject::connect(m_btn8, SIGNAL(clicked(bool)), this, SLOT(pressed8()));
   QObject::connect(m_btn9, SIGNAL(clicked(bool)), this, SLOT(pressed9()));
   QObject::connect(m_btnClr, SIGNAL(clicked(bool)), this, SLOT(erase()));
+
 }
 
 void PinCodeView::setDatabase(QSqlDatabase db)
@@ -165,16 +194,19 @@ void PinCodeView::append(QChar c)
 void PinCodeView::search()
 {
   QString error;
-  if (!PersonSQL::select(m_db, m_currentPerson, error))
+  if (!PersonSQL::isValidPinCode(m_db, m_edPinCode->text(),
+                                 m_currentPerson,
+                                 error))
   {
     QMessageBox::warning(this,
                          tr("Aviso"),
                          error,
                          QMessageBox::Ok);
+    m_edPinCode->clear();
   }
   else
   {
-    close();
+    accept();
   }
 }
 
@@ -190,10 +222,17 @@ Person PinCodeView::getCurrentPerson() const
   return m_currentPerson;
 }
 
-void PinCodeView::keyPressEvent(QKeyEvent *event)
+bool PinCodeView::eventFilter(QObject *target, QEvent *event)
 {
-  if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-    m_btnEnter->animateClick();
-  else
-    QDialog::keyPressEvent(event);
+  if (event->type() == QEvent::KeyPress)
+  {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if (keyEvent->key() == Qt::Key_Return ||
+        keyEvent->key() == Qt::Key_Enter)
+    {
+      m_btnEnter->animateClick();
+      return true;
+    }
+  }
+  return QDialog::eventFilter(target, event);
 }

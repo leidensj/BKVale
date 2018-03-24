@@ -65,17 +65,17 @@ PersonWidget::PersonWidget(QWidget *parent)
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
                    this,
-                   SLOT(savePerson()));
+                   SLOT(save()));
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(qlonglong)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(personSelected(qlonglong)));
+                   SLOT(itemSelected(const JItem&)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(qlonglong)),
+                   SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
-                   SLOT(removePerson(qlonglong)));
+                   SLOT(itemRemoved(qlonglong)));
 }
 
 PersonWidget::~PersonWidget()
@@ -90,67 +90,22 @@ void PersonWidget::setDatabase(QSqlDatabase db)
   m_view->setDatabase(db);
 }
 
-void PersonWidget::personSelected(qlonglong id)
+void PersonWidget::itemSelected(const JItem& jItem)
 {
-  Person person;
-  person.m_id = id;
-  QString error;
-  if (PersonSQL::select(m_database->get(), person, error))
-  {
-    m_view->setPerson(person);
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao abrir a pessoa com ID "
-                             "'%2'.").arg(error, QString::number(id)),
-                          QMessageBox::Ok);
-  }
+  const Person& person = dynamic_cast<const Person&>(jItem);
+  m_view->setPerson(person);
 }
 
-void PersonWidget::removePerson(qlonglong id)
+void PersonWidget::itemRemoved(qlonglong id)
 {
-  QString error;
-  if (QMessageBox::question(this,
-                            tr("Remover pessoa"),
-                            tr("Tem certeza que deseja remover a pessoa selecionada?"),
-                            QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
-  {
-    if (PersonSQL::remove(m_database->get(), id, error))
-    {
-      if (id == m_view->getPerson().m_id)
-        m_view->create();
-      m_database->refresh();
-    }
-    else
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("Erro '%1' ao remover a pessoa com ID "
-                               "'%2'.").arg(error, QString::number(id)),
-                            QMessageBox::Ok);
-    }
-  }
+  if (id == m_view->getPerson().m_id)
+    m_view->create();
 }
 
-void PersonWidget::savePerson()
+void PersonWidget::save()
 {
-  QString error;
   Person person;
   m_view->getPerson(person);
-
-  if (person.isValidId()
-      ? PersonSQL::update(m_database->get(), person, error)
-      : PersonSQL::insert(m_database->get(), person, error))
-  {
-    m_database->refresh();
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao salvar pessoa.").arg(error),
-                          QMessageBox::Ok);
-  }
+  if (m_database->save(person))
+    m_view->create();
 }

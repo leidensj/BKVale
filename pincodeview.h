@@ -18,7 +18,7 @@ public:
   Person getCurrentPerson() const;
 
 protected:
-  void keyPressEvent(QKeyEvent *event);
+  bool eventFilter(QObject *target, QEvent *event);
 
 private:
   void append(QChar c);

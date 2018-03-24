@@ -31,19 +31,19 @@ UserMgtWidget::UserMgtWidget(qlonglong currentUserID, QWidget* parent)
   setLayout(h1);
 
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(qlonglong)),
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(userSelected(qlonglong)));
+                   SLOT(itemSelected(const JItem&)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemoveSignal(qlonglong)),
+                   SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
-                   SLOT(removeUser(qlonglong)));
+                   SLOT(itemRemoved(qlonglong)));
 
   QObject::connect(m_view,
                    SIGNAL(saveSignal()),
                    this,
-                   SLOT(saveUser()));
+                   SLOT(save()));
 
   m_view->create();
 }
@@ -54,80 +54,26 @@ void UserMgtWidget::setDatabase(QSqlDatabase db)
   m_database->set(model, USER_SQL_TABLE_NAME, User::getColumns());
 }
 
-void UserMgtWidget::userSelected(qlonglong id)
+void UserMgtWidget::itemSelected(const JItem& jItem)
 {
-  User user;
-  user.m_id = id;
-  QString error;
-  if (UserSQL::select(m_database->get(), user, error))
-  {
+  const User& user = dynamic_cast<const User&>(jItem);
+  if (user.isValidId())
     m_view->setUser(user);
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao abrir usuário com ID '%2'.").arg(error, id),
-                          QMessageBox::Ok);
-  }
 }
 
-void UserMgtWidget::removeUser(qlonglong id)
+void UserMgtWidget::itemRemoved(qlonglong id)
 {
-  if (id == m_currentUserID)
-  {
-    QMessageBox::warning(this,
-                         tr("Impossível remover usuário"),
-                         tr("Você não pode remover o usuário logado atualmente."),
-                         QMessageBox::Ok);
-    return;
-  }
-
-  User user;
-  user.m_id = id;
-  QString error;
-  UserSQL::select(m_database->get(), user, error);
-  if (QMessageBox::question(this,
-                            tr("Remover usuário"),
-                            tr("Tem certeza que deseja remover o usuário '%1'?").arg(user.m_strUser),
-                            QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
-  {
-    if (UserSQL::remove(m_database->get(), user.m_id, error))
-    {
-      User userview = m_view->getUser();
-      if (user.m_id == userview.m_id)
-        m_view->create();
-    }
-    else
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("Erro '%1' ao remover usuário com ID '%2'.").arg(error, id),
-                            QMessageBox::Ok);
-    }
-  }
+  if (m_view->getUser().m_id == id)
+    m_view->create();
 }
 
-void UserMgtWidget::saveUser()
+void UserMgtWidget::save()
 {
-  QString error;
   User user = m_view->getUser();
-  bool bSuccess = user.isValidId()
-                  ? UserSQL::update(m_database->get(), user, m_view->getPassword(), error)
-                  : UserSQL::insert(m_database->get(), user, m_view->getPassword(), error);
-
-  if (bSuccess)
+  if (m_database->save(user))
   {
     m_bHasAnyUserChanged = true;
     m_view->create();
-    m_database->refresh();
-  }
-  else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao salvar usuário.").arg(error),
-                          QMessageBox::Ok);
   }
 }
 

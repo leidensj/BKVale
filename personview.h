@@ -37,6 +37,7 @@ signals:
   void saveSignal();
 
 private:
+  QSqlDatabase m_db;
   Person m_currentPerson;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;

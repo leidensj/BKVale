@@ -1837,7 +1837,7 @@ bool PersonSQL::execByPinCodeSelect(QSqlQuery& query,
     }
     else
     {
-      error = "Pin informado não encontrado.";
+      error = "Código PIN informado não encontrado.";
       bSuccess = false;
     }
   }

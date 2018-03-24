@@ -169,16 +169,9 @@
     <property name="title">
      <string>Cadastros</string>
     </property>
-    <widget class="QMenu" name="menuPessoas">
-     <property name="title">
-      <string>Pessoas</string>
-     </property>
-     <addaction name="actionPersons"/>
-     <addaction name="actionEmployees"/>
-    </widget>
-    <addaction name="menuPessoas"/>
     <addaction name="actionUsers"/>
     <addaction name="actionProducts"/>
+    <addaction name="actionPersons"/>
     <addaction name="actionCategories"/>
     <addaction name="actionImages"/>
    </widget>
@@ -186,8 +179,6 @@
     <property name="title">
      <string>Impressora</string>
     </property>
-    <addaction name="actionConnect"/>
-    <addaction name="actionDisconnect"/>
     <addaction name="actionPrint"/>
    </widget>
    <widget class="QMenu" name="menuConfigura_es">
@@ -341,30 +332,6 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar pessoas</string>
-   </property>
-  </action>
-  <action name="actionEmployees">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/employee.png</normaloff>:/icons/res/employee.png</iconset>
-   </property>
-   <property name="text">
-    <string>Employees</string>
-   </property>
-   <property name="toolTip">
-    <string>Gerenciar funcionários</string>
-   </property>
-  </action>
-  <action name="actionCashRegister">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/cashier.png</normaloff>:/icons/res/cashier.png</iconset>
-   </property>
-   <property name="text">
-    <string>Caixa</string>
-   </property>
-   <property name="toolTip">
-    <string>Gerenciar caixas</string>
    </property>
   </action>
  </widget>

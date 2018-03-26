@@ -421,13 +421,13 @@ bool BaitaSQL::init(QSqlDatabase db,
                           IMAGE_SQL_TABLE_NAME "(" IMAGE_SQL_COL00 ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
-                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "_TITLE TEXT,"
-                          "_MESSAGE TEXT,"
-                          "_FAVORITE INT,"
-                          "_CAPITALIZATION INT,"
-                          "_SIZE INT)");
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " REMINDER_SQL_TABLE_NAME " ("
+                          REMINDER_SQL_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          REMINDER_SQL_COL00 " TEXT,"
+                          REMINDER_SQL_COL00 " TEXT,"
+                          REMINDER_SQL_COL00 " INT,"
+                          REMINDER_SQL_COL00 " INT,"
+                          REMINDER_SQL_COL00 " INT)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
@@ -1132,141 +1132,151 @@ bool ImageSQL::remove(QSqlDatabase db,
   return false;
 }
 
-bool ReminderSQL::select(QSqlDatabase db,
-                         Reminder& r,
-                         QString error)
+bool ReminderSQL::execSelect(QSqlQuery& query,
+                             Reminder& reminder,
+                             QString& error)
 {
-  error.clear();
-
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
+  qlonglong id = reminder.m_id;
+  reminder.clear();
   query.prepare("SELECT "
-                "_TITLE,"
-                "_MESSAGE,"
-                "_FAVORITE,"
-                "_CAPITALIZATION,"
-                "_SIZE "
-                "FROM _REMINDERS "
-                "WHERE _ID = (:_id)");
+                REMINDER_SQL_COL01 ","
+                REMINDER_SQL_COL02 ","
+                REMINDER_SQL_COL03 ","
+                REMINDER_SQL_COL04 ","
+                REMINDER_SQL_COL05
+                " FROM " REMINDER_SQL_TABLE_NAME
+                " WHERE " REMINDER_SQL_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
 
-  query.bindValue(":_id", r.m_id);
-
-  bool bSuccess = query.exec();
-  if (bSuccess)
+  if (query.exec())
   {
-    bSuccess = query.next();
-    if (bSuccess)
+    if (query.next())
     {
-      r.m_title = query.value(query.record().indexOf("_TITLE")).toString();
-      r.m_message = query.value(query.record().indexOf("_MESSAGE")).toString();
-      r.m_bFavorite = query.value(query.record().indexOf("_FAVORITE")).toBool();
-      r.m_capitalization = (Reminder::Capitalization)
-                           query.value(query.record().indexOf("_CAPITALIZATION")).toInt();
-      r.m_size = (Reminder::Size)
-                 query.value(query.record().indexOf("_SIZE")).toInt();
+      reminder.m_id = id;
+      reminder.m_title = query.value(0).toString();
+      reminder.m_message = query.value(1).toString();
+      reminder.m_bFavorite = query.value(2).toBool();
+      reminder.m_capitalization = (Reminder::Capitalization)query.value(3).toInt();
+      reminder.m_size = (Reminder::Size)query.value(4).toInt();
+      return true;
     }
     else
     {
-      r.clear();
-      r.m_title = "Lembrete não encontrado.";
       error = "Lembrete não encontrado.";
+      return false;
     }
   }
   else
   {
     error = query.lastError().text();
+    return false;
   }
+}
 
+bool ReminderSQL::select(QSqlDatabase db,
+                         Reminder& reminder,
+                         QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execSelect(query, reminder, error);
+  bSuccess = finishTransaction(db, bSuccess, error);
+  if (!bSuccess)
+    reminder.clear();
   return bSuccess;
 }
 
-bool ReminderSQL::insertOrUpdate(QSqlDatabase db,
-                                 const Reminder& r,
-                                 QString& error)
+bool ReminderSQL::insert(QSqlDatabase db,
+                         const Reminder& reminder,
+                         QString& error)
 {
   error.clear();
 
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
-  bool bSuccess = false;
   QSqlQuery query(db);
-  if (r.isValidID())
+  query.prepare("INSERT INTO " REMINDER_SQL_TABLE_NAME " ("
+                REMINDER_SQL_COL01 ","
+                REMINDER_SQL_COL02 ","
+                REMINDER_SQL_COL03 ","
+                REMINDER_SQL_COL04 ","
+                REMINDER_SQL_COL05
+                ") VALUES ("
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04),"
+                "(:_v05))");
+  query.bindValue(":_v01", reminder.m_title);
+  query.bindValue(":_v02", reminder.m_message);
+  query.bindValue(":_v03", reminder.m_bFavorite);
+  query.bindValue(":_v04", (int)reminder.m_capitalization);
+  query.bindValue(":_v05", (int)reminder.m_size);
+
+  if (query.exec())
   {
-    bSuccess = query.prepare("UPDATE _REMINDERS SET "
-                             "_TITLE = :_title,"
-                             "_MESSAGE = :_msg,"
-                             "_FAVORITE = :_fav,"
-                             "_CAPITALIZATION = :_cap,"
-                             "_SIZE = :_size"
-                             " WHERE _ID = (:_id)");
-    if (bSuccess)
-      query.bindValue(":_id", r.m_id);
-  }
-  else
-  {
-    bSuccess = query.prepare("INSERT INTO _REMINDERS ("
-                             "_TITLE,"
-                             "_MESSAGE,"
-                             "_FAVORITE,"
-                             "_CAPITALIZATION,"
-                             "_SIZE) "
-                             "VALUES ("
-                             "(:_title),"
-                             "(:_msg),"
-                             "(:_fav),"
-                             "(:_cap),"
-                             "(:_size))");
+    reminder.m_id = query.lastInsertId().toLongLong();
+    return true;
   }
 
-  if (bSuccess)
-  {
-    query.bindValue(":_id", r.m_id);
-    query.bindValue(":_title", r.m_title);
-    query.bindValue(":_msg", r.m_message);
-    query.bindValue(":_fav", r.m_bFavorite);
-    query.bindValue(":_cap", (int)r.m_capitalization);
-    query.bindValue(":_size", (int)r.m_size);
-    bSuccess = query.exec();
-  }
-
-  if (!bSuccess)
-    error = query.lastError().text();
-
-  return bSuccess;
+  error = query.lastError().text();
+  return false;
 }
 
-void ReminderSQL::setFavorite(QSqlDatabase db,
-                              qlonglong id,
-                              bool bFav)
+bool ReminderSQL::update(QSqlDatabase db,
+                         const Reminder& reminder,
+                         QString& error)
 {
-    QSqlQuery query(db);
-    if (query.prepare("UPDATE _REMINDERS SET "
-                      "_FAVORITE = :_fav"
-                      " WHERE _ID = (:_id)"))
-    {
-      query.bindValue(":_id", id);
-      query.bindValue(":_fav", bFav);
-    }
-    query.exec();
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  QSqlQuery query(db);
+  query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME " SET "
+                REMINDER_SQL_COL01 " = (:_v01),"
+                REMINDER_SQL_COL02 " = (:_v02),"
+                REMINDER_SQL_COL03 " = (:_v03),"
+                REMINDER_SQL_COL04 " = (:_v04),"
+                REMINDER_SQL_COL05 " = (:_v02)"
+                " WHERE " REMINDER_SQL_COL00 " = (:_v00)");
+  query.bindValue(":_v00", reminder.m_id);
+  query.bindValue(":_v01", reminder.m_title);
+  query.bindValue(":_v02", reminder.m_message);
+  query.bindValue(":_v03", reminder.m_bFavorite);
+  query.bindValue(":_v04", (int)reminder.m_capitalization);
+  query.bindValue(":_v05", (int)reminder.m_size);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
+  return false;
 }
 
-bool ReminderSQL::isFavorite(QSqlDatabase db,
-                             qlonglong id)
+bool ReminderSQL::remove(QSqlDatabase db,
+                         qlonglong id,
+                         QString& error)
 {
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
   QSqlQuery query(db);
-  if (query.prepare("SELECT "
-                    "_FAVORITE "
-                    "FROM _REMINDERS "
-                    "WHERE _ID = (:_id)"))
-  {
-    query.bindValue(":_id", id);
-    if (query.exec())
-      if (query.next())
-        return query.value(0).toBool();
-  }
+  query.prepare("DELETE FROM " REMINDER_SQL_TABLE_NAME
+                " WHERE " REMINDER_SQL_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
+
+  if (query.exec())
+    return true;
+
+  error = query.lastError().text();
   return false;
 }
 
@@ -1441,7 +1451,6 @@ double ConsumptionSQL::getTotal(QSqlDatabase db,
 
 bool UserSQL::insert(QSqlDatabase db,
                      const User& user,
-                     const QString& strPassword,
                      QString& error)
 {
   error.clear();
@@ -1473,7 +1482,7 @@ bool UserSQL::insert(QSqlDatabase db,
                 "(:_v09),"
                 "(:_v10))");
   query.bindValue(":_v01", user.m_strUser);
-  query.bindValue(":_v02", user.st_strEncryptedPassword(strPassword));
+  query.bindValue(":_v02", user.strEncryptedPassword());
   query.bindValue(":_v03", user.m_bAccessNote);
   query.bindValue(":_v04", user.m_bAccessReminder);
   query.bindValue(":_v05", user.m_bAccessCalculator);
@@ -1495,7 +1504,6 @@ bool UserSQL::insert(QSqlDatabase db,
 
 bool UserSQL::update(QSqlDatabase db,
                      const User& user,
-                     const QString& strPassword,
                      QString& error)
 {
   error.clear();
@@ -1505,7 +1513,7 @@ bool UserSQL::update(QSqlDatabase db,
 
   QString strQuery("UPDATE " USER_SQL_TABLE_NAME " SET "
                    USER_SQL_COL01 " = (:_v01),");
-  if (!strPassword.isEmpty())
+  if (!user.m_password.isEmpty())
     strQuery += USER_SQL_COL02 " = (:_v02),";
   strQuery += USER_SQL_COL03" = (:_v03),"
               USER_SQL_COL04" = (:_v04),"
@@ -1522,8 +1530,8 @@ bool UserSQL::update(QSqlDatabase db,
   query.prepare(strQuery);
   query.bindValue(":_v00", user.m_id);
   query.bindValue(":_v01", user.m_strUser);
-  if (!strPassword.isEmpty())
-    query.bindValue(":_v02", User::st_strEncryptedPassword(strPassword));
+  if (!user.m_password.isEmpty())
+    query.bindValue(":_v02", user.strEncryptedPassword());
   query.bindValue(":_v03", user.m_bAccessNote);
   query.bindValue(":_v04", user.m_bAccessReminder);
   query.bindValue(":_v05", user.m_bAccessCalculator);

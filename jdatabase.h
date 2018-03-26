@@ -10,6 +10,7 @@
 #include "jtablecolumn.h"
 #include "product.h"
 #include "person.h"
+#include "reminder.h"
 
 class QPushButton;
 class JTableView;

@@ -5,7 +5,7 @@
 #include "productview.h"
 #include "categoryview.h"
 #include "noteview.h"
-#include "reminderwidget.h"
+#include "reminderview.h"
 #include "consumptionwidget.h"
 #include "calculatorwidget.h"
 #include "usermgtwidget.h"
@@ -31,7 +31,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
 {
   ui->setupUi(this);
   m_note = new NoteView;
-  m_reminder = new ReminderWidget;
+  m_reminder = new ReminderView;
   m_consumption = new ConsumptionWidget;
   m_calculator = new CalculatorWidget;
   ui->tabNotes->layout()->addWidget(m_note);
@@ -237,7 +237,7 @@ void BaitaAssistant::print()
       m_note->saveAndPrint(printer, m_settings.m_interfaceType);
       break;
     case Functionality::ReminderMode:
-      m_reminder->saveAndPrint(printer, m_settings.m_interfaceType, m_userLogin.getId());
+      m_reminder->saveAndPrint(printer, m_settings.m_interfaceType);
       break;
     case Functionality::ConsumptionMode:
       print(m_consumption->printContent());
@@ -325,7 +325,7 @@ void BaitaAssistant::updateControls()
       ui->actionPrint->setEnabled(m_note->getNote().isValid() && bIsOpen);
       break;
     case Functionality::ReminderMode:
-      ui->actionPrint->setEnabled(m_reminder->isValid() && bIsOpen);
+      ui->actionPrint->setEnabled(m_reminder->getReminder().isValid() && bIsOpen);
       break;
       case Functionality::CalculatorMode:
       ui->actionPrint->setEnabled(bIsOpen);

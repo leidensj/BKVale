@@ -64,12 +64,10 @@ namespace UserSQL
 {
   bool insert(QSqlDatabase db,
               const User& user,
-              const QString& strPassword,
               QString& error);
 
   bool update(QSqlDatabase db,
               const User& user,
-              const QString& strPassword,
               QString& error);
 
   bool select(QSqlDatabase db,
@@ -173,20 +171,25 @@ namespace ImageSQL
 
 namespace ReminderSQL
 {
-  bool insertOrUpdate(QSqlDatabase db,
-                      const Reminder& r,
-                      QString& error);
+  bool execSelect(QSqlQuery& query,
+                  Reminder& reminder,
+                  QString& error);
+
+  bool insert(QSqlDatabase db,
+              const Reminder& reminder,
+              QString& error);
+
+  bool update(QSqlDatabase db,
+              const Reminder& reminder,
+              QString& error);
 
   bool select(QSqlDatabase db,
-              Reminder& r,
-              QString error);
+              Reminder& reminder,
+              QString& error);
 
-  void setFavorite(QSqlDatabase db,
-                   qlonglong id,
-                   bool bFav);
-
-  bool isFavorite(QSqlDatabase db,
-                  qlonglong id);
+  bool remove(QSqlDatabase db,
+              qlonglong id,
+              QString& error);
 }
 
 namespace ConsumptionSQL

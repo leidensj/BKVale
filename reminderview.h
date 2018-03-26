@@ -2,13 +2,17 @@
 #define REMINDERVIEW_H
 
 #include <QFrame>
+#include <QSqlDatabase>
 #include "reminder.h"
+#include "settings.h"
 
-class QLineEdit;
+class JLineEdit;
 class QPlainTextEdit;
 class QCheckBox;
 class QRadioButton;
 class QPushButton;
+class QDockWidget;
+class JDatabase;
 
 class ReminderView : public QFrame
 {
@@ -16,34 +20,40 @@ class ReminderView : public QFrame
 
 public:
   explicit ReminderView(QWidget *parent = 0);
-  ~ReminderView();
-  Reminder reminder() const;
-  bool isValid() const;
-  bool isSaveChecked() const;
+  Reminder getReminder() const;
+  void setReminder(const Reminder& reminder);
+  void setDatabase(QSqlDatabase db);
+  void saveAndPrint(QIODevice* printer, InterfaceType type);
+
 
 private slots:
   void emitChangedSignal();
-  void emitSearchClickedSignal();
   void setCapitalization(int state);
+  void search();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  bool save();
+  bool print(QIODevice* printer, InterfaceType type);
 
 public slots:
-  void setReminder(const Reminder r);
-  void clear();
+  void create();
 
 signals:
-  changedSignal();
-  searchClickedSignal();
+  void changedSignal();
 
 private:
-  int m_currentID;
-  QLineEdit* m_title;
-  QPlainTextEdit* m_message;
-  QCheckBox* m_capitalization;
-  QRadioButton* m_size1;
-  QRadioButton* m_size2;
-  QPushButton* m_create;
-  QPushButton* m_search;
-  QCheckBox* m_save;
+  int m_currentId;
+  JLineEdit* m_edTitle;
+  QPlainTextEdit* m_teMessage;
+  QCheckBox* m_cbCapitalization;
+  QRadioButton* m_rdSize1;
+  QRadioButton* m_rdSize2;
+  QCheckBox* m_cbFavorite;
+  QPushButton* m_btnCreate;
+  QPushButton* m_btnSearch;
+  QCheckBox* m_cbSave;
+  JDatabase* m_database;
+  QDockWidget* m_dock;
 };
 
 #endif // REMINDERVIEW_H

@@ -21,8 +21,6 @@ SOURCES += main.cpp\
     databaseutils.cpp \
     settings.cpp \
     reminderview.cpp \
-    reminderwidget.cpp \
-    reminderdatabase.cpp \
     consumptionview.cpp \
     consumptiondatabase.cpp \
     consumptionwidget.cpp \
@@ -60,8 +58,6 @@ HEADERS  += mainwindow.h \
     settings.h \
     reminder.h \
     reminderview.h \
-    reminderwidget.h \
-    reminderdatabase.h \
     consumption.h \
     consumptionview.h \
     consumptiondatabase.h \

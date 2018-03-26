@@ -7,6 +7,8 @@
 #include "jitem.h"
 #include "defines.h"
 
+typedef QString Password;
+
 struct User : public JItem
 {
   User();
@@ -22,6 +24,7 @@ struct User : public JItem
   bool m_bAccessUser;
   bool m_bAccessProduct;
   bool m_bAccessSettings;
+  Password m_password;
 
   bool operator != (const JItem& other) const
   {
@@ -48,6 +51,7 @@ struct User : public JItem
     return m_strUser.length() > 4;
   }
 
+  QString strEncryptedPassword() const;
   static QString st_strEncryptedPassword(const QString& strPassword);
   static QVector<JTableColumn> getColumns()
   {

@@ -42,6 +42,55 @@ public:
   }
 };
 
+class ReminderTableModel : public QSqlTableModel
+{
+public:
+  ReminderTableModel(QObject *parent, QSqlDatabase db)
+    : QSqlTableModel(parent, db)
+  {
+
+  }
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  {
+    if (!index.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlTableModel::data(index, role);
+    if (role == Qt::DecorationRole)
+    {
+      if (index.column() == 3)
+      {
+        if (QSqlTableModel::data(index, Qt::EditRole).toBool())
+          value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
+        else
+          value = "";
+      }
+    }
+    else if (role == Qt::DisplayRole)
+    {
+      if (index.column() == 3)
+        value = value.toBool() ? tr("Sim") : "";
+      else if (index.column() == 1)
+      {
+        auto cap = (Reminder::Capitalization)record(index.row()).value(4).toInt();
+        switch (cap)
+        {
+          case Reminder::Capitalization::AllUppercase:
+            value = value.toString().toUpper();
+            break;
+          case Reminder::Capitalization::AllLowercase:
+            value = value.toString().toLower();
+            break;
+          case Reminder::Capitalization::Normal:
+          default:
+            break;
+        }
+      }
+    }
+    return value;
+  }
+};
 
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
@@ -210,9 +259,10 @@ void JDatabase::setDatabase(QSqlDatabase db,
     model = new ImageTableModel(this, db);
   else if (m_tableName == NOTE_SQL_TABLE_NAME)
     model = new NoteTableModel(this, db);
+  else if (m_tableName == REMINDER_SQL_TABLE_NAME)
+    model = new ReminderTableModel(this, db);
   else
     model = new QSqlTableModel(this, db);
-
 
   m_tableName = tableName;
   m_vColumns = vColumns;
@@ -319,6 +369,22 @@ void JDatabase::selectItem(qlonglong id)
       if (bSuccess)
         emit itemSelectedSignal(o);
     }
+    else if (m_tableName == USER_SQL_TABLE_NAME)
+    {
+      User o;
+      o.m_id = id;
+      bSuccess = UserSQL::select(model->database(), o, error);
+      if (bSuccess)
+        emit itemSelectedSignal(o);
+    }
+    else if (m_tableName == REMINDER_SQL_TABLE_NAME)
+    {
+      Reminder o;
+      o.m_id = id;
+      bSuccess = ReminderSQL::select(model->database(), o, error);
+      if (bSuccess)
+        emit itemSelectedSignal(o);
+    }
     else
     {
       error = tr("Item ainda não implementado.");
@@ -376,6 +442,8 @@ void JDatabase::removeItem()
       bSuccess = NoteSQL::remove(model->database(), id, error);
     else if (m_tableName == USER_SQL_TABLE_NAME)
       bSuccess = UserSQL::remove(model->database(), id, error);
+    else if (m_tableName == REMINDER_SQL_TABLE_NAME)
+      bSuccess = ReminderSQL::remove(model->database(), id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -493,6 +561,20 @@ bool JDatabase::save(const JItem& jItem)
       bSuccess = o.isValidId()
                  ? NoteSQL::update(model->database(), o, error)
                  : NoteSQL::insert(model->database(), o, error);
+    }
+    else if (m_tableName == USER_SQL_TABLE_NAME)
+    {
+      const User& o = dynamic_cast<const User&>(jItem);
+      bSuccess = o.isValidId()
+                 ? UserSQL::update(model->database(), o, error)
+                 : UserSQL::insert(model->database(), o, error);
+    }
+    else if (m_tableName == REMINDER_SQL_TABLE_NAME)
+    {
+      const Reminder& o = dynamic_cast<const Reminder&>(jItem);
+      bSuccess = o.isValidId()
+                 ? ReminderSQL::update(model->database(), o, error)
+                 : ReminderSQL::insert(model->database(), o, error);
     }
     else
       error = tr("Item ainda não implementado.");

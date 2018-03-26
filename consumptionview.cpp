@@ -1,5 +1,4 @@
 #include "consumptionview.h"
-#include "productwidget.h"
 #include <QDialog>
 #include <QLayout>
 #include <QDateEdit>

@@ -15,8 +15,8 @@ JDatabasePicker::JDatabasePicker(const QString& text,
                                  bool bDisplayGroup,
                                  QWidget* parent)
  : QFrame(parent)
- , m_id(INVALID_ID)
  , m_text(text)
+ , m_id(INVALID_ID)
  , m_selector(nullptr)
  , m_btnSearch(nullptr)
  , m_edText(nullptr)

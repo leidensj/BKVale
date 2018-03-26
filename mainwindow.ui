@@ -180,6 +180,8 @@
      <string>Impressora</string>
     </property>
     <addaction name="actionPrint"/>
+    <addaction name="actionConnect"/>
+    <addaction name="actionDisconnect"/>
    </widget>
    <widget class="QMenu" name="menuConfigura_es">
     <property name="title">

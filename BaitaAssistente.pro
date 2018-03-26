@@ -31,7 +31,6 @@ SOURCES += main.cpp\
     consumptionchart.cpp \
     calculatorwidget.cpp \
     noteview.cpp \
-    notewidget.cpp \
     logindialog.cpp \
     jlineedit.cpp \
     user.cpp \
@@ -40,12 +39,9 @@ SOURCES += main.cpp\
     notetablewidget.cpp \
     jdatabase.cpp \
     categoryview.cpp \
-    categorywidget.cpp \
     jimageview.cpp \
     imageview.cpp \
-    imagewidget.cpp \
     productview.cpp \
-    productwidget.cpp \
     imagetablemodel.cpp \
     personview.cpp \
     personwidget.cpp \
@@ -76,7 +72,6 @@ HEADERS  += mainwindow.h \
     calculatorwidget.h \
     calculator.h \
     noteview.h \
-    notewidget.h \
     logindialog.h \
     jlineedit.h \
     user.h \
@@ -86,14 +81,11 @@ HEADERS  += mainwindow.h \
     jdatabase.h \
     category.h \
     categoryview.h \
-    categorywidget.h \
     jimageview.h \
     image.h \
     imageview.h \
-    imagewidget.h \
     product.h \
     productview.h \
-    productwidget.h \
     jtablecolumn.h \
     imagetablemodel.h \
     person.h \

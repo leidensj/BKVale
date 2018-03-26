@@ -5,7 +5,6 @@
 #include <QDialog>
 #include <QSqlDatabase>
 #include <QModelIndex>
-#include <QSqlTableModel>
 #include <QVector>
 #include <QTableView>
 #include "jtablecolumn.h"
@@ -38,10 +37,10 @@ public:
   explicit JDatabase(bool bSelectorMode = false,
                      QWidget *parent = 0);
   ~JDatabase();
-  void set(QSqlTableModel* model,
-           const QString& tableName,
-           const QVector<JTableColumn>& vColumns);
-  QSqlDatabase get() const;
+  void setDatabase(QSqlDatabase db,
+                   const QString& tableName,
+                   const QVector<JTableColumn>& vColumns);
+  QSqlDatabase getDatabase() const;
   QString getTableName() const;
   bool save(const JItem& jItem);
 
@@ -84,9 +83,9 @@ public:
                              const QIcon& icon,
                              QWidget* parent = 0);
 
-  void set(QSqlTableModel* model,
-           const QString& tableName,
-           const QVector<JTableColumn>& vColumns);
+  void setDatabase(QSqlDatabase db,
+                   const QString& tableName,
+                   const QVector<JTableColumn>& vColumns);
 
   Product getCurrentProduct() const;
   Person getCurrentPerson() const;

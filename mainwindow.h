@@ -12,7 +12,7 @@ class BaitaAssistant;
 }
 
 class QLabel;
-class NoteWidget;
+class NoteView;
 class ReminderWidget;
 class ConsumptionWidget;
 class CalculatorWidget;
@@ -37,7 +37,7 @@ public:
 private:
   Ui::BaitaAssistant *ui;
   UserLoginSQL m_userLogin;
-  NoteWidget* m_note;
+  NoteView* m_note;
   ReminderWidget* m_reminder;
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;

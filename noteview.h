@@ -5,10 +5,10 @@
 #include <QStringList>
 #include <QSqlDatabase>
 #include "note.h"
+#include "settings.h"
 
 #define MAX_ITEMS 100
 
-class QTableWidgetItem;
 class QDateEdit;
 class QLineEdit;
 class QSpinBox;
@@ -17,6 +17,9 @@ class QLabel;
 class QCheckBox;
 class NoteTableWidget;
 class JDatabasePicker;
+class QDockWidget;
+class JDatabase;
+class QIODevice;
 
 class NoteView : public QFrame
 {
@@ -27,12 +30,11 @@ public:
   ~NoteView();
   void setDatabase(QSqlDatabase db);
   Note getNote() const;
-  void setLastID(qlonglong lastID);
-  qlonglong getLastID() const;
-  void setProduct(int row, const Product& product);
   void addNoteItem(const NoteItem& noteItem);
 
 private:
+  qlonglong m_currentId;
+  qlonglong m_lastId;
   QSqlDatabase m_db;
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
@@ -48,31 +50,35 @@ private:
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
   QCheckBox* m_cbCash;
-  qlonglong m_currentID;
-  qlonglong m_lastID;
+  JDatabase* m_database;
+  QDockWidget* m_dock;
+
+  bool print(QIODevice* printer,
+             InterfaceType type,
+             const QString& userName,
+             int id);
 
 private slots:
   void setToday();
   void checkDate();
-  void emitShowSearchSignal();
-  void emitCreateSignal();
-  void emitOpenLastSignal();
-  void emitSearchNewProductSignal();
-  void emitSearchProductSignal();
   void removeItem();
   void supplierChanged();
+  void showSearch();
+  bool save();
+  void lastItemSelected();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void searchProduct();
 
 public slots:
-  void create(qlonglong number);
+  void create();
   void setNote(const Note& note);
   void updateControls();
+  void saveAndPrint(QIODevice* printer,
+                    InterfaceType type);
 
 signals:
   void changedSignal();
-  void showSearchSignal();
-  void searchProductSignal(int row);
-  void createSignal();
-  void openLastSignal(qlonglong id);
 };
 
 #endif // BKFRAME_H

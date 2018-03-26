@@ -3,12 +3,13 @@
 #include "notetablewidget.h"
 #include "person.h"
 #include "jdatabasepicker.h"
+#include "jdatabase.h"
+#include "pincodeview.h"
+#include "printutils.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
-#include <QTableWidget>
 #include <QKeyEvent>
-#include <QMessageBox>
 #include <QLayout>
 #include <QDateEdit>
 #include <QSpinBox>
@@ -16,9 +17,14 @@
 #include <QTextCharFormat>
 #include <QTimer>
 #include <QCheckBox>
+#include <QSplitter>
+#include <QDockWidget>
+#include <QMessageBox>
 
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
+  , m_currentId(INVALID_ID)
+  , m_lastId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnOpenLast(nullptr)
   , m_btnSearch(nullptr)
@@ -33,8 +39,6 @@ NoteView::NoteView(QWidget *parent)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
   , m_cbCash(nullptr)
-  , m_currentID(INVALID_ID)
-  , m_lastID(INVALID_ID)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -213,26 +217,54 @@ NoteView::NoteView(QWidget *parent)
   hlayout3->setAlignment(Qt::AlignRight);
   hlayout3->addWidget(m_edTotal);
 
-  QVBoxLayout* vlayout2 = new QVBoxLayout();
-  vlayout2->setContentsMargins(0, 0, 0, 0);
-  vlayout2->addLayout(hlayout1);
-  vlayout2->addWidget(frame);
-  vlayout2->addWidget(m_table);
-  vlayout2->addLayout(hlayout3);
-  setLayout(vlayout2);
+  QVBoxLayout* viewLayout = new QVBoxLayout();
+  viewLayout->setContentsMargins(9, 0, 0, 0);
+  viewLayout->addLayout(hlayout1);
+  viewLayout->addWidget(frame);
+  viewLayout->addWidget(m_table);
+  viewLayout->addLayout(hlayout3);
 
+  QFrame* viewFrame = new QFrame;
+  viewFrame->setLayout(viewLayout);
+
+  m_database = new JDatabase;
+  m_database->layout()->setContentsMargins(0, 9, 0, 0);
+
+  m_dock = new QDockWidget();
+  m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  m_dock->setFeatures(0);
+  m_dock->setFeatures(QDockWidget::DockWidgetClosable);
+  m_dock->setWindowTitle(tr("Pesquisar"));
+  m_dock->setWidget(m_database);
+
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(m_dock);
+  splitter->addWidget(viewFrame);
+
+  QVBoxLayout* mainLayout = new QVBoxLayout();
+  mainLayout->addWidget(splitter);
+  setLayout(mainLayout);
+
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(const JItem&)),
+                   this,
+                   SLOT(itemSelected(const JItem&)));
+  QObject::connect(m_database,
+                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   this,
+                   SLOT(itemRemoved(qlonglong)));
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitShowSearchSignal()));
+                   SLOT(showSearch()));
   QObject::connect(m_btnAdd,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitSearchNewProductSignal()));
+                   SLOT(searchProduct()));
   QObject::connect(m_btnSearchItem,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitSearchProductSignal()));
+                   SLOT(searchProduct()));
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
@@ -240,7 +272,7 @@ NoteView::NoteView(QWidget *parent)
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitCreateSignal()));
+                   SLOT(create()));
   QObject::connect(m_table,
                    SIGNAL(changedSignal()),
                    this,
@@ -248,15 +280,11 @@ NoteView::NoteView(QWidget *parent)
   QObject::connect(m_btnOpenLast,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitOpenLastSignal()));
+                   SLOT(lastItemSelected()));
   QObject::connect(m_dtDate,
                    SIGNAL(dateChanged(const QDate&)),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_btnToday,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(setToday()));
   QObject::connect(m_btnToday,
                    SIGNAL(clicked(bool)),
                    this,
@@ -277,8 +305,9 @@ NoteView::NoteView(QWidget *parent)
                    SLOT(checkDate()));
   timer->start(60000);
 
-  create(NOTE_SQL_DEFAULT_NUMBER);
+  create();
   checkDate();
+  m_dock->close();
   updateControls();
 }
 
@@ -290,11 +319,7 @@ NoteView::~NoteView()
 void NoteView::setDatabase(QSqlDatabase db)
 {
   m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
-}
-
-void NoteView::setProduct(int row, const Product& product)
-{
-  m_table->setProduct(row, product);
+  m_database->setDatabase(db, NOTE_SQL_TABLE_NAME, Note::getColumns());
 }
 
 void NoteView::addNoteItem(const NoteItem& noteItem)
@@ -315,7 +340,7 @@ void NoteView::removeItem()
 Note NoteView::getNote() const
 {
   Note note;
-  note.m_id = m_currentID;
+  note.m_id = m_currentId;
   note.m_date = m_dtDate->date().toString(Qt::ISODate);
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_total = m_edTotal->text().toDouble();
@@ -326,7 +351,7 @@ Note NoteView::getNote() const
 
 void NoteView::setNote(const Note& note)
 {
-  m_currentID = note.m_id;
+  m_currentId = note.m_id;
   m_table->removeAllItems();
   m_supplierPicker->clear();
   m_dtDate->setDate(QDate::fromString(note.m_date, Qt::ISODate));
@@ -339,9 +364,10 @@ void NoteView::setNote(const Note& note)
   updateControls();
 }
 
-void NoteView::create(qlonglong number)
+void NoteView::create()
 {
-  m_currentID = INVALID_ID;
+  qlonglong number = NoteSQL::nextNumber(m_database->getDatabase());
+  m_currentId = INVALID_ID;
   m_dtDate->setDate(QDate::currentDate());
   m_snNumber->setValue(number);
   m_edTotal->setText("");
@@ -363,7 +389,7 @@ void NoteView::supplierChanged()
     }
     else
     {
-      emit searchProductSignal(-1);
+      searchProduct();
     }
   }
   updateControls();
@@ -373,8 +399,8 @@ void NoteView::updateControls()
 {
   m_btnRemove->setEnabled(m_table->currentRow() >= 0);
   m_btnSearchItem->setEnabled(m_table->currentRow() >= 0);
-  m_btnOpenLast->setEnabled(IS_VALID_ID(m_lastID));
-  m_lblNumberStatus->setPixmap(QPixmap(IS_VALID_ID(m_currentID)
+  m_btnOpenLast->setEnabled(IS_VALID_ID(m_lastId));
+  m_lblNumberStatus->setPixmap(QPixmap(IS_VALID_ID(m_currentId)
                                      ? ":/icons/res/fileedit.png"
                                      : ":/icons/res/filenew.png"));
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
@@ -388,33 +414,6 @@ void NoteView::updateControls()
   emit changedSignal();
 }
 
-void NoteView::emitShowSearchSignal()
-{
-  emit showSearchSignal();
-}
-
-void NoteView::emitCreateSignal()
-{
-  emit createSignal();
-}
-
-void NoteView::emitOpenLastSignal()
-{
-  if (m_lastID != INVALID_ID)
-    emit openLastSignal(m_lastID);
-}
-
-void NoteView::setLastID(qlonglong lastID)
-{
-  m_lastID = lastID;
-  updateControls();
-}
-
-qlonglong NoteView::getLastID() const
-{
-  return m_lastID;
-}
-
 void NoteView::checkDate()
 {
   QTextCharFormat fmt;
@@ -425,7 +424,7 @@ void NoteView::checkDate()
   fmt.setFontOverline(true);
   m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
-  bool bIsEditMode = IS_VALID_ID(m_currentID);
+  bool bIsEditMode = IS_VALID_ID(m_currentId);
   bool bIsDirty = IS_VALID_ID(m_supplierPicker->getId()) || m_table->hasItems();
   if (!bIsEditMode && !bIsDirty)
     setToday();
@@ -437,12 +436,104 @@ void NoteView::setToday()
   updateControls();
 }
 
-void NoteView::emitSearchNewProductSignal()
+void NoteView::searchProduct()
 {
-  emit searchProductSignal(-1);
+  JDatabaseSelector dlg(tr("Selecionar Produto"),
+                        QIcon(":/icons/res/item.png"));
+  dlg.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME, Product::getColumns());
+  dlg.exec();
+  Product product = dlg.getCurrentProduct();
+  if (product.isValidId())
+  {
+    if (m_btnAdd == sender())
+    {
+      NoteItem noteItem;
+      noteItem.m_product = product;
+      addNoteItem(noteItem);
+    }
+    else
+    {
+      m_table->setProduct(product);
+    }
+
+  }
 }
 
-void NoteView::emitSearchProductSignal()
+void NoteView::showSearch()
 {
-  emit searchProductSignal(m_table->currentRow());
+  if (m_dock->isVisible())
+    m_dock->close();
+  else
+    m_dock->show();
+}
+
+bool NoteView::print(QIODevice* printer,
+                     InterfaceType type,
+                     const QString& userName,
+                     int id)
+{
+  Note note;
+  note.m_id = id;
+  QString error;
+  if (NoteSQL::select(m_database->getDatabase(), note, error))
+  {
+    QString str(NotePrinter::build(note, userName));
+    if (Printer::printString(printer, type, str, error))
+      return true;
+  }
+
+  QMessageBox::warning(this,
+                       tr("Erro"),
+                       tr("Erro '%1' ao imprimir o vale.").arg(error),
+                       QMessageBox::Ok);
+  return false;
+}
+
+bool NoteView::save()
+{
+  Note note = getNote();
+  bool bSuccess = m_database->save(note);
+  if (bSuccess)
+    m_lastId = note.m_id;
+  updateControls();
+  return bSuccess;
+}
+
+void NoteView::saveAndPrint(QIODevice* printer,
+                              InterfaceType type)
+{
+  PinCodeView w(this);
+  w.setDatabase(m_database->getDatabase());
+  if (w.exec())
+  {
+    if (w.getCurrentPerson().isValidId())
+    {
+      if (save())
+      {
+        create();
+        print(printer, type, w.getCurrentPerson().m_alias, m_lastId);
+      }
+    }
+  }
+}
+
+void NoteView::lastItemSelected()
+{
+  if (m_lastId != INVALID_ID)
+  m_database->selectItem(m_lastId);
+}
+
+void NoteView::itemSelected(const JItem& jItem)
+{
+  const Note& note = dynamic_cast<const Note&>(jItem);
+  m_lastId = note.m_id;
+  setNote(note);
+}
+
+void NoteView::itemRemoved(qlonglong id)
+{
+  if (id == m_lastId)
+    m_lastId = INVALID_ID;
+  if (id == m_currentId)
+    create();
 }

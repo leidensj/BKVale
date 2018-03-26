@@ -340,17 +340,10 @@ bool NoteSQL::remove(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", id);
+  query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
+                " WHERE " NOTE_SQL_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
   bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
-                  " WHERE " NOTE_SQL_COL00 " = (:_v00)");
-    query.bindValue(":_v00", id);
-    bSuccess = query.exec();
-  }
 
   if (!bSuccess)
   {
@@ -425,7 +418,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                           CATEGORY_SQL_COL01 " INTEGER,"
                           CATEGORY_SQL_COL02 " TEXT NOT NULL UNIQUE,"
                           "FOREIGN KEY(" CATEGORY_SQL_COL01 ") REFERENCES "
-                          IMAGE_SQL_TABLE_NAME "(" IMAGE_SQL_COL00 "))");
+                          IMAGE_SQL_TABLE_NAME "(" IMAGE_SQL_COL00 ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _REMINDERS ("
@@ -476,9 +469,9 @@ bool BaitaSQL::init(QSqlDatabase db,
                         PRODUCT_SQL_COL12 " INT,"
                         PRODUCT_SQL_COL13 " INT,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL02 ") REFERENCES "
-                        CATEGORY_SQL_TABLE_NAME "(" CATEGORY_SQL_COL00 "),"
+                        CATEGORY_SQL_TABLE_NAME "(" CATEGORY_SQL_COL00 ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL03 ") REFERENCES "
-                        IMAGE_SQL_TABLE_NAME "(" IMAGE_SQL_COL00 "))");
+                        IMAGE_SQL_TABLE_NAME "(" IMAGE_SQL_COL00 ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PERSON_SQL_TABLE_NAME " ("
@@ -498,7 +491,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                           PERSON_SQL_COL13 " INT,"
                           PERSON_SQL_COL14 " TEXT,"
                           "FOREIGN KEY(" PERSON_SQL_COL01 ") REFERENCES "
-                          IMAGE_SQL_TABLE_NAME "(" IMAGE_SQL_COL00 "))");
+                          IMAGE_SQL_TABLE_NAME "(" IMAGE_SQL_COL00 ") ON DELETE SET NULL)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " ADDRESS_SQL_TABLE_NAME " ("
@@ -513,7 +506,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                         ADDRESS_SQL_COL08 " TEXT,"
                         ADDRESS_SQL_COL09 " TEXT,"
                         "FOREIGN KEY(" ADDRESS_SQL_COL01 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" ADDRESS_SQL_COL00 "))");
+                        PERSON_SQL_TABLE_NAME "(" ADDRESS_SQL_COL00 ") ON DELETE CASCADE)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PHONE_SQL_TABLE_NAME " ("
@@ -523,7 +516,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                         PHONE_SQL_COL03 " INT DEFAULT " PHONE_DEFAULT_CODE_VALUE_STR ","
                         PHONE_SQL_COL04 " TEXT,"
                         "FOREIGN KEY(" PHONE_SQL_COL01 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" PERSON_SQL_COL00 "))");
+                        PERSON_SQL_TABLE_NAME "(" PERSON_SQL_COL00 ") ON DELETE CASCADE)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("
@@ -534,7 +527,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                         NOTE_SQL_COL04 " REAL,"
                         NOTE_SQL_COL05 " INT,"
                         "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" PERSON_SQL_COL00 "))");
+                        PERSON_SQL_TABLE_NAME "(" PERSON_SQL_COL00 ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
@@ -545,9 +538,9 @@ bool BaitaSQL::init(QSqlDatabase db,
                           NOTE_ITEMS_SQL_COL04 " REAL,"
                           NOTE_ITEMS_SQL_COL05 " INT,"
                           "FOREIGN KEY(" NOTE_ITEMS_SQL_COL01 ") REFERENCES "
-                          NOTE_SQL_TABLE_NAME "(" NOTE_SQL_COL00 "),"
+                          NOTE_SQL_TABLE_NAME "(" NOTE_SQL_COL00 ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" NOTE_ITEMS_SQL_COL02 ") REFERENCES "
-                          PRODUCT_SQL_TABLE_NAME "(" PRODUCT_SQL_COL00 "))");
+                          PRODUCT_SQL_TABLE_NAME "(" PRODUCT_SQL_COL00 ") ON DELETE SET NULL)");
 
   if (bSuccess)
   {
@@ -910,25 +903,20 @@ bool CategorySQL::insert(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("INSERT INTO " CATEGORY_SQL_TABLE_NAME " ("
+  query.prepare(
+        QString("INSERT INTO " CATEGORY_SQL_TABLE_NAME " ("
+                CATEGORY_SQL_COL01 ","
                 CATEGORY_SQL_COL02 ")"
-                " VALUES ("
+                " VALUES (") +
+                (category.m_image.isValidId()
+                 ? "(:_v01)," : "NULL,") +
                 "(:_v02))");
+  if (category.m_image.isValidId())
+    query.bindValue(":_v01", category.m_image.m_id);
   query.bindValue(":_v02", category.m_name);
   bool bSuccess = query.exec();
   if (bSuccess)
-  {
     category.m_id = query.lastInsertId().toLongLong();
-    if (category.m_image.isValidId())
-    {
-      query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                    CATEGORY_SQL_COL01 " = (:_v01)"
-                    " WHERE " CATEGORY_SQL_COL00 " = (:_v00)");
-      query.bindValue(":_v00", category.m_id);
-      query.bindValue(":_v01", category.m_image.m_id);
-      bSuccess = query.exec();
-    }
-  }
 
   if (!bSuccess)
   {
@@ -962,13 +950,22 @@ bool CategorySQL::update(QSqlDatabase db,
   query.bindValue(":_v00", category.m_id);
   query.bindValue(":_v02", category.m_name);
   bool bSuccess = query.exec();
-  if (bSuccess && category.m_image.isValidId())
+  if (bSuccess)
   {
-    query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                  CATEGORY_SQL_COL01 " = (:_v01)"
-                  " WHERE " CATEGORY_SQL_COL00 " = (:_v00)");
+    if (category.m_image.isValidId())
+    {
+      query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
+                    CATEGORY_SQL_COL01 " = (:_v01)"
+                    " WHERE " CATEGORY_SQL_COL00 " = (:_v00)");
+      query.bindValue(":_v01", category.m_image.m_id);
+    }
+    else
+    {
+      query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
+                    CATEGORY_SQL_COL01 " = NULL"
+                    " WHERE " CATEGORY_SQL_COL00 " = (:_v00)");
+    }
     query.bindValue(":_v00", category.m_id);
-    query.bindValue(":_v01", category.m_image.m_id);
     bSuccess = query.exec();
   }
 
@@ -2190,22 +2187,9 @@ bool PersonSQL::remove(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("DELETE FROM " PHONE_SQL_TABLE_NAME " WHERE " PHONE_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", id);
+  query.prepare("DELETE FROM " PERSON_SQL_TABLE_NAME " WHERE " PERSON_SQL_COL00 " = (:_v00)");
+  query.bindValue(":_v00", id);
   bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    query.prepare("DELETE FROM " ADDRESS_SQL_TABLE_NAME " WHERE " PHONE_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", id);
-    bSuccess = query.exec();
-  }
-  if (bSuccess)
-  {
-    query.prepare("DELETE FROM " PERSON_SQL_TABLE_NAME " WHERE " PERSON_SQL_COL00 " = (:_v00)");
-    query.bindValue(":_v00", id);
-    bSuccess = query.exec();
-  }
-
   if (!bSuccess)
   {
     error = query.lastError().text();

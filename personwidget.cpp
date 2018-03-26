@@ -3,46 +3,8 @@
 #include "jdatabase.h"
 #include "databaseutils.h"
 #include <QMessageBox>
-#include <QSqlTableModel>
 #include <QLayout>
 #include <QSplitter>
-
-/*void setColumnIcon(QSqlTableModel* model,
-                   ItemTableIndex idx)
-{
-  if (model != nullptr)
-  {
-    model->setHeaderData((int)idx,
-                         Qt::Horizontal,
-                         QVariant::fromValue(QIcon(columnIcon(idx))),
-                         Qt::DecorationRole);
-  }
-}*/
-
-class PersonTableModel : public QSqlTableModel
-{
-
-public:
-  PersonTableModel(QObject *parent, QSqlDatabase db)
-   : QSqlTableModel(parent, db)
-  {
-
-  }
-
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
-  {
-    if (!index.isValid())
-      return QModelIndex();
-
-    QVariant value = QSqlTableModel::data(index, role);
-    if (role == Qt::DisplayRole)
-    {
-      //TODO
-    }
-
-    return value;
-  }
-};
 
 PersonWidget::PersonWidget(QWidget *parent)
   : QFrame(parent)
@@ -85,8 +47,7 @@ PersonWidget::~PersonWidget()
 
 void PersonWidget::setDatabase(QSqlDatabase db)
 {
-  PersonTableModel* model = new PersonTableModel(m_database, db);
-  m_database->set(model, PERSON_SQL_TABLE_NAME, Person::getColumns());
+  m_database->setDatabase(db, PERSON_SQL_TABLE_NAME, Person::getColumns());
   m_view->setDatabase(db);
 }
 

@@ -2,14 +2,14 @@
 #include "ui_mainwindow.h"
 #include "noteview.h"
 #include "printutils.h"
-#include "productwidget.h"
-#include "categorywidget.h"
-#include "notewidget.h"
+#include "productview.h"
+#include "categoryview.h"
+#include "noteview.h"
 #include "reminderwidget.h"
 #include "consumptionwidget.h"
 #include "calculatorwidget.h"
 #include "usermgtwidget.h"
-#include "imagewidget.h"
+#include "imageview.h"
 #include "logindialog.h"
 #include "personwidget.h"
 #include <QMessageBox>
@@ -30,10 +30,10 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_statusUserName(nullptr)
 {
   ui->setupUi(this);
-  m_note = new NoteWidget();
-  m_reminder = new ReminderWidget();
-  m_consumption = new ConsumptionWidget();
-  m_calculator = new CalculatorWidget();
+  m_note = new NoteView;
+  m_reminder = new ReminderWidget;
+  m_consumption = new ConsumptionWidget;
+  m_calculator = new CalculatorWidget;
   ui->tabNotes->layout()->addWidget(m_note);
   ui->tabReminder->layout()->addWidget(m_reminder);
   ui->tabConsumption->layout()->addWidget(m_consumption);
@@ -349,7 +349,7 @@ void BaitaAssistant::openProductsDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ProductWidget* w = new ProductWidget();
+  ProductView* w = new ProductView();
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
@@ -364,7 +364,7 @@ void BaitaAssistant::openCategoriesDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  CategoryWidget* w = new CategoryWidget(this);
+  CategoryView* w = new CategoryView(this);
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
@@ -397,7 +397,7 @@ void BaitaAssistant::openImagesDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  ImageWidget* w = new ImageWidget();
+  ImageView* w = new ImageView();
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);

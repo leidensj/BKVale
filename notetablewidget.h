@@ -14,8 +14,8 @@ public:
   explicit NoteTableWidget(QWidget* parent = 0);
   QVector<NoteItem> getNoteItems() const;
   void setNoteItems(const QVector<NoteItem>& vNoteItem);
-  void setProduct(int row, const Product& product);
-  void setNoteItem(int row, const NoteItem& noteItem);
+  void setProduct(const Product& product);
+  void setNoteItem(const NoteItem& noteItem);
   void addNoteItem(const NoteItem& noteItem);
   QString computeTotal() const;
 

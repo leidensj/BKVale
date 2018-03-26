@@ -1,13 +1,17 @@
 #include "categoryview.h"
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
+#include "jdatabase.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
 #include <QTabWidget>
+#include <QSplitter>
+#include <QMessageBox>
 
 CategoryView::CategoryView(QWidget* parent)
   : QFrame(parent)
+  , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edName(nullptr)
@@ -60,49 +64,81 @@ CategoryView::CategoryView(QWidget* parent)
                     QIcon(":/icons/res/category.png"),
                     tr("Categoria"));
 
-  QVBoxLayout* mainlayout = new QVBoxLayout;
-  mainlayout->setContentsMargins(0, 0, 0, 0);
-  mainlayout->setAlignment(Qt::AlignTop);
-  mainlayout->addLayout(buttonlayout);
-  mainlayout->addWidget(tabWidget);
-  setLayout(mainlayout);
+  QVBoxLayout* viewlayout = new QVBoxLayout;
+  viewlayout->setContentsMargins(0, 0, 0, 0);
+  viewlayout->setAlignment(Qt::AlignTop);
+  viewlayout->addLayout(buttonlayout);
+  viewlayout->addWidget(tabWidget);
+
+  QFrame* viewFrame = new QFrame;
+  viewFrame->setLayout(viewlayout);
+
+  m_database = new JDatabase();
+
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(m_database);
+  splitter->addWidget(viewFrame);
+
+  QVBoxLayout* mainLayout = new QVBoxLayout();
+  mainLayout->addWidget(splitter);
+  setLayout(mainLayout);
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
-
   QObject::connect(m_btnSave,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitSaveSignal()));
-
-  QObject::connect(m_edName,
-                   SIGNAL(textChanged(const QString&)),
+                   SLOT(save()));
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(updateControls()));
-
-  updateControls();
+                   SLOT(itemSelected(const JItem&)));
+  QObject::connect(m_database,
+                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   this,
+                   SLOT(itemRemoved(qlonglong)));
 }
 
 void CategoryView::setDatabase(QSqlDatabase db)
 {
   m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
+  m_database->setDatabase(db, CATEGORY_SQL_TABLE_NAME, Category::getColumns());
+}
+
+void CategoryView::itemSelected(const JItem& jItem)
+{
+  const Category& category = dynamic_cast<const Category&>(jItem);
+  if (category.isValidId())
+    setCategory(category);
+}
+
+void CategoryView::itemRemoved(qlonglong id)
+{
+  if (m_currentId == id)
+    create();
+}
+
+void CategoryView::save()
+{
+  Category category = getCategory();
+  if (m_database->save(category))
+    create();
 }
 
 void CategoryView::create()
 {
-  m_currentCategory = Category();
-  m_edName->clear();
-  m_imagePicker->clear();
-  updateControls();
+  m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
+  m_currentId = INVALID_ID;
+  setCategory(Category());
   m_edName->setFocus();
 }
 
 Category CategoryView::getCategory() const
 {
   Category category;
-  category.m_id = m_currentCategory.m_id;
+  category.m_id = m_currentId;
   category.m_image.m_id = m_imagePicker->getId();
   category.m_name = m_edName->text();
   return category;
@@ -110,29 +146,13 @@ Category CategoryView::getCategory() const
 
 void CategoryView::setCategory(const Category &category)
 {
-  m_currentCategory = category;
+  QString strIcon = category.isValidId()
+                    ? ":/icons/res/saveas.png"
+                    : ":/icons/res/save.png";
+  m_btnSave->setIcon(QIcon(strIcon));
+  m_currentId = category.m_id;
   m_edName->setText(category.m_name);
   m_imagePicker->setItem(category.m_image.m_id,
                          category.m_image.m_name,
                          category.m_image.m_image);
-  updateControls();
-}
-
-void CategoryView::emitSaveSignal()
-{
-  emit saveSignal();
-}
-
-void CategoryView::updateControls()
-{
-  Category category = getCategory();
-  bool bEnable = category.isValid();
-  QString saveIcon(":/icons/res/save.png");
-  if (m_currentCategory.isValidId())
-  {
-    saveIcon = ":/icons/res/saveas.png";
-    bEnable = bEnable && m_currentCategory != category;
-  }
-  m_btnSave->setEnabled(bEnable);
-  m_btnSave->setIcon(QIcon(saveIcon));
 }

@@ -2,6 +2,7 @@
 #include "jlineedit.h"
 #include "defines.h"
 #include "databaseutils.h"
+#include "imagetablemodel.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
@@ -9,6 +10,38 @@
 #include <QHeaderView>
 #include <QShortcut>
 #include <QMessageBox>
+
+class NoteTableModel : public QSqlTableModel
+{
+public:
+  NoteTableModel(QObject *parent, QSqlDatabase db)
+    : QSqlTableModel(parent, db)
+  {
+
+  }
+
+  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
+  {
+    QVariant value = QSqlTableModel::data(idx, role);
+    if (role == Qt::DisplayRole)
+    {
+      if (idx.column() == 2)
+        value = QDate::fromString(value.toString(), Qt::ISODate).toString("dd/MM/yyyy");
+      else if (idx.column() == 3)
+      {
+        Person person;
+        person.m_id = value.toLongLong();
+        QString error;
+        PersonSQL::select(database(), person, error);
+        value = person.m_alias;
+      }
+      else if (idx.column() == 4)
+        value = "R$ " + QString::number(value.toDouble(), 'f', 2);
+    }
+    return value;
+  }
+};
+
 
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
@@ -165,12 +198,21 @@ JDatabase::~JDatabase()
 
 }
 
-void JDatabase::set(QSqlTableModel* model,
-                    const QString& tableName,
-                    const QVector<JTableColumn>& vColumns)
+void JDatabase::setDatabase(QSqlDatabase db,
+                            const QString& tableName,
+                            const QVector<JTableColumn>& vColumns)
 {
-  if (m_table->model() != nullptr || model == nullptr)
+  if (m_table->model() != nullptr)
     return;
+
+  QSqlTableModel* model = nullptr;
+  if (m_tableName == IMAGE_SQL_TABLE_NAME)
+    model = new ImageTableModel(this, db);
+  else if (m_tableName == NOTE_SQL_TABLE_NAME)
+    model = new NoteTableModel(this, db);
+  else
+    model = new QSqlTableModel(this, db);
+
 
   m_tableName = tableName;
   m_vColumns = vColumns;
@@ -209,7 +251,7 @@ void JDatabase::set(QSqlTableModel* model,
   refresh();
 }
 
-QSqlDatabase JDatabase::get() const
+QSqlDatabase JDatabase::getDatabase() const
 {
   if (m_table->model() != nullptr)
   {
@@ -338,7 +380,10 @@ void JDatabase::removeItem()
       error = tr("Item ainda não implementado.");
 
     if (bSuccess)
+    {
       emit itemRemovedSignal(id);
+      refresh();
+    }
     else
     {
       QMessageBox::critical(this,
@@ -485,11 +530,11 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
                    SLOT(itemSelected(const JItem&)));
 }
 
-void JDatabaseSelector::set(QSqlTableModel* model,
-                            const QString& tableName,
-                            const QVector<JTableColumn>& vColumns)
+void JDatabaseSelector::setDatabase(QSqlDatabase db,
+                                    const QString& tableName,
+                                    const QVector<JTableColumn>& vColumns)
 {
-  m_database->set(model, tableName, vColumns);
+  m_database->setDatabase(db, tableName, vColumns);
 }
 
 void JDatabaseSelector::itemSelected(const JItem& jItem)

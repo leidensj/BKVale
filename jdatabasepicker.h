@@ -46,9 +46,9 @@ signals:
   void changedSignal();
 
 private:
+  qlonglong m_id;
   QSqlDatabase m_db;
   JDatabaseSelector* m_selector;
-  qlonglong m_id;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;
   QPushButton* m_btnClear;

@@ -1,9 +1,11 @@
 #include "imageview.h"
 #include "jlineedit.h"
 #include "jimageview.h"
+#include "jdatabase.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QTabWidget>
+#include <QSplitter>
 
 ImageView::ImageView(QWidget* parent)
   : QFrame(parent)
@@ -50,77 +52,99 @@ ImageView::ImageView(QWidget* parent)
                     QIcon(":/icons/res/icon.png"),
                     tr("Imagem"));
 
-  QVBoxLayout* mainlayout = new QVBoxLayout;
-  mainlayout->addLayout(buttonlayout);
-  mainlayout->addWidget(tabWidget);
-  setLayout(mainlayout);
+  QVBoxLayout* viewlayout = new QVBoxLayout;
+  viewlayout->setContentsMargins(9, 0, 0, 0);
+  viewlayout->addLayout(buttonlayout);
+  viewlayout->addWidget(tabWidget);
+
+  QFrame* viewFrame = new QFrame;
+  viewFrame->setLayout(viewlayout);
+
+  m_database = new JDatabase;
+  m_database->layout()->setContentsMargins(0, 0, 9, 0);
+
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(m_database);
+  splitter->addWidget(viewFrame);
+
+  QVBoxLayout* mainLayout = new QVBoxLayout();
+  mainLayout->addWidget(splitter);
+  setLayout(mainLayout);
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
-
   QObject::connect(m_btnSave,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitSaveSignal()));
-
+                   SLOT(save()));
   QObject::connect(m_edImageName,
                    SIGNAL(textChanged(const QString&)),
                    this,
                    SLOT(updateControls()));
-
   QObject::connect(m_imageView,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
-
-  updateControls();
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(const JItem&)),
+                   this,
+                   SLOT(itemSelected(const JItem&)));
+  QObject::connect(m_database,
+                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   this,
+                   SLOT(itemRemoved(qlonglong)));
 }
 
- void ImageView::setImage(const Image& image)
- {
-   m_edImageName->clear();
-   m_imageView->clearImage();
-   m_currentImg = image;
-   m_edImageName->setText(m_currentImg.m_name);
-   m_imageView->setImage(m_currentImg.m_image);
-   updateControls();
- }
+void ImageView::setDatabase(QSqlDatabase db)
+{
+  m_database->setDatabase(db, IMAGE_SQL_TABLE_NAME, Image::getColumns());
+}
+
+void ImageView::setImage(const Image& image)
+{
+  QString strIcon = image.isValidId()
+                    ? ":/icons/res/saveas.png"
+                    : ":/icons/res/save.png";
+  m_btnSave->setIcon(QIcon(strIcon));
+  m_currentId = image.m_id;
+  m_edImageName->clear();
+  m_imageView->clearImage();
+  m_edImageName->setText(image.m_name);
+  m_imageView->setImage(image.m_image);
+}
 
  Image ImageView::getImage() const
  {
-   Image img;
-   img.m_id = m_currentImg.m_id;
-   img.m_name = m_edImageName->text();
-   img.m_image = m_imageView->getImage();
-   return img;
+   Image image;
+   image.m_id = m_currentId;
+   image.m_name = m_edImageName->text();
+   image.m_image = m_imageView->getImage();
+   return image;
  }
 
- void ImageView::create()
- {
-   m_currentImg = Image();
-   m_edImageName->clear();
-   m_imageView->clearImage();
-   updateControls();
- }
+void ImageView::create()
+{
+  m_currentId = INVALID_ID;
+  setImage(Image());
+}
 
- void ImageView::emitSaveSignal()
- {
-  emit saveSignal();
- }
+void ImageView::itemSelected(const JItem& jItem)
+{
+  const Image& image = dynamic_cast<const Image&>(jItem);
+  if (image.isValidId())
+    setImage(image);
+}
 
- void ImageView::updateControls()
- {
-   Image img = getImage();
-   bool bEnable = img.isValid();
-   QString saveIcon(":/icons/res/save.png");
-   if (m_currentImg.isValidId())
-   {
-     saveIcon = ":/icons/res/saveas.png";
-     bEnable = bEnable && m_currentImg != img;
-   }
+void ImageView::itemRemoved(qlonglong id)
+{
+  if (m_currentId == id)
+    create();
+}
 
-   m_btnSave->setEnabled(bEnable);
-   m_btnSave->setIcon(QIcon(saveIcon));
- }
+void ImageView::save()
+{
+  if (m_database->save(getImage()))
+    create();
+}

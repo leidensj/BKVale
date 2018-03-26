@@ -8,6 +8,7 @@
 class QPushButton;
 class JLineEdit;
 class JDatabasePicker;
+class JDatabase;
 
 class CategoryView : public QFrame
 {
@@ -19,8 +20,9 @@ public:
   Category getCategory() const;
 
 private slots:
-  void emitSaveSignal();
-  void updateControls();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 
 public slots:
   void setCategory(const Category& category);
@@ -30,11 +32,12 @@ signals:
   void saveSignal();
 
 private:
-  Category m_currentCategory;
+  qlonglong m_currentId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edName;
   JDatabasePicker* m_imagePicker;
+  JDatabase* m_database;
 };
 
 #endif // CATEGORYVIEW_H

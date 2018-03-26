@@ -3,7 +3,6 @@
 #include "jimageview.h"
 #include "defines.h"
 #include "jdatabase.h"
-#include <QSqlTableModel>
 #include <QPushButton>
 #include <QLayout>
 #include <QGroupBox>
@@ -16,6 +15,7 @@ JDatabasePicker::JDatabasePicker(const QString& text,
                                  bool bDisplayGroup,
                                  QWidget* parent)
  : QFrame(parent)
+ , m_id(INVALID_ID)
  , m_text(text)
  , m_selector(nullptr)
  , m_btnSearch(nullptr)
@@ -106,7 +106,6 @@ void JDatabasePicker::setDatabase(QSqlDatabase db,
                                   const QString& filter)
 {
   m_db = db;
-  QSqlTableModel* model = new QSqlTableModel(this, db);
   QVector<JTableColumn> vColumns;
   if (tableName == IMAGE_SQL_TABLE_NAME)
     vColumns = Image::getColumns();
@@ -117,7 +116,7 @@ void JDatabasePicker::setDatabase(QSqlDatabase db,
   else if (tableName == PRODUCT_SQL_TABLE_NAME)
     vColumns = Product::getColumns();
 
-  m_selector->set(model, tableName, vColumns);
+  m_selector->setDatabase(m_db, tableName, vColumns);
 }
 
 void JDatabasePicker::setItem(const JItem& jItem)

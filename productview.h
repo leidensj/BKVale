@@ -12,6 +12,7 @@ class QDoubleSpinBox;
 class QPushButton;
 class QCheckBox;
 class JDatabasePicker;
+class JDatabase;
 
 class ProductView : public QFrame
 {
@@ -24,8 +25,9 @@ public:
   Product getProduct() const;
 
 private slots:
-  void emitSaveSignal();
-  void updateControls();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 
 public slots:
   void setProduct(const Product& product);
@@ -35,7 +37,7 @@ signals:
   saveSignal();
 
 private:
-  Product m_currentProduct;
+  qlonglong m_currentId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   JLineEdit* m_edName;
@@ -51,6 +53,7 @@ private:
   QCheckBox* m_cbAvailableToSell;
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
+  JDatabase* m_database;
 };
 
 #endif // PRODUCTVIEW_H

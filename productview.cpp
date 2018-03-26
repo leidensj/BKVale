@@ -1,6 +1,7 @@
 #include "productview.h"
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
+#include "jdatabase.h"
 #include <QLayout>
 #include <QPushButton>
 #include <QDoubleSpinBox>
@@ -8,9 +9,11 @@
 #include <QGroupBox>
 #include <QFormLayout>
 #include <QTabWidget>
+#include <QSplitter>
 
 ProductView::ProductView(QWidget* parent)
   : QFrame(parent)
+  , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edName(nullptr)
@@ -26,6 +29,7 @@ ProductView::ProductView(QWidget* parent)
   , m_cbAvailableToSell(nullptr)
   , m_categoryPicker(nullptr)
   , m_imagePicker(nullptr)
+  , m_database(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -134,12 +138,25 @@ ProductView::ProductView(QWidget* parent)
                     QIcon(":/icons/res/item.png"),
                     tr("Produto"));
 
-  QVBoxLayout* mainlayout = new QVBoxLayout;
-  mainlayout->setContentsMargins(0, 0, 0, 0);
-  mainlayout->setAlignment(Qt::AlignTop);
-  mainlayout->addLayout(buttonlayout);
-  mainlayout->addWidget(tabWidget);
-  setLayout(mainlayout);
+  QVBoxLayout* viewlayout = new QVBoxLayout;
+  viewlayout->setContentsMargins(9, 0, 0, 0);
+  viewlayout->setAlignment(Qt::AlignTop);
+  viewlayout->addLayout(buttonlayout);
+  viewlayout->addWidget(tabWidget);
+
+  QFrame* viewFrame = new QFrame;
+  viewFrame->setLayout(viewlayout);
+
+  m_database = new JDatabase;
+  m_database->layout()->setContentsMargins(0, 0, 9, 0);
+
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(m_database);
+  splitter->addWidget(viewFrame);
+
+  QVBoxLayout* mainLayout = new QVBoxLayout();
+  mainLayout->addWidget(splitter);
+  setLayout(mainLayout);
 
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
@@ -148,53 +165,15 @@ ProductView::ProductView(QWidget* parent)
   QObject::connect(m_btnSave,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitSaveSignal()));
-  QObject::connect(m_edName,
-                   SIGNAL(textChanged(const QString&)),
+                   SLOT(save()));
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
-                   SLOT(updateControls()));
-  QObject::connect(m_edUnity,
-                   SIGNAL(textChanged(const QString&)),
+                   SLOT(itemSelected(const JItem&)));
+  QObject::connect(m_database,
+                   SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
-                   SLOT(updateControls()));
-  QObject::connect(m_edPackageUnity,
-                   SIGNAL(textChanged(const QString&)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_spnPackageAmmount,
-                   SIGNAL(valueChanged(double)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_edDetails,
-                   SIGNAL(textChanged(const QString&)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_edCode,
-                   SIGNAL(textChanged(const QString&)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_cbAvailableAtNotes,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_cbAvailableAtShop,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_cbAvailableAtConsumption,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_cbAvailableToBuy,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_cbAvailableToSell,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(updateControls()));
-
-  updateControls();
+                   SLOT(itemRemoved(qlonglong)));
 }
 
 ProductView::~ProductView()
@@ -206,12 +185,13 @@ void ProductView::setDatabase(QSqlDatabase db)
 {
   m_categoryPicker->setDatabase(db, CATEGORY_SQL_TABLE_NAME);
   m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
+  m_database->setDatabase(db, PRODUCT_SQL_TABLE_NAME, Product::getColumns());
 }
 
 Product ProductView::getProduct() const
 {
   Product product;
-  product.m_id = m_currentProduct.m_id;
+  product.m_id = m_currentId;
   product.m_name = m_edName->text();
   product.m_unity = m_edUnity->text();
   product.m_packageUnity = m_edPackageUnity->text();
@@ -230,7 +210,11 @@ Product ProductView::getProduct() const
 
 void ProductView::setProduct(const Product &product)
 {
-  m_currentProduct = product;
+  QString strIcon = product.isValidId()
+                    ? ":/icons/res/saveas.png"
+                    : ":/icons/res/save.png";
+  m_btnSave->setIcon(QIcon(strIcon));
+  m_currentId = product.m_id;
   m_edName->setText(product.m_name);
   m_edUnity->setText(product.m_unity);
   m_edPackageUnity->setText(product.m_packageUnity);
@@ -244,32 +228,29 @@ void ProductView::setProduct(const Product &product)
   m_cbAvailableToSell->setChecked(product.m_bAvailableToSell);
   m_categoryPicker->setItem(product.m_category.m_id, product.m_category.m_name, product.m_category.m_image.m_image);
   m_imagePicker->setItem(product.m_image.m_id, product.m_image.m_name, product.m_image.m_image);
-  updateControls();
 }
 
 void ProductView::create()
 {
   Product product;
   setProduct(product);
-  updateControls();
 }
 
-void ProductView::emitSaveSignal()
+void ProductView::itemSelected(const JItem& jItem)
 {
-  emit saveSignal();
+  const Product& product = dynamic_cast<const Product&>(jItem);
+  if (product.isValidId())
+    setProduct(product);
 }
 
-void ProductView::updateControls()
+void ProductView::itemRemoved(qlonglong id)
 {
-  Product product = getProduct();
-  bool bEnable = product.isValid();
-  QString saveIcon(":/icons/res/save.png");
-  if (m_currentProduct.isValidId())
-  {
-    saveIcon = ":/icons/res/saveas.png";
-    bEnable = bEnable && m_currentProduct != product;
-  }
-  m_btnSave->setEnabled(bEnable);
-  m_btnSave->setIcon(QIcon(saveIcon));
+  if (id == m_currentId)
+    create();
+}
 
+void ProductView::save()
+{
+  if (m_database->save(getProduct()))
+    create();
 }

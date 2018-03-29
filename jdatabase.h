@@ -39,8 +39,7 @@ public:
                      QWidget *parent = 0);
   ~JDatabase();
   void setDatabase(QSqlDatabase db,
-                   const QString& tableName,
-                   const QVector<JTableColumn>& vColumns);
+                   const QString& tableName);
   QSqlDatabase getDatabase() const;
   QString getTableName() const;
   bool save(const JItem& jItem);
@@ -48,6 +47,7 @@ public:
 public slots:
   void refresh();
   void selectItem(qlonglong id);
+  void setUserFilter(const QString& userFilter);
 
 private:
   const bool m_bSelectorMode;
@@ -59,6 +59,7 @@ private:
   QPushButton* m_btnContains;
   JTableView* m_table;
   QString m_tableName;
+  QString m_userFilter;
   QVector<JTableColumn> m_vColumns;
 
 private slots:
@@ -85,14 +86,15 @@ public:
                              QWidget* parent = 0);
 
   void setDatabase(QSqlDatabase db,
-                   const QString& tableName,
-                   const QVector<JTableColumn>& vColumns);
+                   const QString& tableName);
 
   Product getCurrentProduct() const;
   Person getCurrentPerson() const;
   Category getCurrentCategory() const;
   Image getCurrentImage() const;
   QString getTableName() const;
+
+  void setUserFilter(const QString& userFilter);
 
 private slots:
   void itemSelected(const JItem& jItem);

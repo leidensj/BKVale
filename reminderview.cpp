@@ -152,7 +152,7 @@ ReminderView::ReminderView(QWidget *parent)
 
 void ReminderView::setDatabase(QSqlDatabase db)
 {
-  m_database->setDatabase(db, REMINDER_SQL_TABLE_NAME, Reminder::getColumns());
+  m_database->setDatabase(db, REMINDER_SQL_TABLE_NAME);
 }
 
 Reminder ReminderView::getReminder() const

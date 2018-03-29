@@ -360,6 +360,44 @@ bool NoteSQL::remove(QSqlDatabase db,
   return bSuccess;
 }
 
+double NoteSQL::selectPriceSuggestion(QSqlDatabase db,
+                                      qlonglong supplierId,
+                                      qlonglong productId)
+{
+  double val = 0.0;
+  QString error;
+  if (!BaitaSQL::isOpen(db, error))
+    return val;
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04
+                " FROM " NOTE_SQL_TABLE_NAME
+                " INNER JOIN " NOTE_ITEMS_SQL_TABLE_NAME
+                " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL00
+                " = " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
+                " WHERE " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
+                " = (:_v01)"
+                " AND " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02
+                " = (:_v02) "
+                " ORDER BY " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL00
+                " DESC LIMIT 1");
+  query.bindValue(":_v01", supplierId);
+  query.bindValue(":_v02", productId);
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    if (query.next())
+      val = query.value(0).toDouble();
+  }
+  error = query.lastError().text();
+
+  finishTransaction(db, bSuccess, error);
+  return val;
+}
+
 bool BaitaSQL::isOpen(QSqlDatabase db,
                       QString& error)
 {
@@ -423,11 +461,11 @@ bool BaitaSQL::init(QSqlDatabase db,
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " REMINDER_SQL_TABLE_NAME " ("
                           REMINDER_SQL_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          REMINDER_SQL_COL00 " TEXT,"
-                          REMINDER_SQL_COL00 " TEXT,"
-                          REMINDER_SQL_COL00 " INT,"
-                          REMINDER_SQL_COL00 " INT,"
-                          REMINDER_SQL_COL00 " INT)");
+                          REMINDER_SQL_COL01 " TEXT,"
+                          REMINDER_SQL_COL02 " TEXT,"
+                          REMINDER_SQL_COL03 " INT,"
+                          REMINDER_SQL_COL04 " INT,"
+                          REMINDER_SQL_COL05 " INT)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
@@ -462,12 +500,11 @@ bool BaitaSQL::init(QSqlDatabase db,
                         PRODUCT_SQL_COL05 " TEXT,"
                         PRODUCT_SQL_COL06 " REAL,"
                         PRODUCT_SQL_COL07 " TEXT,"
-                        PRODUCT_SQL_COL08 " TEXT,"
+                        PRODUCT_SQL_COL08 " INT,"
                         PRODUCT_SQL_COL09 " INT,"
                         PRODUCT_SQL_COL10 " INT,"
                         PRODUCT_SQL_COL11 " INT,"
                         PRODUCT_SQL_COL12 " INT,"
-                        PRODUCT_SQL_COL13 " INT,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL02 ") REFERENCES "
                         CATEGORY_SQL_TABLE_NAME "(" CATEGORY_SQL_COL00 ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL03 ") REFERENCES "
@@ -598,12 +635,11 @@ bool ProductSQL::execSelect(QSqlQuery& query,
                 PRODUCT_SQL_COL05 ","
                 PRODUCT_SQL_COL06 ","
                 PRODUCT_SQL_COL07 ","
-                PRODUCT_SQL_COL08 ","
+                PRODUCT_SQL_COL09 ","
                 PRODUCT_SQL_COL09 ","
                 PRODUCT_SQL_COL10 ","
                 PRODUCT_SQL_COL11 ","
-                PRODUCT_SQL_COL12 ","
-                PRODUCT_SQL_COL13
+                PRODUCT_SQL_COL12
                 " FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " PRODUCT_SQL_COL00 " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -620,12 +656,11 @@ bool ProductSQL::execSelect(QSqlQuery& query,
       product.m_packageUnity = query.value(4).toString();
       product.m_packageAmmount = query.value(5).toDouble();
       product.m_details = query.value(6).toString();
-      product.m_code = query.value(7).toString();
-      product.m_bAvailableAtNotes = query.value(8).toBool();
-      product.m_bAvailableAtShop = query.value(9).toBool();
-      product.m_bAvailableAtConsumption = query.value(10).toBool();
-      product.m_bAvailableToBuy = query.value(11).toBool();
-      product.m_bAvailableToSell = query.value(12).toBool();
+      product.m_bAvailableAtNotes = query.value(7).toBool();
+      product.m_bAvailableAtShop = query.value(8).toBool();
+      product.m_bAvailableAtConsumption = query.value(9).toBool();
+      product.m_bAvailableToBuy = query.value(10).toBool();
+      product.m_bAvailableToSell = query.value(11).toBool();
     }
     else
     {
@@ -684,12 +719,11 @@ bool ProductSQL::insert(QSqlDatabase db,
                 PRODUCT_SQL_COL05 ","
                 PRODUCT_SQL_COL06 ","
                 PRODUCT_SQL_COL07 ","
-                PRODUCT_SQL_COL08 ","
+                PRODUCT_SQL_COL09 ","
                 PRODUCT_SQL_COL09 ","
                 PRODUCT_SQL_COL10 ","
                 PRODUCT_SQL_COL11 ","
-                PRODUCT_SQL_COL12 ","
-                PRODUCT_SQL_COL13 ")"
+                PRODUCT_SQL_COL12 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -701,20 +735,18 @@ bool ProductSQL::insert(QSqlDatabase db,
                 "(:_v09),"
                 "(:_v10),"
                 "(:_v11),"
-                "(:_v12),"
-                "(:_v13))");
+                "(:_v12))");
   query.bindValue(":_v01", product.m_name);
   query.bindValue(":_v02", product.m_category.m_id);
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_packageUnity);
   query.bindValue(":_v06", product.m_packageAmmount);
   query.bindValue(":_v07", product.m_details);
-  query.bindValue(":_v08", product.m_code);
-  query.bindValue(":_v09", product.m_bAvailableAtNotes);
-  query.bindValue(":_v10", product.m_bAvailableAtShop);
-  query.bindValue(":_v11", product.m_bAvailableAtConsumption);
-  query.bindValue(":_v12", product.m_bAvailableToBuy);
-  query.bindValue(":_v13", product.m_bAvailableToSell);
+  query.bindValue(":_v08", product.m_bAvailableAtNotes);
+  query.bindValue(":_v09", product.m_bAvailableAtShop);
+  query.bindValue(":_v10", product.m_bAvailableAtConsumption);
+  query.bindValue(":_v11", product.m_bAvailableToBuy);
+  query.bindValue(":_v12", product.m_bAvailableToSell);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -768,8 +800,7 @@ bool ProductSQL::update(QSqlDatabase db,
                 PRODUCT_SQL_COL09 " = (:_v09),"
                 PRODUCT_SQL_COL10 " = (:_v10),"
                 PRODUCT_SQL_COL11 " = (:_v11),"
-                PRODUCT_SQL_COL12 " = (:_v12),"
-                PRODUCT_SQL_COL13 " = (:_v13)"
+                PRODUCT_SQL_COL12 " = (:_v12)"
                 " WHERE " PRODUCT_SQL_COL00 " = (:_v00)");
   query.bindValue(":_v00", product.m_id);
   query.bindValue(":_v01", product.m_name);
@@ -778,12 +809,11 @@ bool ProductSQL::update(QSqlDatabase db,
   query.bindValue(":_v05", product.m_packageUnity);
   query.bindValue(":_v06", product.m_packageAmmount);
   query.bindValue(":_v07", product.m_details);
-  query.bindValue(":_v08", product.m_code);
-  query.bindValue(":_v09", product.m_bAvailableAtNotes);
-  query.bindValue(":_v10", product.m_bAvailableAtShop);
-  query.bindValue(":_v11", product.m_bAvailableAtConsumption);
-  query.bindValue(":_v12", product.m_bAvailableToBuy);
-  query.bindValue(":_v13", product.m_bAvailableToSell);
+  query.bindValue(":_v08", product.m_bAvailableAtNotes);
+  query.bindValue(":_v09", product.m_bAvailableAtShop);
+  query.bindValue(":_v10", product.m_bAvailableAtConsumption);
+  query.bindValue(":_v11", product.m_bAvailableToBuy);
+  query.bindValue(":_v12", product.m_bAvailableToSell);
   bool bSuccess = query.exec();
   if (bSuccess && product.m_image.isValidId())
   {

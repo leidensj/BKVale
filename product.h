@@ -17,12 +17,24 @@ struct Product : public JItem
   QString m_packageUnity;
   double m_packageAmmount;
   QString m_details;
-  QString m_code;
   bool m_bAvailableAtNotes;
   bool m_bAvailableAtShop;
   bool m_bAvailableAtConsumption;
   bool m_bAvailableToBuy;
   bool m_bAvailableToSell;
+
+  bool hasPackageUnity() const
+  {
+    return !m_packageUnity.isEmpty() &&
+        m_unity != m_packageUnity;
+  }
+
+  QString strPackageUnity(bool bUsePackageUnity = true) const
+  {
+    return hasPackageUnity() && bUsePackageUnity ?
+          m_packageUnity :
+          m_unity;
+  }
 
   void clear()
   {
@@ -34,7 +46,6 @@ struct Product : public JItem
     m_packageUnity.clear();
     m_packageAmmount = 1.0;
     m_details.clear();
-    m_code.clear();
     m_bAvailableAtNotes = false;
     m_bAvailableAtShop = false;
     m_bAvailableAtConsumption = false;
@@ -58,7 +69,6 @@ struct Product : public JItem
         m_packageUnity != another.m_packageUnity ||
         m_packageAmmount != another.m_packageAmmount ||
         m_details != another.m_details ||
-        m_code != another.m_code ||
         m_bAvailableAtNotes != another.m_bAvailableAtNotes ||
         m_bAvailableAtShop != another.m_bAvailableAtShop ||
         m_bAvailableAtConsumption != another.m_bAvailableAtConsumption ||
@@ -89,12 +99,11 @@ struct Product : public JItem
     c.push_back(JTableColumn(PRODUCT_SQL_COL05, QObject::tr("Unidade da Embalagem")));
     c.push_back(JTableColumn(PRODUCT_SQL_COL06, QObject::tr("Quantidade da Embalagem")));
     c.push_back(JTableColumn(PRODUCT_SQL_COL07, QObject::tr("Detalhes"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL08, QObject::tr("Código")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL09, QObject::tr("Notas")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL10, QObject::tr("Compras")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL11, QObject::tr("Consumo")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL12, QObject::tr("Compra")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL13, QObject::tr("Venda")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL08, QObject::tr("Notas")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL09, QObject::tr("Compras")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL10, QObject::tr("Consumo")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL11, QObject::tr("Compra")));
+    c.push_back(JTableColumn(PRODUCT_SQL_COL12, QObject::tr("Venda")));
     return c;
   }
 };

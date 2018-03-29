@@ -98,6 +98,10 @@ namespace NoteSQL
   bool remove(QSqlDatabase db,
               qlonglong id,
               QString& error);
+
+  double selectPriceSuggestion(QSqlDatabase db,
+                               qlonglong supplierId,
+                               qlonglong productId);
 }
 
 namespace ProductSQL

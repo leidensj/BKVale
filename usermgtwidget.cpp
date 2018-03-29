@@ -50,7 +50,7 @@ UserMgtWidget::UserMgtWidget(qlonglong currentUserID, QWidget* parent)
 
 void UserMgtWidget::setDatabase(QSqlDatabase db)
 {
-  m_database->setDatabase(db, USER_SQL_TABLE_NAME, User::getColumns());
+  m_database->setDatabase(db, USER_SQL_TABLE_NAME);
 }
 
 void UserMgtWidget::itemSelected(const JItem& jItem)

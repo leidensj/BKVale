@@ -320,7 +320,8 @@ NoteView::~NoteView()
 void NoteView::setDatabase(QSqlDatabase db)
 {
   m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
-  m_database->setDatabase(db, NOTE_SQL_TABLE_NAME, Note::getColumns());
+  m_database->setDatabase(db, NOTE_SQL_TABLE_NAME);
+  m_supplierPicker->setUserFilter(PERSON_FILTER_SUPPLIER);
 }
 
 void NoteView::addNoteItem(const NoteItem& noteItem)
@@ -383,7 +384,7 @@ void NoteView::supplierChanged()
 {
   if (IS_VALID_ID(m_supplierPicker->getId()))
   {
-    if (m_table->hasItems() != 0)
+    if (m_table->hasItems())
     {
       m_table->setCurrentCell(0, 0);
       m_table->setFocus();
@@ -441,22 +442,29 @@ void NoteView::searchProduct()
 {
   JDatabaseSelector dlg(tr("Selecionar Produto"),
                         QIcon(":/icons/res/item.png"));
-  dlg.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME, Product::getColumns());
+  dlg.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
+  dlg.setUserFilter(PRODUCT_FILTER_NOTE);
   dlg.exec();
   Product product = dlg.getCurrentProduct();
   if (product.isValidId())
   {
-    if (m_btnAdd == sender())
+    if (m_btnAdd == sender() || !m_table->hasItems())
     {
       NoteItem noteItem;
       noteItem.m_product = product;
+      if (IS_VALID_ID(m_supplierPicker->getId()))
+      {
+        noteItem.m_price = NoteSQL::selectPriceSuggestion(
+                             m_database->getDatabase(),
+                             m_supplierPicker->getId(),
+                             product.m_id);
+      }
       addNoteItem(noteItem);
     }
     else
     {
       m_table->setProduct(product);
     }
-
   }
 }
 

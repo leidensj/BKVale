@@ -21,7 +21,6 @@ ProductView::ProductView(QWidget* parent)
   , m_edPackageUnity(nullptr)
   , m_spnPackageAmmount(nullptr)
   , m_edDetails(nullptr)
-  , m_edCode(nullptr)
   , m_cbAvailableAtNotes(nullptr)
   , m_cbAvailableAtShop(nullptr)
   , m_cbAvailableAtConsumption(nullptr)
@@ -64,9 +63,6 @@ ProductView::ProductView(QWidget* parent)
 
   m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edDetails->setMaxLength(PRODUCT_MAX_DETAILS_LENGTH);
-
-  m_edCode = new JLineEdit(JValidatorType::Numeric, true, true);
-  m_edCode->setMaxLength(PRODUCT_MAX_MIDASCODE_LENGTH);
 
   m_cbAvailableAtNotes = new QCheckBox;
   m_cbAvailableAtNotes->setText(tr("Vales"));
@@ -121,7 +117,6 @@ ProductView::ProductView(QWidget* parent)
   formlayout->addRow(tr("Unidade embalagem:"), m_edPackageUnity);
   formlayout->addRow(tr("Quantidade embalagem:"), m_spnPackageAmmount);
   formlayout->addRow(tr("Detalhes:"), m_edDetails);
-  formlayout->addRow(tr("Código:"), m_edCode);
 
   QVBoxLayout* tablayout = new QVBoxLayout;
   tablayout->setAlignment(Qt::AlignTop);
@@ -185,7 +180,7 @@ void ProductView::setDatabase(QSqlDatabase db)
 {
   m_categoryPicker->setDatabase(db, CATEGORY_SQL_TABLE_NAME);
   m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
-  m_database->setDatabase(db, PRODUCT_SQL_TABLE_NAME, Product::getColumns());
+  m_database->setDatabase(db, PRODUCT_SQL_TABLE_NAME);
 }
 
 Product ProductView::getProduct() const
@@ -197,7 +192,6 @@ Product ProductView::getProduct() const
   product.m_packageUnity = m_edPackageUnity->text();
   product.m_packageAmmount = m_spnPackageAmmount->value();
   product.m_details = m_edDetails->text();
-  product.m_code = m_edCode->text();
   product.m_bAvailableAtNotes = m_cbAvailableAtNotes->isChecked();
   product.m_bAvailableAtShop = m_cbAvailableAtShop->isChecked();
   product.m_bAvailableAtConsumption = m_cbAvailableAtConsumption->isChecked();
@@ -220,7 +214,6 @@ void ProductView::setProduct(const Product &product)
   m_edPackageUnity->setText(product.m_packageUnity);
   m_spnPackageAmmount->setValue(product.m_packageAmmount);
   m_edDetails->setText(product.m_details);
-  m_edCode->setText(product.m_code);
   m_cbAvailableAtNotes->setChecked(product.m_bAvailableAtNotes);
   m_cbAvailableAtShop->setChecked(product.m_bAvailableAtShop);
   m_cbAvailableAtConsumption->setChecked(product.m_bAvailableAtConsumption);

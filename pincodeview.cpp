@@ -112,7 +112,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btnEnter->setFlat(true);
   m_btnEnter->setText("");
   m_btnEnter->setIconSize(QSize(64, 64));
-  m_btnEnter->setIcon(QIcon(":/icons/res/pincode.png"));
+  m_btnEnter->setIcon(QIcon(":/icons/res/enter.png"));
 
   QHBoxLayout* hline4 = new QHBoxLayout();
   hline4->addWidget(m_btnClr);
@@ -121,9 +121,9 @@ PinCodeView::PinCodeView(QWidget* parent)
   hline4->setContentsMargins(0, 0, 0, 0);
 
   QLabel* lbl = new QLabel();
-  lbl->setPixmap(QIcon(":/icons/res/employee.png").pixmap(QSize(32, 32)));
-  lbl->setMinimumSize(32, 32);
-  lbl->setMaximumSize(32, 32);
+  lbl->setPixmap(QIcon(":/icons/res/pincode.png").pixmap(QSize(48, 48)));
+  lbl->setMinimumSize(48, 48);
+  lbl->setMaximumSize(48, 48);
   lbl->setScaledContents(true);
 
   m_edPinCode = new QLineEdit;

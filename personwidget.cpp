@@ -47,7 +47,7 @@ PersonWidget::~PersonWidget()
 
 void PersonWidget::setDatabase(QSqlDatabase db)
 {
-  m_database->setDatabase(db, PERSON_SQL_TABLE_NAME, Person::getColumns());
+  m_database->setDatabase(db, PERSON_SQL_TABLE_NAME);
   m_view->setDatabase(db);
 }
 

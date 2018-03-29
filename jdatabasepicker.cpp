@@ -102,21 +102,14 @@ JDatabasePicker::JDatabasePicker(const QString& text,
 }
 
 void JDatabasePicker::setDatabase(QSqlDatabase db,
-                                  const QString& tableName,
-                                  const QString& filter)
+                                  const QString& tableName)
 {
-  m_db = db;
-  QVector<JTableColumn> vColumns;
-  if (tableName == IMAGE_SQL_TABLE_NAME)
-    vColumns = Image::getColumns();
-  else if (tableName == PERSON_SQL_TABLE_NAME)
-    vColumns = Person::getColumns();
-  else if (tableName == CATEGORY_SQL_TABLE_NAME)
-    vColumns = Category::getColumns();
-  else if (tableName == PRODUCT_SQL_TABLE_NAME)
-    vColumns = Product::getColumns();
+  m_selector->setDatabase(m_db, tableName);
+}
 
-  m_selector->setDatabase(m_db, tableName, vColumns);
+void JDatabasePicker::setUserFilter(const QString& userFilter)
+{
+  m_selector->setUserFilter(userFilter);
 }
 
 void JDatabasePicker::setItem(const JItem& jItem)

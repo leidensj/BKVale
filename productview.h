@@ -45,7 +45,6 @@ private:
   JLineEdit* m_edPackageUnity;
   QDoubleSpinBox* m_spnPackageAmmount;
   JLineEdit* m_edDetails;
-  JLineEdit* m_edCode;
   QCheckBox* m_cbAvailableAtNotes;
   QCheckBox* m_cbAvailableAtShop;
   QCheckBox* m_cbAvailableAtConsumption;

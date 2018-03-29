@@ -104,7 +104,7 @@ CategoryView::CategoryView(QWidget* parent)
 void CategoryView::setDatabase(QSqlDatabase db)
 {
   m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
-  m_database->setDatabase(db, CATEGORY_SQL_TABLE_NAME, Category::getColumns());
+  m_database->setDatabase(db, CATEGORY_SQL_TABLE_NAME);
 }
 
 void CategoryView::itemSelected(const JItem& jItem)

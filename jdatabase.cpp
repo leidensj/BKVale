@@ -248,11 +248,25 @@ JDatabase::~JDatabase()
 }
 
 void JDatabase::setDatabase(QSqlDatabase db,
-                            const QString& tableName,
-                            const QVector<JTableColumn>& vColumns)
+                            const QString& tableName)
 {
   if (m_table->model() != nullptr)
     return;
+
+  if (tableName == IMAGE_SQL_TABLE_NAME)
+    m_vColumns = Image::getColumns();
+  else if (tableName == PERSON_SQL_TABLE_NAME)
+    m_vColumns = Person::getColumns();
+  else if (tableName == CATEGORY_SQL_TABLE_NAME)
+    m_vColumns = Category::getColumns();
+  else if (tableName == PRODUCT_SQL_TABLE_NAME)
+    m_vColumns = Product::getColumns();
+  else if (tableName == USER_SQL_TABLE_NAME)
+    m_vColumns = User::getColumns();
+  else if (tableName == NOTE_SQL_TABLE_NAME)
+    m_vColumns = Note::getColumns();
+  else if (tableName == REMINDER_SQL_TABLE_NAME)
+    m_vColumns = Reminder::getColumns();
 
   QSqlTableModel* model = nullptr;
   if (m_tableName == IMAGE_SQL_TABLE_NAME)
@@ -265,7 +279,6 @@ void JDatabase::setDatabase(QSqlDatabase db,
     model = new QSqlTableModel(this, db);
 
   m_tableName = tableName;
-  m_vColumns = vColumns;
 
   model->setTable(m_tableName);
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
@@ -476,7 +489,7 @@ void JDatabase::filterSearchChanged()
   {
     m_edFilterSearch->setPlaceholderText(tr("Procurar pelo(a) ") +
                                          m_vColumns.at(column).m_friendlyName.toLower());
-    model->setFilter("");
+    model->setFilter(m_userFilter);
   }
   else
   {
@@ -484,6 +497,7 @@ void JDatabase::filterSearchChanged()
     if (m_btnContains->isChecked())
         filter += "%";
     filter += str + "%'";
+    filter += " AND " + m_userFilter;
     model->setFilter(filter);
   }
   enableControls();
@@ -513,6 +527,12 @@ void JDatabase::containsPressed()
 void JDatabase::focusFilterSearch()
 {
   m_edFilterSearch->setFocus();
+}
+
+void JDatabase::setUserFilter(const QString& userFilter)
+{
+  m_userFilter = userFilter;
+  filterSearchChanged();
 }
 
 QString JDatabase::getTableName() const
@@ -613,10 +633,9 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
 }
 
 void JDatabaseSelector::setDatabase(QSqlDatabase db,
-                                    const QString& tableName,
-                                    const QVector<JTableColumn>& vColumns)
+                                    const QString& tableName)
 {
-  m_database->setDatabase(db, tableName, vColumns);
+  m_database->setDatabase(db, tableName);
 }
 
 void JDatabaseSelector::itemSelected(const JItem& jItem)
@@ -631,6 +650,11 @@ void JDatabaseSelector::itemSelected(const JItem& jItem)
     m_currentProduct = dynamic_cast<const Product&>(jItem);
   emit itemSelectedSignal(jItem);
   close();
+}
+
+void JDatabaseSelector::setUserFilter(const QString& userFilter)
+{
+  m_database->setUserFilter(userFilter);
 }
 
 Product JDatabaseSelector::getCurrentProduct() const

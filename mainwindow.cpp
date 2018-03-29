@@ -322,7 +322,7 @@ void BaitaAssistant::updateControls()
   switch ((Functionality)ui->tabWidget->currentIndex())
   {
     case Functionality::NoteMode:
-      ui->actionPrint->setEnabled(m_note->getNote().isValid() && bIsOpen);
+      ui->actionPrint->setEnabled(m_note->getNote().isValid());
       break;
     case Functionality::ReminderMode:
       ui->actionPrint->setEnabled(m_reminder->getReminder().isValid() && bIsOpen);

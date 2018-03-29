@@ -9,6 +9,7 @@
 
 ImageView::ImageView(QWidget* parent)
   : QFrame(parent)
+  , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_edImageName(nullptr)
@@ -79,14 +80,6 @@ ImageView::ImageView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(save()));
-  QObject::connect(m_edImageName,
-                   SIGNAL(textChanged(const QString&)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_imageView,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
   QObject::connect(m_database,
                    SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
@@ -99,7 +92,7 @@ ImageView::ImageView(QWidget* parent)
 
 void ImageView::setDatabase(QSqlDatabase db)
 {
-  m_database->setDatabase(db, IMAGE_SQL_TABLE_NAME, Image::getColumns());
+  m_database->setDatabase(db, IMAGE_SQL_TABLE_NAME);
 }
 
 void ImageView::setImage(const Image& image)

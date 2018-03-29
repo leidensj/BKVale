@@ -25,12 +25,11 @@ public:
                            QWidget* parent = 0);
 
   qlonglong getId() const;
-
   const QString m_text;
 
   void setDatabase(QSqlDatabase db,
-                   const QString& tableName,
-                   const QString& filter = "");
+                   const QString& tableName);
+  void setUserFilter(const QString& userFilter);
 
 public slots:
   void clear();

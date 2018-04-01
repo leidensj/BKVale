@@ -10,14 +10,24 @@
 #include <QHeaderView>
 #include <QShortcut>
 #include <QMessageBox>
+#include <QSqlRelationalTableModel>
 
-class NoteTableModel : public QSqlTableModel
+class NoteTableModel : public QSqlRelationalTableModel
 {
 public:
   NoteTableModel(QObject *parent, QSqlDatabase db)
-    : QSqlTableModel(parent, db)
+    : QSqlRelationalTableModel(parent, db)
   {
 
+  }
+
+  void setTable(const QString& table)
+  {
+    setJoinMode(JoinMode::LeftJoin);
+    QSqlRelationalTableModel::setTable(table);
+    setRelation(3, QSqlRelation(PERSON_SQL_TABLE_NAME,
+                                PERSON_SQL_COL00,
+                                PERSON_SQL_COL03));
   }
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
@@ -27,14 +37,6 @@ public:
     {
       if (idx.column() == 2)
         value = QDate::fromString(value.toString(), Qt::ISODate).toString("dd/MM/yyyy");
-      else if (idx.column() == 3)
-      {
-        Person person;
-        person.m_id = value.toLongLong();
-        QString error;
-        PersonSQL::select(database(), person, error);
-        value = person.m_alias;
-      }
       else if (idx.column() == 4)
         value = "R$ " + QString::number(value.toDouble(), 'f', 2);
     }
@@ -158,7 +160,7 @@ JDatabase::JDatabase(bool bSelectorMode,
   hlayout0->addWidget(m_btnRemove);
   hlayout0->addWidget(m_btnFilter);
 
-  m_edFilterSearch = new JLineEdit(JValidatorType::All, false, false);
+  m_edFilterSearch = new JLineEdit(JValidatorType::All, true, false);
   m_edFilterSearch->setToolTip(tr("Procurar (Ctrl+F)"));
   m_edFilterSearch->setClearButtonEnabled(true);
 
@@ -253,19 +255,21 @@ void JDatabase::setDatabase(QSqlDatabase db,
   if (m_table->model() != nullptr)
     return;
 
-  if (tableName == IMAGE_SQL_TABLE_NAME)
+  m_tableName = tableName;
+
+  if (m_tableName == IMAGE_SQL_TABLE_NAME)
     m_vColumns = Image::getColumns();
-  else if (tableName == PERSON_SQL_TABLE_NAME)
+  else if (m_tableName == PERSON_SQL_TABLE_NAME)
     m_vColumns = Person::getColumns();
-  else if (tableName == CATEGORY_SQL_TABLE_NAME)
+  else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
     m_vColumns = Category::getColumns();
-  else if (tableName == PRODUCT_SQL_TABLE_NAME)
+  else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
     m_vColumns = Product::getColumns();
-  else if (tableName == USER_SQL_TABLE_NAME)
+  else if (m_tableName == USER_SQL_TABLE_NAME)
     m_vColumns = User::getColumns();
-  else if (tableName == NOTE_SQL_TABLE_NAME)
+  else if (m_tableName == NOTE_SQL_TABLE_NAME)
     m_vColumns = Note::getColumns();
-  else if (tableName == REMINDER_SQL_TABLE_NAME)
+  else if (m_tableName == REMINDER_SQL_TABLE_NAME)
     m_vColumns = Reminder::getColumns();
 
   QSqlTableModel* model = nullptr;
@@ -277,8 +281,6 @@ void JDatabase::setDatabase(QSqlDatabase db,
     model = new ReminderTableModel(this, db);
   else
     model = new QSqlTableModel(this, db);
-
-  m_tableName = tableName;
 
   model->setTable(m_tableName);
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
@@ -420,7 +422,8 @@ void JDatabase::refresh()
     QModelIndex idx = m_table->currentIndex();
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->select();
-    m_table->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
+    if (idx.isValid())
+      m_table->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
   }
   enableControls();
   if (m_bSelectorMode)
@@ -481,11 +484,8 @@ void JDatabase::filterSearchChanged()
     return;
 
   QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
-  QString str = m_edFilterSearch->text();
-  str = str.toUpper();
-  m_edFilterSearch->setTextBlockingSignals(str);
   int column = m_table->horizontalHeader()->sortIndicatorSection();
-  if (str.isEmpty())
+  if (m_edFilterSearch->text().isEmpty())
   {
     m_edFilterSearch->setPlaceholderText(tr("Procurar pelo(a) ") +
                                          m_vColumns.at(column).m_friendlyName.toLower());
@@ -496,8 +496,9 @@ void JDatabase::filterSearchChanged()
     QString filter = m_vColumns.at(column).m_sqlName + " LIKE '";
     if (m_btnContains->isChecked())
         filter += "%";
-    filter += str + "%'";
-    filter += " AND " + m_userFilter;
+    filter += m_edFilterSearch->text() + "%'";
+    if (!m_userFilter.isEmpty())
+      filter += " AND " + m_userFilter;
     model->setFilter(filter);
   }
   enableControls();

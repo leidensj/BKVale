@@ -190,6 +190,8 @@ void NoteTableWidget::setProduct(const Product& product)
       bIsPackageAmmount = item(currentRow(), (int)NoteColumn::Unity)->checkState() == Qt::Checked;
     item(currentRow(), (int)NoteColumn::Unity)->setText(product.strPackageUnity(bIsPackageAmmount));
 
+    update(currentRow(), (int)NoteColumn::Ammount);
+    update(currentRow(), (int)NoteColumn::Price);
     setCurrentCell(currentRow(), 0);
     blockSignals(false);
   }
@@ -208,6 +210,8 @@ void NoteTableWidget::setNoteItem(const NoteItem& noteItem)
     item(currentRow(), (int)NoteColumn::SubTotal)->setText(noteItem.strSubtotal());
     if (noteItem.m_product.hasPackageUnity())
       item(currentRow(), (int)NoteColumn::Unity)->setCheckState(noteItem.m_bIsPackageAmmount ? Qt::Checked : Qt::Unchecked);
+    item(currentRow(), (int)NoteColumn::Description)->setBackgroundColor(QColor(230, 230, 230));
+    item(currentRow(), (int)NoteColumn::Unity)->setBackgroundColor(QColor(230, 230, 230));
     setProduct(noteItem.m_product);
     blockSignals(false);
   }
@@ -236,13 +240,23 @@ void NoteTableWidget::update(int row, int column)
     } break;
     case NoteColumn::Ammount:
     {
-      setText(row, column, NoteItem::st_strAmmount(evaluate(row, column)));
+      double value = evaluate(row, column);
+      setText(row, column, NoteItem::st_strAmmount(value));
       setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
+      if (value == 0.0)
+        item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(255, 120, 120));
+      else
+        item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(175, 255, 175));
     } break;
     case NoteColumn::Price:
     {
-      setText(row, column, NoteItem::st_strPrice(evaluate(row, column)));
+      double value = evaluate(row, column);
+      setText(row, column, NoteItem::st_strPrice(value));
       setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
+      if (value == 0.0)
+        item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(255, 175, 175));
+      else
+        item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(175, 255, 175));
     } break;
     case NoteColumn::SubTotal:
     {

@@ -32,8 +32,10 @@ private slots:
   void search();
   void itemSelected(const JItem& jItem);
   void itemRemoved(qlonglong id);
-  bool save();
-  bool print(QIODevice* printer, InterfaceType type);
+  bool save(const Reminder& reminder);
+  bool print(const Reminder& reminder,
+             QIODevice* printer,
+             InterfaceType type);
 
 public slots:
   void create();

@@ -102,7 +102,7 @@ ReminderView::ReminderView(QWidget *parent)
   viewFrame->setLayout(viewLayout);
 
   m_database = new JDatabase;
-  m_database->layout()->setContentsMargins(0, 0, 9, 0);
+  m_database->layout()->setContentsMargins(0, 9, 0, 0);
 
   m_dock = new QDockWidget();
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -126,26 +126,30 @@ ReminderView::ReminderView(QWidget *parent)
                    SIGNAL(textEdited(const QString&)),
                    this,
                    SLOT(emitChangedSignal()));
-
   QObject::connect(m_teMessage,
                    SIGNAL(textChanged()),
                    this,
                    SLOT(emitChangedSignal()));
-
   QObject::connect(m_cbCapitalization,
                    SIGNAL(stateChanged(int)),
                    this,
                    SLOT(setCapitalization(int)));
-
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
-
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(search()));
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(const JItem&)),
+                   this,
+                   SLOT(itemSelected(const JItem&)));
+  QObject::connect(m_database,
+                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   this,
+                   SLOT(itemRemoved(qlonglong)));
 
   setCapitalization(m_cbCapitalization->checkState());
 }
@@ -199,11 +203,11 @@ void ReminderView::itemRemoved(qlonglong id)
     create();
 }
 
-bool ReminderView::save()
+bool ReminderView::save(const Reminder& reminder)
 {
   if (!m_cbSave->isChecked())
     return true;
-  bool bSuccess = m_database->save(getReminder());
+  bool bSuccess = m_database->save(reminder);
   if (bSuccess)
     create();
   return bSuccess;
@@ -271,9 +275,11 @@ void ReminderView::search()
     m_dock->show();
 }
 
-bool ReminderView::print(QIODevice* printer, InterfaceType type)
+bool ReminderView::print(const Reminder& reminder,
+                         QIODevice* printer,
+                         InterfaceType type)
 {
-  QString str(ReminderPrinter::build(getReminder()));
+  QString str(ReminderPrinter::build(reminder));
   QString error;
   bool bSuccess = Printer::printString(printer, type, str, error);
   if (!bSuccess)
@@ -289,9 +295,10 @@ bool ReminderView::print(QIODevice* printer, InterfaceType type)
 
 void ReminderView::saveAndPrint(QIODevice* printer, InterfaceType type)
 {
-  if (save())
+  Reminder reminder = getReminder();
+  if (save(reminder))
   {
-    if (print(printer, type))
+    if (print(reminder, printer, type))
       create();
   }
 }

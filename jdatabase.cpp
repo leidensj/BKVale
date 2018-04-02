@@ -313,7 +313,7 @@ void JDatabase::setDatabase(QSqlDatabase db,
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
                    SLOT(enableControls()));
-  refresh();
+  refresh(false);
 }
 
 QSqlDatabase JDatabase::getDatabase() const
@@ -415,14 +415,18 @@ void JDatabase::selectItem(qlonglong id)
   }
 }
 
-void JDatabase::refresh()
+void JDatabase::refresh(bool bSaveIdx)
 {
   if (m_table->model())
   {
-    QModelIndex idx = m_table->currentIndex();
+    QModelIndex idx;
+    if (bSaveIdx)
+      idx = m_table->currentIndex();
+
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->select();
-    if (idx.isValid())
+
+    if (bSaveIdx && dx.isValid())
       m_table->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
   }
   enableControls();

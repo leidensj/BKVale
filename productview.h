@@ -33,9 +33,6 @@ public slots:
   void setProduct(const Product& product);
   void create();
 
-signals:
-  saveSignal();
-
 private:
   qlonglong m_currentId;
   QPushButton* m_btnCreate;

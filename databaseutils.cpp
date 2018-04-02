@@ -304,7 +304,8 @@ bool NoteSQL::select(QSqlDatabase db,
       noteItem.m_ammount = query.value(2).toDouble();
       noteItem.m_price = query.value(3).toDouble();
       noteItem.m_bIsPackageAmmount = query.value(4).toBool();
-      bSuccess = ProductSQL::execSelect(query, noteItem.m_product, error);
+      if (noteItem.m_product.isValidId())
+        bSuccess = ProductSQL::execSelect(query, noteItem.m_product, error);
       if (!bSuccess)
         break;
       else
@@ -312,7 +313,7 @@ bool NoteSQL::select(QSqlDatabase db,
     }
   }
 
-  if (bSuccess)
+  if (bSuccess && note.m_supplier.isValidId())
     bSuccess = PersonSQL::execSelect(query, note.m_supplier, error);
 
   if (!bSuccess)
@@ -488,13 +489,16 @@ bool BaitaSQL::init(QSqlDatabase db,
                           USER_SQL_COL07 " INT,"
                           USER_SQL_COL08 " INT,"
                           USER_SQL_COL09 " INT,"
-                          USER_SQL_COL10 " INT)");
+                          USER_SQL_COL10 " INT,"
+                          USER_SQL_COL11 " INT,"
+                          USER_SQL_COL12 " INT,"
+                          USER_SQL_COL13 " INT)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
                         PRODUCT_SQL_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
                         PRODUCT_SQL_COL01 " TEXT NOT NULL UNIQUE,"
-                        PRODUCT_SQL_COL02 " INTEGER NOT NULL,"
+                        PRODUCT_SQL_COL02 " INTEGER,"
                         PRODUCT_SQL_COL03 " INTEGER,"
                         PRODUCT_SQL_COL04 " TEXT NOT NULL,"
                         PRODUCT_SQL_COL05 " TEXT,"
@@ -560,7 +564,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                         NOTE_SQL_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
                         NOTE_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
                         NOTE_SQL_COL02 " TEXT NOT NULL,"
-                        NOTE_SQL_COL03 " INTEGER NOT NULL,"
+                        NOTE_SQL_COL03 " INTEGER,"
                         NOTE_SQL_COL04 " REAL,"
                         NOTE_SQL_COL05 " INT,"
                         "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
@@ -570,7 +574,7 @@ bool BaitaSQL::init(QSqlDatabase db,
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
                           NOTE_ITEMS_SQL_COL00 " INTEGER PRIMARY KEY AUTOINCREMENT,"
                           NOTE_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
-                          NOTE_ITEMS_SQL_COL02 " INTEGER NOT NULL,"
+                          NOTE_ITEMS_SQL_COL02 " INTEGER,"
                           NOTE_ITEMS_SQL_COL03 " REAL,"
                           NOTE_ITEMS_SQL_COL04 " REAL,"
                           NOTE_ITEMS_SQL_COL05 " INT,"
@@ -594,11 +598,14 @@ bool BaitaSQL::init(QSqlDatabase db,
                     USER_SQL_COL07 ","
                     USER_SQL_COL08 ","
                     USER_SQL_COL09 ","
-                    USER_SQL_COL10 ")"
+                    USER_SQL_COL10 ","
+                    USER_SQL_COL11 ","
+                    USER_SQL_COL12 ","
+                    USER_SQL_COL13 ")"
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
                     "(:_password),"
-                    "1,1,1,1,1,1,1,1)");
+                    "1,1,1,1,1,1,1,1,1,1,1)");
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();
     }
@@ -635,7 +642,7 @@ bool ProductSQL::execSelect(QSqlQuery& query,
                 PRODUCT_SQL_COL05 ","
                 PRODUCT_SQL_COL06 ","
                 PRODUCT_SQL_COL07 ","
-                PRODUCT_SQL_COL09 ","
+                PRODUCT_SQL_COL08 ","
                 PRODUCT_SQL_COL09 ","
                 PRODUCT_SQL_COL10 ","
                 PRODUCT_SQL_COL11 ","
@@ -672,7 +679,7 @@ bool ProductSQL::execSelect(QSqlQuery& query,
   if (bSuccess && product.m_image.isValidId())
     bSuccess = ImageSQL::execSelect(query, product.m_image, error);
 
-  if (bSuccess)
+  if (bSuccess && product.m_category.isValidId())
     bSuccess = CategorySQL::execSelect(query, product.m_category, error);
 
   if (!bSuccess)
@@ -712,9 +719,11 @@ bool ProductSQL::insert(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("INSERT INTO " PRODUCT_SQL_TABLE_NAME " ("
+  query.prepare(
+        QString("INSERT INTO " PRODUCT_SQL_TABLE_NAME " ("
                 PRODUCT_SQL_COL01 ","
                 PRODUCT_SQL_COL02 ","
+                PRODUCT_SQL_COL03 ","
                 PRODUCT_SQL_COL04 ","
                 PRODUCT_SQL_COL05 ","
                 PRODUCT_SQL_COL06 ","
@@ -726,7 +735,9 @@ bool ProductSQL::insert(QSqlDatabase db,
                 PRODUCT_SQL_COL12 ")"
                 " VALUES ("
                 "(:_v01),"
-                "(:_v02),"
+                "(:_v02),") +
+        (product.m_image.isValidId()
+         ? "(:_v03)," : "NULL,") +
                 "(:_v04),"
                 "(:_v05),"
                 "(:_v06),"
@@ -738,6 +749,8 @@ bool ProductSQL::insert(QSqlDatabase db,
                 "(:_v12))");
   query.bindValue(":_v01", product.m_name);
   query.bindValue(":_v02", product.m_category.m_id);
+  if (product.m_image.isValidId())
+    query.bindValue(":_v03", product.m_image.m_id);
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_packageUnity);
   query.bindValue(":_v06", product.m_packageAmmount);
@@ -750,18 +763,7 @@ bool ProductSQL::insert(QSqlDatabase db,
 
   bool bSuccess = query.exec();
   if (bSuccess)
-  {
     product.m_id = query.lastInsertId().toLongLong();
-    if (product.m_image.isValidId())
-    {
-      query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
-                    PRODUCT_SQL_COL03 " = (:_v03)"
-                    " WHERE " PRODUCT_SQL_COL00 " = (:_v00)");
-      query.bindValue(":_v00", product.m_id);
-      query.bindValue(":_v03", product.m_image.m_id);
-      bSuccess = query.exec();
-    }
-  }
 
   if (!bSuccess)
   {
@@ -789,9 +791,12 @@ bool ProductSQL::update(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
+  query.prepare(
+        QString("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
                 PRODUCT_SQL_COL01 " = (:_v01),"
                 PRODUCT_SQL_COL02 " = (:_v02),"
+                PRODUCT_SQL_COL03 " = ") +
+        (product.m_image.isValidId() ? "(:_v03)," : "NULL,") +
                 PRODUCT_SQL_COL04 " = (:_v04),"
                 PRODUCT_SQL_COL05 " = (:_v05),"
                 PRODUCT_SQL_COL06 " = (:_v06),"
@@ -805,6 +810,8 @@ bool ProductSQL::update(QSqlDatabase db,
   query.bindValue(":_v00", product.m_id);
   query.bindValue(":_v01", product.m_name);
   query.bindValue(":_v02", product.m_category.m_id);
+  if (product.m_image.isValidId())
+    query.bindValue(":_v03", product.m_image.m_id);
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_packageUnity);
   query.bindValue(":_v06", product.m_packageAmmount);
@@ -815,15 +822,6 @@ bool ProductSQL::update(QSqlDatabase db,
   query.bindValue(":_v11", product.m_bAvailableToBuy);
   query.bindValue(":_v12", product.m_bAvailableToSell);
   bool bSuccess = query.exec();
-  if (bSuccess && product.m_image.isValidId())
-  {
-    query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
-                  PRODUCT_SQL_COL03 " = (:_v03)"
-                  " WHERE " PRODUCT_SQL_COL00 " = (:_v00)");
-    query.bindValue(":_v00", product.m_id);
-    query.bindValue(":_v03", product.m_image.m_id);
-    bSuccess = query.exec();
-  }
 
   if (!bSuccess)
   {
@@ -1499,7 +1497,10 @@ bool UserSQL::insert(QSqlDatabase db,
                 USER_SQL_COL07 ","
                 USER_SQL_COL08 ","
                 USER_SQL_COL09 ","
-                USER_SQL_COL10 ")"
+                USER_SQL_COL10 ","
+                USER_SQL_COL11 ","
+                USER_SQL_COL12 ","
+                USER_SQL_COL13 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -1510,7 +1511,10 @@ bool UserSQL::insert(QSqlDatabase db,
                 "(:_v07),"
                 "(:_v08),"
                 "(:_v09),"
-                "(:_v10))");
+                "(:_v10),"
+                "(:_v11),"
+                "(:_v12),"
+                "(:_v13))");
   query.bindValue(":_v01", user.m_strUser);
   query.bindValue(":_v02", user.strEncryptedPassword());
   query.bindValue(":_v03", user.m_bAccessNote);
@@ -1521,6 +1525,9 @@ bool UserSQL::insert(QSqlDatabase db,
   query.bindValue(":_v08", user.m_bAccessUser);
   query.bindValue(":_v09", user.m_bAccessProduct);
   query.bindValue(":_v10", user.m_bAccessSettings);
+  query.bindValue(":_v11", user.m_bAccessPerson);
+  query.bindValue(":_v12", user.m_bAccessCategory);
+  query.bindValue(":_v13", user.m_bAccessImage);
 
   if (query.exec())
   {
@@ -1552,7 +1559,10 @@ bool UserSQL::update(QSqlDatabase db,
               USER_SQL_COL07" = (:_v07),"
               USER_SQL_COL08" = (:_v08),"
               USER_SQL_COL09" = (:_v09),"
-              USER_SQL_COL10" = (:_v10)"
+              USER_SQL_COL10" = (:_v10),"
+              USER_SQL_COL11" = (:_v11),"
+              USER_SQL_COL12" = (:_v12),"
+              USER_SQL_COL13" = (:_v13)"
               " WHERE " USER_SQL_COL00 " = (:_v00)";
 
 
@@ -1570,6 +1580,9 @@ bool UserSQL::update(QSqlDatabase db,
   query.bindValue(":_v08", user.m_bAccessUser);
   query.bindValue(":_v09", user.m_bAccessProduct);
   query.bindValue(":_v10", user.m_bAccessSettings);
+  query.bindValue(":_v11", user.m_bAccessPerson);
+  query.bindValue(":_v12", user.m_bAccessCategory);
+  query.bindValue(":_v13", user.m_bAccessImage);
 
   if (query.exec())
     return true;
@@ -1601,7 +1614,10 @@ bool UserSQL::select(QSqlDatabase db,
                 USER_SQL_COL07 ","
                 USER_SQL_COL08 ","
                 USER_SQL_COL09 ","
-                USER_SQL_COL10
+                USER_SQL_COL10 ","
+                USER_SQL_COL11 ","
+                USER_SQL_COL12 ","
+                USER_SQL_COL13
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " ADDRESS_SQL_COL00 " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -1620,6 +1636,9 @@ bool UserSQL::select(QSqlDatabase db,
       user.m_bAccessUser = query.value(7).toBool();
       user.m_bAccessProduct = query.value(8).toBool();
       user.m_bAccessSettings = query.value(9).toBool();
+      user.m_bAccessPerson = query.value(10).toBool();
+      user.m_bAccessCategory = query.value(11).toBool();
+      user.m_bAccessImage = query.value(12).toBool();
       bFound = true;
     }
 
@@ -1688,7 +1707,10 @@ bool UserLoginSQL::login(const QString& strUser,
                 USER_SQL_COL07 ","
                 USER_SQL_COL08 ","
                 USER_SQL_COL09 ","
-                USER_SQL_COL10
+                USER_SQL_COL10 ","
+                USER_SQL_COL11 ","
+                USER_SQL_COL12 ","
+                USER_SQL_COL13
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " USER_SQL_COL01 " = (:_v01) AND "
                 USER_SQL_COL02 " = (:_v02) LIMIT 1");
@@ -1711,6 +1733,9 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessUser = query.value(8).toBool();
       m_user.m_bAccessProduct = query.value(9).toBool();
       m_user.m_bAccessSettings = query.value(10).toBool();
+      m_user.m_bAccessPerson = query.value(11).toBool();
+      m_user.m_bAccessCategory = query.value(12).toBool();
+      m_user.m_bAccessImage = query.value(13).toBool();
       bFound = true;
     }
 

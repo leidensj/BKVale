@@ -45,7 +45,7 @@ public:
   bool save(const JItem& jItem);
 
 public slots:
-  void refresh();
+  void refresh(bool bSaveIdx = true);
   void selectItem(qlonglong id);
   void setUserFilter(const QString& userFilter);
 

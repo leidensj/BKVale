@@ -248,7 +248,9 @@ void PersonPageView::switchUserType()
     m_lblAlias->setText(tr("Nome fantasia:"));
     m_lblCpfCnpj->setText(tr("CNPJ:"));
     m_lblRgIE->setText(tr("IE:"));
+    m_edCpfCnpj->clear();
     m_edCpfCnpj->setInputMask("99.999.999/9999-99;_");
+    m_edRgIE->clear();
     m_edRgIE->setInputMask("");
     m_cbEmployee->setChecked(false);
     m_edPinCode->setEnabled(false);
@@ -260,7 +262,9 @@ void PersonPageView::switchUserType()
     m_lblAlias->setText(tr("Apelido:"));
     m_lblCpfCnpj->setText(tr("CPF:"));
     m_lblRgIE->setText(tr("RG:"));
+    m_edCpfCnpj->clear();
     m_edCpfCnpj->setInputMask("999.999.999-99;_");
+    m_edRgIE->clear();
     m_edRgIE->setInputMask("9999999999;_");
     m_cbEmployee->setEnabled(true);
     m_grpBirthDate->show();

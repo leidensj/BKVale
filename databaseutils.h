@@ -43,6 +43,9 @@ public:
   bool hasAccessToUsers() const { return isValid() && m_user.m_bAccessUser; }
   bool hasAccessToProducts() const { return isValid() && m_user.m_bAccessProduct; }
   bool hasAccessToSettings() const { return isValid() && m_user.m_bAccessSettings; }
+  bool hasAccessToPersons() const { return isValid() && m_user.m_bAccessPerson; }
+  bool hasAccessToCategories() const { return isValid() && m_user.m_bAccessCategory; }
+  bool hasAccessToImages() const { return isValid() && m_user.m_bAccessImage; }
 };
 
 namespace BaitaSQL

@@ -24,6 +24,9 @@ struct User : public JItem
   bool m_bAccessUser;
   bool m_bAccessProduct;
   bool m_bAccessSettings;
+  bool m_bAccessPerson;
+  bool m_bAccessCategory;
+  bool m_bAccessImage;
   Password m_password;
 
   bool operator != (const JItem& other) const
@@ -67,6 +70,9 @@ struct User : public JItem
     c.push_back(JTableColumn(USER_SQL_COL08, QObject::tr("Usuários")));
     c.push_back(JTableColumn(USER_SQL_COL09, QObject::tr("Produtos")));
     c.push_back(JTableColumn(USER_SQL_COL10, QObject::tr("Configurações")));
+    c.push_back(JTableColumn(USER_SQL_COL11, QObject::tr("Pessoas")));
+    c.push_back(JTableColumn(USER_SQL_COL12, QObject::tr("Categorias")));
+    c.push_back(JTableColumn(USER_SQL_COL13, QObject::tr("Imagens")));
     return c;
   }
 };

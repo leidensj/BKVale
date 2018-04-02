@@ -23,6 +23,9 @@ UserMgtView::UserMgtView(QWidget* parent)
   , m_accessConsumption(nullptr)
   , m_accessUser(nullptr)
   , m_accessProduct(nullptr)
+  , m_accessPerson(nullptr)
+  , m_accessCategory(nullptr)
+  , m_accessImage(nullptr)
   , m_accessSettings(nullptr)
 {
   m_create = new QPushButton;
@@ -88,9 +91,23 @@ UserMgtView::UserMgtView(QWidget* parent)
   m_accessUser = new QCheckBox;
   m_accessUser->setIcon(QIcon(":/icons/res/user.png"));
   m_accessUser->setText(tr("Usuários"));
+
   m_accessProduct = new QCheckBox;
   m_accessProduct->setIcon(QIcon(":/icons/res/item.png"));
-  m_accessProduct->setText(tr("Itens"));
+  m_accessProduct->setText(tr("Produtos"));
+
+  m_accessPerson = new QCheckBox;
+  m_accessPerson->setIcon(QIcon(":/icons/res/person.png"));
+  m_accessPerson->setText(tr("pessoas"));
+
+  m_accessCategory = new QCheckBox;
+  m_accessCategory->setIcon(QIcon(":/icons/res/category.png"));
+  m_accessCategory->setText(tr("Itens"));
+
+  m_accessImage = new QCheckBox;
+  m_accessImage->setIcon(QIcon(":/icons/res/image.png"));
+  m_accessImage->setText(tr("Imagens"));
+
   m_accessSettings = new QCheckBox;
   m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
   m_accessSettings->setText(tr("Configurações"));
@@ -120,6 +137,9 @@ UserMgtView::UserMgtView(QWidget* parent)
   grouplayout->addWidget(m_accessConsumption);
   grouplayout->addWidget(m_accessUser);
   grouplayout->addWidget(m_accessProduct);
+  grouplayout->addWidget(m_accessPerson);
+  grouplayout->addWidget(m_accessCategory);
+  grouplayout->addWidget(m_accessImage);
   grouplayout->addWidget(m_accessSettings);
 
   QGroupBox* groupbox = new QGroupBox;
@@ -175,6 +195,9 @@ User UserMgtView::getUser() const
   user.m_bAccessConsumption = m_accessConsumption->isChecked();
   user.m_bAccessUser = m_accessUser->isChecked();
   user.m_bAccessProduct = m_accessProduct->isChecked();
+  user.m_bAccessPerson = m_accessPerson->isChecked();
+  user.m_bAccessCategory = m_accessCategory->isChecked();
+  user.m_bAccessImage = m_accessImage->isChecked();
   user.m_bAccessSettings = m_accessSettings->isChecked();
   return user;
 }
@@ -192,6 +215,9 @@ void UserMgtView::setUser(const User& user)
   m_accessConsumption->setChecked(user.m_bAccessConsumption);
   m_accessUser->setChecked(user.m_bAccessUser);
   m_accessProduct->setChecked(user.m_bAccessProduct);
+  m_accessPerson->setChecked(user.m_bAccessProduct);
+  m_accessCategory->setChecked(user.m_bAccessCategory);
+  m_accessImage->setChecked(user.m_bAccessImage);
   m_accessSettings->setChecked(user.m_bAccessSettings);
 }
 

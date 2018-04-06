@@ -32,7 +32,6 @@ SOURCES += main.cpp\
     logindialog.cpp \
     jlineedit.cpp \
     user.cpp \
-    usermgtwidget.cpp \
     usermgtview.cpp \
     notetablewidget.cpp \
     jdatabase.cpp \
@@ -71,7 +70,6 @@ HEADERS  += mainwindow.h \
     logindialog.h \
     jlineedit.h \
     user.h \
-    usermgtwidget.h \
     usermgtview.h \
     notetablewidget.h \
     jdatabase.h \

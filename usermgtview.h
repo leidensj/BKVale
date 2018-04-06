@@ -2,25 +2,31 @@
 #define USERMGTVIEW_H
 
 #include <QFrame>
+#include <QSqlDatabase>
 #include "user.h"
 
 class QCheckBox;
 class JLineEdit;
 class QPushButton;
 class QLabel;
+class JDatabase;
 
 class UserMgtView : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit UserMgtView(QWidget* parent = 0);
+  explicit UserMgtView(qlonglong currentLoggedId, QWidget* parent = 0);
   User getUser() const;
   void setUser(const User& user);
   QString getPassword() const;
+  void setDatabase(QSqlDatabase db);
+  bool hasLoggedUserChanged() const;
 
 private:
-  int m_currentID;
+  qlonglong m_currentLoggedId;
+  int m_currentId;
+  bool m_bHasLoggedUserChanged;
   QPushButton* m_create;
   QPushButton* m_save;
   JLineEdit* m_user;
@@ -38,12 +44,15 @@ private:
   QCheckBox* m_accessCategory;
   QCheckBox* m_accessImage;
   QCheckBox* m_accessSettings;
+  JDatabase* m_database;
 
 public slots:
   void create();
 
 private slots:
-  void emitSaveSignal();
+  void save();
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
   void viewPassword(bool b);
 
 signals:

@@ -101,5 +101,6 @@
         <file>res/cashier.png</file>
         <file>res/visit.png</file>
         <file>res/whatsapp.png</file>
+        <file>res/usershield.png</file>
     </qresource>
 </RCC>

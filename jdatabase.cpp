@@ -426,7 +426,7 @@ void JDatabase::refresh(bool bSaveIdx)
     QSqlTableModel* model = dynamic_cast<QSqlTableModel*>(m_table->model());
     model->select();
 
-    if (bSaveIdx && dx.isValid())
+    if (bSaveIdx && idx.isValid())
       m_table->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
   }
   enableControls();

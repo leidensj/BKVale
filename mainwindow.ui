@@ -207,7 +207,7 @@
      <normaloff>:/icons/res/connected.png</normaloff>:/icons/res/connected.png</iconset>
    </property>
    <property name="text">
-    <string>Conectar à impressora</string>
+    <string>Conectar</string>
    </property>
   </action>
   <action name="actionDisconnect">
@@ -216,7 +216,7 @@
      <normaloff>:/icons/res/disconnected.png</normaloff>:/icons/res/disconnected.png</iconset>
    </property>
    <property name="text">
-    <string>Desconectar da impressora</string>
+    <string>Desconectar</string>
    </property>
   </action>
   <action name="actionPrint">

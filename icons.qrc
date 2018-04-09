@@ -138,5 +138,6 @@
         <file>res/calw5.png</file>
         <file>res/calw6.png</file>
         <file>res/calw7.png</file>
+        <file>res/usershield.png</file>
     </qresource>
 </RCC>

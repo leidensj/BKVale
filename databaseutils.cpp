@@ -728,7 +728,7 @@ bool ProductSQL::insert(QSqlDatabase db,
                 PRODUCT_SQL_COL05 ","
                 PRODUCT_SQL_COL06 ","
                 PRODUCT_SQL_COL07 ","
-                PRODUCT_SQL_COL09 ","
+                PRODUCT_SQL_COL08 ","
                 PRODUCT_SQL_COL09 ","
                 PRODUCT_SQL_COL10 ","
                 PRODUCT_SQL_COL11 ","

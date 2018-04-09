@@ -1,6 +1,7 @@
 #include "usermgtview.h"
 #include <QCheckBox>
 #include "jlineedit.h"
+#include "jdatabase.h"
 #include <QPushButton>
 #include <QLabel>
 #include <QLayout>
@@ -8,10 +9,12 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QTabWidget>
+#include <QSplitter>
 
-UserMgtView::UserMgtView(QWidget* parent)
+UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   : QFrame(parent)
-  , m_currentID(INVALID_ID)
+  , m_currentLoggedId(currentLoggedId)
+  , m_currentId(INVALID_ID)
   , m_user(nullptr)
   , m_lblPasswordMsg(nullptr)
   , m_password(nullptr)
@@ -27,6 +30,7 @@ UserMgtView::UserMgtView(QWidget* parent)
   , m_accessCategory(nullptr)
   , m_accessImage(nullptr)
   , m_accessSettings(nullptr)
+  , m_database(nullptr)
 {
   m_create = new QPushButton;
   m_create->setFlat(true);
@@ -98,14 +102,14 @@ UserMgtView::UserMgtView(QWidget* parent)
 
   m_accessPerson = new QCheckBox;
   m_accessPerson->setIcon(QIcon(":/icons/res/person.png"));
-  m_accessPerson->setText(tr("pessoas"));
+  m_accessPerson->setText(tr("Pessoas"));
 
   m_accessCategory = new QCheckBox;
   m_accessCategory->setIcon(QIcon(":/icons/res/category.png"));
-  m_accessCategory->setText(tr("Itens"));
+  m_accessCategory->setText(tr("Categorias"));
 
   m_accessImage = new QCheckBox;
-  m_accessImage->setIcon(QIcon(":/icons/res/image.png"));
+  m_accessImage->setIcon(QIcon(":/icons/res/icon.png"));
   m_accessImage->setText(tr("Imagens"));
 
   m_accessSettings = new QCheckBox;
@@ -129,41 +133,50 @@ UserMgtView::UserMgtView(QWidget* parent)
   passwordlayout->addWidget(m_password);
   passwordlayout->addWidget(m_viewPassword);
 
-  QVBoxLayout* grouplayout = new QVBoxLayout;
-  grouplayout->addWidget(m_accessNote);
-  grouplayout->addWidget(m_accessReminder);
-  grouplayout->addWidget(m_accessCalculator);
-  grouplayout->addWidget(m_accessShop);
-  grouplayout->addWidget(m_accessConsumption);
-  grouplayout->addWidget(m_accessUser);
-  grouplayout->addWidget(m_accessProduct);
-  grouplayout->addWidget(m_accessPerson);
-  grouplayout->addWidget(m_accessCategory);
-  grouplayout->addWidget(m_accessImage);
-  grouplayout->addWidget(m_accessSettings);
+  QVBoxLayout* tabPermissionslayout = new QVBoxLayout;
+  tabPermissionslayout->addWidget(m_accessNote);
+  tabPermissionslayout->addWidget(m_accessReminder);
+  tabPermissionslayout->addWidget(m_accessCalculator);
+  tabPermissionslayout->addWidget(m_accessShop);
+  tabPermissionslayout->addWidget(m_accessConsumption);
+  tabPermissionslayout->addWidget(m_accessUser);
+  tabPermissionslayout->addWidget(m_accessProduct);
+  tabPermissionslayout->addWidget(m_accessPerson);
+  tabPermissionslayout->addWidget(m_accessCategory);
+  tabPermissionslayout->addWidget(m_accessImage);
+  tabPermissionslayout->addWidget(m_accessSettings);
 
-  QGroupBox* groupbox = new QGroupBox;
-  groupbox->setTitle(tr("Permissões"));
-  groupbox->setLayout(grouplayout);
+  QVBoxLayout* tabUserlayout = new QVBoxLayout;
+  tabUserlayout->setAlignment(Qt::AlignTop);
+  tabUserlayout->addLayout(userlayout);
+  tabUserlayout->addWidget(m_lblPasswordMsg);
+  tabUserlayout->addLayout(passwordlayout);
 
-  QVBoxLayout* tablayout = new QVBoxLayout;
-  tablayout->setAlignment(Qt::AlignTop);
-  tablayout->addLayout(userlayout);
-  tablayout->addWidget(m_lblPasswordMsg);
-  tablayout->addLayout(passwordlayout);
-  tablayout->addWidget(groupbox);
+  QFrame* tabUserFrame = new QFrame;
+  tabUserFrame->setLayout(tabUserlayout);
 
-  QFrame* tabframe = new QFrame;
-  tabframe->setLayout(tablayout);
+  QFrame* tabPermissionsFrame = new QFrame;
+  tabPermissionsFrame->setLayout(tabPermissionslayout);
 
   QTabWidget* tabWidget = new QTabWidget;
-  tabWidget->addTab(tabframe,
+  tabWidget->addTab(tabUserFrame,
                     QIcon(":/icons/res/user.png"),
                     tr("Usuário"));
 
-  QVBoxLayout* mainlayout = new QVBoxLayout;
-  mainlayout->addLayout(buttonlayout);
-  mainlayout->addWidget(tabWidget);
+  tabWidget->addTab(tabPermissionsFrame,
+                    QIcon(":/icons/res/usershield.png"),
+                    tr("Permissões"));
+
+  m_database = new JDatabase();
+  m_database->setContentsMargins(0, 0, 9, 0);
+
+  QSplitter* splitter = new QSplitter(Qt::Horizontal);
+  splitter->addWidget(m_database);
+  splitter->addWidget(tabWidget);
+
+  QHBoxLayout* mainlayout = new QHBoxLayout();
+  mainlayout->addWidget(splitter);
+  mainlayout->setContentsMargins(0, 0, 0, 0);
   setLayout(mainlayout);
 
   QObject::connect(m_create,
@@ -174,19 +187,35 @@ UserMgtView::UserMgtView(QWidget* parent)
   QObject::connect(m_save,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(emitSaveSignal()));
+                   SLOT(save()));
 
   QObject::connect(m_viewPassword,
                    SIGNAL(toggled(bool)),
                    this,
                    SLOT(viewPassword(bool)));
+
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(const JItem&)),
+                   this,
+                   SLOT(itemSelected(const JItem&)));
+
+  QObject::connect(m_database,
+                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   this,
+                   SLOT(itemRemoved(qlonglong)));
+
   create();
+}
+
+void UserMgtView::setDatabase(QSqlDatabase db)
+{
+  m_database->setDatabase(db, USER_SQL_TABLE_NAME);
 }
 
 User UserMgtView::getUser() const
 {
   User user;
-  user.m_id = m_currentID;
+  user.m_id = m_currentId;
   user.m_strUser = m_user->text();
   user.m_bAccessNote = m_accessNote->isChecked();
   user.m_bAccessReminder = m_accessReminder->isChecked();
@@ -205,7 +234,7 @@ User UserMgtView::getUser() const
 void UserMgtView::setUser(const User& user)
 {
   m_lblPasswordMsg->show();
-  m_currentID = user.m_id;
+  m_currentId = user.m_id;
   m_user->setText(user.m_strUser);
   m_password->setText("");
   m_accessNote->setChecked(user.m_bAccessNote);
@@ -224,7 +253,7 @@ void UserMgtView::setUser(const User& user)
 void UserMgtView::create()
 {
   m_lblPasswordMsg->hide();
-  m_currentID = INVALID_ID;
+  m_currentId = INVALID_ID;
   m_user->setText("");
   m_password->setText("");
   m_accessNote->setChecked(false);
@@ -238,22 +267,6 @@ void UserMgtView::create()
   m_user->setFocus();
 }
 
-void UserMgtView::emitSaveSignal()
-{
-  if (m_user->text().isEmpty())
-  {
-
-    QMessageBox::warning(this,
-                          tr("Usuário inválido"),
-                          tr("O nome de usuário é obrigatório."),
-                          QMessageBox::Ok);
-  }
-  else
-  {
-    emit saveSignal();
-  }
-}
-
 QString UserMgtView::getPassword() const
 {
   return m_password->text();
@@ -263,4 +276,31 @@ void UserMgtView::viewPassword(bool b)
 {
   m_password->setEchoMode( b ? QLineEdit::EchoMode::Normal
                              : QLineEdit::EchoMode::Password);
+}
+
+void UserMgtView::itemSelected(const JItem& jItem)
+{
+  const User& user = dynamic_cast<const User&>(jItem);
+  if (user.isValidId())
+    setUser(user);
+}
+
+void UserMgtView::itemRemoved(qlonglong id)
+{
+  if (m_currentId == id)
+    create();
+}
+
+void UserMgtView::save()
+{
+  if (m_database->save(getUser()))
+  {
+    m_bHasLoggedUserChanged = m_currentId == m_currentLoggedId;
+    create();
+  }
+}
+
+bool UserMgtView::hasLoggedUserChanged() const
+{
+  return m_bHasLoggedUserChanged;
 }

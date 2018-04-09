@@ -8,7 +8,7 @@
 #include "reminderview.h"
 #include "consumptionwidget.h"
 #include "calculatorwidget.h"
-#include "usermgtwidget.h"
+#include "usermgtview.h"
 #include "imageview.h"
 #include "logindialog.h"
 #include "personwidget.h"
@@ -382,7 +382,7 @@ void BaitaAssistant::openUsersDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout();
   dlg.setLayout(layout);
-  UserMgtWidget* w = new UserMgtWidget(m_userLogin.getId());
+  UserMgtView* w = new UserMgtView(m_userLogin.getId());
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
@@ -391,7 +391,7 @@ void BaitaAssistant::openUsersDialog()
   dlg.setModal(true);
   dlg.exec();
 
-  if (w->hasAnyUserChanged())
+  if (w->hasLoggedUserChanged())
     openLoginDialog();
 }
 

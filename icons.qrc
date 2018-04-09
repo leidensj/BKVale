@@ -101,5 +101,42 @@
         <file>res/cashier.png</file>
         <file>res/visit.png</file>
         <file>res/whatsapp.png</file>
+        <file>res/cal1.png</file>
+        <file>res/cal2.png</file>
+        <file>res/cal3.png</file>
+        <file>res/cal4.png</file>
+        <file>res/cal5.png</file>
+        <file>res/cal6.png</file>
+        <file>res/cal7.png</file>
+        <file>res/cal8.png</file>
+        <file>res/cal9.png</file>
+        <file>res/cal10.png</file>
+        <file>res/cal11.png</file>
+        <file>res/cal12.png</file>
+        <file>res/cal13.png</file>
+        <file>res/cal14.png</file>
+        <file>res/cal15.png</file>
+        <file>res/cal16.png</file>
+        <file>res/cal17.png</file>
+        <file>res/cal19.png</file>
+        <file>res/cal20.png</file>
+        <file>res/cal21.png</file>
+        <file>res/cal22.png</file>
+        <file>res/cal23.png</file>
+        <file>res/cal24.png</file>
+        <file>res/cal25.png</file>
+        <file>res/cal26.png</file>
+        <file>res/cal27.png</file>
+        <file>res/cal28.png</file>
+        <file>res/cal29.png</file>
+        <file>res/cal31.png</file>
+        <file>res/phoneback.png</file>
+        <file>res/calw1.png</file>
+        <file>res/calw2.png</file>
+        <file>res/calw3.png</file>
+        <file>res/calw4.png</file>
+        <file>res/calw5.png</file>
+        <file>res/calw6.png</file>
+        <file>res/calw7.png</file>
     </qresource>
 </RCC>

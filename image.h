@@ -49,13 +49,6 @@ struct Image : public JItem
     c.push_back(JTableColumn(IMAGE_SQL_COL02, QObject::tr("Imagem")));
     return c;
   }
-
-  enum class Column
-  {
-    Id,
-    Name,
-    Image
-  };
 };
 
 #endif // IMAGE_H

@@ -318,7 +318,8 @@ bool NoteSQL::select(QSqlDatabase db,
 
   if (!bSuccess)
   {
-    error = query.lastError().text();
+    if (error.isEmpty())
+      error = query.lastError().text();
     note.clear();
   }
   else

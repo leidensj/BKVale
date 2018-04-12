@@ -51,6 +51,7 @@ public slots:
 
 private:
   const bool m_bSelectorMode;
+  QSqlDatabase m_db;
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;

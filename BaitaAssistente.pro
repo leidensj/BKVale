@@ -39,7 +39,6 @@ SOURCES += main.cpp\
     jimageview.cpp \
     imageview.cpp \
     productview.cpp \
-    imagetablemodel.cpp \
     personview.cpp \
     personwidget.cpp \
     personpageview.cpp \
@@ -81,7 +80,6 @@ HEADERS  += mainwindow.h \
     product.h \
     productview.h \
     jtablecolumn.h \
-    imagetablemodel.h \
     person.h \
     address.h \
     personview.h \

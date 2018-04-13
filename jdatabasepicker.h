@@ -46,7 +46,6 @@ signals:
 
 private:
   qlonglong m_id;
-  QSqlDatabase m_db;
   JDatabaseSelector* m_selector;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;

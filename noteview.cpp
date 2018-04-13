@@ -445,25 +445,25 @@ void NoteView::searchProduct()
   dlg.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
   dlg.setUserFilter(PRODUCT_FILTER_NOTE);
   dlg.exec();
-  Product product = dlg.getCurrentProduct();
-  if (product.isValidId())
+  Product* product = dynamic_cast<Product*>(dlg.getCurrentItem());
+  if (product != nullptr && product->isValidId())
   {
     if (m_btnAdd == sender() || !m_table->hasItems())
     {
       NoteItem noteItem;
-      noteItem.m_product = product;
+      noteItem.m_product = *product;
       if (IS_VALID_ID(m_supplierPicker->getId()))
       {
         noteItem.m_price = NoteSQL::selectPriceSuggestion(
                              m_database->getDatabase(),
                              m_supplierPicker->getId(),
-                             product.m_id);
+                             product->m_id);
       }
       addNoteItem(noteItem);
     }
     else
     {
-      m_table->setProduct(product);
+      m_table->setProduct(*product);
     }
   }
 }

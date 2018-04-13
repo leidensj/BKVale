@@ -9,6 +9,7 @@ struct JItem
 {
   mutable qlonglong m_id;
   JItem() : m_id(INVALID_ID) {}
+  virtual ~JItem() {}
   bool isValidId() const { return IS_VALID_ID(m_id); }
   virtual bool isValid() const = 0;
   virtual void clear() = 0;

@@ -685,7 +685,8 @@ bool ProductSQL::execSelect(QSqlQuery& query,
 
   if (!bSuccess)
   {
-    error = query.lastError().text();
+    if (error.isEmpty())
+      error = query.lastError().text();
     product.clear();
   }
 
@@ -896,7 +897,8 @@ bool CategorySQL::execSelect(QSqlQuery& query,
 
   if (!bSuccess)
   {
-    error = query.lastError().text();
+    if (error.isEmpty())
+      error = query.lastError().text();
     category.clear();
   }
 
@@ -1863,9 +1865,10 @@ bool PersonSQL::execSelect(QSqlQuery& query,
   if (bSuccess && person.m_image.isValidId())
     bSuccess = ImageSQL::execSelect(query, person.m_image, error);
 
-  if (!bSuccess && error.isEmpty())
+  if (!bSuccess)
   {
-    error = query.lastError().text();
+    if (error.isEmpty())
+      error = query.lastError().text();
     person.clear();
   }
 
@@ -1903,9 +1906,10 @@ bool PersonSQL::execByPinCodeSelect(QSqlQuery& query,
     }
   }
 
-  if (!bSuccess && error.isEmpty())
+  if (!bSuccess)
   {
-    error = query.lastError().text();
+    if (error.isEmpty())
+      error = query.lastError().text();
     person.clear();
   }
 

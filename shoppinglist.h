@@ -147,7 +147,5 @@ struct ShoppingList : public JItem
   }
 };
 
-#endif // COMMON_H
-
 
 #endif // SHOPPINGLIST_H

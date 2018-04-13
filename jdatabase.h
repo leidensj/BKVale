@@ -51,7 +51,6 @@ public slots:
 
 private:
   const bool m_bSelectorMode;
-  QSqlDatabase m_db;
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
@@ -71,6 +70,7 @@ private slots:
   void enableControls();
   void removeItem();
   void focusFilterSearch();
+  void sortChanged(int column, Qt::SortOrder sortOrder);
 
 signals:
   void itemSelectedSignal(const JItem& jItem);
@@ -86,16 +86,16 @@ public:
                              const QIcon& icon,
                              QWidget* parent = 0);
 
+  ~JDatabaseSelector();
+
   void setDatabase(QSqlDatabase db,
                    const QString& tableName);
 
-  Product getCurrentProduct() const;
-  Person getCurrentPerson() const;
-  Category getCurrentCategory() const;
-  Image getCurrentImage() const;
-  QString getTableName() const;
-
   void setUserFilter(const QString& userFilter);
+
+  JItem* getCurrentItem();
+
+  QString getTableName() const;
 
 private slots:
   void itemSelected(const JItem& jItem);
@@ -104,11 +104,8 @@ signals:
   void itemSelectedSignal(const JItem& jItem);
 
 private:
-  Product m_currentProduct;
-  Person m_currentPerson;
-  Category m_currentCategory;
-  Image m_currentImage;
   JDatabase* m_database;
+  JItem* m_currentItem;
 };
 
 #endif // JDATABASE_H

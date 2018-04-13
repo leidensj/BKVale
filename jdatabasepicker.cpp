@@ -104,7 +104,7 @@ JDatabasePicker::JDatabasePicker(const QString& text,
 void JDatabasePicker::setDatabase(QSqlDatabase db,
                                   const QString& tableName)
 {
-  m_selector->setDatabase(m_db, tableName);
+  m_selector->setDatabase(db, tableName);
 }
 
 void JDatabasePicker::setUserFilter(const QString& userFilter)

@@ -12,10 +12,15 @@
 #include <QSqlQueryModel>
 #include <QPixmap>
 #include <QIcon>
-#include <QSqlQuery>
 
 class JTableModel : public QSqlQueryModel
 {
+protected:
+  QSqlDatabase m_db;
+  QString m_strSort;
+  QString m_strFilter;
+  QString m_strCustomFilter;
+
 public:
   JTableModel(QObject *parent, QSqlDatabase db)
     : QSqlQueryModel(parent)
@@ -24,12 +29,48 @@ public:
 
   }
 
-  virtual QString getStrQuery() = 0;
-  virtual void setQuery() = 0;
-  virtual void setFilter(const QString& value, bool bContaining, int column) = 0;
+  QSqlDatabase getDatabase() const { return m_db; }
 
-protected:
-  QSqlDatabase m_db;
+  QString getStrQueryOrderFilter()
+  {
+    QString strQuery;
+    if (!m_strFilter.isEmpty())
+      strQuery += m_strFilter;
+    if (!m_strCustomFilter.isEmpty())
+      strQuery += m_strCustomFilter;
+    if (!m_strSort.isEmpty())
+      strQuery += m_strSort;
+    return strQuery;
+  }
+
+  virtual QString getStrQuery() = 0;
+
+  virtual void select()
+  {
+    QString strQuery(getStrQuery());
+    strQuery += getStrQueryOrderFilter();
+    QSqlQueryModel::setQuery(strQuery, m_db);
+  }
+
+  virtual void adjustHeader(QHeaderView* /*header*/)
+  {
+
+  }
+
+  virtual void prepareFilter(const QString& /*value*/, bool /*bContaining*/, int /*column*/)
+  {
+
+  }
+
+  virtual void prepareCustomFilter(const QString& /*value*/)
+  {
+
+  }
+
+  virtual void prepareSort(int /*column*/, Qt::SortOrder /*sortOrder*/)
+  {
+
+  }
 };
 
 class NoteTableModel : public JTableModel
@@ -44,9 +85,10 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
+                     NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL00 ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
-                     NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 ","
+                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL03 ","
                      "SUM("
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03
                      "*"
@@ -59,33 +101,125 @@ public:
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL00
                      "="
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
+                     " INNER JOIN "
+                     PERSON_SQL_TABLE_NAME
+                     " ON "
+                     NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
+                     "="
+                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL00
                      " GROUP BY "
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01);
     return strQuery;
   }
 
-  void setQuery()
+  void select()
   {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
-    setHeaderData(0, Qt::Horizontal, tr("Número"));
-    setHeaderData(1, Qt::Horizontal, tr("Data"));
-    setHeaderData(2, Qt::Horizontal, tr("Fornecedor"));
-    setHeaderData(3, Qt::Horizontal, tr("Total"));
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Número"));
+    setHeaderData(2, Qt::Horizontal, tr("Data"));
+    setHeaderData(3, Qt::Horizontal, tr("Fornecedor"));
+    setHeaderData(4, Qt::Horizontal, tr("Total"));
   }
 
-  void setFilter(const QString& /*filter*/, bool /*bContaining*/, int /*column*/)
+  void adjustHeader(QHeaderView* header)
   {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
+    if (header != nullptr)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
+    }
   }
+
+  /*void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = " ORDER BY " NOTE_SQL_COL01;
+        break;
+      case 2:
+        m_strSort = " ORDER BY " NOTE_SQL_COL02;
+        break;
+      case 3:
+        m_strSort = " ORDER BY " NOTE_SQL_COL03;
+        break;
+      case 4:
+        m_strSort = " ORDER BY SUM("
+                    NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03
+                    "*"
+                    NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ")";
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
+  }
+
+  void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = " HAVING ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " NOTE_SQL_COL01;
+          break;
+        case 2:
+          m_strFilter += " " NOTE_SQL_COL02;
+          break;
+        case 3:
+          m_strFilter += " " NOTE_SQL_COL03;
+          break;
+        case 4:
+          m_strFilter += " SUM("
+                       NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03
+                       "*"
+                       NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ")";
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE ";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%";
+    }
+  }
+
+  void prepareCustomFilter(const QString& value)
+  {
+    m_strCustomFilter.clear();
+    if (m_strFilter.isEmpty())
+      m_strCustomFilter = " HAVING ";
+    else
+      m_strCustomFilter = " AND ";
+    m_strCustomFilter += value;
+  }*/
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
   {
     QVariant value = QSqlQueryModel::data(idx, role);
     if (role == Qt::DisplayRole)
     {
-      if (idx.column() == 1)
+      if (idx.column() == 2)
         value = QDate::fromString(value.toString(), Qt::ISODate).toString("dd/MM/yyyy");
-      else if (idx.column() == 3)
+      else if (idx.column() == 4)
         value = "R$ " + QString::number(value.toDouble(), 'f', 2);
     }
     return value;
@@ -104,22 +238,13 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
+                     REMINDER_SQL_COL00 ","
                      REMINDER_SQL_COL01 ","
                      REMINDER_SQL_COL02 ","
                      REMINDER_SQL_COL03
                      " FROM "
                      REMINDER_SQL_TABLE_NAME);
     return strQuery;
-  }
-
-  void setQuery()
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
-  }
-
-  void setFilter(const QString& /*filter*/, bool /*bContaining*/, int /*column*/)
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
   }
 
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
@@ -175,21 +300,12 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
+                     PERSON_SQL_COL00 ","
                      PERSON_SQL_COL02 ","
                      PERSON_SQL_COL03
                      " FROM "
                      PERSON_SQL_TABLE_NAME);
     return strQuery;
-  }
-
-  void setQuery()
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
-  }
-
-  void setFilter(const QString& /*filter*/, bool /*bContaining*/, int /*column*/)
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
   }
 };
 
@@ -205,20 +321,11 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
+                     CATEGORY_SQL_COL00 ","
                      CATEGORY_SQL_COL02
                      " FROM "
                      CATEGORY_SQL_TABLE_NAME);
     return strQuery;
-  }
-
-  void setQuery()
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
-  }
-
-  void setFilter(const QString& /*filter*/, bool /*bContaining*/, int /*column*/)
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
   }
 };
 
@@ -234,21 +341,12 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
+                     PRODUCT_SQL_COL00 ","
                      PRODUCT_SQL_COL01 ","
                      PRODUCT_SQL_COL04
                      " FROM "
                      PRODUCT_SQL_TABLE_NAME);
     return strQuery;
-  }
-
-  void setQuery()
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
-  }
-
-  void setFilter(const QString& /*filter*/, bool /*bContaining*/, int /*column*/)
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
   }
 };
 
@@ -264,20 +362,11 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
+                     USER_SQL_COL00 ","
                      USER_SQL_COL01
                      " FROM "
                      USER_SQL_TABLE_NAME);
     return strQuery;
-  }
-
-  void setQuery()
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
-  }
-
-  void setFilter(const QString& /*filter*/, bool /*bContaining*/, int /*column*/)
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
   }
 };
 
@@ -293,20 +382,11 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
+                     IMAGE_SQL_COL00 ","
                      IMAGE_SQL_COL01
                      " FROM "
                      IMAGE_SQL_TABLE_NAME);
     return strQuery;
-  }
-
-  void setQuery()
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
-  }
-
-  void setFilter(const QString& /*filter*/, bool /*bContaining*/, int /*column*/)
-  {
-    QSqlQueryModel::setQuery(getStrQuery(), m_db);
   }
 
   QVariant data(const QModelIndex &idx, int role) const
@@ -506,10 +586,15 @@ void JDatabase::setDatabase(QSqlDatabase db,
   else
     return;
 
-  m_db = db;
   m_tableName = tableName;
-  model->setQuery();
+  model->select();
   m_table->setModel(model);
+  model->adjustHeader(m_table->horizontalHeader());
+
+  QObject::connect(m_table->horizontalHeader(),
+                   SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+                   this,
+                   SLOT(sortChanged(int, Qt::SortOrder)));
 
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
@@ -520,7 +605,10 @@ void JDatabase::setDatabase(QSqlDatabase db,
 
 QSqlDatabase JDatabase::getDatabase() const
 {
-  return m_db;
+  JTableModel* model = dynamic_cast<JTableModel*>(m_table->model());
+  if (model != nullptr)
+    return model->getDatabase();
+  return QSqlDatabase();
 }
 
 void JDatabase::selectItem()
@@ -529,7 +617,7 @@ void JDatabase::selectItem()
   JTableModel* model = dynamic_cast<JTableModel*>(m_table->model());
   if (model != nullptr && row >= 0)
   {
-    qlonglong id = model->index(row, ID_COLUMN).data(Qt::EditRole).toLongLong();
+    qlonglong id = model->record(row).value(ID_COLUMN).toLongLong();
     selectItem(id);
   }
 }
@@ -542,7 +630,7 @@ void JDatabase::selectItem(qlonglong id)
   {
     Image o;
     o.m_id = id;
-    bSuccess = ImageSQL::select(m_db, o, error);
+    bSuccess = ImageSQL::select(getDatabase(), o, error);
     if (bSuccess)
       emit itemSelectedSignal(o);
   }
@@ -550,7 +638,7 @@ void JDatabase::selectItem(qlonglong id)
   {
     Person o;
     o.m_id = id;
-    bSuccess = PersonSQL::select(m_db, o, error);
+    bSuccess = PersonSQL::select(getDatabase(), o, error);
     if (bSuccess)
       emit itemSelectedSignal(o);
   }
@@ -558,7 +646,7 @@ void JDatabase::selectItem(qlonglong id)
   {
     Category o;
     o.m_id = id;
-    bSuccess = CategorySQL::select(m_db, o, error);
+    bSuccess = CategorySQL::select(getDatabase(), o, error);
     if (bSuccess)
       emit itemSelectedSignal(o);
   }
@@ -566,7 +654,7 @@ void JDatabase::selectItem(qlonglong id)
   {
     Product o;
     o.m_id = id;
-    bSuccess = ProductSQL::select(m_db, o, error);
+    bSuccess = ProductSQL::select(getDatabase(), o, error);
     if (bSuccess)
       emit itemSelectedSignal(o);
   }
@@ -574,7 +662,7 @@ void JDatabase::selectItem(qlonglong id)
   {
     Note o;
     o.m_id = id;
-    bSuccess = NoteSQL::select(m_db, o, error);
+    bSuccess = NoteSQL::select(getDatabase(), o, error);
     if (bSuccess)
       emit itemSelectedSignal(o);
   }
@@ -582,7 +670,7 @@ void JDatabase::selectItem(qlonglong id)
   {
     User o;
     o.m_id = id;
-    bSuccess = UserSQL::select(m_db, o, error);
+    bSuccess = UserSQL::select(getDatabase(), o, error);
     if (bSuccess)
       emit itemSelectedSignal(o);
   }
@@ -590,7 +678,7 @@ void JDatabase::selectItem(qlonglong id)
   {
     Reminder o;
     o.m_id = id;
-    bSuccess = ReminderSQL::select(m_db, o, error);
+    bSuccess = ReminderSQL::select(getDatabase(), o, error);
     if (bSuccess)
       emit itemSelectedSignal(o);
   }
@@ -617,7 +705,7 @@ void JDatabase::refresh(bool bSaveIdx)
       idx = m_table->currentIndex();
 
     JTableModel* model = dynamic_cast<JTableModel*>(m_table->model());
-    model->setQuery();
+    model->select();
 
     if (bSaveIdx && idx.isValid())
       m_table->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
@@ -643,19 +731,19 @@ void JDatabase::removeItem()
     bool bSuccess = false;
     QString error;
     if (m_tableName == IMAGE_SQL_TABLE_NAME)
-      bSuccess = ImageSQL::remove(m_db, id, error);
+      bSuccess = ImageSQL::remove(getDatabase(), id, error);
     else if (m_tableName == PERSON_SQL_TABLE_NAME)
-      bSuccess = PersonSQL::remove(m_db, id, error);
+      bSuccess = PersonSQL::remove(getDatabase(), id, error);
     else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
-      bSuccess = CategorySQL::remove(m_db, id, error);
+      bSuccess = CategorySQL::remove(getDatabase(), id, error);
     else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
-      bSuccess = ProductSQL::remove(m_db, id, error);
+      bSuccess = ProductSQL::remove(getDatabase(), id, error);
     else if (m_tableName == NOTE_SQL_TABLE_NAME)
-      bSuccess = NoteSQL::remove(m_db, id, error);
+      bSuccess = NoteSQL::remove(getDatabase(), id, error);
     else if (m_tableName == USER_SQL_TABLE_NAME)
-      bSuccess = UserSQL::remove(m_db, id, error);
+      bSuccess = UserSQL::remove(getDatabase(), id, error);
     else if (m_tableName == REMINDER_SQL_TABLE_NAME)
-      bSuccess = ReminderSQL::remove(m_db, id, error);
+      bSuccess = ReminderSQL::remove(getDatabase(), id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -684,11 +772,11 @@ void JDatabase::filterSearchChanged()
   if (m_edFilterSearch->text().isEmpty())
   {
     m_edFilterSearch->setPlaceholderText(tr("Procurar..."));
-    model->setFilter("", false, column);
+    model->prepareFilter("", false, column);
   }
   else
   {
-    model->setFilter(m_edFilterSearch->text(), m_btnContains->isChecked(), column);
+    model->prepareFilter(m_edFilterSearch->text(), m_btnContains->isChecked(), column);
   }
   enableControls();
 }
@@ -725,6 +813,16 @@ void JDatabase::setUserFilter(const QString& userFilter)
   filterSearchChanged();
 }
 
+void JDatabase::sortChanged(int column, Qt::SortOrder sortOrder)
+{
+  JTableModel* model = dynamic_cast<JTableModel*>(m_table->model());
+  if (model != nullptr)
+  {
+    model->prepareSort(column, sortOrder);
+    model->select();
+  }
+}
+
 QString JDatabase::getTableName() const
 {
   return m_tableName;
@@ -738,50 +836,50 @@ bool JDatabase::save(const JItem& jItem)
   {
     const Image& o = dynamic_cast<const Image&>(jItem);
     bSuccess = o.isValidId()
-               ? ImageSQL::update(m_db, o, error)
-               : ImageSQL::insert(m_db, o, error);
+               ? ImageSQL::update(getDatabase(), o, error)
+               : ImageSQL::insert(getDatabase(), o, error);
   }
   else if (m_tableName == PERSON_SQL_TABLE_NAME)
   {
     const Person& o = dynamic_cast<const Person&>(jItem);
     bSuccess = o.isValidId()
-               ? PersonSQL::update(m_db, o, error)
-               : PersonSQL::insert(m_db, o, error);
+               ? PersonSQL::update(getDatabase(), o, error)
+               : PersonSQL::insert(getDatabase(), o, error);
   }
   else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
   {
     const Category& o = dynamic_cast<const Category&>(jItem);
     bSuccess = o.isValidId()
-               ? CategorySQL::update(m_db, o, error)
-               : CategorySQL::insert(m_db, o, error);
+               ? CategorySQL::update(getDatabase(), o, error)
+               : CategorySQL::insert(getDatabase(), o, error);
   }
   else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
   {
     const Product& o = dynamic_cast<const Product&>(jItem);
     bSuccess = o.isValidId()
-               ? ProductSQL::update(m_db, o, error)
-               : ProductSQL::insert(m_db, o, error);
+               ? ProductSQL::update(getDatabase(), o, error)
+               : ProductSQL::insert(getDatabase(), o, error);
   }
   else if (m_tableName == NOTE_SQL_TABLE_NAME)
   {
     const Note& o = dynamic_cast<const Note&>(jItem);
     bSuccess = o.isValidId()
-               ? NoteSQL::update(m_db, o, error)
-               : NoteSQL::insert(m_db, o, error);
+               ? NoteSQL::update(getDatabase(), o, error)
+               : NoteSQL::insert(getDatabase(), o, error);
   }
   else if (m_tableName == USER_SQL_TABLE_NAME)
   {
     const User& o = dynamic_cast<const User&>(jItem);
     bSuccess = o.isValidId()
-               ? UserSQL::update(m_db, o, error)
-               : UserSQL::insert(m_db, o, error);
+               ? UserSQL::update(getDatabase(), o, error)
+               : UserSQL::insert(getDatabase(), o, error);
   }
   else if (m_tableName == REMINDER_SQL_TABLE_NAME)
   {
     const Reminder& o = dynamic_cast<const Reminder&>(jItem);
     bSuccess = o.isValidId()
-               ? ReminderSQL::update(m_db, o, error)
-               : ReminderSQL::insert(m_db, o, error);
+               ? ReminderSQL::update(getDatabase(), o, error)
+               : ReminderSQL::insert(getDatabase(), o, error);
   }
   else
     error = tr("Item ainda não implementado.");
@@ -803,6 +901,7 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
                                      QWidget* parent)
   : QDialog(parent)
   , m_database(nullptr)
+  , m_currentItem(nullptr)
 {
   m_database = new JDatabase(true);
   QHBoxLayout* hlayout0 = new QHBoxLayout();
@@ -818,6 +917,12 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
                    SLOT(itemSelected(const JItem&)));
 }
 
+JDatabaseSelector::~JDatabaseSelector()
+{
+  if (m_currentItem != nullptr)
+    delete m_currentItem;
+}
+
 void JDatabaseSelector::setDatabase(QSqlDatabase db,
                                     const QString& tableName)
 {
@@ -826,14 +931,17 @@ void JDatabaseSelector::setDatabase(QSqlDatabase db,
 
 void JDatabaseSelector::itemSelected(const JItem& jItem)
 {
+  if (m_currentItem != nullptr)
+    delete m_currentItem;
+
   if (m_database->getTableName() == IMAGE_SQL_TABLE_NAME)
-    m_currentImage = dynamic_cast<const Image&>(jItem);
+    m_currentItem = new Image(dynamic_cast<const Image&>(jItem));
   else if (m_database->getTableName() == PERSON_SQL_TABLE_NAME)
-    m_currentPerson = dynamic_cast<const Person&>(jItem);
+    m_currentItem = new Person(dynamic_cast<const Person&>(jItem));
   else if (m_database->getTableName() == CATEGORY_SQL_TABLE_NAME)
-    m_currentCategory = dynamic_cast<const Category&>(jItem);
+    m_currentItem = new Category(dynamic_cast<const Category&>(jItem));
   else if (m_database->getTableName() == PRODUCT_SQL_TABLE_NAME)
-    m_currentProduct = dynamic_cast<const Product&>(jItem);
+    m_currentItem = new Product(dynamic_cast<const Product&>(jItem));
   emit itemSelectedSignal(jItem);
   close();
 }
@@ -843,27 +951,12 @@ void JDatabaseSelector::setUserFilter(const QString& userFilter)
   m_database->setUserFilter(userFilter);
 }
 
-Product JDatabaseSelector::getCurrentProduct() const
-{
-  return m_currentProduct;
-}
-
-Person JDatabaseSelector::getCurrentPerson() const
-{
-  return m_currentPerson;
-}
-
-Category JDatabaseSelector::getCurrentCategory() const
-{
-  return m_currentCategory;
-}
-
-Image JDatabaseSelector::getCurrentImage() const
-{
-  return m_currentImage;
-}
-
 QString JDatabaseSelector::getTableName() const
 {
   return m_database->getTableName();
+}
+
+JItem* JDatabaseSelector::getCurrentItem()
+{
+  return m_currentItem;
 }

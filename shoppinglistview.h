@@ -9,7 +9,7 @@ class JDatabase;
 class QPushButton;
 class JDatabasePicker;
 class QCheckBox;
-class QTextEdit;
+class QPlainTextEdit;
 
 class ShoppingListView : public QFrame
 {
@@ -19,9 +19,9 @@ public:
   explicit ShoppingListView(QWidget* parent = nullptr);
 
 private slots:
-  bool save();
+  /*bool save();
   void itemSelected(const JItem& jItem);
-  void itemRemoved(qlonglong id);
+  void itemRemoved(qlonglong id);*/
 
 private:
   qlonglong m_currentId;
@@ -30,7 +30,7 @@ private:
 
   JDatabase* m_database;
   JDatabasePicker* m_supplierPicker;
-  QTextEdit m_teDescription;
+  QPlainTextEdit* m_teDescription;
 
   QCheckBox* m_cbSupplierCalls;
   QCheckBox* m_cbCallSupplier;

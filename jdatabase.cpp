@@ -29,32 +29,23 @@ public:
 
   }
 
-  QSqlDatabase getDatabase() const { return m_db; }
-
-  QString getStrQueryOrderFilter()
-  {
-    QString strQuery;
-    if (!m_strFilter.isEmpty())
-      strQuery += m_strFilter;
-    if (!m_strCustomFilter.isEmpty())
-      strQuery += m_strCustomFilter;
-    if (!m_strSort.isEmpty())
-      strQuery += m_strSort;
-    return strQuery;
-  }
-
   virtual QString getStrQuery() = 0;
+
+  QSqlDatabase getDatabase() const { return m_db; }
 
   virtual void select()
   {
-    QString strQuery(getStrQuery());
-    strQuery += getStrQueryOrderFilter();
-    QSqlQueryModel::setQuery(strQuery, m_db);
+    QSqlQueryModel::setQuery(getStrCompleteQuery(), m_db);
   }
 
-  virtual void adjustHeader(QHeaderView* /*header*/)
+  virtual void select(QHeaderView* /*header*/)
   {
+    select();
+  }
 
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery();
   }
 
   virtual void prepareFilter(const QString& /*value*/, bool /*bContaining*/, int /*column*/)
@@ -107,12 +98,19 @@ public:
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
                      "="
                      PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL00
-                     " GROUP BY "
-                     NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01);
+                     " GROUP BY " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
+                     " %1 "
+                     " %2 "
+                     " %4");
     return strQuery;
   }
 
-  void select()
+  QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  void select(QHeaderView* header)
   {
     JTableModel::select();
     setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -120,36 +118,35 @@ public:
     setHeaderData(2, Qt::Horizontal, tr("Data"));
     setHeaderData(3, Qt::Horizontal, tr("Fornecedor"));
     setHeaderData(4, Qt::Horizontal, tr("Total"));
-  }
-
-  void adjustHeader(QHeaderView* header)
-  {
     if (header != nullptr)
     {
-      header->hideSection(0);
-      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
+      if (header->count() == 5)
+      {
+        header->hideSection(0);
+        header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+        header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+        header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+        header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
+      }
     }
   }
 
-  /*void prepareSort(int column, Qt::SortOrder sortOrder)
+  void prepareSort(int column, Qt::SortOrder sortOrder)
   {
     m_strSort.clear();
     switch (column)
     {
       case 1:
-        m_strSort = " ORDER BY " NOTE_SQL_COL01;
+        m_strSort = "ORDER BY " NOTE_SQL_COL01;
         break;
       case 2:
-        m_strSort = " ORDER BY " NOTE_SQL_COL02;
+        m_strSort = "ORDER BY " NOTE_SQL_COL02;
         break;
       case 3:
-        m_strSort = " ORDER BY " NOTE_SQL_COL03;
+        m_strSort = "ORDER BY " NOTE_SQL_COL03;
         break;
       case 4:
-        m_strSort = " ORDER BY SUM("
+        m_strSort = "ORDER BY SUM("
                     NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03
                     "*"
                     NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ")";
@@ -172,7 +169,7 @@ public:
     m_strFilter.clear();
     if (!value.isEmpty())
     {
-      m_strFilter = " HAVING ";
+      m_strFilter = "HAVING ";
       switch (column)
       {
         case 1:
@@ -182,7 +179,7 @@ public:
           m_strFilter += " " NOTE_SQL_COL02;
           break;
         case 3:
-          m_strFilter += " " NOTE_SQL_COL03;
+          m_strFilter += " " PERSON_SQL_COL03;
           break;
         case 4:
           m_strFilter += " SUM("
@@ -195,10 +192,10 @@ public:
     }
     if (!m_strFilter.isEmpty())
     {
-      m_strFilter += " LIKE ";
+      m_strFilter += " LIKE '";
       if (bContaining)
         m_strFilter += "%";
-      m_strFilter += value + "%";
+      m_strFilter += value + "%'";
     }
   }
 
@@ -206,11 +203,11 @@ public:
   {
     m_strCustomFilter.clear();
     if (m_strFilter.isEmpty())
-      m_strCustomFilter = " HAVING ";
+      m_strCustomFilter = "HAVING ";
     else
-      m_strCustomFilter = " AND ";
+      m_strCustomFilter = "AND ";
     m_strCustomFilter += value;
-  }*/
+  }
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
   {
@@ -587,9 +584,8 @@ void JDatabase::setDatabase(QSqlDatabase db,
     return;
 
   m_tableName = tableName;
-  model->select();
   m_table->setModel(model);
-  model->adjustHeader(m_table->horizontalHeader());
+  model->select(m_table->horizontalHeader());
 
   QObject::connect(m_table->horizontalHeader(),
                    SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
@@ -768,15 +764,19 @@ void JDatabase::filterSearchChanged()
     return;
 
   JTableModel* model = dynamic_cast<JTableModel*>(m_table->model());
-  int column = m_table->horizontalHeader()->sortIndicatorSection();
-  if (m_edFilterSearch->text().isEmpty())
+  if (model != nullptr)
   {
-    m_edFilterSearch->setPlaceholderText(tr("Procurar..."));
-    model->prepareFilter("", false, column);
-  }
-  else
-  {
-    model->prepareFilter(m_edFilterSearch->text(), m_btnContains->isChecked(), column);
+    int column = m_table->horizontalHeader()->sortIndicatorSection();
+    if (m_edFilterSearch->text().isEmpty())
+    {
+      m_edFilterSearch->setPlaceholderText(tr("Procurar..."));
+      model->prepareFilter("", false, column);
+    }
+    else
+    {
+      model->prepareFilter(m_edFilterSearch->text(), m_btnContains->isChecked(), column);
+    }
+    model->select(m_table->horizontalHeader());
   }
   enableControls();
 }

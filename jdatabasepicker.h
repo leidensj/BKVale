@@ -11,6 +11,7 @@ class QPushButton;
 class JLineEdit;
 class JImageView;
 class JDatabaseSelector;
+class JDatabase;
 
 class JDatabasePicker : public QFrame
 {
@@ -27,9 +28,9 @@ public:
   qlonglong getId() const;
   const QString m_text;
 
+  JDatabase* getDatabase() const;
   void setDatabase(QSqlDatabase db,
                    const QString& tableName);
-  void setUserFilter(const QString& userFilter);
 
 public slots:
   void clear();

@@ -47,7 +47,7 @@ public:
 public slots:
   void refresh(bool bSaveIdx = true);
   void selectItem(qlonglong id);
-  void setUserFilter(const QString& userFilter);
+  void setCustomFilter(const QString& customFilter);
 
 private:
   const bool m_bSelectorMode;
@@ -59,7 +59,7 @@ private:
   QPushButton* m_btnContains;
   JTableView* m_table;
   QString m_tableName;
-  QString m_userFilter;
+  QString m_customFilter;
   QVector<JTableColumn> m_vColumns;
 
 private slots:
@@ -91,9 +91,8 @@ public:
   void setDatabase(QSqlDatabase db,
                    const QString& tableName);
 
-  void setUserFilter(const QString& userFilter);
-
-  JItem* getCurrentItem();
+  JItem* getCurrentItem() const;
+  JDatabase* getDatabase() const;
 
   QString getTableName() const;
 

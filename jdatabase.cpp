@@ -53,7 +53,7 @@ public:
 
   }
 
-  virtual void prepareCustomFilter(const QString& /*value*/)
+  virtual void prepareCustomFilter(const QString& /*customFilter*/)
   {
 
   }
@@ -199,14 +199,16 @@ public:
     }
   }
 
-  void prepareCustomFilter(const QString& value)
+  void prepareCustomFilter(const QString& customFilter)
   {
     m_strCustomFilter.clear();
-    if (m_strFilter.isEmpty())
-      m_strCustomFilter = "HAVING ";
-    else
-      m_strCustomFilter = "AND ";
-    m_strCustomFilter += value;
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "HAVING " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
   }
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
@@ -215,7 +217,7 @@ public:
     if (role == Qt::DisplayRole)
     {
       if (idx.column() == 2)
-        value = QDate::fromString(value.toString(), Qt::ISODate).toString("dd/MM/yyyy");
+        value = QDate::fromString(value.toString(), Qt::ISODate).toString("yyyy/MM/dd");
       else if (idx.column() == 4)
         value = "R$ " + QString::number(value.toDouble(), 'f', 2);
     }
@@ -234,14 +236,105 @@ public:
 
   QString getStrQuery()
   {
-    QString strQuery("SELECT "
-                     REMINDER_SQL_COL00 ","
-                     REMINDER_SQL_COL01 ","
-                     REMINDER_SQL_COL02 ","
-                     REMINDER_SQL_COL03
-                     " FROM "
-                     REMINDER_SQL_TABLE_NAME);
-    return strQuery;
+    return
+        "SELECT "
+        REMINDER_SQL_COL00 ","
+        REMINDER_SQL_COL01 ","
+        REMINDER_SQL_COL02 ","
+        REMINDER_SQL_COL03
+        " FROM "
+        REMINDER_SQL_TABLE_NAME
+        " %1 %2 %3";
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Título"));
+    setHeaderData(2, Qt::Horizontal, tr("Mensagem"));
+    setHeaderData(3, Qt::Horizontal, tr("Favorito"));
+    if (header != nullptr && header->count() == 4)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
+    }
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = "WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " REMINDER_SQL_COL01;
+          break;
+        case 2:
+          m_strFilter += " " REMINDER_SQL_COL02;
+          break;
+        case 3:
+          m_strFilter += " " REMINDER_SQL_COL03;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "WHERE " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = "ORDER BY " REMINDER_SQL_COL01;
+        break;
+      case 2:
+        m_strSort = "ORDER BY " REMINDER_SQL_COL02;
+        break;
+      case 3:
+        m_strSort = "ORDER BY " REMINDER_SQL_COL03;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
   }
 
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
@@ -252,7 +345,7 @@ public:
     QVariant value = QSqlQueryModel::data(index, role);
     if (role == Qt::DecorationRole)
     {
-      if (index.column() == 2)
+      if (index.column() == 3)
       {
         if (QSqlQueryModel::data(index, Qt::EditRole).toBool())
           value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
@@ -262,7 +355,7 @@ public:
     }
     else if (role == Qt::DisplayRole)
     {
-      if (index.column() == 2)
+      if (index.column() == 3)
         value = value.toBool() ? tr("Sim") : "";
       else if (index.column() == 1)
       {
@@ -301,8 +394,91 @@ public:
                      PERSON_SQL_COL02 ","
                      PERSON_SQL_COL03
                      " FROM "
-                     PERSON_SQL_TABLE_NAME);
+                     PERSON_SQL_TABLE_NAME
+                     " %1 %2 %3");
     return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome/Razão Social"));
+    setHeaderData(2, Qt::Horizontal, tr("Apelido/Nome Fantasia"));
+    if (header != nullptr && header->count() == 3)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = "WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " PERSON_SQL_COL02;
+          break;
+        case 2:
+          m_strFilter += " " PERSON_SQL_COL03;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "WHERE " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = "ORDER BY " PERSON_SQL_COL02;
+        break;
+      case 2:
+        m_strSort = "ORDER BY " PERSON_SQL_COL03;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
   }
 };
 
@@ -324,6 +500,80 @@ public:
                      CATEGORY_SQL_TABLE_NAME);
     return strQuery;
   }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    if (header != nullptr && header->count() == 2)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = "WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " CATEGORY_SQL_COL02;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "WHERE " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = "ORDER BY " CATEGORY_SQL_COL02;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
+  }
 };
 
 class ProductTableModel : public JTableModel
@@ -342,8 +592,91 @@ public:
                      PRODUCT_SQL_COL01 ","
                      PRODUCT_SQL_COL04
                      " FROM "
-                     PRODUCT_SQL_TABLE_NAME);
+                     PRODUCT_SQL_TABLE_NAME
+                     " %1 %2 %3");
     return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    setHeaderData(1, Qt::Horizontal, tr("Unidade"));
+    if (header != nullptr && header->count() == 3)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+    }
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = "WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " PRODUCT_SQL_COL01;
+          break;
+        case 2:
+          m_strFilter += " " PRODUCT_SQL_COL04;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "WHERE " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = "ORDER BY " PRODUCT_SQL_COL01;
+        break;
+      case 2:
+        m_strSort = "ORDER BY " PRODUCT_SQL_COL04;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
   }
 };
 
@@ -365,6 +698,80 @@ public:
                      USER_SQL_TABLE_NAME);
     return strQuery;
   }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    if (header != nullptr && header->count() == 2)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = "WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " USER_SQL_COL01;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "WHERE " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = "ORDER BY " USER_SQL_COL01;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
+  }
 };
 
 class ImageTableModel : public JTableModel
@@ -380,10 +787,87 @@ public:
   {
     QString strQuery("SELECT "
                      IMAGE_SQL_COL00 ","
-                     IMAGE_SQL_COL01
+                     IMAGE_SQL_COL01 ","
+                     IMAGE_SQL_COL02
                      " FROM "
                      IMAGE_SQL_TABLE_NAME);
     return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Imagem"));
+    setHeaderData(1, Qt::Horizontal, tr("Imagem"));
+    if (header != nullptr && header->count() == 2)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+      header->hideSection(2);
+    }
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = "WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " IMAGE_SQL_COL01;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "WHERE " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = "ORDER BY " IMAGE_SQL_COL01;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
   }
 
   QVariant data(const QModelIndex &idx, int role) const
@@ -393,11 +877,10 @@ public:
     {
       if (idx.column() == 0)
       {
-        //TODO
-        /*QPixmap px(QSize(16, 16));
-        px.loadFromData(QSqlTableModel::data(createIndex(idx.row(), (int)Image::Column::Image),
+        QPixmap px(QSize(16, 16));
+        px.loadFromData(QSqlQueryModel::data(createIndex(idx.row(), 2),
                                              Qt::EditRole).toByteArray());
-        value = QVariant::fromValue(QIcon(px));*/
+        value = QVariant::fromValue(QIcon(px));
       }
     }
     return value;
@@ -776,6 +1259,7 @@ void JDatabase::filterSearchChanged()
     {
       model->prepareFilter(m_edFilterSearch->text(), m_btnContains->isChecked(), column);
     }
+    model->prepareCustomFilter(m_customFilter);
     model->select(m_table->horizontalHeader());
   }
   enableControls();
@@ -807,9 +1291,9 @@ void JDatabase::focusFilterSearch()
   m_edFilterSearch->setFocus();
 }
 
-void JDatabase::setUserFilter(const QString& userFilter)
+void JDatabase::setCustomFilter(const QString& customFilter)
 {
-  m_userFilter = userFilter;
+  m_customFilter = customFilter;
   filterSearchChanged();
 }
 
@@ -946,17 +1430,17 @@ void JDatabaseSelector::itemSelected(const JItem& jItem)
   close();
 }
 
-void JDatabaseSelector::setUserFilter(const QString& userFilter)
-{
-  m_database->setUserFilter(userFilter);
-}
-
 QString JDatabaseSelector::getTableName() const
 {
   return m_database->getTableName();
 }
 
-JItem* JDatabaseSelector::getCurrentItem()
+JItem* JDatabaseSelector::getCurrentItem() const
 {
   return m_currentItem;
+}
+
+JDatabase* JDatabaseSelector::getDatabase() const
+{
+  return m_database;
 }

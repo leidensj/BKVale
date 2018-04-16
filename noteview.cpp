@@ -321,7 +321,7 @@ void NoteView::setDatabase(QSqlDatabase db)
 {
   m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
   m_database->setDatabase(db, NOTE_SQL_TABLE_NAME);
-  m_supplierPicker->setUserFilter(PERSON_FILTER_SUPPLIER);
+  m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
 }
 
 void NoteView::addNoteItem(const NoteItem& noteItem)
@@ -443,7 +443,7 @@ void NoteView::searchProduct()
   JDatabaseSelector dlg(tr("Selecionar Produto"),
                         QIcon(":/icons/res/item.png"));
   dlg.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
-  dlg.setUserFilter(PRODUCT_FILTER_NOTE);
+  dlg.getDatabase()->setCustomFilter(PRODUCT_FILTER_NOTE);
   dlg.exec();
   Product* product = dynamic_cast<Product*>(dlg.getCurrentItem());
   if (product != nullptr && product->isValidId())

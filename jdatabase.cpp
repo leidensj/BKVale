@@ -800,7 +800,7 @@ public:
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("Imagem"));
     setHeaderData(1, Qt::Horizontal, tr("Imagem"));
-    if (header != nullptr && header->count() == 2)
+    if (header != nullptr && header->count() == 3)
     {
       header->hideSection(0);
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
@@ -875,7 +875,7 @@ public:
     QVariant value = QSqlQueryModel::data(idx, role);
     if (role == Qt::DecorationRole)
     {
-      if (idx.column() == 0)
+      if (idx.column() == 1)
       {
         QPixmap px(QSize(16, 16));
         px.loadFromData(QSqlQueryModel::data(createIndex(idx.row(), 2),

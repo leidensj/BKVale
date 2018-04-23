@@ -29,6 +29,7 @@ private slots:
   void addItem();
   void removeItem();
   void editItem();
+  void updateControls();
 
 private:
   qlonglong m_currentId;

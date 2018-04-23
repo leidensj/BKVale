@@ -61,18 +61,6 @@ struct Reminder : public JItem
   {
     clear();
   }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(REMINDER_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(REMINDER_SQL_COL01, QObject::tr("Título"), false, true, JResizeMode::ResizeToContents));
-    c.push_back(JTableColumn(REMINDER_SQL_COL02, QObject::tr("Mensagem"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(REMINDER_SQL_COL03, QObject::tr("Favorito"), false, false, JResizeMode::ResizeToContents));
-    c.push_back(JTableColumn(REMINDER_SQL_COL04, QObject::tr("Fonte")));
-    c.push_back(JTableColumn(REMINDER_SQL_COL04, QObject::tr("Tamanho")));
-    return c;
-  }
 };
 
 #endif // REMINDER_H

@@ -139,5 +139,8 @@
         <file>res/calw6.png</file>
         <file>res/calw7.png</file>
         <file>res/usershield.png</file>
+        <file>res/shopmgt.png</file>
+        <file>res/cal18.png</file>
+        <file>res/cal30.png</file>
     </qresource>
 </RCC>

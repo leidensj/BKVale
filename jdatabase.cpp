@@ -76,7 +76,7 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL00 ","
+                     NOTE_SQL_TABLE_NAME "." SQL_COLID ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
                      PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL03 ","
@@ -89,7 +89,7 @@ public:
                      " INNER JOIN "
                      NOTE_SQL_TABLE_NAME
                      " ON "
-                     NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL00
+                     NOTE_SQL_TABLE_NAME "." SQL_COLID
                      "="
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
                      " INNER JOIN "
@@ -97,7 +97,7 @@ public:
                      " ON "
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
                      "="
-                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL00
+                     PERSON_SQL_TABLE_NAME "." SQL_COLID
                      " GROUP BY " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
                      " %1 "
                      " %2 "
@@ -238,7 +238,7 @@ public:
   {
     return
         "SELECT "
-        REMINDER_SQL_COL00 ","
+        SQL_COLID ","
         REMINDER_SQL_COL01 ","
         REMINDER_SQL_COL02 ","
         REMINDER_SQL_COL03
@@ -390,7 +390,7 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     PERSON_SQL_COL00 ","
+                     SQL_COLID ","
                      PERSON_SQL_COL02 ","
                      PERSON_SQL_COL03
                      " FROM "
@@ -494,7 +494,7 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     CATEGORY_SQL_COL00 ","
+                     SQL_COLID ","
                      CATEGORY_SQL_COL02
                      " FROM "
                      CATEGORY_SQL_TABLE_NAME);
@@ -588,7 +588,7 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     PRODUCT_SQL_COL00 ","
+                     SQL_COLID ","
                      PRODUCT_SQL_COL01 ","
                      PRODUCT_SQL_COL04
                      " FROM "
@@ -692,7 +692,7 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     USER_SQL_COL00 ","
+                     SQL_COLID ","
                      USER_SQL_COL01
                      " FROM "
                      USER_SQL_TABLE_NAME);
@@ -786,7 +786,7 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     IMAGE_SQL_COL00 ","
+                     SQL_COLID ","
                      IMAGE_SQL_COL01 ","
                      IMAGE_SQL_COL02
                      " FROM "

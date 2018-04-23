@@ -174,6 +174,7 @@
     <addaction name="actionPersons"/>
     <addaction name="actionCategories"/>
     <addaction name="actionImages"/>
+    <addaction name="actionShoppingList"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
     <property name="title">
@@ -334,6 +335,18 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar pessoas</string>
+   </property>
+  </action>
+  <action name="actionShoppingList">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/shopmgt.png</normaloff>:/icons/res/shopmgt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Listas de Compras</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar Listas de Compras</string>
    </property>
   </action>
  </widget>

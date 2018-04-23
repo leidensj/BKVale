@@ -345,7 +345,6 @@ Note NoteView::getNote() const
   note.m_id = m_currentId;
   note.m_date = m_dtDate->date().toString(Qt::ISODate);
   note.m_supplier.m_id = m_supplierPicker->getId();
-  note.m_total = m_edTotal->text().toDouble();
   note.m_bCash = m_cbCash->isChecked();
   note.m_vNoteItem = m_table->getNoteItems();
   return note;

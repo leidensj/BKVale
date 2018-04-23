@@ -87,25 +87,6 @@ struct Product : public JItem
         !m_name.isEmpty() &&
         !m_unity.isEmpty();
   }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(PRODUCT_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL01, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL02, QObject::tr("Categoria")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL03, QObject::tr("Imagem")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL04, QObject::tr("Unidade"), false));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL05, QObject::tr("Unidade da Embalagem")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL06, QObject::tr("Quantidade da Embalagem")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL07, QObject::tr("Detalhes"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL08, QObject::tr("Notas")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL09, QObject::tr("Compras")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL10, QObject::tr("Consumo")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL11, QObject::tr("Compra")));
-    c.push_back(JTableColumn(PRODUCT_SQL_COL12, QObject::tr("Venda")));
-    return c;
-  }
 };
 
 #endif // PRODUCT_H

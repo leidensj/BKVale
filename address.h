@@ -77,22 +77,6 @@ struct Address : public JItem
         m_number != ADDRESS_INVALID_NUMBER;
   }
 
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(ADDRESS_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL01, QObject::tr("Id Pessoa"), false, true));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL02, QObject::tr("CEP")));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL03, QObject::tr("Bairro"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL04, QObject::tr("Rua"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL05, QObject::tr("Número")));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL06, QObject::tr("Cidade")));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL07, QObject::tr("Estado")));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL08, QObject::tr("Complemento")));
-    c.push_back(JTableColumn(ADDRESS_SQL_COL09, QObject::tr("Referência")));
-    return c;
-  }
-
   struct BRState
   {
     QString m_abv;

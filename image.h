@@ -40,15 +40,6 @@ struct Image : public JItem
   }
 
   bool isValid() const { return !m_name.isEmpty() && !m_image.isEmpty(); }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(IMAGE_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(IMAGE_SQL_COL01, QObject::tr("Imagem"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(IMAGE_SQL_COL02, QObject::tr("Imagem")));
-    return c;
-  }
 };
 
 #endif // IMAGE_H

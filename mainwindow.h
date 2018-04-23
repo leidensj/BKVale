@@ -63,6 +63,7 @@ private slots:
   void openLoginDialog();
   void openImagesDialog();
   void openPersonsDialog();
+  void openShoppingListDialog();
 };
 
 #endif // MAINWINDOW_H

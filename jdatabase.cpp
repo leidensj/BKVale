@@ -1252,7 +1252,14 @@ void JDatabase::filterSearchChanged()
     int column = m_table->horizontalHeader()->sortIndicatorSection();
     if (m_edFilterSearch->text().isEmpty())
     {
-      m_edFilterSearch->setPlaceholderText(tr("Procurar..."));
+      QString columnName;
+      if (column > 0)
+        columnName = m_table->model()->headerData(column, Qt::Horizontal).toString().toLower();
+      if (columnName.isEmpty())
+        columnName = tr("Procurar...");
+      else
+        columnName = tr("Procurar pelo(a) ") + columnName;
+      m_edFilterSearch->setPlaceholderText(columnName);
       model->prepareFilter("", false, column);
     }
     else

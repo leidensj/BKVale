@@ -42,15 +42,6 @@ struct Category : public JItem
   {
     return !m_name.isEmpty();
   }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(CATEGORY_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(CATEGORY_SQL_COL01, QObject::tr("Id Imagem")));
-    c.push_back(JTableColumn(CATEGORY_SQL_COL02, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
-    return c;
-  }
 };
 
 #endif // CATEGORY_H

@@ -56,25 +56,6 @@ struct User : public JItem
 
   QString strEncryptedPassword() const;
   static QString st_strEncryptedPassword(const QString& strPassword);
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(USER_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(USER_SQL_COL01, QObject::tr("Nome"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(USER_SQL_COL02, QObject::tr("Senha")));
-    c.push_back(JTableColumn(USER_SQL_COL03, QObject::tr("Notas")));
-    c.push_back(JTableColumn(USER_SQL_COL04, QObject::tr("Lembretes")));
-    c.push_back(JTableColumn(USER_SQL_COL05, QObject::tr("Calculadora")));
-    c.push_back(JTableColumn(USER_SQL_COL06, QObject::tr("Compras")));
-    c.push_back(JTableColumn(USER_SQL_COL07, QObject::tr("Consumo")));
-    c.push_back(JTableColumn(USER_SQL_COL08, QObject::tr("Usuários")));
-    c.push_back(JTableColumn(USER_SQL_COL09, QObject::tr("Produtos")));
-    c.push_back(JTableColumn(USER_SQL_COL10, QObject::tr("Configurações")));
-    c.push_back(JTableColumn(USER_SQL_COL11, QObject::tr("Pessoas")));
-    c.push_back(JTableColumn(USER_SQL_COL12, QObject::tr("Categorias")));
-    c.push_back(JTableColumn(USER_SQL_COL13, QObject::tr("Imagens")));
-    return c;
-  }
 };
 
 #endif // USER_H

@@ -12,6 +12,7 @@
 #include "imageview.h"
 #include "logindialog.h"
 #include "personwidget.h"
+#include "shoppinglistview.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -127,6 +128,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openPersonsDialog()));
+
+  QObject::connect(ui->actionShoppingList,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openShoppingListDialog()));
 
   m_settings.load();
   if (!m_settings.m_serialPort.isEmpty() &&
@@ -441,6 +447,21 @@ void BaitaAssistant::openPersonsDialog()
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Pessoas"));
   dlg.setWindowIcon(QIcon(":/icons/res/person.png"));
+  dlg.setModal(true);
+  dlg.exec();
+}
+
+void BaitaAssistant::openShoppingListDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout;
+  dlg.setLayout(layout);
+  ShoppingListView* w = new ShoppingListView;
+  w->setDatabase(m_userLogin.getDatabase());
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Listas de Compras"));
+  dlg.setWindowIcon(QIcon(":/icons/res/shopmgt.png"));
   dlg.setModal(true);
   dlg.exec();
 }

@@ -46,7 +46,8 @@ SOURCES += main.cpp\
     phonepageview.cpp \
     jdatabasepicker.cpp \
     pincodeview.cpp \
-    shoppinglistview.cpp
+    shoppinglistview.cpp \
+    shoppinglisttable.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -94,7 +95,8 @@ HEADERS  += mainwindow.h \
     jdatabasepicker.h \
     pincodeview.h \
     shoppinglist.h \
-    shoppinglistview.h
+    shoppinglistview.h \
+    shoppinglisttable.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

@@ -93,27 +93,6 @@ struct Person : public JItem
       b = b && !m_employeePinCode.isEmpty();
     return b;
   }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(PERSON_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(PERSON_SQL_COL01, QObject::tr("Id Imagem")));
-    c.push_back(JTableColumn(PERSON_SQL_COL02, QObject::tr("Nome"), false, false, JResizeMode::Interactive));
-    c.push_back(JTableColumn(PERSON_SQL_COL03, QObject::tr("Apelido"), false, true, JResizeMode::Stretch));
-    c.push_back(JTableColumn(PERSON_SQL_COL04, QObject::tr("Email")));
-    c.push_back(JTableColumn(PERSON_SQL_COL05, QObject::tr("CPF/CNPJ")));
-    c.push_back(JTableColumn(PERSON_SQL_COL06, QObject::tr("RG/IE")));
-    c.push_back(JTableColumn(PERSON_SQL_COL07, QObject::tr("Detalhes")));
-    c.push_back(JTableColumn(PERSON_SQL_COL08, QObject::tr("Data de Nascimento")));
-    c.push_back(JTableColumn(PERSON_SQL_COL09, QObject::tr("Data de Criação")));
-    c.push_back(JTableColumn(PERSON_SQL_COL10, QObject::tr("Empresa")));
-    c.push_back(JTableColumn(PERSON_SQL_COL11, QObject::tr("Cliente")));
-    c.push_back(JTableColumn(PERSON_SQL_COL12, QObject::tr("Fornecedor")));
-    c.push_back(JTableColumn(PERSON_SQL_COL13, QObject::tr("Funcionário")));
-    c.push_back(JTableColumn(PERSON_SQL_COL14, QObject::tr("Código PIN")));
-    return c;
-  }
 };
 
 #endif // PERSON_H

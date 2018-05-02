@@ -83,7 +83,6 @@ struct Note : public JItem
   qlonglong m_number;
   QString m_date;
   Person m_supplier;
-  double m_total;
   bool m_bCash;
   QVector<NoteItem> m_vNoteItem;
 
@@ -93,7 +92,6 @@ struct Note : public JItem
     m_number = NOTE_SQL_DEFAULT_NUMBER;
     m_supplier.clear();
     m_date.clear();
-    m_total = 0.0;
     m_bCash = false;
     m_vNoteItem.clear();
   }
@@ -106,14 +104,23 @@ struct Note : public JItem
   QString strDate() const { return QDate::fromString(m_date, Qt::ISODate).toString("dd/MM/yyyy"); }
   QString strDayOfWeek() const { return QDate::fromString(m_date, Qt::ISODate).toString("dddd"); }
   QString strId() const { return QString::number(m_id); }
-  QString strTotal() const { return QString::number(m_total, 'f', 2); }
   static QString st_strNumber(qlonglong number) { return QString::number(number); }
   QString strNumber() const { return st_strNumber(m_number); }
+
+  double total() const
+  {
+    double total = 0.0;
+    for (int i = 0; i != m_vNoteItem.size(); ++i)
+      total += m_vNoteItem.at(i).subtotal();
+    return total;
+  }
+
+  QString strTotal() const { return QString::number(total(), 'f', 2); }
 
   bool isValid() const
   {
     bool b = m_supplier.isValidId() &&
-             m_total != 0.0 &&
+             total() != 0.0 &&
              !m_vNoteItem.isEmpty();
     for (int i = 0; i != m_vNoteItem.size(); ++i)
       b &= m_vNoteItem.at(i).isValid();
@@ -127,7 +134,7 @@ struct Note : public JItem
         m_number != another.m_number ||
         m_date != another.m_date ||
         m_supplier.m_id != another.m_supplier.m_id ||
-        m_total != another.m_total ||
+        total() != another.total() ||
         m_bCash != another.m_bCash ||
         m_vNoteItem != another.m_vNoteItem;
   }
@@ -135,18 +142,6 @@ struct Note : public JItem
   bool operator ==(const JItem& other) const
   {
     return !(*this != other);
-  }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(NOTE_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(NOTE_SQL_COL01, QObject::tr("Número"), false, true));
-    c.push_back(JTableColumn(NOTE_SQL_COL02, QObject::tr("Data"), false));
-    c.push_back(JTableColumn(NOTE_SQL_COL03, QObject::tr("Fornecedor"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(NOTE_SQL_COL04, QObject::tr("Total"), false));
-    c.push_back(JTableColumn(NOTE_SQL_COL05, QObject::tr("À Vista")));
-    return c;
   }
 };
 

@@ -54,17 +54,6 @@ struct Phone : public JItem
       ") " +
       m_number;
   }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(PHONE_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(PHONE_SQL_COL01, QObject::tr("Id Pessoa")));
-    c.push_back(JTableColumn(PHONE_SQL_COL02, QObject::tr("País"), false));
-    c.push_back(JTableColumn(PHONE_SQL_COL03, QObject::tr("Código"), false));
-    c.push_back(JTableColumn(PHONE_SQL_COL04, QObject::tr("Número"), false, false, JResizeMode::Stretch));
-    return c;
-  }
 };
 
 #endif // PHONENUMBER_H

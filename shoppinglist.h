@@ -15,11 +15,10 @@
 
 enum class ShoppingListColumn : int
 {
-  Ammount,
   Unity,
   Description,
-  Price,
-  SubTotal
+  Ammount,
+  Price
 };
 
 struct ShoppingListItem : JItem
@@ -28,6 +27,8 @@ struct ShoppingListItem : JItem
   double m_ammount;
   double m_price;
   bool m_bIsPackageAmmount;
+  bool m_bPrintAmmount;
+  bool m_bPrintPrice;
 
   void clear()
   {
@@ -36,6 +37,8 @@ struct ShoppingListItem : JItem
     m_ammount = 0.0;
     m_price = 0.0;
     m_bIsPackageAmmount = true;
+    m_bPrintAmmount = true;
+    m_bPrintPrice = true;
   }
 
   ShoppingListItem()
@@ -79,6 +82,7 @@ Q_DECLARE_METATYPE(ShoppingListItem)
 struct ShoppingList : public JItem
 {
   Person m_supplier;
+  Image m_image;
   QStringList m_dates;
   QString m_description;
   QVector<ShoppingListItem> m_vItem;
@@ -132,18 +136,6 @@ struct ShoppingList : public JItem
   bool operator ==(const JItem& other) const
   {
     return !(*this != other);
-  }
-
-  static QVector<JTableColumn> getColumns()
-  {
-    QVector<JTableColumn> c;
-    c.push_back(JTableColumn(NOTE_SQL_COL00, QObject::tr("Id")));
-    c.push_back(JTableColumn(NOTE_SQL_COL01, QObject::tr("Número"), false, true));
-    c.push_back(JTableColumn(NOTE_SQL_COL02, QObject::tr("Data"), false));
-    c.push_back(JTableColumn(NOTE_SQL_COL03, QObject::tr("Fornecedor"), false, false, JResizeMode::Stretch));
-    c.push_back(JTableColumn(NOTE_SQL_COL04, QObject::tr("Total"), false));
-    c.push_back(JTableColumn(NOTE_SQL_COL05, QObject::tr("À Vista")));
-    return c;
   }
 };
 

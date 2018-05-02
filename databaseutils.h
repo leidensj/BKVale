@@ -262,4 +262,27 @@ namespace PersonSQL
                       QString& error);
 }
 
+/*namespace ShoppingListSQL
+{
+ bool execSelect(QSqlQuery& query,
+                 Category& category,
+                 QString& error);
+
+  bool select(QSqlDatabase db,
+              Category& category,
+              QString& error);
+
+  bool insert(QSqlDatabase db,
+              const Category& category,
+              QString& error);
+
+  bool update(QSqlDatabase db,
+              const Category& category,
+              QString& error);
+
+  bool remove(QSqlDatabase db,
+              qlonglong id,
+              QString& error);
+}*/
+
 #endif // DATABASEUTILS_H

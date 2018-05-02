@@ -346,7 +346,8 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
                    this,
                    SLOT(reset()));
 
-  clear();
+  m_edDisplay->setText("0");
+  m_view->setPlainText("0");
 }
 
 double CalculatorWidget::calculate(double op1, double op2, Calculator::Button button)
@@ -399,18 +400,8 @@ void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
 
 QString CalculatorWidget::buildPrintContent(double value, Calculator::Button button)
 {
-  QString text;
-  if (Calculator::isEqual(button))
-  {
-    text = Calculator::toStr(button) + " " +
-           QString::number(value, 'f').remove(QRegExp("\\.?0*$"));
-  }
-  else
-  {
-    text = QString::number(value, 'f').remove(QRegExp("\\.?0*$")) +
-           " " + Calculator::toStr(button);
-  }
-  return text;
+  return Calculator::toStr(button) + " " +
+      QString::number(value, 'f').remove(QRegExp("\\.?0*$"));;
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
@@ -423,7 +414,7 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
                    ? currentValue : m_lastValue;
     m_total = calculate(m_total, value, button);
     emitPrintSignal(value, button);
-    m_edDisplay->setText("");
+    m_edDisplay->setText(QString::number(m_total, 'f').remove(QRegExp("\\.?0*$")));
     m_lastValue = value;
   }
   else if (Calculator::isEqual(button))
@@ -434,7 +425,7 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
   }
   else if (Calculator::isDigit(button))
   {
-    if (Calculator::isEqual(m_lastButton))
+    if (!Calculator::isDigit(m_lastButton))
       m_edDisplay->setText("");
     QString strValue = m_edDisplay->text();
     strValue.append(Calculator::toStr(button));
@@ -457,15 +448,22 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
 
 void CalculatorWidget::clear()
 {
-  m_edDisplay->setText("");
+  m_edDisplay->setText("0");
 }
 
 void CalculatorWidget::reset()
 {
-  m_edDisplay->setText("");
-  m_view->setPlainText("");
+  m_edDisplay->setText("0");
+  m_view->setPlainText("0");
   m_lastValue = 0.0;
   m_total = 0.0;
   if (m_btnPrint->isChecked())
     emit printSignal(Printer::strCmdFullCut());
+}
+
+void CalculatorWidget::enablePrinter(bool bEnable)
+{
+  if (!bEnable)
+    m_btnPrint->setChecked(bEnable);
+  m_btnPrint->setEnabled(bEnable);
 }

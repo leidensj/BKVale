@@ -35,6 +35,7 @@ class CalculatorWidget : public QFrame
 public:
   explicit CalculatorWidget(QWidget* parent = 0);
   void print(QIODevice* printer, InterfaceType type);
+  void enablePrinter(bool bEnable);
 
 private slots:
   void calculatorButtonClicked(Calculator::Button button);

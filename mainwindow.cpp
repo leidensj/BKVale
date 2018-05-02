@@ -313,9 +313,9 @@ void BaitaAssistant::updateControls()
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
   ui->actionProducts->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProducts());
- ui->actionPersons->setEnabled(bIsSQLOk && m_userLogin.hasAccessToPersons());
- ui->actionCategories->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCategories());
- ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
+  ui->actionPersons->setEnabled(bIsSQLOk && m_userLogin.hasAccessToPersons());
+  ui->actionCategories->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCategories());
+  ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
 
   ui->tabWidget->setTabEnabled((int)Functionality::NoteMode,
                                bIsSQLOk && m_userLogin.hasAccessToNote());
@@ -327,6 +327,8 @@ void BaitaAssistant::updateControls()
                                bIsSQLOk && m_userLogin.hasAccessToShop());
   ui->tabWidget->setTabEnabled((int)Functionality::ConsumptionMode,
                                bIsSQLOk && m_userLogin.hasAccessToConsumption());
+
+  m_calculator->enablePrinter(bIsOpen);
 
   switch ((Functionality)ui->tabWidget->currentIndex())
   {

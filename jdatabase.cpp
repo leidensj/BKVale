@@ -1070,6 +1070,7 @@ void JDatabase::setDatabase(QSqlDatabase db,
   m_table->setModel(model);
   model->select(m_table->horizontalHeader());
 
+
   QObject::connect(m_table->horizontalHeader(),
                    SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
                    this,
@@ -1079,6 +1080,10 @@ void JDatabase::setDatabase(QSqlDatabase db,
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
                    SLOT(enableControls()));
+
+  if (m_table->horizontalHeader()->count() > 1)
+    m_table->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
+
   refresh(false);
 }
 
@@ -1254,7 +1259,7 @@ void JDatabase::filterSearchChanged()
     {
       QString columnName;
       if (column > 0)
-        columnName = m_table->model()->headerData(column, Qt::Horizontal).toString().toLower();
+        columnName = model->headerData(column, Qt::Horizontal).toString().toLower();
       if (columnName.isEmpty())
         columnName = tr("Procurar...");
       else

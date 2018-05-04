@@ -1,5 +1,6 @@
 #include "settingsdlg.h"
 #include "ui_settingsdlg.h"
+#include "defines.h"
 #include <QSerialPortInfo>
 #include <QPushButton>
 #include <QFileDialog>
@@ -49,6 +50,8 @@ SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
   ui->cbSerialParity->addItem("Space parity", QSerialPort::SpaceParity);
   ui->cbSerialParity->addItem("Mark parity", QSerialPort::MarkParity);
 
+  ui->spNotesDefaultNumber->setValue(NOTE_DEFAULT_NUMBER);
+
   refreshAvailablePorts();
   doDataExchange(true);
 }
@@ -74,6 +77,7 @@ void SettingsDlg::doDataExchange(bool toUI)
     ui->cbSerialParity->setCurrentIndex(ui->cbSerialParity->findData(m_settings.m_serialParity));
     ui->edEthernetIP->setText(m_settings.m_ethernetIP);
     ui->sbEthernetPort->setValue(m_settings.m_ethernetPort);
+    ui->spNotesDefaultNumber->setValue(m_settings.m_notesDefaultNumber);
   }
   else
   {
@@ -88,6 +92,7 @@ void SettingsDlg::doDataExchange(bool toUI)
     m_settings.m_serialStopBits = (QSerialPort::StopBits)ui->cbSerialStopBits->currentData().toUInt();
     m_settings.m_ethernetIP = ui->edEthernetIP->text();
     m_settings.m_ethernetPort = ui->sbEthernetPort->value();
+    m_settings.m_notesDefaultNumber = ui->spNotesDefaultNumber->value();
   }
 }
 

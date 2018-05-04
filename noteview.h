@@ -20,6 +20,7 @@ class JDatabasePicker;
 class QDockWidget;
 class JDatabase;
 class QIODevice;
+class QPlainTextEdit;
 
 class NoteView : public QFrame
 {
@@ -52,6 +53,7 @@ private:
   QCheckBox* m_cbCash;
   JDatabase* m_database;
   QDockWidget* m_dock;
+  QPlainTextEdit* m_teObservation;
 
   bool print(QIODevice* printer,
              InterfaceType type,

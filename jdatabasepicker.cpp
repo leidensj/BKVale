@@ -11,7 +11,6 @@
 JDatabasePicker::JDatabasePicker(const QString& text,
                                  const QIcon& icon,
                                  bool bShowImage,
-                                 bool bRequired,
                                  bool bDisplayGroup,
                                  QWidget* parent)
  : QFrame(parent)
@@ -32,13 +31,9 @@ JDatabasePicker::JDatabasePicker(const QString& text,
 
   m_edText = new JLineEdit(JValidatorType::All, true, true);
   m_edText->setReadOnly(true);
+
   if (!bDisplayGroup)
     m_edText->setPlaceholderText(m_text);
-  if (bRequired)
-  {
-    QString str = !bDisplayGroup ? " *" : "*";
-    m_edText->setPlaceholderText(m_edText->placeholderText() + str);
-  }
 
   m_btnClear = new QPushButton();
   m_btnClear->setFlat(true);
@@ -115,22 +110,23 @@ JDatabase* JDatabasePicker::getDatabase() const
 void JDatabasePicker::setItem(const JItem& jItem)
 {
   m_selector->hide();
-  if (m_selector->getTableName() == IMAGE_SQL_TABLE_NAME)
+  QString tableName = m_selector->getDatabase()->getTableName();
+  if (tableName == IMAGE_SQL_TABLE_NAME)
   {
     const Image& o = dynamic_cast<const Image&>(jItem);
     setItem(o.m_id, o.m_name, o.m_image);
   }
-  else if (m_selector->getTableName() == PERSON_SQL_TABLE_NAME)
+  else if (tableName == PERSON_SQL_TABLE_NAME)
   {
     const Person& o = dynamic_cast<const Person&>(jItem);
     setItem(o.m_id, o.m_alias, o.m_image.m_image);
   }
-  else if (m_selector->getTableName() == CATEGORY_SQL_TABLE_NAME)
+  else if (tableName == CATEGORY_SQL_TABLE_NAME)
   {
     const Category& o = dynamic_cast<const Category&>(jItem);
     setItem(o.m_id, o.m_name, o.m_image.m_image);
   }
-  else if (m_selector->getTableName() == PRODUCT_SQL_TABLE_NAME)
+  else if (tableName == PRODUCT_SQL_TABLE_NAME)
   {
     const Product& o = dynamic_cast<const Product&>(jItem);
     setItem(o.m_id, o.m_name, o.m_image.m_image);

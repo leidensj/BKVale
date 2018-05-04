@@ -13,6 +13,7 @@
 #include "reminder.h"
 
 class QPushButton;
+class QCheckBox;
 class JTableView;
 class JLineEdit;
 
@@ -42,6 +43,8 @@ public:
                    const QString& tableName);
   QSqlDatabase getDatabase() const;
   QString getTableName() const;
+  JItem* getCurrentItem() const;
+
   bool save(const JItem& jItem);
 
 public slots:
@@ -56,11 +59,12 @@ private:
   QPushButton* m_btnRemove;
   QPushButton* m_btnFilter;
   JLineEdit* m_edFilterSearch;
-  QPushButton* m_btnContains;
+  QCheckBox* m_cbContains;
   JTableView* m_table;
   QString m_tableName;
   QString m_customFilter;
   QVector<JTableColumn> m_vColumns;
+  JItem* m_currentItem;
 
 private slots:
   void selectItem();
@@ -86,15 +90,10 @@ public:
                              const QIcon& icon,
                              QWidget* parent = 0);
 
-  ~JDatabaseSelector();
-
   void setDatabase(QSqlDatabase db,
                    const QString& tableName);
 
-  JItem* getCurrentItem() const;
   JDatabase* getDatabase() const;
-
-  QString getTableName() const;
 
 private slots:
   void itemSelected(const JItem& jItem);
@@ -104,7 +103,6 @@ signals:
 
 private:
   JDatabase* m_database;
-  JItem* m_currentItem;
 };
 
 #endif // JDATABASE_H

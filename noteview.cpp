@@ -20,6 +20,7 @@
 #include <QSplitter>
 #include <QDockWidget>
 #include <QMessageBox>
+#include <QPlainTextEdit>
 
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
@@ -39,6 +40,7 @@ NoteView::NoteView(QWidget *parent)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
   , m_cbCash(nullptr)
+  , m_teObservation(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -180,12 +182,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
 
-  m_supplierPicker =
-      new JDatabasePicker(tr("Fornecedor"),
-                          QIcon(":/icons/res/supplier.png"),
-                          true,
-                          true,
-                          false);
+  m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->addLayout(hlayout2);
@@ -217,10 +214,19 @@ NoteView::NoteView(QWidget *parent)
   hlayout3->setAlignment(Qt::AlignRight);
   hlayout3->addWidget(m_edTotal);
 
+  m_teObservation = new QPlainTextEdit;
+  m_teObservation->setPlaceholderText(tr("Observações (opcional):"));
+  m_teObservation->setMaximumHeight(frame->sizeHint().height());
+
+  QHBoxLayout* headerlayout = new QHBoxLayout;
+  headerlayout->setContentsMargins(0, 0, 0, 0);
+  headerlayout->addWidget(frame);
+  headerlayout->addWidget(m_teObservation);
+
   QVBoxLayout* viewLayout = new QVBoxLayout();
   viewLayout->setContentsMargins(9, 0, 0, 0);
   viewLayout->addLayout(hlayout1);
-  viewLayout->addWidget(frame);
+  viewLayout->addLayout(headerlayout);
   viewLayout->addWidget(m_table);
   viewLayout->addLayout(hlayout3);
 
@@ -346,6 +352,7 @@ Note NoteView::getNote() const
   note.m_date = m_dtDate->date().toString(Qt::ISODate);
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_bCash = m_cbCash->isChecked();
+  note.m_observation = m_teObservation->toPlainText();
   note.m_vNoteItem = m_table->getNoteItems();
   return note;
 }
@@ -362,6 +369,7 @@ void NoteView::setNote(const Note& note)
   m_supplierPicker->setItem(note.m_supplier.m_id,
                             note.m_supplier.m_alias,
                             note.m_supplier.m_image.m_image);
+  m_teObservation->setPlainText(note.m_observation);
   updateControls();
 }
 
@@ -444,25 +452,25 @@ void NoteView::searchProduct()
   dlg.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
   dlg.getDatabase()->setCustomFilter(PRODUCT_FILTER_NOTE);
   dlg.exec();
-  Product* product = dynamic_cast<Product*>(dlg.getCurrentItem());
-  if (product != nullptr && product->isValidId())
+  Product* pProduct = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
+  if (pProduct != nullptr && pProduct->isValidId())
   {
     if (m_btnAdd == sender() || !m_table->hasItems())
     {
       NoteItem noteItem;
-      noteItem.m_product = *product;
+      noteItem.m_product = *pProduct;
       if (IS_VALID_ID(m_supplierPicker->getId()))
       {
         noteItem.m_price = NoteSQL::selectPriceSuggestion(
                              m_database->getDatabase(),
                              m_supplierPicker->getId(),
-                             product->m_id);
+                             pProduct->m_id);
       }
       addNoteItem(noteItem);
     }
     else
     {
-      m_table->setProduct(*product);
+      m_table->setProduct(*pProduct);
     }
   }
 }

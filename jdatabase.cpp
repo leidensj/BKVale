@@ -12,6 +12,7 @@
 #include <QSqlQueryModel>
 #include <QPixmap>
 #include <QIcon>
+#include <QCheckBox>
 
 class JTableModel : public QSqlQueryModel
 {
@@ -602,7 +603,7 @@ public:
     JTableModel::select();
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("Nome"));
-    setHeaderData(1, Qt::Horizontal, tr("Unidade"));
+    setHeaderData(2, Qt::Horizontal, tr("Unidade"));
     if (header != nullptr && header->count() == 3)
     {
       header->hideSection(0);
@@ -912,8 +913,9 @@ JDatabase::JDatabase(bool bSelectorMode,
   , m_btnRemove(nullptr)
   , m_btnFilter(nullptr)
   , m_edFilterSearch(nullptr)
-  , m_btnContains(nullptr)
+  , m_cbContains(nullptr)
   , m_table(nullptr)
+  , m_currentItem(nullptr)
 {
   m_btnOpen = new QPushButton();
   m_btnOpen->setFlat(true);
@@ -957,18 +959,16 @@ JDatabase::JDatabase(bool bSelectorMode,
   m_edFilterSearch->setToolTip(tr("Procurar (Ctrl+F)"));
   m_edFilterSearch->setClearButtonEnabled(true);
 
-  m_btnContains = new QPushButton();
-  m_btnContains->setFlat(true);
-  m_btnContains->setText("");
-  m_btnContains->setIconSize(QSize(24, 24));
-  m_btnContains->setIcon(QIcon(":/icons/res/center.png"));
-  m_btnContains->setToolTip(tr("Contendo"));
-  m_btnContains->setCheckable(true);
+  m_cbContains = new QCheckBox;
+  m_cbContains->setText(tr("Contendo"));
+  m_cbContains->setIconSize(QSize(16, 16));
+  m_cbContains->setIcon(QIcon(":/icons/res/center.png"));
+  m_cbContains->setToolTip(tr("Procurar por palavras contendo o termo informado"));
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
   hlayout1->addWidget(m_edFilterSearch);
-  hlayout1->addWidget(m_btnContains);
+  hlayout1->addWidget(m_cbContains);
 
   m_table = new JTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -1008,7 +1008,7 @@ JDatabase::JDatabase(bool bSelectorMode,
                    SIGNAL(enterSignal()),
                    this,
                    SLOT(filterSearchEnter()));
-  QObject::connect(m_btnContains,
+  QObject::connect(m_cbContains,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(containsPressed()));
@@ -1039,7 +1039,8 @@ JDatabase::JDatabase(bool bSelectorMode,
 
 JDatabase::~JDatabase()
 {
-
+  if (m_currentItem != nullptr)
+    delete m_currentItem;
 }
 
 void JDatabase::setDatabase(QSqlDatabase db,
@@ -1108,6 +1109,9 @@ void JDatabase::selectItem()
 
 void JDatabase::selectItem(qlonglong id)
 {
+  if (m_currentItem != nullptr)
+    delete m_currentItem;
+
   bool bSuccess = false;
   QString error;
   if (m_tableName == IMAGE_SQL_TABLE_NAME)
@@ -1115,62 +1119,60 @@ void JDatabase::selectItem(qlonglong id)
     Image o;
     o.m_id = id;
     bSuccess = ImageSQL::select(getDatabase(), o, error);
-    if (bSuccess)
-      emit itemSelectedSignal(o);
+    m_currentItem = new Image(o);
   }
   else if (m_tableName == PERSON_SQL_TABLE_NAME)
   {
     Person o;
     o.m_id = id;
     bSuccess = PersonSQL::select(getDatabase(), o, error);
-    if (bSuccess)
-      emit itemSelectedSignal(o);
+    m_currentItem = new Person(o);
   }
   else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
   {
     Category o;
     o.m_id = id;
     bSuccess = CategorySQL::select(getDatabase(), o, error);
-    if (bSuccess)
-      emit itemSelectedSignal(o);
+    m_currentItem = new Category(o);
   }
   else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
   {
     Product o;
     o.m_id = id;
     bSuccess = ProductSQL::select(getDatabase(), o, error);
-    if (bSuccess)
-      emit itemSelectedSignal(o);
+    m_currentItem = new Product(o);
   }
   else if (m_tableName == NOTE_SQL_TABLE_NAME)
   {
     Note o;
     o.m_id = id;
     bSuccess = NoteSQL::select(getDatabase(), o, error);
-    if (bSuccess)
-      emit itemSelectedSignal(o);
+    m_currentItem = new Note(o);
   }
   else if (m_tableName == USER_SQL_TABLE_NAME)
   {
     User o;
     o.m_id = id;
     bSuccess = UserSQL::select(getDatabase(), o, error);
-    if (bSuccess)
-      emit itemSelectedSignal(o);
+    m_currentItem = new User(o);
   }
   else if (m_tableName == REMINDER_SQL_TABLE_NAME)
   {
     Reminder o;
     o.m_id = id;
     bSuccess = ReminderSQL::select(getDatabase(), o, error);
-    if (bSuccess)
-      emit itemSelectedSignal(o);
+    m_currentItem = new Reminder(o);
   }
   else
   {
     error = tr("Item ainda não implementado.");
   }
 
+  if (bSuccess)
+  {
+    const JItem& jItem = *m_currentItem;
+    emit itemSelectedSignal(jItem);
+  }
   if (!bSuccess)
   {
     QMessageBox::critical(this,
@@ -1269,7 +1271,7 @@ void JDatabase::filterSearchChanged()
     }
     else
     {
-      model->prepareFilter(m_edFilterSearch->text(), m_btnContains->isChecked(), column);
+      model->prepareFilter(m_edFilterSearch->text(), m_cbContains->isChecked(), column);
     }
     model->prepareCustomFilter(m_customFilter);
     model->select(m_table->horizontalHeader());
@@ -1322,6 +1324,11 @@ void JDatabase::sortChanged(int column, Qt::SortOrder sortOrder)
 QString JDatabase::getTableName() const
 {
   return m_tableName;
+}
+
+JItem* JDatabase::getCurrentItem() const
+{
+  return m_currentItem;
 }
 
 bool JDatabase::save(const JItem& jItem)
@@ -1397,7 +1404,6 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
                                      QWidget* parent)
   : QDialog(parent)
   , m_database(nullptr)
-  , m_currentItem(nullptr)
 {
   m_database = new JDatabase(true);
   QHBoxLayout* hlayout0 = new QHBoxLayout();
@@ -1413,12 +1419,6 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
                    SLOT(itemSelected(const JItem&)));
 }
 
-JDatabaseSelector::~JDatabaseSelector()
-{
-  if (m_currentItem != nullptr)
-    delete m_currentItem;
-}
-
 void JDatabaseSelector::setDatabase(QSqlDatabase db,
                                     const QString& tableName)
 {
@@ -1427,29 +1427,8 @@ void JDatabaseSelector::setDatabase(QSqlDatabase db,
 
 void JDatabaseSelector::itemSelected(const JItem& jItem)
 {
-  if (m_currentItem != nullptr)
-    delete m_currentItem;
-
-  if (m_database->getTableName() == IMAGE_SQL_TABLE_NAME)
-    m_currentItem = new Image(dynamic_cast<const Image&>(jItem));
-  else if (m_database->getTableName() == PERSON_SQL_TABLE_NAME)
-    m_currentItem = new Person(dynamic_cast<const Person&>(jItem));
-  else if (m_database->getTableName() == CATEGORY_SQL_TABLE_NAME)
-    m_currentItem = new Category(dynamic_cast<const Category&>(jItem));
-  else if (m_database->getTableName() == PRODUCT_SQL_TABLE_NAME)
-    m_currentItem = new Product(dynamic_cast<const Product&>(jItem));
   emit itemSelectedSignal(jItem);
   close();
-}
-
-QString JDatabaseSelector::getTableName() const
-{
-  return m_database->getTableName();
-}
-
-JItem* JDatabaseSelector::getCurrentItem() const
-{
-  return m_currentItem;
 }
 
 JDatabase* JDatabaseSelector::getDatabase() const

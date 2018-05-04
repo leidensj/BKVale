@@ -20,9 +20,8 @@ class JDatabasePicker : public QFrame
 public:
   explicit JDatabasePicker(const QString& text,
                            const QIcon& icon,
-                           bool bShowImage = false,
-                           bool bRequired = false,
-                           bool bDisplayGroup = true,
+                           bool bShowImage,
+                           bool bDisplayGroup,
                            QWidget* parent = 0);
 
   qlonglong getId() const;

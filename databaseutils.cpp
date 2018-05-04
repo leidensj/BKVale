@@ -1,4 +1,5 @@
 #include "databaseutils.h"
+#include "settings.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
@@ -28,7 +29,9 @@ namespace {
 }
 qlonglong NoteSQL::nextNumber(QSqlDatabase db)
 {
-  qlonglong number = NOTE_SQL_DEFAULT_NUMBER;
+  Settings settings;
+  settings.load();
+  qlonglong number = settings.m_notesDefaultNumber;
   if (!db.isOpen())
     return number;
 
@@ -36,8 +39,8 @@ qlonglong NoteSQL::nextNumber(QSqlDatabase db)
   QSqlQuery query(db);
   bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
   if (bSuccess)
-    number = query.next() ? query.value(0).toLongLong() + 1 : NOTE_SQL_DEFAULT_NUMBER;
-  number = number > NOTE_SQL_DEFAULT_NUMBER ? number : NOTE_SQL_DEFAULT_NUMBER;
+    number = query.next() ? query.value(0).toLongLong() + 1 : settings.m_notesDefaultNumber;
+  number = number > settings.m_notesDefaultNumber ? number : settings.m_notesDefaultNumber;
 
   if (!bSuccess)
     db.rollback();
@@ -56,6 +59,9 @@ bool NoteSQL::insert(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  Settings settings;
+  settings.load();
+
   db.transaction();
   QSqlQuery query(db);
 
@@ -64,23 +70,26 @@ bool NoteSQL::insert(QSqlDatabase db,
   {
       qlonglong number = query.next()
                          ? query.value(0).toLongLong() + 1
-                         : NOTE_SQL_DEFAULT_NUMBER;
-      number = number > NOTE_SQL_DEFAULT_NUMBER ? number : NOTE_SQL_DEFAULT_NUMBER;
+                         : settings.m_notesDefaultNumber;
+      number = number > settings.m_notesDefaultNumber ? number : settings.m_notesDefaultNumber;
 
       query.prepare("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
                     NOTE_SQL_COL01 ","
                     NOTE_SQL_COL02 ","
                     NOTE_SQL_COL03 ","
-                    NOTE_SQL_COL04
+                    NOTE_SQL_COL04 ","
+                    NOTE_SQL_COL05
                     ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
                     "(:_v03),"
-                    "(:_v04))");
+                    "(:_v04),"
+                    "(:_v05))");
       query.bindValue(":_v01", number);
       query.bindValue(":_v02", note.m_date);
       query.bindValue(":_v03", note.m_supplier.m_id);
-      query.bindValue(":_v05", note.m_bCash);
+      query.bindValue(":_v04", note.m_bCash);
+      query.bindValue(":_v05", note.m_observation);
       bSuccess = query.exec();
   }
 
@@ -143,12 +152,14 @@ bool NoteSQL::update(QSqlDatabase db,
   query.prepare("UPDATE " NOTE_SQL_TABLE_NAME " SET "
                 NOTE_SQL_COL02 " = (:_v02),"
                 NOTE_SQL_COL03 " = (:_v03),"
-                NOTE_SQL_COL04 " = (:_v04) "
+                NOTE_SQL_COL04 " = (:_v04),"
+                NOTE_SQL_COL05 " = (:_v05) "
                 "WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", note.m_id);
   query.bindValue(":_v02", note.m_date);
   query.bindValue(":_v03", note.m_supplier.m_id);
   query.bindValue(":_v04", note.m_bCash);
+  query.bindValue(":_v05", note.m_observation);
   bool bSuccess = query.exec();
 
   if (bSuccess && !note.m_vNoteItem.isEmpty())
@@ -253,7 +264,8 @@ bool NoteSQL::select(QSqlDatabase db,
                 NOTE_SQL_COL01 ","
                 NOTE_SQL_COL02 ","
                 NOTE_SQL_COL03 ","
-                NOTE_SQL_COL04
+                NOTE_SQL_COL04 ","
+                NOTE_SQL_COL05
                 " FROM " NOTE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -268,6 +280,7 @@ bool NoteSQL::select(QSqlDatabase db,
       note.m_date = query.value(1).toString();
       note.m_supplier.m_id = query.value(2).toLongLong();
       note.m_bCash = query.value(3).toBool();
+      note.m_observation = query.value(4).toString();
     }
     else
     {
@@ -560,6 +573,7 @@ bool BaitaSQL::init(QSqlDatabase db,
                         NOTE_SQL_COL02 " TEXT NOT NULL,"
                         NOTE_SQL_COL03 " INTEGER,"
                         NOTE_SQL_COL04 " INT,"
+                        NOTE_SQL_COL05 " TEXT,"
                         "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
                         PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 

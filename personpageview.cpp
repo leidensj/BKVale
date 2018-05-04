@@ -55,9 +55,7 @@ PersonPageView::PersonPageView(QWidget* parent)
   m_dtBirthDate->setCalendarPopup(true);
   m_dtBirthDate->setDisplayFormat("dd/MM/yyyy");
   m_dtBirthDate->setDate(QDate::currentDate());
-  m_imagePicker = new JDatabasePicker(tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      true, false, true);
+  m_imagePicker = new JDatabasePicker(tr("Imagem"),  QIcon(":/icons/res/icon.png"), true, true);
   m_cbCustomer = new QCheckBox;
   m_cbCustomer->setText(tr("Cliente"));
   m_cbCustomer->setIcon(QIcon(":/icons/res/client.png"));

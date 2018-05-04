@@ -35,11 +35,7 @@ CategoryView::CategoryView(QWidget* parent)
   m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
 
-  m_imagePicker = new JDatabasePicker(tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      true,
-                                      false,
-                                      true);
+  m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);

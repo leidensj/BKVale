@@ -84,16 +84,18 @@ struct Note : public JItem
   QString m_date;
   Person m_supplier;
   bool m_bCash;
+  QString m_observation;
   QVector<NoteItem> m_vNoteItem;
 
   void clear()
   {
     m_id = INVALID_ID;
-    m_number = NOTE_SQL_DEFAULT_NUMBER;
+    m_number = NOTE_DEFAULT_NUMBER;
     m_supplier.clear();
     m_date.clear();
     m_bCash = false;
     m_vNoteItem.clear();
+    m_observation.clear();
   }
 
   Note()

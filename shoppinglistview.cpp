@@ -96,7 +96,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_btnEdit->setShortcut(QKeySequence(Qt::Key_F3));
   m_btnEdit->setToolTip(tr("Editar (F3)"));
 
-  m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, false, false);
+  m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, true);
   m_teDescription = new QPlainTextEdit;
   m_cbPrintAmmount = new QCheckBox;
   m_cbPrintAmmount->setText(tr("Imprimir quantidade recomendada"));
@@ -274,7 +274,7 @@ void ShoppingListView::addItem()
   JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
   if (w.exec())
   {
-    ShoppingListItem* p = dynamic_cast<ShoppingListItem*>(w.getCurrentItem());
+    ShoppingListItem* p = static_cast<ShoppingListItem*>(w.getDatabase()->getCurrentItem());
     if (p != nullptr)
       m_table->addShopItem(*p);
   }
@@ -290,7 +290,7 @@ void ShoppingListView::editItem()
   JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
   if (w.exec())
   {
-    ShoppingListItem* p = dynamic_cast<ShoppingListItem*>(w.getCurrentItem());
+    ShoppingListItem* p = static_cast<ShoppingListItem*>(w.getDatabase()->getCurrentItem());
     if (p != nullptr)
       m_table->setShopItem(*p);
   }

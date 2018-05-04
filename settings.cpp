@@ -1,21 +1,23 @@
 #include "settings.h"
+#include "defines.h"
 #include <QSettings>
 
 #define COMPANY_NAME "LEICO"
 #define APP_NAME     "BaitaAssistente"
 #define DATABASE_NAME    "BaitaAssistente.db"
 
-#define DATABASE_DIR       "databaseDir"
-#define INTERFACE_TYPE     "interfaceType"
-#define CONNECT_STARTUP    "connectStartup"
-#define SERIAL_PORT        "serial/port"
-#define SERIAL_BAUDRATE    "serial/baudRate"
-#define SERIAL_DATABITS    "serial/dataBits"
-#define SERIAL_FLOWCONTROL "serial/flowControl"
-#define SERIAL_PARITY      "serial/parity"
-#define SERIAL_STOPBITS    "serial/stopBits"
-#define ETHERNET_IP        "ethernet/ip"
-#define ETHERNET_PORT      "ethernet/port"
+#define DATABASE_DIR         "databaseDir"
+#define INTERFACE_TYPE       "interfaceType"
+#define CONNECT_STARTUP      "connectStartup"
+#define SERIAL_PORT          "serial/port"
+#define SERIAL_BAUDRATE      "serial/baudRate"
+#define SERIAL_DATABITS      "serial/dataBits"
+#define SERIAL_FLOWCONTROL   "serial/flowControl"
+#define SERIAL_PARITY        "serial/parity"
+#define SERIAL_STOPBITS      "serial/stopBits"
+#define ETHERNET_IP          "ethernet/ip"
+#define ETHERNET_PORT        "ethernet/port"
+#define NOTES_DEFAULT_NUMBER "notes/defaultnumber"
 
 Settings::Settings()
 {
@@ -35,6 +37,7 @@ void Settings::clear()
   m_serialStopBits = QSerialPort::OneStop;
   m_ethernetIP.clear();
   m_ethernetPort = 9100;
+  m_notesDefaultNumber = NOTE_DEFAULT_NUMBER;
 }
 
 void Settings::save() const
@@ -51,6 +54,7 @@ void Settings::save() const
   settings.setValue(SERIAL_STOPBITS, (int)m_serialStopBits);
   settings.setValue(ETHERNET_IP, m_ethernetIP);
   settings.setValue(ETHERNET_PORT, m_ethernetPort);
+  settings.setValue(NOTES_DEFAULT_NUMBER, m_notesDefaultNumber);
 }
 
 void Settings::load()
@@ -72,6 +76,7 @@ void Settings::load()
                                                            (int)QSerialPort::OneStop).toInt();
   m_ethernetIP = settings.value(ETHERNET_IP).toString();
   m_ethernetPort = settings.value(ETHERNET_PORT, 9100).toInt();
+  m_notesDefaultNumber = settings.value(NOTES_DEFAULT_NUMBER, NOTE_DEFAULT_NUMBER).toInt();
 }
 
 QString Settings::databasePath() const

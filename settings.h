@@ -23,6 +23,7 @@ struct Settings
   QSerialPort::StopBits m_serialStopBits;
   QString m_ethernetIP;
   int m_ethernetPort;
+  int m_notesDefaultNumber;
 
   QString databasePath() const;
 

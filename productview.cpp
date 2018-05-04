@@ -6,7 +6,6 @@
 #include <QPushButton>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
-#include <QGroupBox>
 #include <QFormLayout>
 #include <QTabWidget>
 #include <QSplitter>
@@ -84,31 +83,14 @@ ProductView::ProductView(QWidget* parent)
   m_cbAvailableToSell->setText(tr("Venda"));
   m_cbAvailableToSell->setIcon(QIcon(":/icons/res/sell.png"));
 
-  m_categoryPicker = new JDatabasePicker(tr("Categoria"),
-                                         QIcon(":/icons/res/category.png"),
-                                         true, true, true);
-
-
-  m_imagePicker = new JDatabasePicker(tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      true, false, true);
+  m_categoryPicker = new JDatabasePicker(tr("Categoria"), QIcon(":/icons/res/category.png"), true, true);
+  m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
   buttonlayout->setAlignment(Qt::AlignLeft);
   buttonlayout->addWidget(m_btnCreate);
   buttonlayout->addWidget(m_btnSave);
-
-  QVBoxLayout* grplayout = new QVBoxLayout;
-  grplayout->addWidget(m_cbAvailableAtNotes);
-  grplayout->addWidget(m_cbAvailableAtShop);
-  grplayout->addWidget(m_cbAvailableAtConsumption);
-  grplayout->addWidget(m_cbAvailableToBuy);
-  grplayout->addWidget(m_cbAvailableToSell);
-
-  QGroupBox* grpAccess = new QGroupBox;
-  grpAccess->setTitle(tr("Disponível em/para:"));
-  grpAccess->setLayout(grplayout);
 
   QFormLayout* formlayout = new QFormLayout;
   formlayout->setContentsMargins(0, 0, 0, 0);
@@ -118,20 +100,35 @@ ProductView::ProductView(QWidget* parent)
   formlayout->addRow(tr("Quantidade embalagem:"), m_spnPackageAmmount);
   formlayout->addRow(tr("Detalhes:"), m_edDetails);
 
-  QVBoxLayout* tablayout = new QVBoxLayout;
-  tablayout->setAlignment(Qt::AlignTop);
-  tablayout->addLayout(formlayout);
-  tablayout->addWidget(m_categoryPicker);
-  tablayout->addWidget(m_imagePicker);
-  tablayout->addWidget(grpAccess);
+  QVBoxLayout* tabInfoLayout = new QVBoxLayout;
+  tabInfoLayout->setAlignment(Qt::AlignTop);
+  tabInfoLayout->addLayout(formlayout);
+  tabInfoLayout->addWidget(m_categoryPicker);
+  tabInfoLayout->addWidget(m_imagePicker);
 
-  QFrame* tabframe = new QFrame;
-  tabframe->setLayout(tablayout);
+  QVBoxLayout* tabAvailablelayout = new QVBoxLayout;
+  tabAvailablelayout->addWidget(m_cbAvailableAtNotes);
+  tabAvailablelayout->addWidget(m_cbAvailableAtShop);
+  tabAvailablelayout->addWidget(m_cbAvailableAtConsumption);
+  tabAvailablelayout->addWidget(m_cbAvailableToBuy);
+  tabAvailablelayout->addWidget(m_cbAvailableToSell);
+  tabAvailablelayout->setAlignment(Qt::AlignTop);
+
+  QFrame* tabInfoFrame = new QFrame;
+  tabInfoFrame->setLayout(tabInfoLayout);
+
+  QFrame* tabAvailableFrame = new QFrame;
+  tabAvailableFrame->setLayout(tabAvailablelayout);
 
   QTabWidget* tabWidget = new QTabWidget;
-  tabWidget->addTab(tabframe,
-                    QIcon(":/icons/res/item.png"),
-                    tr("Produto"));
+
+  tabWidget->addTab(tabInfoFrame,
+                    QIcon(":/icons/res/details.png"),
+                    tr("Informações"));
+
+  tabWidget->addTab(tabAvailableFrame,
+                    QIcon(":/icons/res/check.png"),
+                    tr("Disponibilidade"));
 
   QVBoxLayout* viewlayout = new QVBoxLayout;
   viewlayout->setContentsMargins(9, 0, 0, 0);

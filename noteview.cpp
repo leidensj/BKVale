@@ -384,6 +384,7 @@ void NoteView::create()
   m_supplierPicker->clear();
   m_supplierPicker->setFocus();
   m_cbCash->setChecked(false);
+  m_teObservation->clear();
   updateControls();
 }
 

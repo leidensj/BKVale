@@ -742,8 +742,9 @@ bool ProductSQL::insert(QSqlDatabase db,
                 PRODUCT_SQL_COL11 ","
                 PRODUCT_SQL_COL12 ")"
                 " VALUES ("
-                "(:_v01),"
-                "(:_v02),") +
+                "(:_v01),") +
+        (product.m_category.isValidId()
+         ? "(:_v02)," : "NULL,") +
         (product.m_image.isValidId()
          ? "(:_v03)," : "NULL,") +
                 "(:_v04),"
@@ -756,7 +757,8 @@ bool ProductSQL::insert(QSqlDatabase db,
                 "(:_v11),"
                 "(:_v12))");
   query.bindValue(":_v01", product.m_name);
-  query.bindValue(":_v02", product.m_category.m_id);
+  if (product.m_category.isValidId())
+    query.bindValue(":_v02", product.m_category.m_id);
   if (product.m_image.isValidId())
     query.bindValue(":_v03", product.m_image.m_id);
   query.bindValue(":_v04", product.m_unity);
@@ -802,8 +804,9 @@ bool ProductSQL::update(QSqlDatabase db,
   query.prepare(
         QString("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
                 PRODUCT_SQL_COL01 " = (:_v01),"
-                PRODUCT_SQL_COL02 " = (:_v02),"
-                PRODUCT_SQL_COL03 " = ") +
+                PRODUCT_SQL_COL02 " = ") +
+        (product.m_category.isValidId() ? "(:_v02)," : "NULL,") +
+                PRODUCT_SQL_COL03 " = " +
         (product.m_image.isValidId() ? "(:_v03)," : "NULL,") +
                 PRODUCT_SQL_COL04 " = (:_v04),"
                 PRODUCT_SQL_COL05 " = (:_v05),"
@@ -817,7 +820,8 @@ bool ProductSQL::update(QSqlDatabase db,
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", product.m_id);
   query.bindValue(":_v01", product.m_name);
-  query.bindValue(":_v02", product.m_category.m_id);
+  if (product.m_category.isValidId())
+    query.bindValue(":_v02", product.m_category.m_id);
   if (product.m_image.isValidId())
     query.bindValue(":_v03", product.m_image.m_id);
   query.bindValue(":_v04", product.m_unity);

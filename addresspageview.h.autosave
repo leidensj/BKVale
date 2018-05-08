@@ -1,0 +1,18 @@
+#ifndef ADDRESSPAGEVIEW_H
+#define ADDRESSPAGEVIEW_H
+
+#include <QFrame>
+#include "address.h"
+#include <QVector>
+#include <QMetaType>
+
+class JLineEdit;
+class QSpinBox;
+class QPushButton;
+class QComboBox;
+class QListWidget;
+class QListWidgetItem;
+
+
+
+#endif // ADDRESSPAGEVIEW_H

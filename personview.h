@@ -9,10 +9,21 @@
 #include "person.h"
 
 class QPushButton;
-class PersonPageView;
-class PhonePageView;
 class AddressPageView;
 class QTabWidget;
+class QLabel;
+class QRadioButton;
+class JLineEdit;
+class QDateEdit;
+class JDatabasePicker;
+class QCheckBox;
+class QSpinBox;
+class QListWidget;
+class QComboBox;
+class JDatabase;
+
+Q_DECLARE_METATYPE(Phone)
+Q_DECLARE_METATYPE(Address)
 
 class PersonView : public QFrame
 {
@@ -23,27 +34,81 @@ public:
   void setDatabase(QSqlDatabase db);
   ~PersonView();
   Person getPerson() const;
-  void getPerson(Person& person) const;
 
 private slots:
-  void emitSaveSignal();
   void updateControls();
+  void switchUserType();
+  Phone getPhone() const;
+  void addPhone();
+  void addPhone(const Phone& phone);
+  void removePhone();
+  void openPhone();
+  void clearPhone();
+  Address getAddress() const;
+  void addAddress();
+  void addAddress(const Address& address);
+  void removeAddress();
+  void openAddress();
+  void clearAddress();
+  void processPostalCode();
+
+  void itemSelected(const JItem& jItem);
+  void itemRemoved(qlonglong id);
+  void save();
 
 public slots:
   void setPerson(const Person& person);
   void create();
 
-signals:
-  void saveSignal();
-
 private:
   QSqlDatabase m_db;
-  Person m_currentPerson;
+  qlonglong m_currentId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
-  PersonPageView* m_personPage;
-  PhonePageView* m_phonePage;
   AddressPageView* m_addressPage;
+
+  QRadioButton* m_rdoPerson;
+  QRadioButton* m_rdoCompany;
+  JLineEdit* m_edName;
+  QLabel* m_lblName;
+  JLineEdit* m_edAlias;
+  QLabel* m_lblAlias;
+  JLineEdit* m_edEmail;
+  JLineEdit* m_edCpfCnpj;
+  QLabel* m_lblCpfCnpj;
+  JLineEdit* m_edRgIE;
+  QLabel* m_lblRgIE;
+  JLineEdit* m_edDetails;
+  QDateEdit* m_dtBirthDate;
+  QCheckBox* m_cbBirthDate;
+  JDatabasePicker* m_imagePicker;
+  QCheckBox* m_cbCustomer;
+  QCheckBox* m_cbSupplier;
+  QCheckBox* m_cbEmployee;
+  QDateEdit* m_dtCreationDate;
+  JLineEdit* m_edPinCode;
+
+  QSpinBox* m_spnPhoneCountryCode;
+  QSpinBox* m_spnPhoneCode;
+  JLineEdit* m_edPhoneNumber;
+  QPushButton* m_btnAddPhone;
+  QPushButton* m_btnRemovePhone;
+  QListWidget* m_lstPhone;
+
+  JLineEdit* m_edAddressPostalCode;
+  QPushButton* m_btnAddressPostalCode;
+  JLineEdit* m_edAddressNeighborhood;
+  JLineEdit* m_edAddressStreet;
+  QSpinBox* m_spnAddressNumber;
+  JLineEdit* m_edAddressCity;
+  QComboBox* m_cbAddressState;
+  JLineEdit* m_edAddressComplement;
+  JLineEdit* m_edAddressReference;
+  QPushButton* m_btnAddAddress;
+  QPushButton* m_btnRemoveAddress;
+  QListWidget* m_lstAddress;
+
+  JDatabase* m_database;
 };
 
 #endif // PERSONVIEW_H

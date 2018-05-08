@@ -40,10 +40,6 @@ SOURCES += main.cpp\
     imageview.cpp \
     productview.cpp \
     personview.cpp \
-    personwidget.cpp \
-    personpageview.cpp \
-    addresspageview.cpp \
-    phonepageview.cpp \
     jdatabasepicker.cpp \
     pincodeview.cpp \
     shoppinglistview.cpp \
@@ -85,10 +81,6 @@ HEADERS  += mainwindow.h \
     person.h \
     address.h \
     personview.h \
-    personwidget.h \
-    personpageview.h \
-    addresspageview.h \
-    phonepageview.h \
     phone.h \
     defines.h \
     jitem.h \

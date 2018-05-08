@@ -11,7 +11,7 @@
 #include "usermgtview.h"
 #include "imageview.h"
 #include "logindialog.h"
-#include "personwidget.h"
+#include "personview.h"
 #include "shoppinglistview.h"
 #include <QMessageBox>
 #include <QInputDialog>
@@ -358,9 +358,9 @@ void BaitaAssistant::showInfo()
 void BaitaAssistant::openProductsDialog()
 {
   QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout();
+  QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  ProductView* w = new ProductView();
+  ProductView* w = new ProductView(this);
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
@@ -373,7 +373,7 @@ void BaitaAssistant::openProductsDialog()
 void BaitaAssistant::openCategoriesDialog()
 {
   QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout();
+  QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   CategoryView* w = new CategoryView(this);
   w->setDatabase(m_userLogin.getDatabase());
@@ -388,9 +388,9 @@ void BaitaAssistant::openCategoriesDialog()
 void BaitaAssistant::openUsersDialog()
 {
   QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout();
+  QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  UserMgtView* w = new UserMgtView(m_userLogin.getId());
+  UserMgtView* w = new UserMgtView(m_userLogin.getId(), this);
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
@@ -406,9 +406,9 @@ void BaitaAssistant::openUsersDialog()
 void BaitaAssistant::openImagesDialog()
 {
   QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout();
+  QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  ImageView* w = new ImageView();
+  ImageView* w = new ImageView(this);
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
@@ -441,9 +441,9 @@ void BaitaAssistant::openLoginDialog()
 void BaitaAssistant::openPersonsDialog()
 {
   QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout();
+  QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  PersonWidget* w = new PersonWidget();
+  PersonView* w = new PersonView(this);
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
@@ -458,7 +458,7 @@ void BaitaAssistant::openShoppingListDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  ShoppingListView* w = new ShoppingListView;
+  ShoppingListView* w = new ShoppingListView(this);
   w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);

@@ -10,23 +10,35 @@
 
 namespace {
   bool finishTransaction(QSqlDatabase db,
+                         const QSqlQuery& query,
                          bool bExecSelectResult,
                          QString& error)
   {
     if (!bExecSelectResult)
     {
+      if (error.isEmpty())
+      {
+        error = query.lastError().text();
+        if (error.isEmpty())
+          error = db.lastError().text();
+      }
       db.rollback();
       return false;
     }
     else
       bExecSelectResult = db.commit();
 
-    if (!bExecSelectResult)
-      error = db.lastError().text();
+    if (!bExecSelectResult && error.isEmpty())
+    {
+      error = query.lastError().text();
+      if (error.isEmpty())
+        error = db.lastError().text();
+    }
 
     return bExecSelectResult;
   }
 }
+
 qlonglong NoteSQL::nextNumber(QSqlDatabase db)
 {
   Settings settings;
@@ -123,19 +135,7 @@ bool NoteSQL::insert(QSqlDatabase db,
     }
   }
 
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool NoteSQL::update(QSqlDatabase db,
@@ -162,89 +162,40 @@ bool NoteSQL::update(QSqlDatabase db,
   query.bindValue(":_v05", note.m_observation);
   bool bSuccess = query.exec();
 
-  if (bSuccess && !note.m_vNoteItem.isEmpty())
-  {
-    QString str = "DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                  " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)"
-                  " AND " SQL_COLID " NOT IN (";
-    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
-      str += "(:_v00" + QString::number(i) + "),";
-    str.replace(str.length() - 1, 1, ")");
-    query.prepare(str);
-    query.bindValue(":_v01", note.m_id);
-    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
-      query.bindValue("_v00" + QString::number(i), note.m_vNoteItem.at(i).m_id);
-    bSuccess = query.exec();
-  }
-  else if (note.m_vNoteItem.isEmpty())
-  {
-    query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", note.m_id);
-    bSuccess = query.exec();
-  }
+  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
+  query.bindValue(":_v01", note.m_id);
+  bSuccess = query.exec();
 
   if (bSuccess)
   {
     for (int i = 0; i != note.m_vNoteItem.size(); ++i)
     {
-      if (note.m_vNoteItem.at(i).isValidId())
-      {
-        query.prepare("UPDATE " NOTE_ITEMS_SQL_TABLE_NAME " SET "
-                      NOTE_ITEMS_SQL_COL01 " = (:_v01),"
-                      NOTE_ITEMS_SQL_COL02 " = (:_v02),"
-                      NOTE_ITEMS_SQL_COL03 " = (:_v03),"
-                      NOTE_ITEMS_SQL_COL04 " = (:_v04),"
-                      NOTE_ITEMS_SQL_COL05 " = (:_v05)"
-                      " WHERE " SQL_COLID " = (:_v00)");
-        query.bindValue(":_v00", note.m_vNoteItem.at(i).m_id);
-        query.bindValue(":_v01", note.m_id);
-        query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id);
-        query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
-        query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
-        query.bindValue(":_v05", note.m_vNoteItem.at(i).m_bIsPackageAmmount);
-        bSuccess = query.exec();
-      }
+      query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
+                    NOTE_ITEMS_SQL_COL01 ","
+                    NOTE_ITEMS_SQL_COL02 ","
+                    NOTE_ITEMS_SQL_COL03 ","
+                    NOTE_ITEMS_SQL_COL04 ","
+                    NOTE_ITEMS_SQL_COL05
+                    " ) VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05))");
+      query.bindValue(":_v01", note.m_id);
+      query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id);
+      query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
+      query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
+      query.bindValue(":_v05", note.m_vNoteItem.at(i).m_bIsPackageAmmount);
+      bSuccess = query.exec();
+      if (bSuccess)
+        note.m_vNoteItem.at(i).m_id = query.lastInsertId().toLongLong();
       else
-      {
-        query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                      NOTE_ITEMS_SQL_COL01 ","
-                      NOTE_ITEMS_SQL_COL02 ","
-                      NOTE_ITEMS_SQL_COL03 ","
-                      NOTE_ITEMS_SQL_COL04 ","
-                      NOTE_ITEMS_SQL_COL05
-                      " ) VALUES ("
-                      "(:_v01),"
-                      "(:_v02),"
-                      "(:_v03),"
-                      "(:_v04),"
-                      "(:_v05))");
-        query.bindValue(":_v01", note.m_id);
-        query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id);
-        query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
-        query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
-        query.bindValue(":_v05", note.m_vNoteItem.at(i).m_bIsPackageAmmount);
-        bSuccess = query.exec();
-        if (bSuccess)
-          note.m_vNoteItem.at(i).m_id = query.lastInsertId().toLongLong();
-      }
-      if (!bSuccess)
         break;
     }
   }
 
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool NoteSQL::select(QSqlDatabase db,
@@ -319,22 +270,7 @@ bool NoteSQL::select(QSqlDatabase db,
     }
   }
 
-  if (bSuccess && note.m_supplier.isValidId())
-    bSuccess = PersonSQL::execSelect(query, note.m_supplier, error);
-
-  if (!bSuccess)
-  {
-    if (error.isEmpty())
-      error = query.lastError().text();
-    note.clear();
-  }
-  else
-  {
-    bSuccess = finishTransaction(db, bSuccess, error);
-    if (!bSuccess)
-      note.clear();
-  }
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool NoteSQL::remove(QSqlDatabase db,
@@ -395,14 +331,7 @@ double NoteSQL::selectPriceSuggestion(QSqlDatabase db,
   query.bindValue(":_v02", productId);
   bool bSuccess = query.exec();
 
-  if (bSuccess)
-  {
-    if (query.next())
-      val = query.value(0).toDouble();
-  }
-  error = query.lastError().text();
-
-  finishTransaction(db, bSuccess, error);
+  finishTransaction(db, query, bSuccess, error);
   return val;
 }
 
@@ -710,10 +639,7 @@ bool ProductSQL::select(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, product, error);
-  bSuccess = finishTransaction(db, bSuccess, error);
-  if (!bSuccess)
-    product.clear();
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ProductSQL::insert(QSqlDatabase db,
@@ -774,20 +700,7 @@ bool ProductSQL::insert(QSqlDatabase db,
   bool bSuccess = query.exec();
   if (bSuccess)
     product.m_id = query.lastInsertId().toLongLong();
-
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ProductSQL::update(QSqlDatabase db,
@@ -927,10 +840,7 @@ bool CategorySQL::select(QSqlDatabase db,
   QSqlQuery query(db);
 
   bool bSuccess = execSelect(query, category, error);
-  bSuccess = finishTransaction(db, bSuccess, error);
-  if (!bSuccess)
-    category.clear();
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool CategorySQL::insert(QSqlDatabase db,
@@ -1092,10 +1002,7 @@ bool ImageSQL::select(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, image, error);
-  bSuccess = finishTransaction(db, bSuccess, error);
-  if (!bSuccess)
-    image.clear();
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ImageSQL::insert(QSqlDatabase db,
@@ -1161,16 +1068,13 @@ bool ImageSQL::remove(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " IMAGE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
-
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ReminderSQL::execSelect(QSqlQuery& query,
@@ -1225,10 +1129,7 @@ bool ReminderSQL::select(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, reminder, error);
-  bSuccess = finishTransaction(db, bSuccess, error);
-  if (!bSuccess)
-    reminder.clear();
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ReminderSQL::insert(QSqlDatabase db,
@@ -1240,6 +1141,7 @@ bool ReminderSQL::insert(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " REMINDER_SQL_TABLE_NAME " ("
                 REMINDER_SQL_COL01 ","
@@ -1259,14 +1161,10 @@ bool ReminderSQL::insert(QSqlDatabase db,
   query.bindValue(":_v04", (int)reminder.m_capitalization);
   query.bindValue(":_v05", (int)reminder.m_size);
 
-  if (query.exec())
-  {
+  bool bSuccess = query.exec();
+  if (bSuccess)
     reminder.m_id = query.lastInsertId().toLongLong();
-    return true;
-  }
-
-  error = query.lastError().text();
-  return false;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ReminderSQL::update(QSqlDatabase db,
@@ -1278,6 +1176,7 @@ bool ReminderSQL::update(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME " SET "
                 REMINDER_SQL_COL01 " = (:_v01),"
@@ -1293,11 +1192,8 @@ bool ReminderSQL::update(QSqlDatabase db,
   query.bindValue(":_v04", (int)reminder.m_capitalization);
   query.bindValue(":_v05", (int)reminder.m_size);
 
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ReminderSQL::remove(QSqlDatabase db,
@@ -1309,16 +1205,14 @@ bool ReminderSQL::remove(QSqlDatabase db,
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " REMINDER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
 
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ConsumptionSQL::selectTotal(QSqlDatabase db,
@@ -1936,10 +1830,7 @@ bool PersonSQL::select(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, person, error);
-  bSuccess = finishTransaction(db, bSuccess, error);
-  if (!bSuccess)
-    person.clear();
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool PersonSQL::insert(QSqlDatabase db,
@@ -2294,10 +2185,7 @@ bool PersonSQL::isValidPinCode(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execByPinCodeSelect(query, pincode, person, error);
-  bSuccess = finishTransaction(db, bSuccess, error);
-  if (!bSuccess)
-    person.clear();
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 /*bool CategorySQL::execSelect(QSqlQuery& query,

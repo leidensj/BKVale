@@ -24,7 +24,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -295,6 +295,20 @@
          </property>
          <property name="value">
           <number>1000</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="cbNotePIN">
+         <property name="text">
+          <string>Exigir código PIN</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icons.qrc">
+           <normaloff>:/icons/res/pincode.png</normaloff>:/icons/res/pincode.png</iconset>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

@@ -1,11 +1,11 @@
 #include "shoppinglistview.h"
 #include <QPushButton>
 #include <QCheckBox>
-#include <QPlainTextEdit>
 #include <QLayout>
 #include "jdatabase.h"
 #include "jdatabasepicker.h"
 #include "shoppinglisttable.h"
+#include "jlineedit.h"
 #include <QSplitter>
 #include <QTabWidget>
 #include <QLabel>
@@ -52,7 +52,8 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_btnEdit(nullptr)
   , m_database(nullptr)
   , m_supplierPicker(nullptr)
-  , m_teDescription(nullptr)
+  , m_edTitle(nullptr)
+  , m_edDescription(nullptr)
   , m_cbPrintAmmount(nullptr)
   , m_cbPrintPrice(nullptr)
   , m_cbSupplierCalls(nullptr)
@@ -97,7 +98,8 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_btnEdit->setToolTip(tr("Editar (F3)"));
 
   m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, true);
-  m_teDescription = new QPlainTextEdit;
+  m_edTitle = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edDescription = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_cbPrintAmmount = new QCheckBox;
   m_cbPrintAmmount->setText(tr("Imprimir quantidade recomendada"));
   m_cbPrintPrice = new QCheckBox;
@@ -173,9 +175,15 @@ ShoppingListView::ShoppingListView(QWidget* parent)
     weekLayout1->addWidget(m_vbtnWeek.at(i));
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
+  viewLayout->addWidget(m_edTitle);
+  viewLayout->addWidget(m_edDescription);
   viewLayout->addWidget(m_supplierPicker);
   viewLayout->addWidget(new QLabel(tr("Detalhes:")));
-  viewLayout->addWidget(m_teDescription);
+
+  viewLayout->addWidget(m_cbCallSupplier);
+  viewLayout->addWidget(m_cbSupplierCalls);
+  viewLayout->addWidget(m_cbWhatsapp);
+  viewLayout->addWidget(m_cbVisit);
   viewLayout->addWidget(m_cbPrintAmmount);
   viewLayout->addWidget(m_cbPrintPrice);
 
@@ -266,12 +274,14 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
 void ShoppingListView::setDatabase(QSqlDatabase db)
 {
-
+  m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
+  m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
 }
 
 void ShoppingListView::addItem()
 {
   JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
+  w.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
   if (w.exec())
   {
     ShoppingListItem* p = static_cast<ShoppingListItem*>(w.getDatabase()->getCurrentItem());

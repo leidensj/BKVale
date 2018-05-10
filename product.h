@@ -22,6 +22,7 @@ struct Product : public JItem
   bool m_bAvailableAtConsumption;
   bool m_bAvailableToBuy;
   bool m_bAvailableToSell;
+  bool m_bAvailableAtShoppingList;
 
   bool hasPackageUnity() const
   {
@@ -51,6 +52,7 @@ struct Product : public JItem
     m_bAvailableAtConsumption = false;
     m_bAvailableToBuy = false;
     m_bAvailableToSell = false;
+    m_bAvailableAtShoppingList = false;
   }
 
   Product()
@@ -73,7 +75,8 @@ struct Product : public JItem
         m_bAvailableAtShop != another.m_bAvailableAtShop ||
         m_bAvailableAtConsumption != another.m_bAvailableAtConsumption ||
         m_bAvailableToBuy != another.m_bAvailableToBuy ||
-        m_bAvailableToSell != another.m_bAvailableToSell;
+        m_bAvailableToSell != another.m_bAvailableToSell ||
+        m_bAvailableAtShoppingList != another.m_bAvailableAtShoppingList;
   }
 
   bool operator == (const JItem& other) const

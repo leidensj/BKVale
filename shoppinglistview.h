@@ -10,7 +10,7 @@ class JDatabase;
 class QPushButton;
 class JDatabasePicker;
 class QCheckBox;
-class QPlainTextEdit;
+class JLineEdit;
 class ShoppingListTable;
 
 class ShoppingListView : public QFrame
@@ -41,8 +41,9 @@ private:
   QPushButton* m_btnEdit;
 
   JDatabase* m_database;
+  JLineEdit* m_edTitle;
   JDatabasePicker* m_supplierPicker;
-  QPlainTextEdit* m_teDescription;
+  JLineEdit* m_edDescription;
 
   QCheckBox* m_cbPrintAmmount;
   QCheckBox* m_cbPrintPrice;

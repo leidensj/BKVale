@@ -1213,6 +1213,14 @@ void JDatabase::removeItem()
   int row = m_table->currentIndex().row();
   if (row >= 0 && m_table->model())
   {
+    if (QMessageBox::question(this,
+                              tr("Remover item"),
+                              tr("Tem certeza que deseja remover o item selecionado?"),
+                              QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
+    {
+      return;
+    }
+
     qlonglong id = m_table->model()->index(row, ID_COLUMN).data(Qt::EditRole).toLongLong();
     bool bSuccess = false;
     QString error;

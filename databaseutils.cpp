@@ -262,13 +262,13 @@ bool NoteSQL::select(QSqlDatabase db,
       noteItem.m_price = query.value(3).toDouble();
       noteItem.m_bIsPackageAmmount = query.value(4).toBool();
       if (noteItem.m_product.isValidId())
-        bSuccess = ProductSQL::execSelect(query, noteItem.m_product, error);
-      if (!bSuccess)
-        break;
-      else
-        note.m_vNoteItem.push_back(noteItem);
+        ProductSQL::execSelect(query, noteItem.m_product, error);
+      note.m_vNoteItem.push_back(noteItem);
     }
   }
+
+  if (bSuccess)
+    bSuccess = PersonSQL::execSelect(query, note.m_supplier, error);
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -308,10 +308,9 @@ double NoteSQL::selectPriceSuggestion(QSqlDatabase db,
                                       qlonglong supplierId,
                                       qlonglong productId)
 {
-  double val = 0.0;
   QString error;
   if (!BaitaSQL::isOpen(db, error))
-    return val;
+    return 0.0;
 
   db.transaction();
   QSqlQuery query(db);
@@ -332,7 +331,7 @@ double NoteSQL::selectPriceSuggestion(QSqlDatabase db,
   bool bSuccess = query.exec();
 
   finishTransaction(db, query, bSuccess, error);
-  return val;
+  return bSuccess && query.next() ? query.value(0).toDouble() : 0.0;
 }
 
 bool BaitaSQL::isOpen(QSqlDatabase db,
@@ -604,19 +603,14 @@ bool ProductSQL::execSelect(QSqlQuery& query,
       product.m_bAvailableAtConsumption = query.value(9).toBool();
       product.m_bAvailableToBuy = query.value(10).toBool();
       product.m_bAvailableToSell = query.value(11).toBool();
-    }
-    else
-    {
-      error = "Produto não encontrado.";
-      bSuccess = false;
+
+      if (bSuccess && product.m_image.isValidId())
+        bSuccess = ImageSQL::execSelect(query, product.m_image, error);
+
+      if (bSuccess && product.m_category.isValidId())
+        bSuccess = CategorySQL::execSelect(query, product.m_category, error);
     }
   }
-
-  if (bSuccess && product.m_image.isValidId())
-    bSuccess = ImageSQL::execSelect(query, product.m_image, error);
-
-  if (bSuccess && product.m_category.isValidId())
-    bSuccess = CategorySQL::execSelect(query, product.m_category, error);
 
   if (!bSuccess)
   {
@@ -1702,11 +1696,6 @@ bool PersonSQL::execSelect(QSqlQuery& query,
       person.m_bSupplier = query.value(11).toBool();
       person.m_bEmployee = query.value(12).toBool();
       person.m_employeePinCode = query.value(13).toString();
-    }
-    else
-    {
-      error = "Pessoa não encontrada.";
-      bSuccess = false;
     }
   }
 

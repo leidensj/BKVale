@@ -9,6 +9,7 @@
 #include <QSplitter>
 #include <QTabWidget>
 #include <QLabel>
+#include <QFormLayout>
 
 namespace {
 QPushButton* monthButtonFactory(int n)
@@ -51,9 +52,9 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_btnRemove(nullptr)
   , m_btnEdit(nullptr)
   , m_database(nullptr)
-  , m_supplierPicker(nullptr)
   , m_edTitle(nullptr)
   , m_edDescription(nullptr)
+  , m_supplierPicker(nullptr)
   , m_cbPrintAmmount(nullptr)
   , m_cbPrintPrice(nullptr)
   , m_cbSupplierCalls(nullptr)
@@ -174,16 +175,14 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   for (int i = 0; i != 7; ++i)
     weekLayout1->addWidget(m_vbtnWeek.at(i));
 
-  QVBoxLayout* viewLayout = new QVBoxLayout;
-  viewLayout->addWidget(m_edTitle);
-  viewLayout->addWidget(m_edDescription);
-  viewLayout->addWidget(m_supplierPicker);
-  viewLayout->addWidget(new QLabel(tr("Detalhes:")));
+  QFormLayout* viewFormLayout = new QFormLayout;
+  viewFormLayout->addRow(tr("Título:"), m_edTitle);
+  viewFormLayout->addRow(tr("Descrição:"), m_edDescription);
 
-  viewLayout->addWidget(m_cbCallSupplier);
-  viewLayout->addWidget(m_cbSupplierCalls);
-  viewLayout->addWidget(m_cbWhatsapp);
-  viewLayout->addWidget(m_cbVisit);
+  QVBoxLayout* viewLayout = new QVBoxLayout;
+  viewLayout->setAlignment(Qt::AlignTop);
+  viewLayout->addLayout(viewFormLayout);
+  viewLayout->addWidget(m_supplierPicker);
   viewLayout->addWidget(m_cbPrintAmmount);
   viewLayout->addWidget(m_cbPrintPrice);
 
@@ -282,6 +281,7 @@ void ShoppingListView::addItem()
 {
   JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
   w.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
+  w.getDatabase()->setCustomFilter(PRODUCT_FILTER_SHOP);
   if (w.exec())
   {
     ShoppingListItem* p = static_cast<ShoppingListItem*>(w.getDatabase()->getCurrentItem());
@@ -293,6 +293,7 @@ void ShoppingListView::addItem()
 void ShoppingListView::removeItem()
 {
   m_table->removeCurrentItem();
+  updateControls();
 }
 
 void ShoppingListView::editItem()

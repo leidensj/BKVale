@@ -54,7 +54,7 @@ namespace
                         QString& strNote)
   {
     if (!note.m_observation.isEmpty())
-      strNote += "Observacoes: " + note.m_observation;
+      strNote += ESC_LF "Observacoes: " + note.m_observation + ESC_LF;
     strNote += ESC_LF
                ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON

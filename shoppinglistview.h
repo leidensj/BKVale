@@ -42,8 +42,8 @@ private:
 
   JDatabase* m_database;
   JLineEdit* m_edTitle;
-  JDatabasePicker* m_supplierPicker;
   JLineEdit* m_edDescription;
+  JDatabasePicker* m_supplierPicker;
 
   QCheckBox* m_cbPrintAmmount;
   QCheckBox* m_cbPrintPrice;

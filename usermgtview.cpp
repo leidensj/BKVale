@@ -170,9 +170,16 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   m_database = new JDatabase();
   m_database->setContentsMargins(0, 0, 9, 0);
 
+  QVBoxLayout* viewLayout = new QVBoxLayout;
+  viewLayout->addLayout(buttonlayout);
+  viewLayout->addWidget(tabWidget);
+
+  QFrame* viewFrame = new QFrame;
+  viewFrame->setLayout(viewLayout);
+
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);
-  splitter->addWidget(tabWidget);
+  splitter->addWidget(viewFrame);
 
   QHBoxLayout* mainlayout = new QHBoxLayout();
   mainlayout->addWidget(splitter);

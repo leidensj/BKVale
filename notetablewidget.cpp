@@ -210,8 +210,8 @@ void NoteTableWidget::setNoteItem(const NoteItem& noteItem)
     item(currentRow(), (int)NoteColumn::SubTotal)->setText(noteItem.strSubtotal());
     if (noteItem.m_product.hasPackageUnity())
       item(currentRow(), (int)NoteColumn::Unity)->setCheckState(noteItem.m_bIsPackageAmmount ? Qt::Checked : Qt::Unchecked);
-    item(currentRow(), (int)NoteColumn::Description)->setBackgroundColor(QColor(230, 230, 230));
-    item(currentRow(), (int)NoteColumn::Unity)->setBackgroundColor(QColor(230, 230, 230));
+    item(currentRow(), (int)NoteColumn::Description)->setTextColor(QColor(Qt::darkGray));
+    item(currentRow(), (int)NoteColumn::Unity)->setTextColor(QColor(Qt::darkGray));
     item(currentRow(), (int)NoteColumn::SubTotal)->setTextColor(QColor(Qt::red));
     setProduct(noteItem.m_product);
     blockSignals(false);

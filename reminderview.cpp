@@ -40,6 +40,7 @@ ReminderView::ReminderView(QWidget *parent)
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
   m_cbSave = new QCheckBox();
   m_cbSave->setText(tr("Salvar lembrete"));
+  m_cbSave->setIcon(QIcon(":/icons/res/save.png"));
   m_cbSave->setChecked(true);
   m_edTitle = new JLineEdit(JValidatorType::AlphanumericAndSpaces, false, true);
   m_edTitle->setPlaceholderText(tr("Título"));

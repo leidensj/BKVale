@@ -253,18 +253,25 @@ bool NoteSQL::select(QSqlDatabase db,
                   " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", note.m_id);
     bSuccess = query.exec();
-    while (bSuccess && query.next())
+    if (bSuccess)
     {
-      NoteItem noteItem;
-      noteItem.m_id = query.value(0).toLongLong();
-      noteItem.m_product.m_id = query.value(1).toLongLong();
-      noteItem.m_ammount = query.value(2).toDouble();
-      noteItem.m_price = query.value(3).toDouble();
-      noteItem.m_bIsPackageAmmount = query.value(4).toBool();
-      if (noteItem.m_product.isValidId())
-        ProductSQL::execSelect(query, noteItem.m_product, error);
-      note.m_vNoteItem.push_back(noteItem);
+      while (bSuccess && query.next())
+      {
+        NoteItem noteItem;
+        noteItem.m_id = query.value(0).toLongLong();
+        noteItem.m_product.m_id = query.value(1).toLongLong();
+        noteItem.m_ammount = query.value(2).toDouble();
+        noteItem.m_price = query.value(3).toDouble();
+        noteItem.m_bIsPackageAmmount = query.value(4).toBool();
+        note.m_vNoteItem.push_back(noteItem);
+      }
+      for (int i = 0; i != note.m_vNoteItem.size(); ++i)
+      {
+        if (note.m_vNoteItem.at(i).m_product.isValidId())
+          ProductSQL::execSelect(query, note.m_vNoteItem[i].m_product, error);
+      }
     }
+
   }
 
   if (bSuccess)

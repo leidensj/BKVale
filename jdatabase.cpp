@@ -93,7 +93,7 @@ public:
                      NOTE_SQL_TABLE_NAME "." SQL_COLID
                      "="
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
-                     " INNER JOIN "
+                     " LEFT JOIN "
                      PERSON_SQL_TABLE_NAME
                      " ON "
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03

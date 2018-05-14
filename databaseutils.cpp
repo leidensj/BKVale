@@ -268,13 +268,14 @@ bool NoteSQL::select(QSqlDatabase db,
       for (int i = 0; i != note.m_vNoteItem.size(); ++i)
       {
         if (note.m_vNoteItem.at(i).m_product.isValidId())
-          ProductSQL::execSelect(query, note.m_vNoteItem[i].m_product, error);
+          bSuccess = ProductSQL::execSelect(query, note.m_vNoteItem[i].m_product, error);
+        if (!bSuccess)
+          break;
       }
     }
-
   }
 
-  if (bSuccess)
+  if (bSuccess && note.m_supplier.isValidId())
     bSuccess = PersonSQL::execSelect(query, note.m_supplier, error);
 
   return finishTransaction(db, query, bSuccess, error);
@@ -523,6 +524,39 @@ bool BaitaSQL::init(QSqlDatabase db,
                           "FOREIGN KEY(" NOTE_ITEMS_SQL_COL01 ") REFERENCES "
                           NOTE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" NOTE_ITEMS_SQL_COL02 ") REFERENCES "
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_SQL_TABLE_NAME " ("
+                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SHOPPING_LIST_SQL_COL01 " INTEGER,"
+                          SHOPPING_LIST_SQL_COL02 " INTEGER,"
+                          SHOPPING_LIST_SQL_COL03 " TEXT NOT NULL,"
+                          SHOPPING_LIST_SQL_COL04 " TEXT,"
+                          SHOPPING_LIST_SQL_COL05 " INT,"
+                          SHOPPING_LIST_SQL_COL06 " INT,"
+                          SHOPPING_LIST_SQL_COL07 " INT,"
+                          SHOPPING_LIST_SQL_COL08 " INT,"
+                          SHOPPING_LIST_SQL_COL09 " TEXT,"
+                          SHOPPING_LIST_SQL_COL10 " TEXT,"
+                          SHOPPING_LIST_SQL_COL11 " INT,"
+                          SHOPPING_LIST_SQL_COL12 " INT,"
+                          "FOREIGN KEY(" SHOPPING_LIST_SQL_COL01 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                          "FOREIGN KEY(" SHOPPING_LIST_SQL_COL02 ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_ITEM_SQL_TABLE_NAME " ("
+                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SHOPPING_LIST_ITEM_SQL_COL01 " INTEGER,"
+                          SHOPPING_LIST_ITEM_SQL_COL02 " INTEGER,"
+                          SHOPPING_LIST_ITEM_SQL_COL03 " REAL,"
+                          SHOPPING_LIST_ITEM_SQL_COL04 " REAL,"
+                          SHOPPING_LIST_ITEM_SQL_COL05 " INT,"
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEM_SQL_COL01 ") REFERENCES "
+                          SHOPPING_LIST_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEM_SQL_COL02 ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)

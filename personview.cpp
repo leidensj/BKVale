@@ -352,7 +352,6 @@ PersonView::PersonView(QWidget* parent)
                     tr("Endereço"));
 
   m_database = new JDatabase;
-  m_database->layout()->setContentsMargins(0, 0, 9, 0);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setAlignment(Qt::AlignTop);

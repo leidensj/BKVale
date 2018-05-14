@@ -2,9 +2,9 @@
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
 #include "jdatabase.h"
+#include "jdoublespinbox.h"
 #include <QLayout>
 #include <QPushButton>
-#include <QDoubleSpinBox>
 #include <QCheckBox>
 #include <QFormLayout>
 #include <QTabWidget>
@@ -54,7 +54,7 @@ ProductView::ProductView(QWidget* parent)
   m_edPackageUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
   m_edPackageUnity->setMaxLength(PRODUCT_MAX_PACKAGE_UNITY_LENGTH);
 
-  m_spnPackageAmmount = new QDoubleSpinBox();
+  m_spnPackageAmmount = new JDoubleSpinBox(true);
   m_spnPackageAmmount->setMaximum(PRODUCT_MAX_PACKAGE_AMMOUNT_LENGTH);
   m_spnPackageAmmount->setMinimum(0.0);
   m_spnPackageAmmount->setValue(1.0);
@@ -140,7 +140,6 @@ ProductView::ProductView(QWidget* parent)
   viewFrame->setLayout(viewlayout);
 
   m_database = new JDatabase;
-  m_database->layout()->setContentsMargins(0, 0, 9, 0);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);

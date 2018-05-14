@@ -27,8 +27,6 @@ struct ShoppingListItem : JItem
   double m_ammount;
   double m_price;
   bool m_bIsPackageAmmount;
-  bool m_bPrintAmmount;
-  bool m_bPrintPrice;
 
   void clear()
   {
@@ -37,8 +35,6 @@ struct ShoppingListItem : JItem
     m_ammount = 0.0;
     m_price = 0.0;
     m_bIsPackageAmmount = true;
-    m_bPrintAmmount = true;
-    m_bPrintPrice = true;
   }
 
   ShoppingListItem()
@@ -83,25 +79,33 @@ struct ShoppingList : public JItem
 {
   Person m_supplier;
   Image m_image;
-  QStringList m_dates;
+  bool m_weekDays[7];
+  bool m_monthDays[31];
   QString m_description;
   QVector<ShoppingListItem> m_vItem;
   bool m_bSupplierCalls;
   bool m_bCallSupplier;
   bool m_bWhatsapp;
   bool m_bVisit;
+  bool m_bPrintAmmount;
+  bool m_bPrintPrice;
 
   void clear()
   {
     m_id = INVALID_ID;
     m_supplier.clear();
-    m_dates.clear();
+    for (int i = 0; i != 7; ++i)
+      m_weekDays[i] = false;
+    for (int i = 0; i != 31; ++i)
+      m_monthDays[i] = false;
     m_description.clear();
     m_vItem.clear();
     m_bSupplierCalls = false;
     m_bCallSupplier = false;
     m_bWhatsapp = false;
     m_bVisit = false;
+    m_bPrintAmmount = true;
+    m_bPrintPrice = true;
   }
 
   ShoppingList()
@@ -112,25 +116,85 @@ struct ShoppingList : public JItem
   bool isValid() const
   {
     bool b = m_supplier.isValidId() &&
-             !m_dates.isEmpty() &&
              !m_vItem.isEmpty();
     for (int i = 0; i != m_vItem.size(); ++i)
       b &= m_vItem.at(i).isValid();
     return b;
   }
 
+  void setWeekDays(const QString& strWeekDays)
+  {
+    for (int i = 0; i != 7; ++i)
+      m_weekDays[i] = false;
+    QStringList lst = strWeekDays.split(SHOPPING_LIST_SEPARATOR);
+    for (int i = 0; i != lst.size(); ++i)
+    {
+      int day = lst.at(i).toInt();
+      if (day > 0 && day < 8)
+        m_weekDays[day - 1] = true;
+    }
+  }
+
+  void setMonthDays(const QString& strMonthDays)
+  {
+    for (int i = 0; i != 7; ++i)
+      m_monthDays[i] = false;
+    QStringList lst = strMonthDays.split(SHOPPING_LIST_SEPARATOR);
+    for (int i = 0; i != lst.size(); ++i)
+    {
+      int day = lst.at(i).toInt();
+      if (day > 0 && day < 32)
+        m_monthDays[day - 1] = true;
+    }
+  }
+
+  QString getWeekDays() const
+  {
+    QString strWeekDays;
+    for (int i = 0; i != 7; ++i)
+      if (m_weekDays[i])
+        strWeekDays += SHOPPING_LIST_SEPARATOR + QString::number(i + 1);
+    return strWeekDays;
+  }
+
+  QString getMonthDays() const
+  {
+    QString strMonthDays;
+    for (int i = 0; i != 31; ++i)
+      if (m_monthDays[i])
+        strMonthDays += SHOPPING_LIST_SEPARATOR + QString::number(i + 1);
+    return strMonthDays;
+  }
+
   bool operator !=(const JItem& other) const
   {
     const ShoppingList& another = dynamic_cast<const ShoppingList&>(other);
-    return
-        m_supplier.m_id != another.m_supplier.m_id ||
-        m_dates != another.m_dates ||
-        m_description != another.m_description ||
-        m_vItem != another.m_vItem ||
-        m_bSupplierCalls != another.m_bSupplierCalls ||
-        m_bCallSupplier != another.m_bCallSupplier ||
-        m_bWhatsapp != another.m_bWhatsapp ||
-        m_bVisit != another.m_bVisit;
+    bool b = m_supplier.m_id != another.m_supplier.m_id ||
+             m_description != another.m_description ||
+             m_vItem != another.m_vItem ||
+             m_bSupplierCalls != another.m_bSupplierCalls ||
+             m_bCallSupplier != another.m_bCallSupplier ||
+             m_bWhatsapp != another.m_bWhatsapp ||
+             m_bVisit != another.m_bVisit;
+    if (!b)
+    {
+      for (int i = 0; i != 7; ++i)
+      {
+        b |= m_weekDays[i] != another.m_weekDays[i];
+        if (b)
+          break;
+      }
+
+      if (!b)
+      for (int i = 0; i != 31; ++i)
+      {
+        b |= m_monthDays[i] != another.m_monthDays[i];
+        if (b)
+          break;
+      }
+    }
+
+    return b;
   }
 
   bool operator ==(const JItem& other) const

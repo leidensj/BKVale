@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     jdatabasepicker.cpp \
     pincodeview.cpp \
     shoppinglistview.cpp \
-    shoppinglisttable.cpp
+    shoppinglisttable.cpp \
+    jdoublespinbox.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -88,7 +89,8 @@ HEADERS  += mainwindow.h \
     pincodeview.h \
     shoppinglist.h \
     shoppinglistview.h \
-    shoppinglisttable.h
+    shoppinglisttable.h \
+    jdoublespinbox.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

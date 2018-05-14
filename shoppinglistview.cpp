@@ -10,6 +10,7 @@
 #include <QTabWidget>
 #include <QLabel>
 #include <QFormLayout>
+#include <QGroupBox>
 
 namespace {
 QPushButton* monthButtonFactory(int n)
@@ -55,6 +56,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_edTitle(nullptr)
   , m_edDescription(nullptr)
   , m_supplierPicker(nullptr)
+  , m_imagePicker(nullptr)
   , m_cbPrintAmmount(nullptr)
   , m_cbPrintPrice(nullptr)
   , m_cbSupplierCalls(nullptr)
@@ -99,6 +101,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_btnEdit->setToolTip(tr("Editar (F3)"));
 
   m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, true);
+  m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
   m_edTitle = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_edDescription = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
   m_cbPrintAmmount = new QCheckBox;
@@ -179,20 +182,26 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   viewFormLayout->addRow(tr("Título:"), m_edTitle);
   viewFormLayout->addRow(tr("Descrição:"), m_edDescription);
 
-  QVBoxLayout* viewLayout = new QVBoxLayout;
-  viewLayout->setAlignment(Qt::AlignTop);
-  viewLayout->addLayout(viewFormLayout);
-  viewLayout->addWidget(m_supplierPicker);
-  viewLayout->addWidget(m_cbPrintAmmount);
-  viewLayout->addWidget(m_cbPrintPrice);
-
   QVBoxLayout* contactLayout = new QVBoxLayout;
   contactLayout->setAlignment(Qt::AlignTop);
-  contactLayout->addWidget(new QLabel(tr("Como entrar em contato com o fornecedor:")));
   contactLayout->addWidget(m_cbCallSupplier);
   contactLayout->addWidget(m_cbSupplierCalls);
   contactLayout->addWidget(m_cbWhatsapp);
   contactLayout->addWidget(m_cbVisit);
+
+  QGroupBox* contactGroupBox = new QGroupBox;
+  contactGroupBox->setCheckable(true);
+  contactGroupBox->setTitle(tr("Imprimir contato"));
+  contactGroupBox->setLayout(contactLayout);
+
+  QVBoxLayout* viewLayout = new QVBoxLayout;
+  viewLayout->setAlignment(Qt::AlignTop);
+  viewLayout->addLayout(viewFormLayout);
+  viewLayout->addWidget(m_supplierPicker);
+  viewLayout->addWidget(m_imagePicker);
+  viewLayout->addWidget(m_cbPrintAmmount);
+  viewLayout->addWidget(m_cbPrintPrice);
+  viewLayout->addWidget(contactGroupBox);
 
   QVBoxLayout* calendarLayout = new QVBoxLayout;
   calendarLayout->setAlignment(Qt::AlignTop);
@@ -217,9 +226,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   QFrame* tabList = new QFrame;
   tabList->setLayout(listLayout);
 
-  QFrame* tabContact = new QFrame;
-  tabContact->setLayout(contactLayout);
-
   QFrame* tabCalendar = new QFrame;
   tabCalendar->setLayout(calendarLayout);
 
@@ -230,9 +236,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   tabWidget->addTab(tabList,
                     QIcon(":/icons/res/item.png"),
                     tr("Produtos"));
-  tabWidget->addTab(tabContact,
-                    QIcon(":/icons/res/phone.png"),
-                    tr("Contato"));
   tabWidget->addTab(tabCalendar,
                     QIcon(":/icons/res/calendar.png"),
                     tr("Calendário"));
@@ -267,6 +270,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    SLOT(editItem()));
   QObject::connect(m_table,
                    SIGNAL(changedSignal()),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(contactGroupBox,
+                   SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
 }

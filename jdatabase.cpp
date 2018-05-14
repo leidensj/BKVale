@@ -978,7 +978,6 @@ JDatabase::JDatabase(bool bSelectorMode,
   m_table->horizontalHeader()->setHighlightSections(false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
-  vlayout1->setContentsMargins(0, 0, 0, 0);
   vlayout1->addLayout(hlayout0);
   vlayout1->addLayout(hlayout1);
   vlayout1->addWidget(m_table);

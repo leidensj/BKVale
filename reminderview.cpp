@@ -103,7 +103,6 @@ ReminderView::ReminderView(QWidget *parent)
   viewFrame->setLayout(viewLayout);
 
   m_database = new JDatabase;
-  m_database->layout()->setContentsMargins(0, 9, 0, 0);
 
   m_dock = new QDockWidget();
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);

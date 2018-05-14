@@ -62,7 +62,6 @@ ImageView::ImageView(QWidget* parent)
   viewFrame->setLayout(viewlayout);
 
   m_database = new JDatabase;
-  m_database->layout()->setContentsMargins(0, 0, 9, 0);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);

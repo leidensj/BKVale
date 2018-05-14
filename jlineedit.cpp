@@ -1,6 +1,5 @@
 #include "jlineedit.h"
 
-
 namespace
 {
 QString getRegEx(JValidatorType validator)
@@ -51,10 +50,12 @@ void JLineEdit::keyPressEvent(QKeyEvent *event)
   {
     emit enterSignal();
     if (m_enterAsTab)
-    {
       focusNextChild();
-    }
   }
+  else if (event->key() == Qt::Key_Down)
+    focusNextChild();
+  else if (event->key() == Qt::Key_Up)
+    focusPreviousChild();
   else
     QLineEdit::keyPressEvent(event);
 }

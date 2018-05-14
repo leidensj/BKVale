@@ -8,7 +8,7 @@
 
 class QLabel;
 class JLineEdit;
-class QDoubleSpinBox;
+class JDoubleSpinBox;
 class QPushButton;
 class QCheckBox;
 class JDatabasePicker;
@@ -40,7 +40,7 @@ private:
   JLineEdit* m_edName;
   JLineEdit* m_edUnity;
   JLineEdit* m_edPackageUnity;
-  QDoubleSpinBox* m_spnPackageAmmount;
+  JDoubleSpinBox* m_spnPackageAmmount;
   JLineEdit* m_edDetails;
   QCheckBox* m_cbAvailableAtNotes;
   QCheckBox* m_cbAvailableAtShop;

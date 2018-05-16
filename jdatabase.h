@@ -51,6 +51,7 @@ public slots:
   void refresh(bool bSaveIdx = true);
   void selectItem(qlonglong id);
   void setCustomFilter(const QString& customFilter);
+  void clearFilterSearch();
 
 private:
   const bool m_bSelectorMode;
@@ -94,6 +95,9 @@ public:
                    const QString& tableName);
 
   JDatabase* getDatabase() const;
+
+protected:
+  void closeEvent(QCloseEvent * e);
 
 private slots:
   void itemSelected(const JItem& jItem);

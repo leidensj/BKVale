@@ -1110,6 +1110,10 @@ JDatabase::JDatabase(bool bSelectorMode,
                    SIGNAL(enterSignal()),
                    this,
                    SLOT(filterSearchEnter()));
+  QObject::connect(m_edFilterSearch,
+                   SIGNAL(keyDownSignal()),
+                   this,
+                   SLOT(filterSearchEnter()));
   QObject::connect(m_cbContains,
                    SIGNAL(clicked(bool)),
                    this,

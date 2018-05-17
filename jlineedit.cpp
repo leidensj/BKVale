@@ -35,10 +35,10 @@ QValidator::State JRegExpValidator::validate(QString& input, int& pos) const
 
 JLineEdit::JLineEdit(JValidatorType validator,
                      bool toUpper,
-                     bool enterAsTab,
+                     bool keysAsTab,
                      QWidget* parent)
   : QLineEdit(parent)
-  , m_enterAsTab(enterAsTab)
+  , m_keysAsTab(keysAsTab)
 {
   if (validator != JValidatorType::All)
     setValidator(new JRegExpValidator(toUpper, QRegExp(getRegEx(validator)), this));
@@ -49,13 +49,21 @@ void JLineEdit::keyPressEvent(QKeyEvent *event)
   if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
   {
     emit enterSignal();
-    if (m_enterAsTab)
+    if (m_keysAsTab)
       focusNextChild();
   }
   else if (event->key() == Qt::Key_Down)
-    focusNextChild();
+  {
+    emit keyDownSignal();
+    if (m_keysAsTab)
+      focusNextChild();
+  }
   else if (event->key() == Qt::Key_Up)
-    focusPreviousChild();
+  {
+    emit keyUpSignal();
+    if (m_keysAsTab)
+      focusPreviousChild();
+  }
   else
     QLineEdit::keyPressEvent(event);
 }

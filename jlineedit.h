@@ -30,7 +30,7 @@ class JLineEdit : public QLineEdit
 public:
   explicit JLineEdit(JValidatorType validator,
                      bool toUpper,
-                     bool enterAsTab,
+                     bool keysAsTab,
                      QWidget* parent = 0);
 
   void setTextBlockingSignals(const QString& str);
@@ -39,10 +39,12 @@ protected:
   void keyPressEvent(QKeyEvent *event);
 
 private:
-  const bool m_enterAsTab;
+  const bool m_keysAsTab;
 
 signals:
   void enterSignal();
+  void keyDownSignal();
+  void keyUpSignal();
 };
 
 #endif // JLINEEDIT_H

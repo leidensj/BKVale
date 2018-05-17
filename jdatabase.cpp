@@ -1415,6 +1415,12 @@ void JDatabase::filterSearchEnter()
   }
 }
 
+void JDatabase::clearFilterSearch()
+{
+  m_edFilterSearch->clear();
+  filterSearchChanged();
+}
+
 void JDatabase::containsPressed()
 {
   filterSearchChanged();
@@ -1423,6 +1429,7 @@ void JDatabase::containsPressed()
 
 void JDatabase::focusFilterSearch()
 {
+  m_edFilterSearch->selectAll();
   m_edFilterSearch->setFocus();
 }
 
@@ -1562,4 +1569,11 @@ void JDatabaseSelector::itemSelected(const JItem& jItem)
 JDatabase* JDatabaseSelector::getDatabase() const
 {
   return m_database;
+}
+
+void JDatabaseSelector::closeEvent(QCloseEvent * e)
+{
+  m_database->clearFilterSearch();
+  m_database->refresh();
+  QDialog::closeEvent(e);
 }

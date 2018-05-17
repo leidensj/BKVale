@@ -12,6 +12,7 @@ class JDatabasePicker;
 class QCheckBox;
 class JLineEdit;
 class ShoppingListTable;
+class QTabWidget;
 
 class ShoppingListView : public QFrame
 {
@@ -20,12 +21,15 @@ class ShoppingListView : public QFrame
 public:
   explicit ShoppingListView(QWidget* parent = nullptr);
   void setDatabase(QSqlDatabase db);
+  void setShoppingList(const ShoppingList& lst);
+  ShoppingList getShoppingList() const;
 
 private slots:
-  /*bool save();
+  void save();
   void itemSelected(const JItem& jItem);
-  void itemRemoved(qlonglong id);*/
+  void itemRemoved(qlonglong id);
 
+  void create();
   void addItem();
   void removeItem();
   void editItem();
@@ -55,9 +59,10 @@ private:
   QCheckBox* m_cbVisit;
 
   ShoppingListTable* m_table;
+  QTabWidget* m_tabWidget;
 
-  QVector<QPushButton*> m_vbtnMonth;
-  QVector<QPushButton*> m_vbtnWeek;
+  QPushButton* m_vbtnMonth[31];
+  QPushButton* m_vbtnWeek[7];
 };
 
 #endif // SHOPPINGLISTVIEW_H

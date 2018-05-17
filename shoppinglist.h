@@ -77,11 +77,12 @@ Q_DECLARE_METATYPE(ShoppingListItem)
 
 struct ShoppingList : public JItem
 {
+  QString m_title;
+  QString m_description;
   Person m_supplier;
   Image m_image;
   bool m_weekDays[7];
   bool m_monthDays[31];
-  QString m_description;
   QVector<ShoppingListItem> m_vItem;
   bool m_bSupplierCalls;
   bool m_bCallSupplier;
@@ -93,12 +94,14 @@ struct ShoppingList : public JItem
   void clear()
   {
     m_id = INVALID_ID;
+    m_title.clear();
+    m_description.clear();
     m_supplier.clear();
+    m_image.clear();
     for (int i = 0; i != 7; ++i)
       m_weekDays[i] = false;
     for (int i = 0; i != 31; ++i)
       m_monthDays[i] = false;
-    m_description.clear();
     m_vItem.clear();
     m_bSupplierCalls = false;
     m_bCallSupplier = false;

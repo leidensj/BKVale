@@ -12,11 +12,11 @@ class ShoppingListTable : public QTableWidget
 
 public:
   explicit ShoppingListTable(QWidget* parent = 0);
-  QVector<ShoppingListItem> getShopItems() const;
-  void setShopItems(const QVector<ShoppingListItem>& vShopItem);
+  QVector<ShoppingListItem> getShoppingItems() const;
+  void setShoppingItems(const QVector<ShoppingListItem>& vItem);
   void setProduct(const Product& product);
-  void setShopItem(const ShoppingListItem& shopItem);
-  void addShopItem(const ShoppingListItem& shopItem);
+  void setShoppingItem(const ShoppingListItem& shopItem);
+  void addShoppingItem(const ShoppingListItem& shopItem);
 
   void removeCurrentItem() { removeRow(currentRow()); }
   void removeAllItems() { setRowCount(0); }

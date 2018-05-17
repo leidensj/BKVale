@@ -265,18 +265,19 @@ bool NoteSQL::select(QSqlDatabase db,
         noteItem.m_bIsPackageAmmount = query.value(4).toBool();
         note.m_vNoteItem.push_back(noteItem);
       }
-      for (int i = 0; i != note.m_vNoteItem.size(); ++i)
-      {
-        if (note.m_vNoteItem.at(i).m_product.isValidId())
-          bSuccess = ProductSQL::execSelect(query, note.m_vNoteItem[i].m_product, error);
-        if (!bSuccess)
-          break;
-      }
     }
   }
 
   if (bSuccess && note.m_supplier.isValidId())
-    bSuccess = PersonSQL::execSelect(query, note.m_supplier, error);
+  {
+    QString error2;
+    PersonSQL::execSelect(query, note.m_supplier, error2);
+    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
+    {
+      if (note.m_vNoteItem.at(i).m_product.isValidId())
+        ProductSQL::execSelect(query, note.m_vNoteItem[i].m_product, error2);
+    }
+  }
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -296,20 +297,7 @@ bool NoteSQL::remove(QSqlDatabase db,
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
   bool bSuccess = query.exec();
-
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 double NoteSQL::selectPriceSuggestion(QSqlDatabase db,
@@ -547,16 +535,16 @@ bool BaitaSQL::init(QSqlDatabase db,
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_ITEM_SQL_TABLE_NAME " ("
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
                           SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          SHOPPING_LIST_ITEM_SQL_COL01 " INTEGER,"
-                          SHOPPING_LIST_ITEM_SQL_COL02 " INTEGER,"
-                          SHOPPING_LIST_ITEM_SQL_COL03 " REAL,"
-                          SHOPPING_LIST_ITEM_SQL_COL04 " REAL,"
-                          SHOPPING_LIST_ITEM_SQL_COL05 " INT,"
-                          "FOREIGN KEY(" SHOPPING_LIST_ITEM_SQL_COL01 ") REFERENCES "
+                          SHOPPING_LIST_ITEMS_SQL_COL01 " INTEGER,"
+                          SHOPPING_LIST_ITEMS_SQL_COL02 " INTEGER,"
+                          SHOPPING_LIST_ITEMS_SQL_COL03 " REAL,"
+                          SHOPPING_LIST_ITEMS_SQL_COL04 " REAL,"
+                          SHOPPING_LIST_ITEMS_SQL_COL05 " INT,"
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL01 ") REFERENCES "
                           SHOPPING_LIST_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" SHOPPING_LIST_ITEM_SQL_COL02 ") REFERENCES "
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL02 ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
@@ -2218,71 +2206,9 @@ bool PersonSQL::isValidPinCode(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-/*bool CategorySQL::execSelect(QSqlQuery& query,
-                             Category& category,
+bool ShoppingListSQL::insert(QSqlDatabase db,
+                             const ShoppingList& shoppingList,
                              QString& error)
-{
-  error.clear();
-  qlonglong id = category.m_id;
-  category.clear();
-
-  query.prepare("SELECT "
-                CATEGORY_SQL_COL01 ","
-                CATEGORY_SQL_COL02
-                " FROM " CATEGORY_SQL_TABLE_NAME
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
-
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    if (query.next())
-    {
-      category.m_id = id;
-      category.m_image.m_id = query.value(0).toLongLong();
-      category.m_name = query.value(1).toString();
-    }
-    else
-    {
-      error = "Categoria não encontrada.";
-      bSuccess = false;
-    }
-  }
-
-  if (bSuccess && category.m_image.isValidId())
-    bSuccess = ImageSQL::execSelect(query, category.m_image, error);
-
-  if (!bSuccess)
-  {
-    if (error.isEmpty())
-      error = query.lastError().text();
-    category.clear();
-  }
-
-  return bSuccess;
-}
-
-bool CategorySQL::select(QSqlDatabase db,
-                         Category& category,
-                         QString& error)
-{
-  error.clear();
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = execSelect(query, category, error);
-  bSuccess = finishTransaction(db, bSuccess, error);
-  if (!bSuccess)
-    category.clear();
-  return bSuccess;
-}
-
-bool CategorySQL::insert(QSqlDatabase db,
-                         const Category& category,
-                         QString& error)
 {
   error.clear();
 
@@ -2292,38 +2218,95 @@ bool CategorySQL::insert(QSqlDatabase db,
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
-        QString("INSERT INTO " CATEGORY_SQL_TABLE_NAME " ("
-                CATEGORY_SQL_COL01 ","
-                CATEGORY_SQL_COL02 ")"
-                " VALUES (") +
-                (category.m_image.isValidId()
-                 ? "(:_v01)," : "NULL,") +
-                "(:_v02))");
-  if (category.m_image.isValidId())
-    query.bindValue(":_v01", category.m_image.m_id);
-  query.bindValue(":_v02", category.m_name);
+        QString(
+          "INSERT INTO " SHOPPING_LIST_SQL_TABLE_NAME " ("
+          "%1"
+          "%2"
+          SHOPPING_LIST_SQL_COL03 ","
+          SHOPPING_LIST_SQL_COL04 ","
+          SHOPPING_LIST_SQL_COL05 ","
+          SHOPPING_LIST_SQL_COL06 ","
+          SHOPPING_LIST_SQL_COL07 ","
+          SHOPPING_LIST_SQL_COL08 ","
+          SHOPPING_LIST_SQL_COL09 ","
+          SHOPPING_LIST_SQL_COL10 ","
+          SHOPPING_LIST_SQL_COL11 ","
+          SHOPPING_LIST_SQL_COL12
+          ") VALUES ("
+          "%3"
+          "%4"
+          "(:_v03),"
+          "(:_v04),"
+          "(:_v05),"
+          "(:_v06),"
+          "(:_v07),"
+          "(:_v08),"
+          "(:_v09),"
+          "(:_v10),"
+          "(:_v11),"
+          "(:_v12))").arg(
+          shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 "," : "",
+          shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 "," : "",
+          shoppingList.m_supplier.isValidId() ? "(:_v01)," : "",
+          shoppingList.m_image.isValidId() ? "(:_v02)," : ""));
+
+  if (shoppingList.m_supplier.isValidId())
+    query.bindValue(":_v01", shoppingList.m_supplier.m_id);
+  if (shoppingList.m_image.isValidId())
+    query.bindValue(":_v02", shoppingList.m_image.m_id);
+  query.bindValue(":_v03", shoppingList.m_title);
+  query.bindValue(":_v04", shoppingList.m_description);
+  query.bindValue(":_v05", shoppingList.m_bSupplierCalls);
+  query.bindValue(":_v06", shoppingList.m_bCallSupplier);
+  query.bindValue(":_v07", shoppingList.m_bWhatsapp);
+  query.bindValue(":_v08", shoppingList.m_bVisit);
+  query.bindValue(":_v09", shoppingList.getWeekDays());
+  query.bindValue(":_v10", shoppingList.getMonthDays());
+  query.bindValue(":_v11", shoppingList.m_bPrintPrice);
+  query.bindValue(":_v12", shoppingList.m_bPrintAmmount);
   bool bSuccess = query.exec();
+
   if (bSuccess)
-    category.m_id = query.lastInsertId().toLongLong();
-
-  if (!bSuccess)
   {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
+    shoppingList.m_id = query.lastInsertId().toLongLong();
+    for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
+    {
+      query.prepare(
+            QString("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
+                    SHOPPING_LIST_ITEMS_SQL_COL01 ","
+                    "%1"
+                    SHOPPING_LIST_ITEMS_SQL_COL03 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL04 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL05
+                    ") VALUES ("
+                    "(:_v01),"
+                    "%2"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05))").arg(
+                    shoppingList.m_vItem.at(i).m_product.isValidId() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
+                    shoppingList.m_vItem.at(i).m_product.isValidId() ? "(:_v02)," : ""));
+
+      query.bindValue(":_v01", shoppingList.m_id);
+      if (shoppingList.m_vItem.at(i).m_product.isValidId())
+        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id);
+      query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
+      query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
+      query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_bIsPackageAmmount);
+      bSuccess = query.exec();
+      if (bSuccess)
+        shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
+      else
+        break;
+    }
   }
-  else
-    bSuccess = db.commit();
 
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool CategorySQL::update(QSqlDatabase db,
-                         const Category& category,
-                         QString& error)
+bool ShoppingListSQL::update(QSqlDatabase db,
+                             const ShoppingList& shoppingList,
+                             QString& error)
 {
   error.clear();
 
@@ -2332,63 +2315,195 @@ bool CategorySQL::update(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                CATEGORY_SQL_COL02 " = (:_v02)"
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", category.m_id);
-  query.bindValue(":_v02", category.m_name);
+  query.prepare(
+        QString("UPDATE " SHOPPING_LIST_SQL_TABLE_NAME " SET "
+                "%1"
+                "%2"
+                SHOPPING_LIST_SQL_COL03 " = (:_v03),"
+                SHOPPING_LIST_SQL_COL04 " = (:_v04),"
+                SHOPPING_LIST_SQL_COL05 " = (:_v05),"
+                SHOPPING_LIST_SQL_COL06 " = (:_v06),"
+                SHOPPING_LIST_SQL_COL07 " = (:_v07),"
+                SHOPPING_LIST_SQL_COL08 " = (:_v08),"
+                SHOPPING_LIST_SQL_COL09 " = (:_v09),"
+                SHOPPING_LIST_SQL_COL10 " = (:_v10),"
+                SHOPPING_LIST_SQL_COL11 " = (:_v11),"
+                SHOPPING_LIST_SQL_COL12 " = (:_v12) "
+                "WHERE " SQL_COLID " = (:_v00)").arg(
+                shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 " = (:_v01)," : "",
+                shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 " = (:_v02)," : ""));
+
+  query.bindValue(":_v00", shoppingList.m_id);
+  if (shoppingList.m_supplier.isValidId())
+    query.bindValue(":_v01", shoppingList.m_supplier.m_id);
+  if (shoppingList.m_image.isValidId())
+    query.bindValue(":_v02", shoppingList.m_image.m_id);
+  query.bindValue(":_v03", shoppingList.m_title);
+  query.bindValue(":_v04", shoppingList.m_description);
+  query.bindValue(":_v05", shoppingList.m_bSupplierCalls);
+  query.bindValue(":_v06", shoppingList.m_bCallSupplier);
+  query.bindValue(":_v07", shoppingList.m_bWhatsapp);
+  query.bindValue(":_v08", shoppingList.m_bVisit);
+  query.bindValue(":_v09", shoppingList.getWeekDays());
+  query.bindValue(":_v10", shoppingList.getMonthDays());
+  query.bindValue(":_v11", shoppingList.m_bPrintPrice);
+  query.bindValue(":_v12", shoppingList.m_bPrintAmmount);
   bool bSuccess = query.exec();
+
+  query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
+  query.bindValue(":_v01", shoppingList.m_id);
+  bSuccess = query.exec();
+
   if (bSuccess)
   {
-    if (category.m_image.isValidId())
+    for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
     {
-      query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                    CATEGORY_SQL_COL01 " = (:_v01)"
-                    " WHERE " SQL_COLID " = (:_v00)");
-      query.bindValue(":_v01", category.m_image.m_id);
+      query.prepare(
+            QString("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
+                    SHOPPING_LIST_ITEMS_SQL_COL01 ","
+                    "%1"
+                    SHOPPING_LIST_ITEMS_SQL_COL03 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL04 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL05
+                    ") VALUES ("
+                    "(:_v01),"
+                    "%2"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05))").arg(
+                    shoppingList.m_vItem.at(i).m_product.isValidId() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
+                    shoppingList.m_vItem.at(i).m_product.isValidId() ? "(:_v02)," : ""));
+      query.bindValue(":_v01", shoppingList.m_id);
+      if (shoppingList.m_vItem.at(i).m_product.isValidId())
+        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id);
+      query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
+      query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
+      query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_bIsPackageAmmount);
+      bSuccess = query.exec();
+      if (bSuccess)
+        shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
+      else
+        break;
+    }
+  }
+
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ShoppingListSQL::select(QSqlDatabase db,
+                             ShoppingList& shoppingList,
+                             QString& error)
+{
+  error.clear();
+  qlonglong id = shoppingList.m_id;
+  shoppingList.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("SELECT "
+                SHOPPING_LIST_SQL_COL01 ","
+                SHOPPING_LIST_SQL_COL02 ","
+                SHOPPING_LIST_SQL_COL03 ","
+                SHOPPING_LIST_SQL_COL04 ","
+                SHOPPING_LIST_SQL_COL05 ","
+                SHOPPING_LIST_SQL_COL06 ","
+                SHOPPING_LIST_SQL_COL07 ","
+                SHOPPING_LIST_SQL_COL08 ","
+                SHOPPING_LIST_SQL_COL09 ","
+                SHOPPING_LIST_SQL_COL10 ","
+                SHOPPING_LIST_SQL_COL11 ","
+                SHOPPING_LIST_SQL_COL12
+                " FROM " SHOPPING_LIST_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id);
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      shoppingList.m_id = id;
+      shoppingList.m_supplier.m_id = query.value(0).toLongLong();
+      shoppingList.m_image.m_id = query.value(1).toLongLong();
+      shoppingList.m_title = query.value(2).toString();
+      shoppingList.m_description = query.value(3).toString();
+      shoppingList.m_bSupplierCalls = query.value(4).toBool();
+      shoppingList.m_bCallSupplier = query.value(5).toBool();
+      shoppingList.m_bWhatsapp = query.value(6).toBool();
+      shoppingList.m_bVisit = query.value(7).toBool();
+      shoppingList.setWeekDays(query.value(8).toString());
+      shoppingList.setMonthDays(query.value(9).toString());
+      shoppingList.m_bPrintPrice = query.value(10).toBool();
+      shoppingList.m_bPrintAmmount = query.value(11).toBool();
     }
     else
     {
-      query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                    CATEGORY_SQL_COL01 " = NULL"
-                    " WHERE " SQL_COLID " = (:_v00)");
+      error = "Lista não encontrada.";
+      bSuccess = false;
     }
-    query.bindValue(":_v00", category.m_id);
-    bSuccess = query.exec();
   }
 
-  if (!bSuccess)
+  if (bSuccess)
   {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
+    query.prepare("SELECT "
+                  SQL_COLID ","
+                  SHOPPING_LIST_ITEMS_SQL_COL02 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL03 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL04 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL05
+                  " FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME
+                  " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", shoppingList.m_id);
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      while (bSuccess && query.next())
+      {
+        ShoppingListItem item;
+        item.m_id = query.value(0).toLongLong();
+        item.m_product.m_id = query.value(1).toLongLong();
+        item.m_ammount = query.value(2).toDouble();
+        item.m_price = query.value(3).toDouble();
+        item.m_bIsPackageAmmount = query.value(4).toBool();
+        shoppingList.m_vItem.push_back(item);
+      }
+    }
   }
-  else
-    bSuccess = db.commit();
 
-  if (!bSuccess)
-    error = db.lastError().text();
+  if (bSuccess)
+  {
+    QString error2;
+    if (shoppingList.m_supplier.isValidId())
+      PersonSQL::execSelect(query, shoppingList.m_supplier, error2);
+    if (shoppingList.m_image.isValidId())
+      ImageSQL::execSelect(query, shoppingList.m_image, error2);
+    for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
+    {
+      if (shoppingList.m_vItem.at(i).m_product.isValidId())
+        ProductSQL::execSelect(query, shoppingList.m_vItem[i].m_product, error);
+    }
+  }
 
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool CategorySQL::remove(QSqlDatabase db,
-                         qlonglong id,
-                         QString& error)
+bool ShoppingListSQL::remove(QSqlDatabase db,
+                             qlonglong id,
+                             QString& error)
 {
   error.clear();
 
   if (!BaitaSQL::isOpen(db, error))
     return false;
 
+  db.transaction();
   QSqlQuery query(db);
-  query.prepare("DELETE FROM " CATEGORY_SQL_TABLE_NAME
+  query.prepare("DELETE FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
-
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
-}*/
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
+}

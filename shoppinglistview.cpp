@@ -64,6 +64,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_cbWhatsapp(nullptr)
   , m_cbVisit(nullptr)
   , m_table(nullptr)
+  , m_tabWidget(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -124,10 +125,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_database = new JDatabase;
 
   for (int i = 0; i != 31; ++i)
-    m_vbtnMonth.push_back(monthButtonFactory(i));
+    m_vbtnMonth[i] = monthButtonFactory(i);
 
   for (int i = 0; i != 7; ++i)
-    m_vbtnWeek.push_back(weekButtonFactory(i));
+    m_vbtnWeek[i] = weekButtonFactory(i);
 
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonLayout->setAlignment(Qt::AlignLeft);
@@ -146,53 +147,41 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   monthLayout1->setContentsMargins(0, 0, 0, 0);
   monthLayout1->setAlignment(Qt::AlignLeft);
   for (int i = 0; i != 7; ++i)
-    monthLayout1->addWidget(m_vbtnMonth.at(i));
+    monthLayout1->addWidget(m_vbtnMonth[i]);
 
   QHBoxLayout* monthLayout2 = new QHBoxLayout;
   monthLayout2->setContentsMargins(0, 0, 0, 0);
   monthLayout2->setAlignment(Qt::AlignLeft);
   for (int i = 7; i != 14; ++i)
-    monthLayout2->addWidget(m_vbtnMonth.at(i));
+    monthLayout2->addWidget(m_vbtnMonth[i]);
 
   QHBoxLayout* monthLayout3 = new QHBoxLayout;
   monthLayout3->setContentsMargins(0, 0, 0, 0);
   monthLayout3->setAlignment(Qt::AlignLeft);
   for (int i = 14; i != 21; ++i)
-    monthLayout3->addWidget(m_vbtnMonth.at(i));
+    monthLayout3->addWidget(m_vbtnMonth[i]);
 
   QHBoxLayout* monthLayout4 = new QHBoxLayout;
   monthLayout4->setContentsMargins(0, 0, 0, 0);
   monthLayout4->setAlignment(Qt::AlignLeft);
   for (int i = 21; i != 28; ++i)
-    monthLayout4->addWidget(m_vbtnMonth.at(i));
+    monthLayout4->addWidget(m_vbtnMonth[i]);
 
   QHBoxLayout* monthLayout5 = new QHBoxLayout;
   monthLayout5->setContentsMargins(0, 0, 0, 0);
   monthLayout5->setAlignment(Qt::AlignLeft);
   for (int i = 28; i != 31; ++i)
-    monthLayout5->addWidget(m_vbtnMonth.at(i));
+    monthLayout5->addWidget(m_vbtnMonth[i]);
 
   QHBoxLayout* weekLayout1 = new QHBoxLayout;
   weekLayout1->setContentsMargins(0, 0, 0, 0);
   weekLayout1->setAlignment(Qt::AlignLeft);
   for (int i = 0; i != 7; ++i)
-    weekLayout1->addWidget(m_vbtnWeek.at(i));
+    weekLayout1->addWidget(m_vbtnWeek[i]);
 
   QFormLayout* viewFormLayout = new QFormLayout;
   viewFormLayout->addRow(tr("Título:"), m_edTitle);
   viewFormLayout->addRow(tr("Descrição:"), m_edDescription);
-
-  QVBoxLayout* contactLayout = new QVBoxLayout;
-  contactLayout->setAlignment(Qt::AlignTop);
-  contactLayout->addWidget(m_cbCallSupplier);
-  contactLayout->addWidget(m_cbSupplierCalls);
-  contactLayout->addWidget(m_cbWhatsapp);
-  contactLayout->addWidget(m_cbVisit);
-
-  QGroupBox* contactGroupBox = new QGroupBox;
-  contactGroupBox->setCheckable(true);
-  contactGroupBox->setTitle(tr("Imprimir contato"));
-  contactGroupBox->setLayout(contactLayout);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setAlignment(Qt::AlignTop);
@@ -201,7 +190,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   viewLayout->addWidget(m_imagePicker);
   viewLayout->addWidget(m_cbPrintAmmount);
   viewLayout->addWidget(m_cbPrintPrice);
-  viewLayout->addWidget(contactGroupBox);
+  viewLayout->addWidget(m_cbCallSupplier);
+  viewLayout->addWidget(m_cbSupplierCalls);
+  viewLayout->addWidget(m_cbWhatsapp);
+  viewLayout->addWidget(m_cbVisit);
 
   QVBoxLayout* calendarLayout = new QVBoxLayout;
   calendarLayout->setAlignment(Qt::AlignTop);
@@ -229,20 +221,20 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   QFrame* tabCalendar = new QFrame;
   tabCalendar->setLayout(calendarLayout);
 
-  QTabWidget* tabWidget = new QTabWidget;
-  tabWidget->addTab(tabView,
-                    QIcon(":/icons/res/details.png"),
-                    tr("Informações"));
-  tabWidget->addTab(tabList,
-                    QIcon(":/icons/res/item.png"),
-                    tr("Produtos"));
-  tabWidget->addTab(tabCalendar,
-                    QIcon(":/icons/res/calendar.png"),
-                    tr("Calendário"));
+  m_tabWidget = new QTabWidget;
+  m_tabWidget->addTab(tabView,
+                      QIcon(":/icons/res/details.png"),
+                      tr("Informações"));
+  m_tabWidget->addTab(tabList,
+                      QIcon(":/icons/res/item.png"),
+                      tr("Produtos"));
+  m_tabWidget->addTab(tabCalendar,
+                      QIcon(":/icons/res/calendar.png"),
+                      tr("Calendário"));
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addLayout(buttonLayout);
-  mainLayout->addWidget(tabWidget);
+  mainLayout->addWidget(m_tabWidget);
 
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(mainLayout);
@@ -272,14 +264,28 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(contactGroupBox,
+  QObject::connect(m_database,
+                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   this,
+                   SLOT(itemRemoved(qlonglong)));
+  QObject::connect(m_database,
+                   SIGNAL(itemSelectedSignal(const JItem&)),
+                   this,
+                   SLOT(itemSelected(const JItem&)));
+  QObject::connect(m_btnSave,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(updateControls()));
+                   SLOT(save()));
+  QObject::connect(m_btnCreate,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(create()));
+
 }
 
 void ShoppingListView::setDatabase(QSqlDatabase db)
 {
+  m_database->setDatabase(db, SHOPPING_LIST_SQL_TABLE_NAME);
   m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
   m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
 }
@@ -291,9 +297,13 @@ void ShoppingListView::addItem()
   w.getDatabase()->setCustomFilter(PRODUCT_FILTER_SHOP);
   if (w.exec())
   {
-    ShoppingListItem* p = static_cast<ShoppingListItem*>(w.getDatabase()->getCurrentItem());
-    if (p != nullptr)
-      m_table->addShopItem(*p);
+    Product* p = static_cast<Product*>(w.getDatabase()->getCurrentItem());
+    if (p != nullptr && p->isValidId())
+    {
+      ShoppingListItem o;
+      o.m_product = *p;
+      m_table->addShoppingItem(o);
+    }
   }
 }
 
@@ -306,11 +316,16 @@ void ShoppingListView::removeItem()
 void ShoppingListView::editItem()
 {
   JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
+  w.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
+  w.getDatabase()->setCustomFilter(PRODUCT_FILTER_SHOP);
   if (w.exec())
   {
-    ShoppingListItem* p = static_cast<ShoppingListItem*>(w.getDatabase()->getCurrentItem());
+    Product* p = static_cast<Product*>(w.getDatabase()->getCurrentItem());
     if (p != nullptr)
-      m_table->setShopItem(*p);
+    {
+      Product o = *p;
+      m_table->setProduct(o);
+    }
   }
 }
 
@@ -319,4 +334,71 @@ void ShoppingListView::updateControls()
   m_btnAdd->setEnabled(m_table->rowCount() < SHOPPING_LIST_MAX_NUMBER_OF_ITEMS);
   m_btnEdit->setEnabled(m_table->currentRow() != -1);
   m_btnRemove->setEnabled(m_table->currentRow() != -1);
+}
+
+void ShoppingListView::create()
+{
+  setShoppingList(ShoppingList());
+  m_tabWidget->setCurrentIndex(0);
+}
+
+void ShoppingListView::itemSelected(const JItem& jItem)
+{
+  const ShoppingList& list = dynamic_cast<const ShoppingList&>(jItem);
+  if (list.isValidId())
+    setShoppingList(list);
+}
+
+void ShoppingListView::itemRemoved(qlonglong id)
+{
+  if (id == m_currentId)
+    create();
+}
+
+void ShoppingListView::save()
+{
+  if (m_database->save(getShoppingList()))
+    create();
+}
+
+void ShoppingListView::setShoppingList(const ShoppingList& lst)
+{
+  m_currentId = lst.m_id;
+  m_edTitle->setText(lst.m_title);
+  m_edDescription->setText(lst.m_description);
+  m_supplierPicker->setItem(lst.m_supplier);
+  m_imagePicker->setItem(lst.m_image);
+  m_cbPrintAmmount->setChecked(lst.m_bPrintAmmount);
+  m_cbPrintPrice->setChecked(lst.m_bPrintPrice);
+  m_cbCallSupplier->setChecked(lst.m_bCallSupplier);
+  m_cbSupplierCalls->setChecked(lst.m_bSupplierCalls);
+  m_cbWhatsapp->setChecked(lst.m_bWhatsapp);
+  m_cbVisit->setChecked(lst.m_bVisit);
+  for (int i = 0; i != 7; ++i)
+    m_vbtnWeek[i]->setChecked(lst.m_weekDays[i]);
+  for (int i = 0; i != 31; ++i)
+    m_vbtnMonth[i]->setChecked(lst.m_monthDays[i]);
+  m_table->setShoppingItems(lst.m_vItem);
+}
+
+ShoppingList ShoppingListView::getShoppingList() const
+{
+  ShoppingList lst;
+  lst.m_id = m_currentId;
+  lst.m_title = m_edTitle->text();
+  lst.m_description = m_edDescription->text();
+  lst.m_supplier.m_id = m_supplierPicker->getId();
+  lst.m_image.m_id = m_imagePicker->getId();
+  lst.m_bPrintAmmount = m_cbPrintAmmount->isChecked();
+  lst.m_bPrintPrice = m_cbPrintPrice->isChecked();
+  lst.m_bCallSupplier = m_cbCallSupplier->isChecked();
+  lst.m_bSupplierCalls = m_cbSupplierCalls->isChecked();
+  lst.m_bWhatsapp = m_cbWhatsapp->isChecked();
+  lst.m_bVisit = m_cbVisit->isChecked();
+  for (int i = 0; i != 7; ++i)
+    lst.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
+  for (int i = 0; i != 31; ++i)
+    lst.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
+  lst.m_vItem = m_table->getShoppingItems();
+  return lst;
 }

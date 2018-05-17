@@ -800,7 +800,7 @@ public:
     JTableModel::select();
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("Imagem"));
-    setHeaderData(1, Qt::Horizontal, tr("Imagem"));
+    setHeaderData(2, Qt::Horizontal, tr("Imagem"));
     if (header != nullptr && header->count() == 3)
     {
       header->hideSection(0);
@@ -811,7 +811,7 @@ public:
 
   virtual QString getStrCompleteQuery()
   {
-    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+    return getStrQuery() + m_strFilter + m_strCustomFilter + m_strSort;
   }
 
   virtual void prepareFilter(const QString& value, bool bContaining, int column)
@@ -819,7 +819,7 @@ public:
     m_strFilter.clear();
     if (!value.isEmpty())
     {
-      m_strFilter = "WHERE ";
+      m_strFilter = " WHERE ";
       switch (column)
       {
         case 1:
@@ -844,9 +844,9 @@ public:
     if (!customFilter.isEmpty())
     {
       if (m_strFilter.isEmpty())
-        m_strCustomFilter = "WHERE " + customFilter;
+        m_strCustomFilter = " WHERE " + customFilter;
       else
-        m_strCustomFilter = "AND " + customFilter;
+        m_strCustomFilter = " AND " + customFilter;
     }
   }
 
@@ -856,7 +856,7 @@ public:
     switch (column)
     {
       case 1:
-        m_strSort = "ORDER BY " IMAGE_SQL_COL01;
+        m_strSort = " ORDER BY " IMAGE_SQL_COL01;
         break;
       default:
         break;
@@ -885,6 +885,109 @@ public:
       }
     }
     return value;
+  }
+};
+
+class ShoppingListTableModel : public JTableModel
+{
+public:
+  ShoppingListTableModel(QObject *parent, QSqlDatabase db)
+    : JTableModel(parent, db)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     SHOPPING_LIST_SQL_TABLE_NAME "." SQL_COLID ","
+                     SHOPPING_LIST_SQL_TABLE_NAME "." SHOPPING_LIST_SQL_COL03 ","
+                     SHOPPING_LIST_SQL_TABLE_NAME "." SHOPPING_LIST_SQL_COL04
+                     " FROM "
+                     SHOPPING_LIST_SQL_TABLE_NAME);
+    return strQuery;
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery() + m_strFilter + m_strCustomFilter + m_strSort;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Título"));
+    setHeaderData(2, Qt::Horizontal, tr("Descrição"));
+    if (header != nullptr && header->count() == 3)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = " WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " SHOPPING_LIST_SQL_COL03;
+          break;
+        case 2:
+          m_strFilter += " " SHOPPING_LIST_SQL_COL04;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = " WHERE " + customFilter;
+      else
+        m_strCustomFilter = " AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = " ORDER BY " SHOPPING_LIST_SQL_COL03;
+        break;
+      case 2:
+        m_strSort = " ORDER BY " SHOPPING_LIST_SQL_COL04;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
   }
 };
 
@@ -1063,6 +1166,8 @@ void JDatabase::setDatabase(QSqlDatabase db,
     model = new ProductTableModel(this, db);
   else if (tableName == CATEGORY_SQL_TABLE_NAME)
     model = new CategoryTableModel(this, db);
+  else if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    model = new ShoppingListTableModel(this, db);
   else
     return;
 
@@ -1162,12 +1267,19 @@ void JDatabase::selectItem(qlonglong id)
     bSuccess = ReminderSQL::select(getDatabase(), o, error);
     m_currentItem = new Reminder(o);
   }
+  else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+  {
+    ShoppingList o;
+    o.m_id = id;
+    bSuccess = ShoppingListSQL::select(getDatabase(), o, error);
+    m_currentItem = new ShoppingList(o);
+  }
   else
   {
     error = tr("Item ainda não implementado.");
   }
 
-  if (bSuccess)
+  if (bSuccess && m_currentItem != nullptr)
   {
     const JItem& jItem = *m_currentItem;
     emit itemSelectedSignal(jItem);
@@ -1237,6 +1349,8 @@ void JDatabase::removeItem()
       bSuccess = UserSQL::remove(getDatabase(), id, error);
     else if (m_tableName == REMINDER_SQL_TABLE_NAME)
       bSuccess = ReminderSQL::remove(getDatabase(), id, error);
+    else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+      bSuccess = ShoppingListSQL::remove(getDatabase(), id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -1391,6 +1505,13 @@ bool JDatabase::save(const JItem& jItem)
                ? ReminderSQL::update(getDatabase(), o, error)
                : ReminderSQL::insert(getDatabase(), o, error);
   }
+  else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+  {
+    const ShoppingList& o = dynamic_cast<const ShoppingList&>(jItem);
+    bSuccess = o.isValidId()
+               ? ShoppingListSQL::update(getDatabase(), o, error)
+               : ShoppingListSQL::insert(getDatabase(), o, error);
+  }
   else
     error = tr("Item ainda não implementado.");
 
@@ -1435,7 +1556,7 @@ void JDatabaseSelector::setDatabase(QSqlDatabase db,
 void JDatabaseSelector::itemSelected(const JItem& jItem)
 {
   emit itemSelectedSignal(jItem);
-  close();
+  accept();
 }
 
 JDatabase* JDatabaseSelector::getDatabase() const

@@ -102,7 +102,7 @@ void ShoppingListTable::setText(int row, int column, const QString& str)
     p->setText(str);
 }
 
-QVector<ShoppingListItem> ShoppingListTable::getShopItems() const
+QVector<ShoppingListItem> ShoppingListTable::getShoppingItems() const
 {
   QVector<ShoppingListItem> vShopItem;
   for (int i = 0; i != rowCount(); ++i)
@@ -119,7 +119,7 @@ QVector<ShoppingListItem> ShoppingListTable::getShopItems() const
   return vShopItem;
 }
 
-void ShoppingListTable::addShopItem(const ShoppingListItem& shopItem)
+void ShoppingListTable::addShoppingItem(const ShoppingListItem& shopItem)
 {
   blockSignals(true);
   insertRow(rowCount());
@@ -129,7 +129,7 @@ void ShoppingListTable::addShopItem(const ShoppingListItem& shopItem)
   setItem(row, 2, new QTableWidgetItem);
   setItem(row, 3, new QTableWidgetItem);
   setCurrentCell(row, 0);
-  setShopItem(shopItem);
+  setShoppingItem(shopItem);
   blockSignals(false);
 }
 
@@ -170,7 +170,7 @@ void ShoppingListTable::setProduct(const Product& product)
   }
 }
 
-void ShoppingListTable::setShopItem(const ShoppingListItem& shopItem)
+void ShoppingListTable::setShoppingItem(const ShoppingListItem& shopItem)
 {
   if (currentRow() >= 0)
   {
@@ -189,11 +189,11 @@ void ShoppingListTable::setShopItem(const ShoppingListItem& shopItem)
   }
 }
 
-void ShoppingListTable::setShopItems(const QVector<ShoppingListItem>& vShopItem)
+void ShoppingListTable::setShoppingItems(const QVector<ShoppingListItem>& vItem)
 {
   removeAllItems();
-  for (int i = 0; i != vShopItem.size(); ++i)
-    addShopItem(vShopItem.at(i));
+  for (int i = 0; i != vItem.size(); ++i)
+    addShoppingItem(vItem.at(i));
 }
 
 void ShoppingListTable::update(int row, int column)

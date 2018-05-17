@@ -14,6 +14,7 @@
 #include "person.h"
 #include "phone.h"
 #include "address.h"
+#include "shoppinglist.h"
 
 class UserLoginSQL
 {
@@ -262,27 +263,27 @@ namespace PersonSQL
                       QString& error);
 }
 
-/*namespace ShoppingListSQL
+namespace ShoppingListSQL
 {
  bool execSelect(QSqlQuery& query,
-                 Category& category,
+                 ShoppingList& shoppingList,
                  QString& error);
 
   bool select(QSqlDatabase db,
-              Category& category,
+              ShoppingList& shoppingList,
               QString& error);
 
   bool insert(QSqlDatabase db,
-              const Category& category,
+              const ShoppingList& shoppingList,
               QString& error);
 
   bool update(QSqlDatabase db,
-              const Category& category,
+              const ShoppingList& shoppingList,
               QString& error);
 
   bool remove(QSqlDatabase db,
               qlonglong id,
               QString& error);
-}*/
+}
 
 #endif // DATABASEUTILS_H

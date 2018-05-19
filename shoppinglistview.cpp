@@ -103,8 +103,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, true);
   m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
-  m_edTitle = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
-  m_edDescription = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                            JLineEdit::st_defaultFlags1);
+  m_edDescription = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                  JLineEdit::st_defaultFlags1);
   m_cbPrintAmmount = new QCheckBox;
   m_cbPrintAmmount->setText(tr("Imprimir quantidade recomendada"));
   m_cbPrintPrice = new QCheckBox;

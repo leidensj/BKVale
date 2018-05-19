@@ -21,6 +21,7 @@ class QDockWidget;
 class JDatabase;
 class QIODevice;
 class QPlainTextEdit;
+class JLineEdit;
 
 class NoteView : public QFrame
 {
@@ -54,6 +55,7 @@ private:
   JDatabase* m_database;
   QDockWidget* m_dock;
   QPlainTextEdit* m_teObservation;
+  JLineEdit* m_edDisccount;
 
   bool print(QIODevice* printer,
              InterfaceType type,

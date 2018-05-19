@@ -6,14 +6,6 @@
 #include <QValidator>
 #include <QRegExpValidator>
 
-enum class JValidatorType : int
-{
-  All,
-  Alphanumeric,
-  AlphanumericAndSpaces,
-  Numeric
-};
-
 class JRegExpValidator: public QRegExpValidator
 {
 public:
@@ -27,10 +19,32 @@ private:
 class JLineEdit : public QLineEdit
 {
   Q_OBJECT
+
 public:
-  explicit JLineEdit(JValidatorType validator,
-                     bool toUpper,
-                     bool keysAsTab,
+  enum class Flags
+  {
+    ToUpper = 1 << 0,
+    EnterAsTab = 1 << 1,
+    ArrowsAsTab = 1 << 2,
+  };
+
+  enum class Input
+  {
+    All = 1 << 0,
+    AlphanumericAndSpaces = 1 << 1,
+    Alphanumeric = 1 << 2,
+    Numeric = 1 << 3,
+    BasicMath = 1 << 4
+  };
+
+  static const int st_defaultFlags1 = (int)Flags::ToUpper |
+                                      (int)Flags::EnterAsTab |
+                                      (int)Flags::ArrowsAsTab;
+  static const int st_defaultFlags2 = (int)Flags::EnterAsTab |
+                                      (int)Flags::ArrowsAsTab;
+
+  explicit JLineEdit(Input input,
+                     int flags = st_defaultFlags1,
                      QWidget* parent = 0);
 
   void setTextBlockingSignals(const QString& str);
@@ -39,7 +53,7 @@ protected:
   void keyPressEvent(QKeyEvent *event);
 
 private:
-  const bool m_keysAsTab;
+  const int m_flags;
 
 signals:
   void enterSignal();

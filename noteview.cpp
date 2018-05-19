@@ -6,6 +6,8 @@
 #include "jdatabase.h"
 #include "pincodeview.h"
 #include "printutils.h"
+#include "jlineedit.h"
+#include "tinyexpr.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -21,6 +23,8 @@
 #include <QDockWidget>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+
+#define DISCCOUNT_LAST_VALUE_PROP "lastValue"
 
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
@@ -41,6 +45,7 @@ NoteView::NoteView(QWidget *parent)
   , m_table(nullptr)
   , m_cbCash(nullptr)
   , m_teObservation(nullptr)
+  , m_edDisccount(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -209,10 +214,17 @@ NoteView::NoteView(QWidget *parent)
     m_edTotal->setPalette(palette);
   }
 
-  QHBoxLayout* hlayout3 = new QHBoxLayout();
-  hlayout3->setContentsMargins(0, 0, 0, 0);
-  hlayout3->setAlignment(Qt::AlignRight);
-  hlayout3->addWidget(m_edTotal);
+  m_edDisccount = new JLineEdit(JLineEdit::Input::BasicMath, 0);
+  m_edDisccount->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+  m_edDisccount->setAlignment(Qt::AlignRight);
+  m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, 0.0);
+
+  QHBoxLayout* totalLayout = new QHBoxLayout;
+  totalLayout->setContentsMargins(0, 0, 0, 0);
+  totalLayout->addWidget(new QLabel(tr("Descontos/Acréscimos:")));
+  totalLayout->addWidget(m_edDisccount);
+  totalLayout->addStretch();
+  totalLayout->addWidget(m_edTotal);
 
   m_teObservation = new QPlainTextEdit;
   m_teObservation->setPlaceholderText(tr("Observações (opcional):"));
@@ -228,7 +240,7 @@ NoteView::NoteView(QWidget *parent)
   viewLayout->addLayout(hlayout1);
   viewLayout->addLayout(headerlayout);
   viewLayout->addWidget(m_table);
-  viewLayout->addLayout(hlayout3);
+  viewLayout->addLayout(totalLayout);
 
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
@@ -303,6 +315,14 @@ NoteView::NoteView(QWidget *parent)
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(supplierChanged()));
+  QObject::connect(m_edDisccount,
+                   SIGNAL(editingFinished()),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_edDisccount,
+                   SIGNAL(enterSignal()),
+                   m_table,
+                   SLOT(setFocus()));
 
   QTimer *timer = new QTimer(this);
   QObject::connect(timer,
@@ -352,6 +372,7 @@ Note NoteView::getNote() const
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_bCash = m_cbCash->isChecked();
   note.m_observation = m_teObservation->toPlainText();
+  note.m_disccount = m_edDisccount->text().toDouble();
   note.m_vNoteItem = m_table->getNoteItems();
   return note;
 }
@@ -369,6 +390,7 @@ void NoteView::setNote(const Note& note)
                             note.m_supplier.m_alias,
                             note.m_supplier.m_image.m_image);
   m_teObservation->setPlainText(note.m_observation);
+  m_edDisccount->setText(note.strDisccount());
   updateControls();
 }
 
@@ -384,6 +406,7 @@ void NoteView::create()
   m_supplierPicker->setFocus();
   m_cbCash->setChecked(false);
   m_teObservation->clear();
+  m_edDisccount->clear();
   updateControls();
 }
 
@@ -415,10 +438,32 @@ void NoteView::updateControls()
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
                             ? ":/icons/res/calendarok.png"
                             : ":/icons/res/calendarwarning.png"));
-  if (m_table->hasItems())
-    m_edTotal->setText(m_table->computeTotal());
+
+  // evaluate disccount
+  auto exp = m_edDisccount->text().toStdString();
+  int error = 0;
+  double disccount = te_interp(exp.c_str(), &error);
+  if (!error)
+    m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, disccount);
   else
-  m_edTotal->clear();
+    m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, 0.0);
+  disccount = m_edDisccount->property(DISCCOUNT_LAST_VALUE_PROP).toDouble();
+  m_edDisccount->setText(Note::st_strDisccount(disccount));
+  QPalette palette = m_edDisccount->palette();
+  palette.setColor(QPalette::ColorRole::Text,
+                   disccount >= 0 ? Qt::red : Qt::darkGreen);
+  m_edDisccount->setPalette(palette);
+
+  double total = m_table->computeTotal() + disccount;
+
+  if (m_table->hasItems() || total != 0)
+    m_edTotal->setText(Note::st_strTotal(total));
+  else
+    m_edTotal->clear();
+
+  palette.setColor(QPalette::ColorRole::Text,
+                   total >= 0 ? Qt::red : Qt::darkGreen);
+  m_edTotal->setPalette(palette);
 
   emit changedSignal();
 }

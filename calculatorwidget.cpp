@@ -425,7 +425,8 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
   }
   else if (Calculator::isDigit(button))
   {
-    if (!Calculator::isDigit(m_lastButton))
+    if (!Calculator::isDigit(m_lastButton) &&
+        !Calculator::isDecimal(m_lastButton))
       m_edDisplay->setText("");
     QString strValue = m_edDisplay->text();
     strValue.append(Calculator::toStr(button));

@@ -29,7 +29,8 @@ ImageView::ImageView(QWidget* parent)
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
-  m_edImageName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edImageName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                JLineEdit::st_defaultFlags1);
   m_edImageName->setPlaceholderText(tr("Nome"));
 
   m_imageView = new JImageView(true);

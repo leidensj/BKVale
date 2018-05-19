@@ -85,6 +85,7 @@ public:
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03
                      "*"
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ")"
+                     " + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06
                      " FROM "
                      NOTE_ITEMS_SQL_TABLE_NAME
                      " INNER JOIN "
@@ -1058,7 +1059,8 @@ JDatabase::JDatabase(bool bSelectorMode,
   hlayout0->addWidget(m_btnRemove);
   hlayout0->addWidget(m_btnFilter);
 
-  m_edFilterSearch = new JLineEdit(JValidatorType::All, true, false);
+  m_edFilterSearch = new JLineEdit(JLineEdit::Input::All,
+                                   (int)JLineEdit::Flags::ToUpper);
   m_edFilterSearch->setToolTip(tr("Procurar (Ctrl+F)"));
   m_edFilterSearch->setClearButtonEnabled(true);
 

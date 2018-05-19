@@ -49,7 +49,7 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
   lblPassword->setMinimumSize(24, 24);
   lblPassword->setMaximumSize(24, 24);
   lblPassword->setScaledContents(true);
-  m_user = new JLineEdit(JValidatorType::Alphanumeric, true, true);
+  m_user = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags1);
   m_user->setPlaceholderText(tr("Usuário"));
   m_user->setMinimumHeight(24);
   m_user->setMaximumHeight(24);
@@ -59,7 +59,7 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
     m_user->setFont(f);
   }
 
-  m_password = new JLineEdit(JValidatorType::All, false, true);
+  m_password = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
   m_password->setPlaceholderText(tr("Senha"));
   m_password->setEchoMode(QLineEdit::EchoMode::Password);
   {

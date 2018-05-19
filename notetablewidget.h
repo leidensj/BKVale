@@ -17,7 +17,7 @@ public:
   void setProduct(const Product& product);
   void setNoteItem(const NoteItem& noteItem);
   void addNoteItem(const NoteItem& noteItem);
-  QString computeTotal() const;
+  double computeTotal() const;
 
   void removeCurrentItem() { removeRow(currentRow()); }
   void removeAllItems() { setRowCount(0); }

@@ -42,7 +42,8 @@ ReminderView::ReminderView(QWidget *parent)
   m_cbSave->setText(tr("Salvar lembrete"));
   m_cbSave->setIcon(QIcon(":/icons/res/save.png"));
   m_cbSave->setChecked(true);
-  m_edTitle = new JLineEdit(JValidatorType::AlphanumericAndSpaces, false, true);
+  m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                            JLineEdit::st_defaultFlags2);
   m_edTitle->setPlaceholderText(tr("Título"));
   m_teMessage = new QPlainTextEdit();
   m_teMessage->setPlaceholderText(tr("Mensagem"));

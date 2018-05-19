@@ -90,12 +90,12 @@ QString NoteTableWidget::computeSubTotal(int row) const
   return QString::number(subTotal, 'f', 2);
 }
 
-QString NoteTableWidget::computeTotal() const
+double NoteTableWidget::computeTotal() const
 {
   double total = 0.0;
   for (int row = 0; row != rowCount(); ++row)
     total += text(row, (int)NoteColumn::SubTotal).toDouble();
-  return QString::number(total, 'f', 2);
+  return total;
 }
 
 double NoteTableWidget::evaluate(int row, int column) const
@@ -212,7 +212,6 @@ void NoteTableWidget::setNoteItem(const NoteItem& noteItem)
       item(currentRow(), (int)NoteColumn::Unity)->setCheckState(noteItem.m_bIsPackageAmmount ? Qt::Checked : Qt::Unchecked);
     item(currentRow(), (int)NoteColumn::Description)->setTextColor(QColor(Qt::darkGray));
     item(currentRow(), (int)NoteColumn::Unity)->setTextColor(QColor(Qt::darkGray));
-    item(currentRow(), (int)NoteColumn::SubTotal)->setTextColor(QColor(Qt::red));
     setProduct(noteItem.m_product);
     blockSignals(false);
   }
@@ -272,6 +271,10 @@ void NoteTableWidget::update(int row, int column)
     default:
       break;
   }
+  double subTotal = text(row, (int)NoteColumn::SubTotal).toDouble();
+  item(row, (int)NoteColumn::SubTotal)->setTextColor(QColor(subTotal >= 0
+                                                            ? Qt::red
+                                                            : Qt::darkGreen));
   blockSignals(false);
   emitChangedSignal();
 }

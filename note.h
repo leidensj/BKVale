@@ -86,6 +86,7 @@ struct Note : public JItem
   bool m_bCash;
   QString m_observation;
   QVector<NoteItem> m_vNoteItem;
+  double m_disccount;
 
   void clear()
   {
@@ -96,6 +97,7 @@ struct Note : public JItem
     m_bCash = false;
     m_vNoteItem.clear();
     m_observation.clear();
+    m_disccount = 0.0;
   }
 
   Note()
@@ -108,25 +110,23 @@ struct Note : public JItem
   QString strId() const { return QString::number(m_id); }
   static QString st_strNumber(qlonglong number) { return QString::number(number); }
   QString strNumber() const { return st_strNumber(m_number); }
+  static QString st_strDisccount(double d) { return QString::number(d, 'f', 2); }
+  QString strDisccount() const { return st_strDisccount(m_disccount); }
 
   double total() const
   {
     double total = 0.0;
     for (int i = 0; i != m_vNoteItem.size(); ++i)
       total += m_vNoteItem.at(i).subtotal();
-    return total;
+    return total + m_disccount;
   }
 
-  QString strTotal() const { return QString::number(total(), 'f', 2); }
+  static QString st_strTotal(double d) { return QString::number(d, 'f', 2); }
+  QString strTotal() const { return st_strTotal(total()); }
 
   bool isValid() const
   {
-    bool b = m_supplier.isValidId() &&
-             total() != 0.0 &&
-             !m_vNoteItem.isEmpty();
-    for (int i = 0; i != m_vNoteItem.size(); ++i)
-      b &= m_vNoteItem.at(i).isValid();
-    return b;
+    return true;
   }
 
   bool operator !=(const JItem& other) const
@@ -138,7 +138,8 @@ struct Note : public JItem
         m_supplier.m_id != another.m_supplier.m_id ||
         total() != another.total() ||
         m_bCash != another.m_bCash ||
-        m_vNoteItem != another.m_vNoteItem;
+        m_vNoteItem != another.m_vNoteItem ||
+        m_disccount != another.m_disccount;
   }
 
   bool operator ==(const JItem& other) const

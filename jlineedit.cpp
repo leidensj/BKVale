@@ -2,17 +2,19 @@
 
 namespace
 {
-QString getRegEx(JValidatorType validator)
+QString getRegEx(JLineEdit::Input input)
 {
-  switch (validator)
+  switch (input)
   {
-    case JValidatorType::Alphanumeric:
+    case JLineEdit::Input::Alphanumeric:
       return "^[a-zA-Z0-9]*$";
-    case JValidatorType::AlphanumericAndSpaces:
+    case JLineEdit::Input::AlphanumericAndSpaces:
       return "^[a-zA-Z0-9 ]*$";
-    case JValidatorType::Numeric:
+    case JLineEdit::Input::Numeric:
       return "^[0-9]*$";
-    case JValidatorType::All:
+    case JLineEdit::Input::BasicMath:
+      return "^[0-9/\\-\\*\\+\\.][^,]*$";
+    case JLineEdit::Input::All:
     default:
       return "";
   }
@@ -33,15 +35,15 @@ QValidator::State JRegExpValidator::validate(QString& input, int& pos) const
   return QRegExpValidator::validate(input, pos);
 }
 
-JLineEdit::JLineEdit(JValidatorType validator,
-                     bool toUpper,
-                     bool keysAsTab,
+JLineEdit::JLineEdit(Input input,
+                     int flags,
                      QWidget* parent)
   : QLineEdit(parent)
-  , m_keysAsTab(keysAsTab)
+  , m_flags(flags)
 {
-  if (validator != JValidatorType::All)
-    setValidator(new JRegExpValidator(toUpper, QRegExp(getRegEx(validator)), this));
+  if (input != Input::All)
+    setValidator(new JRegExpValidator(flags & (int)Flags::ToUpper,
+                                      QRegExp(getRegEx(input)), this));
 }
 
 void JLineEdit::keyPressEvent(QKeyEvent *event)
@@ -49,19 +51,19 @@ void JLineEdit::keyPressEvent(QKeyEvent *event)
   if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
   {
     emit enterSignal();
-    if (m_keysAsTab)
+    if (m_flags & (int)Flags::EnterAsTab)
       focusNextChild();
   }
   else if (event->key() == Qt::Key_Down)
   {
     emit keyDownSignal();
-    if (m_keysAsTab)
+    if (m_flags & (int)Flags::ArrowsAsTab)
       focusNextChild();
   }
   else if (event->key() == Qt::Key_Up)
   {
     emit keyUpSignal();
-    if (m_keysAsTab)
+    if (m_flags && (int)Flags::ArrowsAsTab)
       focusPreviousChild();
   }
   else

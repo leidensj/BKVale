@@ -134,16 +134,22 @@ PersonView::PersonView(QWidget* parent)
   m_rdoCompany = new QRadioButton;
   m_rdoCompany->setText(tr("Jurídica"));
   m_rdoCompany->setIcon(QIcon(":/icons/res/building.png"));
-  m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                           JLineEdit::st_defaultFlags1);
   m_lblName = new QLabel;
-  m_edAlias = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edAlias = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                            JLineEdit::st_defaultFlags1);
   m_lblAlias = new QLabel;
-  m_edEmail = new JLineEdit(JValidatorType::All, false, true);
-  m_edCpfCnpj = new JLineEdit(JValidatorType::Numeric, false, true);
+  m_edEmail = new JLineEdit(JLineEdit::Input::All,
+                            JLineEdit::st_defaultFlags2);
+  m_edCpfCnpj = new JLineEdit(JLineEdit::Input::Numeric,
+                              JLineEdit::st_defaultFlags2);
   m_lblCpfCnpj = new QLabel;
-  m_edRgIE= new JLineEdit(JValidatorType::Numeric, false, true);
+  m_edRgIE= new JLineEdit(JLineEdit::Input::Numeric,
+                          JLineEdit::st_defaultFlags2);
   m_lblRgIE = new QLabel;
-  m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edDetails = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                              JLineEdit::st_defaultFlags1);
   m_dtBirthDate = new QDateEdit;
   m_dtBirthDate->setCalendarPopup(true);
   m_dtBirthDate->setDisplayFormat("dd/MM/yyyy");
@@ -166,7 +172,8 @@ PersonView::PersonView(QWidget* parent)
   m_dtCreationDate->setDisplayFormat("dd/MM/yyyy");
   m_dtCreationDate->setDate(QDate::currentDate());
   m_dtCreationDate->setReadOnly(true);
-  m_edPinCode = new JLineEdit(JValidatorType::Numeric, false, true);
+  m_edPinCode = new JLineEdit(JLineEdit::Input::Numeric,
+                              JLineEdit::st_defaultFlags2);
   m_edPinCode->setEchoMode(QLineEdit::EchoMode::PasswordEchoOnEdit);
   m_edPinCode->setAlignment(Qt::AlignCenter);
   m_edPinCode->setPlaceholderText(tr("Código PIN"));
@@ -177,7 +184,8 @@ PersonView::PersonView(QWidget* parent)
     m_edPinCode->setFont(f);
   }
 
-  m_edPhoneNumber = new JLineEdit(JValidatorType::Numeric, false, true);
+  m_edPhoneNumber = new JLineEdit(JLineEdit::Input::Numeric,
+                                  JLineEdit::st_defaultFlags2);
   m_edPhoneNumber->setPlaceholderText(tr("*"));
   m_spnPhoneCountryCode = new QSpinBox;
   m_spnPhoneCountryCode->setMinimum(0);
@@ -202,29 +210,35 @@ PersonView::PersonView(QWidget* parent)
   m_btnRemovePhone->setToolTip(tr("Remover telefone"));
   m_lstPhone = new QListWidget;
 
-  m_edAddressPostalCode = new JLineEdit(JValidatorType::Numeric, false, true);
+  m_edAddressPostalCode = new JLineEdit(JLineEdit::Input::Numeric,
+                                        JLineEdit::st_defaultFlags2);
   m_edAddressPostalCode->setInputMask(ADDRESS_CEP_MASK);
   m_btnAddressPostalCode = new QPushButton();
   m_btnAddressPostalCode->setFlat(true);
   m_btnAddressPostalCode->setIconSize(QSize(16, 16));
   m_btnAddressPostalCode->setIcon(QIcon(":/icons/res/process.png"));
   m_btnAddressPostalCode->setToolTip(tr("Buscar CEP"));
-  m_edAddressNeighborhood = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
+  m_edAddressNeighborhood = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                          JLineEdit::st_defaultFlags1);
   m_edAddressNeighborhood->setPlaceholderText(tr("*"));
-  m_edAddressStreet = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
+  m_edAddressStreet = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                    JLineEdit::st_defaultFlags1);
   m_edAddressStreet->setPlaceholderText(tr("*"));
   m_spnAddressNumber = new QSpinBox();
   m_spnAddressNumber->setMinimum(0);
   m_spnAddressNumber->setMaximum(999999);
   m_spnAddressNumber->setPrefix(tr("Nº "));
-  m_edAddressCity = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
+  m_edAddressCity = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                  JLineEdit::st_defaultFlags1);
   m_edAddressCity->setPlaceholderText(tr("*"));
   m_cbAddressState = new QComboBox();
   for (int i = 0; i != ADDRESS_NUMBER_OF_BRAZILIAN_STATES; ++i)
     m_cbAddressState->addItem(Address::st_getBRState((Address::EBRState)i).m_name);
   m_cbAddressState->setCurrentIndex((int)Address::EBRState::RS);
-  m_edAddressComplement = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
-  m_edAddressReference = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true,true);
+  m_edAddressComplement = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                        JLineEdit::st_defaultFlags1);
+  m_edAddressReference = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                       JLineEdit::st_defaultFlags1);
   m_btnAddAddress = new QPushButton();
   m_btnAddAddress->setFlat(true);
   m_btnAddAddress->setIconSize(QSize(16, 16));

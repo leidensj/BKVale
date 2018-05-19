@@ -57,14 +57,14 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   lblPassword->setMaximumSize(24, 24);
   lblPassword->setScaledContents(true);
 
-  m_user = new JLineEdit(JValidatorType::Alphanumeric, true, true);
+  m_user = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags1);
   m_user->setPlaceholderText(tr("Usuário"));
   m_user->setMaxLength(USER_MAX_USERNAME_LENGTH);
 
   m_lblPasswordMsg = new QLabel;
   m_lblPasswordMsg->setText(tr("Redefinir a senha:"));
 
-  m_password = new JLineEdit(JValidatorType::All, false, true);
+  m_password = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
   m_password->setPlaceholderText(tr("Senha"));
   m_user->setMaxLength(USER_MAX_PASSWORD_LENGTH);
   m_password->setEchoMode(QLineEdit::EchoMode::Password);

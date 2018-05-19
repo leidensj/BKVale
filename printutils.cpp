@@ -44,7 +44,11 @@ namespace
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
-               note.m_supplier.m_alias +
+               (note.isValidId()
+               ? (note.m_supplier.m_alias.isEmpty()
+               ? note.m_supplier.m_name
+               : note.m_supplier.m_alias)
+               : "Não informado") +
                ESC_LF +
                ESC_VERT_TAB;
   }

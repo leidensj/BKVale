@@ -43,15 +43,18 @@ ProductView::ProductView(QWidget* parent)
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
-  m_edName = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                           JLineEdit::st_defaultFlags1);
   m_edName->setMaxLength(PRODUCT_MAX_NAME_LENGTH);
   m_edName->setPlaceholderText("*");
 
-  m_edUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
+  m_edUnity = new JLineEdit(JLineEdit::Input::Alphanumeric,
+                            JLineEdit::st_defaultFlags1);
   m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
   m_edUnity->setPlaceholderText("*");
 
-  m_edPackageUnity = new JLineEdit(JValidatorType::Alphanumeric, true, true);
+  m_edPackageUnity = new JLineEdit(JLineEdit::Input::Alphanumeric,
+                                   JLineEdit::st_defaultFlags1);
   m_edPackageUnity->setMaxLength(PRODUCT_MAX_PACKAGE_UNITY_LENGTH);
 
   m_spnPackageAmmount = new JDoubleSpinBox(true);
@@ -60,7 +63,8 @@ ProductView::ProductView(QWidget* parent)
   m_spnPackageAmmount->setValue(1.0);
   m_spnPackageAmmount->setSingleStep(0.1);
 
-  m_edDetails = new JLineEdit(JValidatorType::AlphanumericAndSpaces, true, true);
+  m_edDetails = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                              JLineEdit::st_defaultFlags1);
   m_edDetails->setMaxLength(PRODUCT_MAX_DETAILS_LENGTH);
 
   m_cbAvailableAtNotes = new QCheckBox;

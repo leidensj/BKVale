@@ -29,7 +29,8 @@ JDatabasePicker::JDatabasePicker(const QString& text,
   m_btnSearch->setIcon(QIcon(":/icons/res/binoculars.png"));
   m_btnSearch->setToolTip(tr("Selecionar ") + m_text);
 
-  m_edText = new JLineEdit(JValidatorType::All, true, true);
+  m_edText = new JLineEdit(JLineEdit::Input::All,
+                           JLineEdit::st_defaultFlags1);
   m_edText->setReadOnly(true);
 
   if (!bDisplayGroup)

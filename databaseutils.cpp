@@ -85,23 +85,27 @@ bool NoteSQL::insert(QSqlDatabase db,
                          : settings.m_notesDefaultNumber;
       number = number > settings.m_notesDefaultNumber ? number : settings.m_notesDefaultNumber;
 
-      query.prepare("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
+      query.prepare(
+            QString("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
                     NOTE_SQL_COL01 ","
-                    NOTE_SQL_COL02 ","
-                    NOTE_SQL_COL03 ","
+                    NOTE_SQL_COL02 ",") +
+                    (note.m_supplier.isValidId()
+                     ? NOTE_SQL_COL03 "," : "") +
                     NOTE_SQL_COL04 ","
                     NOTE_SQL_COL05 ","
                     NOTE_SQL_COL06
                     ") VALUES ("
                     "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
+                    "(:_v02)," +
+                    (note.m_supplier.isValidId()
+                     ? "(:_v03)," : "") +
                     "(:_v04),"
                     "(:_v05),"
                     "(:_v06))");
       query.bindValue(":_v01", number);
       query.bindValue(":_v02", note.m_date);
-      query.bindValue(":_v03", note.m_supplier.m_id);
+      if (note.m_supplier.isValidId())
+        query.bindValue(":_v03", note.m_supplier.m_id);
       query.bindValue(":_v04", note.m_bCash);
       query.bindValue(":_v05", note.m_observation);
       query.bindValue(":_v06", note.m_disccount);
@@ -152,16 +156,20 @@ bool NoteSQL::update(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("UPDATE " NOTE_SQL_TABLE_NAME " SET "
-                NOTE_SQL_COL02 " = (:_v02),"
-                NOTE_SQL_COL03 " = (:_v03),"
+  query.prepare(
+        QString("UPDATE " NOTE_SQL_TABLE_NAME " SET "
+                NOTE_SQL_COL02 " = (:_v02),") +
+                (note.m_supplier.isValidId()
+                 ? NOTE_SQL_COL03 " = (:_v03),"
+                 : NOTE_SQL_COL03 " = NULL,") +
                 NOTE_SQL_COL04 " = (:_v04),"
                 NOTE_SQL_COL05 " = (:_v05),"
                 NOTE_SQL_COL06 " = (:_v06) "
                 "WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", note.m_id);
   query.bindValue(":_v02", note.m_date);
-  query.bindValue(":_v03", note.m_supplier.m_id);
+  if (note.m_supplier.isValidId())
+    query.bindValue(":_v03", note.m_supplier.m_id);
   query.bindValue(":_v04", note.m_bCash);
   query.bindValue(":_v05", note.m_observation);
   query.bindValue(":_v06", note.m_disccount);
@@ -275,10 +283,11 @@ bool NoteSQL::select(QSqlDatabase db,
     }
   }
 
-  if (bSuccess && note.m_supplier.isValidId())
+  if (bSuccess)
   {
     QString error2;
-    PersonSQL::execSelect(query, note.m_supplier, error2);
+    if (note.m_supplier.isValidId())
+      PersonSQL::execSelect(query, note.m_supplier, error2);
     for (int i = 0; i != note.m_vNoteItem.size(); ++i)
     {
       if (note.m_vNoteItem.at(i).m_product.isValidId())

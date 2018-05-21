@@ -15,6 +15,7 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   : QFrame(parent)
   , m_currentLoggedId(currentLoggedId)
   , m_currentId(INVALID_ID)
+  , m_bHasLoggedUserChanged(false)
   , m_user(nullptr)
   , m_lblPasswordMsg(nullptr)
   , m_password(nullptr)
@@ -224,6 +225,7 @@ User UserMgtView::getUser() const
   User user;
   user.m_id = m_currentId;
   user.m_strUser = m_user->text();
+  user.m_password = m_password->text();
   user.m_bAccessNote = m_accessNote->isChecked();
   user.m_bAccessReminder = m_accessReminder->isChecked();
   user.m_bAccessCalculator = m_accessCalculator->isChecked();
@@ -294,6 +296,8 @@ void UserMgtView::itemSelected(const JItem& jItem)
 
 void UserMgtView::itemRemoved(qlonglong id)
 {
+  if (!m_bHasLoggedUserChanged)
+    m_bHasLoggedUserChanged = m_bHasLoggedUserChanged == id;
   if (m_currentId == id)
     create();
 }
@@ -302,7 +306,8 @@ void UserMgtView::save()
 {
   if (m_database->save(getUser()))
   {
-    m_bHasLoggedUserChanged = m_currentId == m_currentLoggedId;
+    if (!m_bHasLoggedUserChanged)
+      m_bHasLoggedUserChanged = m_currentId == m_currentLoggedId;
     create();
   }
 }

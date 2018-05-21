@@ -81,26 +81,29 @@ public:
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
                      PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL03 ","
-                     "SUM("
-                     NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03
+                     "IFNULL("
+                     "SUM(" NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03
                      "*"
                      NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ")"
                      " + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06
+                     ", " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06 ")"
                      " FROM "
-                     NOTE_ITEMS_SQL_TABLE_NAME
-                     " INNER JOIN "
                      NOTE_SQL_TABLE_NAME
+                     " LEFT JOIN "
+                     NOTE_ITEMS_SQL_TABLE_NAME
                      " ON "
+                     NOTE_SQL_TABLE_NAME "." SQL_COLID " = NULL"
+                     " OR("
                      NOTE_SQL_TABLE_NAME "." SQL_COLID
                      "="
-                     NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
+                     NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01 ")"
                      " LEFT JOIN "
                      PERSON_SQL_TABLE_NAME
                      " ON "
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
                      "="
                      PERSON_SQL_TABLE_NAME "." SQL_COLID
-                     " GROUP BY " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
+                     " GROUP BY " NOTE_SQL_TABLE_NAME "." SQL_COLID
                      " %1 "
                      " %2 "
                      " %4");

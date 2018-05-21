@@ -121,8 +121,18 @@ struct Note : public JItem
     return total + m_disccount;
   }
 
+  double subTotal() const
+  {
+    double subTotal = 0.0;
+    for (int i = 0; i != m_vNoteItem.size(); ++i)
+      subTotal += m_vNoteItem.at(i).subtotal();
+    return subTotal;
+  }
+
   static QString st_strTotal(double d) { return QString::number(d, 'f', 2); }
+  static QString st_strSubTotal(double d) { return QString::number(d, 'f', 2); }
   QString strTotal() const { return st_strTotal(total()); }
+  QString strSubTotal() const { return st_strSubTotal(subTotal()); }
 
   bool isValid() const
   {

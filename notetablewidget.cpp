@@ -245,8 +245,6 @@ void NoteTableWidget::update(int row, int column)
       setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
       if (value == 0.0)
         item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(255, 200, 200));
-      else if (value < 0)
-        item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(255, 255, 200));
       else
         item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(Qt::white));
     } break;
@@ -257,8 +255,6 @@ void NoteTableWidget::update(int row, int column)
       setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
       if (value == 0.0)
         item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(255, 200, 200));
-      else if (value < 0)
-        item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(255, 255, 200));
       else
         item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(Qt::white));
     } break;

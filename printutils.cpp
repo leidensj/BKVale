@@ -44,11 +44,11 @@ namespace
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
-               (note.isValidId()
+               (note.m_supplier.isValidId()
                ? (note.m_supplier.m_alias.isEmpty()
                ? note.m_supplier.m_name
                : note.m_supplier.m_alias)
-               : "Não informado") +
+               : "Nao informado") +
                ESC_LF +
                ESC_VERT_TAB;
   }
@@ -57,8 +57,20 @@ namespace
                         const QString& user,
                         QString& strNote)
   {
+    if (note.m_disccount != 0)
+    {
+      strNote += ESC_LF ESC_EXPAND_ON ESC_ALIGN_CENTER;
+      strNote += "Subtotal: R$" + note.strSubTotal() + ESC_LF;
+      if (note.m_disccount > 0)
+        strNote += "Acrescimo: R$" + note.strDisccount();
+      else if(note.m_disccount < 0)
+        strNote += "Desconto: R$" + note.strDisccount() ;
+      strNote += ESC_EXPAND_OFF ESC_ALIGN_LEFT ESC_LF;
+    }
+
     if (!note.m_observation.isEmpty())
-      strNote += ESC_LF "Observacoes: " + note.m_observation + ESC_LF;
+      strNote += ESC_LF ESC_EXPAND_ON "Observacoes: " ESC_EXPAND_OFF +
+                 note.m_observation + ESC_LF;
     strNote += ESC_LF
                ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON
@@ -87,7 +99,11 @@ namespace
                  "________________________________"
                  ESC_LF
                  "Assinatura " +
-                 note.m_supplier.m_alias +
+                 (note.m_supplier.isValidId()
+                  ? (note.m_supplier.m_alias.isEmpty()
+                     ? note.m_supplier.m_name
+                     : note.m_supplier.m_alias)
+                  : "fornecedor") +
                  ESC_LF;
     }
   }

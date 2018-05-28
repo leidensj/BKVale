@@ -59,7 +59,7 @@ namespace
   {
     if (note.m_disccount != 0)
     {
-      strNote += ESC_LF ESC_EXPAND_ON ESC_ALIGN_CENTER;
+      strNote += ESC_EXPAND_ON ESC_ALIGN_CENTER ESC_LF;
       strNote += "Subtotal: R$" + note.strSubTotal() + ESC_LF;
       if (note.m_disccount > 0)
         strNote += "Acrescimo: R$" + note.strDisccount();
@@ -366,6 +366,102 @@ QString ConsumptionPrinter::build(const QVector<qint64>& vDate,
          QString::number(total, 'f', 2) +
          ESC_LF
          ESC_LF
+         ESC_FULL_CUT;
+
+  return str;
+}
+
+QString ShoppingListPrinter::build(const ShoppingList& lst)
+{
+  QString str;
+  str += ESC_EXPAND_ON
+         ESC_ALIGN_CENTER
+         "LISTA DE COMPRAS"
+         ESC_EXPAND_OFF
+         ESC_LF
+         ESC_DOUBLE_FONT_ON +
+         lst.m_title +
+         ESC_LF
+         ESC_EXPAND_ON +
+         QDate::currentDate().toString("dd/MM/yyyy") +
+         ESC_EXPAND_OFF
+         ESC_LF +
+         QDate::currentDate().toString("dddd") +
+         ESC_LF
+         ESC_ALIGN_LEFT;
+
+  if (!lst.m_description.isEmpty())
+    str += ESC_VERT_TAB
+           ESC_EXPAND_ON
+           "Descricao: "
+           ESC_EXPAND_OFF +
+           lst.m_description +
+           ESC_LF;
+
+  if (lst.m_supplier.isValidId())
+  {
+    str += ESC_VERT_TAB
+           ESC_EXPAND_ON
+           "Fornecedor: " +
+           lst.m_supplier.strAliasName() +
+           ESC_EXPAND_OFF
+           ESC_LF;
+
+    for (int i = 0; i != lst.m_supplier.m_vPhone.size(); ++i)
+    {
+      if (!lst.m_supplier.m_vPhone.at(i).m_number.isEmpty())
+      {
+        if (!lst.m_supplier.m_vPhone.at(i).m_name.isEmpty())
+          str += lst.m_supplier.m_vPhone.at(i).m_name + " ";
+        str += lst.m_supplier.m_vPhone.at(i).getFormattedPhone() + ESC_LF;
+      }
+    }
+
+    if (lst.m_bCallSupplier)
+      str += "Ligar para o fornecedor" ESC_LF;
+
+    if (lst.m_bSupplierCalls)
+      str += "Fornecedor liga" ESC_LF;
+
+    if (lst.m_bWhatsapp)
+      str += "Whatsapp" ESC_LF;
+
+    if (lst.m_bVisit)
+      str += "Visita presencial" ESC_LF;
+  }
+
+  str += ESC_LF;
+
+  if (lst.m_vItem.size() != 0)
+    str += "EST: quantidade em estoque." ESC_LF
+           "COM: quantidade a ser comprada." ESC_LF
+           "REC: quantidade recomendada." ESC_LF
+           ESC_EXPAND_ON
+           "| EST | COM | REC "
+           ESC_LF;
+
+  for (int i = 0; i != lst.m_vItem.size(); ++i)
+  {
+    str += ESC_EXPAND_OFF
+           ESC_ALIGN_LEFT +
+           lst.m_vItem.at(i).m_product.m_name +
+           ESC_LF
+           ESC_EXPAND_ON
+           "|     |     | " +
+           lst.m_vItem.at(i).strAmmount() +
+           lst.m_vItem.at(i).strUnity() +
+           ESC_LF
+           "|     |     | ";
+    if (lst.m_bPrintPrice)
+      str += "R$ " + lst.m_vItem.at(i).strPrice();
+
+    str += ESC_EXPAND_OFF
+           ESC_LF;
+  }
+
+  str += ESC_ALIGN_LEFT
+         ESC_LF
+         ESC_VERT_TAB
          ESC_FULL_CUT;
 
   return str;

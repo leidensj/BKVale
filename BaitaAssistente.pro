@@ -44,7 +44,8 @@ SOURCES += main.cpp\
     pincodeview.cpp \
     shoppinglistview.cpp \
     shoppinglisttable.cpp \
-    jdoublespinbox.cpp
+    jdoublespinbox.cpp \
+    shopview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -90,7 +91,8 @@ HEADERS  += mainwindow.h \
     shoppinglist.h \
     shoppinglistview.h \
     shoppinglisttable.h \
-    jdoublespinbox.h
+    jdoublespinbox.h \
+    shopview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

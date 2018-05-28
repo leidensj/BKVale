@@ -37,7 +37,6 @@ NoteView::NoteView(QWidget *parent)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
   , m_snNumber(nullptr)
-  , m_lblNumberStatus(nullptr)
   , m_dtDate(nullptr)
   , m_btnToday(nullptr)
   , m_edTotal(nullptr)
@@ -119,8 +118,9 @@ NoteView::NoteView(QWidget *parent)
   m_snNumber = new QSpinBox();
   m_snNumber->setReadOnly(true);
   m_snNumber->setButtonSymbols(QSpinBox::ButtonSymbols::NoButtons);
-  m_snNumber->setMaximum(999999);
-  m_snNumber->setMinimum(-1);
+  m_snNumber->setMaximum(99999999);
+  m_snNumber->setMinimum(0);
+  m_snNumber->setSpecialValueText(tr("S/N"));
   m_snNumber->setMinimumSize(90, 0);
   m_snNumber->setAlignment(Qt::AlignRight);
   m_snNumber->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
@@ -132,13 +132,6 @@ NoteView::NoteView(QWidget *parent)
     palette.setColor(QPalette::ColorRole::Text, Qt::red);
     m_snNumber->setPalette(palette);
   }
-
-  m_lblNumberStatus = new QLabel();
-  m_lblNumberStatus->setText("");
-  m_lblNumberStatus->setPixmap(QPixmap(":/icons/res/filenew.png"));
-  m_lblNumberStatus->setScaledContents(true);
-  m_lblNumberStatus->setMinimumSize(24, 24);
-  m_lblNumberStatus->setMaximumSize(24, 24);
 
   QLabel* lblDate = new QLabel();
   lblDate->setText(tr("Data:"));
@@ -179,7 +172,6 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->setAlignment(Qt::AlignLeft);
   hlayout2->addWidget(lblNumber);
   hlayout2->addWidget(m_snNumber);
-  hlayout2->addWidget(m_lblNumberStatus);
   hlayout2->addWidget(line1);
   hlayout2->addWidget(lblDate);
   hlayout2->addWidget(m_dtDate);
@@ -396,17 +388,8 @@ void NoteView::setNote(const Note& note)
 
 void NoteView::create()
 {
-  qlonglong number = NoteSQL::nextNumber(m_database->getDatabase());
-  m_currentId = INVALID_ID;
-  m_dtDate->setDate(QDate::currentDate());
-  m_snNumber->setValue(number);
-  m_edTotal->setText("");
-  m_table->removeAllItems();
-  m_supplierPicker->clear();
-  m_supplierPicker->setFocus();
-  m_cbCash->setChecked(false);
-  m_teObservation->clear();
-  m_edDisccount->clear();
+  Note note;
+  setNote(note);
   updateControls();
 }
 
@@ -432,9 +415,6 @@ void NoteView::updateControls()
   m_btnRemove->setEnabled(m_table->currentRow() >= 0);
   m_btnSearchItem->setEnabled(m_table->currentRow() >= 0);
   m_btnOpenLast->setEnabled(IS_VALID_ID(m_lastId));
-  m_lblNumberStatus->setPixmap(QPixmap(IS_VALID_ID(m_currentId)
-                                     ? ":/icons/res/fileedit.png"
-                                     : ":/icons/res/filenew.png"));
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
                             ? ":/icons/res/calendarok.png"
                             : ":/icons/res/calendarwarning.png"));

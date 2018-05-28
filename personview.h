@@ -91,6 +91,7 @@ private:
   QSpinBox* m_spnPhoneCountryCode;
   QSpinBox* m_spnPhoneCode;
   JLineEdit* m_edPhoneNumber;
+  JLineEdit* m_edPhoneName;
   QPushButton* m_btnAddPhone;
   QPushButton* m_btnRemovePhone;
   QListWidget* m_lstPhone;

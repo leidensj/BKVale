@@ -49,6 +49,7 @@ public:
 
 public slots:
   void refresh(bool bSaveIdx = true);
+  void selectItem();
   void selectItem(qlonglong id);
   void setCustomFilter(const QString& customFilter);
   void clearFilterSearch();
@@ -68,7 +69,6 @@ private:
   JItem* m_currentItem;
 
 private slots:
-  void selectItem();
   void filterSearchChanged();
   void filterSearchEnter();
   void containsPressed();
@@ -76,10 +76,12 @@ private slots:
   void removeItem();
   void focusFilterSearch();
   void sortChanged(int column, Qt::SortOrder sortOrder);
+  void emitCurrentRowChangedSignal();
 
 signals:
   void itemSelectedSignal(const JItem& jItem);
   void itemRemovedSignal(qlonglong id);
+  void currentRowChangedSignal(int row);
 };
 
 class JDatabaseSelector : public QDialog

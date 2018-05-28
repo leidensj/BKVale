@@ -13,6 +13,7 @@
 #include "logindialog.h"
 #include "personview.h"
 #include "shoppinglistview.h"
+#include "shopview.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -27,6 +28,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
+  , m_shop(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
 {
@@ -35,10 +37,12 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_reminder = new ReminderView;
   m_consumption = new ConsumptionWidget;
   m_calculator = new CalculatorWidget;
+  m_shop = new ShopView;
   ui->tabNotes->layout()->addWidget(m_note);
   ui->tabReminder->layout()->addWidget(m_reminder);
   ui->tabConsumption->layout()->addWidget(m_consumption);
   ui->tabCalculator->layout()->addWidget(m_calculator);
+  ui->tabShop->layout()->addWidget(m_shop);
 
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
@@ -134,6 +138,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(openShoppingListDialog()));
 
+  QObject::connect(m_shop,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(updateControls()));
+
   m_settings.load();
   if (!m_settings.m_serialPort.isEmpty() &&
       m_settings.m_bConnectOnStartup)
@@ -144,6 +153,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_note->create();
   m_consumption->setDatabase(m_userLogin.getDatabase());
   m_reminder->setDatabase(m_userLogin.getDatabase());
+  m_shop->setDatabase(m_userLogin.getDatabase());
   updateControls();
   updateStatusBar();
 }
@@ -252,6 +262,7 @@ void BaitaAssistant::print()
       m_calculator->print(printer, m_settings.m_interfaceType);
       break;
     case Functionality::ShopMode:
+      m_shop->print(printer, m_settings.m_interfaceType);
       break;
   }
 }
@@ -299,8 +310,11 @@ void BaitaAssistant::openSettingsDialog()
 
 void BaitaAssistant::updateStatusBar()
 {
-  m_statusUserName->setText("<img src=':/icons/res/16user.png'> " + m_userLogin.strUser());
-  m_statusDatabasePath->setText("<img src=':/icons/res/16database.png'> " + m_settings.databasePath());
+  // para adicionar um ícone:
+  // "<img src=':/icons/res/16user.png'> " + ...
+
+  m_statusUserName->setText(tr("Usuário:") + m_userLogin.strUser());
+  m_statusDatabasePath->setText(tr("Banco de dados:") + m_settings.databasePath());
 }
 
 void BaitaAssistant::updateControls()
@@ -345,6 +359,8 @@ void BaitaAssistant::updateControls()
       ui->actionPrint->setEnabled(m_consumption->isValid() && bIsOpen);
       break;
     case Functionality::ShopMode:
+      ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId() && bIsOpen);
+      break;
     default:
       break;
   }

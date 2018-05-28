@@ -55,6 +55,11 @@ struct Person : public JItem
     clear();
   }
 
+  QString strAliasName() const
+  {
+    return m_alias.isEmpty() ? m_name : m_alias;
+  }
+
   bool operator !=(const JItem& other) const
   {
     const Person& another = dynamic_cast<const Person&>(other);

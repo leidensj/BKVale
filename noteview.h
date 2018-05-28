@@ -13,7 +13,6 @@ class QDateEdit;
 class QLineEdit;
 class QSpinBox;
 class QPushButton;
-class QLabel;
 class QCheckBox;
 class NoteTableWidget;
 class JDatabasePicker;
@@ -45,7 +44,6 @@ private:
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;
-  QLabel* m_lblNumberStatus;
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLineEdit* m_edTotal;

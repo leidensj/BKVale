@@ -16,6 +16,7 @@ class NoteView;
 class ReminderView;
 class ConsumptionWidget;
 class CalculatorWidget;
+class ShopView;
 
 enum class Functionality : int
 {
@@ -41,6 +42,7 @@ private:
   ReminderView* m_reminder;
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
+  ShopView* m_shop;
   QSerialPort m_printerSerial;
   QTcpSocket m_printerTCP;
   Settings m_settings;

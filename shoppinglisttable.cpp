@@ -31,6 +31,7 @@ ShoppingListTable::ShoppingListTable(QWidget* parent)
   horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+  verticalHeader()->setSectionsMovable(true);
 
   QObject::connect(this,
                    SIGNAL(cellChanged(int, int)),

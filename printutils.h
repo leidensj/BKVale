@@ -10,6 +10,7 @@
 #include "consumption.h"
 #include "settings.h"
 #include "person.h"
+#include "shoppinglist.h"
 
 namespace Printer
 {
@@ -38,6 +39,11 @@ namespace NotePrinter
 namespace ReminderPrinter
 {
   QString build(const Reminder& r);
+}
+
+namespace ShoppingListPrinter
+{
+  QString build(const ShoppingList& lst);
 }
 
 namespace ConsumptionPrinter

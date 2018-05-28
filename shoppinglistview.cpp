@@ -112,17 +112,17 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_cbPrintPrice = new QCheckBox;
   m_cbPrintPrice->setText(tr("Imprimir preço sugerido"));
   m_cbSupplierCalls = new QCheckBox;
-  m_cbSupplierCalls->setText(tr("Ele liga"));
-  m_cbSupplierCalls->setIcon(QIcon(":/icons/res/phone.png"));
+  m_cbSupplierCalls->setText(tr("O fornecedor liga"));
+  //m_cbSupplierCalls->setIcon(QIcon(":/icons/res/phone.png"));
   m_cbCallSupplier = new QCheckBox;
-  m_cbCallSupplier->setText(tr("Ligar para ele"));
-  m_cbCallSupplier->setIcon(QIcon(":/icons/res/phoneback.png"));
+  m_cbCallSupplier->setText(tr("Ligar para o fornecedor"));
+  //m_cbCallSupplier->setIcon(QIcon(":/icons/res/phoneback.png"));
   m_cbWhatsapp = new QCheckBox;
   m_cbWhatsapp->setText(tr("Whatsapp"));
-  m_cbWhatsapp->setIcon(QIcon(":/icons/res/whatsapp.png"));
+  //m_cbWhatsapp->setIcon(QIcon(":/icons/res/whatsapp.png"));
   m_cbVisit = new QCheckBox;
-  m_cbVisit->setText(tr("Visita"));
-  m_cbVisit->setIcon(QIcon(":/icons/res/visit.png"));
+  m_cbVisit->setText(tr("Visita presencial"));
+  //m_cbVisit->setIcon(QIcon(":/icons/res/visit.png"));
 
   m_database = new JDatabase;
 
@@ -192,6 +192,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   viewLayout->addWidget(m_imagePicker);
   viewLayout->addWidget(m_cbPrintAmmount);
   viewLayout->addWidget(m_cbPrintPrice);
+  viewLayout->addWidget(new QLabel(tr("Contato:")));
   viewLayout->addWidget(m_cbCallSupplier);
   viewLayout->addWidget(m_cbSupplierCalls);
   viewLayout->addWidget(m_cbWhatsapp);
@@ -381,6 +382,7 @@ void ShoppingListView::setShoppingList(const ShoppingList& lst)
   for (int i = 0; i != 31; ++i)
     m_vbtnMonth[i]->setChecked(lst.m_monthDays[i]);
   m_table->setShoppingItems(lst.m_vItem);
+  updateControls();
 }
 
 ShoppingList ShoppingListView::getShoppingList() const

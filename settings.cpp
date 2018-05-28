@@ -37,7 +37,7 @@ void Settings::clear()
   m_serialStopBits = QSerialPort::OneStop;
   m_ethernetIP.clear();
   m_ethernetPort = 9100;
-  m_notesDefaultNumber = NOTE_DEFAULT_NUMBER;
+  m_notesDefaultNumber = 1000;
 }
 
 void Settings::save() const
@@ -76,7 +76,7 @@ void Settings::load()
                                                            (int)QSerialPort::OneStop).toInt();
   m_ethernetIP = settings.value(ETHERNET_IP).toString();
   m_ethernetPort = settings.value(ETHERNET_PORT, 9100).toInt();
-  m_notesDefaultNumber = settings.value(NOTES_DEFAULT_NUMBER, NOTE_DEFAULT_NUMBER).toInt();
+  m_notesDefaultNumber = settings.value(NOTES_DEFAULT_NUMBER, 1000).toInt();
 }
 
 QString Settings::databasePath() const

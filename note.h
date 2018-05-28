@@ -91,9 +91,9 @@ struct Note : public JItem
   void clear()
   {
     m_id = INVALID_ID;
-    m_number = NOTE_DEFAULT_NUMBER;
+    m_number = 0;
     m_supplier.clear();
-    m_date.clear();
+    m_date = QDate::currentDate().toString(Qt::ISODate);
     m_bCash = false;
     m_vNoteItem.clear();
     m_observation.clear();

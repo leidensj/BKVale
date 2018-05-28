@@ -103,6 +103,7 @@
        <attribute name="title">
         <string>Compras</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5"/>
       </widget>
       <widget class="QWidget" name="tabConsumption">
        <attribute name="icon">

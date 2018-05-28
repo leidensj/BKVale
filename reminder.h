@@ -32,8 +32,8 @@ struct Reminder : public JItem
     m_title.clear();
     m_message.clear();
     m_bFavorite = false;
-    m_size = Size::Normal;
-    m_capitalization = Capitalization::Normal;
+    m_size = Size::Large;
+    m_capitalization = Capitalization::AllUppercase;
   }
 
   bool operator != (const JItem& other) const

@@ -502,7 +502,8 @@ public:
                      SQL_COLID ","
                      CATEGORY_SQL_COL02
                      " FROM "
-                     CATEGORY_SQL_TABLE_NAME);
+                     CATEGORY_SQL_TABLE_NAME
+                     " %1 %2 %3");
     return strQuery;
   }
 
@@ -700,7 +701,8 @@ public:
                      SQL_COLID ","
                      USER_SQL_COL01
                      " FROM "
-                     USER_SQL_TABLE_NAME);
+                     USER_SQL_TABLE_NAME
+                     " %1 %2 %3");
     return strQuery;
   }
 
@@ -1132,6 +1134,7 @@ JDatabase::JDatabase(bool bSelectorMode,
                    SIGNAL(enterKeyPressedSignal()),
                    this,
                    SLOT(selectItem()));
+
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F),
                 this,
                 SLOT(focusFilterSearch()));
@@ -1152,6 +1155,7 @@ JDatabase::~JDatabase()
 {
   if (m_currentItem != nullptr)
     delete m_currentItem;
+  m_currentItem = nullptr;
 }
 
 void JDatabase::setDatabase(QSqlDatabase db,
@@ -1195,6 +1199,11 @@ void JDatabase::setDatabase(QSqlDatabase db,
                    this,
                    SLOT(enableControls()));
 
+  QObject::connect(m_table->selectionModel(),
+                   SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+                   this,
+                   SLOT(emitCurrentRowChangedSignal()));
+
   if (m_table->horizontalHeader()->count() > 1)
     m_table->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
@@ -1218,12 +1227,19 @@ void JDatabase::selectItem()
     qlonglong id = model->record(row).value(ID_COLUMN).toLongLong();
     selectItem(id);
   }
+  else
+  {
+    if (m_currentItem != nullptr)
+      delete m_currentItem;
+    m_currentItem = nullptr;
+  }
 }
 
 void JDatabase::selectItem(qlonglong id)
 {
   if (m_currentItem != nullptr)
     delete m_currentItem;
+  m_currentItem = nullptr;
 
   bool bSuccess = false;
   QString error;
@@ -1331,7 +1347,8 @@ void JDatabase::enableControls()
 void JDatabase::removeItem()
 {
   int row = m_table->currentIndex().row();
-  if (row >= 0 && m_table->model())
+  JTableModel* model = dynamic_cast<JTableModel*>(m_table->model());
+  if (row >= 0 && model)
   {
     if (QMessageBox::question(this,
                               tr("Remover item"),
@@ -1341,7 +1358,7 @@ void JDatabase::removeItem()
       return;
     }
 
-    qlonglong id = m_table->model()->index(row, ID_COLUMN).data(Qt::EditRole).toLongLong();
+    qlonglong id = model->index(row, ID_COLUMN).data(Qt::EditRole).toLongLong();
     bool bSuccess = false;
     QString error;
     if (m_tableName == IMAGE_SQL_TABLE_NAME)
@@ -1366,7 +1383,9 @@ void JDatabase::removeItem()
     if (bSuccess)
     {
       emit itemRemovedSignal(id);
-      refresh();
+      m_table->hideRow(row);
+      if (row - 1 != -1)
+        m_table->selectRow(row - 1);
     }
     else
     {
@@ -1395,7 +1414,7 @@ void JDatabase::filterSearchChanged()
       if (columnName.isEmpty())
         columnName = tr("Procurar...");
       else
-        columnName = tr("Procurar pelo(a) ") + columnName;
+        columnName = tr("Procurar por: ") + columnName;
       m_edFilterSearch->setPlaceholderText(columnName);
       model->prepareFilter("", false, column);
     }
@@ -1541,6 +1560,11 @@ bool JDatabase::save(const JItem& jItem)
                           QMessageBox::Ok);
   }
   return bSuccess;
+}
+
+void JDatabase::emitCurrentRowChangedSignal()
+{
+  emit currentRowChangedSignal(m_table->currentIndex().row());
 }
 
 JDatabaseSelector::JDatabaseSelector(const QString& title,

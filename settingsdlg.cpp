@@ -50,8 +50,6 @@ SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
   ui->cbSerialParity->addItem("Space parity", QSerialPort::SpaceParity);
   ui->cbSerialParity->addItem("Mark parity", QSerialPort::MarkParity);
 
-  ui->spNotesDefaultNumber->setValue(NOTE_DEFAULT_NUMBER);
-
   refreshAvailablePorts();
   doDataExchange(true);
 }

@@ -11,6 +11,7 @@ struct Phone : public JItem
   int m_countryCode;
   int m_code;
   QString m_number;
+  QString m_name;
 
   void clear()
   {
@@ -18,6 +19,7 @@ struct Phone : public JItem
     m_countryCode = PHONE_DEFAULT_COUNTRY_CODE_VALUE;
     m_code = PHONE_DEFAULT_CODE_VALUE;
     m_number.clear();
+    m_name.clear();
   }
 
   Phone()
@@ -31,7 +33,8 @@ struct Phone : public JItem
     return
         m_countryCode != another.m_countryCode ||
         m_code != another.m_code ||
-        m_number != another.m_number;
+        m_number != another.m_number ||
+        m_name != another.m_name;
   }
 
   bool operator ==(const JItem& other) const

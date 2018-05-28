@@ -401,7 +401,7 @@ void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
 QString CalculatorWidget::buildPrintContent(double value, Calculator::Button button)
 {
   return Calculator::toStr(button) + " " +
-      QString::number(value, 'f').remove(QRegExp("\\.?0*$"));;
+      QString::number(value, 'f').remove(QRegExp("\\.?0*$"));
 }
 
 void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)

@@ -206,9 +206,9 @@ void ReminderView::itemRemoved(qlonglong id)
 
 bool ReminderView::save(const Reminder& reminder)
 {
-  if (!m_cbSave->isChecked())
-    return true;
-  bool bSuccess = m_database->save(reminder);
+  bool bSuccess = m_cbSave->isChecked()
+                  ? m_database->save(reminder)
+                  : true;
   if (bSuccess)
     create();
   return bSuccess;
@@ -298,8 +298,5 @@ void ReminderView::saveAndPrint(QIODevice* printer, InterfaceType type)
 {
   Reminder reminder = getReminder();
   if (save(reminder))
-  {
-    if (print(reminder, printer, type))
-      create();
-  }
+    print(reminder, printer, type);
 }

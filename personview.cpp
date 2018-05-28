@@ -96,6 +96,7 @@ PersonView::PersonView(QWidget* parent)
   , m_spnPhoneCountryCode(nullptr)
   , m_spnPhoneCode(nullptr)
   , m_edPhoneNumber(nullptr)
+  , m_edPhoneName(nullptr)
   , m_btnAddPhone(nullptr)
   , m_btnRemovePhone(nullptr)
   , m_lstPhone(nullptr)
@@ -129,11 +130,9 @@ PersonView::PersonView(QWidget* parent)
 
   m_rdoPerson = new QRadioButton;
   m_rdoPerson->setText(tr("Fisíca"));
-  m_rdoPerson->setIcon(QIcon(":/icons/res/house.png"));
   m_rdoPerson->setChecked(true);
   m_rdoCompany = new QRadioButton;
   m_rdoCompany->setText(tr("Jurídica"));
-  m_rdoCompany->setIcon(QIcon(":/icons/res/building.png"));
   m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                            JLineEdit::st_defaultFlags1);
   m_lblName = new QLabel;
@@ -186,6 +185,9 @@ PersonView::PersonView(QWidget* parent)
 
   m_edPhoneNumber = new JLineEdit(JLineEdit::Input::Numeric,
                                   JLineEdit::st_defaultFlags2);
+  m_edPhoneName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                                JLineEdit::st_defaultFlags1);
+  m_edPhoneName->setPlaceholderText(tr("Nome (opcional)"));
   m_edPhoneNumber->setPlaceholderText(tr("*"));
   m_spnPhoneCountryCode = new QSpinBox;
   m_spnPhoneCountryCode->setMinimum(0);
@@ -283,11 +285,15 @@ PersonView::PersonView(QWidget* parent)
   phoneButtonLayout->addWidget(m_btnAddPhone);
   phoneButtonLayout->addWidget(m_btnRemovePhone);
 
-  QHBoxLayout* phoneInformationLayout = new QHBoxLayout;
-  phoneInformationLayout->setContentsMargins(0, 0, 0, 0);
-  phoneInformationLayout->addWidget(m_spnPhoneCountryCode);
-  phoneInformationLayout->addWidget(m_spnPhoneCode);
-  phoneInformationLayout->addWidget(m_edPhoneNumber);
+  QHBoxLayout* phoneNumberLayout = new QHBoxLayout;
+  phoneNumberLayout->setContentsMargins(0, 0, 0, 0);
+  phoneNumberLayout->addWidget(m_spnPhoneCountryCode);
+  phoneNumberLayout->addWidget(m_spnPhoneCode);
+  phoneNumberLayout->addWidget(m_edPhoneNumber);
+
+  QVBoxLayout* phoneInformationLayout = new QVBoxLayout;
+  phoneInformationLayout->addWidget(m_edPhoneName);
+  phoneInformationLayout->addLayout(phoneNumberLayout);
 
   QHBoxLayout* buttonLayout = new QHBoxLayout();
   buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -590,6 +596,7 @@ Phone PersonView::getPhone() const
   phone.m_code = m_spnPhoneCode->value();
   phone.m_countryCode = m_spnPhoneCountryCode->value();
   phone.m_number = m_edPhoneNumber->text();
+  phone.m_name = m_edPhoneName->text();
   return phone;
 }
 
@@ -625,6 +632,7 @@ void PersonView::openPhone()
     m_spnPhoneCode->setValue(phone.m_code);
     m_spnPhoneCountryCode->setValue(phone.m_countryCode);
     m_edPhoneNumber->setText(phone.m_number);
+    m_edPhoneName->setText(phone.m_name);
   }
 }
 
@@ -633,6 +641,7 @@ void PersonView::clearPhone()
   m_spnPhoneCode->setValue(PHONE_DEFAULT_CODE_VALUE);
   m_spnPhoneCountryCode->setValue(PHONE_DEFAULT_COUNTRY_CODE_VALUE);
   m_edPhoneNumber->clear();
+  m_edPhoneName->clear();
 }
 
 Address PersonView::getAddress() const

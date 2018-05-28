@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QDate>
 #include <QMetaType>
+#include <QRegExp>
 #include "jtablecolumn.h"
 #include "person.h"
 #include "product.h"
@@ -47,7 +48,7 @@ struct ShoppingListItem : JItem
                                     : m_product.m_unity; }
   double subtotal() const { return m_ammount * m_price; }
   static QString st_strSubTotal(double subtotal) { return QString::number(subtotal, 'f', 2); }
-  static QString st_strAmmount(double ammount) { return QString::number(ammount, 'f', 3); }
+  static QString st_strAmmount(double ammount) { return QString::number(ammount, 'f').remove(QRegExp("\\.?0*$")); }
   static QString st_strPrice(double price) { return QString::number(price, 'f', 2); }
   QString strSubtotal() const { return st_strSubTotal(subtotal()); }
   QString strAmmount() const { return st_strAmmount(m_ammount); }
@@ -118,8 +119,7 @@ struct ShoppingList : public JItem
 
   bool isValid() const
   {
-    bool b = m_supplier.isValidId() &&
-             !m_vItem.isEmpty();
+    bool b = true;
     for (int i = 0; i != m_vItem.size(); ++i)
       b &= m_vItem.at(i).isValid();
     return b;
@@ -157,6 +157,8 @@ struct ShoppingList : public JItem
     for (int i = 0; i != 7; ++i)
       if (m_weekDays[i])
         strWeekDays += SHOPPING_LIST_SEPARATOR + QString::number(i + 1);
+    if (!strWeekDays.isEmpty())
+      strWeekDays += SHOPPING_LIST_SEPARATOR;
     return strWeekDays;
   }
 
@@ -166,7 +168,14 @@ struct ShoppingList : public JItem
     for (int i = 0; i != 31; ++i)
       if (m_monthDays[i])
         strMonthDays += SHOPPING_LIST_SEPARATOR + QString::number(i + 1);
+    if (!strMonthDays.isEmpty())
+      strMonthDays += SHOPPING_LIST_SEPARATOR;
     return strMonthDays;
+  }
+
+  bool hasContact() const
+  {
+    return m_bSupplierCalls || m_bCallSupplier || m_bVisit || m_bWhatsapp;
   }
 
   bool operator !=(const JItem& other) const

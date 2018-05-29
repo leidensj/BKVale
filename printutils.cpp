@@ -401,10 +401,12 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
   if (lst.m_supplier.isValidId())
   {
     str += ESC_VERT_TAB
-           ESC_EXPAND_ON
-           "Fornecedor: " +
+           ESC_ALIGN_CENTER
+           "Fornecedor: "
+           ESC_EXPAND_ON +
            lst.m_supplier.strAliasName() +
            ESC_EXPAND_OFF
+           ESC_ALIGN_LEFT
            ESC_LF;
 
     for (int i = 0; i != lst.m_supplier.m_vPhone.size(); ++i)
@@ -433,10 +435,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
   str += ESC_LF;
 
   if (lst.m_vItem.size() != 0)
-    str += "EST: quantidade em estoque." ESC_LF
-           "COM: quantidade a ser comprada." ESC_LF
-           "REC: quantidade recomendada." ESC_LF
-           ESC_EXPAND_ON
+    str += ESC_EXPAND_ON
            "| EST | COM | REC "
            ESC_LF;
 
@@ -447,10 +446,11 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
            lst.m_vItem.at(i).m_product.m_name +
            ESC_LF
            ESC_EXPAND_ON
-           "|     |     | " +
-           lst.m_vItem.at(i).strAmmount() +
-           lst.m_vItem.at(i).strUnity() +
-           ESC_LF
+           "|     |     | ";
+    if (lst.m_bPrintAmmount)
+      str += lst.m_vItem.at(i).strAmmount() +
+             lst.m_vItem.at(i).strUnity();
+    str += ESC_LF
            "|     |     | ";
     if (lst.m_bPrintPrice)
       str += "R$ " + lst.m_vItem.at(i).strPrice();

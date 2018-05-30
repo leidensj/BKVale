@@ -17,6 +17,7 @@ class ReminderView;
 class ConsumptionWidget;
 class CalculatorWidget;
 class ShopView;
+class ReservationView;
 
 enum class Functionality : int
 {
@@ -24,7 +25,8 @@ enum class Functionality : int
   ReminderMode,
   CalculatorMode,
   ShopMode,
-  ConsumptionMode
+  ConsumptionMode,
+  ReservationMode
 };
 
 class BaitaAssistant : public QMainWindow
@@ -43,6 +45,7 @@ private:
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
   ShopView* m_shop;
+  ReservationView* m_reservation;
   QSerialPort m_printerSerial;
   QTcpSocket m_printerTCP;
   Settings m_settings;

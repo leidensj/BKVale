@@ -8,7 +8,6 @@
 #include <QDate>
 #include <QMetaType>
 #include <QRegExp>
-#include "jtablecolumn.h"
 #include "person.h"
 #include "product.h"
 #include "defines.h"

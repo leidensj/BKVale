@@ -13,6 +13,7 @@
 #include "logindialog.h"
 #include "personview.h"
 #include "shoppinglistview.h"
+#include "reservationview.h"
 #include "shopview.h"
 #include <QMessageBox>
 #include <QInputDialog>
@@ -29,6 +30,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
   , m_shop(nullptr)
+  , m_reservation(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
 {
@@ -38,11 +40,13 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_consumption = new ConsumptionWidget;
   m_calculator = new CalculatorWidget;
   m_shop = new ShopView;
+  m_reservation = new ReservationView;
   ui->tabNotes->layout()->addWidget(m_note);
   ui->tabReminder->layout()->addWidget(m_reminder);
   ui->tabConsumption->layout()->addWidget(m_consumption);
   ui->tabCalculator->layout()->addWidget(m_calculator);
   ui->tabShop->layout()->addWidget(m_shop);
+  ui->tabReservation->layout()->addWidget(m_reservation);
 
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
@@ -264,6 +268,9 @@ void BaitaAssistant::print()
     case Functionality::ShopMode:
       m_shop->print(printer, m_settings.m_interfaceType);
       break;
+    case Functionality::ReservationMode:
+      //TODO
+      break;
   }
 }
 
@@ -360,6 +367,9 @@ void BaitaAssistant::updateControls()
       break;
     case Functionality::ShopMode:
       ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId() && bIsOpen);
+      break;
+    case Functionality::ReservationMode:
+      ui->actionPrint->setEnabled(m_reservation->getReservation().isValid() && bIsOpen);
       break;
     default:
       break;

@@ -7,7 +7,6 @@
 #include <QVector>
 #include <QDate>
 #include <QMetaType>
-#include "jtablecolumn.h"
 #include "person.h"
 #include "product.h"
 #include "defines.h"

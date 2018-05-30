@@ -65,6 +65,9 @@
       <property name="tabsClosable">
        <bool>false</bool>
       </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
       <widget class="QWidget" name="tabNotes">
        <attribute name="icon">
         <iconset resource="icons.qrc">
@@ -114,6 +117,16 @@
         <string>Consumo</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3"/>
+      </widget>
+      <widget class="QWidget" name="tabReservation">
+       <attribute name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/res/reservation.png</normaloff>:/icons/res/reservation.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Reservas</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6"/>
       </widget>
      </widget>
     </item>

@@ -45,7 +45,9 @@ SOURCES += main.cpp\
     shoppinglistview.cpp \
     shoppinglisttable.cpp \
     jdoublespinbox.cpp \
-    shopview.cpp
+    shopview.cpp \
+    reservationview.cpp \
+    jspinbox.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -79,7 +81,6 @@ HEADERS  += mainwindow.h \
     imageview.h \
     product.h \
     productview.h \
-    jtablecolumn.h \
     person.h \
     address.h \
     personview.h \
@@ -92,7 +93,10 @@ HEADERS  += mainwindow.h \
     shoppinglistview.h \
     shoppinglisttable.h \
     jdoublespinbox.h \
-    shopview.h
+    shopview.h \
+    reservation.h \
+    reservationview.h \
+    jspinbox.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

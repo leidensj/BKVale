@@ -1,7 +1,6 @@
 #ifndef ADDRESS_H
 #define ADDRESS_H
 
-#include "jtablecolumn.h"
 #include "defines.h"
 #include "jitem.h"
 #include <QObject>

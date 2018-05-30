@@ -5,7 +5,6 @@
 #include <QString>
 #include <QByteArray>
 #include <QVector>
-#include "jtablecolumn.h"
 #include "defines.h"
 #include "jitem.h"
 

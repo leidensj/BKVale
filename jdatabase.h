@@ -7,7 +7,6 @@
 #include <QModelIndex>
 #include <QVector>
 #include <QTableView>
-#include "jtablecolumn.h"
 #include "product.h"
 #include "person.h"
 #include "reminder.h"
@@ -65,7 +64,6 @@ private:
   JTableView* m_table;
   QString m_tableName;
   QString m_customFilter;
-  QVector<JTableColumn> m_vColumns;
   JItem* m_currentItem;
 
 private slots:

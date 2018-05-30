@@ -1224,7 +1224,7 @@ void JDatabase::selectItem()
   JTableModel* model = dynamic_cast<JTableModel*>(m_table->model());
   if (model != nullptr && row >= 0)
   {
-    qlonglong id = model->record(row).value(ID_COLUMN).toLongLong();
+    qlonglong id = model->record(row).value(SQL_COLID_NUMBER).toLongLong();
     selectItem(id);
   }
   else
@@ -1358,7 +1358,7 @@ void JDatabase::removeItem()
       return;
     }
 
-    qlonglong id = model->index(row, ID_COLUMN).data(Qt::EditRole).toLongLong();
+    qlonglong id = model->index(row, SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong();
     bool bSuccess = false;
     QString error;
     if (m_tableName == IMAGE_SQL_TABLE_NAME)

@@ -2,7 +2,6 @@
 #define JITEM_H
 
 #include "defines.h"
-#include "jtablecolumn.h"
 #include <QVector>
 
 struct JItem

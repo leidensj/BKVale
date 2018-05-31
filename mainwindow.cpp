@@ -158,6 +158,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_consumption->setDatabase(m_userLogin.getDatabase());
   m_reminder->setDatabase(m_userLogin.getDatabase());
   m_shop->setDatabase(m_userLogin.getDatabase());
+  m_reservation->setDatabase(m_userLogin.getDatabase());
   updateControls();
   updateStatusBar();
 }

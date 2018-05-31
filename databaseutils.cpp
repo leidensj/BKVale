@@ -566,6 +566,16 @@ bool BaitaSQL::init(QSqlDatabase db,
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " RESERVATION_SQL_TABLE_NAME " ("
+                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          RESERVATION_SQL_COL01 " INTEGER,"
+                          RESERVATION_SQL_COL02 " TEXT,"
+                          RESERVATION_SQL_COL03 " TEXT,"
+                          RESERVATION_SQL_COL04 " TEXT,"
+                          RESERVATION_SQL_COL05 " INT,"
+                          RESERVATION_SQL_COL06 " TEXT)");
+
+  if (bSuccess)
   {
     query.exec("SELECT * FROM " USER_SQL_TABLE_NAME " LIMIT 1");
     if (!query.next())
@@ -2557,6 +2567,171 @@ bool ShoppingListSQL::remove(QSqlDatabase db,
   query.prepare("DELETE FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool ReservationSQL::execSelect(QSqlQuery& query,
+                                Reservation& res,
+                                QString& error)
+{
+  error.clear();
+  qlonglong id = res.m_id;
+  res.clear();
+
+  query.prepare("SELECT "
+                RESERVATION_SQL_COL01 ","
+                RESERVATION_SQL_COL02 ","
+                RESERVATION_SQL_COL03 ","
+                RESERVATION_SQL_COL04 ","
+                RESERVATION_SQL_COL05 ","
+                RESERVATION_SQL_COL06
+                " FROM " RESERVATION_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      res.m_id = id;
+      res.m_number = query.value(0).toLongLong();
+      res.m_name = query.value(1).toString();
+      res.m_location = query.value(2).toString();
+      res.m_dateTime = query.value(3).toString();
+      res.m_ammount = query.value(4).toInt();
+      res.m_observation = query.value(5).toString();
+    }
+    else
+    {
+      error = "Reserva não encontrada.";
+      bSuccess = false;
+    }
+  }
+
+  if (!bSuccess)
+  {
+    if (error.isEmpty())
+      error = query.lastError().text();
+    res.clear();
+  }
+
+  return bSuccess;
+}
+
+bool ReservationSQL::select(QSqlDatabase db,
+                            Reservation& res,
+                            QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+
+  bool bSuccess = execSelect(query, res, error);
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ReservationSQL::insert(QSqlDatabase db,
+                         const Reservation& res,
+                         QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("INSERT INTO " RESERVATION_SQL_TABLE_NAME " ("
+                RESERVATION_SQL_COL01 ","
+                RESERVATION_SQL_COL02 ","
+                RESERVATION_SQL_COL03 ","
+                RESERVATION_SQL_COL04 ","
+                RESERVATION_SQL_COL05 ","
+                RESERVATION_SQL_COL06 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04),"
+                "(:_v05),"
+                "(:_v06))");
+  query.bindValue(":_v01", res.m_number);
+  query.bindValue(":_v02", res.m_name);
+  query.bindValue(":_v03", res.m_location);
+  query.bindValue(":_v04", res.m_dateTime);
+  query.bindValue(":_v05", res.m_ammount);
+  query.bindValue(":_v06", res.m_observation);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+    res.m_id = query.lastInsertId().toLongLong();
+
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ReservationSQL::update(QSqlDatabase db,
+                            const Reservation& res,
+                            QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("UPDATE " RESERVATION_SQL_TABLE_NAME " SET "
+                RESERVATION_SQL_COL01 " = (:_v01),"
+                RESERVATION_SQL_COL02 " = (:_v02),"
+                RESERVATION_SQL_COL03 " = (:_v03),"
+                RESERVATION_SQL_COL04 " = (:_v04),"
+                RESERVATION_SQL_COL05 " = (:_v05),"
+                RESERVATION_SQL_COL06 " = (:_v06)"
+                " WHERE " SQL_COLID " = (:_v00)");
+
+  query.bindValue(":_v00", res.m_id);
+  query.bindValue(":_v01", res.m_number);
+  query.bindValue(":_v02", res.m_name);
+  query.bindValue(":_v03", res.m_location);
+  query.bindValue(":_v04", res.m_dateTime);
+  query.bindValue(":_v05", res.m_ammount);
+  query.bindValue(":_v06", res.m_observation);
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ReservationSQL::remove(QSqlDatabase db,
+                            qlonglong id,
+                            QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(db, error))
+    return false;
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM " RESERVATION_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id);
+
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }

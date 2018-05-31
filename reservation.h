@@ -13,20 +13,18 @@ struct Reservation : public JItem
   qlonglong m_number;
   QString m_name;
   QString m_location;
-  QDateTime m_dateTime;
+  QString m_dateTime;
   int m_ammount;
   QString m_observation;
-  qlonglong m_employeeId;
 
   void clear()
   {
     m_number = 0;
-    m_dateTime = QDateTime::currentDateTime();
+    m_dateTime = QDateTime::currentDateTime().toString(Qt::DateFormat::ISODate);
     m_location.clear();
     m_name.clear();
     m_ammount = 0;
     m_observation.clear();
-    m_employeeId = INVALID_ID;
   }
 
   Reservation()

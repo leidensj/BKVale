@@ -997,6 +997,129 @@ public:
   }
 };
 
+class ReservationTableModel : public JTableModel
+{
+public:
+  ReservationTableModel(QObject *parent, QSqlDatabase db)
+    : JTableModel(parent, db)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     SQL_COLID ","
+                     RESERVATION_SQL_COL01 ","
+                     RESERVATION_SQL_COL04 ","
+                     RESERVATION_SQL_COL02 ","
+                     RESERVATION_SQL_COL03
+                     " FROM "
+                     RESERVATION_SQL_TABLE_NAME
+                     " %1 %2 %3");
+    return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select();
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Número"));
+    setHeaderData(2, Qt::Horizontal, tr("Data"));
+    setHeaderData(3, Qt::Horizontal, tr("Nome"));
+    setHeaderData(4, Qt::Horizontal, tr("Local"));
+    if (header != nullptr && header->count() == 5)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(4, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+
+  virtual QString getStrCompleteQuery()
+  {
+    return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
+  }
+
+  virtual void prepareFilter(const QString& value, bool bContaining, int column)
+  {
+    m_strFilter.clear();
+    if (!value.isEmpty())
+    {
+      m_strFilter = "WHERE ";
+      switch (column)
+      {
+        case 1:
+          m_strFilter += " " RESERVATION_SQL_COL01;
+          break;
+        case 2:
+          m_strFilter += " " RESERVATION_SQL_COL04;
+          break;
+        case 3:
+          m_strFilter += " " RESERVATION_SQL_COL02;
+          break;
+        case 4:
+          m_strFilter += " " RESERVATION_SQL_COL03;
+          break;
+        default:
+          break;
+      }
+    }
+    if (!m_strFilter.isEmpty())
+    {
+      m_strFilter += " LIKE '";
+      if (bContaining)
+        m_strFilter += "%";
+      m_strFilter += value + "%'";
+    }
+  }
+
+  virtual void prepareCustomFilter(const QString& customFilter)
+  {
+    m_strCustomFilter.clear();
+    if (!customFilter.isEmpty())
+    {
+      if (m_strFilter.isEmpty())
+        m_strCustomFilter = "WHERE " + customFilter;
+      else
+        m_strCustomFilter = "AND " + customFilter;
+    }
+  }
+
+  virtual void prepareSort(int column, Qt::SortOrder sortOrder)
+  {
+    m_strSort.clear();
+    switch (column)
+    {
+      case 1:
+        m_strSort = "ORDER BY " RESERVATION_SQL_COL01;
+        break;
+      case 2:
+        m_strSort = "ORDER BY " RESERVATION_SQL_COL04;
+        break;
+      case 3:
+        m_strSort = "ORDER BY " RESERVATION_SQL_COL02;
+        break;
+      case 4:
+        m_strSort = "ORDER BY " RESERVATION_SQL_COL03;
+        break;
+      default:
+        break;
+    }
+
+    if (!m_strSort.isEmpty())
+    {
+      if (sortOrder == Qt::SortOrder::AscendingOrder)
+        m_strSort += " ASC";
+      else if (sortOrder == Qt::SortOrder::DescendingOrder)
+        m_strSort += " DESC";
+    }
+  }
+};
+
+
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
 {
@@ -1181,6 +1304,8 @@ void JDatabase::setDatabase(QSqlDatabase db,
     model = new CategoryTableModel(this, db);
   else if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     model = new ShoppingListTableModel(this, db);
+  else if (tableName == RESERVATION_SQL_TABLE_NAME)
+    model = new ReservationTableModel(this, db);
   else
     return;
 
@@ -1299,6 +1424,13 @@ void JDatabase::selectItem(qlonglong id)
     bSuccess = ShoppingListSQL::select(getDatabase(), o, error);
     m_currentItem = new ShoppingList(o);
   }
+  else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
+  {
+    Reservation o;
+    o.m_id = id;
+    bSuccess = ReservationSQL::select(getDatabase(), o, error);
+    m_currentItem = new Reservation(o);
+  }
   else
   {
     error = tr("Item ainda não implementado.");
@@ -1377,6 +1509,8 @@ void JDatabase::removeItem()
       bSuccess = ReminderSQL::remove(getDatabase(), id, error);
     else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
       bSuccess = ShoppingListSQL::remove(getDatabase(), id, error);
+    else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
+      bSuccess = ReservationSQL::remove(getDatabase(), id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -1546,6 +1680,13 @@ bool JDatabase::save(const JItem& jItem)
     bSuccess = o.isValidId()
                ? ShoppingListSQL::update(getDatabase(), o, error)
                : ShoppingListSQL::insert(getDatabase(), o, error);
+  }
+  else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
+  {
+    const Reservation& o = dynamic_cast<const Reservation&>(jItem);
+    bSuccess = o.isValidId()
+               ? ReservationSQL::update(getDatabase(), o, error)
+               : ReservationSQL::insert(getDatabase(), o, error);
   }
   else
     error = tr("Item ainda não implementado.");

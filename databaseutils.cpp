@@ -2658,6 +2658,8 @@ bool ReservationSQL::insert(QSqlDatabase db,
 
   db.transaction();
   QSqlQuery query(db);
+  query.exec("SELECT MAX(" RESERVATION_SQL_COL01 ") FROM " RESERVATION_SQL_TABLE_NAME);
+  res.m_number = query.next() ? query.value(0).toLongLong() + 1 : 1;
   query.prepare("INSERT INTO " RESERVATION_SQL_TABLE_NAME " ("
                 RESERVATION_SQL_COL01 ","
                 RESERVATION_SQL_COL02 ","

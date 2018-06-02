@@ -29,8 +29,8 @@ protected:
 private:
   QString text(int row, int column) const;
   void setText(int row, int column, const QString& str);
-  QString computeUnitValue(int row) const;
-  QString computeSubTotal(int row) const;
+  double computePrice(int row) const;
+  double computeSubTotal(int row) const;
   double evaluate(int row, int column) const;
 
 private slots:

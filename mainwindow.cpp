@@ -270,8 +270,17 @@ void BaitaAssistant::print()
       m_shop->print(printer, m_settings.m_interfaceType);
       break;
     case Functionality::ReservationMode:
-      //TODO
-      break;
+    {
+      Reservation res = m_reservation->save();
+      if (res.isValidId())
+      {
+        QString error;
+        Printer::printString(printer,
+                             m_settings.m_interfaceType,
+                             ReservationPrinter::build(res),
+                             error);
+      }
+    } break;
   }
 }
 
@@ -321,8 +330,8 @@ void BaitaAssistant::updateStatusBar()
   // para adicionar um ícone:
   // "<img src=':/icons/res/16user.png'> " + ...
 
-  m_statusUserName->setText(tr("Usuário:") + m_userLogin.strUser());
-  m_statusDatabasePath->setText(tr("Banco de dados:") + m_settings.databasePath());
+  m_statusUserName->setText(tr("Usuário: ") + m_userLogin.strUser());
+  m_statusDatabasePath->setText(tr("Banco de dados: ") + m_settings.databasePath());
 }
 
 void BaitaAssistant::updateControls()

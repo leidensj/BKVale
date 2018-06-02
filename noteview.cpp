@@ -437,7 +437,7 @@ void NoteView::updateControls()
   double total = m_table->computeTotal() + disccount;
 
   if (m_table->hasItems() || total != 0)
-    m_edTotal->setText(Note::st_strTotal(total));
+    m_edTotal->setText(Note::st_strMoney(total));
   else
     m_edTotal->clear();
 

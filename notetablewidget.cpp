@@ -74,20 +74,20 @@ void NoteTableWidget::keyPressEvent(QKeyEvent *event)
   }
 }
 
-QString NoteTableWidget::computeUnitValue(int row) const
+double NoteTableWidget::computePrice(int row) const
 {
   const double ammount = text(row, (int)NoteColumn::Ammount).toDouble();
   const double subTotal = text(row, (int)NoteColumn::SubTotal).toDouble();
-  const double unitValue = ammount ? subTotal / ammount : 0.0;
-  return QString::number(unitValue, 'f', 2);
+  const double price = ammount ? subTotal / ammount : 0.0;
+  return price;
 }
 
-QString NoteTableWidget::computeSubTotal(int row) const
+double NoteTableWidget::computeSubTotal(int row) const
 {
   const double ammount = text(row, (int)NoteColumn::Ammount).toDouble();
   const double unitValue = text(row, (int)NoteColumn::Price).toDouble();
   const double subTotal = ammount * unitValue;
-  return QString::number(subTotal, 'f', 2);
+  return subTotal;
 }
 
 double NoteTableWidget::computeTotal() const
@@ -242,35 +242,37 @@ void NoteTableWidget::update(int row, int column)
     {
       double value = evaluate(row, column);
       setText(row, column, NoteItem::st_strAmmount(value));
-      setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
-      if (value == 0.0)
-        item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(255, 200, 200));
-      else
-        item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(Qt::white));
+      setText(row, (int)NoteColumn::SubTotal, Note::st_strMoney(computeSubTotal(row)));
     } break;
     case NoteColumn::Price:
     {
       double value = evaluate(row, column);
       setText(row, column, NoteItem::st_strPrice(value));
-      setText(row, (int)NoteColumn::SubTotal, computeSubTotal(row));
-      if (value == 0.0)
-        item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(255, 200, 200));
-      else
-        item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(Qt::white));
+      setText(row, (int)NoteColumn::SubTotal, Note::st_strMoney(computeSubTotal(row)));
     } break;
     case NoteColumn::SubTotal:
     {
       setText(row, column, NoteItem::st_strSubTotal(evaluate(row, column)));
-      setText(row, (int)NoteColumn::Price, computeUnitValue(row));
+      setText(row, (int)NoteColumn::Price, Note::st_strMoney(computePrice(row)));
     } break;
     case NoteColumn::Description:
     default:
       break;
   }
+
   double subTotal = text(row, (int)NoteColumn::SubTotal).toDouble();
+  double price = text(row, (int)NoteColumn::Price).toDouble();
+  double ammount = text(row, (int)NoteColumn::Ammount).toDouble();
+
   item(row, (int)NoteColumn::SubTotal)->setTextColor(QColor(subTotal >= 0
                                                             ? Qt::red
                                                             : Qt::darkGreen));
+  item(row, (int)NoteColumn::Price)->setBackgroundColor(QColor(price == 0.0
+                                                               ? (255, 200, 200)
+                                                               : Qt::white));
+  item(row, (int)NoteColumn::Ammount)->setBackgroundColor(QColor(ammount == 0
+                                                                 ? (255, 200, 200)
+                                                                 : Qt::white));
   blockSignals(false);
   emitChangedSignal();
 }

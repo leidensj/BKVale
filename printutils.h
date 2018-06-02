@@ -11,6 +11,7 @@
 #include "settings.h"
 #include "person.h"
 #include "shoppinglist.h"
+#include "reservation.h"
 
 namespace Printer
 {
@@ -44,6 +45,11 @@ namespace ReminderPrinter
 namespace ShoppingListPrinter
 {
   QString build(const ShoppingList& lst);
+}
+
+namespace ReservationPrinter
+{
+  QString build(const Reservation& lst);
 }
 
 namespace ConsumptionPrinter

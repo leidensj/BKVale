@@ -10,7 +10,7 @@
 
 struct Reservation : public JItem
 {
-  qlonglong m_number;
+  mutable qlonglong m_number;
   QString m_name;
   QString m_location;
   QString m_dateTime;
@@ -49,7 +49,7 @@ struct Reservation : public JItem
 
   bool isValid() const
   {
-    return false;
+    return true;
   }
 };
 

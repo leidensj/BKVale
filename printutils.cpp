@@ -467,6 +467,51 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
   return str;
 }
 
+QString ReservationPrinter::build(const Reservation& res)
+{
+  QString str;
+  str += ESC_EXPAND_ON
+         ESC_ALIGN_CENTER
+         "RESERVA"
+         ESC_EXPAND_OFF
+         ESC_LF
+         ESC_DOUBLE_FONT_ON +
+         QString::number(res.m_number) +
+         ESC_LF
+         ESC_EXPAND_ON
+         "DATA E HORA"
+         ESC_EXPAND_OFF
+         ESC_LF
+         ESC_DOUBLE_FONT_ON +
+         QDateTime::fromString(res.m_dateTime, Qt::ISODate).toString("dd/MM/yyyy HH:mm") +
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_ALIGN_LEFT
+         "Nome: "
+         ESC_EXPAND_ON +
+         res.m_name +
+         ESC_EXPAND_OFF
+         ESC_LF
+         "Local: "
+         ESC_EXPAND_ON +
+         res.m_location +
+         ESC_EXPAND_OFF
+         ESC_LF
+         "Quantidade: "
+         ESC_EXPAND_ON +
+         QString::number(res.m_ammount) +
+         " pessoas" +
+         ESC_EXPAND_OFF
+         ESC_LF
+         "Observacoes: " +
+         res.m_observation +
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_FULL_CUT;
+
+  return str;
+}
+
 // C++
 #include <iostream>
 #include <iomanip>

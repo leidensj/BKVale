@@ -11,6 +11,7 @@
 #include <QSplitter>
 #include <QMessageBox>
 #include <QDockWidget>
+#include <QPlainTextEdit>
 
 ReservationView::ReservationView(QWidget* parent)
   : QFrame(parent)
@@ -22,7 +23,7 @@ ReservationView::ReservationView(QWidget* parent)
   , m_edLocation(nullptr)
   , m_dateTimeEdit(nullptr)
   , m_snAmmount(nullptr)
-  , m_edObservation(nullptr)
+  , m_teObservation(nullptr)
   , m_dock(nullptr)
   , m_database(nullptr)
 {
@@ -66,7 +67,8 @@ ReservationView::ReservationView(QWidget* parent)
   m_snAmmount->setSuffix(tr(" Pessoas"));
   m_dock = new QDockWidget;
   m_database = new JDatabase;
-  m_edObservation = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_teObservation = new QPlainTextEdit;
+  m_teObservation->setPlaceholderText(tr("Observações:"));
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
@@ -80,7 +82,7 @@ ReservationView::ReservationView(QWidget* parent)
   informationlayout->addRow(tr("Local:"), m_edLocation);
   informationlayout->addRow(tr("Horário:"), m_dateTimeEdit);
   informationlayout->addRow(tr("Quantidade:"), m_snAmmount);
-  informationlayout->addRow(tr("Observações:"), m_edObservation);
+  informationlayout->addWidget(m_teObservation);
 
   QFrame* informationFrame = new QFrame();
   informationFrame->setFrameShape(QFrame::Shape::StyledPanel);
@@ -149,11 +151,12 @@ void ReservationView::itemRemoved(qlonglong id)
     create();
 }
 
-void ReservationView::save()
+Reservation ReservationView::save()
 {
   Reservation res = getReservation();
   if (m_database->save(res))
     create();
+  return res;
 }
 
 void ReservationView::create()
@@ -172,7 +175,7 @@ Reservation ReservationView::getReservation() const
   res.m_location = m_edLocation->text();
   res.m_dateTime = m_dateTimeEdit->dateTime().toString(Qt::DateFormat::ISODate);
   res.m_ammount = m_snAmmount->value();
-  res.m_observation = m_edObservation->text();
+  res.m_observation = m_teObservation->toPlainText();
   return res;
 }
 
@@ -184,7 +187,7 @@ void ReservationView::setReservation(const Reservation &res)
   m_edLocation->setText(res.m_location);
   m_dateTimeEdit->setDateTime(QDateTime::fromString(res.m_dateTime, Qt::DateFormat::ISODate));
   m_snAmmount->setValue(res.m_ammount);
-  m_edObservation->setText(res.m_observation);
+  m_teObservation->setPlainText(res.m_observation);
 }
 
 void ReservationView::showSearch()

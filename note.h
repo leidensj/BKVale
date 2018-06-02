@@ -128,10 +128,9 @@ struct Note : public JItem
     return subTotal;
   }
 
-  static QString st_strTotal(double d) { return QString::number(d, 'f', 2); }
-  static QString st_strSubTotal(double d) { return QString::number(d, 'f', 2); }
-  QString strTotal() const { return st_strTotal(total()); }
-  QString strSubTotal() const { return st_strSubTotal(subTotal()); }
+  static QString st_strMoney(double d) { return QString::number(d, 'f', 2); }
+  QString strTotal() const { return st_strMoney(total()); }
+  QString strSubTotal() const { return st_strMoney(subTotal()); }
 
   bool isValid() const
   {

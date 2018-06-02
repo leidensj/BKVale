@@ -12,6 +12,7 @@ class JDatabase;
 class QDateTimeEdit;
 class JSpinBox;
 class QDockWidget;
+class QPlainTextEdit;
 
 class ReservationView : public QFrame
 {
@@ -25,12 +26,12 @@ public:
 private slots:
   void itemSelected(const JItem& jItem);
   void itemRemoved(qlonglong id);
-  void save();
   void showSearch();
 
 public slots:
   void setReservation(const Reservation& reservation);
   void create();
+  Reservation save();
 
 signals:
   void saveSignal();
@@ -44,7 +45,7 @@ private:
   JLineEdit* m_edLocation;
   QDateTimeEdit* m_dateTimeEdit;
   JSpinBox* m_snAmmount;
-  JLineEdit* m_edObservation;
+  QPlainTextEdit* m_teObservation;
   QDockWidget* m_dock;
   JDatabase* m_database;
 };

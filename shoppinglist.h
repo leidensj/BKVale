@@ -26,7 +26,7 @@ struct ShoppingListItem : JItem
   Product m_product;
   double m_ammount;
   double m_price;
-  bool m_bIsPackageAmmount;
+  Pack m_pack;
 
   void clear()
   {
@@ -34,7 +34,7 @@ struct ShoppingListItem : JItem
     m_product.clear();
     m_ammount = 0.0;
     m_price = 0.0;
-    m_bIsPackageAmmount = true;
+    m_pack.clear();
   }
 
   ShoppingListItem()
@@ -42,8 +42,8 @@ struct ShoppingListItem : JItem
     clear();
   }
 
-  QString strUnity() const { return m_bIsPackageAmmount
-                                    ? m_product.m_packageUnity
+  QString strUnity() const { return m_pack.m_bIsPack
+                                    ? m_pack.m_unity
                                     : m_product.m_unity; }
   double subtotal() const { return m_ammount * m_price; }
   static QString st_strSubTotal(double subtotal) { return QString::number(subtotal, 'f', 2); }
@@ -64,7 +64,7 @@ struct ShoppingListItem : JItem
         m_product.m_id != another.m_product.m_id ||
         m_ammount != another.m_ammount ||
         m_price != another.m_price ||
-        m_bIsPackageAmmount != another.m_bIsPackageAmmount;
+        m_pack != another.m_pack;
   }
 
   bool operator ==(const JItem& other) const

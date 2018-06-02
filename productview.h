@@ -39,8 +39,6 @@ private:
   QPushButton* m_btnSave;
   JLineEdit* m_edName;
   JLineEdit* m_edUnity;
-  JLineEdit* m_edPackageUnity;
-  JDoubleSpinBox* m_spnPackageAmmount;
   JLineEdit* m_edDetails;
   QCheckBox* m_cbAvailableAtNotes;
   QCheckBox* m_cbAvailableAtShop;

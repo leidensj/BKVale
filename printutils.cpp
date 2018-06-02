@@ -117,10 +117,7 @@ namespace
       QString item;
       {
         QString itemPt1 = note.m_vNoteItem.at(i).strAmmount();
-        if (note.m_vNoteItem.at(i).m_bIsPackageAmmount)
-          itemPt1 += note.m_vNoteItem.at(i).m_product.m_packageUnity;
-        else
-          itemPt1 += note.m_vNoteItem.at(i).m_product.m_unity;
+        itemPt1 += note.m_vNoteItem.at(i).strUnity();
         itemPt1 += " x R$" + note.m_vNoteItem.at(i).strPrice();
         QString itemPt2 = "R$" + note.m_vNoteItem.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());

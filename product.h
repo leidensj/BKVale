@@ -8,14 +8,39 @@
 #include "defines.h"
 #include "category.h"
 
+struct Pack
+{
+  bool m_bIsPack;
+  QString m_unity;
+  double m_ammount;
+
+  void clear()
+  {
+    m_bIsPack = false;
+    m_unity.clear();
+    m_ammount = 0.0;
+  }
+
+  Pack()
+  {
+    clear();
+  }
+
+  bool operator !=(const Pack& other) const
+  {
+    return
+        m_bIsPack != other.m_bIsPack ||
+        m_unity != other.m_unity ||
+        m_ammount != other.m_ammount;
+  }
+};
+
 struct Product : public JItem
 {
   Category m_category;
   Image m_image;
   QString m_name;
   QString m_unity;
-  QString m_packageUnity;
-  double m_packageAmmount;
   QString m_details;
   bool m_bAvailableAtNotes;
   bool m_bAvailableAtShop;
@@ -24,19 +49,6 @@ struct Product : public JItem
   bool m_bAvailableToSell;
   bool m_bAvailableAtShoppingList;
 
-  bool hasPackageUnity() const
-  {
-    return !m_packageUnity.isEmpty() &&
-        m_unity != m_packageUnity;
-  }
-
-  QString strPackageUnity(bool bUsePackageUnity = true) const
-  {
-    return hasPackageUnity() && bUsePackageUnity ?
-          m_packageUnity :
-          m_unity;
-  }
-
   void clear()
   {
     m_id = INVALID_ID;
@@ -44,8 +56,6 @@ struct Product : public JItem
     m_image.clear();
     m_name.clear();
     m_unity.clear();
-    m_packageUnity.clear();
-    m_packageAmmount = 1.0;
     m_details.clear();
     m_bAvailableAtNotes = false;
     m_bAvailableAtShop = false;
@@ -68,8 +78,6 @@ struct Product : public JItem
         m_category.m_id != another.m_category.m_id ||
         m_name != another.m_name ||
         m_unity != another.m_unity ||
-        m_packageUnity != another.m_packageUnity ||
-        m_packageAmmount != another.m_packageAmmount ||
         m_details != another.m_details ||
         m_bAvailableAtNotes != another.m_bAvailableAtNotes ||
         m_bAvailableAtShop != another.m_bAvailableAtShop ||

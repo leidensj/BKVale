@@ -111,10 +111,9 @@ QVector<ShoppingListItem> ShoppingListTable::getShoppingItems() const
     ShoppingListItem shopItem = item(i, 1)->data(Qt::UserRole).value<ShoppingListItem>();
     shopItem.m_ammount = text(i, 2).toDouble();
     shopItem.m_price = text(i, 3).toDouble();
-    if (shopItem.m_product.hasPackageUnity())
-      shopItem.m_bIsPackageAmmount = item(i, 0)->checkState() == Qt::Checked ? true : false;
-    else
-      shopItem.m_bIsPackageAmmount = false;
+    shopItem.m_pack.m_bIsPack = item(i, 0)->checkState() == Qt::Checked ? true : false;
+    if (shopItem.m_pack.m_bIsPack)
+      shopItem.m_pack.m_unity = item(i, 0)->text();
     vShopItem.push_back(shopItem);
   }
   return vShopItem;
@@ -134,6 +133,17 @@ void ShoppingListTable::addShoppingItem(const ShoppingListItem& shopItem)
   blockSignals(false);
 }
 
+void ShoppingListTable::setUnityEnabled(bool bEnable)
+{
+  Qt::ItemFlags flags = Qt::NoItemFlags |
+                        Qt::ItemIsSelectable |
+                        Qt::ItemIsEnabled |
+                        Qt::ItemIsUserCheckable;
+  if (bEnable)
+    flags |= Qt::ItemIsEditable;
+  item(currentRow(), 0)->setFlags(flags);
+}
+
 void ShoppingListTable::setProduct(const Product& product)
 {
   if (currentRow() >= 0)
@@ -146,23 +156,12 @@ void ShoppingListTable::setProduct(const Product& product)
 
     item(currentRow(), 1)->setText(product.m_name);
     item(currentRow(), 1)->setIcon(ico);
-    if (product.hasPackageUnity())
-      item(currentRow(), 0)->setFlags(Qt::NoItemFlags |
-                                      Qt::ItemIsSelectable |
-                                      Qt::ItemIsEnabled |
-                                      Qt::ItemIsUserCheckable);
-    else
-      item(currentRow(), 0)->setFlags(Qt::NoItemFlags |
-                                      Qt::ItemIsSelectable |
-                                      Qt::ItemIsEnabled);
     item(currentRow(), 1)->setFlags(Qt::NoItemFlags |
                                     Qt::ItemIsSelectable |
                                     Qt::ItemIsEnabled);
-
-    bool bIsPackageAmmount = false;
-    if (product.hasPackageUnity())
-      bIsPackageAmmount = item(currentRow(), 0)->checkState() == Qt::Checked;
-    item(currentRow(), 0)->setText(product.strPackageUnity(bIsPackageAmmount));
+    setUnityEnabled(false);
+    item(currentRow(), 0)->setCheckState(Qt::Unchecked);
+    item(currentRow(), 0)->setText(product.m_unity);
 
     update(currentRow(), 2);
     update(currentRow(), 3);
@@ -181,11 +180,12 @@ void ShoppingListTable::setShoppingItem(const ShoppingListItem& shopItem)
     item(currentRow(), 1)->setData(Qt::UserRole, var);
     item(currentRow(), 2)->setText(shopItem.strAmmount());
     item(currentRow(), 3)->setText(shopItem.strPrice());
-    if (shopItem.m_product.hasPackageUnity())
-      item(currentRow(), 0)->setCheckState(shopItem.m_bIsPackageAmmount ? Qt::Checked : Qt::Unchecked);
     item(currentRow(), 1)->setBackgroundColor(QColor(230, 230, 230));
     item(currentRow(), 0)->setBackgroundColor(QColor(230, 230, 230));
     setProduct(shopItem.m_product);
+    setUnityEnabled(shopItem.m_pack.m_bIsPack);
+    item(currentRow(), 0)->setCheckState(shopItem.m_pack.m_bIsPack ? Qt::Checked : Qt::Unchecked);
+    item(currentRow(), 0)->setText(shopItem.strUnity());
     blockSignals(false);
   }
 }
@@ -205,11 +205,10 @@ void ShoppingListTable::update(int row, int column)
     case 0:
     {
       ShoppingListItem shopItem = item(row, 1)->data(Qt::UserRole).value<ShoppingListItem>();
-      if (shopItem.m_product.hasPackageUnity())
-      {
-        bool bChecked = item(row, column)->checkState() == Qt::Checked;
-        setText(row, column, shopItem.m_product.strPackageUnity(bChecked));
-      }
+      bool bChecked = item(row, column)->checkState() == Qt::Checked;
+      setUnityEnabled(bChecked);
+      if (bChecked)
+        setText(row, column, bChecked ? shopItem.m_pack.m_unity : shopItem.m_product.m_unity);
     } break;
     case 2:
     {

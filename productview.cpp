@@ -17,8 +17,6 @@ ProductView::ProductView(QWidget* parent)
   , m_btnSave(nullptr)
   , m_edName(nullptr)
   , m_edUnity(nullptr)
-  , m_edPackageUnity(nullptr)
-  , m_spnPackageAmmount(nullptr)
   , m_edDetails(nullptr)
   , m_cbAvailableAtNotes(nullptr)
   , m_cbAvailableAtShop(nullptr)
@@ -52,16 +50,6 @@ ProductView::ProductView(QWidget* parent)
                             JLineEdit::st_defaultFlags1);
   m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
   m_edUnity->setPlaceholderText("*");
-
-  m_edPackageUnity = new JLineEdit(JLineEdit::Input::Alphanumeric,
-                                   JLineEdit::st_defaultFlags1);
-  m_edPackageUnity->setMaxLength(PRODUCT_MAX_PACKAGE_UNITY_LENGTH);
-
-  m_spnPackageAmmount = new JDoubleSpinBox(true);
-  m_spnPackageAmmount->setMaximum(PRODUCT_MAX_PACKAGE_AMMOUNT_LENGTH);
-  m_spnPackageAmmount->setMinimum(0.0);
-  m_spnPackageAmmount->setValue(1.0);
-  m_spnPackageAmmount->setSingleStep(0.1);
 
   m_edDetails = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                               JLineEdit::st_defaultFlags1);
@@ -100,8 +88,6 @@ ProductView::ProductView(QWidget* parent)
   formlayout->setContentsMargins(0, 0, 0, 0);
   formlayout->addRow(tr("Nome:"), m_edName);
   formlayout->addRow(tr("Unidade:"), m_edUnity);
-  formlayout->addRow(tr("Unidade embalagem:"), m_edPackageUnity);
-  formlayout->addRow(tr("Quantidade embalagem:"), m_spnPackageAmmount);
   formlayout->addRow(tr("Detalhes:"), m_edDetails);
 
   QVBoxLayout* tabInfoLayout = new QVBoxLayout;
@@ -189,8 +175,6 @@ Product ProductView::getProduct() const
   product.m_id = m_currentId;
   product.m_name = m_edName->text();
   product.m_unity = m_edUnity->text();
-  product.m_packageUnity = m_edPackageUnity->text();
-  product.m_packageAmmount = m_spnPackageAmmount->value();
   product.m_details = m_edDetails->text();
   product.m_bAvailableAtNotes = m_cbAvailableAtNotes->isChecked();
   product.m_bAvailableAtShop = m_cbAvailableAtShop->isChecked();
@@ -211,8 +195,6 @@ void ProductView::setProduct(const Product &product)
   m_currentId = product.m_id;
   m_edName->setText(product.m_name);
   m_edUnity->setText(product.m_unity);
-  m_edPackageUnity->setText(product.m_packageUnity);
-  m_spnPackageAmmount->setValue(product.m_packageAmmount);
   m_edDetails->setText(product.m_details);
   m_cbAvailableAtNotes->setChecked(product.m_bAvailableAtNotes);
   m_cbAvailableAtShop->setChecked(product.m_bAvailableAtShop);

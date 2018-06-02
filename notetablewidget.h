@@ -32,6 +32,7 @@ private:
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
   double evaluate(int row, int column) const;
+  void setUnityEnabled(bool bEnable);
 
 private slots:
   void update(int row, int column);

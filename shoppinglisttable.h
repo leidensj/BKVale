@@ -29,6 +29,7 @@ private:
   QString text(int row, int column) const;
   void setText(int row, int column, const QString& str);
   double evaluate(int row, int column) const;
+  void setUnityEnabled(bool bEnable);
 
 private slots:
   void update(int row, int column);

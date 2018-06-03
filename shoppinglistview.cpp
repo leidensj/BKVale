@@ -5,6 +5,7 @@
 #include "jdatabase.h"
 #include "jdatabasepicker.h"
 #include "shoppinglisttable.h"
+#include "packageeditor.h"
 #include "jlineedit.h"
 #include <QSplitter>
 #include <QTabWidget>
@@ -51,7 +52,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_btnSave(nullptr)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
-  , m_btnEdit(nullptr)
   , m_database(nullptr)
   , m_edTitle(nullptr)
   , m_edDescription(nullptr)
@@ -93,13 +93,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
   m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
   m_btnRemove->setToolTip(tr("Remover (Alt+-)"));
-
-  m_btnEdit = new QPushButton;
-  m_btnEdit->setFlat(true);
-  m_btnEdit->setIconSize(QSize(24, 24));
-  m_btnEdit->setIcon(QIcon(":/icons/res/binoculars.png"));
-  m_btnEdit->setShortcut(QKeySequence(Qt::Key_F3));
-  m_btnEdit->setToolTip(tr("Editar (F3)"));
 
   m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, true);
   m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
@@ -143,7 +136,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   tableButtonLayout->setContentsMargins(0, 0, 0, 0);
   tableButtonLayout->addWidget(m_btnAdd);
   tableButtonLayout->addWidget(m_btnRemove);
-  tableButtonLayout->addWidget(m_btnEdit);
 
   QHBoxLayout* monthLayout1 = new QHBoxLayout;
   monthLayout1->setContentsMargins(0, 0, 0, 0);
@@ -259,10 +251,15 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(removeItem()));
-  QObject::connect(m_btnEdit,
-                   SIGNAL(clicked(bool)),
+  QObject::connect(m_table,
+                   SIGNAL(productSignal(const Product&)),
                    this,
-                   SLOT(editItem()));
+                   SLOT(editProduct()));
+  QObject::connect(m_table,
+                   SIGNAL(packageSignal(const Package&,
+                                        const QString&)),
+                   this,
+                   SLOT(editPackage(const Package&, const QString&)));
   QObject::connect(m_table,
                    SIGNAL(changedSignal()),
                    this,
@@ -316,7 +313,7 @@ void ShoppingListView::removeItem()
   updateControls();
 }
 
-void ShoppingListView::editItem()
+void ShoppingListView::editProduct()
 {
   JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
   w.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
@@ -332,10 +329,17 @@ void ShoppingListView::editItem()
   }
 }
 
+void ShoppingListView::editPackage(const Package& package,
+                                   const QString& productUnity)
+{
+  PackageEditor dlg(package, productUnity);
+  if (dlg.exec())
+    m_table->setPackage(dlg.getPackage());
+}
+
 void ShoppingListView::updateControls()
 {
   m_btnAdd->setEnabled(m_table->rowCount() < SHOPPING_LIST_MAX_NUMBER_OF_ITEMS);
-  m_btnEdit->setEnabled(m_table->currentRow() != -1);
   m_btnRemove->setEnabled(m_table->currentRow() != -1);
 }
 

@@ -117,7 +117,7 @@ namespace
       QString item;
       {
         QString itemPt1 = note.m_vNoteItem.at(i).strAmmount();
-        itemPt1 += note.m_vNoteItem.at(i).strUnity();
+        itemPt1 += note.m_vNoteItem.at(i).m_package.strUnity(note.m_vNoteItem.at(i).m_product.m_unity);
         itemPt1 += " x R$" + note.m_vNoteItem.at(i).strPrice();
         QString itemPt2 = "R$" + note.m_vNoteItem.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
@@ -446,7 +446,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
            "|     |     | ";
     if (lst.m_bPrintAmmount)
       str += lst.m_vItem.at(i).strAmmount() +
-             lst.m_vItem.at(i).strUnity();
+             lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity);
     str += ESC_LF
            "|     |     | ";
     if (lst.m_bPrintPrice)

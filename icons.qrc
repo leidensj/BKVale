@@ -143,5 +143,7 @@
         <file>res/cal18.png</file>
         <file>res/cal30.png</file>
         <file>res/reservation.png</file>
+        <file>res/edit.png</file>
+        <file>res/package.png</file>
     </qresource>
 </RCC>

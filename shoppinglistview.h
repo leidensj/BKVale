@@ -32,7 +32,9 @@ private slots:
   void create();
   void addItem();
   void removeItem();
-  void editItem();
+  void editProduct();
+  void editPackage(const Package& package,
+                   const QString& productUnity);
   void updateControls();
 
 private:
@@ -42,7 +44,6 @@ private:
 
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
-  QPushButton* m_btnEdit;
 
   JDatabase* m_database;
   JLineEdit* m_edTitle;

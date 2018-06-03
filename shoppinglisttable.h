@@ -15,6 +15,7 @@ public:
   QVector<ShoppingListItem> getShoppingItems() const;
   void setShoppingItems(const QVector<ShoppingListItem>& vItem);
   void setProduct(const Product& product);
+  void setPackage(const Package& package);
   void setShoppingItem(const ShoppingListItem& shopItem);
   void addShoppingItem(const ShoppingListItem& shopItem);
 
@@ -26,17 +27,18 @@ protected:
   void keyPressEvent(QKeyEvent *event);
 
 private:
-  QString text(int row, int column) const;
-  void setText(int row, int column, const QString& str);
   double evaluate(int row, int column) const;
-  void setUnityEnabled(bool bEnable);
 
 private slots:
   void update(int row, int column);
   void emitChangedSignal();
+  void emitEditSignal(int row, int column);
 
 signals:
   void changedSignal();
+  void packageSignal(const Package& package,
+                     const QString& productUnity);
+  void productSignal(const Product& product);
 };
 
 #endif // SHOPPINGLISTTABLE_H

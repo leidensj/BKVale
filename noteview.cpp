@@ -8,6 +8,7 @@
 #include "printutils.h"
 #include "jlineedit.h"
 #include "tinyexpr.h"
+#include "packageeditor.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -33,7 +34,6 @@ NoteView::NoteView(QWidget *parent)
   , m_btnCreate(nullptr)
   , m_btnOpenLast(nullptr)
   , m_btnSearch(nullptr)
-  , m_btnSearchItem(nullptr)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
   , m_snNumber(nullptr)
@@ -72,14 +72,6 @@ NoteView::NoteView(QWidget *parent)
   QFrame* vFrame0 = new QFrame;
   vFrame0->setFrameShape(QFrame::VLine);
 
-  m_btnSearchItem = new QPushButton();
-  m_btnSearchItem->setFlat(true);
-  m_btnSearchItem->setText("");
-  m_btnSearchItem->setIconSize(QSize(24, 24));
-  m_btnSearchItem->setIcon(QIcon(":/icons/res/binoculars.png"));
-  m_btnSearchItem->setToolTip(tr("Procurar item (F3)"));
-  m_btnSearchItem->setShortcut(QKeySequence(Qt::Key_F3));
-
   m_btnAdd = new QPushButton();
   m_btnAdd->setFlat(true);
   m_btnAdd->setText("");
@@ -103,7 +95,6 @@ NoteView::NoteView(QWidget *parent)
   hlayout1->addWidget(m_btnSearch);
   hlayout1->addWidget(m_btnOpenLast);
   hlayout1->addWidget(vFrame0);
-  hlayout1->addWidget(m_btnSearchItem);
   hlayout1->addWidget(m_btnAdd);
   hlayout1->addWidget(m_btnRemove);
 
@@ -271,10 +262,14 @@ NoteView::NoteView(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(searchProduct()));
-  QObject::connect(m_btnSearchItem,
-                   SIGNAL(clicked(bool)),
+  QObject::connect(m_table,
+                   SIGNAL(productSignal(const Product&)),
                    this,
                    SLOT(searchProduct()));
+  QObject::connect(m_table,
+                   SIGNAL(packageSignal(const Package&, const QString&)),
+                   this,
+                   SLOT(editPackage(const Package&, const QString&)));
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
@@ -413,7 +408,6 @@ void NoteView::supplierChanged()
 void NoteView::updateControls()
 {
   m_btnRemove->setEnabled(m_table->currentRow() >= 0);
-  m_btnSearchItem->setEnabled(m_table->currentRow() >= 0);
   m_btnOpenLast->setEnabled(IS_VALID_ID(m_lastId));
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
                             ? ":/icons/res/calendarok.png"
@@ -428,7 +422,7 @@ void NoteView::updateControls()
   else
     m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, 0.0);
   disccount = m_edDisccount->property(DISCCOUNT_LAST_VALUE_PROP).toDouble();
-  m_edDisccount->setText(Note::st_strDisccount(disccount));
+  m_edDisccount->setText(JItem::st_strMoney(disccount));
   QPalette palette = m_edDisccount->palette();
   palette.setColor(QPalette::ColorRole::Text,
                    disccount >= 0 ? Qt::red : Qt::darkGreen);
@@ -437,7 +431,7 @@ void NoteView::updateControls()
   double total = m_table->computeTotal() + disccount;
 
   if (m_table->hasItems() || total != 0)
-    m_edTotal->setText(Note::st_strMoney(total));
+    m_edTotal->setText(JItem::st_strMoney(total));
   else
     m_edTotal->clear();
 
@@ -497,6 +491,15 @@ void NoteView::searchProduct()
     {
       m_table->setProduct(*pProduct);
     }
+  }
+}
+
+void NoteView::editPackage(const Package& package, const QString& productUnity)
+{
+  PackageEditor dlg(package, productUnity);
+  if (dlg.exec())
+  {
+    m_table->setPackage(dlg.getPackage());
   }
 }
 

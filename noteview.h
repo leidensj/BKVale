@@ -40,7 +40,6 @@ private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnSearch;
-  QPushButton* m_btnSearchItem;
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;
@@ -71,6 +70,8 @@ private slots:
   void itemSelected(const JItem& jItem);
   void itemRemoved(qlonglong id);
   void searchProduct();
+  void editPackage(const Package& package,
+                   const QString& productUnity);
 
 public slots:
   void create();

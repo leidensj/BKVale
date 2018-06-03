@@ -26,7 +26,7 @@ struct NoteItem : JItem
   Product m_product;
   double m_ammount;
   double m_price;
-  Pack m_pack;
+  Package m_package;
 
   void clear()
   {
@@ -34,7 +34,7 @@ struct NoteItem : JItem
     m_product.clear();
     m_ammount = 0.0;
     m_price = 0.0;
-    m_pack.clear();
+    m_package.clear();
   }
 
   NoteItem()
@@ -42,16 +42,10 @@ struct NoteItem : JItem
     clear();
   }
 
-  QString strUnity() const { return m_pack.m_bIsPack
-                                    ? m_pack.m_unity
-                                    : m_product.m_unity; }
   double subtotal() const { return m_ammount * m_price; }
-  static QString st_strSubTotal(double subtotal) { return QString::number(subtotal, 'f', 2); }
-  static QString st_strAmmount(double ammount) { return QString::number(ammount, 'f', 3); }
-  static QString st_strPrice(double price) { return QString::number(price, 'f', 2); }
-  QString strSubtotal() const { return st_strSubTotal(subtotal()); }
+  QString strSubtotal() const { return st_strMoney(subtotal()); }
   QString strAmmount() const { return st_strAmmount(m_ammount); }
-  QString strPrice() const { return st_strPrice(m_price); }
+  QString strPrice() const { return st_strMoney(m_price); }
   bool isValid() const
   {
     return m_product.isValidId() &&
@@ -66,7 +60,7 @@ struct NoteItem : JItem
         m_product.m_id != another.m_product.m_id ||
         m_ammount != another.m_ammount ||
         m_price != another.m_price ||
-        m_pack != another.m_pack;
+        m_package != another.m_package;
   }
 
   bool operator ==(const JItem& other) const
@@ -107,10 +101,8 @@ struct Note : public JItem
   QString strDate() const { return QDate::fromString(m_date, Qt::ISODate).toString("dd/MM/yyyy"); }
   QString strDayOfWeek() const { return QDate::fromString(m_date, Qt::ISODate).toString("dddd"); }
   QString strId() const { return QString::number(m_id); }
-  static QString st_strNumber(qlonglong number) { return QString::number(number); }
-  QString strNumber() const { return st_strNumber(m_number); }
-  static QString st_strDisccount(double d) { return QString::number(d, 'f', 2); }
-  QString strDisccount() const { return st_strDisccount(m_disccount); }
+  QString strNumber() const { return st_strInt(m_number); }
+  QString strDisccount() const { return st_strMoney(m_disccount); }
 
   double total() const
   {
@@ -128,7 +120,6 @@ struct Note : public JItem
     return subTotal;
   }
 
-  static QString st_strMoney(double d) { return QString::number(d, 'f', 2); }
   QString strTotal() const { return st_strMoney(total()); }
   QString strSubTotal() const { return st_strMoney(subTotal()); }
 

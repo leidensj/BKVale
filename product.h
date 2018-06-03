@@ -7,31 +7,46 @@
 #include "jitem.h"
 #include "defines.h"
 #include "category.h"
+#include <QRegExp>
 
-struct Pack
+struct Package
 {
-  bool m_bIsPack;
+  bool m_bIsPackage;
   QString m_unity;
   double m_ammount;
 
   void clear()
   {
-    m_bIsPack = false;
+    m_bIsPackage = false;
     m_unity.clear();
     m_ammount = 0.0;
   }
 
-  Pack()
+  Package()
   {
     clear();
   }
 
-  bool operator !=(const Pack& other) const
+  bool operator !=(const Package& other) const
   {
     return
-        m_bIsPack != other.m_bIsPack ||
+        m_bIsPackage != other.m_bIsPackage ||
         m_unity != other.m_unity ||
         m_ammount != other.m_ammount;
+  }
+
+  QString strFormattedUnity(const QString& productUnity) const
+  {
+    return !m_bIsPackage
+        ? productUnity
+        : m_unity + " (" +
+          QString::number(m_ammount, 'f', 3).remove(QRegExp("\\.?0*$")) +
+          productUnity + ")";
+  }
+
+  QString strUnity(const QString& productUnity) const
+  {
+    return m_bIsPackage ? m_unity : productUnity;
   }
 };
 

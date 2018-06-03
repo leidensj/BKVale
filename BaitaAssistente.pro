@@ -47,7 +47,8 @@ SOURCES += main.cpp\
     jdoublespinbox.cpp \
     shopview.cpp \
     reservationview.cpp \
-    jspinbox.cpp
+    jspinbox.cpp \
+    packageeditor.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -96,7 +97,8 @@ HEADERS  += mainwindow.h \
     shopview.h \
     reservation.h \
     reservationview.h \
-    jspinbox.h
+    jspinbox.h \
+    packageeditor.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

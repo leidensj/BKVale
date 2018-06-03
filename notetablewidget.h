@@ -15,6 +15,7 @@ public:
   QVector<NoteItem> getNoteItems() const;
   void setNoteItems(const QVector<NoteItem>& vNoteItem);
   void setProduct(const Product& product);
+  void setPackage(const Package& package);
   void setNoteItem(const NoteItem& noteItem);
   void addNoteItem(const NoteItem& noteItem);
   double computeTotal() const;
@@ -32,14 +33,17 @@ private:
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
   double evaluate(int row, int column) const;
-  void setUnityEnabled(bool bEnable);
 
 private slots:
   void update(int row, int column);
   void emitChangedSignal();
+  void emitEditSignal(int row, int column);
 
 signals:
   void changedSignal();
+  void packageSignal(const Package& package,
+                     const QString& productUnity);
+  void productSignal(const Product& product);
 };
 
 #endif // NOTETABLEWIDGET_H

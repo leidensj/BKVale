@@ -42,6 +42,11 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
                    SIGNAL(currentCellChanged(int, int, int, int)),
                    this,
                    SLOT(emitChangedSignal()));
+
+  QObject::connect(this,
+                   SIGNAL(cellDoubleClicked(int, int)),
+                   this,
+                   SLOT(emitEditSignal(int, int)));
 }
 
 void NoteTableWidget::keyPressEvent(QKeyEvent *event)
@@ -135,9 +140,6 @@ QVector<NoteItem> NoteTableWidget::getNoteItems() const
     NoteItem noteItem = item(i, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
     noteItem.m_ammount = text(i, (int)NoteColumn::Ammount).toDouble();
     noteItem.m_price = text(i, (int)NoteColumn::Price).toDouble();
-    noteItem.m_pack.m_bIsPack = item(i, (int)NoteColumn::Unity)->checkState() == Qt::Checked ? true : false;
-    if (noteItem.m_pack.m_bIsPack)
-      noteItem.m_pack.m_unity = item(i, (int)NoteColumn::Unity)->text();
     vNoteItem.push_back(noteItem);
   }
   return vNoteItem;
@@ -158,15 +160,19 @@ void NoteTableWidget::addNoteItem(const NoteItem& noteItem)
   blockSignals(false);
 }
 
-void NoteTableWidget::setUnityEnabled(bool bEnable)
+void NoteTableWidget::setPackage(const Package& package)
 {
-  Qt::ItemFlags flags = Qt::NoItemFlags |
-                        Qt::ItemIsSelectable |
-                        Qt::ItemIsEnabled |
-                        Qt::ItemIsUserCheckable;
-  if (bEnable)
-    flags |= Qt::ItemIsEditable;
-  item(currentRow(), (int)NoteColumn::Unity)->setFlags(flags);
+  if (currentRow() >= 0)
+  {
+    blockSignals(true);
+    NoteItem noteItem = item(currentRow(), (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
+    noteItem.m_package = package;
+    QVariant var;
+    var.setValue(noteItem);
+    item(currentRow(), (int)NoteColumn::Description)->setData(Qt::UserRole, var);
+    item(currentRow(), (int)NoteColumn::Unity)->setText(noteItem.m_package.strFormattedUnity(noteItem.m_product.m_unity));
+    blockSignals(false);
+  }
 }
 
 void NoteTableWidget::setProduct(const Product& product)
@@ -174,6 +180,12 @@ void NoteTableWidget::setProduct(const Product& product)
   if (currentRow() >= 0)
   {
     blockSignals(true);
+
+    NoteItem noteItem = item(currentRow(), (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
+    noteItem.m_package.clear();
+    noteItem.m_product = product;
+    QVariant var;
+    var.setValue(noteItem);
 
     QPixmap pixmap(QSize(16, 16));
     pixmap.loadFromData(product.m_image.m_image);
@@ -184,8 +196,10 @@ void NoteTableWidget::setProduct(const Product& product)
     item(currentRow(), (int)NoteColumn::Description)->setFlags(Qt::NoItemFlags |
                                                                Qt::ItemIsSelectable |
                                                                Qt::ItemIsEnabled);
-    item(currentRow(), (int)NoteColumn::Unity)->setCheckState(Qt::Unchecked);
-    setUnityEnabled(false);
+    item(currentRow(), (int)NoteColumn::Unity)->setFlags(Qt::NoItemFlags |
+                                                         Qt::ItemIsSelectable |
+                                                         Qt::ItemIsEnabled |
+                                                         Qt::ItemIsUserCheckable);
     item(currentRow(), (int)NoteColumn::Unity)->setText(product.m_unity);
 
     update(currentRow(), (int)NoteColumn::Ammount);
@@ -206,12 +220,10 @@ void NoteTableWidget::setNoteItem(const NoteItem& noteItem)
     item(currentRow(), (int)NoteColumn::Ammount)->setText(noteItem.strAmmount());
     item(currentRow(), (int)NoteColumn::Price)->setText(noteItem.strPrice());
     item(currentRow(), (int)NoteColumn::SubTotal)->setText(noteItem.strSubtotal());
-    item(currentRow(), (int)NoteColumn::Unity)->setCheckState(noteItem.m_pack.m_bIsPack ? Qt::Checked : Qt::Unchecked);
-    setUnityEnabled(noteItem.m_pack.m_bIsPack);
-    item(currentRow(), (int)NoteColumn::Unity)->setText(noteItem.strUnity());
     item(currentRow(), (int)NoteColumn::Description)->setTextColor(QColor(Qt::darkGray));
     item(currentRow(), (int)NoteColumn::Unity)->setTextColor(QColor(Qt::darkGray));
     setProduct(noteItem.m_product);
+    setPackage(noteItem.m_package);
     blockSignals(false);
   }
 }
@@ -230,28 +242,23 @@ void NoteTableWidget::update(int row, int column)
   {
     case NoteColumn::Unity:
     {
-      NoteItem noteItem = item(row, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
-      bool bChecked = item(row, column)->checkState() == Qt::Checked;
-      setUnityEnabled(bChecked);
-      if (!bChecked)
-        item(row, column)->setText(noteItem.m_product.m_unity);
     } break;
     case NoteColumn::Ammount:
     {
       double value = evaluate(row, column);
-      setText(row, column, NoteItem::st_strAmmount(value));
-      setText(row, (int)NoteColumn::SubTotal, Note::st_strMoney(computeSubTotal(row)));
+      setText(row, column, JItem::st_strAmmount(value));
+      setText(row, (int)NoteColumn::SubTotal, JItem::st_strMoney(computeSubTotal(row)));
     } break;
     case NoteColumn::Price:
     {
       double value = evaluate(row, column);
-      setText(row, column, NoteItem::st_strPrice(value));
-      setText(row, (int)NoteColumn::SubTotal, Note::st_strMoney(computeSubTotal(row)));
+      setText(row, column, JItem::st_strMoney(value));
+      setText(row, (int)NoteColumn::SubTotal, JItem::st_strMoney(computeSubTotal(row)));
     } break;
     case NoteColumn::SubTotal:
     {
-      setText(row, column, NoteItem::st_strSubTotal(evaluate(row, column)));
-      setText(row, (int)NoteColumn::Price, Note::st_strMoney(computePrice(row)));
+      setText(row, column, JItem::st_strMoney(evaluate(row, column)));
+      setText(row, (int)NoteColumn::Price, JItem::st_strMoney(computePrice(row)));
     } break;
     case NoteColumn::Description:
     default:
@@ -278,4 +285,18 @@ void NoteTableWidget::update(int row, int column)
 void NoteTableWidget::emitChangedSignal()
 {
   emit changedSignal();
+}
+
+void NoteTableWidget::emitEditSignal(int row, int column)
+{
+  if (column == (int)NoteColumn::Unity && row >= 0)
+  {
+    NoteItem noteItem = item(row, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
+    emit packageSignal(noteItem.m_package, noteItem.m_product.m_unity);
+  }
+  else if (column == (int)NoteColumn::Description && row >= 0)
+  {
+    NoteItem noteItem = item(row, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
+    emit productSignal(noteItem.m_product);
+  }
 }

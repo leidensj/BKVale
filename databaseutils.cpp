@@ -137,9 +137,9 @@ bool NoteSQL::insert(QSqlDatabase db,
       query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id);
       query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
       query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
-      query.bindValue(":_v05", note.m_vNoteItem.at(i).m_pack.m_bIsPack);
-      query.bindValue(":_v06", note.m_vNoteItem.at(i).m_pack.m_unity);
-      query.bindValue(":_v07", note.m_vNoteItem.at(i).m_pack.m_ammount);
+      query.bindValue(":_v05", note.m_vNoteItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", note.m_vNoteItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", note.m_vNoteItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
         note.m_vNoteItem.at(i).m_id = query.lastInsertId().toLongLong();
@@ -181,7 +181,7 @@ bool NoteSQL::update(QSqlDatabase db,
   query.bindValue(":_v06", note.m_disccount);
   bool bSuccess = query.exec();
 
-  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
+  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:v01)");
   query.bindValue(":_v01", note.m_id);
   bSuccess = query.exec();
 
@@ -209,9 +209,9 @@ bool NoteSQL::update(QSqlDatabase db,
       query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id);
       query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
       query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
-      query.bindValue(":_v05", note.m_vNoteItem.at(i).m_pack.m_bIsPack);
-      query.bindValue(":_v06", note.m_vNoteItem.at(i).m_pack.m_unity);
-      query.bindValue(":_v07", note.m_vNoteItem.at(i).m_pack.m_ammount);
+      query.bindValue(":_v05", note.m_vNoteItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", note.m_vNoteItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", note.m_vNoteItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
         note.m_vNoteItem.at(i).m_id = query.lastInsertId().toLongLong();
@@ -291,9 +291,9 @@ bool NoteSQL::select(QSqlDatabase db,
         noteItem.m_product.m_id = query.value(1).toLongLong();
         noteItem.m_ammount = query.value(2).toDouble();
         noteItem.m_price = query.value(3).toDouble();
-        noteItem.m_pack.m_bIsPack = query.value(4).toBool();
-        noteItem.m_pack.m_unity = query.value(5).toString();
-        noteItem.m_pack.m_ammount = query.value(6).toDouble();
+        noteItem.m_package.m_bIsPackage = query.value(4).toBool();
+        noteItem.m_package.m_unity = query.value(5).toString();
+        noteItem.m_package.m_ammount = query.value(6).toDouble();
         note.m_vNoteItem.push_back(noteItem);
       }
     }
@@ -2363,9 +2363,9 @@ bool ShoppingListSQL::insert(QSqlDatabase db,
         query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id);
       query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
       query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
-      query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_pack.m_bIsPack);
-      query.bindValue(":_v06", shoppingList.m_vItem.at(i).m_pack.m_unity);
-      query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_pack.m_ammount);
+      query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", shoppingList.m_vItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
         shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
@@ -2455,9 +2455,9 @@ bool ShoppingListSQL::update(QSqlDatabase db,
         query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id);
       query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
       query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
-      query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_pack.m_bIsPack);
-      query.bindValue(":_v06", shoppingList.m_vItem.at(i).m_pack.m_unity);
-      query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_pack.m_ammount);
+      query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", shoppingList.m_vItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
         shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
@@ -2548,9 +2548,9 @@ bool ShoppingListSQL::select(QSqlDatabase db,
         item.m_product.m_id = query.value(1).toLongLong();
         item.m_ammount = query.value(2).toDouble();
         item.m_price = query.value(3).toDouble();
-        item.m_pack.m_bIsPack = query.value(4).toBool();
-        item.m_pack.m_unity = query.value(5).toString();
-        item.m_pack.m_ammount = query.value(6).toDouble();
+        item.m_package.m_bIsPackage = query.value(4).toBool();
+        item.m_package.m_unity = query.value(5).toString();
+        item.m_package.m_ammount = query.value(6).toDouble();
         shoppingList.m_vItem.push_back(item);
       }
     }

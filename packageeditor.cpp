@@ -26,8 +26,8 @@ PackageEditor::PackageEditor(const Package& package,
   m_spnAmmount->setValue(1.0);
 
   QFormLayout* flayout = new QFormLayout;
-  flayout->addRow(tr("Unidade"), m_edUnity);
-  flayout->addRow(tr("Quantidade"), m_spnAmmount);
+  flayout->addRow(tr("Unidade:"), m_edUnity);
+  flayout->addRow(tr("Quantidade:"), m_spnAmmount);
 
   m_grpIsPackage->setLayout(flayout);
 

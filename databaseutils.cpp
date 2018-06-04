@@ -591,7 +591,8 @@ bool BaitaSQL::init(QSqlDatabase db,
                           RESERVATION_SQL_COL03 " TEXT,"
                           RESERVATION_SQL_COL04 " TEXT,"
                           RESERVATION_SQL_COL05 " INT,"
-                          RESERVATION_SQL_COL06 " TEXT)");
+                          RESERVATION_SQL_COL06 " TEXT,"
+                          RESERVATION_SQL_COL07 " TEXT)");
 
   if (bSuccess)
   {
@@ -2617,7 +2618,8 @@ bool ReservationSQL::execSelect(QSqlQuery& query,
                 RESERVATION_SQL_COL03 ","
                 RESERVATION_SQL_COL04 ","
                 RESERVATION_SQL_COL05 ","
-                RESERVATION_SQL_COL06
+                RESERVATION_SQL_COL06 ","
+                RESERVATION_SQL_COL07
                 " FROM " RESERVATION_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -2634,6 +2636,7 @@ bool ReservationSQL::execSelect(QSqlQuery& query,
       res.m_dateTime = query.value(3).toString();
       res.m_ammount = query.value(4).toInt();
       res.m_observation = query.value(5).toString();
+      res.m_phone = query.value(6).toString();
     }
     else
     {
@@ -2686,20 +2689,23 @@ bool ReservationSQL::insert(QSqlDatabase db,
                 RESERVATION_SQL_COL03 ","
                 RESERVATION_SQL_COL04 ","
                 RESERVATION_SQL_COL05 ","
-                RESERVATION_SQL_COL06 ")"
+                RESERVATION_SQL_COL06 ","
+                RESERVATION_SQL_COL07 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
                 "(:_v03),"
                 "(:_v04),"
                 "(:_v05),"
-                "(:_v06))");
+                "(:_v06),"
+                "(:_v07))");
   query.bindValue(":_v01", res.m_number);
   query.bindValue(":_v02", res.m_name);
   query.bindValue(":_v03", res.m_location);
   query.bindValue(":_v04", res.m_dateTime);
   query.bindValue(":_v05", res.m_ammount);
   query.bindValue(":_v06", res.m_observation);
+  query.bindValue(":_v07", res.m_phone);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -2725,7 +2731,8 @@ bool ReservationSQL::update(QSqlDatabase db,
                 RESERVATION_SQL_COL03 " = (:_v03),"
                 RESERVATION_SQL_COL04 " = (:_v04),"
                 RESERVATION_SQL_COL05 " = (:_v05),"
-                RESERVATION_SQL_COL06 " = (:_v06)"
+                RESERVATION_SQL_COL06 " = (:_v06),"
+                RESERVATION_SQL_COL07 " = (:_v07)"
                 " WHERE " SQL_COLID " = (:_v00)");
 
   query.bindValue(":_v00", res.m_id);
@@ -2735,6 +2742,7 @@ bool ReservationSQL::update(QSqlDatabase db,
   query.bindValue(":_v04", res.m_dateTime);
   query.bindValue(":_v05", res.m_ammount);
   query.bindValue(":_v06", res.m_observation);
+  query.bindValue(":_v07", res.m_phone);
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }

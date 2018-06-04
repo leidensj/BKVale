@@ -20,6 +20,7 @@ ReservationView::ReservationView(QWidget* parent)
   , m_btnSearch(nullptr)
   , m_snNumber(nullptr)
   , m_edName(nullptr)
+  , m_edPhone(nullptr)
   , m_edLocation(nullptr)
   , m_dateTimeEdit(nullptr)
   , m_snAmmount(nullptr)
@@ -57,6 +58,7 @@ ReservationView::ReservationView(QWidget* parent)
   }
 
   m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_edPhone = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_edLocation = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_dateTimeEdit = new QDateTimeEdit;
   m_dateTimeEdit->setCalendarPopup(true);
@@ -68,7 +70,6 @@ ReservationView::ReservationView(QWidget* parent)
   m_dock = new QDockWidget;
   m_database = new JDatabase;
   m_teObservation = new QPlainTextEdit;
-  m_teObservation->setPlaceholderText(tr("Observações:"));
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
@@ -79,10 +80,11 @@ ReservationView::ReservationView(QWidget* parent)
   QFormLayout* informationlayout = new QFormLayout;
   informationlayout->addRow(tr("Número:"), m_snNumber);
   informationlayout->addRow(tr("Nome:"), m_edName);
+  informationlayout->addRow(tr("Telefone:"), m_edPhone);
   informationlayout->addRow(tr("Local:"), m_edLocation);
   informationlayout->addRow(tr("Horário:"), m_dateTimeEdit);
   informationlayout->addRow(tr("Quantidade:"), m_snAmmount);
-  informationlayout->addWidget(m_teObservation);
+  informationlayout->addRow(tr("Observações:"), m_teObservation);
 
   QFrame* informationFrame = new QFrame();
   informationFrame->setFrameShape(QFrame::Shape::StyledPanel);
@@ -172,6 +174,7 @@ Reservation ReservationView::getReservation() const
   res.m_id = m_currentId;
   res.m_number = m_snNumber->value();
   res.m_name = m_edName->text();
+  res.m_phone = m_edPhone->text();
   res.m_location = m_edLocation->text();
   res.m_dateTime = m_dateTimeEdit->dateTime().toString(Qt::DateFormat::ISODate);
   res.m_ammount = m_snAmmount->value();
@@ -184,6 +187,7 @@ void ReservationView::setReservation(const Reservation &res)
   m_currentId = res.m_id;
   m_snNumber->setValue(res.m_number);
   m_edName->setText(res.m_name);
+  m_edPhone->setText(res.m_phone);
   m_edLocation->setText(res.m_location);
   m_dateTimeEdit->setDateTime(QDateTime::fromString(res.m_dateTime, Qt::DateFormat::ISODate));
   m_snAmmount->setValue(res.m_ammount);

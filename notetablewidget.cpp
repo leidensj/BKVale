@@ -186,6 +186,7 @@ void NoteTableWidget::setProduct(const Product& product)
     noteItem.m_product = product;
     QVariant var;
     var.setValue(noteItem);
+    item(currentRow(), (int)NoteColumn::Description)->setData(Qt::UserRole, var);
 
     QPixmap pixmap(QSize(16, 16));
     pixmap.loadFromData(product.m_image.m_image);

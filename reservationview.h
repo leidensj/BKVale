@@ -42,6 +42,7 @@ private:
   QPushButton* m_btnSearch;
   JSpinBox* m_snNumber;
   JLineEdit* m_edName;
+  JLineEdit* m_edPhone;
   JLineEdit* m_edLocation;
   QDateTimeEdit* m_dateTimeEdit;
   JSpinBox* m_snAmmount;

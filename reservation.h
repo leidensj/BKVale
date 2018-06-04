@@ -14,6 +14,7 @@ struct Reservation : public JItem
   QString m_name;
   QString m_location;
   QString m_dateTime;
+  QString m_phone;
   int m_ammount;
   QString m_observation;
 
@@ -25,6 +26,7 @@ struct Reservation : public JItem
     m_name.clear();
     m_ammount = 0;
     m_observation.clear();
+    m_phone.clear();
   }
 
   Reservation()
@@ -39,7 +41,7 @@ struct Reservation : public JItem
            m_location != another.m_location ||
            m_name != another.m_name ||
            m_ammount != another.m_ammount ||
-           m_number != another.m_number;
+           m_phone != another.m_phone;
   }
 
   bool operator == (const JItem& other) const

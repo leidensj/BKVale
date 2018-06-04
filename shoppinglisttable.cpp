@@ -144,6 +144,7 @@ void ShoppingListTable::setProduct(const Product& product)
     o.m_product = product;
     QVariant var;
     var.setValue(o);
+    item(currentRow(), (int)ShoppingListColumn::Description)->setData(Qt::UserRole, var);
 
     QPixmap pixmap(QSize(16, 16));
     pixmap.loadFromData(product.m_image.m_image);

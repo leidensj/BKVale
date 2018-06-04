@@ -397,7 +397,7 @@ void NoteView::supplierChanged()
       m_table->setCurrentCell(0, 0);
       m_table->setFocus();
     }
-    else
+    else if (!IS_VALID_ID(m_currentId))
     {
       searchProduct();
     }
@@ -477,14 +477,14 @@ void NoteView::searchProduct()
     if (m_btnAdd == sender() || !m_table->hasItems())
     {
       NoteItem noteItem;
-      noteItem.m_product = *pProduct;
       if (IS_VALID_ID(m_supplierPicker->getId()))
       {
-        noteItem.m_price = NoteSQL::selectPriceSuggestion(
-                             m_database->getDatabase(),
-                             m_supplierPicker->getId(),
-                             pProduct->m_id);
+        noteItem = NoteSQL::selectLastItem(m_database->getDatabase(),
+                                           m_supplierPicker->getId(),
+                                           pProduct->m_id);
+        noteItem.m_ammount = 0.0;
       }
+      noteItem.m_product = *pProduct;
       addNoteItem(noteItem);
     }
     else

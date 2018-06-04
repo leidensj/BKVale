@@ -181,7 +181,7 @@ bool NoteSQL::update(QSqlDatabase db,
   query.bindValue(":_v06", note.m_disccount);
   bool bSuccess = query.exec();
 
-  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:v01)");
+  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
   query.bindValue(":_v01", note.m_id);
   bSuccess = query.exec();
 
@@ -332,18 +332,25 @@ bool NoteSQL::remove(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-double NoteSQL::selectPriceSuggestion(QSqlDatabase db,
-                                      qlonglong supplierId,
-                                      qlonglong productId)
+NoteItem NoteSQL::selectLastItem(QSqlDatabase db,
+                               qlonglong supplierId,
+                               qlonglong productId)
 {
+  NoteItem noteItem;
   QString error;
   if (!BaitaSQL::isOpen(db, error))
-    return 0.0;
+    return noteItem;
 
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01 ","
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 ","
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03 ","
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ","
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL05 ","
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL06 ","
+                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL07
                 " FROM " NOTE_SQL_TABLE_NAME
                 " INNER JOIN " NOTE_ITEMS_SQL_TABLE_NAME
                 " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID
@@ -358,8 +365,21 @@ double NoteSQL::selectPriceSuggestion(QSqlDatabase db,
   query.bindValue(":_v02", productId);
   bool bSuccess = query.exec();
 
+  if (bSuccess && query.next())
+  {
+    noteItem.m_id = query.value(0).toLongLong();
+    noteItem.m_product.m_id = query.value(1).toLongLong();
+    noteItem.m_ammount = query.value(2).toDouble();
+    noteItem.m_price = query.value(3).toDouble();
+    noteItem.m_package.m_bIsPackage = query.value(4).toBool();
+    noteItem.m_package.m_unity = query.value(5).toString();
+    noteItem.m_package.m_ammount = query.value(6).toDouble();
+    if (noteItem.m_product.isValidId())
+      ProductSQL::execSelect(query, noteItem.m_product, error);
+  }
+
   finishTransaction(db, query, bSuccess, error);
-  return bSuccess && query.next() ? query.value(0).toDouble() : 0.0;
+  return noteItem;
 }
 
 bool BaitaSQL::isOpen(QSqlDatabase db,

@@ -104,9 +104,9 @@ namespace NoteSQL
               qlonglong id,
               QString& error);
 
-  double selectPriceSuggestion(QSqlDatabase db,
-                               qlonglong supplierId,
-                               qlonglong productId);
+  NoteItem selectLastItem(QSqlDatabase db,
+                          qlonglong supplierId,
+                          qlonglong productId);
 }
 
 namespace ProductSQL

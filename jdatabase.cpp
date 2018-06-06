@@ -106,7 +106,7 @@ public:
                      " GROUP BY " NOTE_SQL_TABLE_NAME "." SQL_COLID
                      " %1 "
                      " %2 "
-                     " %4");
+                     " %3");
     return strQuery;
   }
 
@@ -594,11 +594,19 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     SQL_COLID ","
-                     PRODUCT_SQL_COL01 ","
-                     PRODUCT_SQL_COL04
+                     PRODUCT_SQL_TABLE_NAME "." SQL_COLID ","
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01 ","
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL04 ","
+                     CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL02
                      " FROM "
                      PRODUCT_SQL_TABLE_NAME
+                     " LEFT JOIN "
+                     CATEGORY_SQL_TABLE_NAME
+                     " ON "
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL02
+                     " = "
+                     CATEGORY_SQL_TABLE_NAME "." SQL_COLID
+                     " GROUP BY " PRODUCT_SQL_TABLE_NAME "." SQL_COLID
                      " %1 %2 %3");
     return strQuery;
   }
@@ -609,16 +617,19 @@ public:
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("Nome"));
     setHeaderData(2, Qt::Horizontal, tr("Unidade"));
-    if (header != nullptr && header->count() == 3)
+    setHeaderData(3, Qt::Horizontal, tr("Categoria"));
+    if (header != nullptr && header->count() == 4)
     {
       header->hideSection(0);
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
       header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
     }
   }
 
   virtual QString getStrCompleteQuery()
   {
+    QString str = getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
     return getStrQuery().arg(m_strFilter, m_strCustomFilter, m_strSort);
   }
 
@@ -627,14 +638,17 @@ public:
     m_strFilter.clear();
     if (!value.isEmpty())
     {
-      m_strFilter = "WHERE ";
+      m_strFilter = "HAVING ";
       switch (column)
       {
         case 1:
-          m_strFilter += " " PRODUCT_SQL_COL01;
+          m_strFilter += " " PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01;
           break;
         case 2:
-          m_strFilter += " " PRODUCT_SQL_COL04;
+          m_strFilter += " " PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL04;
+          break;
+        case 3:
+          m_strFilter += " " CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL02;
           break;
         default:
           break;
@@ -655,7 +669,7 @@ public:
     if (!customFilter.isEmpty())
     {
       if (m_strFilter.isEmpty())
-        m_strCustomFilter = "WHERE " + customFilter;
+        m_strCustomFilter = "HAVING " + customFilter;
       else
         m_strCustomFilter = "AND " + customFilter;
     }
@@ -667,10 +681,13 @@ public:
     switch (column)
     {
       case 1:
-        m_strSort = "ORDER BY " PRODUCT_SQL_COL01;
+        m_strSort = "ORDER BY " PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01;
         break;
       case 2:
-        m_strSort = "ORDER BY " PRODUCT_SQL_COL04;
+        m_strSort = "ORDER BY " PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL04;
+        break;
+      case 3:
+        m_strSort = "ORDER BY " CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL02;
         break;
       default:
         break;

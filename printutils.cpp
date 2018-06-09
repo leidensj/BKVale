@@ -445,7 +445,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
            ESC_EXPAND_ON
            "|     |     | ";
     if (lst.m_bPrintAmmount)
-      str += lst.m_vItem.at(i).strAmmount() +
+      str += JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
              lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity);
     str += ESC_LF
            "|     |     | ";
@@ -493,6 +493,9 @@ QString ReservationPrinter::build(const Reservation& res)
          ESC_EXPAND_ON +
          res.m_location +
          ESC_EXPAND_OFF
+         ESC_LF
+         "Telefone: " +
+         res.m_phone +
          ESC_LF
          "Quantidade: "
          ESC_EXPAND_ON +

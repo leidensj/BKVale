@@ -4,8 +4,6 @@
 #include <QFrame>
 #include <QSqlDatabase>
 #include "shoppinglist.h"
-#include "settings.h"
-#include <QIODevice>
 
 class JDatabase;
 class QDateEdit;
@@ -20,7 +18,6 @@ public:
   ShopView(QWidget* parent = nullptr);
   void setDatabase(QSqlDatabase db);
   ShoppingList getShoppingList() const;
-  void print(QIODevice* printer, InterfaceType type);
 
 private slots:
   void updateControls();

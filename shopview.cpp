@@ -96,22 +96,6 @@ ShoppingList ShopView::getShoppingList() const
   return lst;
 }
 
-void ShopView::print(QIODevice* printer, InterfaceType type)
-{
-  QString error;
-  ShoppingList lst = getShoppingList();
-  if (!Printer::printString(printer,
-                            type,
-                            ShoppingListPrinter::build(lst),
-                            error))
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao imprimir a lista de compras.").arg(error),
-                          QMessageBox::Ok);
-  }
-}
-
 void ShopView::emitChangedSignal()
 {
   emit changedSignal();

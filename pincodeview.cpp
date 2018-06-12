@@ -6,7 +6,6 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QKeyEvent>
-#include <QLabel>
 
 PinCodeView::PinCodeView(QWidget* parent)
   : QDialog(parent)
@@ -112,19 +111,13 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btnEnter->setFlat(true);
   m_btnEnter->setText("");
   m_btnEnter->setIconSize(QSize(64, 64));
-  m_btnEnter->setIcon(QIcon(":/icons/res/enter.png"));
+  m_btnEnter->setIcon(QIcon(":/icons/res/pincode.png"));
 
   QHBoxLayout* hline4 = new QHBoxLayout();
   hline4->addWidget(m_btnClr);
   hline4->addWidget(m_btn0);
   hline4->addWidget(m_btnEnter);
   hline4->setContentsMargins(0, 0, 0, 0);
-
-  QLabel* lbl = new QLabel();
-  lbl->setPixmap(QIcon(":/icons/res/pincode.png").pixmap(QSize(48, 48)));
-  lbl->setMinimumSize(48, 48);
-  lbl->setMaximumSize(48, 48);
-  lbl->setScaledContents(true);
 
   m_edPinCode = new QLineEdit;
   m_edPinCode->setAlignment(Qt::AlignCenter);
@@ -134,16 +127,10 @@ PinCodeView::PinCodeView(QWidget* parent)
   f.setPointSize(24);
   f.setBold(true);
   m_edPinCode->setFont(f);
-  m_edPinCode->setPlaceholderText(tr("Código PIN"));
   m_edPinCode->setReadOnly(true);
 
-  QHBoxLayout* hline5 = new QHBoxLayout();
-  hline5->addWidget(lbl);
-  hline5->addWidget(m_edPinCode);
-  hline5->setContentsMargins(0, 0, 0, 0);
-
   QVBoxLayout* vlayoutl = new QVBoxLayout();
-  vlayoutl->addLayout(hline5);
+  vlayoutl->addWidget(m_edPinCode);
   vlayoutl->addLayout(hline1);
   vlayoutl->addLayout(hline2);
   vlayoutl->addLayout(hline3);
@@ -212,9 +199,7 @@ void PinCodeView::search()
 
 void PinCodeView::erase()
 {
-  QString str = m_edPinCode->text();
-  str.chop(1);
-  m_edPinCode->setText(str);
+  m_edPinCode->clear();
 }
 
 Person PinCodeView::getCurrentPerson() const

@@ -1736,6 +1736,7 @@ JDatabaseSelector::JDatabaseSelector(const QString& title,
   hlayout0->addWidget(m_database);
   setLayout(hlayout0);
 
+  resize(500, 400);
   setWindowTitle(title);
   setWindowIcon(icon);
 

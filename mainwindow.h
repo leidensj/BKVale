@@ -51,16 +51,15 @@ private:
   Settings m_settings;
   QLabel* m_statusDatabasePath;
   QLabel* m_statusUserName;
+  bool connectPrinter();
+  void disconnectPrinter();
 
 private slots:
-  void connect();
-  void connectedTCP();
-  void disconnect();
   void updateControls();
   void updateStatusBar();
   void showInfo();
   void print();
-  void print(const QString& text);
+  bool print(const QString& text);
   void openSettingsDialog();
   void openUsersDialog();
   void openProductsDialog();

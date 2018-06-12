@@ -147,7 +147,7 @@ bool Printer::printByteArray(QIODevice* printer,
   {
     error = QObject::tr("Erro ao imprimir:\n'%1'.").arg(printer->errorString());
   }
-  else if (!printer->waitForBytesWritten(30000))
+  else if (!printer->waitForBytesWritten(10000))
     error = QObject::tr("Falha de timeout.");
   else
     return true;
@@ -156,24 +156,24 @@ bool Printer::printByteArray(QIODevice* printer,
 }
 
 bool Printer::printString(QIODevice* printer,
-                          InterfaceType type,
+                          bool bIsEthernet,
                           const QString& msg,
                           QString& error)
 {
   error.clear();
 
   QByteArray data;
-  if (type == InterfaceType::Serial)
-  {
-    data = msg.toUtf8();
-  }
-  else if (type == InterfaceType::Ethernet)
+  if (bIsEthernet)
   {
     QDataStream out(&data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_3);
     out << quint16(0) << msg.toUtf8();
     out.device()->seek(0);
     out << quint16(data.size() - sizeof(quint16));
+  }
+  else
+  {
+    data = msg.toUtf8();
   }
 
   return printByteArray(printer, data, error);

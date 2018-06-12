@@ -4,12 +4,10 @@
 #include <QFrame>
 #include <QPushButton>
 #include "calculator.h"
-#include "settings.h"
 
 class QLineEdit;
 class QPlainTextEdit;
 class QRadioButton;
-
 
 class CalculatorPushButton : public QPushButton
 {
@@ -34,21 +32,18 @@ class CalculatorWidget : public QFrame
 
 public:
   explicit CalculatorWidget(QWidget* parent = 0);
-  void print(QIODevice* printer, InterfaceType type);
-  void enablePrinter(bool bEnable);
+  QString getFullContent() const;
 
 private slots:
   void calculatorButtonClicked(Calculator::Button button);
   void clear();
   void reset();
-  void emitPrintSignal(double value, Calculator::Button button);
+  void emitLineSignal(double value, Calculator::Button button);
 
 signals:
-  void printSignal(const QString& text);
+  void lineSignal(const QString& text);
 
 private:
-  QIODevice* m_printer;
-  InterfaceType m_type;
   QPushButton* m_btnPrint;
   QRadioButton* m_rdoAlignLeft;
   QRadioButton* m_rdoAlignCenter;

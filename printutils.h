@@ -8,7 +8,6 @@
 #include "reminder.h"
 #include "product.h"
 #include "consumption.h"
-#include "settings.h"
 #include "person.h"
 #include "shoppinglist.h"
 #include "reservation.h"
@@ -21,7 +20,7 @@ namespace Printer
                       QString& error);
 
   bool printString(QIODevice* printer,
-                   InterfaceType type,
+                   bool bIsEthernet,
                    const QString& msg,
                    QString& error);
 

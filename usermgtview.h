@@ -36,6 +36,7 @@ private:
   QCheckBox* m_accessNote;
   QCheckBox* m_accessReminder;
   QCheckBox* m_accessCalculator;
+  QCheckBox* m_accessShoppingList;
   QCheckBox* m_accessShop;
   QCheckBox* m_accessConsumption;
   QCheckBox* m_accessUser;
@@ -43,6 +44,7 @@ private:
   QCheckBox* m_accessPerson;
   QCheckBox* m_accessCategory;
   QCheckBox* m_accessImage;
+  QCheckBox* m_accessReservation;
   QCheckBox* m_accessSettings;
   JDatabase* m_database;
 

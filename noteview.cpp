@@ -4,8 +4,6 @@
 #include "person.h"
 #include "jdatabasepicker.h"
 #include "jdatabase.h"
-#include "pincodeview.h"
-#include "printutils.h"
 #include "jlineedit.h"
 #include "tinyexpr.h"
 #include "packageeditor.h"
@@ -511,54 +509,19 @@ void NoteView::showSearch()
     m_dock->show();
 }
 
-bool NoteView::print(QIODevice* printer,
-                     InterfaceType type,
-                     const QString& userName,
-                     int id)
-{
-  Note note;
-  note.m_id = id;
-  QString error;
-  if (NoteSQL::select(m_database->getDatabase(), note, error))
-  {
-    QString str(NotePrinter::build(note, userName));
-    if (Printer::printString(printer, type, str, error))
-      return true;
-  }
-
-  QMessageBox::warning(this,
-                       tr("Erro"),
-                       tr("Erro '%1' ao imprimir o vale.").arg(error),
-                       QMessageBox::Ok);
-  return false;
-}
-
-bool NoteView::save()
+Note NoteView::save()
 {
   Note note = getNote();
   bool bSuccess = m_database->save(note);
   if (bSuccess)
-    m_lastId = note.m_id;
-  updateControls();
-  return bSuccess;
-}
-
-void NoteView::saveAndPrint(QIODevice* printer,
-                              InterfaceType type)
-{
-  PinCodeView w(this);
-  w.setDatabase(m_database->getDatabase());
-  if (w.exec())
   {
-    if (w.getCurrentPerson().isValidId())
-    {
-      if (save())
-      {
-        create();
-        print(printer, type, w.getCurrentPerson().m_alias, m_lastId);
-      }
-    }
+    m_lastId = note.m_id;
+    create();
   }
+  else
+    note.clear();
+  updateControls();
+  return note;
 }
 
 void NoteView::lastItemSelected()

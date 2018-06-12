@@ -59,6 +59,9 @@
         <height>24</height>
        </size>
       </property>
+      <property name="elideMode">
+       <enum>Qt::ElideNone</enum>
+      </property>
       <property name="documentMode">
        <bool>false</bool>
       </property>
@@ -66,7 +69,7 @@
        <bool>false</bool>
       </property>
       <property name="movable">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="tabNotes">
        <attribute name="icon">
@@ -156,8 +159,6 @@
    <addaction name="actionPersons"/>
    <addaction name="actionProducts"/>
    <addaction name="separator"/>
-   <addaction name="actionConnect"/>
-   <addaction name="actionDisconnect"/>
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
@@ -195,8 +196,6 @@
      <string>Impressora</string>
     </property>
     <addaction name="actionPrint"/>
-    <addaction name="actionConnect"/>
-    <addaction name="actionDisconnect"/>
    </widget>
    <widget class="QMenu" name="menuConfigura_es">
     <property name="title">
@@ -216,24 +215,6 @@
    <addaction name="menuConfigura_es"/>
    <addaction name="menuAjuda"/>
   </widget>
-  <action name="actionConnect">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/connected.png</normaloff>:/icons/res/connected.png</iconset>
-   </property>
-   <property name="text">
-    <string>Conectar</string>
-   </property>
-  </action>
-  <action name="actionDisconnect">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/disconnected.png</normaloff>:/icons/res/disconnected.png</iconset>
-   </property>
-   <property name="text">
-    <string>Desconectar</string>
-   </property>
-  </action>
   <action name="actionPrint">
    <property name="icon">
     <iconset resource="icons.qrc">

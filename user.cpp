@@ -20,6 +20,8 @@ void User::clear()
   m_bAccessProduct = false;
   m_bAccessSettings = false;
   m_password.clear();
+  m_bAccessReservation = false;
+  m_bAccessShoppingList = false;
 }
 
 QString User::st_strEncryptedPassword(const QString& strPassword)

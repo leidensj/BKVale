@@ -7,7 +7,6 @@
 #include <QRadioButton>
 #include <QSplitter>
 #include <QMessageBox>
-#include "printutils.h"
 #include "escpos.h"
 
 CalculatorPushButton::CalculatorPushButton(Calculator::Button button, QWidget* parent)
@@ -27,8 +26,6 @@ void CalculatorPushButton::emitCalculatorButtonClickedSignal()
 
 CalculatorWidget::CalculatorWidget(QWidget* parent)
   : QFrame(parent)
-  , m_printer(nullptr)
-  , m_type(InterfaceType::Serial)
   , m_btn0(nullptr)
   , m_btn1(nullptr)
   , m_btn2(nullptr)
@@ -370,22 +367,12 @@ double CalculatorWidget::calculate(double op1, double op2, Calculator::Button bu
   }
 }
 
-void CalculatorWidget::print(QIODevice* printer, InterfaceType type)
+QString CalculatorWidget::getFullContent() const
 {
-  QString error;
-  if (!Printer::printString(printer,
-                            type,
-                            m_view->toPlainText() + Printer::strCmdFullCut(),
-                            error))
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao imprimir a conta.").arg(error),
-                          QMessageBox::Ok);
-  }
+  return m_view->toPlainText();
 }
 
-void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
+void CalculatorWidget::emitLineSignal(double value, Calculator::Button button)
 {
   QString text = buildPrintContent(value, button);
   m_view->appendPlainText(text);
@@ -394,7 +381,7 @@ void CalculatorWidget::emitPrintSignal(double value, Calculator::Button button)
   {
     QString text2 = m_rdoAlignLeft->isChecked() ? ESC_ALIGN_LEFT : ESC_ALIGN_CENTER;
     text2 += ESC_EXPAND_ON + text + ESC_LF ESC_EXPAND_OFF;
-    emit printSignal(text2);
+    emit lineSignal(text2);
   }
 }
 
@@ -413,13 +400,13 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
                    !Calculator::isEqual(m_lastButton)
                    ? currentValue : m_lastValue;
     m_total = calculate(m_total, value, button);
-    emitPrintSignal(value, button);
+    emitLineSignal(value, button);
     m_edDisplay->setText(QString::number(m_total, 'f').remove(QRegExp("\\.?0*$")));
     m_lastValue = value;
   }
   else if (Calculator::isEqual(button))
   {
-    emitPrintSignal(m_total, button);
+    emitLineSignal(m_total, button);
     m_edDisplay->setText(QString::number(m_total, 'f').
                          remove(QRegExp("\\.?0*$")));
   }
@@ -459,12 +446,5 @@ void CalculatorWidget::reset()
   m_lastValue = 0.0;
   m_total = 0.0;
   if (m_btnPrint->isChecked())
-    emit printSignal(Printer::strCmdFullCut());
-}
-
-void CalculatorWidget::enablePrinter(bool bEnable)
-{
-  if (!bEnable)
-    m_btnPrint->setChecked(bEnable);
-  m_btnPrint->setEnabled(bEnable);
+    emit lineSignal(ESC_FULL_CUT);
 }

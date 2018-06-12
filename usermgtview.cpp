@@ -23,6 +23,7 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   , m_accessNote(nullptr)
   , m_accessReminder(nullptr)
   , m_accessCalculator(nullptr)
+  , m_accessShoppingList(nullptr)
   , m_accessShop(nullptr)
   , m_accessConsumption(nullptr)
   , m_accessUser(nullptr)
@@ -30,6 +31,7 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   , m_accessPerson(nullptr)
   , m_accessCategory(nullptr)
   , m_accessImage(nullptr)
+  , m_accessReservation(nullptr)
   , m_accessSettings(nullptr)
   , m_database(nullptr)
 {
@@ -89,6 +91,9 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   m_accessShop = new QCheckBox;
   m_accessShop->setIcon(QIcon(":/icons/res/shop.png"));
   m_accessShop->setText(tr("Compras"));
+  m_accessShoppingList = new QCheckBox;
+  m_accessShoppingList->setIcon(QIcon(":/icons/res/shopmgt.png"));
+  m_accessShoppingList->setText(tr("Listas de Compras"));
   m_accessConsumption = new QCheckBox;
   m_accessConsumption->setIcon(QIcon(":/icons/res/stock.png"));
   m_accessConsumption->setText(tr("Consumo"));
@@ -112,6 +117,10 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   m_accessImage = new QCheckBox;
   m_accessImage->setIcon(QIcon(":/icons/res/icon.png"));
   m_accessImage->setText(tr("Imagens"));
+
+  m_accessReservation = new QCheckBox;
+  m_accessReservation->setIcon(QIcon(":/icons/res/reservation.png"));
+  m_accessReservation->setText(tr("Reservas"));
 
   m_accessSettings = new QCheckBox;
   m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
@@ -140,11 +149,13 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   tabPermissionslayout->addWidget(m_accessCalculator);
   tabPermissionslayout->addWidget(m_accessShop);
   tabPermissionslayout->addWidget(m_accessConsumption);
+  tabPermissionslayout->addWidget(m_accessReservation);
   tabPermissionslayout->addWidget(m_accessUser);
   tabPermissionslayout->addWidget(m_accessProduct);
   tabPermissionslayout->addWidget(m_accessPerson);
   tabPermissionslayout->addWidget(m_accessCategory);
   tabPermissionslayout->addWidget(m_accessImage);
+  tabPermissionslayout->addWidget(m_accessShoppingList);
   tabPermissionslayout->addWidget(m_accessSettings);
 
   QVBoxLayout* tabUserlayout = new QVBoxLayout;
@@ -237,6 +248,8 @@ User UserMgtView::getUser() const
   user.m_bAccessCategory = m_accessCategory->isChecked();
   user.m_bAccessImage = m_accessImage->isChecked();
   user.m_bAccessSettings = m_accessSettings->isChecked();
+  user.m_bAccessReservation = m_accessReservation->isChecked();
+  user.m_bAccessShoppingList = m_accessShoppingList->isChecked();
   return user;
 }
 
@@ -257,6 +270,8 @@ void UserMgtView::setUser(const User& user)
   m_accessCategory->setChecked(user.m_bAccessCategory);
   m_accessImage->setChecked(user.m_bAccessImage);
   m_accessSettings->setChecked(user.m_bAccessSettings);
+  m_accessReservation->setChecked(user.m_bAccessReservation);
+  m_accessShoppingList->setChecked(user.m_bAccessShoppingList);
 }
 
 void UserMgtView::create()
@@ -273,6 +288,8 @@ void UserMgtView::create()
   m_accessUser->setChecked(false);
   m_accessProduct->setChecked(false);
   m_accessSettings->setChecked(false);
+  m_accessReservation->setChecked(false);
+  m_accessShoppingList->setChecked(false);
   m_user->setFocus();
 }
 

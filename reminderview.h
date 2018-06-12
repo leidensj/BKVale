@@ -4,7 +4,6 @@
 #include <QFrame>
 #include <QSqlDatabase>
 #include "reminder.h"
-#include "settings.h"
 
 class JLineEdit;
 class QPlainTextEdit;
@@ -23,8 +22,8 @@ public:
   Reminder getReminder() const;
   void setReminder(const Reminder& reminder);
   void setDatabase(QSqlDatabase db);
-  void saveAndPrint(QIODevice* printer, InterfaceType type);
-
+  Reminder save();
+  bool isSave() const;
 
 private slots:
   void emitChangedSignal();
@@ -32,10 +31,6 @@ private slots:
   void search();
   void itemSelected(const JItem& jItem);
   void itemRemoved(qlonglong id);
-  bool save(const Reminder& reminder);
-  bool print(const Reminder& reminder,
-             QIODevice* printer,
-             InterfaceType type);
 
 public slots:
   void create();

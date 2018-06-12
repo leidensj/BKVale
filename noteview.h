@@ -5,7 +5,6 @@
 #include <QStringList>
 #include <QSqlDatabase>
 #include "note.h"
-#include "settings.h"
 
 #define MAX_ITEMS 100
 
@@ -54,18 +53,12 @@ private:
   QPlainTextEdit* m_teObservation;
   JLineEdit* m_edDisccount;
 
-  bool print(QIODevice* printer,
-             InterfaceType type,
-             const QString& userName,
-             int id);
-
 private slots:
   void setToday();
   void checkDate();
   void removeItem();
   void supplierChanged();
   void showSearch();
-  bool save();
   void lastItemSelected();
   void itemSelected(const JItem& jItem);
   void itemRemoved(qlonglong id);
@@ -77,8 +70,7 @@ public slots:
   void create();
   void setNote(const Note& note);
   void updateControls();
-  void saveAndPrint(QIODevice* printer,
-                    InterfaceType type);
+  Note save();
 
 signals:
   void changedSignal();

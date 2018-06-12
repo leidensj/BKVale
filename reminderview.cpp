@@ -1,7 +1,6 @@
 #include "reminderview.h"
 #include "jlineedit.h"
 #include "jdatabase.h"
-#include "printutils.h"
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QRadioButton>
@@ -189,6 +188,7 @@ void ReminderView::create()
 {
   Reminder reminder;
   setReminder(reminder);
+  m_cbSave->setChecked(false);
 }
 
 void ReminderView::itemSelected(const JItem& jItem)
@@ -204,14 +204,14 @@ void ReminderView::itemRemoved(qlonglong id)
     create();
 }
 
-bool ReminderView::save(const Reminder& reminder)
+Reminder ReminderView::save()
 {
-  bool bSuccess = m_cbSave->isChecked()
-                  ? m_database->save(reminder)
-                  : true;
-  if (bSuccess)
+  Reminder r = getReminder();
+  if (m_database->save(r))
     create();
-  return bSuccess;
+  else
+    r.clear();
+  return r;
 }
 
 void ReminderView::emitChangedSignal()
@@ -276,27 +276,7 @@ void ReminderView::search()
     m_dock->show();
 }
 
-bool ReminderView::print(const Reminder& reminder,
-                         QIODevice* printer,
-                         InterfaceType type)
+bool ReminderView::isSave() const
 {
-  QString str(ReminderPrinter::build(reminder));
-  QString error;
-  bool bSuccess = Printer::printString(printer, type, str, error);
-  if (!bSuccess)
-  {
-    QMessageBox::warning(this,
-                         tr("Erro"),
-                         tr("Erro '%1' ao imprimir o lembrete.").arg(error),
-                         QMessageBox::Ok);
-  }
-  return bSuccess;
-}
-
-
-void ReminderView::saveAndPrint(QIODevice* printer, InterfaceType type)
-{
-  Reminder reminder = getReminder();
-  if (save(reminder))
-    print(reminder, printer, type);
+  return m_cbSave->isChecked();
 }

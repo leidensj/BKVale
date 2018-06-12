@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "noteview.h"
 #include "printutils.h"
+#include "pincodeview.h"
 #include "productview.h"
 #include "categoryview.h"
 #include "noteview.h"
@@ -57,15 +58,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   statusBar()->addWidget(m_statusDatabasePath);
   statusBar()->addWidget(m_statusUserName);
 
-  QObject::connect(ui->actionConnect,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(connect()));
-
-  QObject::connect(ui->actionDisconnect,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(disconnect()));
 
   QObject::connect(ui->actionPrint,
                    SIGNAL(triggered(bool)),
@@ -118,14 +110,9 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SLOT(openImagesDialog()));
 
   QObject::connect(m_calculator,
-                   SIGNAL(printSignal(const QString&)),
+                   SIGNAL(lineSignal(const QString&)),
                    this,
                    SLOT(print(const QString&)));
-
-  QObject::connect(&m_printerTCP,
-                   SIGNAL(connected()),
-                   this,
-                   SLOT(connectedTCP()));
 
   QObject::connect(ui->actionLogin,
                    SIGNAL(triggered(bool)),
@@ -148,11 +135,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SLOT(updateControls()));
 
   m_settings.load();
-  if (!m_settings.m_serialPort.isEmpty() &&
-      m_settings.m_bConnectOnStartup)
-  {
-    connect();
-  }
   m_note->setDatabase(m_userLogin.getDatabase());
   m_note->create();
   m_consumption->setDatabase(m_userLogin.getDatabase());
@@ -168,7 +150,7 @@ BaitaAssistant::~BaitaAssistant()
   delete ui;
 }
 
-void BaitaAssistant::connect()
+bool BaitaAssistant::connectPrinter()
 {
   if (m_printerSerial.isOpen())
     m_printerSerial.close();
@@ -183,39 +165,39 @@ void BaitaAssistant::connect()
                        tr("É necessário selecionar uma porta serial "
                           "ou endereço para se conectar à impressora."),
                        QMessageBox::Ok);
-    updateControls();
-    return;
+    return false;
   }
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
   QString error;
   bool bSuccess = false;
-  if (m_settings.m_interfaceType == InterfaceType::Serial)
-  {
-    m_printerSerial.setPortName(m_settings.m_serialPort);
-    bSuccess = m_printerSerial.open((QIODevice::ReadWrite));
-    if (bSuccess)
-      bSuccess = Printer::printString(&m_printerSerial,
-                                      m_settings.m_interfaceType,
-                                      Printer::strCmdInit(),
-                                      error);
-    else
-      error = m_printerSerial.errorString();
-
-  }
-  else if (m_settings.m_interfaceType == InterfaceType::Ethernet)
+  if (m_settings.m_bIsPrinterEthernet)
   {
     m_printerTCP.connectToHost(m_settings.m_ethernetIP,
                                (quint16)m_settings.m_ethernetPort);
     bSuccess = m_printerTCP.waitForConnected();
     if (bSuccess)
       bSuccess = Printer::printString(&m_printerTCP,
-                                      m_settings.m_interfaceType,
+                                      m_settings.m_bIsPrinterEthernet,
                                       Printer::strCmdInit(),
                                       error);
     else
       error = m_printerTCP.errorString();
   }
+  else
+  {
+    m_printerSerial.setPortName(m_settings.m_serialPort);
+    bSuccess = m_printerSerial.open(QIODevice::ReadWrite);
+    if (bSuccess)
+      bSuccess = Printer::printString(&m_printerSerial,
+                                      m_settings.m_bIsPrinterEthernet,
+                                      Printer::strCmdInit(),
+                                      error);
+    else
+      error = m_printerSerial.errorString();
+
+  }
+
 
   QApplication::restoreOverrideCursor();
 
@@ -227,101 +209,100 @@ void BaitaAssistant::connect()
                           "'%1'.").arg(error),
                        QMessageBox::Ok);
   }
-  updateControls();
+  return bSuccess;
 }
 
-void BaitaAssistant::connectedTCP()
-{
-  setWindowTitle("CONECTOU");
-}
-
-void BaitaAssistant::disconnect()
+void BaitaAssistant::disconnectPrinter()
 {
   if (m_printerSerial.isOpen())
       m_printerSerial.close();
   if (m_printerTCP.isOpen())
     m_printerTCP.close();
-  updateControls();
 }
 
 void BaitaAssistant::print()
 {
-  QIODevice* printer = nullptr;
-  if (m_settings.m_interfaceType == InterfaceType::Serial)
-    printer = &m_printerSerial;
-  else if (m_settings.m_interfaceType == InterfaceType::Ethernet)
-    printer = &m_printerTCP;
-
   switch ((Functionality)ui->tabWidget->currentIndex())
   {
     case Functionality::NoteMode:
-      m_note->saveAndPrint(printer, m_settings.m_interfaceType);
-      break;
+    {
+      QString name;
+      if (m_settings.m_notesPincodeRequired)
+      {
+        PinCodeView w(this);
+        w.setDatabase(m_userLogin.getDatabase());
+        if (!w.exec() || !w.getCurrentPerson().isValidId())
+          return;
+        name = w.getCurrentPerson().strAliasName();
+      }
+      Note note = m_note->save();
+      if (note.isValidId())
+        print(NotePrinter::build(note, name));
+    } break;
     case Functionality::ReminderMode:
-      m_reminder->saveAndPrint(printer, m_settings.m_interfaceType);
-      break;
+    {
+      Reminder r;
+      if (m_reminder->isSave())
+      {
+        r = m_reminder->save();
+        if (r.isValidId())
+          print(ReminderPrinter::build(r));
+      }
+      else
+      {
+        r = m_reminder->getReminder();
+        if (print(ReminderPrinter::build(r)))
+          m_reminder->create();
+      }
+    } break;
     case Functionality::ConsumptionMode:
       print(m_consumption->printContent());
       break;
     case Functionality::CalculatorMode:
-      m_calculator->print(printer, m_settings.m_interfaceType);
+      print(m_calculator->getFullContent() + Printer::strCmdFullCut());
       break;
     case Functionality::ShopMode:
-      m_shop->print(printer, m_settings.m_interfaceType);
+      print(ShoppingListPrinter::build(m_shop->getShoppingList()));
       break;
     case Functionality::ReservationMode:
     {
       Reservation res = m_reservation->save();
       if (res.isValidId())
-      {
-        QString error;
-        Printer::printString(printer,
-                             m_settings.m_interfaceType,
-                             ReservationPrinter::build(res),
-                             error);
-      }
+        print(ReservationPrinter::build(res));
     } break;
   }
 }
 
-void BaitaAssistant::print(const QString& text)
+bool BaitaAssistant::print(const QString& text)
 {
-  QIODevice* printer = nullptr;
-  if (m_settings.m_interfaceType == InterfaceType::Serial)
-    printer = &m_printerSerial;
-  else if (m_settings.m_interfaceType == InterfaceType::Ethernet)
-    printer = &m_printerTCP;
-
-  QString error;
-  if (!Printer::printString(printer,
-                            m_settings.m_interfaceType,
-                            text,
-                            error))
+  bool bSuccess = connectPrinter();
+  if (bSuccess)
   {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao imprimir.").arg(error),
-                          QMessageBox::Ok);
+    QIODevice* printer = m_settings.m_bIsPrinterEthernet
+                         ? (QIODevice*)&m_printerSerial
+                         : (QIODevice*)&m_printerTCP;
+
+    QString error;
+    bSuccess = Printer::printString(printer, m_settings.m_bIsPrinterEthernet, text, error);
+    if (!bSuccess)
+    {
+      QMessageBox::critical(this,
+                            tr("Erro"),
+                            tr("Erro '%1' ao imprimir.").arg(error),
+                            QMessageBox::Ok);
+    }
+    disconnectPrinter();
   }
+  return bSuccess;
 }
 
 void BaitaAssistant::openSettingsDialog()
 {
-  if (m_printerTCP.isOpen() || m_printerSerial.isOpen())
+  SettingsDlg dlg(m_settings);
+  if (dlg.exec() == QDialog::Accepted)
   {
-    QMessageBox::warning(this,
-                         tr("Aviso"),
-                         tr("Desconecte a impressora primeiro."),
-                         QMessageBox::Ok);
-  }
-  else
-  {
-    SettingsDlg dlg(m_settings);
-    if (dlg.exec() == QDialog::Accepted)
-    {
-      m_settings = dlg.getSettings();
-      m_settings.save();
-    }
+    m_settings = dlg.getSettings();
+    m_settings.save();
   }
 }
 
@@ -337,16 +318,14 @@ void BaitaAssistant::updateStatusBar()
 void BaitaAssistant::updateControls()
 {
   const bool bIsSQLOk = m_userLogin.getDatabase().isOpen();
-  const bool bIsOpen = m_printerSerial.isOpen() || m_printerTCP.isOpen();
-  ui->actionConnect->setEnabled(!bIsOpen && bIsSQLOk);
-  ui->actionDisconnect->setEnabled(bIsOpen && bIsSQLOk);
-  ui->actionSettings->setEnabled(bIsSQLOk && !bIsOpen && m_userLogin.hasAccessToSettings());
+  ui->actionSettings->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSettings());
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
   ui->actionProducts->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProducts());
   ui->actionPersons->setEnabled(bIsSQLOk && m_userLogin.hasAccessToPersons());
   ui->actionCategories->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCategories());
   ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
+  ui->actionShoppingList->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShoppingLists());
 
   ui->tabWidget->setTabEnabled((int)Functionality::NoteMode,
                                bIsSQLOk && m_userLogin.hasAccessToNote());
@@ -358,28 +337,28 @@ void BaitaAssistant::updateControls()
                                bIsSQLOk && m_userLogin.hasAccessToShop());
   ui->tabWidget->setTabEnabled((int)Functionality::ConsumptionMode,
                                bIsSQLOk && m_userLogin.hasAccessToConsumption());
-
-  m_calculator->enablePrinter(bIsOpen);
+  ui->tabWidget->setTabEnabled((int)Functionality::ReservationMode,
+                               bIsSQLOk && m_userLogin.hasAccessToReservations());
 
   switch ((Functionality)ui->tabWidget->currentIndex())
   {
     case Functionality::NoteMode:
-      ui->actionPrint->setEnabled(m_note->getNote().isValid() && bIsOpen);
+      ui->actionPrint->setEnabled(m_note->getNote().isValid());
       break;
     case Functionality::ReminderMode:
-      ui->actionPrint->setEnabled(m_reminder->getReminder().isValid() && bIsOpen);
+      ui->actionPrint->setEnabled(m_reminder->getReminder().isValid());
       break;
       case Functionality::CalculatorMode:
-      ui->actionPrint->setEnabled(bIsOpen);
+      ui->actionPrint->setEnabled(true);
       break;
     case Functionality::ConsumptionMode:
-      ui->actionPrint->setEnabled(m_consumption->isValid() && bIsOpen);
+      ui->actionPrint->setEnabled(m_consumption->isValid());
       break;
     case Functionality::ShopMode:
-      ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId() && bIsOpen);
+      ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId());
       break;
     case Functionality::ReservationMode:
-      ui->actionPrint->setEnabled(m_reservation->getReservation().isValid() && bIsOpen);
+      ui->actionPrint->setEnabled(m_reservation->getReservation().isValid());
       break;
     default:
       break;

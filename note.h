@@ -73,7 +73,7 @@ Q_DECLARE_METATYPE(NoteItem)
 
 struct Note : public JItem
 {
-  qlonglong m_number;
+  mutable qlonglong m_number;
   QString m_date;
   Person m_supplier;
   bool m_bCash;

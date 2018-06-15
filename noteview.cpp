@@ -516,6 +516,9 @@ Note NoteView::save()
   if (bSuccess)
   {
     m_lastId = note.m_id;
+    QString error;
+    //TODO quickfix
+    NoteSQL::select(m_database->getDatabase(), note, error);
     create();
   }
   else

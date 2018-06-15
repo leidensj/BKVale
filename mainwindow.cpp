@@ -279,8 +279,8 @@ bool BaitaAssistant::print(const QString& text)
   if (bSuccess)
   {
     QIODevice* printer = m_settings.m_bIsPrinterEthernet
-                         ? (QIODevice*)&m_printerSerial
-                         : (QIODevice*)&m_printerTCP;
+                         ? (QIODevice*)&m_printerTCP
+                         : (QIODevice*)&m_printerSerial;
 
     QString error;
     bSuccess = Printer::printString(printer, m_settings.m_bIsPrinterEthernet, text, error);

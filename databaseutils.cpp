@@ -80,36 +80,36 @@ bool NoteSQL::insert(QSqlDatabase db,
   bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
   if (bSuccess)
   {
-      qlonglong number = query.next()
-                         ? query.value(0).toLongLong() + 1
-                         : settings.m_notesDefaultNumber;
-      number = number > settings.m_notesDefaultNumber ? number : settings.m_notesDefaultNumber;
+    note.m_number = query.next()
+                    ? query.value(0).toLongLong() + 1
+                    : settings.m_notesDefaultNumber;
+    note.m_number = note.m_number > settings.m_notesDefaultNumber ? note.m_number : settings.m_notesDefaultNumber;
 
-      query.prepare(
-            QString("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
-                    NOTE_SQL_COL01 ","
-                    NOTE_SQL_COL02 ",") +
-                    (note.m_supplier.isValidId()
-                     ? NOTE_SQL_COL03 "," : "") +
-                    NOTE_SQL_COL04 ","
-                    NOTE_SQL_COL05 ","
-                    NOTE_SQL_COL06
-                    ") VALUES ("
-                    "(:_v01),"
-                    "(:_v02)," +
-                    (note.m_supplier.isValidId()
-                     ? "(:_v03)," : "") +
-                    "(:_v04),"
-                    "(:_v05),"
-                    "(:_v06))");
-      query.bindValue(":_v01", number);
-      query.bindValue(":_v02", note.m_date);
-      if (note.m_supplier.isValidId())
-        query.bindValue(":_v03", note.m_supplier.m_id);
-      query.bindValue(":_v04", note.m_bCash);
-      query.bindValue(":_v05", note.m_observation);
-      query.bindValue(":_v06", note.m_disccount);
-      bSuccess = query.exec();
+    query.prepare(
+          QString("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
+                  NOTE_SQL_COL01 ","
+                  NOTE_SQL_COL02 ",") +
+                  (note.m_supplier.isValidId()
+                   ? NOTE_SQL_COL03 "," : "") +
+                  NOTE_SQL_COL04 ","
+                  NOTE_SQL_COL05 ","
+                  NOTE_SQL_COL06
+                  ") VALUES ("
+                  "(:_v01),"
+                  "(:_v02)," +
+                  (note.m_supplier.isValidId()
+                   ? "(:_v03)," : "") +
+                  "(:_v04),"
+                  "(:_v05),"
+                  "(:_v06))");
+    query.bindValue(":_v01", note.m_number);
+    query.bindValue(":_v02", note.m_date);
+    if (note.m_supplier.isValidId())
+      query.bindValue(":_v03", note.m_supplier.m_id);
+    query.bindValue(":_v04", note.m_bCash);
+    query.bindValue(":_v05", note.m_observation);
+    query.bindValue(":_v06", note.m_disccount);
+    bSuccess = query.exec();
   }
 
   if (bSuccess)

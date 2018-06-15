@@ -8,7 +8,7 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
 {
   setColumnCount(NOTE_NUMBER_OF_COLUMNS);
   QStringList headers;
-  headers << "Quantidade" << "Unidade" << "Descrição" << "Preço" << "Subtotal";
+  headers << "Quantidade" << "Unidade" << "Produto" << "Preço" << "Subtotal";
   setHorizontalHeaderLabels(headers);
   {
     QFont f = font();

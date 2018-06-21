@@ -145,5 +145,6 @@
         <file>res/reservation.png</file>
         <file>res/edit.png</file>
         <file>res/package.png</file>
+        <file>res/databasebackup.png</file>
     </qresource>
 </RCC>

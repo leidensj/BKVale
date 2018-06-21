@@ -94,8 +94,16 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
   m_btnRemove->setToolTip(tr("Remover (Alt+-)"));
 
-  m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, true);
-  m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
+  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
+                                         tr("Fornecedor"),
+                                         QIcon(":/icons/res/supplier.png"),
+                                         true,
+                                         true);
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
+                                      tr("Imagem"),
+                                      QIcon(":/icons/res/icon.png"),
+                                      true,
+                                      true);
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
   m_edDescription = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
@@ -117,7 +125,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_cbVisit->setText(tr("Visita presencial"));
   //m_cbVisit->setIcon(QIcon(":/icons/res/visit.png"));
 
-  m_database = new JDatabase;
+  m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME);
 
   for (int i = 0; i != 31; ++i)
     m_vbtnMonth[i] = monthButtonFactory(i);
@@ -281,19 +289,12 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    this,
                    SLOT(create()));
 
-}
-
-void ShoppingListView::setDatabase(QSqlDatabase db)
-{
-  m_database->setDatabase(db, SHOPPING_LIST_SQL_TABLE_NAME);
-  m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
   m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
 }
 
 void ShoppingListView::addItem()
 {
-  JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
-  w.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
+  JDatabaseSelector w(PRODUCT_SQL_TABLE_NAME, tr("Produto"), QIcon(":/icons/res/item.png"), this);
   w.getDatabase()->setCustomFilter(PRODUCT_FILTER_SHOP);
   if (w.exec())
   {
@@ -315,8 +316,7 @@ void ShoppingListView::removeItem()
 
 void ShoppingListView::editProduct()
 {
-  JDatabaseSelector w(tr("Produto"), QIcon(":/icons/res/item.png"), this);
-  w.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
+  JDatabaseSelector w(PRODUCT_SQL_TABLE_NAME, tr("Produto"), QIcon(":/icons/res/item.png"), this);
   w.getDatabase()->setCustomFilter(PRODUCT_FILTER_SHOP);
   if (w.exec())
   {

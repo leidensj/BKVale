@@ -68,7 +68,7 @@ ReservationView::ReservationView(QWidget* parent)
   m_snAmmount = new JSpinBox(true);
   m_snAmmount->setSuffix(tr(" Pessoas"));
   m_dock = new QDockWidget;
-  m_database = new JDatabase;
+  m_database = new JDatabase(RESERVATION_SQL_TABLE_NAME);
   m_teObservation = new QPlainTextEdit;
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
@@ -133,11 +133,6 @@ ReservationView::ReservationView(QWidget* parent)
                    this,
                    SLOT(showSearch()));
   m_dock->close();
-}
-
-void ReservationView::setDatabase(QSqlDatabase db)
-{
-  m_database->setDatabase(db, RESERVATION_SQL_TABLE_NAME);
 }
 
 void ReservationView::itemSelected(const JItem& jItem)

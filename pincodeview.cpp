@@ -168,11 +168,6 @@ PinCodeView::PinCodeView(QWidget* parent)
 
 }
 
-void PinCodeView::setDatabase(QSqlDatabase db)
-{
-  m_db = db;
-}
-
 void PinCodeView::append(QChar c)
 {
   m_edPinCode->setText(m_edPinCode->text().append(c));
@@ -181,7 +176,7 @@ void PinCodeView::append(QChar c)
 void PinCodeView::search()
 {
   QString error;
-  if (!PersonSQL::isValidPinCode(m_db, m_edPinCode->text(),
+  if (!PersonSQL::isValidPinCode(m_edPinCode->text(),
                                  m_currentPerson,
                                  error))
   {

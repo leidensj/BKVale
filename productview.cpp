@@ -75,8 +75,16 @@ ProductView::ProductView(QWidget* parent)
   m_cbAvailableToSell->setText(tr("Venda"));
   m_cbAvailableToSell->setIcon(QIcon(":/icons/res/sell.png"));
 
-  m_categoryPicker = new JDatabasePicker(tr("Categoria"), QIcon(":/icons/res/category.png"), true, true);
-  m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
+  m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME,
+                                         tr("Categoria"),
+                                         QIcon(":/icons/res/category.png"),
+                                         true,
+                                         true);
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
+                                      tr("Imagem"),
+                                      QIcon(":/icons/res/icon.png"),
+                                      true,
+                                      true);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
@@ -129,7 +137,7 @@ ProductView::ProductView(QWidget* parent)
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewlayout);
 
-  m_database = new JDatabase;
+  m_database = new JDatabase(PRODUCT_SQL_TABLE_NAME);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);
@@ -160,13 +168,6 @@ ProductView::ProductView(QWidget* parent)
 ProductView::~ProductView()
 {
 
-}
-
-void ProductView::setDatabase(QSqlDatabase db)
-{
-  m_categoryPicker->setDatabase(db, CATEGORY_SQL_TABLE_NAME);
-  m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
-  m_database->setDatabase(db, PRODUCT_SQL_TABLE_NAME);
 }
 
 Product ProductView::getProduct() const

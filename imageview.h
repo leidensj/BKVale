@@ -3,7 +3,6 @@
 
 #include <QFrame>
 #include "image.h"
-#include <QSqlDatabase>
 
 class QPushButton;
 class JLineEdit;
@@ -18,7 +17,6 @@ public:
   explicit ImageView(QWidget* parent = 0);
   void setImage(const Image& image);
   Image getImage() const;
-  void setDatabase(QSqlDatabase db);
 
 public slots:
   void create();

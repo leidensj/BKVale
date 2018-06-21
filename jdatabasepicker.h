@@ -18,7 +18,8 @@ class JDatabasePicker : public QFrame
   Q_OBJECT
 
 public:
-  explicit JDatabasePicker(const QString& text,
+  explicit JDatabasePicker(const QString& tableName,
+                           const QString& text,
                            const QIcon& icon,
                            bool bShowImage,
                            bool bDisplayGroup,
@@ -28,8 +29,6 @@ public:
   const QString m_text;
 
   JDatabase* getDatabase() const;
-  void setDatabase(QSqlDatabase db,
-                   const QString& tableName);
 
 public slots:
   void clear();

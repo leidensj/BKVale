@@ -35,7 +35,11 @@ CategoryView::CategoryView(QWidget* parent)
   m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
 
-  m_imagePicker = new JDatabasePicker(tr("Imagem"), QIcon(":/icons/res/icon.png"), true, true);
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
+                                      tr("Imagem"),
+                                      QIcon(":/icons/res/icon.png"),
+                                      true,
+                                      true);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
@@ -69,7 +73,7 @@ CategoryView::CategoryView(QWidget* parent)
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewlayout);
 
-  m_database = new JDatabase();
+  m_database = new JDatabase(CATEGORY_SQL_TABLE_NAME);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);
@@ -95,12 +99,6 @@ CategoryView::CategoryView(QWidget* parent)
                    SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
                    SLOT(itemRemoved(qlonglong)));
-}
-
-void CategoryView::setDatabase(QSqlDatabase db)
-{
-  m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
-  m_database->setDatabase(db, CATEGORY_SQL_TABLE_NAME);
 }
 
 void CategoryView::itemSelected(const JItem& jItem)

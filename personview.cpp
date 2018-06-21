@@ -156,7 +156,11 @@ PersonView::PersonView(QWidget* parent)
   m_cbBirthDate = new QCheckBox;
   m_cbBirthDate->setChecked(false);
   m_cbBirthDate->setText(tr("Data de nascimento:"));
-  m_imagePicker = new JDatabasePicker(tr("Imagem"),  QIcon(":/icons/res/icon.png"), true, true);
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
+                                      tr("Imagem"),
+                                      QIcon(":/icons/res/icon.png"),
+                                      true,
+                                      true);
   m_cbCustomer = new QCheckBox;
   m_cbCustomer->setText(tr("Cliente"));
   m_cbCustomer->setIcon(QIcon(":/icons/res/client.png"));
@@ -371,7 +375,7 @@ PersonView::PersonView(QWidget* parent)
                     QIcon(":/icons/res/address.png"),
                     tr("Endereço"));
 
-  m_database = new JDatabase;
+  m_database = new JDatabase(PERSON_SQL_TABLE_NAME);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setAlignment(Qt::AlignTop);
@@ -466,12 +470,6 @@ PersonView::PersonView(QWidget* parent)
 PersonView::~PersonView()
 {
 
-}
-
-void PersonView::setDatabase(QSqlDatabase db)
-{
-  m_imagePicker->setDatabase(db, IMAGE_SQL_TABLE_NAME);
-  m_database->setDatabase(db, PERSON_SQL_TABLE_NAME);
 }
 
 Person PersonView::getPerson() const

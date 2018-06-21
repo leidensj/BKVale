@@ -21,10 +21,6 @@ SOURCES += main.cpp\
     databaseutils.cpp \
     settings.cpp \
     reminderview.cpp \
-    consumptionview.cpp \
-    consumptiondatabase.cpp \
-    consumptionwidget.cpp \
-    consumptionfilter.cpp \
     qcustomplot.cpp \
     consumptionchart.cpp \
     calculatorwidget.cpp \
@@ -60,10 +56,6 @@ HEADERS  += mainwindow.h \
     reminder.h \
     reminderview.h \
     consumption.h \
-    consumptionview.h \
-    consumptiondatabase.h \
-    consumptionwidget.h \
-    consumptionfilter.h \
     qcustomplot.h \
     consumptionchart.h \
     calculatorwidget.h \

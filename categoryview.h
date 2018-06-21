@@ -2,7 +2,6 @@
 #define CATEGORYVIEW_H
 
 #include <QFrame>
-#include <QSqlDatabase>
 #include "category.h"
 
 class QPushButton;
@@ -16,7 +15,6 @@ class CategoryView : public QFrame
 
 public:
   explicit CategoryView(QWidget* parent = 0);
-  void setDatabase(QSqlDatabase db);
   Category getCategory() const;
 
 private slots:

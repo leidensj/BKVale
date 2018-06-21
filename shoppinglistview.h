@@ -3,7 +3,6 @@
 
 #include <QFrame>
 #include <QVector>
-#include <QSqlDatabase>
 #include "shoppinglist.h"
 
 class JDatabase;
@@ -20,7 +19,6 @@ class ShoppingListView : public QFrame
 
 public:
   explicit ShoppingListView(QWidget* parent = nullptr);
-  void setDatabase(QSqlDatabase db);
   void setShoppingList(const ShoppingList& lst);
   ShoppingList getShoppingList() const;
 

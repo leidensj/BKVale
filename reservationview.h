@@ -2,7 +2,6 @@
 #define RESERVATIONVIEW_H
 
 #include <QFrame>
-#include <QSqlDatabase>
 #include "reservation.h"
 
 class QPushButton;
@@ -20,7 +19,6 @@ class ReservationView : public QFrame
 
 public:
   explicit ReservationView(QWidget* parent = 0);
-  void setDatabase(QSqlDatabase db);
   Reservation getReservation() const;
 
 private slots:

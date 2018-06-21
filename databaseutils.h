@@ -26,11 +26,7 @@ public:
              const QString& strPassword,
              QString& error);
 
-  void setDatabase(QSqlDatabase db);
-  QSqlDatabase getDatabase() const;
-
 private:
-  QSqlDatabase m_db;
   User m_user;
 
 public:
@@ -54,60 +50,46 @@ public:
 
 namespace BaitaSQL
 {
-  bool isOpen(QSqlDatabase db,
-              QString& error);
+  bool isOpen(QString& error);
 
-  bool open(QSqlDatabase db,
-            const QString& path,
+  bool open(const QString& path,
             QString& error);
 
-  void close(QSqlDatabase db);
+  void close();
 
-  bool init(QSqlDatabase db,
-            QString& error);
+  bool init(QString& error);
 }
 
 namespace UserSQL
 {
-  bool insert(QSqlDatabase db,
-              const User& user,
+  bool insert(const User& user,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const User& user,
+  bool update(const User& user,
               QString& error);
 
-  bool select(QSqlDatabase db,
-              User& user,
+  bool select(User& user,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
 }
 
 namespace NoteSQL
 {
-  qlonglong nextNumber(QSqlDatabase db);
-
-  bool insert(QSqlDatabase db,
-              const Note& note,
+  bool insert(const Note& note,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const Note& note,
+  bool update(const Note& note,
               QString& error);
 
-  bool select(QSqlDatabase db,
-              Note& note,
+  bool select(Note& note,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
 
-  NoteItem selectLastItem(QSqlDatabase db,
-                          qlonglong supplierId,
+  NoteItem selectLastItem(qlonglong supplierId,
                           qlonglong productId);
 }
 
@@ -117,20 +99,16 @@ bool execSelect(QSqlQuery& query,
                 Product& product,
                 QString& error);
 
-bool select(QSqlDatabase db,
-            Product& product,
+bool select(Product& product,
             QString& error);
 
-bool insert(QSqlDatabase db,
-            const Product& product,
+bool insert(const Product& product,
             QString& error);
 
-bool update(QSqlDatabase db,
-            const Product& product,
+bool update(const Product& product,
             QString& error);
 
-bool remove(QSqlDatabase db,
-            qlonglong id,
+bool remove(qlonglong id,
             QString& error);
 }
 
@@ -140,20 +118,16 @@ namespace CategorySQL
                  Category& category,
                  QString& error);
 
-  bool select(QSqlDatabase db,
-              Category& category,
+  bool select(Category& category,
               QString& error);
 
-  bool insert(QSqlDatabase db,
-              const Category& category,
+  bool insert(const Category& category,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const Category& category,
+  bool update(const Category& category,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
 }
 
@@ -163,20 +137,16 @@ namespace ImageSQL
                   Image& image,
                   QString& error);
 
-  bool select(QSqlDatabase db,
-              Image& image,
+  bool select(Image& image,
               QString& error);
 
-  bool insert(QSqlDatabase db,
-              const Image& image,
+  bool insert(const Image& image,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const Image& image,
+  bool update(const Image& image,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
 }
 
@@ -186,51 +156,17 @@ namespace ReminderSQL
                   Reminder& reminder,
                   QString& error);
 
-  bool insert(QSqlDatabase db,
-              const Reminder& reminder,
+  bool insert(const Reminder& reminder,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const Reminder& reminder,
+  bool update(const Reminder& reminder,
               QString& error);
 
-  bool select(QSqlDatabase db,
-              Reminder& reminder,
+  bool select(Reminder& reminder,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
-}
-
-namespace ConsumptionSQL
-{
-  bool selectByDate(QSqlDatabase db,
-                    qint64 date,
-                    QVector<Consumption>& consumptions,
-                    QString& error);
-
-  bool selectTotal(QSqlDatabase db,
-                   const Consumption::Filter& filter,
-                   double& total,
-                   QString& error);
-
-  bool selectSubTotal(QSqlDatabase db,
-                      const Consumption::Filter& filter,
-                      QVector<qint64>& dates,
-                      QVector<double>& totals,
-                      QString &error);
-
-  void getConsumption(QSqlDatabase db,
-                      qint64 date,
-                      QVector<Consumption>& vConsumption,
-                      QVector<Product>& vProduct);
-
-  double getTotal(QSqlDatabase db,
-                  const Consumption::Filter& filter);
-
-  double getTotal(QSqlDatabase db,
-                  qint64 date);
 }
 
 namespace PersonSQL
@@ -244,48 +180,38 @@ namespace PersonSQL
                            Person& person,
                            QString& error);
 
-  bool select(QSqlDatabase db,
-              Person& person,
+  bool select(Person& person,
               QString& error);
 
-  bool insert(QSqlDatabase db,
-              const Person& person,
+  bool insert(const Person& person,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const Person& person,
+  bool update(const Person& person,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
 
-  bool isValidPinCode(QSqlDatabase db,
-                      const QString& pincode,
+  bool isValidPinCode(const QString& pincode,
                       Person& person,
                       QString& error);
 }
 
 namespace ShoppingListSQL
 {
- bool execSelect(QSqlQuery& query,
-                 ShoppingList& shoppingList,
+ bool execSelect(ShoppingList& shoppingList,
                  QString& error);
 
-  bool select(QSqlDatabase db,
-              ShoppingList& shoppingList,
+  bool select(ShoppingList& shoppingList,
               QString& error);
 
-  bool insert(QSqlDatabase db,
-              const ShoppingList& shoppingList,
+  bool insert(const ShoppingList& shoppingList,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const ShoppingList& shoppingList,
+  bool update(const ShoppingList& shoppingList,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
 }
 
@@ -295,20 +221,16 @@ namespace ReservationSQL
                   Reservation& res,
                   QString& error);
 
-  bool select(QSqlDatabase db,
-              Reservation& res,
+  bool select(Reservation& res,
               QString& error);
 
-  bool insert(QSqlDatabase db,
-              const Reservation& res,
+  bool insert(const Reservation& res,
               QString& error);
 
-  bool update(QSqlDatabase db,
-              const Reservation& res,
+  bool update(const Reservation& res,
               QString& error);
 
-  bool remove(QSqlDatabase db,
-              qlonglong id,
+  bool remove(qlonglong id,
               QString& error);
 }
 

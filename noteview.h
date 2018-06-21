@@ -3,7 +3,6 @@
 
 #include <QFrame>
 #include <QStringList>
-#include <QSqlDatabase>
 #include "note.h"
 
 #define MAX_ITEMS 100
@@ -28,14 +27,12 @@ class NoteView : public QFrame
 public:
   explicit NoteView(QWidget *parent = 0);
   ~NoteView();
-  void setDatabase(QSqlDatabase db);
   Note getNote() const;
   void addNoteItem(const NoteItem& noteItem);
 
 private:
   qlonglong m_currentId;
   qlonglong m_lastId;
-  QSqlDatabase m_db;
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnSearch;

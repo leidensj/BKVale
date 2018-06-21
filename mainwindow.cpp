@@ -7,7 +7,6 @@
 #include "categoryview.h"
 #include "noteview.h"
 #include "reminderview.h"
-#include "consumptionwidget.h"
 #include "calculatorwidget.h"
 #include "usermgtview.h"
 #include "imageview.h"
@@ -38,13 +37,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   ui->setupUi(this);
   m_note = new NoteView;
   m_reminder = new ReminderView;
-  m_consumption = new ConsumptionWidget;
   m_calculator = new CalculatorWidget;
   m_shop = new ShopView;
   m_reservation = new ReservationView;
   ui->tabNotes->layout()->addWidget(m_note);
   ui->tabReminder->layout()->addWidget(m_reminder);
-  ui->tabConsumption->layout()->addWidget(m_consumption);
   ui->tabCalculator->layout()->addWidget(m_calculator);
   ui->tabShop->layout()->addWidget(m_shop);
   ui->tabReservation->layout()->addWidget(m_reservation);
@@ -135,12 +132,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SLOT(updateControls()));
 
   m_settings.load();
-  m_note->setDatabase(m_userLogin.getDatabase());
-  m_note->create();
-  m_consumption->setDatabase(m_userLogin.getDatabase());
-  m_reminder->setDatabase(m_userLogin.getDatabase());
-  m_shop->setDatabase(m_userLogin.getDatabase());
-  m_reservation->setDatabase(m_userLogin.getDatabase());
   updateControls();
   updateStatusBar();
 }
@@ -230,7 +221,6 @@ void BaitaAssistant::print()
       if (m_settings.m_notesPincodeRequired)
       {
         PinCodeView w(this);
-        w.setDatabase(m_userLogin.getDatabase());
         if (!w.exec() || !w.getCurrentPerson().isValidId())
           return;
         name = w.getCurrentPerson().strAliasName();
@@ -256,7 +246,6 @@ void BaitaAssistant::print()
       }
     } break;
     case Functionality::ConsumptionMode:
-      print(m_consumption->printContent());
       break;
     case Functionality::CalculatorMode:
       print(m_calculator->getFullContent() + Printer::strCmdFullCut());
@@ -317,7 +306,8 @@ void BaitaAssistant::updateStatusBar()
 
 void BaitaAssistant::updateControls()
 {
-  const bool bIsSQLOk = m_userLogin.getDatabase().isOpen();
+  const bool bIsSQLOk = QSqlDatabase::database(SQLITE_CONNECTION_NAME).isValid() &&
+                        QSqlDatabase::database(SQLITE_CONNECTION_NAME).isOpen();
   ui->actionSettings->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSettings());
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
@@ -352,7 +342,6 @@ void BaitaAssistant::updateControls()
       ui->actionPrint->setEnabled(true);
       break;
     case Functionality::ConsumptionMode:
-      ui->actionPrint->setEnabled(m_consumption->isValid());
       break;
     case Functionality::ShopMode:
       ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId());
@@ -376,7 +365,6 @@ void BaitaAssistant::openProductsDialog()
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   ProductView* w = new ProductView(this);
-  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Produtos"));
@@ -391,7 +379,6 @@ void BaitaAssistant::openCategoriesDialog()
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   CategoryView* w = new CategoryView(this);
-  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Categorias"));
@@ -406,7 +393,6 @@ void BaitaAssistant::openUsersDialog()
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   UserMgtView* w = new UserMgtView(m_userLogin.getId(), this);
-  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Usuários"));
@@ -424,7 +410,6 @@ void BaitaAssistant::openImagesDialog()
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   ImageView* w = new ImageView(this);
-  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Imagens"));
@@ -459,7 +444,6 @@ void BaitaAssistant::openPersonsDialog()
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   PersonView* w = new PersonView(this);
-  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Pessoas"));
@@ -474,7 +458,6 @@ void BaitaAssistant::openShoppingListDialog()
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   ShoppingListView* w = new ShoppingListView(this);
-  w->setDatabase(m_userLogin.getDatabase());
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Listas de Compras"));

@@ -179,7 +179,7 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
                     QIcon(":/icons/res/usershield.png"),
                     tr("Permissões"));
 
-  m_database = new JDatabase();
+  m_database = new JDatabase(USER_SQL_TABLE_NAME);
   m_database->setContentsMargins(0, 0, 9, 0);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
@@ -224,11 +224,6 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
                    SLOT(itemRemoved(qlonglong)));
 
   create();
-}
-
-void UserMgtView::setDatabase(QSqlDatabase db)
-{
-  m_database->setDatabase(db, USER_SQL_TABLE_NAME);
 }
 
 User UserMgtView::getUser() const

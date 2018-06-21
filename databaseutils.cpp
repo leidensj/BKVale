@@ -39,41 +39,18 @@ namespace {
   }
 }
 
-qlonglong NoteSQL::nextNumber(QSqlDatabase db)
-{
-  Settings settings;
-  settings.load();
-  qlonglong number = settings.m_notesDefaultNumber;
-  if (!db.isOpen())
-    return number;
-
-  db.transaction();
-  QSqlQuery query(db);
-  bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
-  if (bSuccess)
-    number = query.next() ? query.value(0).toLongLong() + 1 : settings.m_notesDefaultNumber;
-  number = number > settings.m_notesDefaultNumber ? number : settings.m_notesDefaultNumber;
-
-  if (!bSuccess)
-    db.rollback();
-  else
-    db.commit();
-
-  return number;
-}
-
-bool NoteSQL::insert(QSqlDatabase db,
-                     const Note& note,
+bool NoteSQL::insert(const Note& note,
                      QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
   Settings settings;
   settings.load();
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -151,15 +128,15 @@ bool NoteSQL::insert(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool NoteSQL::update(QSqlDatabase db,
-                     const Note& note,
+bool NoteSQL::update(const Note& note,
                      QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -223,17 +200,17 @@ bool NoteSQL::update(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool NoteSQL::select(QSqlDatabase db,
-                     Note& note,
+bool NoteSQL::select(Note& note,
                      QString& error)
 {
   error.clear();
   qlonglong id = note.m_id;
   note.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -314,15 +291,15 @@ bool NoteSQL::select(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool NoteSQL::remove(QSqlDatabase db,
-                     qlonglong id,
+bool NoteSQL::remove(qlonglong id,
                      QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
@@ -332,15 +309,15 @@ bool NoteSQL::remove(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-NoteItem NoteSQL::selectLastItem(QSqlDatabase db,
-                               qlonglong supplierId,
-                               qlonglong productId)
+NoteItem NoteSQL::selectLastItem(qlonglong supplierId,
+                                 qlonglong productId)
 {
   NoteItem noteItem;
   QString error;
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return noteItem;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -382,19 +359,19 @@ NoteItem NoteSQL::selectLastItem(QSqlDatabase db,
   return noteItem;
 }
 
-bool BaitaSQL::isOpen(QSqlDatabase db,
-                      QString& error)
+bool BaitaSQL::isOpen(QString& error)
 {
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   error.clear();
   if (!db.isOpen())
      error = "Banco de dados não foi aberto.";
   return db.isOpen();
 }
 
-bool BaitaSQL::open(QSqlDatabase db,
-                    const QString& path,
+bool BaitaSQL::open(const QString& path,
                     QString& error)
 {
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   error.clear();
   if (db.isOpen())
     db.close();
@@ -410,19 +387,20 @@ bool BaitaSQL::open(QSqlDatabase db,
   return bSuccess;
 }
 
-void BaitaSQL::close(QSqlDatabase db)
+void BaitaSQL::close()
 {
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.close();
 }
 
-bool BaitaSQL::init(QSqlDatabase db,
-                    QString& error)
+bool BaitaSQL::init(QString& error)
 {
   error.clear();
 
-  if (!isOpen(db, error))
+  if (!isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -718,29 +696,29 @@ bool ProductSQL::execSelect(QSqlQuery& query,
   return bSuccess;
 }
 
-bool ProductSQL::select(QSqlDatabase db,
-                        Product& product,
+bool ProductSQL::select(Product& product,
                         QString& error)
 {
   error.clear();
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, product, error);
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ProductSQL::insert(QSqlDatabase db,
-                        const Product& product,
+bool ProductSQL::insert(const Product& product,
                         QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -787,15 +765,15 @@ bool ProductSQL::insert(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ProductSQL::update(QSqlDatabase db,
-                        const Product& product,
+bool ProductSQL::update(const Product& product,
                         QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -843,15 +821,15 @@ bool ProductSQL::update(QSqlDatabase db,
   return bSuccess;
 }
 
-bool ProductSQL::remove(QSqlDatabase db,
-                        qlonglong id,
+bool ProductSQL::remove(qlonglong id,
                         QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
@@ -908,14 +886,14 @@ bool CategorySQL::execSelect(QSqlQuery& query,
   return bSuccess;
 }
 
-bool CategorySQL::select(QSqlDatabase db,
-                         Category& category,
+bool CategorySQL::select(Category& category,
                          QString& error)
 {
   error.clear();
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -923,15 +901,15 @@ bool CategorySQL::select(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool CategorySQL::insert(QSqlDatabase db,
-                         const Category& category,
+bool CategorySQL::insert(const Category& category,
                          QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -964,15 +942,15 @@ bool CategorySQL::insert(QSqlDatabase db,
   return bSuccess;
 }
 
-bool CategorySQL::update(QSqlDatabase db,
-                         const Category& category,
+bool CategorySQL::update(const Category& category,
                          QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
@@ -1015,15 +993,15 @@ bool CategorySQL::update(QSqlDatabase db,
   return bSuccess;
 }
 
-bool CategorySQL::remove(QSqlDatabase db,
-                         qlonglong id,
+bool CategorySQL::remove(qlonglong id,
                          QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   QSqlQuery query(db);
   query.prepare("DELETE FROM " CATEGORY_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
@@ -1071,29 +1049,30 @@ bool ImageSQL::execSelect(QSqlQuery& query,
   }
 }
 
-bool ImageSQL::select(QSqlDatabase db,
-                      Image& image,
+bool ImageSQL::select(Image& image,
                       QString& error)
 {
   error.clear();
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, image, error);
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ImageSQL::insert(QSqlDatabase db,
-                      const Image& image,
+bool ImageSQL::insert(const Image& image,
                       QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " IMAGE_SQL_TABLE_NAME " ("
                 IMAGE_SQL_COL01 ","
@@ -1104,25 +1083,23 @@ bool ImageSQL::insert(QSqlDatabase db,
   query.bindValue(":_v01", image.m_name);
   query.bindValue(":_v02", image.m_image);
 
-  if (query.exec())
-  {
+  bool bSuccess = query.exec();
+  if (bSuccess)
     image.m_id = query.lastInsertId().toLongLong();
-    return true;
-  }
 
-  error = query.lastError().text();
-  return false;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ImageSQL::update(QSqlDatabase db,
-                      const Image& image,
+bool ImageSQL::update(const Image& image,
                       QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " IMAGE_SQL_TABLE_NAME " SET "
                 IMAGE_SQL_COL01 " = (:_v01),"
@@ -1132,22 +1109,19 @@ bool ImageSQL::update(QSqlDatabase db,
   query.bindValue(":_v01", image.m_name);
   query.bindValue(":_v02", image.m_image);
 
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ImageSQL::remove(QSqlDatabase db,
-                      qlonglong id,
+bool ImageSQL::remove(qlonglong id,
                       QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " IMAGE_SQL_TABLE_NAME
@@ -1198,29 +1172,29 @@ bool ReminderSQL::execSelect(QSqlQuery& query,
   }
 }
 
-bool ReminderSQL::select(QSqlDatabase db,
-                         Reminder& reminder,
+bool ReminderSQL::select(Reminder& reminder,
                          QString& error)
 {
   error.clear();
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, reminder, error);
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReminderSQL::insert(QSqlDatabase db,
-                         const Reminder& reminder,
+bool ReminderSQL::insert(const Reminder& reminder,
                          QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " REMINDER_SQL_TABLE_NAME " ("
@@ -1247,15 +1221,15 @@ bool ReminderSQL::insert(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReminderSQL::update(QSqlDatabase db,
-                         const Reminder& reminder,
+bool ReminderSQL::update(const Reminder& reminder,
                          QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME " SET "
@@ -1276,15 +1250,15 @@ bool ReminderSQL::update(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReminderSQL::remove(QSqlDatabase db,
-                         qlonglong id,
+bool ReminderSQL::remove(qlonglong id,
                          QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " REMINDER_SQL_TABLE_NAME
@@ -1295,184 +1269,16 @@ bool ReminderSQL::remove(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ConsumptionSQL::selectTotal(QSqlDatabase db,
-                                 const Consumption::Filter& filter,
-                                 double& total,
-                                 QString& error)
-{
-  error.clear();
-  total = 0.0;
-
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  QString str("SELECT SUM(_TOTAL) FROM _CONSUMPTION");
-  if (filter.m_bDate)
-  {
-    str += " WHERE _DATE BETWEEN " +
-           QString::number(filter.m_datei) +
-           " AND " +
-           QString::number(filter.m_datef);
-  }
-
-  QSqlQuery query(db);
-  bool bSuccess = query.exec(str);
-  if (bSuccess)
-  {
-    bSuccess = query.next();
-    if (bSuccess)
-      total = query.value(0).toDouble();
-    else
-      error = "Valor não encontrado.";
-  }
-  else
-  {
-    error = query.lastError().text();
-  }
-
-  return bSuccess;
-}
-
-bool ConsumptionSQL::selectSubTotal(QSqlDatabase db,
-                                    const Consumption::Filter& filter,
-                                    QVector<qint64>& dates,
-                                    QVector<double>& totals,
-                                    QString &error)
-{
-  dates.clear();
-  totals.clear();
-  error.clear();
-
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  QString str("SELECT SUM(_TOTAL), _DATE FROM _CONSUMPTION");
-  if (filter.m_bDate)
-  {
-    str += " WHERE _DATE BETWEEN " +
-           QString::number(filter.m_datei) +
-           " AND " +
-           QString::number(filter.m_datef);
-  }
-  str += " GROUP BY _DATE";
-
-  QSqlQuery query(db);
-  bool bSuccess = query.exec(str);
-  if (bSuccess)
-  {
-    bSuccess = false;
-    while (query.next())
-    {
-      totals.push_back(query.value(0).toDouble());
-      dates.push_back(query.value(1).toLongLong());
-      bSuccess = true;
-    }
-    if (!bSuccess)
-      error = "Valor não encontrado.";
-  }
-  else
-  {
-    error = query.lastError().text();
-  }
-
-  return bSuccess;
-}
-
-bool ConsumptionSQL::selectByDate(QSqlDatabase db,
-                                  qint64 date,
-                                  QVector<Consumption>& consumptions,
-                                  QString& error)
-{
-  consumptions.clear();
-  error.clear();
-
-  if (!BaitaSQL::isOpen(db, error))
-    return false;
-
-  QSqlQuery query(db);
-  bool bSuccess = query.exec("SELECT "
-                             "_ID,"
-                             "_DATE,"
-                             "_PRODUCTID,"
-                             "_PRICE,"
-                             "_AMMOUNT,"
-                             "_TOTAL "
-                             "FROM _CONSUMPTION "
-                             "WHERE _DATE = " + QString::number(date));
-
-  if (bSuccess)
-  {
-    while (query.next())
-    {
-      Consumption c;
-      c.m_id = query.value(0).toInt();
-      c.m_date = query.value(1).toLongLong();
-      c.m_itemID = query.value(2).toInt();
-      c.m_price = query.value(3).toDouble();
-      c.m_ammount = query.value(4).toDouble();
-      c.m_total = query.value(5).toDouble();
-      consumptions.push_back(c);
-    }
-  }
-  else
-  {
-    error = query.lastError().text();
-  }
-
-  return bSuccess;
-}
-
-void ConsumptionSQL::getConsumption(QSqlDatabase db,
-                                    qint64 date,
-                                    QVector<Consumption>& vConsumption,
-                                    QVector<Product>& vProduct)
-{
-  vConsumption.clear();
-  vProduct.clear();
-
-  QString error;
-  selectByDate(db, date, vConsumption, error);
-
-  for (int i = 0; i != vConsumption.size(); ++i)
-  {
-    Product product;
-    product.m_id = vConsumption.at(i).m_itemID;
-    ProductSQL::select(db, product, error);
-    vProduct.push_back(product);
-  }
-}
-
-double ConsumptionSQL::getTotal(QSqlDatabase db,
-                                const Consumption::Filter& filter)
-{
-  double total = 0.0;
-  QString error;
-  ConsumptionSQL::selectTotal(db, filter, total, error);
-  return total;
-}
-
-double ConsumptionSQL::getTotal(QSqlDatabase db,
-                                qint64 date)
-{
-  double total = 0.0;
-  QString error;
-  Consumption::Filter filter;
-  filter.m_bDate = true;
-  filter.m_datei = date;
-  filter.m_datef = date;
-  ConsumptionSQL::selectTotal(db, filter, total, error);
-  return total;
-}
-
-bool UserSQL::insert(QSqlDatabase db,
-                     const User& user,
+bool UserSQL::insert(const User& user,
                      QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " USER_SQL_TABLE_NAME " ("
                 USER_SQL_COL01 ","
@@ -1522,23 +1328,19 @@ bool UserSQL::insert(QSqlDatabase db,
   query.bindValue(":_v14", user.m_bAccessReservation);
   query.bindValue(":_v15", user.m_bAccessShoppingList);
 
-  if (query.exec())
-  {
+  bool bSuccess = query.exec();
+  if (bSuccess)
     user.m_id = query.lastInsertId().toLongLong();
-    return true;
-  }
 
-  error = query.lastError().text();
-  return false;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool UserSQL::update(QSqlDatabase db,
-                     const User& user,
+bool UserSQL::update(const User& user,
                      QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
   QString strQuery("UPDATE " USER_SQL_TABLE_NAME " SET "
@@ -1561,6 +1363,8 @@ bool UserSQL::update(QSqlDatabase db,
               " WHERE " SQL_COLID " = (:_v00)";
 
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+   db.transaction();
   QSqlQuery query(db);
   query.prepare(strQuery);
   query.bindValue(":_v00", user.m_id);
@@ -1581,25 +1385,22 @@ bool UserSQL::update(QSqlDatabase db,
   query.bindValue(":_v14", user.m_bAccessReservation);
   query.bindValue(":_v15", user.m_bAccessShoppingList);
 
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool UserSQL::select(QSqlDatabase db,
-                     User& user,
+bool UserSQL::select(User& user,
                      QString& error)
 {
   error.clear();
   qlonglong id = user.m_id;
   user.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
-  bool bFound = false;
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
                 USER_SQL_COL01 ","
@@ -1620,7 +1421,9 @@ bool UserSQL::select(QSqlDatabase db,
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
-  if (query.exec())
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
   {
     if (query.next())
     {
@@ -1640,51 +1443,39 @@ bool UserSQL::select(QSqlDatabase db,
       user.m_bAccessImage = query.value(12).toBool();
       user.m_bAccessReservation = query.value(13).toBool();
       user.m_bAccessShoppingList = query.value(14).toBool();
-      bFound = true;
     }
-
-    if (!bFound)
+    else
+    {
+      bSuccess = false;
       error = "Usuário não encontrado.";
-    return bFound;
+    }
   }
 
-  error = query.lastError().text();
-  return false;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool UserSQL::remove(QSqlDatabase db,
-                     qlonglong id,
+bool UserSQL::remove(qlonglong id,
                      QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
-  if (query.exec())
-    return true;
 
-  error = query.lastError().text();
-  return false;
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 UserLoginSQL::UserLoginSQL()
 {
 
-}
-
-void UserLoginSQL::setDatabase(QSqlDatabase db)
-{
-  m_db = db;
-}
-
-QSqlDatabase UserLoginSQL::getDatabase() const
-{
-  return m_db;
 }
 
 bool UserLoginSQL::login(const QString& strUser,
@@ -1693,10 +1484,12 @@ bool UserLoginSQL::login(const QString& strUser,
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(m_db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlQuery query(m_db);
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
   query.prepare("SELECT "
                 SQL_COLID ","
                 USER_SQL_COL01 ","
@@ -1720,9 +1513,10 @@ bool UserLoginSQL::login(const QString& strUser,
   query.bindValue(":_v01", strUser);
   query.bindValue(":_v02", User::st_strEncryptedPassword(strPassword));
 
-  if (query.exec())
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
   {
-    bool bFound = false;
     if (query.next())
     {
       m_user.m_id = query.value(0).toLongLong();
@@ -1741,16 +1535,15 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessImage = query.value(13).toBool();
       m_user.m_bAccessReservation = query.value(14).toBool();
       m_user.m_bAccessShoppingList = query.value(15).toBool();
-      bFound = true;
     }
-
-    if (!bFound)
+    else
+    {
+      bSuccess = false;
       error = "Usuário ou senha inválidos.";
-    return bFound;
+    }
   }
 
-  error = query.lastError().text();
-  return false;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool PersonSQL::execSelect(QSqlQuery& query,
@@ -1915,28 +1708,28 @@ bool PersonSQL::execByPinCodeSelect(QSqlQuery& query,
   return bSuccess;
 }
 
-bool PersonSQL::select(QSqlDatabase db,
-                       Person& person,
+bool PersonSQL::select(Person& person,
                        QString& error)
 {
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, person, error);
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool PersonSQL::insert(QSqlDatabase db,
-                       const Person& person,
+bool PersonSQL::insert(const Person& person,
                        QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " PERSON_SQL_TABLE_NAME " ("
@@ -2066,30 +1859,18 @@ bool PersonSQL::insert(QSqlDatabase db,
     }
   }
 
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool PersonSQL::update(QSqlDatabase db,
-                       const Person& person,
+bool PersonSQL::update(const Person& person,
                        QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -2273,58 +2054,46 @@ bool PersonSQL::update(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool PersonSQL::remove(QSqlDatabase db,
-                       qlonglong id,
+bool PersonSQL::remove(qlonglong id,
                        QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PERSON_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
   bool bSuccess = query.exec();
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool PersonSQL::isValidPinCode(QSqlDatabase db,
-                               const QString& pincode,
+bool PersonSQL::isValidPinCode(const QString& pincode,
                                Person& person,
                                QString& error)
 {
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execByPinCodeSelect(query, pincode, person, error);
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ShoppingListSQL::insert(QSqlDatabase db,
-                             const ShoppingList& shoppingList,
+bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
                              QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -2420,15 +2189,15 @@ bool ShoppingListSQL::insert(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ShoppingListSQL::update(QSqlDatabase db,
-                             const ShoppingList& shoppingList,
+bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                              QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -2512,17 +2281,17 @@ bool ShoppingListSQL::update(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ShoppingListSQL::select(QSqlDatabase db,
-                             ShoppingList& shoppingList,
+bool ShoppingListSQL::select(ShoppingList& shoppingList,
                              QString& error)
 {
   error.clear();
   qlonglong id = shoppingList.m_id;
   shoppingList.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -2616,15 +2385,15 @@ bool ShoppingListSQL::select(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ShoppingListSQL::remove(QSqlDatabase db,
-                             qlonglong id,
+bool ShoppingListSQL::remove(qlonglong id,
                              QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " SHOPPING_LIST_SQL_TABLE_NAME
@@ -2697,14 +2466,14 @@ bool ReservationSQL::execSelect(QSqlQuery& query,
   return bSuccess;
 }
 
-bool ReservationSQL::select(QSqlDatabase db,
-                            Reservation& res,
+bool ReservationSQL::select(Reservation& res,
                             QString& error)
 {
   error.clear();
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -2712,15 +2481,15 @@ bool ReservationSQL::select(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReservationSQL::insert(QSqlDatabase db,
-                         const Reservation& res,
-                         QString& error)
+bool ReservationSQL::insert(const Reservation& res,
+                            QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.exec("SELECT MAX(" RESERVATION_SQL_COL01 ") FROM " RESERVATION_SQL_TABLE_NAME);
@@ -2756,15 +2525,15 @@ bool ReservationSQL::insert(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReservationSQL::update(QSqlDatabase db,
-                            const Reservation& res,
+bool ReservationSQL::update(const Reservation& res,
                             QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " RESERVATION_SQL_TABLE_NAME " SET "
@@ -2789,15 +2558,15 @@ bool ReservationSQL::update(QSqlDatabase db,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReservationSQL::remove(QSqlDatabase db,
-                            qlonglong id,
+bool ReservationSQL::remove(qlonglong id,
                             QString& error)
 {
   error.clear();
 
-  if (!BaitaSQL::isOpen(db, error))
+  if (!BaitaSQL::isOpen(error))
     return false;
 
+  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " RESERVATION_SQL_TABLE_NAME

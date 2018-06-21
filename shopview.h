@@ -2,7 +2,6 @@
 #define SHOPVIEW_H
 
 #include <QFrame>
-#include <QSqlDatabase>
 #include "shoppinglist.h"
 
 class JDatabase;
@@ -16,7 +15,6 @@ class ShopView : public QFrame
 
 public:
   ShopView(QWidget* parent = nullptr);
-  void setDatabase(QSqlDatabase db);
   ShoppingList getShoppingList() const;
 
 private slots:

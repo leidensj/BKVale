@@ -35,12 +35,10 @@ class JDatabase : public QFrame
   Q_OBJECT
 
 public:
-  explicit JDatabase(bool bSelectorMode = false,
+  explicit JDatabase(const QString& tableName,
+                     bool bSelectorMode = false,
                      QWidget *parent = 0);
   ~JDatabase();
-  void setDatabase(QSqlDatabase db,
-                   const QString& tableName);
-  QSqlDatabase getDatabase() const;
   QString getTableName() const;
   JItem* getCurrentItem() const;
 
@@ -87,12 +85,10 @@ class JDatabaseSelector : public QDialog
   Q_OBJECT
 
 public:
-  explicit JDatabaseSelector(const QString& title,
+  explicit JDatabaseSelector(const QString& tableName,
+                             const QString& title,
                              const QIcon& icon,
                              QWidget* parent = 0);
-
-  void setDatabase(QSqlDatabase db,
-                   const QString& tableName);
 
   JDatabase* getDatabase() const;
 
@@ -103,6 +99,7 @@ private slots:
   void itemSelected(const JItem& jItem);
 
 signals:
+  // TODO remover sinal
   void itemSelectedSignal(const JItem& jItem);
 
 private:

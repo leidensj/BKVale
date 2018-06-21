@@ -8,7 +8,8 @@
 #include <QGroupBox>
 #include <QMessageBox>
 
-JDatabasePicker::JDatabasePicker(const QString& text,
+JDatabasePicker::JDatabasePicker(const QString& tableName,
+                                 const QString& text,
                                  const QIcon& icon,
                                  bool bShowImage,
                                  bool bDisplayGroup,
@@ -73,7 +74,7 @@ JDatabasePicker::JDatabasePicker(const QString& text,
     vlayout0->addLayout(hlayout0);
   setLayout(vlayout0);
 
-  m_selector = new JDatabaseSelector(tr("Selecionar ") + m_text, icon, this);
+  m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, this);
 
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
@@ -95,12 +96,6 @@ JDatabasePicker::JDatabasePicker(const QString& text,
     m_imageView->hide();
     vFrame1->hide();
   }
-}
-
-void JDatabasePicker::setDatabase(QSqlDatabase db,
-                                  const QString& tableName)
-{
-  m_selector->setDatabase(db, tableName);
 }
 
 JDatabase* JDatabasePicker::getDatabase() const

@@ -102,7 +102,7 @@ ReminderView::ReminderView(QWidget *parent)
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
 
-  m_database = new JDatabase;
+  m_database = new JDatabase(REMINDER_SQL_TABLE_NAME);
 
   m_dock = new QDockWidget();
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -152,11 +152,7 @@ ReminderView::ReminderView(QWidget *parent)
                    SLOT(itemRemoved(qlonglong)));
 
   setCapitalization(m_cbCapitalization->checkState());
-}
-
-void ReminderView::setDatabase(QSqlDatabase db)
-{
-  m_database->setDatabase(db, REMINDER_SQL_TABLE_NAME);
+  create();
 }
 
 Reminder ReminderView::getReminder() const

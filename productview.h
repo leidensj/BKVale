@@ -2,7 +2,6 @@
 #define PRODUCTVIEW_H
 
 #include <QFrame>
-#include <QSqlDatabase>
 #include "product.h"
 #include "category.h"
 
@@ -21,7 +20,6 @@ class ProductView : public QFrame
 public:
   explicit ProductView(QWidget* parent = 0);
   ~ProductView();
-  void setDatabase(QSqlDatabase db);
   Product getProduct() const;
 
 private slots:

@@ -2,7 +2,6 @@
 #define USERMGTVIEW_H
 
 #include <QFrame>
-#include <QSqlDatabase>
 #include "user.h"
 
 class QCheckBox;
@@ -20,7 +19,6 @@ public:
   User getUser() const;
   void setUser(const User& user);
   QString getPassword() const;
-  void setDatabase(QSqlDatabase db);
   bool hasLoggedUserChanged() const;
 
 private:

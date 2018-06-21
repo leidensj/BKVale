@@ -2,7 +2,6 @@
 #define PINCODEVIEW_H
 
 #include <QDialog>
-#include <QSqlDatabase>
 #include "person.h"
 
 class QPushButton;
@@ -14,7 +13,6 @@ class PinCodeView : public QDialog
 
 public:
   explicit PinCodeView(QWidget* parent = nullptr);
-  void setDatabase(QSqlDatabase db);
   Person getCurrentPerson() const;
 
 protected:
@@ -39,7 +37,6 @@ private slots:
 
 private:
   Person m_currentPerson;
-  QSqlDatabase m_db;
   QLineEdit* m_edPinCode;
   QPushButton* m_btn0;
   QPushButton* m_btn1;

@@ -3,7 +3,6 @@
 
 #include <QFrame>
 #include <QVector>
-#include <QSqlDatabase>
 #include "address.h"
 #include "phone.h"
 #include "person.h"
@@ -31,7 +30,6 @@ class PersonView : public QFrame
 
 public:
   explicit PersonView(QWidget* parent = 0);
-  void setDatabase(QSqlDatabase db);
   ~PersonView();
   Person getPerson() const;
 
@@ -61,7 +59,6 @@ public slots:
   void create();
 
 private:
-  QSqlDatabase m_db;
   qlonglong m_currentId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;

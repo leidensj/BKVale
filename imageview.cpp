@@ -62,7 +62,7 @@ ImageView::ImageView(QWidget* parent)
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewlayout);
 
-  m_database = new JDatabase;
+  m_database = new JDatabase(IMAGE_SQL_TABLE_NAME);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);
@@ -88,11 +88,6 @@ ImageView::ImageView(QWidget* parent)
                    SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
                    SLOT(itemRemoved(qlonglong)));
-}
-
-void ImageView::setDatabase(QSqlDatabase db)
-{
-  m_database->setDatabase(db, IMAGE_SQL_TABLE_NAME);
 }
 
 void ImageView::setImage(const Image& image)

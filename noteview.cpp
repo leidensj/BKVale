@@ -168,7 +168,11 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
 
-  m_supplierPicker = new JDatabasePicker(tr("Fornecedor"), QIcon(":/icons/res/supplier.png"), true, false);
+  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
+                                         tr("Fornecedor"),
+                                         QIcon(":/icons/res/supplier.png"),
+                                         true,
+                                         false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->addLayout(hlayout2);
@@ -226,7 +230,7 @@ NoteView::NoteView(QWidget *parent)
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
 
-  m_database = new JDatabase;
+  m_database = new JDatabase(NOTE_SQL_TABLE_NAME);
 
   m_dock = new QDockWidget();
   m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -320,18 +324,13 @@ NoteView::NoteView(QWidget *parent)
   checkDate();
   m_dock->close();
   updateControls();
+
+  m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
 }
 
 NoteView::~NoteView()
 {
 
-}
-
-void NoteView::setDatabase(QSqlDatabase db)
-{
-  m_supplierPicker->setDatabase(db, PERSON_SQL_TABLE_NAME);
-  m_database->setDatabase(db, NOTE_SQL_TABLE_NAME);
-  m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
 }
 
 void NoteView::addNoteItem(const NoteItem& noteItem)
@@ -464,9 +463,9 @@ void NoteView::setToday()
 
 void NoteView::searchProduct()
 {
-  JDatabaseSelector dlg(tr("Selecionar Produto"),
+  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
+                        tr("Selecionar Produto"),
                         QIcon(":/icons/res/item.png"));
-  dlg.setDatabase(m_database->getDatabase(), PRODUCT_SQL_TABLE_NAME);
   dlg.getDatabase()->setCustomFilter(PRODUCT_FILTER_NOTE);
   dlg.exec();
   Product* pProduct = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
@@ -477,8 +476,7 @@ void NoteView::searchProduct()
       NoteItem noteItem;
       if (IS_VALID_ID(m_supplierPicker->getId()))
       {
-        noteItem = NoteSQL::selectLastItem(m_database->getDatabase(),
-                                           m_supplierPicker->getId(),
+        noteItem = NoteSQL::selectLastItem(m_supplierPicker->getId(),
                                            pProduct->m_id);
         noteItem.m_ammount = 0.0;
       }
@@ -518,7 +516,7 @@ Note NoteView::save()
     m_lastId = note.m_id;
     QString error;
     //TODO quickfix
-    NoteSQL::select(m_database->getDatabase(), note, error);
+    NoteSQL::select(note, error);
     create();
   }
   else

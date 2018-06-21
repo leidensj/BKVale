@@ -2,7 +2,6 @@
 #define REMINDERVIEW_H
 
 #include <QFrame>
-#include <QSqlDatabase>
 #include "reminder.h"
 
 class JLineEdit;
@@ -21,7 +20,6 @@ public:
   explicit ReminderView(QWidget *parent = 0);
   Reminder getReminder() const;
   void setReminder(const Reminder& reminder);
-  void setDatabase(QSqlDatabase db);
   Reminder save();
   bool isSave() const;
 

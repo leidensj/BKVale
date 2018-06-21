@@ -81,7 +81,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
                    this,
                    SLOT(searchItem()));
 
-  QObject::connect(m_selector,
+  QObject::connect(m_selector->getDatabase(),
                    SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
                    SLOT(setItem(const JItem&)));
@@ -115,7 +115,7 @@ void JDatabasePicker::setItem(const JItem& jItem)
   else if (tableName == PERSON_SQL_TABLE_NAME)
   {
     const Person& o = dynamic_cast<const Person&>(jItem);
-    setItem(o.m_id, o.m_alias, o.m_image.m_image);
+    setItem(o.m_id, o.strAliasName(), o.m_image.m_image);
   }
   else if (tableName == CATEGORY_SQL_TABLE_NAME)
   {

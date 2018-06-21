@@ -381,7 +381,7 @@ bool BaitaSQL::open(const QString& path,
     error = db.lastError().text();
   else
   {
-    QSqlQuery query;
+    QSqlQuery query(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
     query.exec("PRAGMA foreign_keys = ON");
   }
   return bSuccess;

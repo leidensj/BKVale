@@ -370,9 +370,7 @@ void NoteView::setNote(const Note& note)
   m_snNumber->setValue(note.m_number);
   m_cbCash->setChecked(note.m_bCash);
   m_table->setNoteItems(note.m_vNoteItem);
-  m_supplierPicker->setItem(note.m_supplier.m_id,
-                            note.m_supplier.m_alias,
-                            note.m_supplier.m_image.m_image);
+  m_supplierPicker->setItem(note.m_supplier);
   m_teObservation->setPlainText(note.m_observation);
   m_edDisccount->setText(note.strDisccount());
   updateControls();

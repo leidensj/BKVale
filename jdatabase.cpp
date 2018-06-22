@@ -14,7 +14,6 @@
 #include <QIcon>
 #include <QCheckBox>
 #include <QSortFilterProxyModel>
-#include <QRegExp>
 
 class JTableModel : public QSqlQueryModel
 {
@@ -926,18 +925,17 @@ void JDatabase::filterSearchChanged()
 {
   int column = m_table->horizontalHeader()->sortIndicatorSection();
   m_proxyModel->setFilterKeyColumn(column);
-  QRegExp regExp(m_edFilterSearch->text(),
-                 Qt::CaseInsensitive,
-                 m_cbContains->isChecked()
-                 ? QRegExp::Wildcard
-                 : QRegExp::FixedString);
+  QString filter = m_edFilterSearch->text();
+  if (!m_cbContains->isChecked() && !filter.isEmpty())
+    filter.prepend("\\b");
+  QRegExp regExp(filter, Qt::CaseInsensitive, QRegExp::RegExp);
   m_proxyModel->setFilterRegExp(regExp);
-  if (m_edFilterSearch->text().isEmpty())
+
+  if (filter.isEmpty())
   {
     QString columnName;
     if (column > 0)
       columnName = m_proxyModel->headerData(column, Qt::Horizontal).toString().toLower();
-
     columnName = tr("Procurar por: ") + columnName;
     m_edFilterSearch->setPlaceholderText(columnName);
   }

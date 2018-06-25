@@ -393,7 +393,24 @@ void BaitaSQL::close()
   db.close();
 }
 
-bool BaitaSQL::init(QString& error)
+bool BaitaSQL::init(const QString& filePath,
+                    QString& error)
+{
+  bool bSuccess = QSqlDatabase::database(SQLITE_CONNECTION_NAME).isValid();
+  if (bSuccess)
+  {
+    bSuccess = BaitaSQL::open(filePath, error);
+    if (bSuccess)
+    {
+      bSuccess = BaitaSQL::createTables(error);
+      if (!bSuccess)
+        QSqlDatabase::database(SQLITE_CONNECTION_NAME).close();
+    }
+  }
+  return bSuccess;
+}
+
+bool BaitaSQL::createTables(QString& error)
 {
   error.clear();
 

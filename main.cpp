@@ -10,23 +10,6 @@
 
 namespace
 {
-bool initDatabase(const QString& filePath,
-                  QString& error)
-{
-  bool bSuccess = QSqlDatabase::database(SQLITE_CONNECTION_NAME).isValid();
-  if (bSuccess)
-  {
-    bSuccess = BaitaSQL::open(filePath, error);
-    if (bSuccess)
-    {
-      bSuccess = BaitaSQL::init(error);
-      if (!bSuccess)
-        QSqlDatabase::database(SQLITE_CONNECTION_NAME).close();
-    }
-  }
-  return bSuccess;
-}
-
 QString getPath()
 {
   return QFileDialog::getExistingDirectory(nullptr,
@@ -53,7 +36,7 @@ int main(int argc, char *argv[])
   settings.save();
   QSqlDatabase::addDatabase("QSQLITE", SQLITE_CONNECTION_NAME);
   QString error;
-  if (!initDatabase(settings.databasePath(), error))
+  if (!BaitaSQL::init(settings.databasePath(), error))
   {
     QMessageBox msgBox(QMessageBox::Critical,
                        QObject::tr("Erro ao inicializar banco de dados"),

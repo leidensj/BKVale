@@ -13,6 +13,7 @@
 #define ESC_INIT            "\x1b\x40"
 #define ESC_DOUBLE_FONT_ON  "\x1b\x0e\x1b\x56"
 //#define ESC_DOUBLE_FONT_OFF "\x1b\x14\x1b\x64\x30"
+#define ESC_CLEAR           "\x02"
 #define ESC_PORTUGUESE      "\x1b\x74\x08"
 #define ESC_CODEPAGE850     "\x1b\x74\x35"
 #define ESC_REVERSE_ON      "\x1b\x7d\x31"

@@ -90,7 +90,8 @@ HEADERS  += mainwindow.h \
     reservation.h \
     reservationview.h \
     jspinbox.h \
-    packageeditor.h
+    packageeditor.h \
+    escpos.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

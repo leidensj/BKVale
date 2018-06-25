@@ -131,6 +131,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(updateControls()));
 
+  QObject::connect(ui->actionReconnectDatabase,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(reconnectDatabase()));
+
   m_settings.load();
   updateControls();
   updateStatusBar();
@@ -464,4 +469,16 @@ void BaitaAssistant::openShoppingListDialog()
   dlg.setWindowIcon(QIcon(":/icons/res/shopmgt.png"));
   dlg.setModal(true);
   dlg.exec();
+}
+
+void BaitaAssistant::reconnectDatabase()
+{
+  QString error;
+  if (!BaitaSQL::init(m_settings.databasePath(), error))
+  {
+    QMessageBox::critical(this,
+                          tr("Erro ao reconectar"),
+                          tr("O seguinte erro ocorreu ao reconectar ao banco de dados : '%1'").arg(error),
+                          QMessageBox::Ok);
+  }
 }

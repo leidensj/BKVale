@@ -370,7 +370,7 @@ void ShoppingListView::save()
 
 void ShoppingListView::setShoppingList(const ShoppingList& lst)
 {
-  QString strIcon = product.isValidId()
+  QString strIcon = lst.isValidId()
                     ? ":/icons/res/saveas.png"
                     : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(strIcon));

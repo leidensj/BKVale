@@ -57,7 +57,10 @@ namespace BaitaSQL
 
   void close();
 
-  bool init(QString& error);
+  bool createTables(QString& error);
+
+  bool init(const QString& filePath,
+            QString& error);
 }
 
 namespace UserSQL

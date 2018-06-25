@@ -202,7 +202,7 @@
      <string>Manutenção</string>
     </property>
     <addaction name="actionSettings"/>
-    <addaction name="actionReopenDatabase"/>
+    <addaction name="actionReconnectDatabase"/>
    </widget>
    <widget class="QMenu" name="menuAjuda">
     <property name="title">
@@ -345,7 +345,7 @@
     <string>Gerenciar Listas de Compras</string>
    </property>
   </action>
-  <action name="actionReopenDatabase">
+  <action name="actionReconnectDatabase">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/databasebackup.png</normaloff>:/icons/res/databasebackup.png</iconset>

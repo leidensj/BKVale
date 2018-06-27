@@ -160,7 +160,8 @@ PersonView::PersonView(QWidget* parent)
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"),
                                       true,
-                                      true);
+                                      true,
+                                      false);
   m_cbCustomer = new QCheckBox;
   m_cbCustomer->setText(tr("Cliente"));
   m_cbCustomer->setIcon(QIcon(":/icons/res/client.png"));

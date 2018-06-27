@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QString>
 #include <category.h>
+#include <QVector>
 #include <QSqlDatabase>
 #include "jitem.h"
 
@@ -12,6 +13,7 @@ class JLineEdit;
 class JImageView;
 class JDatabaseSelector;
 class JDatabase;
+class QListWidget;
 
 class JDatabasePicker : public QFrame
 {
@@ -23,9 +25,12 @@ public:
                            const QIcon& icon,
                            bool bShowImage,
                            bool bDisplayGroup,
-                           QWidget* parent = 0);
+                           bool bMultipicker,
+                           QWidget* parent = nullptr);
 
   qlonglong getId() const;
+  QVector<qlonglong> getIds() const;
+
   const QString m_text;
 
   JDatabase* getDatabase() const;
@@ -44,12 +49,13 @@ signals:
   void changedSignal();
 
 private:
-  qlonglong m_id;
+  bool m_bMultipicker;
   JDatabaseSelector* m_selector;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;
   QPushButton* m_btnClear;
   JImageView* m_imageView;
+  QListWidget* m_list;
 };
 
 #endif // JDATABASEPICKER_H

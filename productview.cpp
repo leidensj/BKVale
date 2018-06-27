@@ -79,12 +79,14 @@ ProductView::ProductView(QWidget* parent)
                                          tr("Categoria"),
                                          QIcon(":/icons/res/category.png"),
                                          true,
-                                         true);
+                                         true,
+                                         false);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"),
                                       true,
-                                      true);
+                                      true,
+                                      false);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);

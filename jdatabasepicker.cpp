@@ -7,21 +7,27 @@
 #include <QLayout>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QListWidget>
+#include <QLabel>
+
+#define ID_PROPERTY "id"
 
 JDatabasePicker::JDatabasePicker(const QString& tableName,
                                  const QString& text,
                                  const QIcon& icon,
                                  bool bShowImage,
                                  bool bDisplayGroup,
+                                 bool bMultipicker,
                                  QWidget* parent)
  : QFrame(parent)
  , m_text(text)
- , m_id(INVALID_ID)
+ , m_bMultipicker(bMultipicker)
  , m_selector(nullptr)
  , m_btnSearch(nullptr)
  , m_edText(nullptr)
  , m_btnClear(nullptr)
  , m_imageView(nullptr)
+ , m_list(nullptr)
 {
   m_btnSearch = new QPushButton();
   m_btnSearch->setFlat(true);
@@ -30,12 +36,21 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   m_btnSearch->setIcon(QIcon(":/icons/res/binoculars.png"));
   m_btnSearch->setToolTip(tr("Selecionar ") + m_text);
 
-  m_edText = new JLineEdit(JLineEdit::Input::All,
-                           JLineEdit::st_defaultFlags1);
-  m_edText->setReadOnly(true);
+  if (m_bMultipicker)
+  {
+    m_list = new QListWidget;
+  }
+  else
+  {
+    m_edText = new JLineEdit(JLineEdit::Input::All,
+                             JLineEdit::st_defaultFlags1);
+    m_edText->setReadOnly(true);
+  }
 
-  if (!bDisplayGroup)
+  if (!bDisplayGroup && !m_bMultipicker)
+  {
     m_edText->setPlaceholderText(m_text);
+  }
 
   m_btnClear = new QPushButton();
   m_btnClear->setFlat(true);
@@ -44,35 +59,63 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   m_btnClear->setIcon(QIcon(":/icons/res/remove.png"));
   m_btnClear->setToolTip(tr("Remover ") + m_text);
 
-  m_imageView = new JImageView(false, 24);
+  if (!m_bMultipicker)
+    m_imageView = new JImageView(false, 24);
 
-  QFrame* vFrame1 = new QFrame;
-  vFrame1->setFrameShape(QFrame::VLine);
-
-  QHBoxLayout* hlayout0 = new QHBoxLayout();
+  QHBoxLayout* hlayout0 = new QHBoxLayout;
+  QVBoxLayout* vlayout0 = new QVBoxLayout;
 
   QGroupBox* group = nullptr;
-  if (bDisplayGroup)
+  if (bDisplayGroup && !m_bMultipicker)
   {
     group = new QGroupBox();
     group->setTitle(m_text);
     group->setLayout(hlayout0);
   }
 
-  hlayout0->addWidget(m_btnSearch);
-  hlayout0->addWidget(m_edText);
-  hlayout0->addWidget(m_btnClear);
-  hlayout0->addWidget(vFrame1);
-  hlayout0->addWidget(m_imageView);
-
-  QVBoxLayout* vlayout0 = new QVBoxLayout();
-  vlayout0->setContentsMargins(0, 0, 0, 0);
-  vlayout0->setAlignment(Qt::AlignTop);
-  if (bDisplayGroup)
-    vlayout0->addWidget(group);
-  else
+  if (m_bMultipicker)
+  {
+    hlayout0->setContentsMargins(0, 0, 0, 0);
+    hlayout0->setAlignment(Qt::AlignLeft);
+    hlayout0->addWidget(m_btnSearch);
+    hlayout0->addWidget(m_btnClear);
+    hlayout0->addWidget(new QLabel(m_text));
+    vlayout0->setContentsMargins(0, 0, 0, 0);
+    vlayout0->setAlignment(Qt::AlignTop);
     vlayout0->addLayout(hlayout0);
+    vlayout0->addWidget(m_list);
+    m_list->setFixedHeight(70);
+    vlayout0->addStretch();
+  }
+  else
+  {
+    hlayout0->addWidget(m_btnSearch);
+    hlayout0->addWidget(m_edText);
+    hlayout0->addWidget(m_btnClear);
+
+    if (bShowImage)
+    {
+      QFrame* sep = new QFrame;
+      sep->setFrameShape(QFrame::VLine);
+      hlayout0->addWidget(sep);
+    }
+    else
+    {
+      m_imageView->hide();
+    }
+    hlayout0->addWidget(m_imageView);
+    vlayout0->setContentsMargins(0, 0, 0, 0);
+    vlayout0->setAlignment(Qt::AlignTop);
+    if (bDisplayGroup)
+      vlayout0->addWidget(group);
+    else
+      vlayout0->addLayout(hlayout0);
+  }
+
   setLayout(vlayout0);
+
+  if (m_bMultipicker)
+    setFixedHeight(sizeHint().height());
 
   m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, this);
 
@@ -90,12 +133,6 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(clear()));
-
-  if (!bShowImage)
-  {
-    m_imageView->hide();
-    vFrame1->hide();
-  }
 }
 
 JDatabase* JDatabasePicker::getDatabase() const
@@ -105,7 +142,7 @@ JDatabase* JDatabasePicker::getDatabase() const
 
 void JDatabasePicker::setItem(const JItem& jItem)
 {
-  m_selector->hide();
+  m_selector->close();
   QString tableName = m_selector->getDatabase()->getTableName();
   if (tableName == IMAGE_SQL_TABLE_NAME)
   {
@@ -133,12 +170,38 @@ void JDatabasePicker::setItem(qlonglong id,
                               const QString& name,
                               const QByteArray& arImage)
 {
-  qlonglong previousId = m_id;
-  m_id = id;
-  m_edText->setText(name);
-  m_imageView->setImage(arImage);
-  if (previousId != m_id)
-    emit changedSignal();
+  if (m_bMultipicker)
+  {
+    if (id != INVALID_ID)
+    {
+      bool bFound = false;
+      for (int i = 0; i != m_list->count(); ++i)
+      {
+        if (m_list->item(i)->data(Qt::UserRole).toLongLong() == id)
+        {
+          bFound = true;
+          break;
+        }
+      }
+
+      if (!bFound)
+      {
+        m_list->addItem(name);
+        m_list->item(m_list->count() - 1)->setData(Qt::UserRole, id);
+        emit changedSignal();
+      }
+    }
+  }
+  else
+  {
+    qlonglong previousId = m_edText->property(ID_PROPERTY).toLongLong();
+    m_edText->setProperty(ID_PROPERTY, id);
+    m_edText->setText(name);
+    m_imageView->setImage(arImage);
+    if (previousId != id)
+      emit changedSignal();
+  }
+
 }
 
 void JDatabasePicker::searchItem()
@@ -148,15 +211,36 @@ void JDatabasePicker::searchItem()
 
 void JDatabasePicker::clear()
 {
-  qlonglong previousId = m_id;
-  m_id = INVALID_ID;
-  m_edText->clear();
-  m_imageView->clearImage();
-  if (previousId != m_id)
-    emit changedSignal();
+  if (m_bMultipicker)
+  {
+    auto pt = m_list->takeItem(m_list->currentRow());
+    if (pt != nullptr)
+    {
+      emit changedSignal();
+      delete pt;
+    }
+  }
+  else
+  {
+    m_edText->clear();
+    m_imageView->clearImage();
+    qlonglong previousId = m_edText->property(ID_PROPERTY).toLongLong();
+    m_edText->setProperty(ID_PROPERTY, INVALID_ID);
+    if (previousId != INVALID_ID)
+      emit changedSignal();
+  }
 }
 
 qlonglong JDatabasePicker::getId() const
 {
-  return m_id;
+  return m_bMultipicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong();
+}
+
+QVector<qlonglong> JDatabasePicker::getIds() const
+{
+  QVector<qlonglong> v;
+  if (m_bMultipicker)
+    for (int i = 0; i != m_list->count(); ++i)
+      v.push_back(m_list->item(i)->data(Qt::UserRole).toLongLong());
+  return v;
 }

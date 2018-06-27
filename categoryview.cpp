@@ -39,7 +39,8 @@ CategoryView::CategoryView(QWidget* parent)
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"),
                                       true,
-                                      true);
+                                      true,
+                                      false);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);

@@ -98,12 +98,14 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                                          tr("Fornecedor"),
                                          QIcon(":/icons/res/supplier.png"),
                                          true,
-                                         true);
+                                         true,
+                                         false);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"),
                                       true,
-                                      true);
+                                      true,
+                                      false);
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
   m_edDescription = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,

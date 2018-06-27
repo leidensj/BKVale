@@ -172,6 +172,7 @@ NoteView::NoteView(QWidget *parent)
                                          tr("Fornecedor"),
                                          QIcon(":/icons/res/supplier.png"),
                                          true,
+                                         false,
                                          false);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
@@ -182,6 +183,7 @@ NoteView::NoteView(QWidget *parent)
   frame->setFrameShape(QFrame::Shape::StyledPanel);
   frame->setFrameShadow(QFrame::Shadow::Plain);
   frame->setLayout(vlayout1);
+  frame->setFixedHeight(frame->sizeHint().height());
 
   m_table = new NoteTableWidget();
 

@@ -72,7 +72,7 @@ void ShopView::updateControls()
                  QString::number(date.dayOfWeek()) + SHOPPING_LIST_SEPARATOR "%'"
                  " OR " SHOPPING_LIST_SQL_COL10 " LIKE '%" SHOPPING_LIST_SEPARATOR +
                  QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
-  m_database->setCustomFilter(filter);
+  m_database->setFixedFilter(filter);
 }
 
 void ShopView::setToday()

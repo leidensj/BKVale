@@ -146,5 +146,6 @@
         <file>res/edit.png</file>
         <file>res/package.png</file>
         <file>res/databasebackup.png</file>
+        <file>res/filterclear.png</file>
     </qresource>
 </RCC>

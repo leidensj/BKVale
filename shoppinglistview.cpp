@@ -291,13 +291,13 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    this,
                    SLOT(create()));
 
-  m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
+  m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 }
 
 void ShoppingListView::addItem()
 {
   JDatabaseSelector w(PRODUCT_SQL_TABLE_NAME, tr("Produto"), QIcon(":/icons/res/item.png"), this);
-  w.getDatabase()->setCustomFilter(PRODUCT_FILTER_SHOP);
+  w.getDatabase()->setFixedFilter(PRODUCT_FILTER_SHOP);
   if (w.exec())
   {
     Product* p = static_cast<Product*>(w.getDatabase()->getCurrentItem());
@@ -319,7 +319,7 @@ void ShoppingListView::removeItem()
 void ShoppingListView::editProduct()
 {
   JDatabaseSelector w(PRODUCT_SQL_TABLE_NAME, tr("Produto"), QIcon(":/icons/res/item.png"), this);
-  w.getDatabase()->setCustomFilter(PRODUCT_FILTER_SHOP);
+  w.getDatabase()->setFixedFilter(PRODUCT_FILTER_SHOP);
   if (w.exec())
   {
     Product* p = static_cast<Product*>(w.getDatabase()->getCurrentItem());

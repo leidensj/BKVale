@@ -16,6 +16,7 @@ class QCheckBox;
 class JTableView;
 class JLineEdit;
 class QSortFilterProxyModel;
+class NoteFilterDlg;
 
 class JTableView : public QTableView
 {
@@ -49,7 +50,7 @@ public slots:
   void refresh();
   void selectItem();
   void selectItem(qlonglong id);
-  void setCustomFilter(const QString& customFilter);
+  void setFixedFilter(const QString& fixedFilter);
   void clearFilterSearch();
 
 private:
@@ -58,13 +59,16 @@ private:
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
   QPushButton* m_btnFilter;
+  QPushButton* m_btnFilterClear;
   JLineEdit* m_edFilterSearch;
   QCheckBox* m_cbContains;
   JTableView* m_table;
   QString m_tableName;
-  QString m_customFilter;
+  QString m_filter;
+  QString m_fixedFilter;
   JItem* m_currentItem;
   QSortFilterProxyModel* m_proxyModel;
+  NoteFilterDlg* m_noteFilter;
 
 private slots:
   void filterSearchChanged();
@@ -74,6 +78,8 @@ private slots:
   void removeItem();
   void focusFilterSearch();
   void emitCurrentRowChangedSignal();
+  void showFilter();
+  void clearFilter();
 
 signals:
   void itemSelectedSignal(const JItem& jItem);

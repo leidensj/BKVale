@@ -230,6 +230,20 @@ void JDatabasePicker::clear()
       emit changedSignal();
   }
 }
+void JDatabasePicker::clearAll()
+{
+  if (m_bMultipicker)
+  {
+    bool bChanged = m_list->count() != 0;
+    m_list->clear();
+    if (bChanged)
+      emit changedSignal();
+  }
+  else
+  {
+    clear();
+  }
+}
 
 qlonglong JDatabasePicker::getId() const
 {

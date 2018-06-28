@@ -37,6 +37,7 @@ public:
 
 public slots:
   void clear();
+  void clearAll();
   void setItem(const JItem& jItem);
   void setItem(qlonglong id,
                const QString& name,

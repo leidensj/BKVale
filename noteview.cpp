@@ -327,7 +327,7 @@ NoteView::NoteView(QWidget *parent)
   m_dock->close();
   updateControls();
 
-  m_supplierPicker->getDatabase()->setCustomFilter(PERSON_FILTER_SUPPLIER);
+  m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 }
 
 NoteView::~NoteView()
@@ -466,7 +466,7 @@ void NoteView::searchProduct()
   JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
                         tr("Selecionar Produto"),
                         QIcon(":/icons/res/item.png"));
-  dlg.getDatabase()->setCustomFilter(PRODUCT_FILTER_NOTE);
+  dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_NOTE);
   dlg.exec();
   Product* pProduct = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
   if (pProduct != nullptr && pProduct->isValidId())

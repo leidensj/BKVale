@@ -2,6 +2,7 @@
 #include "jlineedit.h"
 #include "defines.h"
 #include "databaseutils.h"
+#include "notefilterdlg.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
@@ -42,7 +43,7 @@ public:
     select("");
   }
 
-  virtual void selectCustomFilter(const QString& /*customFilter*/)
+  virtual void selectFilter(const QString& /*filter*/)
   {
     select(getStrQuery());
   }
@@ -111,9 +112,9 @@ public:
     }
   }
 
-  void selectCustomFilter(const QString& customFilter)
+  void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " HAVING " + customFilter);
+    JTableModel::select(getStrQuery() + " HAVING " + filter);
   }
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
@@ -167,9 +168,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " WHERE " + customFilter);
+    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
@@ -247,9 +248,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " WHERE " + customFilter);
+    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 };
 
@@ -284,9 +285,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " WHERE " + customFilter);
+    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 };
 
@@ -334,9 +335,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " HAVING " + customFilter);
+    JTableModel::select(getStrQuery() + " HAVING " + filter);
   }
 };
 
@@ -371,9 +372,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " WHERE " + customFilter);
+    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 };
 
@@ -411,9 +412,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " WHERE " + customFilter);
+    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 
   QVariant data(const QModelIndex &idx, int role) const
@@ -467,9 +468,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " WHERE " + customFilter);
+    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 };
 
@@ -513,9 +514,9 @@ public:
     }
   }
 
-  virtual void selectCustomFilter(const QString& customFilter)
+  virtual void selectFilter(const QString& filter)
   {
-    JTableModel::select(getStrQuery() + " WHERE " + customFilter);
+    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
@@ -562,11 +563,13 @@ JDatabase::JDatabase(const QString& tableName,
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
   , m_btnFilter(nullptr)
+  , m_btnFilterClear(nullptr)
   , m_edFilterSearch(nullptr)
   , m_cbContains(nullptr)
   , m_table(nullptr)
   , m_currentItem(nullptr)
   , m_proxyModel(nullptr)
+  , m_noteFilter(nullptr)
 {
   m_btnOpen = new QPushButton();
   m_btnOpen->setFlat(true);
@@ -598,6 +601,13 @@ JDatabase::JDatabase(const QString& tableName,
   m_btnFilter->setToolTip(tr("Filtro"));
   m_btnFilter->setIcon(QIcon(":/icons/res/filter.png"));
 
+  m_btnFilterClear = new QPushButton();
+  m_btnFilterClear->setFlat(true);
+  m_btnFilterClear->setText("");
+  m_btnFilterClear->setIconSize(QSize(24, 24));
+  m_btnFilterClear->setToolTip(tr("Limpar filtro"));
+  m_btnFilterClear->setIcon(QIcon(":/icons/res/filterclear.png"));
+
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->setContentsMargins(0, 0, 0, 0);
   hlayout0->setAlignment(Qt::AlignLeft);
@@ -605,6 +615,7 @@ JDatabase::JDatabase(const QString& tableName,
   hlayout0->addWidget(m_btnRefresh);
   hlayout0->addWidget(m_btnRemove);
   hlayout0->addWidget(m_btnFilter);
+  hlayout0->addWidget(m_btnFilterClear);
 
   m_edFilterSearch = new JLineEdit(JLineEdit::Input::All,
                                    (int)JLineEdit::Flags::ToUpper);
@@ -714,6 +725,14 @@ JDatabase::JDatabase(const QString& tableName,
                    SIGNAL(enterKeyPressedSignal()),
                    this,
                    SLOT(selectItem()));
+  QObject::connect(m_btnFilter,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(showFilter()));
+  QObject::connect(m_btnFilterClear,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(clearFilter()));
 
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F),
                 this,
@@ -731,6 +750,13 @@ JDatabase::JDatabase(const QString& tableName,
     m_btnRemove->hide();
     m_edFilterSearch->setFocus();
   }
+
+  if (m_tableName != NOTE_SQL_TABLE_NAME)
+  {
+    m_btnFilter->hide();
+    m_btnFilterClear->hide();
+  }
+
   filterSearchChanged();
 }
 
@@ -851,12 +877,24 @@ void JDatabase::selectItem(qlonglong id)
 void JDatabase::refresh()
 {
   JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
-  if (m_customFilter.isEmpty())
+  if (m_fixedFilter.isEmpty() && m_filter.isEmpty())
     model->select();
   else
-    model->selectCustomFilter(m_customFilter);
-  m_proxyModel->invalidate();
+  {
+    QString str;
+    if (!m_fixedFilter.isEmpty())
+    {
+      if (!m_filter.isEmpty())
+        str = m_fixedFilter + " AND " + m_filter;
+      else
+        str = m_fixedFilter;
+    }
+    else
+      str = m_filter;
+    model->selectFilter(m_filter);
+  }
 
+  m_proxyModel->invalidate();
   enableControls();
   if (m_bSelectorMode)
     m_edFilterSearch->setFocus();
@@ -975,9 +1013,9 @@ void JDatabase::focusFilterSearch()
   m_edFilterSearch->setFocus();
 }
 
-void JDatabase::setCustomFilter(const QString& customFilter)
+void JDatabase::setFixedFilter(const QString& fixedFilter)
 {
-  m_customFilter = customFilter;
+  m_fixedFilter = fixedFilter;
   refresh();
 }
 
@@ -1078,6 +1116,28 @@ void JDatabase::emitCurrentRowChangedSignal()
   emit currentRowChangedSignal(m_table->currentIndex().row());
 }
 
+void JDatabase::showFilter()
+{
+  if (m_tableName == NOTE_SQL_TABLE_NAME)
+  {
+    if (m_noteFilter == nullptr)
+      m_noteFilter = new NoteFilterDlg(this);
+    m_noteFilter->exec();
+    m_filter = m_noteFilter->getFilter();
+    refresh();
+  }
+}
+
+void JDatabase::clearFilter()
+{
+  if (m_tableName == NOTE_SQL_TABLE_NAME)
+  {
+    m_noteFilter->clearFilter();
+    m_filter = "";
+    refresh();
+  }
+}
+
 JDatabaseSelector::JDatabaseSelector(const QString& tableName,
                                      const QString& title,
                                      const QIcon& icon,
@@ -1100,7 +1160,7 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
                    SLOT(itemSelected(const JItem&)));
 }
 
-void JDatabaseSelector::itemSelected(const JItem& jItem)
+void JDatabaseSelector::itemSelected(const JItem& /*jItem*/)
 {
   accept();
 }

@@ -10,7 +10,6 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
   , m_dtBegin(nullptr)
   , m_dtEnd(nullptr)
   , m_supplierPicker(nullptr)
-  , m_productPicker(nullptr)
 {
   m_cbDate = new QCheckBox;
   m_dtBegin = new QDateEdit;
@@ -21,10 +20,6 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
                                          tr("Fornecedor"),
                                          QIcon(":/icons/res/supplier.png"),
                                          true, false, true);
-  m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME,
-                                        tr("Produto"),
-                                        QIcon(":/icons/res/item.png"),
-                                        true, false, true);
 
   QHBoxLayout* dateLayout = new QHBoxLayout;
   dateLayout->setContentsMargins(0, 0, 0, 0);
@@ -37,7 +32,6 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
   mainLayout->setAlignment(Qt::AlignTop);
   mainLayout->addLayout(dateLayout);
   mainLayout->addWidget(m_supplierPicker);
-  mainLayout->addWidget(m_productPicker);
   setLayout(mainLayout);
 
   QObject::connect(m_cbDate,
@@ -62,7 +56,6 @@ QString NoteFilterDlg::getFilter() const
                  m_dtEnd->date().toString(Qt::ISODate) + "' ";
 
   QVector<qlonglong> vSupplier = m_supplierPicker->getIds();
-  QVector<qlonglong> vProduct = m_productPicker->getIds();
 
   if (!vSupplier.isEmpty())
   {
@@ -71,17 +64,6 @@ QString NoteFilterDlg::getFilter() const
     strFilter += " " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 " IN (";
     for (int i = 0; i != vSupplier.size(); ++i)
       strFilter += QString::number(vSupplier.at(i)) + ",";
-    strFilter.chop(1);
-    strFilter += ") ";
-  }
-
-  if (!vProduct.isEmpty())
-  {
-    if (!strFilter.isEmpty())
-      strFilter += " AND ";
-    strFilter += " " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 " IN (";
-    for (int i = 0; i != vProduct.size(); ++i)
-      strFilter += QString::number(vProduct.at(i)) + ",";
     strFilter.chop(1);
     strFilter += ") ";
   }
@@ -95,7 +77,6 @@ void NoteFilterDlg::clearFilter()
   m_dtBegin->setDate(QDate::currentDate());
   m_dtEnd->setDate(QDate::currentDate());
   m_supplierPicker->clearAll();
-  m_productPicker->clearAll();
   updateControls();
 }
 

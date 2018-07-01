@@ -25,7 +25,6 @@ private:
   QDateEdit* m_dtBegin;
   QDateEdit* m_dtEnd;
   JDatabasePicker* m_supplierPicker;
-  JDatabasePicker* m_productPicker;
 };
 
 #endif // NOTEFILTERWIDGET_H

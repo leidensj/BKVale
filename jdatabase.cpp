@@ -61,22 +61,22 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     "_TNOTES." SQL_COLID ","
-                     "_TNOTES." NOTE_SQL_COL01 ","
-                     "_TNOTES." NOTE_SQL_COL02 ","
-                     "_TPERSONS." PERSON_SQL_COL03 ","
-                     "(_TTOTAL._TSUBTOTAL + _TNOTES." NOTE_SQL_COL06 ")"
-                     " FROM " NOTE_SQL_TABLE_NAME " AS _TNOTES "
+                     NOTE_SQL_TABLE_NAME "." SQL_COLID ","
+                     NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
+                     NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
+                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL03 ","
+                     "(IFNULL(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06 ")"
+                     " FROM " NOTE_SQL_TABLE_NAME
                      " LEFT JOIN "
                      "(SELECT " NOTE_ITEMS_SQL_COL01 ","
-                     "SUM(" NOTE_ITEMS_SQL_COL03 "*" NOTE_ITEMS_SQL_COL04 ") AS _TSUBTOTAL"
+                     "IFNULL(SUM(" NOTE_ITEMS_SQL_COL03 "*" NOTE_ITEMS_SQL_COL04 "), 0) AS _TSUBTOTAL"
                      " FROM " NOTE_ITEMS_SQL_TABLE_NAME
                      " GROUP BY " NOTE_ITEMS_SQL_COL01 ") AS _TTOTAL"
-                     " ON _TNOTES." SQL_COLID "= _TTOTAL." NOTE_ITEMS_SQL_COL01
+                     " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." NOTE_ITEMS_SQL_COL01
                      " LEFT JOIN "
-                     PERSON_SQL_TABLE_NAME " AS _TPERSONS "
-                     " ON _TNOTES." NOTE_SQL_COL03 "=_TPERSONS." SQL_COLID
-                     " GROUP BY _TNOTES." SQL_COLID);
+                     PERSON_SQL_TABLE_NAME
+                     " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" PERSON_SQL_TABLE_NAME "." SQL_COLID
+                     " GROUP BY " NOTE_SQL_TABLE_NAME "." SQL_COLID);
     return strQuery;
   }
 
@@ -880,7 +880,7 @@ void JDatabase::refresh()
     }
     else
       str = m_filter;
-    model->selectFilter(m_filter);
+    model->selectFilter(str);
   }
 
   m_proxyModel->invalidate();

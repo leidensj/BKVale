@@ -57,9 +57,9 @@ QString NoteFilterDlg::getFilter() const
 {
   QString strFilter;
   if (m_cbDate->isChecked())
-    strFilter += " " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 " BETWEEN " +
-                 m_dtBegin->date().toString(Qt::ISODate) + " AND " +
-                 m_dtEnd->date().toString(Qt::ISODate) + " ";
+    strFilter += " " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 " BETWEEN '" +
+                 m_dtBegin->date().toString(Qt::ISODate) + "' AND '" +
+                 m_dtEnd->date().toString(Qt::ISODate) + "' ";
 
   QVector<qlonglong> vSupplier = m_supplierPicker->getIds();
   QVector<qlonglong> vProduct = m_productPicker->getIds();
@@ -79,14 +79,11 @@ QString NoteFilterDlg::getFilter() const
   {
     if (!strFilter.isEmpty())
       strFilter += " AND ";
-    strFilter += " " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 " = ANY ("
-                 "SELECT " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 " FROM "
-                 NOTE_ITEMS_SQL_TABLE_NAME " WHERE "
-                 NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 " IN(";
+    strFilter += " " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 " IN (";
     for (int i = 0; i != vProduct.size(); ++i)
       strFilter += QString::number(vProduct.at(i)) + ",";
     strFilter.chop(1);
-    strFilter += "))";
+    strFilter += ") ";
   }
 
   return strFilter;

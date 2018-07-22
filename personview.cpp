@@ -152,10 +152,13 @@ PersonView::PersonView(QWidget* parent)
   m_dtBirthDate = new QDateEdit;
   m_dtBirthDate->setCalendarPopup(true);
   m_dtBirthDate->setDisplayFormat("dd/MM/yyyy");
-  m_dtBirthDate->setDate(QDate::currentDate());
+  m_dtBirthDate->setMinimumDate(QDate(1800, 1, 1));
+  m_dtBirthDate->setDate(QDate(1800, 1, 1));
+  m_dtBirthDate->setSpecialValueText(tr("Não informada"));
   m_cbBirthDate = new QCheckBox;
   m_cbBirthDate->setChecked(false);
   m_cbBirthDate->setText(tr("Data de nascimento:"));
+
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"),
@@ -484,10 +487,9 @@ Person PersonView::getPerson() const
   person.m_CPF_CNPJ = m_edCpfCnpj->text();
   person.m_RG_IE = m_edRgIE->text();
   person.m_details = m_edDetails->text();
-  person.m_birthDate = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked()
-                       ? m_dtBirthDate->date().toString(Qt::ISODate)
-                       : "";
-  person.m_creationDate = m_dtCreationDate->date().toString(Qt::ISODate);
+  person.m_dtBirth = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked()
+                     ? m_dtBirthDate->date() : QDate(1800, 1, 1);
+  person.m_dtCreation = m_dtCreationDate->date();
   person.m_bCompany = m_rdoCompany->isChecked();
   person.m_bCustomer = m_cbCustomer->isChecked();
   person.m_bSupplier = m_cbSupplier->isChecked();
@@ -513,12 +515,9 @@ void PersonView::setPerson(const Person &person)
   m_edCpfCnpj->setText(person.m_CPF_CNPJ);
   m_edRgIE->setText(person.m_RG_IE);
   m_edDetails->setText(person.m_details);
-  m_cbBirthDate->setChecked(!person.m_birthDate.isEmpty());
-  if (m_cbBirthDate->isChecked())
-    m_dtBirthDate->setDate(QDate::fromString(person.m_birthDate, Qt::ISODate));
-  else
-    m_dtBirthDate->setDate(QDate::currentDate());
-  m_dtCreationDate->setDate(QDate::fromString(person.m_creationDate, Qt::ISODate));
+  m_cbBirthDate->setChecked(person.m_dtBirth.year() != 1);
+  m_dtBirthDate->setDate(m_cbBirthDate->isChecked() ? person.m_dtBirth : QDate(1800, 1, 1));
+  m_dtCreationDate->setDate(person.m_dtCreation);
   m_rdoCompany->setChecked(person.m_bCompany);
   m_cbCustomer->setChecked(person.m_bCustomer);
   m_cbSupplier->setChecked(person.m_bSupplier);
@@ -551,6 +550,10 @@ void PersonView::updateControls()
                            : ":/icons/res/save.png"));
   m_edPinCode->setEnabled(m_cbEmployee->isChecked());
   m_dtBirthDate->setEnabled(m_cbBirthDate->isChecked());
+  if (m_cbBirthDate->isChecked() &&
+      m_dtBirthDate->date() == m_dtBirthDate->minimumDate())
+    m_dtBirthDate->setDate(QDate::currentDate());
+
   m_btnRemovePhone->setEnabled(m_lstPhone->currentRow() != -1);
   m_btnRemoveAddress->setEnabled(m_lstAddress->currentRow() != -1);
 }

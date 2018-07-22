@@ -74,7 +74,7 @@ Q_DECLARE_METATYPE(NoteItem)
 struct Note : public JItem
 {
   mutable qlonglong m_number;
-  QString m_date;
+  QDate m_date;
   Person m_supplier;
   bool m_bCash;
   QString m_observation;
@@ -86,7 +86,7 @@ struct Note : public JItem
     m_id = INVALID_ID;
     m_number = 0;
     m_supplier.clear();
-    m_date = QDate::currentDate().toString(Qt::ISODate);
+    m_date = QDate::currentDate();
     m_bCash = false;
     m_vNoteItem.clear();
     m_observation.clear();
@@ -98,8 +98,8 @@ struct Note : public JItem
     clear();
   }
 
-  QString strDate() const { return QDate::fromString(m_date, Qt::ISODate).toString("dd/MM/yyyy"); }
-  QString strDayOfWeek() const { return QDate::fromString(m_date, Qt::ISODate).toString("dddd"); }
+  QString strDate() const { return m_date.toString("dd/MM/yyyy"); }
+  QString strDayOfWeek() const { return m_date.toString("dddd"); }
   QString strId() const { return QString::number(m_id); }
   QString strNumber() const { return st_strInt(m_number); }
   QString strDisccount() const { return st_strMoney(m_disccount); }

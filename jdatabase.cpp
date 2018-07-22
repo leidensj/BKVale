@@ -35,17 +35,18 @@ public:
     QSqlQueryModel::setQuery(query.isEmpty()
                              ? getStrQuery()
                              : query,
-                             QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+                             QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   }
 
   virtual void select(QHeaderView* /*header*/)
   {
-    select("");
+    select();
   }
 
-  virtual void selectFilter(const QString& /*filter*/)
+  virtual void selectFilter(const QString& filter)
   {
-    select(getStrQuery());
+    QString strQuery = getStrQuery() + " WHERE " + filter;
+    JTableModel::select(strQuery);
   }
 };
 
@@ -65,18 +66,17 @@ public:
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
                      PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL03 ","
-                     "(IFNULL(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06 ")"
+                     "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06 ")"
                      " FROM " NOTE_SQL_TABLE_NAME
-                     " LEFT JOIN "
+                     " LEFT OUTER JOIN "
                      "(SELECT " NOTE_ITEMS_SQL_COL01 ","
-                     "IFNULL(SUM(" NOTE_ITEMS_SQL_COL03 "*" NOTE_ITEMS_SQL_COL04 "), 0) AS _TSUBTOTAL"
+                     "COALESCE(SUM(" NOTE_ITEMS_SQL_COL03 "*" NOTE_ITEMS_SQL_COL04 "), 0) AS _TSUBTOTAL"
                      " FROM " NOTE_ITEMS_SQL_TABLE_NAME
                      " GROUP BY " NOTE_ITEMS_SQL_COL01 ") AS _TTOTAL"
                      " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." NOTE_ITEMS_SQL_COL01
-                     " LEFT JOIN "
+                     " LEFT OUTER JOIN "
                      PERSON_SQL_TABLE_NAME
-                     " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" PERSON_SQL_TABLE_NAME "." SQL_COLID
-                     " GROUP BY " NOTE_SQL_TABLE_NAME "." SQL_COLID);
+                     " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" PERSON_SQL_TABLE_NAME "." SQL_COLID);
     return strQuery;
   }
 
@@ -99,11 +99,6 @@ public:
         header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
       }
     }
-  }
-
-  void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " HAVING " + filter);
   }
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
@@ -155,11 +150,6 @@ public:
       header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
       header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
     }
-  }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
@@ -236,11 +226,6 @@ public:
       header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
     }
   }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " WHERE " + filter);
-  }
 };
 
 class CategoryTableModel : public JTableModel
@@ -273,11 +258,6 @@ public:
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
     }
   }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " WHERE " + filter);
-  }
 };
 
 class ProductTableModel : public JTableModel
@@ -298,13 +278,12 @@ public:
                      CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL02
                      " FROM "
                      PRODUCT_SQL_TABLE_NAME
-                     " LEFT JOIN "
+                     " LEFT OUTER JOIN "
                      CATEGORY_SQL_TABLE_NAME
                      " ON "
                      PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL02
                      " = "
-                     CATEGORY_SQL_TABLE_NAME "." SQL_COLID
-                     " GROUP BY " PRODUCT_SQL_TABLE_NAME "." SQL_COLID);
+                     CATEGORY_SQL_TABLE_NAME "." SQL_COLID);
     return strQuery;
   }
 
@@ -322,11 +301,6 @@ public:
       header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
       header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
     }
-  }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " HAVING " + filter);
   }
 };
 
@@ -359,11 +333,6 @@ public:
       header->hideSection(0);
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
     }
-  }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 };
 
@@ -399,11 +368,6 @@ public:
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
       header->hideSection(2);
     }
-  }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 
   QVariant data(const QModelIndex &idx, int role) const
@@ -456,11 +420,6 @@ public:
       header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
     }
   }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " WHERE " + filter);
-  }
 };
 
 class ReservationTableModel : public JTableModel
@@ -501,11 +460,6 @@ public:
       header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
       header->setSectionResizeMode(4, QHeaderView::ResizeMode::Stretch);
     }
-  }
-
-  virtual void selectFilter(const QString& filter)
-  {
-    JTableModel::select(getStrQuery() + " WHERE " + filter);
   }
 
   QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
@@ -936,7 +890,7 @@ void JDatabase::removeItem()
     if (bSuccess)
     {
       emit itemRemovedSignal(id);
-      m_proxyModel->invalidate();
+      refresh();
     }
     else
     {

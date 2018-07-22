@@ -52,14 +52,14 @@ namespace BaitaSQL
 {
   bool isOpen(QString& error);
 
-  bool open(const QString& path,
+  bool open(const QString& hostName,
             QString& error);
 
   void close();
 
   bool createTables(QString& error);
 
-  bool init(const QString& filePath,
+  bool init(const QString& hostName,
             QString& error);
 }
 

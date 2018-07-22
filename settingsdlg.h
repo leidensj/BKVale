@@ -27,7 +27,6 @@ private:
 private slots:
   void refreshAvailablePorts();
   void update();
-  void selectFileDir();
 };
 
 #endif // SETTINGSDLG_H

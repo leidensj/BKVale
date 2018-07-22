@@ -6,15 +6,13 @@
 struct Settings
 {
   Settings();
-  QString m_databaseDir;
+  QString m_databaseHostName;
   bool m_bIsPrinterEthernet;
   QString m_serialPort;
   QString m_ethernetIP;
   int m_ethernetPort;
   int m_notesDefaultNumber;
   bool m_notesPincodeRequired;
-
-  QString databasePath() const;
 
   void clear();
   void save() const;

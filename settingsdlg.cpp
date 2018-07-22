@@ -17,11 +17,6 @@ SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
                    this,
                    SLOT(update()));
 
-  QObject::connect(ui->btnDatabaseDir,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(selectFileDir()));
-
   refreshAvailablePorts();
   doDataExchange(true);
 }
@@ -35,7 +30,6 @@ void SettingsDlg::doDataExchange(bool toUI)
 {
   if (toUI)
   {
-    ui->edDatabaseDir->setText(m_settings.m_databaseDir);
     ui->rdoSerial->setChecked(!m_settings.m_bIsPrinterEthernet);
     ui->rdoEthernet->setChecked(m_settings.m_bIsPrinterEthernet);
     ui->cbSerialPort->setCurrentIndex(ui->cbSerialPort->findText(m_settings.m_serialPort, Qt::MatchExactly));
@@ -46,7 +40,6 @@ void SettingsDlg::doDataExchange(bool toUI)
   }
   else
   {
-    m_settings.m_databaseDir = ui->edDatabaseDir->text();
     m_settings.m_bIsPrinterEthernet = ui->rdoEthernet->isChecked();
     m_settings.m_serialPort = ui->cbSerialPort->currentText();
     m_settings.m_ethernetIP = ui->edEthernetIP->text();
@@ -67,15 +60,4 @@ void SettingsDlg::refreshAvailablePorts()
 void SettingsDlg::update()
 {
   doDataExchange(false);
-}
-
-void SettingsDlg::selectFileDir()
-{
-  QString fileDir = QFileDialog::getExistingDirectory(this,
-                                                      QObject::tr("Selecionar local do banco de dados"),
-                                                      m_settings.m_databaseDir,
-                                                      QFileDialog::ShowDirsOnly
-                                                      | QFileDialog::DontResolveSymlinks);
-  if (!fileDir.isEmpty())
-    ui->edDatabaseDir->setText(fileDir);
 }

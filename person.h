@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <QDate>
 
 struct Person : public JItem
 {
@@ -19,8 +20,8 @@ struct Person : public JItem
   QString m_CPF_CNPJ;
   QString m_RG_IE;
   QString m_details;
-  QString m_birthDate;
-  QString m_creationDate;
+  QDate m_dtBirth;
+  QDate m_dtCreation;
   bool m_bCompany;
   bool m_bCustomer;
   bool m_bSupplier;
@@ -39,8 +40,8 @@ struct Person : public JItem
     m_CPF_CNPJ.clear();
     m_RG_IE.clear();
     m_details.clear();
-    m_birthDate.clear();
-    m_creationDate.clear();
+    m_dtBirth = QDate::currentDate();
+    m_dtCreation = QDate::currentDate();
     m_bCompany = false;
     m_bCustomer = false;
     m_bSupplier = false;
@@ -78,7 +79,7 @@ struct Person : public JItem
               m_vAddress != another.m_vAddress;
 
     if (!m_bCompany)
-      b = b || m_birthDate != another.m_birthDate;
+      b = b || m_dtBirth != another.m_dtBirth;
 
     if (m_bEmployee)
       b = b || m_employeePinCode != another.m_employeePinCode;

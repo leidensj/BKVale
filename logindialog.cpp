@@ -1,12 +1,14 @@
 #include "logindialog.h"
 #include "jlineedit.h"
 #include "user.h"
+#include "databaseutils.h"
 #include <QLayout>
 #include <QIcon>
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
 #include <QPushButton>
+#include "settings.h"
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
@@ -32,7 +34,9 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
   , m_userLogin(userLogin)
   , m_user(nullptr)
   , m_password(nullptr)
+  , m_hostName(nullptr)
   , m_capsLock(nullptr)
+  , m_status(nullptr)
 {
   QLabel* lblBaita = new QLabel();
   lblBaita->setPixmap(QIcon(":/icons/res/baita.png").pixmap(QSize(64, 64)));
@@ -49,6 +53,11 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
   lblPassword->setMinimumSize(24, 24);
   lblPassword->setMaximumSize(24, 24);
   lblPassword->setScaledContents(true);
+  QLabel* lblDatabase = new QLabel();
+  lblDatabase->setPixmap(QIcon(":/icons/res/databasebackup.png").pixmap(QSize(24, 24)));
+  lblDatabase->setMinimumSize(24, 24);
+  lblDatabase->setMaximumSize(24, 24);
+  lblDatabase->setScaledContents(true);
   m_user = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags1);
   m_user->setPlaceholderText(tr("Usuário"));
   m_user->setMinimumHeight(24);
@@ -67,12 +76,25 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
     f.setPointSize(12);
     m_password->setFont(f);
   }
+
   m_capsLock = new QLabel();
   m_capsLock->setPixmap(QIcon(":/icons/res/capslockon.png").pixmap(QSize(24, 24)));
   m_capsLock->setMinimumSize(24, 24);
   m_capsLock->setMaximumSize(24, 24);
   m_capsLock->setScaledContents(true);
   m_capsLock->setToolTip("Caps Lock");
+
+  m_hostName = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
+  m_hostName->setPlaceholderText(tr("Host"));
+  {
+    QFont f = m_hostName->font();
+    f.setPointSize(12);
+    m_hostName->setFont(f);
+  }
+
+  Settings settings;
+  settings.load();
+  m_hostName->setText(settings.m_databaseHostName);
 
   QHBoxLayout *h0 = new QHBoxLayout();
   h0->setContentsMargins(0, 0, 0, 0);
@@ -87,6 +109,10 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
   h2->addWidget(lblPassword);
   h2->addWidget(m_password);
   h2->addWidget(m_capsLock);
+  QHBoxLayout *h3 = new QHBoxLayout();
+  h3->setContentsMargins(0, 0, 0, 0);
+  h3->addWidget(lblDatabase);
+  h3->addWidget(m_hostName);
 
   m_status = new QLabel();
 
@@ -100,6 +126,7 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
   v1->addLayout(h0);
   v1->addLayout(h1);
   v1->addLayout(h2);
+  v1->addLayout(h3);
   v1->addWidget(m_status);
   v1->addWidget(buttonBox);
 
@@ -135,16 +162,30 @@ void LoginDialog::keyPressEvent(QKeyEvent* event)
 void LoginDialog::login()
 {
   QString error;
-  if (m_userLogin.login(m_user->text(),
-                        m_password->text(),
-                        error))
+  bool bSuccess = BaitaSQL::init(m_hostName->text(), error);
+  if (bSuccess)
   {
-    accept();
+    bSuccess = m_userLogin.login(m_user->text(), m_password->text(), error);
+    if (bSuccess)
+    {
+      Settings settings;
+      settings.load();
+      settings.m_databaseHostName = m_hostName->text();
+      settings.save();
+      accept();
+    }
+    else
+    {
+      m_password->selectAll();
+      m_password->setFocus();
+    }
   }
   else
   {
-    m_status->setText(error);
-    m_password->selectAll();
-    m_password->setFocus();
+    m_hostName->selectAll();
+    m_hostName->setFocus();
   }
+
+  if (!bSuccess)
+    m_status->setText(error);
 }

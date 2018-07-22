@@ -306,13 +306,13 @@ void BaitaAssistant::updateStatusBar()
   // "<img src=':/icons/res/16user.png'> " + ...
 
   m_statusUserName->setText(tr("Usuário: ") + m_userLogin.strUser());
-  m_statusDatabasePath->setText(tr("Banco de dados: ") + m_settings.databasePath());
+  m_statusDatabasePath->setText(tr("Banco de dados: ") + m_settings.m_databaseHostName);
 }
 
 void BaitaAssistant::updateControls()
 {
-  const bool bIsSQLOk = QSqlDatabase::database(SQLITE_CONNECTION_NAME).isValid() &&
-                        QSqlDatabase::database(SQLITE_CONNECTION_NAME).isOpen();
+  const bool bIsSQLOk = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid() &&
+                        QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isOpen();
   ui->actionSettings->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSettings());
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
@@ -474,7 +474,7 @@ void BaitaAssistant::openShoppingListDialog()
 void BaitaAssistant::reconnectDatabase()
 {
   QString error;
-  if (!BaitaSQL::init(m_settings.databasePath(), error))
+  if (!BaitaSQL::init(m_settings.m_databaseHostName, error))
   {
     QMessageBox::critical(this,
                           tr("Erro ao reconectar"),

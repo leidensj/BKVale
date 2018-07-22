@@ -27,6 +27,7 @@ private:
   UserLoginSQL& m_userLogin;
   JLineEdit* m_user;
   JLineEdit* m_password;
+  JLineEdit* m_hostName;
   QLabel* m_capsLock;
   QLabel* m_status;
 };

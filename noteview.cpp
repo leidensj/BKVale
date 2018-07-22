@@ -354,7 +354,7 @@ Note NoteView::getNote() const
 {
   Note note;
   note.m_id = m_currentId;
-  note.m_date = m_dtDate->date().toString(Qt::ISODate);
+  note.m_date = m_dtDate->date();
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_bCash = m_cbCash->isChecked();
   note.m_observation = m_teObservation->toPlainText();
@@ -368,7 +368,7 @@ void NoteView::setNote(const Note& note)
   m_currentId = note.m_id;
   m_table->removeAllItems();
   m_supplierPicker->clear();
-  m_dtDate->setDate(QDate::fromString(note.m_date, Qt::ISODate));
+  m_dtDate->setDate(note.m_date);
   m_snNumber->setValue(note.m_number);
   m_cbCash->setChecked(note.m_bCash);
   m_table->setNoteItems(note.m_vNoteItem);

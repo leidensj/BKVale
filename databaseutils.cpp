@@ -50,7 +50,7 @@ bool NoteSQL::insert(const Note& note,
   Settings settings;
   settings.load();
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -136,7 +136,7 @@ bool NoteSQL::update(const Note& note,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -210,7 +210,7 @@ bool NoteSQL::select(Note& note,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -231,7 +231,7 @@ bool NoteSQL::select(Note& note,
     {
       note.m_id = id;
       note.m_number = query.value(0).toLongLong();
-      note.m_date = query.value(1).toString();
+      note.m_date = query.value(1).toDate();
       note.m_supplier.m_id = query.value(2).toLongLong();
       note.m_bCash = query.value(3).toBool();
       note.m_observation = query.value(4).toString();
@@ -299,7 +299,7 @@ bool NoteSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
@@ -317,7 +317,7 @@ NoteItem NoteSQL::selectLastItem(qlonglong supplierId,
   if (!BaitaSQL::isOpen(error))
     return noteItem;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -361,50 +361,49 @@ NoteItem NoteSQL::selectLastItem(qlonglong supplierId,
 
 bool BaitaSQL::isOpen(QString& error)
 {
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   error.clear();
   if (!db.isOpen())
      error = "Banco de dados não foi aberto.";
   return db.isOpen();
 }
 
-bool BaitaSQL::open(const QString& path,
+bool BaitaSQL::open(const QString& hostName,
                     QString& error)
 {
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   error.clear();
   if (db.isOpen())
     db.close();
-  db.setDatabaseName(path);
+  db.setPort(5432);
+  db.setHostName(hostName);
+  db.setDatabaseName("BaitaAssistente");
+  db.setUserName("BaitaAssistente");
+  db.setPassword("jfljfl");
   bool bSuccess = db.open();
   if (!bSuccess)
     error = db.lastError().text();
-  else
-  {
-    QSqlQuery query(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
-    query.exec("PRAGMA foreign_keys = ON");
-  }
   return bSuccess;
 }
 
 void BaitaSQL::close()
 {
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.close();
 }
 
-bool BaitaSQL::init(const QString& filePath,
+bool BaitaSQL::init(const QString& hostName,
                     QString& error)
 {
-  bool bSuccess = QSqlDatabase::database(SQLITE_CONNECTION_NAME).isValid();
+  bool bSuccess = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid();
   if (bSuccess)
   {
-    bSuccess = BaitaSQL::open(filePath, error);
+    bSuccess = BaitaSQL::open(hostName, error);
     if (bSuccess)
     {
       bSuccess = BaitaSQL::createTables(error);
       if (!bSuccess)
-        QSqlDatabase::database(SQLITE_CONNECTION_NAME).close();
+        QSqlDatabase::database(POSTGRE_CONNECTION_NAME).close();
     }
   }
   return bSuccess;
@@ -417,7 +416,7 @@ bool BaitaSQL::createTables(QString& error)
   if (!isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -425,13 +424,13 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " IMAGE_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           IMAGE_SQL_COL01 " TEXT NOT NULL UNIQUE,"
-                          IMAGE_SQL_COL02 " BLOB)");
+                          IMAGE_SQL_COL02 " BYTEA)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CATEGORY_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           CATEGORY_SQL_COL01 " INTEGER,"
                           CATEGORY_SQL_COL02 " TEXT NOT NULL UNIQUE,"
                           "FOREIGN KEY(" CATEGORY_SQL_COL01 ") REFERENCES "
@@ -439,54 +438,46 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " REMINDER_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           REMINDER_SQL_COL01 " TEXT,"
                           REMINDER_SQL_COL02 " TEXT,"
-                          REMINDER_SQL_COL03 " INT,"
-                          REMINDER_SQL_COL04 " INT,"
-                          REMINDER_SQL_COL05 " INT)");
+                          REMINDER_SQL_COL03 " BOOLEAN,"
+                          REMINDER_SQL_COL04 " INTEGER,"
+                          REMINDER_SQL_COL05 " INTEGER)");
 
+  QString str222 = "CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
+                   SQL_COLID " SERIAL PRIMARY KEY,"
+                   USER_SQL_COL01 " TEXT NOT NULL UNIQUE,"
+                   USER_SQL_COL02 " TEXT NOT NULL,"
+                   USER_SQL_COL03 " BOOLEAN,"
+                   USER_SQL_COL04 " BOOLEAN,"
+                   USER_SQL_COL05 " BOOLEAN,"
+                   USER_SQL_COL06 " BOOLEAN,"
+                   USER_SQL_COL07 " BOOLEAN,"
+                   USER_SQL_COL08 " BOOLEAN,"
+                   USER_SQL_COL09 " BOOLEAN,"
+                   USER_SQL_COL10 " BOOLEAN,"
+                   USER_SQL_COL11 " BOOLEAN,"
+                   USER_SQL_COL12 " BOOLEAN,"
+                   USER_SQL_COL13 " BOOLEAN,"
+                   USER_SQL_COL14 " BOOLEAN,"
+                   USER_SQL_COL15 " BOOLEAN)";
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS _CONSUMPTION ("
-                          "_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "_DATE INTEGER,"
-                          "_PRODUCTID INTEGER,"
-                          "_PRICE REAL,"
-                          "_AMMOUNT REAL,"
-                          "_TOTAL REAL)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          USER_SQL_COL01 " TEXT NOT NULL UNIQUE,"
-                          USER_SQL_COL02 " TEXT NOT NULL,"
-                          USER_SQL_COL03 " INT,"
-                          USER_SQL_COL04 " INT,"
-                          USER_SQL_COL05 " INT,"
-                          USER_SQL_COL06 " INT,"
-                          USER_SQL_COL07 " INT,"
-                          USER_SQL_COL08 " INT,"
-                          USER_SQL_COL09 " INT,"
-                          USER_SQL_COL10 " INT,"
-                          USER_SQL_COL11 " INT,"
-                          USER_SQL_COL12 " INT,"
-                          USER_SQL_COL13 " INT,"
-                          USER_SQL_COL14 " INT,"
-                          USER_SQL_COL15 " INT)");
+    bSuccess = query.exec(str222);
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
-                        SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_COLID " SERIAL PRIMARY KEY,"
                         PRODUCT_SQL_COL01 " TEXT NOT NULL UNIQUE,"
                         PRODUCT_SQL_COL02 " INTEGER,"
                         PRODUCT_SQL_COL03 " INTEGER,"
                         PRODUCT_SQL_COL04 " TEXT NOT NULL,"
                         PRODUCT_SQL_COL05 " TEXT,"
-                        PRODUCT_SQL_COL06 " INT,"
-                        PRODUCT_SQL_COL07 " INT,"
-                        PRODUCT_SQL_COL08 " INT,"
-                        PRODUCT_SQL_COL09 " INT,"
-                        PRODUCT_SQL_COL10 " INT,"
+                        PRODUCT_SQL_COL06 " BOOLEAN,"
+                        PRODUCT_SQL_COL07 " BOOLEAN,"
+                        PRODUCT_SQL_COL08 " BOOLEAN,"
+                        PRODUCT_SQL_COL09 " BOOLEAN,"
+                        PRODUCT_SQL_COL10 " BOOLEAN,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL02 ") REFERENCES "
                         CATEGORY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL03 ") REFERENCES "
@@ -494,7 +485,7 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PERSON_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           PERSON_SQL_COL01 " INTEGER,"
                           PERSON_SQL_COL02 " TEXT NOT NULL UNIQUE,"
                           PERSON_SQL_COL03 " TEXT,"
@@ -502,26 +493,26 @@ bool BaitaSQL::createTables(QString& error)
                           PERSON_SQL_COL05 " TEXT,"
                           PERSON_SQL_COL06 " TEXT,"
                           PERSON_SQL_COL07 " TEXT,"
-                          PERSON_SQL_COL08 " TEXT,"
-                          PERSON_SQL_COL09 " TEXT,"
-                          PERSON_SQL_COL10 " INT,"
-                          PERSON_SQL_COL11 " INT,"
-                          PERSON_SQL_COL12 " INT,"
-                          PERSON_SQL_COL13 " INT,"
+                          PERSON_SQL_COL08 " DATE,"
+                          PERSON_SQL_COL09 " DATE,"
+                          PERSON_SQL_COL10 " BOOLEAN,"
+                          PERSON_SQL_COL11 " BOOLEAN,"
+                          PERSON_SQL_COL12 " BOOLEAN,"
+                          PERSON_SQL_COL13 " BOOLEAN,"
                           PERSON_SQL_COL14 " TEXT,"
                           "FOREIGN KEY(" PERSON_SQL_COL01 ") REFERENCES "
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " ADDRESS_SQL_TABLE_NAME " ("
-                        SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_COLID " SERIAL PRIMARY KEY,"
                         ADDRESS_SQL_COL01 " INTEGER,"
                         ADDRESS_SQL_COL02 " TEXT,"
                         ADDRESS_SQL_COL03 " TEXT,"
                         ADDRESS_SQL_COL04 " TEXT,"
-                        ADDRESS_SQL_COL05 " INT,"
+                        ADDRESS_SQL_COL05 " INTEGER,"
                         ADDRESS_SQL_COL06 " TEXT,"
-                        ADDRESS_SQL_COL07 " INT,"
+                        ADDRESS_SQL_COL07 " INTEGER,"
                         ADDRESS_SQL_COL08 " TEXT,"
                         ADDRESS_SQL_COL09 " TEXT,"
                         "FOREIGN KEY(" ADDRESS_SQL_COL01 ") REFERENCES "
@@ -529,10 +520,10 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PHONE_SQL_TABLE_NAME " ("
-                        SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_COLID " SERIAL PRIMARY KEY,"
                         PHONE_SQL_COL01 " INTEGER,"
-                        PHONE_SQL_COL02 " INT DEFAULT " PHONE_DEFAULT_COUNTRY_CODE_VALUE_STR ","
-                        PHONE_SQL_COL03 " INT DEFAULT " PHONE_DEFAULT_CODE_VALUE_STR ","
+                        PHONE_SQL_COL02 " INTEGER DEFAULT " PHONE_DEFAULT_COUNTRY_CODE_VALUE_STR ","
+                        PHONE_SQL_COL03 " INTEGER DEFAULT " PHONE_DEFAULT_CODE_VALUE_STR ","
                         PHONE_SQL_COL04 " TEXT,"
                         PHONE_SQL_COL05 " TEXT,"
                         "FOREIGN KEY(" PHONE_SQL_COL01 ") REFERENCES "
@@ -540,11 +531,11 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("
-                        SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        SQL_COLID " SERIAL PRIMARY KEY,"
                         NOTE_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
-                        NOTE_SQL_COL02 " TEXT NOT NULL,"
+                        NOTE_SQL_COL02 " DATE NOT NULL,"
                         NOTE_SQL_COL03 " INTEGER,"
-                        NOTE_SQL_COL04 " INT,"
+                        NOTE_SQL_COL04 " BOOLEAN,"
                         NOTE_SQL_COL05 " TEXT,"
                         NOTE_SQL_COL06 " REAL,"
                         "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
@@ -552,12 +543,12 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           NOTE_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
                           NOTE_ITEMS_SQL_COL02 " INTEGER,"
                           NOTE_ITEMS_SQL_COL03 " REAL,"
                           NOTE_ITEMS_SQL_COL04 " REAL,"
-                          NOTE_ITEMS_SQL_COL05 " INT,"
+                          NOTE_ITEMS_SQL_COL05 " BOOLEAN,"
                           NOTE_ITEMS_SQL_COL06 " TEXT,"
                           NOTE_ITEMS_SQL_COL07 " REAL,"
                           "FOREIGN KEY(" NOTE_ITEMS_SQL_COL01 ") REFERENCES "
@@ -567,19 +558,19 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           SHOPPING_LIST_SQL_COL01 " INTEGER,"
                           SHOPPING_LIST_SQL_COL02 " INTEGER,"
                           SHOPPING_LIST_SQL_COL03 " TEXT NOT NULL,"
                           SHOPPING_LIST_SQL_COL04 " TEXT,"
-                          SHOPPING_LIST_SQL_COL05 " INT,"
-                          SHOPPING_LIST_SQL_COL06 " INT,"
-                          SHOPPING_LIST_SQL_COL07 " INT,"
-                          SHOPPING_LIST_SQL_COL08 " INT,"
+                          SHOPPING_LIST_SQL_COL05 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL06 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL07 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL08 " BOOLEAN,"
                           SHOPPING_LIST_SQL_COL09 " TEXT,"
                           SHOPPING_LIST_SQL_COL10 " TEXT,"
-                          SHOPPING_LIST_SQL_COL11 " INT,"
-                          SHOPPING_LIST_SQL_COL12 " INT,"
+                          SHOPPING_LIST_SQL_COL11 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL12 " BOOLEAN,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL01 ") REFERENCES "
                           PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL02 ") REFERENCES "
@@ -587,12 +578,12 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           SHOPPING_LIST_ITEMS_SQL_COL01 " INTEGER,"
                           SHOPPING_LIST_ITEMS_SQL_COL02 " INTEGER,"
                           SHOPPING_LIST_ITEMS_SQL_COL03 " REAL,"
                           SHOPPING_LIST_ITEMS_SQL_COL04 " REAL,"
-                          SHOPPING_LIST_ITEMS_SQL_COL05 " INT,"
+                          SHOPPING_LIST_ITEMS_SQL_COL05 " BOOLEAN,"
                           SHOPPING_LIST_ITEMS_SQL_COL06 " TEXT,"
                           SHOPPING_LIST_ITEMS_SQL_COL07 " REAL,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL01 ") REFERENCES "
@@ -602,12 +593,12 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " RESERVATION_SQL_TABLE_NAME " ("
-                          SQL_COLID " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
                           RESERVATION_SQL_COL01 " INTEGER,"
                           RESERVATION_SQL_COL02 " TEXT,"
                           RESERVATION_SQL_COL03 " TEXT,"
-                          RESERVATION_SQL_COL04 " TEXT,"
-                          RESERVATION_SQL_COL05 " INT,"
+                          RESERVATION_SQL_COL04 " DATE,"
+                          RESERVATION_SQL_COL05 " INTEGER,"
                           RESERVATION_SQL_COL06 " TEXT,"
                           RESERVATION_SQL_COL07 " TEXT)");
 
@@ -616,7 +607,7 @@ bool BaitaSQL::createTables(QString& error)
     query.exec("SELECT * FROM " USER_SQL_TABLE_NAME " LIMIT 1");
     if (!query.next())
     {
-      query.prepare("INSERT INTO " USER_SQL_TABLE_NAME " ("
+      QString str = "INSERT INTO " USER_SQL_TABLE_NAME " ("
                     USER_SQL_COL01 ","
                     USER_SQL_COL02 ","
                     USER_SQL_COL03 ","
@@ -634,8 +625,9 @@ bool BaitaSQL::createTables(QString& error)
                     USER_SQL_COL15 ")"
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
-                    "(:_password),"
-                    "1,1,1,1,1,1,1,1,1,1,1,1,1)");
+                    ":_password,"
+                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
+      query.prepare(str);
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();
     }
@@ -720,7 +712,7 @@ bool ProductSQL::select(Product& product,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, product, error);
@@ -735,7 +727,7 @@ bool ProductSQL::insert(const Product& product,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -790,7 +782,7 @@ bool ProductSQL::update(const Product& product,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -846,7 +838,7 @@ bool ProductSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
@@ -910,7 +902,7 @@ bool CategorySQL::select(Category& category,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -926,7 +918,7 @@ bool CategorySQL::insert(const Category& category,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -967,7 +959,7 @@ bool CategorySQL::update(const Category& category,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
@@ -1018,7 +1010,7 @@ bool CategorySQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   QSqlQuery query(db);
   query.prepare("DELETE FROM " CATEGORY_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
@@ -1073,7 +1065,7 @@ bool ImageSQL::select(Image& image,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, image, error);
@@ -1088,7 +1080,7 @@ bool ImageSQL::insert(const Image& image,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " IMAGE_SQL_TABLE_NAME " ("
@@ -1115,7 +1107,7 @@ bool ImageSQL::update(const Image& image,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " IMAGE_SQL_TABLE_NAME " SET "
@@ -1138,7 +1130,7 @@ bool ImageSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " IMAGE_SQL_TABLE_NAME
@@ -1196,7 +1188,7 @@ bool ReminderSQL::select(Reminder& reminder,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, reminder, error);
@@ -1211,7 +1203,7 @@ bool ReminderSQL::insert(const Reminder& reminder,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " REMINDER_SQL_TABLE_NAME " ("
@@ -1246,7 +1238,7 @@ bool ReminderSQL::update(const Reminder& reminder,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME " SET "
@@ -1275,7 +1267,7 @@ bool ReminderSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " REMINDER_SQL_TABLE_NAME
@@ -1294,7 +1286,7 @@ bool UserSQL::insert(const User& user,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " USER_SQL_TABLE_NAME " ("
@@ -1380,7 +1372,7 @@ bool UserSQL::update(const User& user,
               " WHERE " SQL_COLID " = (:_v00)";
 
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
    db.transaction();
   QSqlQuery query(db);
   query.prepare(strQuery);
@@ -1416,7 +1408,7 @@ bool UserSQL::select(User& user,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -1479,7 +1471,7 @@ bool UserSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " USER_SQL_TABLE_NAME
@@ -1504,7 +1496,7 @@ bool UserLoginSQL::login(const QString& strUser,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -1603,8 +1595,8 @@ bool PersonSQL::execSelect(QSqlQuery& query,
       person.m_CPF_CNPJ = query.value(4).toString();
       person.m_RG_IE = query.value(5).toString();
       person.m_details = query.value(6).toString();
-      person.m_birthDate = query.value(7).toString();
-      person.m_creationDate = query.value(8).toString();
+      person.m_dtBirth = query.value(7).toDate();
+      person.m_dtCreation = query.value(8).toDate();
       person.m_bCompany = query.value(9).toBool();
       person.m_bCustomer = query.value(10).toBool();
       person.m_bSupplier = query.value(11).toBool();
@@ -1696,8 +1688,7 @@ bool PersonSQL::execByPinCodeSelect(QSqlQuery& query,
                 SQL_COLID
                 " FROM " PERSON_SQL_TABLE_NAME
                 " WHERE " PERSON_SQL_COL14 " = (:_v14) AND "
-                PERSON_SQL_COL13 " <> 0 AND "
-                PERSON_SQL_COL13 " IS NOT NULL");
+                PERSON_SQL_COL13 " = TRUE");
   query.bindValue(":_v14", pincode);
   bool bSuccess = query.exec();
 
@@ -1731,7 +1722,7 @@ bool PersonSQL::select(Person& person,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execSelect(query, person, error);
@@ -1746,7 +1737,7 @@ bool PersonSQL::insert(const Person& person,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("INSERT INTO " PERSON_SQL_TABLE_NAME " ("
@@ -1783,8 +1774,8 @@ bool PersonSQL::insert(const Person& person,
   query.bindValue(":_v05", person.m_CPF_CNPJ);
   query.bindValue(":_v06", person.m_RG_IE);
   query.bindValue(":_v07", person.m_details);
-  query.bindValue(":_v08", person.m_birthDate);
-  query.bindValue(":_v09", person.m_creationDate);
+  query.bindValue(":_v08", person.m_dtBirth);
+  query.bindValue(":_v09", person.m_dtCreation);
   query.bindValue(":_v10", person.m_bCompany);
   query.bindValue(":_v11", person.m_bCustomer);
   query.bindValue(":_v12", person.m_bSupplier);
@@ -1887,7 +1878,7 @@ bool PersonSQL::update(const Person& person,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -1913,8 +1904,8 @@ bool PersonSQL::update(const Person& person,
   query.bindValue(":_v05", person.m_CPF_CNPJ);
   query.bindValue(":_v06", person.m_RG_IE);
   query.bindValue(":_v07", person.m_details);
-  query.bindValue(":_v08", person.m_birthDate);
-  query.bindValue(":_v09", person.m_creationDate);
+  query.bindValue(":_v08", person.m_dtBirth);
+  query.bindValue(":_v09", person.m_dtCreation);
   query.bindValue(":_v10", person.m_bCompany);
   query.bindValue(":_v11", person.m_bCustomer);
   query.bindValue(":_v12", person.m_bSupplier);
@@ -2079,7 +2070,7 @@ bool PersonSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PERSON_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
@@ -2095,7 +2086,7 @@ bool PersonSQL::isValidPinCode(const QString& pincode,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   bool bSuccess = execByPinCodeSelect(query, pincode, person, error);
@@ -2110,7 +2101,7 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -2214,7 +2205,7 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare(
@@ -2308,7 +2299,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
@@ -2410,7 +2401,7 @@ bool ShoppingListSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " SHOPPING_LIST_SQL_TABLE_NAME
@@ -2490,7 +2481,7 @@ bool ReservationSQL::select(Reservation& res,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
 
@@ -2506,7 +2497,7 @@ bool ReservationSQL::insert(const Reservation& res,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.exec("SELECT MAX(" RESERVATION_SQL_COL01 ") FROM " RESERVATION_SQL_TABLE_NAME);
@@ -2550,7 +2541,7 @@ bool ReservationSQL::update(const Reservation& res,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " RESERVATION_SQL_TABLE_NAME " SET "
@@ -2583,7 +2574,7 @@ bool ReservationSQL::remove(qlonglong id,
   if (!BaitaSQL::isOpen(error))
     return false;
 
-  QSqlDatabase db(QSqlDatabase::database(SQLITE_CONNECTION_NAME));
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " RESERVATION_SQL_TABLE_NAME

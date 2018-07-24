@@ -50,21 +50,21 @@ void JLineEdit::keyPressEvent(QKeyEvent *event)
 {
   if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
   {
-    emit enterSignal();
     if (m_flags & (int)Flags::EnterAsTab)
       focusNextChild();
+    emit enterSignal();
   }
   else if (event->key() == Qt::Key_Down)
   {
-    emit keyDownSignal();
     if (m_flags & (int)Flags::ArrowsAsTab)
       focusNextChild();
+    emit keyDownSignal();
   }
   else if (event->key() == Qt::Key_Up)
   {
-    emit keyUpSignal();
     if (m_flags && (int)Flags::ArrowsAsTab)
       focusPreviousChild();
+    emit keyUpSignal();
   }
   else
     QLineEdit::keyPressEvent(event);

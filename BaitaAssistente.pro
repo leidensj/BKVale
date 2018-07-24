@@ -93,8 +93,8 @@ HEADERS  += mainwindow.h \
     jspinbox.h \
     packageeditor.h \
     escpos.h \
-    filterwidget.h \
-    notefilterdlg.h
+    notefilterdlg.h \
+    filterdlg.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

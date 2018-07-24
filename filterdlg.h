@@ -2,12 +2,16 @@
 #define FILTERWIDGET_H
 
 #include <QString>
+#include <QDialog>
 
-class FilterWidget
+class FilterDlg : public QDialog
 {
+  Q_OBJECT
+
 public:
 
-  FilterWidget()
+  explicit FilterDlg(QWidget* parent = nullptr)
+    : QDialog(parent)
   {
 
   }

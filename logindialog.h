@@ -7,6 +7,8 @@
 class JLineEdit;
 class QLabel;
 class QPushButton;
+class QFrame;
+class JSpinBox;
 
 class LoginDialog : public QDialog
 {
@@ -18,6 +20,8 @@ public:
 
 private slots:
   void login();
+  void showDatabaseOpt();
+  void focusLogin();
 
 protected:
   void keyPressEvent(QKeyEvent *event);
@@ -28,8 +32,12 @@ private:
   JLineEdit* m_user;
   JLineEdit* m_password;
   JLineEdit* m_hostName;
+  JSpinBox* m_port;
   QLabel* m_capsLock;
   QLabel* m_status;
+  QPushButton* m_btnDatabaseOpt;
+  QFrame* m_frDatabase;
+  QPushButton* m_btnLogin;
 };
 
 #endif // LOGINDIALOG_H

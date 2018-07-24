@@ -1073,7 +1073,7 @@ void JDatabase::showFilter()
 
 void JDatabase::clearFilter()
 {
-  if (m_tableName == NOTE_SQL_TABLE_NAME)
+  if (m_tableName == NOTE_SQL_TABLE_NAME )
   {
     m_noteFilter->clearFilter();
     m_filter = "";

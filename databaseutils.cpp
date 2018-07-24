@@ -5,6 +5,7 @@
 #include <QSqlRecord>
 #include <QVariant>
 #include <QDebug>
+#include <QHostInfo>
 
 #define DATABASE_NOT_OPEN_TXT "O banco de dados não foi aberto."
 
@@ -369,13 +370,14 @@ bool BaitaSQL::isOpen(QString& error)
 }
 
 bool BaitaSQL::open(const QString& hostName,
+                    int port,
                     QString& error)
 {
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   error.clear();
   if (db.isOpen())
     db.close();
-  db.setPort(5432);
+  db.setPort(port);
   db.setHostName(hostName);
   db.setDatabaseName("BaitaAssistente");
   db.setUserName("BaitaAssistente");
@@ -393,12 +395,13 @@ void BaitaSQL::close()
 }
 
 bool BaitaSQL::init(const QString& hostName,
+                    int port,
                     QString& error)
 {
   bool bSuccess = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid();
   if (bSuccess)
   {
-    bSuccess = BaitaSQL::open(hostName, error);
+    bSuccess = BaitaSQL::open(hostName, port, error);
     if (bSuccess)
     {
       bSuccess = BaitaSQL::createTables(error);
@@ -445,25 +448,24 @@ bool BaitaSQL::createTables(QString& error)
                           REMINDER_SQL_COL04 " INTEGER,"
                           REMINDER_SQL_COL05 " INTEGER)");
 
-  QString str222 = "CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
-                   SQL_COLID " SERIAL PRIMARY KEY,"
-                   USER_SQL_COL01 " TEXT NOT NULL UNIQUE,"
-                   USER_SQL_COL02 " TEXT NOT NULL,"
-                   USER_SQL_COL03 " BOOLEAN,"
-                   USER_SQL_COL04 " BOOLEAN,"
-                   USER_SQL_COL05 " BOOLEAN,"
-                   USER_SQL_COL06 " BOOLEAN,"
-                   USER_SQL_COL07 " BOOLEAN,"
-                   USER_SQL_COL08 " BOOLEAN,"
-                   USER_SQL_COL09 " BOOLEAN,"
-                   USER_SQL_COL10 " BOOLEAN,"
-                   USER_SQL_COL11 " BOOLEAN,"
-                   USER_SQL_COL12 " BOOLEAN,"
-                   USER_SQL_COL13 " BOOLEAN,"
-                   USER_SQL_COL14 " BOOLEAN,"
-                   USER_SQL_COL15 " BOOLEAN)";
   if (bSuccess)
-    bSuccess = query.exec(str222);
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          USER_SQL_COL01 " TEXT NOT NULL UNIQUE,"
+                          USER_SQL_COL02 " TEXT NOT NULL,"
+                          USER_SQL_COL03 " BOOLEAN,"
+                          USER_SQL_COL04 " BOOLEAN,"
+                          USER_SQL_COL05 " BOOLEAN,"
+                          USER_SQL_COL06 " BOOLEAN,"
+                          USER_SQL_COL07 " BOOLEAN,"
+                          USER_SQL_COL08 " BOOLEAN,"
+                          USER_SQL_COL09 " BOOLEAN,"
+                          USER_SQL_COL10 " BOOLEAN,"
+                          USER_SQL_COL11 " BOOLEAN,"
+                          USER_SQL_COL12 " BOOLEAN,"
+                          USER_SQL_COL13 " BOOLEAN,"
+                          USER_SQL_COL14 " BOOLEAN,"
+                          USER_SQL_COL15 " BOOLEAN)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
@@ -601,6 +603,15 @@ bool BaitaSQL::createTables(QString& error)
                           RESERVATION_SQL_COL05 " INTEGER,"
                           RESERVATION_SQL_COL06 " TEXT,"
                           RESERVATION_SQL_COL07 " TEXT)");
+
+  QString temp = "CREATE TABLE IF NOT EXISTS " ACTIVE_USERS_SQL_TABLE_NAME " ("
+                 SQL_COLID " SERIAL PRIMARY KEY,"
+                 ACTIVE_USERS_SQL_COL01 " INTEGER,"
+                 ACTIVE_USERS_SQL_COL02 " TEXT,"
+                 ACTIVE_USERS_SQL_COL03 " TEXT,"
+                 ACTIVE_USERS_SQL_COL04 " TIMESTAMP)";
+  if (bSuccess)
+    bSuccess = query.exec(temp);
 
   if (bSuccess)
   {
@@ -1544,6 +1555,54 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessImage = query.value(13).toBool();
       m_user.m_bAccessReservation = query.value(14).toBool();
       m_user.m_bAccessShoppingList = query.value(15).toBool();
+
+      bSuccess = ActiveUserSQL::execRefresh(query, error);
+      if (bSuccess)
+      {
+        query.prepare("SELECT " ACTIVE_USERS_SQL_COL02 ","
+                      ACTIVE_USERS_SQL_COL03 " FROM "
+                      ACTIVE_USERS_SQL_TABLE_NAME " WHERE "
+                      ACTIVE_USERS_SQL_COL02 " = (:v02) LIMIT 1");
+        query.bindValue(":v02", strUser);
+        bSuccess = query.exec();
+        if (bSuccess)
+        {
+          if (query.next())
+          {
+            bSuccess = false;
+            error = "Usuário " +
+                    strUser  +
+                    " já logado na máquina " +
+                    query.value(1).toString();
+          }
+          else
+          {
+            query.prepare("SELECT pg_backend_pid()");
+            bSuccess = query.exec();
+            if (bSuccess)
+            {
+              qlonglong pid = 0;
+              if (query.next())
+                pid = query.value(0).toLongLong();
+              QString strQuery = "INSERT INTO " ACTIVE_USERS_SQL_TABLE_NAME " ("
+                              ACTIVE_USERS_SQL_COL01 ","
+                              ACTIVE_USERS_SQL_COL02 ","
+                              ACTIVE_USERS_SQL_COL03 ","
+                              ACTIVE_USERS_SQL_COL04 ")"
+                              " VALUES ("
+                              "(:_v01),"
+                              "(:_v02),"
+                              "(:_v03),"
+                              "current_timestamp)";
+              query.prepare(strQuery);
+              query.bindValue(":_v01", pid);
+              query.bindValue(":_v02", strUser);
+              query.bindValue(":_v03", QHostInfo::localHostName().toUpper());
+              bSuccess = query.exec();
+            }
+          }
+        }
+      }
     }
     else
     {
@@ -1551,6 +1610,9 @@ bool UserLoginSQL::login(const QString& strUser,
       error = "Usuário ou senha inválidos.";
     }
   }
+
+  if (!bSuccess)
+    m_user.clear();
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -2583,4 +2645,25 @@ bool ReservationSQL::remove(qlonglong id,
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ActiveUserSQL::refresh(QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execRefresh(query, error);
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ActiveUserSQL::execRefresh(QSqlQuery& query, QString& error)
+{
+  error.clear();
+  query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
+                " WHERE " ACTIVE_USERS_SQL_COL01 " NOT IN "
+                "(SELECT pid FROM pg_stat_activity)");
+  return query.exec();
 }

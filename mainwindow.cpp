@@ -143,6 +143,8 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
 
 BaitaAssistant::~BaitaAssistant()
 {
+  QString error;
+  ActiveUserSQL::refresh(error);
   delete ui;
 }
 
@@ -306,7 +308,11 @@ void BaitaAssistant::updateStatusBar()
   // "<img src=':/icons/res/16user.png'> " + ...
 
   m_statusUserName->setText(tr("Usuário: ") + m_userLogin.strUser());
-  m_statusDatabasePath->setText(tr("Banco de dados: ") + m_settings.m_databaseHostName);
+  m_statusDatabasePath->setText(tr("Banco de dados: ") +
+                                (m_settings.m_databaseHostName.isEmpty() ? "localhost"
+                                                                        : m_settings.m_databaseHostName) +
+                                ":" +
+                                QString::number(m_settings.m_databasePort));
 }
 
 void BaitaAssistant::updateControls()
@@ -474,7 +480,9 @@ void BaitaAssistant::openShoppingListDialog()
 void BaitaAssistant::reconnectDatabase()
 {
   QString error;
-  if (!BaitaSQL::init(m_settings.m_databaseHostName, error))
+  if (!BaitaSQL::init(m_settings.m_databaseHostName,
+                      m_settings.m_databasePort,
+                      error))
   {
     QMessageBox::critical(this,
                           tr("Erro ao reconectar"),

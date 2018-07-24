@@ -7,6 +7,7 @@ struct Settings
 {
   Settings();
   QString m_databaseHostName;
+  int m_databasePort;
   bool m_bIsPrinterEthernet;
   QString m_serialPort;
   QString m_ethernetIP;

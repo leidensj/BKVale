@@ -53,6 +53,7 @@ namespace BaitaSQL
   bool isOpen(QString& error);
 
   bool open(const QString& hostName,
+            int port,
             QString& error);
 
   void close();
@@ -60,6 +61,7 @@ namespace BaitaSQL
   bool createTables(QString& error);
 
   bool init(const QString& hostName,
+            int port,
             QString& error);
 }
 
@@ -235,6 +237,14 @@ namespace ReservationSQL
 
   bool remove(qlonglong id,
               QString& error);
+}
+
+namespace ActiveUserSQL
+{
+  bool refresh(QString& error);
+
+  bool execRefresh(QSqlQuery& query,
+                   QString& error);
 }
 
 #endif // DATABASEUTILS_H

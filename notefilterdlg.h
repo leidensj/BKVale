@@ -1,14 +1,13 @@
-#ifndef NOTEFILTERWIDGET_H
-#define NOTEFILTERWIDGET_H
+#ifndef NOTEFILTERDLG_H
+#define NOTEFILTERDLG_H
 
-#include <QDialog>
-#include "filterwidget.h"
+#include "filterdlg.h"
 
 class JDatabasePicker;
 class QDateEdit;
 class QCheckBox;
 
-class NoteFilterDlg : public QDialog, FilterWidget
+class NoteFilterDlg : public FilterDlg
 {
   Q_OBJECT
 
@@ -27,4 +26,4 @@ private:
   JDatabasePicker* m_supplierPicker;
 };
 
-#endif // NOTEFILTERWIDGET_H
+#endif // NOTEFILTERDLG_H

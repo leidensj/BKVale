@@ -5,7 +5,7 @@
 #include <QLayout>
 
 NoteFilterDlg::NoteFilterDlg(QWidget* parent)
-  : QDialog(parent)
+  : FilterDlg(parent)
   , m_cbDate(nullptr)
   , m_dtBegin(nullptr)
   , m_dtEnd(nullptr)

@@ -1556,49 +1556,53 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessReservation = query.value(14).toBool();
       m_user.m_bAccessShoppingList = query.value(15).toBool();
 
-      bSuccess = ActiveUserSQL::execRefresh(query, error);
+      bSuccess = ActiveUserSQL::execRemove(query, error);
       if (bSuccess)
       {
-        query.prepare("SELECT " ACTIVE_USERS_SQL_COL02 ","
-                      ACTIVE_USERS_SQL_COL03 " FROM "
-                      ACTIVE_USERS_SQL_TABLE_NAME " WHERE "
-                      ACTIVE_USERS_SQL_COL02 " = (:v02) LIMIT 1");
-        query.bindValue(":v02", strUser);
-        bSuccess = query.exec();
+        bSuccess = ActiveUserSQL::execRefresh(query, error);
         if (bSuccess)
         {
-          if (query.next())
+          query.prepare("SELECT " ACTIVE_USERS_SQL_COL02 ","
+                        ACTIVE_USERS_SQL_COL03 " FROM "
+                        ACTIVE_USERS_SQL_TABLE_NAME " WHERE "
+                        ACTIVE_USERS_SQL_COL02 " = (:v02) LIMIT 1");
+          query.bindValue(":v02", strUser);
+          bSuccess = query.exec();
+          if (bSuccess)
           {
-            bSuccess = false;
-            error = "Usuário " +
-                    strUser  +
-                    " já logado na máquina " +
-                    query.value(1).toString();
-          }
-          else
-          {
-            query.prepare("SELECT pg_backend_pid()");
-            bSuccess = query.exec();
-            if (bSuccess)
+            if (query.next())
             {
-              qlonglong pid = 0;
-              if (query.next())
-                pid = query.value(0).toLongLong();
-              QString strQuery = "INSERT INTO " ACTIVE_USERS_SQL_TABLE_NAME " ("
-                              ACTIVE_USERS_SQL_COL01 ","
-                              ACTIVE_USERS_SQL_COL02 ","
-                              ACTIVE_USERS_SQL_COL03 ","
-                              ACTIVE_USERS_SQL_COL04 ")"
-                              " VALUES ("
-                              "(:_v01),"
-                              "(:_v02),"
-                              "(:_v03),"
-                              "current_timestamp)";
-              query.prepare(strQuery);
-              query.bindValue(":_v01", pid);
-              query.bindValue(":_v02", strUser);
-              query.bindValue(":_v03", QHostInfo::localHostName().toUpper());
+              bSuccess = false;
+              error = "Usuário " +
+                      strUser  +
+                      " já logado na máquina " +
+                      query.value(1).toString();
+            }
+            else
+            {
+              query.prepare("SELECT pg_backend_pid()");
               bSuccess = query.exec();
+              if (bSuccess)
+              {
+                qlonglong pid = 0;
+                if (query.next())
+                  pid = query.value(0).toLongLong();
+                QString strQuery = "INSERT INTO " ACTIVE_USERS_SQL_TABLE_NAME " ("
+                                ACTIVE_USERS_SQL_COL01 ","
+                                ACTIVE_USERS_SQL_COL02 ","
+                                ACTIVE_USERS_SQL_COL03 ","
+                                ACTIVE_USERS_SQL_COL04 ")"
+                                " VALUES ("
+                                "(:_v01),"
+                                "(:_v02),"
+                                "(:_v03),"
+                                "current_timestamp)";
+                query.prepare(strQuery);
+                query.bindValue(":_v01", pid);
+                query.bindValue(":_v02", strUser);
+                query.bindValue(":_v03", QHostInfo::localHostName().toUpper());
+                bSuccess = query.exec();
+              }
             }
           }
         }
@@ -2665,5 +2669,25 @@ bool ActiveUserSQL::execRefresh(QSqlQuery& query, QString& error)
   query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
                 " WHERE " ACTIVE_USERS_SQL_COL01 " NOT IN "
                 "(SELECT pid FROM pg_stat_activity)");
+  return query.exec();
+}
+
+bool ActiveUserSQL::remove(QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execRemove(query, error);
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ActiveUserSQL::execRemove(QSqlQuery& query, QString& error)
+{
+  error.clear();
+  query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
+                " WHERE " ACTIVE_USERS_SQL_COL01 " = pg_backend_pid()");
   return query.exec();
 }

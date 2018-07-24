@@ -37,8 +37,15 @@ class JDatabase : public QFrame
   Q_OBJECT
 
 public:
+  enum class Mode
+  {
+    Full,
+    Selector,
+    ReadOnly
+  };
+
   explicit JDatabase(const QString& tableName,
-                     bool bSelectorMode = false,
+                     Mode mode = Mode::Full,
                      QWidget *parent = 0);
   ~JDatabase();
   QString getTableName() const;
@@ -54,7 +61,7 @@ public slots:
   void clearFilterSearch();
 
 private:
-  const bool m_bSelectorMode;
+  const Mode m_mode;
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;

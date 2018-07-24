@@ -16,7 +16,7 @@ ShopView::ShopView(QWidget* parent)
   , m_btnToday(nullptr)
   , m_lblWeekDay(nullptr)
 {
-  m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME, true);
+  m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME, JDatabase::Mode::ReadOnly);
   m_database->layout()->setContentsMargins(0, 0, 0, 0);
   m_dtDate = new QDateEdit;
   m_dtDate->setCalendarPopup(true);

@@ -3,6 +3,7 @@
 #include <QDateEdit>
 #include <QCheckBox>
 #include <QLayout>
+#include "jdatabase.h"
 
 NoteFilterDlg::NoteFilterDlg(QWidget* parent)
   : FilterDlg(parent)
@@ -20,6 +21,8 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
                                          tr("Fornecedor"),
                                          QIcon(":/icons/res/supplier.png"),
                                          true, false, true);
+
+  m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 
   QHBoxLayout* dateLayout = new QHBoxLayout;
   dateLayout->setContentsMargins(0, 0, 0, 0);

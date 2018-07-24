@@ -203,6 +203,7 @@
     </property>
     <addaction name="actionSettings"/>
     <addaction name="actionReconnectDatabase"/>
+    <addaction name="actionActiveUsers"/>
    </widget>
    <widget class="QMenu" name="menuAjuda">
     <property name="title">
@@ -355,6 +356,18 @@
    </property>
    <property name="toolTip">
     <string>Reconectar ao banco de dados</string>
+   </property>
+  </action>
+  <action name="actionActiveUsers">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/users.png</normaloff>:/icons/res/users.png</iconset>
+   </property>
+   <property name="text">
+    <string>Usuários Ativos</string>
+   </property>
+   <property name="toolTip">
+    <string>Mostra os usuários logados no sistema</string>
    </property>
   </action>
  </widget>

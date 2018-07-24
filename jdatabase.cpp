@@ -480,6 +480,59 @@ public:
   }
 };
 
+class ActiveUserTableModel : public JTableModel
+{
+public:
+  ActiveUserTableModel(QObject *parent)
+    : JTableModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    return
+        "SELECT "
+        SQL_COLID ","
+        ACTIVE_USERS_SQL_COL01 ","
+        ACTIVE_USERS_SQL_COL02 ","
+        ACTIVE_USERS_SQL_COL03 ","
+        ACTIVE_USERS_SQL_COL04
+        " FROM "
+        ACTIVE_USERS_SQL_TABLE_NAME;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select(getStrQuery());
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("PID"));
+    setHeaderData(2, Qt::Horizontal, tr("Nome"));
+    setHeaderData(3, Qt::Horizontal, tr("Máquina"));
+    setHeaderData(4, Qt::Horizontal, tr("Login"));
+    if (header != nullptr && header->count() == 5)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
+    }
+  }
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  {
+    if (!index.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlQueryModel::data(index, role);
+    if (role == Qt::DisplayRole)
+    {
+    }
+    return value;
+  }
+};
+
 
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
@@ -498,10 +551,10 @@ void JTableView::keyPressEvent(QKeyEvent* event)
 }
 
 JDatabase::JDatabase(const QString& tableName,
-                     bool bSelectorMode,
+                     Mode mode,
                      QWidget *parent)
   : QFrame(parent)
-  , m_bSelectorMode(bSelectorMode)
+  , m_mode(mode)
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
@@ -608,6 +661,8 @@ JDatabase::JDatabase(const QString& tableName,
     model = new ShoppingListTableModel(this);
   else if (tableName == RESERVATION_SQL_TABLE_NAME)
     model = new ReservationTableModel(this);
+  else if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+    model = new ActiveUserTableModel(this);
   else
     model = new JTableModel(this);
 
@@ -622,27 +677,14 @@ JDatabase::JDatabase(const QString& tableName,
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
                    SLOT(enableControls()));
-
   QObject::connect(m_table->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
                    this,
                    SLOT(emitCurrentRowChangedSignal()));
-  QObject::connect(m_table,
-                   SIGNAL(doubleClicked(const QModelIndex&)),
-                   this,
-                   SLOT(selectItem()));
-  QObject::connect(m_btnOpen,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(selectItem()));
   QObject::connect(m_btnRefresh,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(refresh()));
-  QObject::connect(m_btnRemove,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(removeItem()));
   QObject::connect(m_edFilterSearch,
                    SIGNAL(textEdited(const QString&)),
                    this,
@@ -664,10 +706,27 @@ JDatabase::JDatabase(const QString& tableName,
                                                Qt::SortOrder)),
                    this,
                    SLOT(filterSearchChanged()));
-  QObject::connect(m_table,
-                   SIGNAL(enterKeyPressedSignal()),
-                   this,
-                   SLOT(selectItem()));
+
+  if (m_mode != Mode::ReadOnly)
+  {
+    QObject::connect(m_table,
+                     SIGNAL(enterKeyPressedSignal()),
+                     this,
+                     SLOT(selectItem()));
+    QObject::connect(m_btnOpen,
+                     SIGNAL(clicked(bool)),
+                     this,
+                     SLOT(selectItem()));
+    QObject::connect(m_btnRemove,
+                     SIGNAL(clicked(bool)),
+                     this,
+                     SLOT(removeItem()));
+    QObject::connect(m_table,
+                     SIGNAL(doubleClicked(const QModelIndex&)),
+                     this,
+                     SLOT(selectItem()));
+  }
+
   QObject::connect(m_btnFilter,
                    SIGNAL(clicked(bool)),
                    this,
@@ -684,7 +743,13 @@ JDatabase::JDatabase(const QString& tableName,
   if (m_table->horizontalHeader()->count() > 1)
     m_table->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
-  if (m_bSelectorMode)
+  if (m_tableName != NOTE_SQL_TABLE_NAME)
+  {
+    m_btnFilter->hide();
+    m_btnFilterClear->hide();
+  }
+
+  if (m_mode == Mode::Selector)
   {
     m_btnOpen->hide();
     m_btnRefresh->hide();
@@ -693,11 +758,12 @@ JDatabase::JDatabase(const QString& tableName,
     m_btnRemove->hide();
     m_edFilterSearch->setFocus();
   }
-
-  if (m_tableName != NOTE_SQL_TABLE_NAME)
+  else if (m_mode == Mode::ReadOnly)
   {
-    m_btnFilter->hide();
-    m_btnFilterClear->hide();
+    m_btnOpen->hide();
+    m_btnRemove->setEnabled(false);
+    m_btnRemove->hide();
+    m_edFilterSearch->setFocus();
   }
 
   filterSearchChanged();
@@ -839,7 +905,7 @@ void JDatabase::refresh()
 
   m_proxyModel->invalidate();
   enableControls();
-  if (m_bSelectorMode)
+  if (m_mode == Mode::Selector || m_mode == Mode::ReadOnly)
     m_edFilterSearch->setFocus();
 }
 
@@ -1073,7 +1139,7 @@ void JDatabase::showFilter()
 
 void JDatabase::clearFilter()
 {
-  if (m_tableName == NOTE_SQL_TABLE_NAME )
+  if (m_tableName == NOTE_SQL_TABLE_NAME && m_noteFilter != nullptr)
   {
     m_noteFilter->clearFilter();
     m_filter = "";
@@ -1088,7 +1154,7 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
   : QDialog(parent)
   , m_database(nullptr)
 {
-  m_database = new JDatabase(tableName, true);
+  m_database = new JDatabase(tableName, JDatabase::Mode::Selector);
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->addWidget(m_database);
   setLayout(hlayout0);

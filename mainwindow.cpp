@@ -15,6 +15,7 @@
 #include "shoppinglistview.h"
 #include "reservationview.h"
 #include "shopview.h"
+#include "jdatabase.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -135,6 +136,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(reconnectDatabase()));
+
+  QObject::connect(ui->actionActiveUsers,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openActiveUsersDialog()));
 
   m_settings.load();
   updateControls();
@@ -489,4 +495,18 @@ void BaitaAssistant::reconnectDatabase()
                           tr("O seguinte erro ocorreu ao reconectar ao banco de dados : '%1'").arg(error),
                           QMessageBox::Ok);
   }
+}
+
+void BaitaAssistant::openActiveUsersDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout;
+  dlg.setLayout(layout);
+  JDatabase* w = new JDatabase(ACTIVE_USERS_SQL_TABLE_NAME, JDatabase::Mode::ReadOnly);
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Usuários Ativos"));
+  dlg.setWindowIcon(QIcon(":/icons/res/users.png"));
+  dlg.setModal(true);
+  dlg.exec();
 }

@@ -245,6 +245,11 @@ namespace ActiveUserSQL
 
   bool execRefresh(QSqlQuery& query,
                    QString& error);
+
+  bool remove(QString& error);
+
+  bool execRemove(QSqlQuery& query,
+                  QString& error);
 }
 
 #endif // DATABASEUTILS_H

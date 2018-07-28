@@ -40,6 +40,317 @@ namespace {
   }
 }
 
+bool BaitaSQL::isOpen(QString& error)
+{
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  error.clear();
+  if (!db.isOpen())
+     error = "Banco de dados não foi aberto.";
+  return db.isOpen();
+}
+
+bool BaitaSQL::open(const QString& hostName,
+                    int port,
+                    QString& error)
+{
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  error.clear();
+  if (db.isOpen())
+    db.close();
+  db.setPort(port);
+  db.setHostName(hostName);
+  db.setDatabaseName("BaitaAssistente");
+  db.setUserName("BaitaAssistente");
+  db.setPassword("jfljfl");
+  bool bSuccess = db.open();
+  if (!bSuccess)
+    error = db.lastError().text();
+  return bSuccess;
+}
+
+void BaitaSQL::close()
+{
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.close();
+}
+
+bool BaitaSQL::init(const QString& hostName,
+                    int port,
+                    QString& error)
+{
+  QSqlDatabase db = QSqlDatabase::database(POSTGRE_CONNECTION_NAME);
+  bool bSuccess = db.isValid();
+  if (bSuccess)
+  {
+    if (db.isOpen())
+      db.close();
+    bSuccess = BaitaSQL::open(hostName, port, error);
+    if (bSuccess)
+    {
+      bSuccess = BaitaSQL::createTables(error);
+      if (!bSuccess)
+        db.close();
+    }
+  }
+  return bSuccess;
+}
+
+bool BaitaSQL::createTables(QString& error)
+{
+  error.clear();
+
+  if (!isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  bool bSuccess = true;
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " IMAGE_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          IMAGE_SQL_COL01 " TEXT NOT NULL UNIQUE,"
+                          IMAGE_SQL_COL02 " BYTEA)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CATEGORY_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CATEGORY_SQL_COL01 " INTEGER,"
+                          CATEGORY_SQL_COL02 " TEXT NOT NULL UNIQUE,"
+                          "FOREIGN KEY(" CATEGORY_SQL_COL01 ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " REMINDER_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          REMINDER_SQL_COL01 " TEXT,"
+                          REMINDER_SQL_COL02 " TEXT,"
+                          REMINDER_SQL_COL03 " BOOLEAN,"
+                          REMINDER_SQL_COL04 " INTEGER,"
+                          REMINDER_SQL_COL05 " INTEGER)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          USER_SQL_COL01 " TEXT NOT NULL UNIQUE,"
+                          USER_SQL_COL02 " TEXT NOT NULL,"
+                          USER_SQL_COL03 " BOOLEAN,"
+                          USER_SQL_COL04 " BOOLEAN,"
+                          USER_SQL_COL05 " BOOLEAN,"
+                          USER_SQL_COL06 " BOOLEAN,"
+                          USER_SQL_COL07 " BOOLEAN,"
+                          USER_SQL_COL08 " BOOLEAN,"
+                          USER_SQL_COL09 " BOOLEAN,"
+                          USER_SQL_COL10 " BOOLEAN,"
+                          USER_SQL_COL11 " BOOLEAN,"
+                          USER_SQL_COL12 " BOOLEAN,"
+                          USER_SQL_COL13 " BOOLEAN,"
+                          USER_SQL_COL14 " BOOLEAN,"
+                          USER_SQL_COL15 " BOOLEAN)");
+
+  if (bSuccess)
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
+                        SQL_COLID " SERIAL PRIMARY KEY,"
+                        PRODUCT_SQL_COL01 " TEXT NOT NULL UNIQUE,"
+                        PRODUCT_SQL_COL02 " INTEGER,"
+                        PRODUCT_SQL_COL03 " INTEGER,"
+                        PRODUCT_SQL_COL04 " TEXT NOT NULL,"
+                        PRODUCT_SQL_COL05 " TEXT,"
+                        PRODUCT_SQL_COL06 " BOOLEAN,"
+                        PRODUCT_SQL_COL07 " BOOLEAN,"
+                        PRODUCT_SQL_COL08 " BOOLEAN,"
+                        PRODUCT_SQL_COL09 " BOOLEAN,"
+                        PRODUCT_SQL_COL10 " BOOLEAN,"
+                        "FOREIGN KEY(" PRODUCT_SQL_COL02 ") REFERENCES "
+                        CATEGORY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                        "FOREIGN KEY(" PRODUCT_SQL_COL03 ") REFERENCES "
+                        IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PERSON_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          PERSON_SQL_COL01 " INTEGER,"
+                          PERSON_SQL_COL02 " TEXT NOT NULL UNIQUE,"
+                          PERSON_SQL_COL03 " TEXT,"
+                          PERSON_SQL_COL04 " TEXT,"
+                          PERSON_SQL_COL05 " TEXT,"
+                          PERSON_SQL_COL06 " TEXT,"
+                          PERSON_SQL_COL07 " TEXT,"
+                          PERSON_SQL_COL08 " DATE,"
+                          PERSON_SQL_COL09 " DATE,"
+                          PERSON_SQL_COL10 " BOOLEAN,"
+                          "FOREIGN KEY(" PERSON_SQL_COL01 ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
+                          EMPLOYEE_SQL_COL01 " INTEGER PRIMARY KEY,"
+                          EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
+                          "FOREIGN KEY(" EMPLOYEE_SQL_COL01 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SUPPLIER_SQL_TABLE_NAME " ("
+                          SUPPLIER_SQL_COL01 " INTEGER PRIMARY KEY,"
+                          "FOREIGN KEY(" SUPPLIER_SQL_COL01 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " ADDRESS_SQL_TABLE_NAME " ("
+                        SQL_COLID " SERIAL PRIMARY KEY,"
+                        ADDRESS_SQL_COL01 " INTEGER,"
+                        ADDRESS_SQL_COL02 " TEXT,"
+                        ADDRESS_SQL_COL03 " TEXT,"
+                        ADDRESS_SQL_COL04 " TEXT,"
+                        ADDRESS_SQL_COL05 " INTEGER,"
+                        ADDRESS_SQL_COL06 " TEXT,"
+                        ADDRESS_SQL_COL07 " INTEGER,"
+                        ADDRESS_SQL_COL08 " TEXT,"
+                        ADDRESS_SQL_COL09 " TEXT,"
+                        "FOREIGN KEY(" ADDRESS_SQL_COL01 ") REFERENCES "
+                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PHONE_SQL_TABLE_NAME " ("
+                        SQL_COLID " SERIAL PRIMARY KEY,"
+                        PHONE_SQL_COL01 " INTEGER,"
+                        PHONE_SQL_COL02 " INTEGER DEFAULT " PHONE_DEFAULT_COUNTRY_CODE_VALUE_STR ","
+                        PHONE_SQL_COL03 " INTEGER DEFAULT " PHONE_DEFAULT_CODE_VALUE_STR ","
+                        PHONE_SQL_COL04 " TEXT,"
+                        PHONE_SQL_COL05 " TEXT,"
+                        "FOREIGN KEY(" PHONE_SQL_COL01 ") REFERENCES "
+                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("
+                        SQL_COLID " SERIAL PRIMARY KEY,"
+                        NOTE_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
+                        NOTE_SQL_COL02 " DATE NOT NULL,"
+                        NOTE_SQL_COL03 " INTEGER,"
+                        NOTE_SQL_COL04 " BOOLEAN,"
+                        NOTE_SQL_COL05 " TEXT,"
+                        NOTE_SQL_COL06 " REAL,"
+                        "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
+                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          NOTE_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
+                          NOTE_ITEMS_SQL_COL02 " INTEGER,"
+                          NOTE_ITEMS_SQL_COL03 " REAL,"
+                          NOTE_ITEMS_SQL_COL04 " REAL,"
+                          NOTE_ITEMS_SQL_COL05 " BOOLEAN,"
+                          NOTE_ITEMS_SQL_COL06 " TEXT,"
+                          NOTE_ITEMS_SQL_COL07 " REAL,"
+                          "FOREIGN KEY(" NOTE_ITEMS_SQL_COL01 ") REFERENCES "
+                          NOTE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" NOTE_ITEMS_SQL_COL02 ") REFERENCES "
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          SHOPPING_LIST_SQL_COL01 " INTEGER,"
+                          SHOPPING_LIST_SQL_COL02 " INTEGER,"
+                          SHOPPING_LIST_SQL_COL03 " TEXT NOT NULL,"
+                          SHOPPING_LIST_SQL_COL04 " TEXT,"
+                          SHOPPING_LIST_SQL_COL05 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL06 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL07 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL08 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL09 " TEXT,"
+                          SHOPPING_LIST_SQL_COL10 " TEXT,"
+                          SHOPPING_LIST_SQL_COL11 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL12 " BOOLEAN,"
+                          "FOREIGN KEY(" SHOPPING_LIST_SQL_COL01 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                          "FOREIGN KEY(" SHOPPING_LIST_SQL_COL02 ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          SHOPPING_LIST_ITEMS_SQL_COL01 " INTEGER,"
+                          SHOPPING_LIST_ITEMS_SQL_COL02 " INTEGER,"
+                          SHOPPING_LIST_ITEMS_SQL_COL03 " REAL,"
+                          SHOPPING_LIST_ITEMS_SQL_COL04 " REAL,"
+                          SHOPPING_LIST_ITEMS_SQL_COL05 " BOOLEAN,"
+                          SHOPPING_LIST_ITEMS_SQL_COL06 " TEXT,"
+                          SHOPPING_LIST_ITEMS_SQL_COL07 " REAL,"
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL01 ") REFERENCES "
+                          SHOPPING_LIST_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL02 ") REFERENCES "
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " RESERVATION_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          RESERVATION_SQL_COL01 " INTEGER,"
+                          RESERVATION_SQL_COL02 " TEXT,"
+                          RESERVATION_SQL_COL03 " TEXT,"
+                          RESERVATION_SQL_COL04 " DATE,"
+                          RESERVATION_SQL_COL05 " INTEGER,"
+                          RESERVATION_SQL_COL06 " TEXT,"
+                          RESERVATION_SQL_COL07 " TEXT)");
+
+  QString temp = "CREATE TABLE IF NOT EXISTS " ACTIVE_USERS_SQL_TABLE_NAME " ("
+                 SQL_COLID " SERIAL PRIMARY KEY,"
+                 ACTIVE_USERS_SQL_COL01 " INTEGER,"
+                 ACTIVE_USERS_SQL_COL02 " TEXT,"
+                 ACTIVE_USERS_SQL_COL03 " TEXT,"
+                 ACTIVE_USERS_SQL_COL04 " TIMESTAMP)";
+  if (bSuccess)
+    bSuccess = query.exec(temp);
+
+  if (bSuccess)
+  {
+    query.exec("SELECT * FROM " USER_SQL_TABLE_NAME " LIMIT 1");
+    if (!query.next())
+    {
+      QString str = "INSERT INTO " USER_SQL_TABLE_NAME " ("
+                    USER_SQL_COL01 ","
+                    USER_SQL_COL02 ","
+                    USER_SQL_COL03 ","
+                    USER_SQL_COL04 ","
+                    USER_SQL_COL05 ","
+                    USER_SQL_COL06 ","
+                    USER_SQL_COL07 ","
+                    USER_SQL_COL08 ","
+                    USER_SQL_COL09 ","
+                    USER_SQL_COL10 ","
+                    USER_SQL_COL11 ","
+                    USER_SQL_COL12 ","
+                    USER_SQL_COL13 ","
+                    USER_SQL_COL14 ","
+                    USER_SQL_COL15 ")"
+                    " VALUES ('"
+                    USER_SQL_DEFAULT_NAME "',"
+                    ":_password,"
+                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
+      query.prepare(str);
+      query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
+      bSuccess = query.exec();
+    }
+  }
+
+  if (!bSuccess)
+  {
+    error = query.lastError().text();
+    db.rollback();
+    return false;
+  }
+  else
+  {
+    bSuccess = db.commit();
+    if (!bSuccess)
+      error = db.lastError().text();
+    return bSuccess;
+  }
+}
+
 bool NoteSQL::insert(const Note& note,
                      QString& error)
 {
@@ -358,305 +669,6 @@ NoteItem NoteSQL::selectLastItem(qlonglong supplierId,
 
   finishTransaction(db, query, bSuccess, error);
   return noteItem;
-}
-
-bool BaitaSQL::isOpen(QString& error)
-{
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  error.clear();
-  if (!db.isOpen())
-     error = "Banco de dados não foi aberto.";
-  return db.isOpen();
-}
-
-bool BaitaSQL::open(const QString& hostName,
-                    int port,
-                    QString& error)
-{
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  error.clear();
-  if (db.isOpen())
-    db.close();
-  db.setPort(port);
-  db.setHostName(hostName);
-  db.setDatabaseName("BaitaAssistente");
-  db.setUserName("BaitaAssistente");
-  db.setPassword("jfljfl");
-  bool bSuccess = db.open();
-  if (!bSuccess)
-    error = db.lastError().text();
-  return bSuccess;
-}
-
-void BaitaSQL::close()
-{
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.close();
-}
-
-bool BaitaSQL::init(const QString& hostName,
-                    int port,
-                    QString& error)
-{
-  bool bSuccess = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid();
-  if (bSuccess)
-  {
-    bSuccess = BaitaSQL::open(hostName, port, error);
-    if (bSuccess)
-    {
-      bSuccess = BaitaSQL::createTables(error);
-      if (!bSuccess)
-        QSqlDatabase::database(POSTGRE_CONNECTION_NAME).close();
-    }
-  }
-  return bSuccess;
-}
-
-bool BaitaSQL::createTables(QString& error)
-{
-  error.clear();
-
-  if (!isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = true;
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " IMAGE_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          IMAGE_SQL_COL01 " TEXT NOT NULL UNIQUE,"
-                          IMAGE_SQL_COL02 " BYTEA)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CATEGORY_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          CATEGORY_SQL_COL01 " INTEGER,"
-                          CATEGORY_SQL_COL02 " TEXT NOT NULL UNIQUE,"
-                          "FOREIGN KEY(" CATEGORY_SQL_COL01 ") REFERENCES "
-                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " REMINDER_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          REMINDER_SQL_COL01 " TEXT,"
-                          REMINDER_SQL_COL02 " TEXT,"
-                          REMINDER_SQL_COL03 " BOOLEAN,"
-                          REMINDER_SQL_COL04 " INTEGER,"
-                          REMINDER_SQL_COL05 " INTEGER)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          USER_SQL_COL01 " TEXT NOT NULL UNIQUE,"
-                          USER_SQL_COL02 " TEXT NOT NULL,"
-                          USER_SQL_COL03 " BOOLEAN,"
-                          USER_SQL_COL04 " BOOLEAN,"
-                          USER_SQL_COL05 " BOOLEAN,"
-                          USER_SQL_COL06 " BOOLEAN,"
-                          USER_SQL_COL07 " BOOLEAN,"
-                          USER_SQL_COL08 " BOOLEAN,"
-                          USER_SQL_COL09 " BOOLEAN,"
-                          USER_SQL_COL10 " BOOLEAN,"
-                          USER_SQL_COL11 " BOOLEAN,"
-                          USER_SQL_COL12 " BOOLEAN,"
-                          USER_SQL_COL13 " BOOLEAN,"
-                          USER_SQL_COL14 " BOOLEAN,"
-                          USER_SQL_COL15 " BOOLEAN)");
-
-  if (bSuccess)
-  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
-                        SQL_COLID " SERIAL PRIMARY KEY,"
-                        PRODUCT_SQL_COL01 " TEXT NOT NULL UNIQUE,"
-                        PRODUCT_SQL_COL02 " INTEGER,"
-                        PRODUCT_SQL_COL03 " INTEGER,"
-                        PRODUCT_SQL_COL04 " TEXT NOT NULL,"
-                        PRODUCT_SQL_COL05 " TEXT,"
-                        PRODUCT_SQL_COL06 " BOOLEAN,"
-                        PRODUCT_SQL_COL07 " BOOLEAN,"
-                        PRODUCT_SQL_COL08 " BOOLEAN,"
-                        PRODUCT_SQL_COL09 " BOOLEAN,"
-                        PRODUCT_SQL_COL10 " BOOLEAN,"
-                        "FOREIGN KEY(" PRODUCT_SQL_COL02 ") REFERENCES "
-                        CATEGORY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
-                        "FOREIGN KEY(" PRODUCT_SQL_COL03 ") REFERENCES "
-                        IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PERSON_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          PERSON_SQL_COL01 " INTEGER,"
-                          PERSON_SQL_COL02 " TEXT NOT NULL UNIQUE,"
-                          PERSON_SQL_COL03 " TEXT,"
-                          PERSON_SQL_COL04 " TEXT,"
-                          PERSON_SQL_COL05 " TEXT,"
-                          PERSON_SQL_COL06 " TEXT,"
-                          PERSON_SQL_COL07 " TEXT,"
-                          PERSON_SQL_COL08 " DATE,"
-                          PERSON_SQL_COL09 " DATE,"
-                          PERSON_SQL_COL10 " BOOLEAN,"
-                          PERSON_SQL_COL11 " BOOLEAN,"
-                          PERSON_SQL_COL12 " BOOLEAN,"
-                          PERSON_SQL_COL13 " BOOLEAN,"
-                          PERSON_SQL_COL14 " TEXT,"
-                          "FOREIGN KEY(" PERSON_SQL_COL01 ") REFERENCES "
-                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
-  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " ADDRESS_SQL_TABLE_NAME " ("
-                        SQL_COLID " SERIAL PRIMARY KEY,"
-                        ADDRESS_SQL_COL01 " INTEGER,"
-                        ADDRESS_SQL_COL02 " TEXT,"
-                        ADDRESS_SQL_COL03 " TEXT,"
-                        ADDRESS_SQL_COL04 " TEXT,"
-                        ADDRESS_SQL_COL05 " INTEGER,"
-                        ADDRESS_SQL_COL06 " TEXT,"
-                        ADDRESS_SQL_COL07 " INTEGER,"
-                        ADDRESS_SQL_COL08 " TEXT,"
-                        ADDRESS_SQL_COL09 " TEXT,"
-                        "FOREIGN KEY(" ADDRESS_SQL_COL01 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
-
-  if (bSuccess)
-  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PHONE_SQL_TABLE_NAME " ("
-                        SQL_COLID " SERIAL PRIMARY KEY,"
-                        PHONE_SQL_COL01 " INTEGER,"
-                        PHONE_SQL_COL02 " INTEGER DEFAULT " PHONE_DEFAULT_COUNTRY_CODE_VALUE_STR ","
-                        PHONE_SQL_COL03 " INTEGER DEFAULT " PHONE_DEFAULT_CODE_VALUE_STR ","
-                        PHONE_SQL_COL04 " TEXT,"
-                        PHONE_SQL_COL05 " TEXT,"
-                        "FOREIGN KEY(" PHONE_SQL_COL01 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
-
-  if (bSuccess)
-  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("
-                        SQL_COLID " SERIAL PRIMARY KEY,"
-                        NOTE_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
-                        NOTE_SQL_COL02 " DATE NOT NULL,"
-                        NOTE_SQL_COL03 " INTEGER,"
-                        NOTE_SQL_COL04 " BOOLEAN,"
-                        NOTE_SQL_COL05 " TEXT,"
-                        NOTE_SQL_COL06 " REAL,"
-                        "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          NOTE_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
-                          NOTE_ITEMS_SQL_COL02 " INTEGER,"
-                          NOTE_ITEMS_SQL_COL03 " REAL,"
-                          NOTE_ITEMS_SQL_COL04 " REAL,"
-                          NOTE_ITEMS_SQL_COL05 " BOOLEAN,"
-                          NOTE_ITEMS_SQL_COL06 " TEXT,"
-                          NOTE_ITEMS_SQL_COL07 " REAL,"
-                          "FOREIGN KEY(" NOTE_ITEMS_SQL_COL01 ") REFERENCES "
-                          NOTE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" NOTE_ITEMS_SQL_COL02 ") REFERENCES "
-                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          SHOPPING_LIST_SQL_COL01 " INTEGER,"
-                          SHOPPING_LIST_SQL_COL02 " INTEGER,"
-                          SHOPPING_LIST_SQL_COL03 " TEXT NOT NULL,"
-                          SHOPPING_LIST_SQL_COL04 " TEXT,"
-                          SHOPPING_LIST_SQL_COL05 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL06 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL07 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL08 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL09 " TEXT,"
-                          SHOPPING_LIST_SQL_COL10 " TEXT,"
-                          SHOPPING_LIST_SQL_COL11 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL12 " BOOLEAN,"
-                          "FOREIGN KEY(" SHOPPING_LIST_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
-                          "FOREIGN KEY(" SHOPPING_LIST_SQL_COL02 ") REFERENCES "
-                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          SHOPPING_LIST_ITEMS_SQL_COL01 " INTEGER,"
-                          SHOPPING_LIST_ITEMS_SQL_COL02 " INTEGER,"
-                          SHOPPING_LIST_ITEMS_SQL_COL03 " REAL,"
-                          SHOPPING_LIST_ITEMS_SQL_COL04 " REAL,"
-                          SHOPPING_LIST_ITEMS_SQL_COL05 " BOOLEAN,"
-                          SHOPPING_LIST_ITEMS_SQL_COL06 " TEXT,"
-                          SHOPPING_LIST_ITEMS_SQL_COL07 " REAL,"
-                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL01 ") REFERENCES "
-                          SHOPPING_LIST_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL02 ") REFERENCES "
-                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " RESERVATION_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          RESERVATION_SQL_COL01 " INTEGER,"
-                          RESERVATION_SQL_COL02 " TEXT,"
-                          RESERVATION_SQL_COL03 " TEXT,"
-                          RESERVATION_SQL_COL04 " DATE,"
-                          RESERVATION_SQL_COL05 " INTEGER,"
-                          RESERVATION_SQL_COL06 " TEXT,"
-                          RESERVATION_SQL_COL07 " TEXT)");
-
-  QString temp = "CREATE TABLE IF NOT EXISTS " ACTIVE_USERS_SQL_TABLE_NAME " ("
-                 SQL_COLID " SERIAL PRIMARY KEY,"
-                 ACTIVE_USERS_SQL_COL01 " INTEGER,"
-                 ACTIVE_USERS_SQL_COL02 " TEXT,"
-                 ACTIVE_USERS_SQL_COL03 " TEXT,"
-                 ACTIVE_USERS_SQL_COL04 " TIMESTAMP)";
-  if (bSuccess)
-    bSuccess = query.exec(temp);
-
-  if (bSuccess)
-  {
-    query.exec("SELECT * FROM " USER_SQL_TABLE_NAME " LIMIT 1");
-    if (!query.next())
-    {
-      QString str = "INSERT INTO " USER_SQL_TABLE_NAME " ("
-                    USER_SQL_COL01 ","
-                    USER_SQL_COL02 ","
-                    USER_SQL_COL03 ","
-                    USER_SQL_COL04 ","
-                    USER_SQL_COL05 ","
-                    USER_SQL_COL06 ","
-                    USER_SQL_COL07 ","
-                    USER_SQL_COL08 ","
-                    USER_SQL_COL09 ","
-                    USER_SQL_COL10 ","
-                    USER_SQL_COL11 ","
-                    USER_SQL_COL12 ","
-                    USER_SQL_COL13 ","
-                    USER_SQL_COL14 ","
-                    USER_SQL_COL15 ")"
-                    " VALUES ('"
-                    USER_SQL_DEFAULT_NAME "',"
-                    ":_password,"
-                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
-      query.prepare(str);
-      query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
-      bSuccess = query.exec();
-    }
-  }
-
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-  {
-    bSuccess = db.commit();
-    if (!bSuccess)
-      error = db.lastError().text();
-    return bSuccess;
-  }
 }
 
 bool ProductSQL::execSelect(QSqlQuery& query,
@@ -1639,11 +1651,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
                 PERSON_SQL_COL07 ","
                 PERSON_SQL_COL08 ","
                 PERSON_SQL_COL09 ","
-                PERSON_SQL_COL10 ","
-                PERSON_SQL_COL11 ","
-                PERSON_SQL_COL12 ","
-                PERSON_SQL_COL13 ","
-                PERSON_SQL_COL14
+                PERSON_SQL_COL10
                 " FROM " PERSON_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -1664,10 +1672,34 @@ bool PersonSQL::execSelect(QSqlQuery& query,
       person.m_dtBirth = query.value(7).toDate();
       person.m_dtCreation = query.value(8).toDate();
       person.m_bCompany = query.value(9).toBool();
-      person.m_bCustomer = query.value(10).toBool();
-      person.m_bSupplier = query.value(11).toBool();
-      person.m_bEmployee = query.value(12).toBool();
-      person.m_employeePinCode = query.value(13).toString();
+    }
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("SELECT "
+                  EMPLOYEE_SQL_COL02
+                  " FROM " EMPLOYEE_SQL_TABLE_NAME
+                  " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", id);
+    bSuccess = query.exec();
+    if (bSuccess && query.next())
+    {
+      person.m_employee.m_bIsEmployee = true;
+      person.m_employee.m_pincode = query.value(0).toString();
+    }
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("SELECT * "
+                  " FROM " SUPPLIER_SQL_TABLE_NAME
+                  " WHERE " SUPPLIER_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", id);
+    bSuccess = query.exec();
+    if (bSuccess && query.next())
+    {
+      person.m_supplier.m_bIsSupplier = true;
     }
   }
 
@@ -1751,13 +1783,12 @@ bool PersonSQL::execByPinCodeSelect(QSqlQuery& query,
   error.clear();
 
   query.prepare("SELECT "
-                SQL_COLID
-                " FROM " PERSON_SQL_TABLE_NAME
-                " WHERE " PERSON_SQL_COL14 " = (:_v14) AND "
-                PERSON_SQL_COL13 " = TRUE");
-  query.bindValue(":_v14", pincode);
-  bool bSuccess = query.exec();
+                EMPLOYEE_SQL_COL01
+                " FROM " EMPLOYEE_SQL_TABLE_NAME
+                " WHERE " EMPLOYEE_SQL_COL02 " = (:_v02) LIMIT 1");
+  query.bindValue(":_v02", pincode);
 
+  bool bSuccess = query.exec();
   if (bSuccess)
   {
     if (query.next())
@@ -1815,11 +1846,7 @@ bool PersonSQL::insert(const Person& person,
                 PERSON_SQL_COL07 ","
                 PERSON_SQL_COL08 ","
                 PERSON_SQL_COL09 ","
-                PERSON_SQL_COL10 ","
-                PERSON_SQL_COL11 ","
-                PERSON_SQL_COL12 ","
-                PERSON_SQL_COL13 ","
-                PERSON_SQL_COL14  ")"
+                PERSON_SQL_COL10 ")"
                 " VALUES ("
                 "(:_v02),"
                 "(:_v03),"
@@ -1829,11 +1856,7 @@ bool PersonSQL::insert(const Person& person,
                 "(:_v07),"
                 "(:_v08),"
                 "(:_v09),"
-                "(:_v10),"
-                "(:_v11),"
-                "(:_v12),"
-                "(:_v13),"
-                "(:_v14))");
+                "(:_v10))");
   query.bindValue(":_v02", person.m_name);
   query.bindValue(":_v03", person.m_alias);
   query.bindValue(":_v04", person.m_email);
@@ -1843,16 +1866,36 @@ bool PersonSQL::insert(const Person& person,
   query.bindValue(":_v08", person.m_dtBirth);
   query.bindValue(":_v09", person.m_dtCreation);
   query.bindValue(":_v10", person.m_bCompany);
-  query.bindValue(":_v11", person.m_bCustomer);
-  query.bindValue(":_v12", person.m_bSupplier);
-  query.bindValue(":_v13", person.m_bEmployee);
-  query.bindValue(":_v14", person.m_employeePinCode);
 
   bool bSuccess = query.exec();
   if (bSuccess)
   {
     person.m_id = query.lastInsertId().toLongLong();
-    if (person.m_image.isValidId())
+
+    if (person.m_employee.m_bIsEmployee)
+    {
+      query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
+                    EMPLOYEE_SQL_COL01 ","
+                    EMPLOYEE_SQL_COL02 ")"
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02))");
+      query.bindValue(":_v01", person.m_id);
+      query.bindValue(":_v02", person.m_employee.m_pincode);
+      bSuccess = query.exec();
+    }
+
+    if (bSuccess && person.m_supplier.m_bIsSupplier)
+    {
+      query.prepare("INSERT INTO " SUPPLIER_SQL_TABLE_NAME " ("
+                    SUPPLIER_SQL_COL01 ")"
+                    " VALUES ("
+                    "(:_v01))");
+      query.bindValue(":_v01", person.m_id);
+      bSuccess = query.exec();
+    }
+
+    if (bSuccess && person.m_image.isValidId())
     {
       query.prepare("UPDATE " PERSON_SQL_TABLE_NAME " SET "
                     PERSON_SQL_COL01 " = (:_v01)"
@@ -1861,75 +1904,75 @@ bool PersonSQL::insert(const Person& person,
       query.bindValue(":_v01", person.m_image.m_id);
       bSuccess = query.exec();
     }
-  }
 
-  if (bSuccess)
-  {
-    for (int i = 0; i != person.m_vPhone.size(); ++i)
+    if (bSuccess)
     {
-      query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
-                    PHONE_SQL_COL01 ","
-                    PHONE_SQL_COL02 ","
-                    PHONE_SQL_COL03 ","
-                    PHONE_SQL_COL04 ","
-                    PHONE_SQL_COL05 ")"
-                    " VALUES ("
-                    "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
-                    "(:_v04),"
-                    "(:_v05))");
-      query.bindValue(":_v01", person.m_id);
-      query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
-      query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
-      query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
-      query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
-      bSuccess = query.exec();
-      if (bSuccess)
-        person.m_vPhone.at(i).m_id = query.lastInsertId().toLongLong();
-      else
-        break;
+      for (int i = 0; i != person.m_vPhone.size(); ++i)
+      {
+        query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
+                      PHONE_SQL_COL01 ","
+                      PHONE_SQL_COL02 ","
+                      PHONE_SQL_COL03 ","
+                      PHONE_SQL_COL04 ","
+                      PHONE_SQL_COL05 ")"
+                      " VALUES ("
+                      "(:_v01),"
+                      "(:_v02),"
+                      "(:_v03),"
+                      "(:_v04),"
+                      "(:_v05))");
+        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
+        query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
+        query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
+        query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
+        bSuccess = query.exec();
+        if (bSuccess)
+          person.m_vPhone.at(i).m_id = query.lastInsertId().toLongLong();
+        else
+          break;
+      }
     }
-  }
 
-  if (bSuccess)
-  {
-    for (int i = 0; i != person.m_vAddress.size(); ++i)
+    if (bSuccess)
     {
-      query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
-                    ADDRESS_SQL_COL01 ","
-                    ADDRESS_SQL_COL02 ","
-                    ADDRESS_SQL_COL03 ","
-                    ADDRESS_SQL_COL04 ","
-                    ADDRESS_SQL_COL05 ","
-                    ADDRESS_SQL_COL06 ","
-                    ADDRESS_SQL_COL07 ","
-                    ADDRESS_SQL_COL08 ","
-                    ADDRESS_SQL_COL09 ")"
-                    " VALUES ("
-                    "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
-                    "(:_v04),"
-                    "(:_v05),"
-                    "(:_v06),"
-                    "(:_v07),"
-                    "(:_v08),"
-                    "(:_v09))");
-      query.bindValue(":_v01", person.m_id);
-      query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
-      query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
-      query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
-      query.bindValue(":_v05", person.m_vAddress.at(i).m_number);
-      query.bindValue(":_v06", person.m_vAddress.at(i).m_city);
-      query.bindValue(":_v07", (int)person.m_vAddress.at(i).m_state);
-      query.bindValue(":_v08", person.m_vAddress.at(i).m_complement);
-      query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
-      bSuccess = query.exec();
-      if (bSuccess)
-        person.m_vAddress.at(i).m_id = query.lastInsertId().toLongLong();
-      else
-        break;
+      for (int i = 0; i != person.m_vAddress.size(); ++i)
+      {
+        query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
+                      ADDRESS_SQL_COL01 ","
+                      ADDRESS_SQL_COL02 ","
+                      ADDRESS_SQL_COL03 ","
+                      ADDRESS_SQL_COL04 ","
+                      ADDRESS_SQL_COL05 ","
+                      ADDRESS_SQL_COL06 ","
+                      ADDRESS_SQL_COL07 ","
+                      ADDRESS_SQL_COL08 ","
+                      ADDRESS_SQL_COL09 ")"
+                      " VALUES ("
+                      "(:_v01),"
+                      "(:_v02),"
+                      "(:_v03),"
+                      "(:_v04),"
+                      "(:_v05),"
+                      "(:_v06),"
+                      "(:_v07),"
+                      "(:_v08),"
+                      "(:_v09))");
+        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
+        query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
+        query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
+        query.bindValue(":_v05", person.m_vAddress.at(i).m_number);
+        query.bindValue(":_v06", person.m_vAddress.at(i).m_city);
+        query.bindValue(":_v07", (int)person.m_vAddress.at(i).m_state);
+        query.bindValue(":_v08", person.m_vAddress.at(i).m_complement);
+        query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
+        bSuccess = query.exec();
+        if (bSuccess)
+          person.m_vAddress.at(i).m_id = query.lastInsertId().toLongLong();
+        else
+          break;
+      }
     }
   }
 
@@ -1957,11 +2000,7 @@ bool PersonSQL::update(const Person& person,
                 PERSON_SQL_COL07 " = (:_v07),"
                 PERSON_SQL_COL08 " = (:_v08),"
                 PERSON_SQL_COL09 " = (:_v09),"
-                PERSON_SQL_COL10 " = (:_v10),"
-                PERSON_SQL_COL11 " = (:_v11),"
-                PERSON_SQL_COL12 " = (:_v12),"
-                PERSON_SQL_COL13 " = (:_v13),"
-                PERSON_SQL_COL14 " = (:_v14)"
+                PERSON_SQL_COL10 " = (:_v10)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", person.m_id);
   query.bindValue(":_v02", person.m_name);
@@ -1973,11 +2012,46 @@ bool PersonSQL::update(const Person& person,
   query.bindValue(":_v08", person.m_dtBirth);
   query.bindValue(":_v09", person.m_dtCreation);
   query.bindValue(":_v10", person.m_bCompany);
-  query.bindValue(":_v11", person.m_bCustomer);
-  query.bindValue(":_v12", person.m_bSupplier);
-  query.bindValue(":_v13", person.m_bEmployee);
-  query.bindValue(":_v14", person.m_employeePinCode);
   bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " EMPLOYEE_SQL_TABLE_NAME
+                  " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", person.m_id);
+    bSuccess = query.exec();
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " SUPPLIER_SQL_TABLE_NAME
+                  " WHERE " SUPPLIER_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", person.m_id);
+    bSuccess = query.exec();
+  }
+
+  if (person.m_employee.m_bIsEmployee)
+  {
+    query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
+                  EMPLOYEE_SQL_COL01 ","
+                  EMPLOYEE_SQL_COL02 ")"
+                  " VALUES ("
+                  "(:_v01),"
+                  "(:_v02))");
+    query.bindValue(":_v01", person.m_id);
+    query.bindValue(":_v02", person.m_employee.m_pincode);
+    bSuccess = query.exec();
+  }
+
+  if (bSuccess && person.m_supplier.m_bIsSupplier)
+  {
+    query.prepare("INSERT INTO " SUPPLIER_SQL_TABLE_NAME " ("
+                  SUPPLIER_SQL_COL01 ")"
+                  " VALUES ("
+                  "(:_v01))");
+    query.bindValue(":_v01", person.m_id);
+    bSuccess = query.exec();
+  }
 
   if (bSuccess && person.m_image.isValidId())
   {

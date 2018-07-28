@@ -111,16 +111,6 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5"/>
       </widget>
-      <widget class="QWidget" name="tabConsumption">
-       <attribute name="icon">
-        <iconset resource="icons.qrc">
-         <normaloff>:/icons/res/stock.png</normaloff>:/icons/res/stock.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Consumo</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3"/>
-      </widget>
       <widget class="QWidget" name="tabReservation">
        <attribute name="icon">
         <iconset resource="icons.qrc">

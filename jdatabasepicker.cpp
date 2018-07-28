@@ -206,6 +206,7 @@ void JDatabasePicker::setItem(qlonglong id,
 
 void JDatabasePicker::searchItem()
 {
+  m_selector->getDatabase()->refresh();
   m_selector->exec();
 }
 
@@ -230,6 +231,7 @@ void JDatabasePicker::clear()
       emit changedSignal();
   }
 }
+
 void JDatabasePicker::clearAll()
 {
   if (m_bMultipicker)

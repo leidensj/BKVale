@@ -22,6 +22,7 @@
 #include "databaseutils.h"
 #include <QSplitter>
 #include <QAction>
+#include <QGroupBox>
 
 // Serviço de busca de cep em:
 // http://postmon.com.br/
@@ -88,9 +89,6 @@ PersonView::PersonView(QWidget* parent)
   , m_dtBirthDate(nullptr)
   , m_cbBirthDate(nullptr)
   , m_imagePicker(nullptr)
-  , m_cbCustomer(nullptr)
-  , m_cbSupplier(nullptr)
-  , m_cbEmployee(nullptr)
   , m_dtCreationDate(nullptr)
   , m_edPinCode(nullptr)
   , m_spnPhoneCountryCode(nullptr)
@@ -113,6 +111,9 @@ PersonView::PersonView(QWidget* parent)
   , m_btnRemoveAddress(nullptr)
   , m_lstAddress(nullptr)
   , m_database(nullptr)
+  , m_tab(nullptr)
+  , m_grpEmployee(nullptr)
+  , m_grpSupplier(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -165,15 +166,6 @@ PersonView::PersonView(QWidget* parent)
                                       true,
                                       true,
                                       false);
-  m_cbCustomer = new QCheckBox;
-  m_cbCustomer->setText(tr("Cliente"));
-  m_cbCustomer->setIcon(QIcon(":/icons/res/client.png"));
-  m_cbSupplier = new QCheckBox;
-  m_cbSupplier->setText(tr("Fornecedor"));
-  m_cbSupplier->setIcon(QIcon(":/icons/res/supplier.png"));
-  m_cbEmployee = new QCheckBox;
-  m_cbEmployee->setText(tr("Funcionário"));
-  m_cbEmployee->setIcon(QIcon(":/icons/res/employee.png"));
   m_dtCreationDate = new QDateEdit;
   m_dtCreationDate->setCalendarPopup(true);
   m_dtCreationDate->setDisplayFormat("dd/MM/yyyy");
@@ -330,13 +322,6 @@ PersonView::PersonView(QWidget* parent)
   dateLayout->addWidget(m_cbBirthDate);
   dateLayout->addWidget(m_dtBirthDate);
 
-  QVBoxLayout* typeLayout = new QVBoxLayout();
-  typeLayout->setAlignment(Qt::AlignTop);
-  typeLayout->addWidget(m_cbCustomer);
-  typeLayout->addWidget(m_cbSupplier);
-  typeLayout->addWidget(m_cbEmployee);
-  typeLayout->addWidget(m_edPinCode);
-
   QVBoxLayout* informationLayout = new QVBoxLayout;
   informationLayout->addLayout(personLayout);
   informationLayout->addLayout(formLayout);
@@ -353,11 +338,40 @@ PersonView::PersonView(QWidget* parent)
   addressLayout->addLayout(addressInformationLayout);
   addressLayout->addWidget(m_lstAddress);
 
+  m_grpEmployee = new QGroupBox;
+  m_grpEmployee->setTitle(tr("Disponível"));
+  m_grpEmployee->setCheckable(true);
+  m_grpEmployee->setChecked(false);
+  QVBoxLayout* employeeLayout = new QVBoxLayout;
+  employeeLayout->setAlignment(Qt::AlignTop);
+  QHBoxLayout* pincodeLayout = new QHBoxLayout;
+  pincodeLayout->setContentsMargins(0, 0, 0, 0);
+  pincodeLayout->addWidget(m_edPinCode);
+  employeeLayout->addLayout(pincodeLayout);
+  m_grpEmployee->setLayout(employeeLayout);
+
+  QVBoxLayout* employeeFrameLayout = new QVBoxLayout;
+  employeeFrameLayout->addWidget(m_grpEmployee);
+
+  m_grpSupplier = new QGroupBox;
+  m_grpSupplier->setTitle(tr("Disponível"));
+  m_grpSupplier->setCheckable(true);
+  m_grpSupplier->setChecked(false);
+  QVBoxLayout* supplierLayout = new QVBoxLayout;
+  supplierLayout->setAlignment(Qt::AlignTop);
+  m_grpSupplier->setLayout(supplierLayout);
+
+  QVBoxLayout* supplierFrameLayout = new QVBoxLayout;
+  supplierFrameLayout->addWidget(m_grpSupplier);
+
   QFrame* informationFrame = new QFrame;
   informationFrame->setLayout(informationLayout);
 
-  QFrame* typeFrame = new QFrame;
-  typeFrame->setLayout(typeLayout);
+  QFrame* employeeFrame = new QFrame;
+  employeeFrame->setLayout(employeeFrameLayout);
+
+  QFrame* supplierFrame = new QFrame;
+  supplierFrame->setLayout(supplierFrameLayout);
 
   QFrame* phoneFrame = new QFrame;
   phoneFrame->setLayout(phoneLayout);
@@ -365,26 +379,29 @@ PersonView::PersonView(QWidget* parent)
   QFrame* addressFrame = new QFrame;
   addressFrame->setLayout(addressLayout);
 
-  QTabWidget* tabWidget = new QTabWidget;
-  tabWidget->addTab(informationFrame,
-                    QIcon(":/icons/res/details.png"),
-                    tr("Informações"));
-  tabWidget->addTab(typeFrame,
-                    QIcon(":/icons/res/check.png"),
-                    tr("Disponibilidade"));
-  tabWidget->addTab(phoneFrame,
-                    QIcon(":/icons/res/phone.png"),
-                    tr("Telefone"));
-  tabWidget->addTab(addressFrame,
-                    QIcon(":/icons/res/address.png"),
-                    tr("Endereço"));
+  m_tab = new QTabWidget;
+  m_tab->addTab(informationFrame,
+                QIcon(":/icons/res/details.png"),
+                tr("Informações"));
+  m_tab->addTab(employeeFrame,
+                QIcon(":/icons/res/employee.png"),
+                tr("Funcionário"));
+  m_tab->addTab(supplierFrame,
+                QIcon(":/icons/res/supplier.png"),
+                tr("Fornecedor"));
+  m_tab->addTab(phoneFrame,
+                QIcon(":/icons/res/phone.png"),
+                tr("Telefone"));
+  m_tab->addTab(addressFrame,
+                QIcon(":/icons/res/address.png"),
+                tr("Endereço"));
 
   m_database = new JDatabase(PERSON_SQL_TABLE_NAME);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setAlignment(Qt::AlignTop);
   viewLayout->addLayout(buttonLayout);
-  viewLayout->addWidget(tabWidget);
+  viewLayout->addWidget(m_tab);
 
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
@@ -405,7 +422,11 @@ PersonView::PersonView(QWidget* parent)
                    SIGNAL(toggled(bool)),
                    this,
                    SLOT(switchUserType()));
-  QObject::connect(m_cbEmployee,
+  QObject::connect(m_grpEmployee,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_grpSupplier,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
@@ -491,10 +512,10 @@ Person PersonView::getPerson() const
                      ? m_dtBirthDate->date() : QDate(1800, 1, 1);
   person.m_dtCreation = m_dtCreationDate->date();
   person.m_bCompany = m_rdoCompany->isChecked();
-  person.m_bCustomer = m_cbCustomer->isChecked();
-  person.m_bSupplier = m_cbSupplier->isChecked();
-  person.m_bEmployee = m_cbEmployee->isChecked();
-  person.m_employeePinCode = m_edPinCode->text();
+
+  person.m_supplier.m_bIsSupplier = m_grpSupplier->isChecked();
+  person.m_employee.m_bIsEmployee = m_grpEmployee->isChecked();
+  person.m_employee.m_pincode = m_grpEmployee->isChecked() ? m_edPinCode->text() : "";
 
   for (int i = 0; i != m_lstPhone->count(); ++i)
     person.m_vPhone.push_back(m_lstPhone->item(i)->data(Qt::UserRole).value<Phone>());
@@ -519,10 +540,13 @@ void PersonView::setPerson(const Person &person)
   m_dtBirthDate->setDate(m_cbBirthDate->isChecked() ? person.m_dtBirth : QDate(1800, 1, 1));
   m_dtCreationDate->setDate(person.m_dtCreation);
   m_rdoCompany->setChecked(person.m_bCompany);
-  m_cbCustomer->setChecked(person.m_bCustomer);
-  m_cbSupplier->setChecked(person.m_bSupplier);
-  m_cbEmployee->setChecked(person.m_bEmployee);
+  m_grpSupplier->setChecked(person.m_supplier.m_bIsSupplier);
+  m_grpEmployee->setChecked(person.m_employee.m_bIsEmployee);
   switchUserType();
+
+  m_edPinCode->clear();
+  if (person.m_employee.m_bIsEmployee)
+    m_edPinCode->setText(person.m_employee.m_pincode);
 
   m_lstPhone->clear();
   m_lstAddress->clear();
@@ -538,6 +562,7 @@ void PersonView::setPerson(const Person &person)
 
 void PersonView::create()
 {
+  m_tab->setCurrentIndex(0);
   m_currentId = INVALID_ID;
   setPerson(Person());
   updateControls();
@@ -548,7 +573,7 @@ void PersonView::updateControls()
   m_btnSave->setIcon(QIcon(IS_VALID_ID(m_currentId)
                            ? ":/icons/res/saveas.png"
                            : ":/icons/res/save.png"));
-  m_edPinCode->setEnabled(m_cbEmployee->isChecked());
+  m_edPinCode->setEnabled(m_grpEmployee->isChecked());
   m_dtBirthDate->setEnabled(m_cbBirthDate->isChecked());
   if (m_cbBirthDate->isChecked() &&
       m_dtBirthDate->date() == m_dtBirthDate->minimumDate())
@@ -570,8 +595,6 @@ void PersonView::switchUserType()
     m_edCpfCnpj->setInputMask("99.999.999/9999-99;_");
     m_edRgIE->clear();
     m_edRgIE->setInputMask("");
-    m_cbEmployee->setChecked(false);
-    m_edPinCode->setEnabled(false);
     m_cbBirthDate->setEnabled(false);
     m_dtBirthDate->setEnabled(false);
   }
@@ -585,7 +608,6 @@ void PersonView::switchUserType()
     m_edCpfCnpj->setInputMask("999.999.999-99;_");
     m_edRgIE->clear();
     m_edRgIE->setInputMask("9999999999;_");
-    m_cbEmployee->setEnabled(true);
     m_cbBirthDate->setEnabled(true);
     m_dtBirthDate->setEnabled(true);
   }

@@ -258,8 +258,6 @@ void BaitaAssistant::print()
           m_reminder->create();
       }
     } break;
-    case Functionality::ConsumptionMode:
-      break;
     case Functionality::CalculatorMode:
       print(m_calculator->getFullContent() + Printer::strCmdFullCut());
       break;
@@ -342,8 +340,6 @@ void BaitaAssistant::updateControls()
                                bIsSQLOk && m_userLogin.hasAccessToCalculator());
   ui->tabWidget->setTabEnabled((int)Functionality::ShopMode,
                                bIsSQLOk && m_userLogin.hasAccessToShop());
-  ui->tabWidget->setTabEnabled((int)Functionality::ConsumptionMode,
-                               bIsSQLOk && m_userLogin.hasAccessToConsumption());
   ui->tabWidget->setTabEnabled((int)Functionality::ReservationMode,
                                bIsSQLOk && m_userLogin.hasAccessToReservations());
 
@@ -357,8 +353,6 @@ void BaitaAssistant::updateControls()
       break;
       case Functionality::CalculatorMode:
       ui->actionPrint->setEnabled(true);
-      break;
-    case Functionality::ConsumptionMode:
       break;
     case Functionality::ShopMode:
       ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId());

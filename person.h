@@ -11,6 +11,37 @@
 #include <QVector>
 #include <QDate>
 
+struct Employee
+{
+  bool m_bIsEmployee;
+  QString m_pincode;
+  void clear()
+  {
+    m_bIsEmployee = false;
+    m_pincode.clear();
+  }
+
+  Employee()
+  {
+    clear();
+  }
+};
+
+struct Supplier
+{
+  bool m_bIsSupplier;
+
+  void clear()
+  {
+    m_bIsSupplier = false;
+  }
+
+  Supplier()
+  {
+    clear();
+  }
+};
+
 struct Person : public JItem
 {
   Image m_image;
@@ -23,10 +54,8 @@ struct Person : public JItem
   QDate m_dtBirth;
   QDate m_dtCreation;
   bool m_bCompany;
-  bool m_bCustomer;
-  bool m_bSupplier;
-  bool m_bEmployee;
-  QString m_employeePinCode;
+  Supplier m_supplier;
+  Employee m_employee;
   QVector<Phone> m_vPhone;
   QVector<Address> m_vAddress;
 
@@ -43,12 +72,12 @@ struct Person : public JItem
     m_dtBirth = QDate::currentDate();
     m_dtCreation = QDate::currentDate();
     m_bCompany = false;
-    m_bCustomer = false;
-    m_bSupplier = false;
-    m_bEmployee = false;
-    m_employeePinCode.clear();
+    m_supplier.clear();
+    m_employee.clear();
     m_vPhone.clear();
     m_vAddress.clear();
+    m_supplier.clear();
+    m_employee.clear();
   }
 
   Person()
@@ -72,17 +101,19 @@ struct Person : public JItem
               m_RG_IE != another.m_RG_IE ||
               m_details != another.m_details ||
               m_bCompany != another.m_bCompany ||
-              m_bCustomer != another.m_bCustomer ||
-              m_bSupplier != another.m_bSupplier ||
-              m_bEmployee != another.m_bEmployee ||
               m_vPhone != another.m_vPhone ||
               m_vAddress != another.m_vAddress;
 
     if (!m_bCompany)
       b = b || m_dtBirth != another.m_dtBirth;
 
-    if (m_bEmployee)
-      b = b || m_employeePinCode != another.m_employeePinCode;
+    if (m_employee.m_bIsEmployee)
+    {
+      b = b || m_employee.m_pincode != another.m_employee.m_pincode;
+    }
+
+    if (m_supplier.m_bIsSupplier)
+      b = b; //NOTHING TODO
 
     return b;
   }
@@ -95,8 +126,6 @@ struct Person : public JItem
   bool isValid() const
   {
     bool b = !m_name.isEmpty();
-    if (m_bEmployee)
-      b = b && !m_employeePinCode.isEmpty();
     return b;
   }
 };

@@ -11,6 +11,7 @@
 #include <QPropertyAnimation>
 #include "settings.h"
 #include "jspinbox.h"
+#include <QApplication>
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
@@ -226,6 +227,9 @@ void LoginDialog::keyPressEvent(QKeyEvent* event)
 
 void LoginDialog::login()
 {
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  m_status->setText("");
+  m_status->setMaximumHeight(0);
   QString error;
   bool bSuccess = BaitaSQL::init(m_hostName->text(), m_port->value(), error);
   if (bSuccess)
@@ -257,6 +261,8 @@ void LoginDialog::login()
     m_status->setText(error);
     m_status->setMaximumHeight(m_status->sizeHint().height());
   }
+
+  QApplication::restoreOverrideCursor();
 }
 
 void LoginDialog::showDatabaseOpt()

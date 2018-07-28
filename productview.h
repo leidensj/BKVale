@@ -12,6 +12,7 @@ class QPushButton;
 class QCheckBox;
 class JDatabasePicker;
 class JDatabase;
+class QTabWidget;
 
 class ProductView : public QFrame
 {
@@ -46,6 +47,7 @@ private:
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
   JDatabase* m_database;
+  QTabWidget* m_tab;
 };
 
 #endif // PRODUCTVIEW_H

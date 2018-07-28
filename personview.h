@@ -20,6 +20,7 @@ class QSpinBox;
 class QListWidget;
 class QComboBox;
 class JDatabase;
+class QGroupBox;
 
 Q_DECLARE_METATYPE(Phone)
 Q_DECLARE_METATYPE(Address)
@@ -79,9 +80,6 @@ private:
   QDateEdit* m_dtBirthDate;
   QCheckBox* m_cbBirthDate;
   JDatabasePicker* m_imagePicker;
-  QCheckBox* m_cbCustomer;
-  QCheckBox* m_cbSupplier;
-  QCheckBox* m_cbEmployee;
   QDateEdit* m_dtCreationDate;
   JLineEdit* m_edPinCode;
 
@@ -107,6 +105,9 @@ private:
   QListWidget* m_lstAddress;
 
   JDatabase* m_database;
+  QTabWidget* m_tab;
+  QGroupBox* m_grpEmployee;
+  QGroupBox* m_grpSupplier;
 };
 
 #endif // PERSONVIEW_H

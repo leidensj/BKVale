@@ -26,6 +26,7 @@ ProductView::ProductView(QWidget* parent)
   , m_categoryPicker(nullptr)
   , m_imagePicker(nullptr)
   , m_database(nullptr)
+  , m_tab(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -120,21 +121,21 @@ ProductView::ProductView(QWidget* parent)
   QFrame* tabAvailableFrame = new QFrame;
   tabAvailableFrame->setLayout(tabAvailablelayout);
 
-  QTabWidget* tabWidget = new QTabWidget;
+  m_tab = new QTabWidget;
 
-  tabWidget->addTab(tabInfoFrame,
-                    QIcon(":/icons/res/details.png"),
-                    tr("Informações"));
+  m_tab->addTab(tabInfoFrame,
+                QIcon(":/icons/res/details.png"),
+                tr("Informações"));
 
-  tabWidget->addTab(tabAvailableFrame,
-                    QIcon(":/icons/res/check.png"),
-                    tr("Disponibilidade"));
+  m_tab->addTab(tabAvailableFrame,
+                QIcon(":/icons/res/check.png"),
+                tr("Disponibilidade"));
 
   QVBoxLayout* viewlayout = new QVBoxLayout;
   viewlayout->setContentsMargins(9, 0, 0, 0);
   viewlayout->setAlignment(Qt::AlignTop);
   viewlayout->addLayout(buttonlayout);
-  viewlayout->addWidget(tabWidget);
+  viewlayout->addWidget(m_tab);
 
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewlayout);
@@ -210,6 +211,7 @@ void ProductView::setProduct(const Product &product)
 
 void ProductView::create()
 {
+  m_tab->setCurrentIndex(0);
   Product product;
   setProduct(product);
 }

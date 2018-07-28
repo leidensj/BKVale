@@ -9,6 +9,7 @@ class QLabel;
 class QPushButton;
 class QFrame;
 class JSpinBox;
+class QProgressBar;
 
 class LoginDialog : public QDialog
 {

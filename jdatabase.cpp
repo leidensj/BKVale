@@ -575,14 +575,6 @@ JDatabase::JDatabase(const QString& tableName,
   m_btnOpen->setToolTip(tr("Abrir (Ctrl+O)"));
   m_btnOpen->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
 
-  m_btnRefresh = new QPushButton();
-  m_btnRefresh->setFlat(true);
-  m_btnRefresh->setText("");
-  m_btnRefresh->setIconSize(QSize(24, 24));
-  m_btnRefresh->setIcon(QIcon(":/icons/res/refresh.png"));
-  m_btnRefresh->setToolTip(tr("Atualizar (F5)"));
-  m_btnRefresh->setShortcut(QKeySequence(Qt::Key_F5));
-
   m_btnRemove = new QPushButton();
   m_btnRemove->setFlat(true);
   m_btnRemove->setText("");
@@ -604,11 +596,18 @@ JDatabase::JDatabase(const QString& tableName,
   m_btnFilterClear->setToolTip(tr("Limpar filtro"));
   m_btnFilterClear->setIcon(QIcon(":/icons/res/filterclear.png"));
 
+  m_btnRefresh = new QPushButton();
+  m_btnRefresh->setFlat(true);
+  m_btnRefresh->setText("");
+  m_btnRefresh->setIconSize(QSize(16, 16));
+  m_btnRefresh->setIcon(QIcon(":/icons/res/refresh.png"));
+  m_btnRefresh->setToolTip(tr("Atualizar (F5)"));
+  m_btnRefresh->setShortcut(QKeySequence(Qt::Key_F5));
+
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->setContentsMargins(0, 0, 0, 0);
   hlayout0->setAlignment(Qt::AlignLeft);
   hlayout0->addWidget(m_btnOpen);
-  hlayout0->addWidget(m_btnRefresh);
   hlayout0->addWidget(m_btnRemove);
   hlayout0->addWidget(m_btnFilter);
   hlayout0->addWidget(m_btnFilterClear);
@@ -626,6 +625,7 @@ JDatabase::JDatabase(const QString& tableName,
 
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
+  hlayout1->addWidget(m_btnRefresh);
   hlayout1->addWidget(m_edFilterSearch);
   hlayout1->addWidget(m_cbContains);
 
@@ -752,7 +752,6 @@ JDatabase::JDatabase(const QString& tableName,
   if (m_mode == Mode::Selector)
   {
     m_btnOpen->hide();
-    m_btnRefresh->hide();
     m_btnFilter->hide();
     m_btnRemove->setEnabled(false);
     m_btnRemove->hide();

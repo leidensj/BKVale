@@ -25,7 +25,6 @@ enum class Functionality : int
   ReminderMode,
   CalculatorMode,
   ShopMode,
-  ConsumptionMode,
   ReservationMode
 };
 

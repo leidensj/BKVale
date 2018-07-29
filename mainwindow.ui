@@ -153,6 +153,8 @@
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionInfo"/>
+   <addaction name="separator"/>
+   <addaction name="actionExit"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -358,6 +360,15 @@
    </property>
    <property name="toolTip">
     <string>Mostra os usuários logados no sistema</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/exit.png</normaloff>:/icons/res/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Sair</string>
    </property>
   </action>
  </widget>

@@ -29,6 +29,8 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   , m_accessUser(nullptr)
   , m_accessProduct(nullptr)
   , m_accessPerson(nullptr)
+  , m_accessEmployee(nullptr)
+  , m_accessSupplier(nullptr)
   , m_accessCategory(nullptr)
   , m_accessImage(nullptr)
   , m_accessReservation(nullptr)
@@ -110,6 +112,14 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   m_accessPerson->setIcon(QIcon(":/icons/res/person.png"));
   m_accessPerson->setText(tr("Pessoas"));
 
+  m_accessEmployee = new QCheckBox;
+  m_accessEmployee->setIcon(QIcon(":/icons/res/employee.png"));
+  m_accessEmployee->setText(tr("Funcionários"));
+
+  m_accessSupplier = new QCheckBox;
+  m_accessSupplier->setIcon(QIcon(":/icons/res/supplier.png"));
+  m_accessSupplier->setText(tr("Fornecedores"));
+
   m_accessCategory = new QCheckBox;
   m_accessCategory->setIcon(QIcon(":/icons/res/category.png"));
   m_accessCategory->setText(tr("Categorias"));
@@ -153,6 +163,8 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   tabPermissionslayout->addWidget(m_accessUser);
   tabPermissionslayout->addWidget(m_accessProduct);
   tabPermissionslayout->addWidget(m_accessPerson);
+  tabPermissionslayout->addWidget(m_accessEmployee);
+  tabPermissionslayout->addWidget(m_accessSupplier);
   tabPermissionslayout->addWidget(m_accessCategory);
   tabPermissionslayout->addWidget(m_accessImage);
   tabPermissionslayout->addWidget(m_accessShoppingList);
@@ -240,6 +252,8 @@ User UserMgtView::getUser() const
   user.m_bAccessUser = m_accessUser->isChecked();
   user.m_bAccessProduct = m_accessProduct->isChecked();
   user.m_bAccessPerson = m_accessPerson->isChecked();
+  user.m_bAccessEmployee = m_accessEmployee->isChecked();
+  user.m_bAccessSupplier = m_accessSupplier->isChecked();
   user.m_bAccessCategory = m_accessCategory->isChecked();
   user.m_bAccessImage = m_accessImage->isChecked();
   user.m_bAccessSettings = m_accessSettings->isChecked();
@@ -250,7 +264,11 @@ User UserMgtView::getUser() const
 
 void UserMgtView::setUser(const User& user)
 {
-  m_lblPasswordMsg->show();
+  m_save->setIcon(QIcon(user.isValidId()
+                        ? ":/icons/res/saveas.png"
+                        : ":/icons/res/save.png"));
+  if (user.isValidId())
+    m_lblPasswordMsg->show();
   m_currentId = user.m_id;
   m_user->setText(user.m_strUser);
   m_password->setText("");
@@ -261,31 +279,22 @@ void UserMgtView::setUser(const User& user)
   m_accessConsumption->setChecked(user.m_bAccessConsumption);
   m_accessUser->setChecked(user.m_bAccessUser);
   m_accessProduct->setChecked(user.m_bAccessProduct);
-  m_accessPerson->setChecked(user.m_bAccessProduct);
+  m_accessPerson->setChecked(user.m_bAccessPerson);
+  m_accessEmployee->setChecked(user.m_bAccessEmployee);
+  m_accessSupplier->setChecked(user.m_bAccessSupplier);
   m_accessCategory->setChecked(user.m_bAccessCategory);
   m_accessImage->setChecked(user.m_bAccessImage);
   m_accessSettings->setChecked(user.m_bAccessSettings);
   m_accessReservation->setChecked(user.m_bAccessReservation);
   m_accessShoppingList->setChecked(user.m_bAccessShoppingList);
+  m_user->setFocus();
 }
 
 void UserMgtView::create()
 {
   m_lblPasswordMsg->hide();
-  m_currentId = INVALID_ID;
-  m_user->setText("");
-  m_password->setText("");
-  m_accessNote->setChecked(false);
-  m_accessReminder->setChecked(false);
-  m_accessCalculator->setChecked(false);
-  m_accessShop->setChecked(false);
-  m_accessConsumption->setChecked(false);
-  m_accessUser->setChecked(false);
-  m_accessProduct->setChecked(false);
-  m_accessSettings->setChecked(false);
-  m_accessReservation->setChecked(false);
-  m_accessShoppingList->setChecked(false);
-  m_user->setFocus();
+  User user;
+  setUser(user);
 }
 
 QString UserMgtView::getPassword() const

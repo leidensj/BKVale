@@ -21,6 +21,7 @@
 #include <QByteArray>
 #include <QDir>
 #include <QLabel>
+#include <QCloseEvent>
 
 BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   : QMainWindow(parent)
@@ -141,6 +142,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openActiveUsersDialog()));
+
+  QObject::connect(ui->actionExit,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(close()));
 
   m_settings.load();
   updateControls();
@@ -454,7 +460,9 @@ void BaitaAssistant::openPersonsDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  PersonView* w = new PersonView(this);
+  PersonView* w = new PersonView(m_userLogin.hasAccessToEmployee(),
+                                 m_userLogin.hasAccessToSupplier(),
+                                 this);
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Pessoas"));
@@ -503,4 +511,16 @@ void BaitaAssistant::openActiveUsersDialog()
   dlg.setWindowIcon(QIcon(":/icons/res/users.png"));
   dlg.setModal(true);
   dlg.exec();
+}
+
+void BaitaAssistant::closeEvent(QCloseEvent* event)
+{
+  if (QMessageBox::question(this,
+                            tr("Sair"),
+                            tr("Tem certeza que deseja sair?"),
+                            QMessageBox::Yes,
+                            QMessageBox::No) == QMessageBox::Yes)
+    QMainWindow::closeEvent(event);
+  else
+    event->ignore();
 }

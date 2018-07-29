@@ -36,6 +36,9 @@ public:
   explicit BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent = 0);
   ~BaitaAssistant();
 
+protected:
+  void closeEvent(QCloseEvent* event);
+
 private:
   Ui::BaitaAssistant *ui;
   UserLoginSQL m_userLogin;

@@ -68,7 +68,9 @@ namespace
   }
 }
 
-PersonView::PersonView(QWidget* parent)
+PersonView::PersonView(bool bAccessEmployee,
+                       bool bAccessSupplier,
+                       QWidget* parent)
   : QFrame(parent)
   , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
@@ -175,8 +177,6 @@ PersonView::PersonView(QWidget* parent)
                               JLineEdit::st_defaultFlags2);
   m_edPinCode->setEchoMode(QLineEdit::EchoMode::PasswordEchoOnEdit);
   m_edPinCode->setAlignment(Qt::AlignCenter);
-  m_edPinCode->setPlaceholderText(tr("Código PIN"));
-  m_edPinCode->addAction(QIcon(":/icons/res/pincode.png"), QLineEdit::LeadingPosition);
   {
     QFont f = m_edPinCode->font();
     f.setBold(true);
@@ -339,13 +339,21 @@ PersonView::PersonView(QWidget* parent)
   addressLayout->addWidget(m_lstAddress);
 
   m_grpEmployee = new QGroupBox;
-  m_grpEmployee->setTitle(tr("Disponível"));
+  m_grpEmployee->setTitle(tr("Disponível como funcionário"));
   m_grpEmployee->setCheckable(true);
   m_grpEmployee->setChecked(false);
+  m_grpEmployee->setFlat(true);
+  QLabel* lblPincode = new QLabel();
+  lblPincode->setPixmap(QIcon(":/icons/res/pincode.png").pixmap(QSize(16, 16)));
+  lblPincode->setMinimumSize(16, 16);
+  lblPincode->setMaximumSize(16, 16);
+  lblPincode->setScaledContents(true);
   QVBoxLayout* employeeLayout = new QVBoxLayout;
   employeeLayout->setAlignment(Qt::AlignTop);
   QHBoxLayout* pincodeLayout = new QHBoxLayout;
   pincodeLayout->setContentsMargins(0, 0, 0, 0);
+  pincodeLayout->addWidget(lblPincode);
+  pincodeLayout->addWidget(new QLabel(tr("Código PIN")));
   pincodeLayout->addWidget(m_edPinCode);
   employeeLayout->addLayout(pincodeLayout);
   m_grpEmployee->setLayout(employeeLayout);
@@ -354,9 +362,10 @@ PersonView::PersonView(QWidget* parent)
   employeeFrameLayout->addWidget(m_grpEmployee);
 
   m_grpSupplier = new QGroupBox;
-  m_grpSupplier->setTitle(tr("Disponível"));
+  m_grpSupplier->setTitle(tr("Disponível como fornecedor"));
   m_grpSupplier->setCheckable(true);
   m_grpSupplier->setChecked(false);
+  m_grpSupplier->setFlat(true);
   QVBoxLayout* supplierLayout = new QVBoxLayout;
   supplierLayout->setAlignment(Qt::AlignTop);
   m_grpSupplier->setLayout(supplierLayout);
@@ -386,9 +395,11 @@ PersonView::PersonView(QWidget* parent)
   m_tab->addTab(employeeFrame,
                 QIcon(":/icons/res/employee.png"),
                 tr("Funcionário"));
+  m_tab->setTabEnabled(1, bAccessEmployee);
   m_tab->addTab(supplierFrame,
                 QIcon(":/icons/res/supplier.png"),
                 tr("Fornecedor"));
+  m_tab->setTabEnabled(2, bAccessSupplier);
   m_tab->addTab(phoneFrame,
                 QIcon(":/icons/res/phone.png"),
                 tr("Telefone"));

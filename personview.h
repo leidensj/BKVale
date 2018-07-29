@@ -30,7 +30,9 @@ class PersonView : public QFrame
   Q_OBJECT
 
 public:
-  explicit PersonView(QWidget* parent = 0);
+  explicit PersonView(bool bAccessEmployee,
+                      bool bAccessSupplier,
+                      QWidget* parent = 0);
   ~PersonView();
   Person getPerson() const;
 

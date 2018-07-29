@@ -97,7 +97,7 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
   m_capsLock->setToolTip("Caps Lock");
 
   m_hostName = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
-  m_hostName->setPlaceholderText(tr("Host"));
+  m_hostName->setPlaceholderText(tr("Servidor"));
   {
     QFont f = m_hostName->font();
     f.setPointSize(12);

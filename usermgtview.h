@@ -40,6 +40,8 @@ private:
   QCheckBox* m_accessUser;
   QCheckBox* m_accessProduct;
   QCheckBox* m_accessPerson;
+  QCheckBox* m_accessEmployee;
+  QCheckBox* m_accessSupplier;
   QCheckBox* m_accessCategory;
   QCheckBox* m_accessImage;
   QCheckBox* m_accessReservation;

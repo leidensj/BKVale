@@ -152,7 +152,6 @@
    <addaction name="actionPrint"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
-   <addaction name="actionInfo"/>
    <addaction name="separator"/>
    <addaction name="actionExit"/>
   </widget>
@@ -171,6 +170,7 @@
      <string>Sistema</string>
     </property>
     <addaction name="actionLogin"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuCadastros">
     <property name="title">

@@ -1,6 +1,8 @@
 #ifndef ESC_H
 #define ESC_H
 
+#include <QString>
+
 #define ESC                 "\x1b"
 #define ESC_ALIGN_CENTER    "\x1b\x61\x31"
 #define ESC_ALIGN_LEFT      "\x1b\x61\x30"
@@ -20,6 +22,10 @@
 #define ESC_REVERSE_OFF     "\x1b\x7d\x30"
 #define ESC_EXPAND_ON       "\x1b\x57\x31"
 #define ESC_EXPAND_OFF      "\x1b\x57\x30"
+
+#define ESC_BARCODE_HRI_OFF "\x1d\x48\x30"
+#define ESC_BARCODE_HRI_ON  "\x1d\x48\x31"
+#define ESC_BARCODE_CODE39  "\x1D\x6B\x04%1\x00"
 
 #define TABLE_WIDTH           48
 #define TABLE_MAX_VALUE       10000

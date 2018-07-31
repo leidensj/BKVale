@@ -34,6 +34,8 @@ namespace
                "Numero     "
                ESC_DOUBLE_FONT_ON +
                note.strNumber() +
+               ESC_LF +
+               QString(ESC_BARCODE_CODE39).arg(note.strNumber()) +
                ESC_LF
                "Data       "
                ESC_DOUBLE_FONT_ON +

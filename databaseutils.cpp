@@ -92,6 +92,10 @@ bool BaitaSQL::init(const QString& hostName,
         db.close();
     }
   }
+  else
+  {
+    error = "Driver not loaded.";
+  }
   return bSuccess;
 }
 

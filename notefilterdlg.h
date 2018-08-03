@@ -24,6 +24,7 @@ private:
   QDateEdit* m_dtBegin;
   QDateEdit* m_dtEnd;
   JDatabasePicker* m_supplierPicker;
+  JDatabasePicker* m_productPicker;
 };
 
 #endif // NOTEFILTERDLG_H

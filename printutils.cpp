@@ -8,6 +8,19 @@
 
 namespace
 {
+
+  QByteArray getCodeBar(const QString& code)
+  {
+    QByteArray data;
+    if (0 < code.length() && code.length() < 256)
+    {
+      QDataStream out(&data, QIODevice::WriteOnly);
+      out.setVersion(QDataStream::Qt_4_3);
+      out << QString(ESC_BARCODE_CODE39).toUtf8() << quint16(code.length()) << code.toUtf8();
+    }
+    return data;
+  }
+
   void noteAppendHeader(const Note& note,
                         QString& strNote)
   {
@@ -30,13 +43,11 @@ namespace
 
     strNote += ESC_LF
                ESC_VERT_TAB
-               ESC_ALIGN_LEFT
-               "Numero     "
-               ESC_DOUBLE_FONT_ON +
-               note.strNumber() +
-               ESC_LF +
-               QString(ESC_BARCODE_CODE39).arg(note.strNumber()) +
-               ESC_LF
+               ESC_ALIGN_CENTER;
+
+    strNote.append(getCodeBar(note.strNumber()));
+
+    strNote += ESC_LF
                "Data       "
                ESC_DOUBLE_FONT_ON +
                note.strDate() +

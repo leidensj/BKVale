@@ -246,6 +246,7 @@ void LoginDialog::login()
     }
     else
     {
+      BaitaSQL::close();
       m_password->selectAll();
       m_password->setFocus();
     }

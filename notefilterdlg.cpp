@@ -5,12 +5,16 @@
 #include <QLayout>
 #include "jdatabase.h"
 
+/* PRODUCT FILTER */
+/*WHERE _NOTES._ID = ANY (SELECT _NOTEID FROM _NOTE_ITEMS WHERE _PRODUCTID IN(...))*/
+
 NoteFilterDlg::NoteFilterDlg(QWidget* parent)
   : FilterDlg(parent)
   , m_cbDate(nullptr)
   , m_dtBegin(nullptr)
   , m_dtEnd(nullptr)
   , m_supplierPicker(nullptr)
+  , m_productPicker(nullptr)
 {
   m_cbDate = new QCheckBox;
   m_dtBegin = new QDateEdit;
@@ -21,8 +25,13 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
                                          tr("Fornecedor"),
                                          QIcon(":/icons/res/supplier.png"),
                                          true, false, true);
+  m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME,
+                                        tr("Produto"),
+                                        QIcon(":/icons/res/item.png"),
+                                        true, false, true);
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
+  m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_NOTE);
 
   QHBoxLayout* dateLayout = new QHBoxLayout;
   dateLayout->setContentsMargins(0, 0, 0, 0);
@@ -35,6 +44,7 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
   mainLayout->setAlignment(Qt::AlignTop);
   mainLayout->addLayout(dateLayout);
   mainLayout->addWidget(m_supplierPicker);
+  mainLayout->addWidget(m_productPicker);
   setLayout(mainLayout);
 
   QObject::connect(m_cbDate,
@@ -71,6 +81,22 @@ QString NoteFilterDlg::getFilter() const
     strFilter += ") ";
   }
 
+  QVector<qlonglong> vProduct = m_productPicker->getIds();
+
+  if (!vProduct.isEmpty())
+  {
+    if (!strFilter.isEmpty())
+      strFilter += " AND ";
+    strFilter += " " NOTE_SQL_TABLE_NAME "." SQL_COLID
+                 " = ANY (SELECT " NOTE_ITEMS_SQL_COL01 " FROM "
+                 NOTE_ITEMS_SQL_TABLE_NAME " WHERE "
+                 NOTE_ITEMS_SQL_COL02 " IN (";
+    for (int i = 0; i != vProduct.size(); ++i)
+      strFilter += QString::number(vProduct.at(i)) + ",";
+    strFilter.chop(1);
+    strFilter += ")) ";
+  }
+
   return strFilter;
 }
 
@@ -80,6 +106,7 @@ void NoteFilterDlg::clearFilter()
   m_dtBegin->setDate(QDate::currentDate());
   m_dtEnd->setDate(QDate::currentDate());
   m_supplierPicker->clearAll();
+  m_productPicker->clearAll();
   updateControls();
 }
 

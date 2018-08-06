@@ -20,7 +20,6 @@ struct User : public JItem
   bool m_bAccessReminder;
   bool m_bAccessCalculator;
   bool m_bAccessShop;
-  bool m_bAccessConsumption;
   bool m_bAccessUser;
   bool m_bAccessProduct;
   bool m_bAccessSettings;
@@ -45,11 +44,12 @@ struct User : public JItem
         m_bAccessPerson != another.m_bAccessPerson ||
         m_bAccessEmployee != another.m_bAccessEmployee ||
         m_bAccessSupplier != another.m_bAccessSupplier ||
-        m_bAccessConsumption != another.m_bAccessConsumption ||
         m_bAccessUser != another.m_bAccessUser ||
         m_bAccessProduct != another.m_bAccessProduct ||
         m_bAccessSettings != another.m_bAccessSettings ||
         m_bAccessReservation != another.m_bAccessReservation ||
+        m_bAccessCategory != another.m_bAccessCategory ||
+        m_bAccessImage != another.m_bAccessImage ||
         m_bAccessShoppingList != another.m_bAccessShoppingList;
   }
 

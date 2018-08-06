@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QTabWidget>
 #include <QSplitter>
+#include <QFormLayout>
 
 ProductBarcodeView::ProductBarcodeView(QWidget* parent)
   : QFrame(parent)
@@ -48,10 +49,13 @@ ProductBarcodeView::ProductBarcodeView(QWidget* parent)
   buttonlayout->addWidget(m_btnCreate);
   buttonlayout->addWidget(m_btnSave);
 
+  QFormLayout* codeLayout = new QFormLayout;
+  codeLayout->addRow(tr("Código"), m_edCode);
+
   QVBoxLayout* tabInfoLayout = new QVBoxLayout;
   tabInfoLayout->setAlignment(Qt::AlignTop);
   tabInfoLayout->addWidget(m_productPicker);
-  tabInfoLayout->addWidget(m_edCode);
+  tabInfoLayout->addLayout(codeLayout);
 
   QFrame* tabInfoFrame = new QFrame;
   tabInfoFrame->setLayout(tabInfoLayout);

@@ -13,8 +13,8 @@
 #define ESC_LF              "\n"
 #define ESC_VERT_TAB        "\x1b\x4a\x40"
 #define ESC_INIT            "\x1b\x40"
-#define ESC_DOUBLE_FONT_ON  "\x1b\x0e\x1b\x56"
-//#define ESC_DOUBLE_FONT_OFF "\x1b\x14\x1b\x64\x30"
+#define ESC_DOUBLE_FONT_ON  "\x1b\x64\x31\x1b\x57\x31"
+#define ESC_DOUBLE_FONT_OFF "\x1b\x64\x30\x1b\x57\x30"
 #define ESC_CLEAR           "\x02"
 #define ESC_PORTUGUESE      "\x1b\x74\x08"
 #define ESC_CODEPAGE850     "\x1b\x74\x35"
@@ -25,6 +25,7 @@
 
 #define ESC_BARCODE_HRI_OFF "\x1d\x48\x30"
 #define ESC_BARCODE_HRI_ON  "\x1d\x48\x31"
+#define ESC_BARCODE_HEIGHT  "\x1d\x68"
 #define ESC_BARCODE_CODE39  "\x1d\x6b\x45"
 
 #define TABLE_WIDTH           48

@@ -153,8 +153,7 @@ bool BaitaSQL::createTables(QString& error)
                           USER_SQL_COL13 " BOOLEAN,"
                           USER_SQL_COL14 " BOOLEAN,"
                           USER_SQL_COL15 " BOOLEAN,"
-                          USER_SQL_COL16 " BOOLEAN,"
-                          USER_SQL_COL17 " BOOLEAN)");
+                          USER_SQL_COL16 " BOOLEAN)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
@@ -168,7 +167,6 @@ bool BaitaSQL::createTables(QString& error)
                         PRODUCT_SQL_COL07 " BOOLEAN,"
                         PRODUCT_SQL_COL08 " BOOLEAN,"
                         PRODUCT_SQL_COL09 " BOOLEAN,"
-                        PRODUCT_SQL_COL10 " BOOLEAN,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL02 ") REFERENCES "
                         CATEGORY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL03 ") REFERENCES "
@@ -340,12 +338,11 @@ bool BaitaSQL::createTables(QString& error)
                     USER_SQL_COL13 ","
                     USER_SQL_COL14 ","
                     USER_SQL_COL15 ","
-                    USER_SQL_COL16 ","
-                    USER_SQL_COL17 ")"
+                    USER_SQL_COL16 ")"
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
                     ":_password,"
-                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE, TRUE,TRUE);";
+                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
       query.prepare(str);
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();
@@ -704,8 +701,7 @@ bool ProductSQL::execSelect(QSqlQuery& query,
                 PRODUCT_SQL_COL06 ","
                 PRODUCT_SQL_COL07 ","
                 PRODUCT_SQL_COL08 ","
-                PRODUCT_SQL_COL09 ","
-                PRODUCT_SQL_COL10
+                PRODUCT_SQL_COL09
                 " FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -722,9 +718,8 @@ bool ProductSQL::execSelect(QSqlQuery& query,
       product.m_details = query.value(4).toString();
       product.m_bAvailableAtNotes = query.value(5).toBool();
       product.m_bAvailableAtShop = query.value(6).toBool();
-      product.m_bAvailableAtConsumption = query.value(7).toBool();
-      product.m_bAvailableToBuy = query.value(8).toBool();
-      product.m_bAvailableToSell = query.value(9).toBool();
+      product.m_bAvailableToBuy = query.value(7).toBool();
+      product.m_bAvailableToSell = query.value(8).toBool();
 
       if (bSuccess && product.m_image.isValidId())
         bSuccess = ImageSQL::execSelect(query, product.m_image, error);
@@ -779,8 +774,7 @@ bool ProductSQL::insert(const Product& product,
                 PRODUCT_SQL_COL06 ","
                 PRODUCT_SQL_COL07 ","
                 PRODUCT_SQL_COL08 ","
-                PRODUCT_SQL_COL09 ","
-                PRODUCT_SQL_COL10 ")"
+                PRODUCT_SQL_COL09 ")"
                 " VALUES ("
                 "(:_v01),") +
         (product.m_category.isValidId()
@@ -792,8 +786,7 @@ bool ProductSQL::insert(const Product& product,
                 "(:_v06),"
                 "(:_v07),"
                 "(:_v08),"
-                "(:_v09),"
-                "(:_v10))");
+                "(:_v09))");
   query.bindValue(":_v01", product.m_name);
   if (product.m_category.isValidId())
     query.bindValue(":_v02", product.m_category.m_id);
@@ -803,9 +796,8 @@ bool ProductSQL::insert(const Product& product,
   query.bindValue(":_v05", product.m_details);
   query.bindValue(":_v06", product.m_bAvailableAtNotes);
   query.bindValue(":_v07", product.m_bAvailableAtShop);
-  query.bindValue(":_v08", product.m_bAvailableAtConsumption);
-  query.bindValue(":_v09", product.m_bAvailableToBuy);
-  query.bindValue(":_v10", product.m_bAvailableToSell);
+  query.bindValue(":_v08", product.m_bAvailableToBuy);
+  query.bindValue(":_v09", product.m_bAvailableToSell);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -836,8 +828,7 @@ bool ProductSQL::update(const Product& product,
                 PRODUCT_SQL_COL06 " = (:_v06),"
                 PRODUCT_SQL_COL07 " = (:_v07),"
                 PRODUCT_SQL_COL08 " = (:_v08),"
-                PRODUCT_SQL_COL09 " = (:_v09),"
-                PRODUCT_SQL_COL10 " = (:_v10)"
+                PRODUCT_SQL_COL09 " = (:_v09)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", product.m_id);
   query.bindValue(":_v01", product.m_name);
@@ -849,9 +840,8 @@ bool ProductSQL::update(const Product& product,
   query.bindValue(":_v05", product.m_details);
   query.bindValue(":_v06", product.m_bAvailableAtNotes);
   query.bindValue(":_v07", product.m_bAvailableAtShop);
-  query.bindValue(":_v08", product.m_bAvailableAtConsumption);
-  query.bindValue(":_v09", product.m_bAvailableToBuy);
-  query.bindValue(":_v10", product.m_bAvailableToSell);
+  query.bindValue(":_v08", product.m_bAvailableToBuy);
+  query.bindValue(":_v09", product.m_bAvailableToSell);
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -1328,8 +1318,7 @@ bool UserSQL::insert(const User& user,
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16 ","
-                USER_SQL_COL17 ")"
+                USER_SQL_COL16 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -1346,25 +1335,23 @@ bool UserSQL::insert(const User& user,
                 "(:_v13),"
                 "(:_v14),"
                 "(:_v15),"
-                "(:_v16),"
-                "(:_v17))");
+                "(:_v16))");
   query.bindValue(":_v01", user.m_strUser);
   query.bindValue(":_v02", user.strEncryptedPassword());
   query.bindValue(":_v03", user.m_bAccessNote);
   query.bindValue(":_v04", user.m_bAccessReminder);
   query.bindValue(":_v05", user.m_bAccessCalculator);
   query.bindValue(":_v06", user.m_bAccessShop);
-  query.bindValue(":_v07", user.m_bAccessConsumption);
-  query.bindValue(":_v08", user.m_bAccessUser);
-  query.bindValue(":_v09", user.m_bAccessProduct);
-  query.bindValue(":_v10", user.m_bAccessSettings);
-  query.bindValue(":_v11", user.m_bAccessPerson);
-  query.bindValue(":_v12", user.m_bAccessCategory);
-  query.bindValue(":_v13", user.m_bAccessImage);
-  query.bindValue(":_v14", user.m_bAccessReservation);
-  query.bindValue(":_v15", user.m_bAccessShoppingList);
-  query.bindValue(":_v16", user.m_bAccessEmployee);
-  query.bindValue(":_v17", user.m_bAccessSupplier);
+  query.bindValue(":_v07", user.m_bAccessUser);
+  query.bindValue(":_v08", user.m_bAccessProduct);
+  query.bindValue(":_v09", user.m_bAccessSettings);
+  query.bindValue(":_v10", user.m_bAccessPerson);
+  query.bindValue(":_v11", user.m_bAccessCategory);
+  query.bindValue(":_v12", user.m_bAccessImage);
+  query.bindValue(":_v13", user.m_bAccessReservation);
+  query.bindValue(":_v14", user.m_bAccessShoppingList);
+  query.bindValue(":_v15", user.m_bAccessEmployee);
+  query.bindValue(":_v16", user.m_bAccessSupplier);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -1398,8 +1385,7 @@ bool UserSQL::update(const User& user,
               USER_SQL_COL13" = (:_v13),"
               USER_SQL_COL14" = (:_v14),"
               USER_SQL_COL15" = (:_v15),"
-              USER_SQL_COL16" = (:_v16),"
-              USER_SQL_COL17" = (:_v17)"
+              USER_SQL_COL16" = (:_v16)"
               " WHERE " SQL_COLID " = (:_v00)";
 
 
@@ -1415,17 +1401,16 @@ bool UserSQL::update(const User& user,
   query.bindValue(":_v04", user.m_bAccessReminder);
   query.bindValue(":_v05", user.m_bAccessCalculator);
   query.bindValue(":_v06", user.m_bAccessShop);
-  query.bindValue(":_v07", user.m_bAccessConsumption);
-  query.bindValue(":_v08", user.m_bAccessUser);
-  query.bindValue(":_v09", user.m_bAccessProduct);
-  query.bindValue(":_v10", user.m_bAccessSettings);
-  query.bindValue(":_v11", user.m_bAccessPerson);
-  query.bindValue(":_v12", user.m_bAccessCategory);
-  query.bindValue(":_v13", user.m_bAccessImage);
-  query.bindValue(":_v14", user.m_bAccessReservation);
-  query.bindValue(":_v15", user.m_bAccessShoppingList);
-  query.bindValue(":_v16", user.m_bAccessEmployee);
-  query.bindValue(":_v17", user.m_bAccessSupplier);
+  query.bindValue(":_v07", user.m_bAccessUser);
+  query.bindValue(":_v08", user.m_bAccessProduct);
+  query.bindValue(":_v09", user.m_bAccessSettings);
+  query.bindValue(":_v10", user.m_bAccessPerson);
+  query.bindValue(":_v11", user.m_bAccessCategory);
+  query.bindValue(":_v12", user.m_bAccessImage);
+  query.bindValue(":_v13", user.m_bAccessReservation);
+  query.bindValue(":_v14", user.m_bAccessShoppingList);
+  query.bindValue(":_v15", user.m_bAccessEmployee);
+  query.bindValue(":_v16", user.m_bAccessSupplier);
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
@@ -1460,8 +1445,7 @@ bool UserSQL::select(User& user,
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16 ","
-                USER_SQL_COL17
+                USER_SQL_COL16
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -1478,17 +1462,16 @@ bool UserSQL::select(User& user,
       user.m_bAccessReminder = query.value(3).toBool();
       user.m_bAccessCalculator = query.value(4).toBool();
       user.m_bAccessShop = query.value(5).toBool();
-      user.m_bAccessConsumption = query.value(6).toBool();
-      user.m_bAccessUser = query.value(7).toBool();
-      user.m_bAccessProduct = query.value(8).toBool();
-      user.m_bAccessSettings = query.value(9).toBool();
-      user.m_bAccessPerson = query.value(10).toBool();
-      user.m_bAccessCategory = query.value(11).toBool();
-      user.m_bAccessImage = query.value(12).toBool();
-      user.m_bAccessReservation = query.value(13).toBool();
-      user.m_bAccessShoppingList = query.value(14).toBool();
-      user.m_bAccessEmployee = query.value(15).toBool();
-      user.m_bAccessSupplier = query.value(16).toBool();
+      user.m_bAccessUser = query.value(6).toBool();
+      user.m_bAccessProduct = query.value(7).toBool();
+      user.m_bAccessSettings = query.value(8).toBool();
+      user.m_bAccessPerson = query.value(9).toBool();
+      user.m_bAccessCategory = query.value(10).toBool();
+      user.m_bAccessImage = query.value(11).toBool();
+      user.m_bAccessReservation = query.value(12).toBool();
+      user.m_bAccessShoppingList = query.value(13).toBool();
+      user.m_bAccessEmployee = query.value(14).toBool();
+      user.m_bAccessSupplier = query.value(15).toBool();
     }
     else
     {
@@ -1553,8 +1536,7 @@ bool UserLoginSQL::login(const QString& strUser,
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16 ","
-                USER_SQL_COL17
+                USER_SQL_COL16
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " USER_SQL_COL01 " = (:_v01) AND "
                 USER_SQL_COL02 " = (:_v02) LIMIT 1");
@@ -1574,17 +1556,16 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessReminder = query.value(4).toBool();
       m_user.m_bAccessCalculator = query.value(5).toBool();
       m_user.m_bAccessShop = query.value(6).toBool();
-      m_user.m_bAccessConsumption = query.value(7).toBool();
-      m_user.m_bAccessUser = query.value(8).toBool();
-      m_user.m_bAccessProduct = query.value(9).toBool();
-      m_user.m_bAccessSettings = query.value(10).toBool();
-      m_user.m_bAccessPerson = query.value(11).toBool();
-      m_user.m_bAccessCategory = query.value(12).toBool();
-      m_user.m_bAccessImage = query.value(13).toBool();
-      m_user.m_bAccessReservation = query.value(14).toBool();
-      m_user.m_bAccessShoppingList = query.value(15).toBool();
-      m_user.m_bAccessEmployee = query.value(16).toBool();
-      m_user.m_bAccessSupplier = query.value(17).toBool();
+      m_user.m_bAccessUser = query.value(7).toBool();
+      m_user.m_bAccessProduct = query.value(8).toBool();
+      m_user.m_bAccessSettings = query.value(9).toBool();
+      m_user.m_bAccessPerson = query.value(10).toBool();
+      m_user.m_bAccessCategory = query.value(11).toBool();
+      m_user.m_bAccessImage = query.value(12).toBool();
+      m_user.m_bAccessReservation = query.value(13).toBool();
+      m_user.m_bAccessShoppingList = query.value(14).toBool();
+      m_user.m_bAccessEmployee = query.value(15).toBool();
+      m_user.m_bAccessSupplier = query.value(16).toBool();
 
       bSuccess = ActiveUserSQL::execRemove(query, error);
       if (bSuccess)

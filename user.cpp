@@ -15,13 +15,17 @@ void User::clear()
   m_bAccessReminder = false;
   m_bAccessCalculator = false;
   m_bAccessShop = false;
-  m_bAccessConsumption = false;
   m_bAccessUser = false;
   m_bAccessProduct = false;
   m_bAccessSettings = false;
-  m_password.clear();
+  m_bAccessPerson = false;
+  m_bAccessEmployee = false;
+  m_bAccessSupplier = false;
+  m_bAccessCategory = false;
+  m_bAccessImage = false;
   m_bAccessReservation = false;
   m_bAccessShoppingList = false;
+  m_password.clear();
 }
 
 QString User::st_strEncryptedPassword(const QString& strPassword)

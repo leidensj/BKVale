@@ -57,7 +57,6 @@ HEADERS  += mainwindow.h \
     settings.h \
     reminder.h \
     reminderview.h \
-    consumption.h \
     qcustomplot.h \
     consumptionchart.h \
     calculatorwidget.h \

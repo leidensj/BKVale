@@ -7,7 +7,6 @@
 #include "note.h"
 #include "reminder.h"
 #include "product.h"
-#include "consumption.h"
 #include "person.h"
 #include "shoppinglist.h"
 #include "reservation.h"
@@ -51,15 +50,4 @@ namespace ReservationPrinter
   QString build(const Reservation& lst);
 }
 
-namespace ConsumptionPrinter
-{
-  QString build(qint64 date,
-                const QVector<Consumption>& consumptions,
-                const QVector<Product>& vProduct,
-                double total);
-
-  QString build(const QVector<qint64>& dates,
-                const QVector<double>& totals,
-                double total);
-}
 #endif // PRINTUTILS_H

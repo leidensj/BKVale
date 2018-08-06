@@ -64,11 +64,18 @@ namespace
 
     strNote += ESC_LF
                ESC_VERT_TAB
-               ESC_ALIGN_CENTER;
+               ESC_DOUBLE_FONT_ON +
+               note.strNumber() + " "
+               ESC_DOUBLE_FONT_OFF
+               ESC_LF;
+
 
     if (0 < note.strNumber().length() && note.strNumber().length() < 256)
     {
-      strNote += ESC_BARCODE_CODE39 +
+      strNote += ESC_BARCODE_HRI_OFF
+                 ESC_BARCODE_HEIGHT +
+                 QString(decToHex[120]) +
+                 ESC_BARCODE_CODE39 +
                  QString(decToHex[note.strNumber().length()]) +
                  note.strNumber() +
                  ESC_LF;
@@ -78,8 +85,8 @@ namespace
                "Data       "
                ESC_DOUBLE_FONT_ON +
                note.strDate() +
-               ESC_LF
-               "           " +
+               ESC_DOUBLE_FONT_OFF
+               " " +
                note.strDayOfWeek() +
                ESC_LF
                "Fornecedor "
@@ -89,7 +96,8 @@ namespace
                ? note.m_supplier.m_name
                : note.m_supplier.m_alias)
                : "Nao informado") +
-               ESC_LF +
+               ESC_DOUBLE_FONT_OFF
+               ESC_LF
                ESC_VERT_TAB;
   }
 
@@ -116,6 +124,7 @@ namespace
                ESC_DOUBLE_FONT_ON
                "TOTAL R$" +
                note.strTotal() +
+               ESC_DOUBLE_FONT_OFF
                ESC_LF
                "Emissao: " +
                QDate::currentDate().toString("dd/MM/yyyy ") +
@@ -275,6 +284,7 @@ QString ReminderPrinter::build(const Reminder& r)
     str += ESC_ALIGN_CENTER
            ESC_DOUBLE_FONT_ON +
            title +
+           ESC_DOUBLE_FONT_OFF
            ESC_LF;
     if (!msg.isEmpty())
     {
@@ -298,116 +308,6 @@ QString ReminderPrinter::build(const Reminder& r)
   return str;
 }
 
-QString ConsumptionPrinter::build(qint64 date,
-                                  const QVector<Consumption>& vConsumption,
-                                  const QVector<Product>& vProduct,
-                                  double total)
-{
-  if (vConsumption.size() != vProduct.size())
-    return "";
-
-  QString str;
-  str += ESC_EXPAND_ON
-         ESC_ALIGN_CENTER
-         "BAITAKAO"
-         ESC_LF
-         "RUA SINIMBU 175 LOURDES"
-         ESC_LF
-         "32221034 32281666"
-         ESC_LF
-         "WWW.BAITAKAO.COM.BR"
-         ESC_LF
-         ESC_VERT_TAB
-         ESC_EXPAND_OFF
-         "RELATORIO DE CONSUMO"
-         ESC_LF
-         ESC_VERT_TAB
-         ESC_EXPAND_ON +
-         QDate::fromJulianDay(date).toString("dd/MM/yyyy") +
-         QDate::fromJulianDay(date).toString(" dddd") +
-         ESC_LF
-         ESC_EXPAND_OFF
-         ESC_ALIGN_LEFT;
-
-  for (int i = 0; i != vConsumption.size(); ++i)
-  {
-    QString subStr;
-    {
-      QString subStr1 = QString::number(vConsumption.at(i).m_ammount, 'f', 3) +
-                        vProduct.at(i).m_unity +
-                        " x R$" +
-                        QString::number(vConsumption.at(i).m_price, 'f', 2);
-      QString subStr2 = "R$" + QString::number(vConsumption.at(i).m_total, 'f', 2);
-      const int n = TABLE_WIDTH - (subStr1.length() + subStr2.length());
-      for (int j = 0; j < n; ++j)
-        subStr1 += " ";
-      subStr = subStr1 + ESC_STRESS_ON + subStr2 + ESC_STRESS_OFF;
-    }
-    str += vProduct.at(i).m_name + ESC_LF + subStr +
-           ESC_LF "________________________________________________" ESC_LF;
-  }
-
-  str += ESC_LF
-         ESC_ALIGN_CENTER
-         ESC_DOUBLE_FONT_ON
-         "TOTAL R$" +
-         QString::number(total, 'f', 2) +
-         ESC_LF
-         ESC_LF
-         ESC_FULL_CUT;
-
-  return str;
-}
-
-QString ConsumptionPrinter::build(const QVector<qint64>& vDate,
-                                  const QVector<double>& vSubTotal,
-                                  double total)
-{
-  if (vDate.size() != vSubTotal.size())
-    return "";
-
-  QString str;
-  str += ESC_EXPAND_ON
-         ESC_ALIGN_CENTER
-         "BAITAKAO"
-         ESC_LF
-         "RUA SINIMBU 175 LOURDES"
-         ESC_LF
-         "32221034 32281666"
-         ESC_LF
-         "WWW.BAITAKAO.COM.BR"
-         ESC_LF
-         ESC_VERT_TAB
-         ESC_EXPAND_OFF
-         "RELATORIO DE CONSUMO"
-         ESC_LF
-         ESC_VERT_TAB
-         ESC_ALIGN_LEFT;
-
-  for (int i = 0; i != vDate.size(); ++i)
-  {
-    QString pt1 = QDate::fromJulianDay(vDate.at(i)).toString("dd/MM/yyyy") +
-                  QDate::fromJulianDay(vDate.at(i)).toString(" (dddd)");
-    QString pt2 = "R$" + QString::number(vSubTotal.at(i), 'f', 2);
-    const int n = TABLE_WIDTH - (pt1.length() + pt2.length());
-    for (int j = 0; j < n; ++j)
-      pt1 += " ";
-    str += pt1 + pt2 + ESC_LF;
-  }
-
-  str += ESC_LF
-         ESC_LF
-         ESC_ALIGN_CENTER
-         ESC_DOUBLE_FONT_ON
-         "TOTAL R$" +
-         QString::number(total, 'f', 2) +
-         ESC_LF
-         ESC_LF
-         ESC_FULL_CUT;
-
-  return str;
-}
-
 QString ShoppingListPrinter::build(const ShoppingList& lst)
 {
   QString str;
@@ -418,6 +318,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
          ESC_LF
          ESC_DOUBLE_FONT_ON +
          lst.m_title +
+         ESC_DOUBLE_FONT_OFF
          ESC_LF
          ESC_EXPAND_ON +
          QDate::currentDate().toString("dd/MM/yyyy") +
@@ -514,6 +415,7 @@ QString ReservationPrinter::build(const Reservation& res)
          ESC_LF
          ESC_DOUBLE_FONT_ON +
          QString::number(res.m_number) +
+         ESC_DOUBLE_FONT_OFF
          ESC_LF
          ESC_EXPAND_ON
          "DATA E HORA"
@@ -521,6 +423,7 @@ QString ReservationPrinter::build(const Reservation& res)
          ESC_LF
          ESC_DOUBLE_FONT_ON +
          QDateTime::fromString(res.m_dateTime, Qt::ISODate).toString("dd/MM/yyyy HH:mm") +
+         ESC_DOUBLE_FONT_OFF
          ESC_LF
          ESC_VERT_TAB
          ESC_ALIGN_LEFT

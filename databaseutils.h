@@ -6,7 +6,6 @@
 #include "user.h"
 #include "note.h"
 #include "product.h"
-#include "consumption.h"
 #include "reminder.h"
 #include "settings.h"
 #include "category.h"
@@ -38,7 +37,6 @@ public:
   bool hasAccessToReminder() const { return isValid() && m_user.m_bAccessReminder; }
   bool hasAccessToCalculator() const { return isValid() && m_user.m_bAccessCalculator; }
   bool hasAccessToShop() const { return isValid() && m_user.m_bAccessShop; }
-  bool hasAccessToConsumption() const { return isValid() && m_user.m_bAccessConsumption; }
   bool hasAccessToUsers() const { return isValid() && m_user.m_bAccessUser; }
   bool hasAccessToProducts() const { return isValid() && m_user.m_bAccessProduct; }
   bool hasAccessToSettings() const { return isValid() && m_user.m_bAccessSettings; }

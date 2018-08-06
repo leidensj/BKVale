@@ -25,7 +25,6 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   , m_accessCalculator(nullptr)
   , m_accessShoppingList(nullptr)
   , m_accessShop(nullptr)
-  , m_accessConsumption(nullptr)
   , m_accessUser(nullptr)
   , m_accessProduct(nullptr)
   , m_accessPerson(nullptr)
@@ -96,9 +95,6 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   m_accessShoppingList = new QCheckBox;
   m_accessShoppingList->setIcon(QIcon(":/icons/res/shopmgt.png"));
   m_accessShoppingList->setText(tr("Listas de Compras"));
-  m_accessConsumption = new QCheckBox;
-  m_accessConsumption->setIcon(QIcon(":/icons/res/stock.png"));
-  m_accessConsumption->setText(tr("Consumo"));
 
   m_accessUser = new QCheckBox;
   m_accessUser->setIcon(QIcon(":/icons/res/user.png"));
@@ -158,7 +154,6 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   tabPermissionslayout->addWidget(m_accessReminder);
   tabPermissionslayout->addWidget(m_accessCalculator);
   tabPermissionslayout->addWidget(m_accessShop);
-  tabPermissionslayout->addWidget(m_accessConsumption);
   tabPermissionslayout->addWidget(m_accessReservation);
   tabPermissionslayout->addWidget(m_accessUser);
   tabPermissionslayout->addWidget(m_accessProduct);
@@ -248,7 +243,6 @@ User UserMgtView::getUser() const
   user.m_bAccessReminder = m_accessReminder->isChecked();
   user.m_bAccessCalculator = m_accessCalculator->isChecked();
   user.m_bAccessShop = m_accessShop->isChecked();
-  user.m_bAccessConsumption = m_accessConsumption->isChecked();
   user.m_bAccessUser = m_accessUser->isChecked();
   user.m_bAccessProduct = m_accessProduct->isChecked();
   user.m_bAccessPerson = m_accessPerson->isChecked();
@@ -276,7 +270,6 @@ void UserMgtView::setUser(const User& user)
   m_accessReminder->setChecked(user.m_bAccessReminder);
   m_accessCalculator->setChecked(user.m_bAccessCalculator);
   m_accessShop->setChecked(user.m_bAccessShop);
-  m_accessConsumption->setChecked(user.m_bAccessConsumption);
   m_accessUser->setChecked(user.m_bAccessUser);
   m_accessProduct->setChecked(user.m_bAccessProduct);
   m_accessPerson->setChecked(user.m_bAccessPerson);

@@ -202,7 +202,6 @@
      <string>Manutenção</string>
     </property>
     <addaction name="actionSettings"/>
-    <addaction name="actionReconnectDatabase"/>
     <addaction name="actionActiveUsers"/>
    </widget>
    <widget class="QMenu" name="menuAjuda">
@@ -332,18 +331,6 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar Listas de Compras</string>
-   </property>
-  </action>
-  <action name="actionReconnectDatabase">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/databasebackup.png</normaloff>:/icons/res/databasebackup.png</iconset>
-   </property>
-   <property name="text">
-    <string>Reconectar</string>
-   </property>
-   <property name="toolTip">
-    <string>Reconectar ao banco de dados</string>
    </property>
   </action>
   <action name="actionActiveUsers">

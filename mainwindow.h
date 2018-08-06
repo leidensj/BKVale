@@ -72,7 +72,6 @@ private slots:
   void openShoppingListDialog();
   void openActiveUsersDialog();
   void openProductBarcodeDialog();
-  void reconnectDatabase();
 };
 
 #endif // MAINWINDOW_H

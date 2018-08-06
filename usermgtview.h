@@ -36,7 +36,6 @@ private:
   QCheckBox* m_accessCalculator;
   QCheckBox* m_accessShoppingList;
   QCheckBox* m_accessShop;
-  QCheckBox* m_accessConsumption;
   QCheckBox* m_accessUser;
   QCheckBox* m_accessProduct;
   QCheckBox* m_accessPerson;

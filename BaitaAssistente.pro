@@ -45,7 +45,8 @@ SOURCES += main.cpp\
     reservationview.cpp \
     jspinbox.cpp \
     packageeditor.cpp \
-    notefilterdlg.cpp
+    notefilterdlg.cpp \
+    productbarcodeview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -94,7 +95,9 @@ HEADERS  += mainwindow.h \
     packageeditor.h \
     escpos.h \
     notefilterdlg.h \
-    filterdlg.h
+    filterdlg.h \
+    productbarcode.h \
+    productbarcodeview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

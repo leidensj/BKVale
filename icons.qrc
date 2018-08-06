@@ -150,5 +150,6 @@
         <file>res/arrowdropup.png</file>
         <file>res/networkcable.png</file>
         <file>res/users.png</file>
+        <file>res/barcode.png</file>
     </qresource>
 </RCC>

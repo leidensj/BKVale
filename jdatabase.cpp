@@ -533,6 +533,45 @@ public:
   }
 };
 
+class ProductBarcodeTableModel : public JTableModel
+{
+public:
+  ProductBarcodeTableModel(QObject *parent)
+    : JTableModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     PRODUCT_BARCODE_SQL_TABLE_NAME "." SQL_COLID ","
+                     PRODUCT_BARCODE_SQL_TABLE_NAME "." PRODUCT_BARCODE_SQL_COL02 ","
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01
+                     " FROM "
+                     PRODUCT_BARCODE_SQL_TABLE_NAME
+                     " LEFT OUTER JOIN "
+                     PRODUCT_SQL_TABLE_NAME
+                     " ON " PRODUCT_BARCODE_SQL_TABLE_NAME "." PRODUCT_BARCODE_SQL_COL01
+                     " = " PRODUCT_SQL_TABLE_NAME "." SQL_COLID);
+    return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Código"));
+    setHeaderData(2, Qt::Horizontal, tr("Produto"));
+    if (header != nullptr && header->count() == 3)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+};
+
 
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
@@ -663,6 +702,8 @@ JDatabase::JDatabase(const QString& tableName,
     model = new ReservationTableModel(this);
   else if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
     model = new ActiveUserTableModel(this);
+  else if (tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
+    model = new ProductBarcodeTableModel(this);
   else
     model = new JTableModel(this);
 
@@ -863,6 +904,13 @@ void JDatabase::selectItem(qlonglong id)
     bSuccess = ReservationSQL::select(o, error);
     m_currentItem = new Reservation(o);
   }
+  else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
+  {
+    ProductBarcode o;
+    o.m_id = id;
+    bSuccess = ProductBarcodeSQL::select(o, error);
+    m_currentItem = new ProductBarcode(o);
+  }
   else
   {
     error = tr("Item ainda não implementado.");
@@ -949,6 +997,8 @@ void JDatabase::removeItem()
       bSuccess = ShoppingListSQL::remove(id, error);
     else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
       bSuccess = ReservationSQL::remove(id, error);
+    else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
+      bSuccess = ProductBarcodeSQL::remove(id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -1103,6 +1153,13 @@ bool JDatabase::save(const JItem& jItem)
     bSuccess = o.isValidId()
                ? ReservationSQL::update(o, error)
                : ReservationSQL::insert(o, error);
+  }
+  else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
+  {
+    const ProductBarcode& o = dynamic_cast<const ProductBarcode&>(jItem);
+    bSuccess = o.isValidId()
+               ? ProductBarcodeSQL::update(o, error)
+               : ProductBarcodeSQL::insert(o, error);
   }
   else
     error = tr("Item ainda não implementado.");

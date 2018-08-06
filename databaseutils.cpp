@@ -302,14 +302,22 @@ bool BaitaSQL::createTables(QString& error)
                           RESERVATION_SQL_COL06 " TEXT,"
                           RESERVATION_SQL_COL07 " TEXT)");
 
-  QString temp = "CREATE TABLE IF NOT EXISTS " ACTIVE_USERS_SQL_TABLE_NAME " ("
-                 SQL_COLID " SERIAL PRIMARY KEY,"
-                 ACTIVE_USERS_SQL_COL01 " INTEGER,"
-                 ACTIVE_USERS_SQL_COL02 " TEXT,"
-                 ACTIVE_USERS_SQL_COL03 " TEXT,"
-                 ACTIVE_USERS_SQL_COL04 " TIMESTAMP)";
   if (bSuccess)
-    bSuccess = query.exec(temp);
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_BARCODE_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          PRODUCT_BARCODE_SQL_COL01 " INTEGER NOT NULL,"
+                          PRODUCT_BARCODE_SQL_COL02 " TEXT UNIQUE NOT NULL CHECK ("
+                          PRODUCT_BARCODE_SQL_COL02 " <> ''),"
+                          "FOREIGN KEY(" PRODUCT_BARCODE_SQL_COL01 ") REFERENCES "
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " ACTIVE_USERS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          ACTIVE_USERS_SQL_COL01 " INTEGER,"
+                          ACTIVE_USERS_SQL_COL02 " TEXT,"
+                          ACTIVE_USERS_SQL_COL03 " TEXT,"
+                          ACTIVE_USERS_SQL_COL04 " TIMESTAMP)");
 
   if (bSuccess)
   {
@@ -845,20 +853,7 @@ bool ProductSQL::update(const Product& product,
   query.bindValue(":_v09", product.m_bAvailableToBuy);
   query.bindValue(":_v10", product.m_bAvailableToSell);
   bool bSuccess = query.exec();
-
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ProductSQL::remove(qlonglong id,
@@ -875,11 +870,8 @@ bool ProductSQL::remove(qlonglong id,
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
 
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool CategorySQL::execSelect(QSqlQuery& query,
@@ -2577,18 +2569,6 @@ bool ShoppingListSQL::remove(qlonglong id,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 bool ReservationSQL::execSelect(QSqlQuery& query,
                                 Reservation& res,
                                 QString& error)
@@ -2790,4 +2770,128 @@ bool ActiveUserSQL::execRemove(QSqlQuery& query, QString& error)
   query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
                 " WHERE " ACTIVE_USERS_SQL_COL01 " = pg_backend_pid()");
   return query.exec();
+}
+
+bool ProductBarcodeSQL::execSelect(QSqlQuery& query,
+                                   ProductBarcode& barcode,
+                                   QString& error)
+{
+  error.clear();
+  qlonglong id = barcode.m_id;
+  barcode.clear();
+
+  query.prepare("SELECT "
+                PRODUCT_BARCODE_SQL_COL01 ","
+                PRODUCT_BARCODE_SQL_COL02
+                " FROM " PRODUCT_BARCODE_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id);
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    bSuccess = query.next();
+    if (bSuccess)
+    {
+      barcode.m_id = id;
+      barcode.m_product.m_id = query.value(0).toLongLong();
+      barcode.m_code = query.value(1).toString();
+    }
+    else
+    {
+      error = "Código não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  if (barcode.m_product.isValidId())
+    ProductSQL::execSelect(query, barcode.m_product, error);
+
+  if (!bSuccess)
+  {
+    if (error.isEmpty())
+      error = query.lastError().text();
+    barcode.clear();
+  }
+
+  return bSuccess;
+}
+
+bool ProductBarcodeSQL::select(ProductBarcode& barcode,
+                               QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execSelect(query, barcode, error);
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ProductBarcodeSQL::insert(const ProductBarcode& barcode,
+                               QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("INSERT INTO " PRODUCT_BARCODE_SQL_TABLE_NAME " ("
+                PRODUCT_BARCODE_SQL_COL01 ","
+                PRODUCT_BARCODE_SQL_COL02 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02))");
+  query.bindValue(":_v01", barcode.m_product.m_id);
+  query.bindValue(":_v02", barcode.m_code);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+    barcode.m_id = query.lastInsertId().toLongLong();
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ProductBarcodeSQL::update(const ProductBarcode& barcode,
+                               QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare(
+        QString("UPDATE " PRODUCT_BARCODE_SQL_TABLE_NAME " SET "
+                PRODUCT_BARCODE_SQL_COL01 " = (:_v01),"
+                PRODUCT_BARCODE_SQL_COL02 " = (:_v02)") +
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", barcode.m_id);
+  query.bindValue(":_v01", barcode.m_product.m_id);
+  query.bindValue(":_v02", barcode.m_code);
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ProductBarcodeSQL::remove(qlonglong id,
+                               QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM " PRODUCT_BARCODE_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id);
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
 }

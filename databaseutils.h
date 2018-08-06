@@ -16,6 +16,7 @@
 #include "address.h"
 #include "shoppinglist.h"
 #include "reservation.h"
+#include "productbarcode.h"
 
 class UserLoginSQL
 {
@@ -113,6 +114,25 @@ bool insert(const Product& product,
             QString& error);
 
 bool update(const Product& product,
+            QString& error);
+
+bool remove(qlonglong id,
+            QString& error);
+}
+
+namespace ProductBarcodeSQL
+{
+bool execSelect(QSqlQuery& query,
+                ProductBarcode& barcode,
+                QString& error);
+
+bool select(ProductBarcode& barcode,
+            QString& error);
+
+bool insert(const ProductBarcode& barcode,
+            QString& error);
+
+bool update(const ProductBarcode& barcode,
             QString& error);
 
 bool remove(qlonglong id,

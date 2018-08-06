@@ -16,6 +16,7 @@
 #include "reservationview.h"
 #include "shopview.h"
 #include "jdatabase.h"
+#include "productbarcodeview.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -142,6 +143,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openActiveUsersDialog()));
+
+  QObject::connect(ui->actionProductBarcodes,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openProductBarcodeDialog()));
 
   QObject::connect(ui->actionExit,
                    SIGNAL(triggered(bool)),
@@ -513,6 +519,20 @@ void BaitaAssistant::openActiveUsersDialog()
   dlg.exec();
 }
 
+void BaitaAssistant::openProductBarcodeDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout;
+  dlg.setLayout(layout);
+  ProductBarcodeView* w = new ProductBarcodeView(this);
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Códigos"));
+  dlg.setWindowIcon(QIcon(":/icons/res/barcode.png"));
+  dlg.setModal(true);
+  dlg.exec();
+}
+
 void BaitaAssistant::closeEvent(QCloseEvent* event)
 {
   if (QMessageBox::question(this,
@@ -524,3 +544,4 @@ void BaitaAssistant::closeEvent(QCloseEvent* event)
   else
     event->ignore();
 }
+

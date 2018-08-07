@@ -75,7 +75,7 @@ namespace
       strNote += ESC_BARCODE_HRI_OFF
                  ESC_BARCODE_HEIGHT +
                  QString(decToHex[120]) +
-                 ESC_BARCODE_CODE39 +
+                 ESC_BARCODE_CODE93 +
                  QString(decToHex[note.strNumber().length()]) +
                  note.strNumber() +
                  ESC_LF;

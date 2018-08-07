@@ -27,6 +27,7 @@
 #define ESC_BARCODE_HRI_ON  "\x1d\x48\x31"
 #define ESC_BARCODE_HEIGHT  "\x1d\x68"
 #define ESC_BARCODE_CODE39  "\x1d\x6b\x45"
+#define ESC_BARCODE_CODE93  "\x1d\x6b\x48"
 
 #define TABLE_WIDTH           48
 #define TABLE_MAX_VALUE       10000

@@ -50,7 +50,7 @@ ProductBarcodeView::ProductBarcodeView(QWidget* parent)
   buttonlayout->addWidget(m_btnSave);
 
   QFormLayout* codeLayout = new QFormLayout;
-  codeLayout->addRow(tr("Código"), m_edCode);
+  codeLayout->addRow(tr("Código:"), m_edCode);
 
   QVBoxLayout* tabInfoLayout = new QVBoxLayout;
   tabInfoLayout->setAlignment(Qt::AlignTop);

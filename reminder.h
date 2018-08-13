@@ -60,7 +60,7 @@ struct Reminder : public JItem
 
   bool isValid() const
   {
-    return !m_title.isEmpty() || !m_message.isEmpty();
+    return !m_title.isEmpty() || !m_message.isEmpty() || !m_barcode.isEmpty();
   }
 
   Reminder()

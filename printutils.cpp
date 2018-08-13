@@ -309,6 +309,7 @@ QString ReminderPrinter::build(const Reminder& r)
       str += ESC_LF;
     str += r.m_bBarcodeHRI ? ESC_BARCODE_HRI_ON : ESC_BARCODE_HRI_OFF;
     str += ESC_BARCODE_HEIGHT +
+           QString(decToHex[120]) +
            ESC_BARCODE_CODE93 +
            QString(decToHex[r.m_barcode.length()]) +
            r.m_barcode;

@@ -9,6 +9,7 @@
 #include <QDockWidget>
 #include <QSplitter>
 #include <QMessageBox>
+#include <QLabel>
 
 ReminderView::ReminderView(QWidget *parent)
   : QFrame(parent)
@@ -73,6 +74,12 @@ ReminderView::ReminderView(QWidget *parent)
   m_cbBarcodeHRI = new QCheckBox;
   m_cbBarcodeHRI->setText(tr("Incluir HRI"));
 
+  QLabel* lblBarcode = new QLabel();
+  lblBarcode->setPixmap(QIcon(":/icons/res/barcode.png").pixmap(QSize(24, 24)));
+  lblBarcode->setMinimumSize(24, 24);
+  lblBarcode->setMaximumSize(24, 24);
+  lblBarcode->setScaledContents(true);
+
   QFrame* vFrame1 = new QFrame;
   vFrame1->setFrameShape(QFrame::VLine);
 
@@ -103,6 +110,7 @@ ReminderView::ReminderView(QWidget *parent)
   QHBoxLayout* hlayout3 = new QHBoxLayout;
   hlayout3->setContentsMargins(0, 0, 0, 0);
   hlayout3->setAlignment(Qt::AlignLeft);
+  hlayout3->addWidget(lblBarcode);
   hlayout3->addWidget(m_edBarcode);
   hlayout3->addWidget(m_cbBarcodeHRI);
 

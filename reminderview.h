@@ -40,10 +40,12 @@ private:
   int m_currentId;
   JLineEdit* m_edTitle;
   QPlainTextEdit* m_teMessage;
+  JLineEdit* m_edBarcode;
   QCheckBox* m_cbCapitalization;
   QRadioButton* m_rdSize1;
   QRadioButton* m_rdSize2;
   QCheckBox* m_cbFavorite;
+  QCheckBox* m_cbBarcodeHRI;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSearch;
   QCheckBox* m_cbSave;

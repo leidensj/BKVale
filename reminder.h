@@ -25,6 +25,8 @@ struct Reminder : public JItem
   bool m_bFavorite;
   Size m_size;
   Capitalization m_capitalization;
+  bool m_bBarcodeHRI;
+  QString m_barcode;
 
   void clear()
   {
@@ -34,6 +36,8 @@ struct Reminder : public JItem
     m_bFavorite = false;
     m_size = Size::Large;
     m_capitalization = Capitalization::AllUppercase;
+    m_bBarcodeHRI = true;
+    m_barcode.clear();
   }
 
   bool operator != (const JItem& other) const
@@ -44,7 +48,9 @@ struct Reminder : public JItem
         m_message != another.m_message ||
         m_bFavorite != another.m_bFavorite ||
         m_size != another.m_size ||
-        m_capitalization != another.m_capitalization;
+        m_capitalization != another.m_capitalization ||
+        m_bBarcodeHRI != another.m_bBarcodeHRI ||
+        m_barcode != another.m_barcode;
   }
 
   bool operator == (const JItem& other) const

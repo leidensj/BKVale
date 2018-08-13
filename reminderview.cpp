@@ -15,10 +15,12 @@ ReminderView::ReminderView(QWidget *parent)
   , m_currentId(INVALID_ID)
   , m_edTitle(nullptr)
   , m_teMessage(nullptr)
+  , m_edBarcode(nullptr)
   , m_cbCapitalization(nullptr)
   , m_rdSize1(nullptr)
   , m_rdSize2(nullptr)
   , m_cbFavorite(nullptr)
+  , m_cbBarcodeHRI(nullptr)
   , m_btnCreate(nullptr)
   , m_btnSearch(nullptr)
   , m_cbSave(nullptr)
@@ -64,6 +66,12 @@ ReminderView::ReminderView(QWidget *parent)
   m_cbFavorite->setText(tr("Favorito"));
   m_cbFavorite->setIcon(QIcon(":/icons/res/favorite.png"));
   m_cbFavorite->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F));
+  m_edBarcode = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
+  m_edBarcode->setPlaceholderText(tr("Código de barras"));
+  m_edBarcode->setMaxLength(REMINDER_MAX_BARCODE_CODE93_LENGTH);
+  m_edBarcode->setClearButtonEnabled(true);
+  m_cbBarcodeHRI = new QCheckBox;
+  m_cbBarcodeHRI->setText(tr("Incluir HRI"));
 
   QFrame* vFrame1 = new QFrame;
   vFrame1->setFrameShape(QFrame::VLine);
@@ -82,7 +90,7 @@ ReminderView::ReminderView(QWidget *parent)
   QFrame* vFrame3 = new QFrame;
   vFrame3->setFrameShape(QFrame::VLine);
 
-  QHBoxLayout* hlayout2 = new QHBoxLayout();
+  QHBoxLayout* hlayout2 = new QHBoxLayout;
   hlayout2->setContentsMargins(0, 0, 0, 0);
   hlayout2->setAlignment(Qt::AlignLeft);
   hlayout2->addWidget(m_cbCapitalization);
@@ -92,12 +100,19 @@ ReminderView::ReminderView(QWidget *parent)
   hlayout2->addWidget(vFrame3);
   hlayout2->addWidget(m_cbFavorite);
 
+  QHBoxLayout* hlayout3 = new QHBoxLayout;
+  hlayout3->setContentsMargins(0, 0, 0, 0);
+  hlayout3->setAlignment(Qt::AlignLeft);
+  hlayout3->addWidget(m_edBarcode);
+  hlayout3->addWidget(m_cbBarcodeHRI);
+
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setContentsMargins(9, 0, 0, 0);
   viewLayout->addLayout(hlayout1);
   viewLayout->addWidget(m_edTitle);
   viewLayout->addLayout(hlayout2);
   viewLayout->addWidget(m_teMessage);
+  viewLayout->addLayout(hlayout3);
 
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
@@ -177,6 +192,8 @@ Reminder ReminderView::getReminder() const
       r.m_capitalization = Reminder::Capitalization::AllUppercase;
       break;
   }
+  r.m_bBarcodeHRI = m_cbBarcodeHRI->isChecked();
+  r.m_barcode = m_edBarcode->text();
   return r;
 }
 
@@ -262,6 +279,8 @@ void ReminderView::setReminder(const Reminder& reminder)
       m_cbCapitalization->setCheckState(Qt::Unchecked);
       break;
   }
+  m_cbBarcodeHRI->setChecked(reminder.m_bBarcodeHRI);
+  m_edBarcode->setText(reminder.m_barcode);
 }
 
 void ReminderView::search()

@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QLabel>
 #include <QCloseEvent>
+#include <QInputDialog>
 
 BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   : QMainWindow(parent)
@@ -260,8 +261,21 @@ void BaitaAssistant::print()
       }
       else
       {
+        int nCopies = QInputDialog::getInt(this,
+                                           tr("Imprimir Lembrete"),
+                                           tr("Número de cópias:"),
+                                           1, 1, 100);
         r = m_reminder->getReminder();
-        if (print(ReminderPrinter::build(r)))
+        QString str = ReminderPrinter::build(r);
+        bool bSuccess= false;
+        for (int i = 0; i != nCopies; ++i)
+        {
+          bSuccess = print(str);
+          if (!bSuccess)
+            break;
+        }
+
+        if (bSuccess)
           m_reminder->create();
       }
     } break;

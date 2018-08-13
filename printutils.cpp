@@ -301,10 +301,22 @@ QString ReminderPrinter::build(const Reminder& r)
     str += msg;
     if (r.m_size == Reminder::Size::Large)
       str += ESC_EXPAND_OFF;
-    str += ESC_LF ESC_LF;
   }
 
-  str += ESC_FULL_CUT;
+  if (!r.m_barcode.isEmpty() && 0 < r.m_barcode.length() && r.m_barcode.length() < 256)
+  {
+    if (!str.isEmpty())
+      str += ESC_LF;
+    str += r.m_bBarcodeHRI ? ESC_BARCODE_HRI_ON : ESC_BARCODE_HRI_OFF;
+    str += ESC_BARCODE_HEIGHT +
+           ESC_BARCODE_CODE93 +
+           QString(decToHex[r.m_barcode.length()]) +
+           r.m_barcode;
+  }
+
+  if (!str.isEmpty())
+    str += ESC_LF ESC_LF ESC_FULL_CUT;
+
   return str;
 }
 

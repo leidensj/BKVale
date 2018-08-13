@@ -133,7 +133,9 @@ bool BaitaSQL::createTables(QString& error)
                           REMINDER_SQL_COL02 " TEXT,"
                           REMINDER_SQL_COL03 " BOOLEAN,"
                           REMINDER_SQL_COL04 " INTEGER,"
-                          REMINDER_SQL_COL05 " INTEGER)");
+                          REMINDER_SQL_COL05 " INTEGER,"
+                          REMINDER_SQL_COL06 " BOOLEAN,"
+                          REMINDER_SQL_COL07 " TEXT)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
@@ -1164,7 +1166,9 @@ bool ReminderSQL::execSelect(QSqlQuery& query,
                 REMINDER_SQL_COL02 ","
                 REMINDER_SQL_COL03 ","
                 REMINDER_SQL_COL04 ","
-                REMINDER_SQL_COL05
+                REMINDER_SQL_COL05 ","
+                REMINDER_SQL_COL06 ","
+                REMINDER_SQL_COL07
                 " FROM " REMINDER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -1179,6 +1183,8 @@ bool ReminderSQL::execSelect(QSqlQuery& query,
       reminder.m_bFavorite = query.value(2).toBool();
       reminder.m_capitalization = (Reminder::Capitalization)query.value(3).toInt();
       reminder.m_size = (Reminder::Size)query.value(4).toInt();
+      reminder.m_bBarcodeHRI = query.value(5).toBool();
+      reminder.m_barcode = query.value(6).toString();
       return true;
     }
     else
@@ -1224,18 +1230,24 @@ bool ReminderSQL::insert(const Reminder& reminder,
                 REMINDER_SQL_COL02 ","
                 REMINDER_SQL_COL03 ","
                 REMINDER_SQL_COL04 ","
-                REMINDER_SQL_COL05
+                REMINDER_SQL_COL05 ","
+                REMINDER_SQL_COL06 ","
+                REMINDER_SQL_COL07
                 ") VALUES ("
                 "(:_v01),"
                 "(:_v02),"
                 "(:_v03),"
                 "(:_v04),"
-                "(:_v05))");
+                "(:_v05),"
+                "(:_v06),"
+                "(:_v07))");
   query.bindValue(":_v01", reminder.m_title);
   query.bindValue(":_v02", reminder.m_message);
   query.bindValue(":_v03", reminder.m_bFavorite);
   query.bindValue(":_v04", (int)reminder.m_capitalization);
   query.bindValue(":_v05", (int)reminder.m_size);
+  query.bindValue(":_v06", reminder.m_bBarcodeHRI);
+  query.bindValue(":_v07", reminder.m_barcode);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -1259,7 +1271,9 @@ bool ReminderSQL::update(const Reminder& reminder,
                 REMINDER_SQL_COL02 " = (:_v02),"
                 REMINDER_SQL_COL03 " = (:_v03),"
                 REMINDER_SQL_COL04 " = (:_v04),"
-                REMINDER_SQL_COL05 " = (:_v05)"
+                REMINDER_SQL_COL05 " = (:_v05),"
+                REMINDER_SQL_COL06 " = (:_v06),"
+                REMINDER_SQL_COL07 " = (:_v07)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", reminder.m_id);
   query.bindValue(":_v01", reminder.m_title);
@@ -1267,6 +1281,8 @@ bool ReminderSQL::update(const Reminder& reminder,
   query.bindValue(":_v03", reminder.m_bFavorite);
   query.bindValue(":_v04", (int)reminder.m_capitalization);
   query.bindValue(":_v05", (int)reminder.m_size);
+  query.bindValue(":_v06", reminder.m_bBarcodeHRI);
+  query.bindValue(":_v07", reminder.m_barcode);
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);

@@ -11,6 +11,16 @@ namespace Ui {
 class BaitaAssistant;
 }
 
+enum class Functionality : int
+{
+  None = 0,
+  Note,
+  Reminder,
+  Calculator,
+  Shop,
+  Reservation
+};
+
 class QLabel;
 class NoteView;
 class ReminderView;
@@ -18,15 +28,7 @@ class ConsumptionWidget;
 class CalculatorWidget;
 class ShopView;
 class ReservationView;
-
-enum class Functionality : int
-{
-  NoteMode = 0,
-  ReminderMode,
-  CalculatorMode,
-  ShopMode,
-  ReservationMode
-};
+class JMdiSubWindow;
 
 class BaitaAssistant : public QMainWindow
 {
@@ -53,8 +55,14 @@ private:
   Settings m_settings;
   QLabel* m_statusDatabasePath;
   QLabel* m_statusUserName;
+  JMdiSubWindow* m_noteWindow;
+  JMdiSubWindow* m_reminderWindow;
+  JMdiSubWindow* m_calculatorWindow;
+  JMdiSubWindow* m_shopWindow;
+  JMdiSubWindow* m_reservationWindow;
   bool connectPrinter();
   void disconnectPrinter();
+  Functionality getCurrentFunctionality() const;
 
 private slots:
   void updateControls();
@@ -72,6 +80,7 @@ private slots:
   void openShoppingListDialog();
   void openActiveUsersDialog();
   void openProductBarcodeDialog();
+  void activateWindow();
 };
 
 #endif // MAINWINDOW_H

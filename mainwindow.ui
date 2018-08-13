@@ -38,89 +38,28 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
+     <widget class="QMdiArea" name="mdi">
+      <property name="background">
+       <brush brushstyle="BDiagPattern">
+        <color alpha="255">
+         <red>160</red>
+         <green>160</green>
+         <blue>160</blue>
+        </color>
+       </brush>
       </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
+      <property name="activationOrder">
+       <enum>QMdiArea::StackingOrder</enum>
       </property>
-      <property name="tabShape">
-       <enum>QTabWidget::Rounded</enum>
-      </property>
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>24</width>
-        <height>24</height>
-       </size>
-      </property>
-      <property name="elideMode">
-       <enum>Qt::ElideNone</enum>
+      <property name="viewMode">
+       <enum>QMdiArea::SubWindowView</enum>
       </property>
       <property name="documentMode">
        <bool>false</bool>
       </property>
-      <property name="tabsClosable">
+      <property name="tabsMovable">
        <bool>false</bool>
       </property>
-      <property name="movable">
-       <bool>false</bool>
-      </property>
-      <widget class="QWidget" name="tabNotes">
-       <attribute name="icon">
-        <iconset resource="icons.qrc">
-         <normaloff>:/icons/res/note.png</normaloff>:/icons/res/note.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Vales</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout"/>
-      </widget>
-      <widget class="QWidget" name="tabReminder">
-       <attribute name="icon">
-        <iconset resource="icons.qrc">
-         <normaloff>:/icons/res/postit.png</normaloff>:/icons/res/postit.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Lembretes</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2"/>
-      </widget>
-      <widget class="QWidget" name="tabCalculator">
-       <attribute name="icon">
-        <iconset resource="icons.qrc">
-         <normaloff>:/icons/res/calculator.png</normaloff>:/icons/res/calculator.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Calculadora</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4"/>
-      </widget>
-      <widget class="QWidget" name="tabShop">
-       <attribute name="icon">
-        <iconset resource="icons.qrc">
-         <normaloff>:/icons/res/shop.png</normaloff>:/icons/res/shop.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Compras</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5"/>
-      </widget>
-      <widget class="QWidget" name="tabReservation">
-       <attribute name="icon">
-        <iconset resource="icons.qrc">
-         <normaloff>:/icons/res/reservation.png</normaloff>:/icons/res/reservation.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Reservas</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_6"/>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -215,6 +154,25 @@
    <addaction name="menuImpressora"/>
    <addaction name="menuConfigura_es"/>
    <addaction name="menuAjuda"/>
+  </widget>
+  <widget class="QToolBar" name="toolFunctionality">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNotes"/>
+   <addaction name="actionReminders"/>
+   <addaction name="actionCalculator"/>
+   <addaction name="actionShop"/>
+   <addaction name="actionReservations"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">
@@ -376,6 +334,51 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar usuários</string>
+   </property>
+  </action>
+  <action name="actionNotes">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/note.png</normaloff>:/icons/res/note.png</iconset>
+   </property>
+   <property name="text">
+    <string>Vales</string>
+   </property>
+  </action>
+  <action name="actionReminders">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/postit.png</normaloff>:/icons/res/postit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lembretes</string>
+   </property>
+  </action>
+  <action name="actionCalculator">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/calculator.png</normaloff>:/icons/res/calculator.png</iconset>
+   </property>
+   <property name="text">
+    <string>Calculadora</string>
+   </property>
+  </action>
+  <action name="actionShop">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/shop.png</normaloff>:/icons/res/shop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Compras</string>
+   </property>
+  </action>
+  <action name="actionReservations">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/reservation.png</normaloff>:/icons/res/reservation.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reservas</string>
    </property>
   </action>
  </widget>

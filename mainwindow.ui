@@ -39,14 +39,10 @@
     </property>
     <item>
      <widget class="QMdiArea" name="mdi">
-      <property name="background">
-       <brush brushstyle="BDiagPattern">
-        <color alpha="255">
-         <red>160</red>
-         <green>160</green>
-         <blue>160</blue>
-        </color>
-       </brush>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
       </property>
       <property name="activationOrder">
        <enum>QMdiArea::StackingOrder</enum>
@@ -65,6 +61,12 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="toolMain">
+   <property name="windowTitle">
+    <string>Barra de Ferramentas</string>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
    <property name="movable">
     <bool>false</bool>
    </property>
@@ -156,8 +158,14 @@
    <addaction name="menuAjuda"/>
   </widget>
   <widget class="QToolBar" name="toolFunctionality">
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Funcionalidades</string>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>

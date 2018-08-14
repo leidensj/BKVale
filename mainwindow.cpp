@@ -214,8 +214,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(activateWindow()));
 
-
-
+  activateWindow();
   m_settings.load();
   updateControls();
   updateStatusBar();
@@ -631,27 +630,27 @@ void BaitaAssistant::activateWindow()
   m_reservationWindow->hide();
   if (sender() == ui->actionNotes)
   {
-    m_noteWindow->show();
+    m_noteWindow->showMaximized();
     ui->mdi->setActiveSubWindow(m_noteWindow);
   }
   else if (sender() == ui->actionReminders)
   {
-    m_reminderWindow->show();
+    m_reminderWindow->showMaximized();
     ui->mdi->setActiveSubWindow(m_reminderWindow);
   }
   else if (sender() == ui->actionCalculator)
   {
-    m_calculatorWindow->show();
+    m_calculatorWindow->showMaximized();
     ui->mdi->setActiveSubWindow(m_calculatorWindow);
   }
   else if (sender() == ui->actionShop)
   {
-    m_shopWindow->show();
+    m_shopWindow->showMaximized();
     ui->mdi->setActiveSubWindow(m_shopWindow);
   }
   else if (sender() == ui->actionReservations)
   {
-    m_reservationWindow->show();
+    m_reservationWindow->showMaximized();
     ui->mdi->setActiveSubWindow(m_reservationWindow);
   }
 }

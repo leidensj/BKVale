@@ -257,7 +257,6 @@ NoteView::NoteView(QWidget *parent)
   splitter->addWidget(viewFrame);
 
   QVBoxLayout* mainLayout = new QVBoxLayout();
-  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(splitter);
   setLayout(mainLayout);
 

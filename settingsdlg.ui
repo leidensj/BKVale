@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>407</width>
-    <height>247</height>
+    <height>267</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,15 +32,15 @@
      <property name="tabsClosable">
       <bool>false</bool>
      </property>
-     <widget class="QWidget" name="general">
+     <widget class="QWidget" name="printer">
       <attribute name="icon">
        <iconset resource="icons.qrc">
-        <normaloff>:/icons/res/general.png</normaloff>:/icons/res/general.png</iconset>
+        <normaloff>:/icons/res/printer.png</normaloff>:/icons/res/printer.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>Geral</string>
+       <string>Impressora</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
@@ -90,30 +90,6 @@
          </item>
         </layout>
        </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="printer">
-      <attribute name="icon">
-       <iconset resource="icons.qrc">
-        <normaloff>:/icons/res/printer.png</normaloff>:/icons/res/printer.png</iconset>
-      </attribute>
-      <attribute name="title">
-       <string>Impressora</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QGroupBox" name="grpSerial">
          <property name="title">
@@ -199,6 +175,10 @@
         </spacer>
        </item>
       </layout>
+      <zorder>grpSerial</zorder>
+      <zorder>grpEthernet</zorder>
+      <zorder>label_10</zorder>
+      <zorder>layoutWidget</zorder>
      </widget>
      <widget class="QWidget" name="notes">
       <attribute name="icon">

@@ -24,6 +24,24 @@
 #include <QLabel>
 #include <QCloseEvent>
 #include <QInputDialog>
+#include <QMdiSubWindow>
+
+class JMdiSubWindow : public QMdiSubWindow
+{
+public:
+  JMdiSubWindow(QWidget* parent = nullptr)
+    : QMdiSubWindow(parent)
+  {
+
+  }
+
+protected:
+  void closeEvent(QCloseEvent *closeEvent)
+  {
+    closeEvent->ignore();
+    hide();
+  }
+};
 
 BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   : QMainWindow(parent)
@@ -37,6 +55,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_reservation(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
+  , m_noteWindow(nullptr)
+  , m_reminderWindow(nullptr)
+  , m_calculatorWindow(nullptr)
+  , m_shopWindow(nullptr)
+  , m_reservationWindow(nullptr)
 {
   ui->setupUi(this);
   m_note = new NoteView;
@@ -44,11 +67,33 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_calculator = new CalculatorWidget;
   m_shop = new ShopView;
   m_reservation = new ReservationView;
-  ui->tabNotes->layout()->addWidget(m_note);
-  ui->tabReminder->layout()->addWidget(m_reminder);
-  ui->tabCalculator->layout()->addWidget(m_calculator);
-  ui->tabShop->layout()->addWidget(m_shop);
-  ui->tabReservation->layout()->addWidget(m_reservation);
+
+
+  m_noteWindow = new JMdiSubWindow(this);
+  m_noteWindow->setWindowTitle(tr("Vales"));
+  m_noteWindow->setWindowIcon(QIcon(":/icons/res/note.png"));
+  m_noteWindow->setWidget(m_note);
+  ui->mdi->addSubWindow(m_noteWindow);
+  m_reminderWindow = new JMdiSubWindow(this);
+  m_reminderWindow->setWindowTitle(tr("Lembretes"));
+  m_reminderWindow->setWindowIcon(QIcon(":/icons/res/postit.png"));
+  m_reminderWindow->setWidget(m_reminder);
+  ui->mdi->addSubWindow(m_reminderWindow);
+  m_calculatorWindow = new JMdiSubWindow(this);
+  m_calculatorWindow->setWindowTitle(tr("Calculadora"));
+  m_calculatorWindow->setWindowIcon(QIcon(":/icons/res/calculator.png"));
+  m_calculatorWindow->setWidget(m_calculator);
+  ui->mdi->addSubWindow(m_calculatorWindow);
+  m_shopWindow = new JMdiSubWindow(this);
+  m_shopWindow->setWindowTitle(tr("Compras"));
+  m_shopWindow->setWindowIcon(QIcon(":/icons/res/shop.png"));
+  m_shopWindow->setWidget(m_shop);
+  ui->mdi->addSubWindow(m_shopWindow);
+  m_reservationWindow = new JMdiSubWindow(this);
+  m_reservationWindow->setWindowTitle(tr("Reservas"));
+  m_reservationWindow->setWindowIcon(QIcon(":/icons/res/reservation.png"));
+  m_reservationWindow->setWidget(m_reservation);
+  ui->mdi->addSubWindow(m_reservationWindow);
 
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
@@ -58,7 +103,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_statusUserName->setTextFormat(Qt::RichText);
   statusBar()->addWidget(m_statusDatabasePath);
   statusBar()->addWidget(m_statusUserName);
-
 
   QObject::connect(ui->actionPrint,
                    SIGNAL(triggered(bool)),
@@ -77,11 +121,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
 
   QObject::connect(m_note,
                    SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
-
-  QObject::connect(ui->tabWidget,
-                   SIGNAL(currentChanged(int)),
                    this,
                    SLOT(updateControls()));
 
@@ -150,6 +189,32 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(close()));
 
+  QObject::connect(ui->actionNotes,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(activateWindow()));
+
+  QObject::connect(ui->actionReminders,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(activateWindow()));
+
+  QObject::connect(ui->actionCalculator,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(activateWindow()));
+
+  QObject::connect(ui->actionShop,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(activateWindow()));
+
+  QObject::connect(ui->actionReservations,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(activateWindow()));
+
+  activateWindow();
   m_settings.load();
   updateControls();
   updateStatusBar();
@@ -232,11 +297,27 @@ void BaitaAssistant::disconnectPrinter()
     m_printerTCP.close();
 }
 
+Functionality BaitaAssistant::getCurrentFunctionality() const
+{
+  QMdiSubWindow* activeWindow = ui->mdi->activeSubWindow();
+  if (activeWindow == m_noteWindow)
+    return Functionality::Note;
+  else if (activeWindow == m_reminderWindow)
+    return Functionality::Reminder;
+  else if (activeWindow == m_calculatorWindow)
+    return Functionality::Calculator;
+  else if (activeWindow == m_shopWindow)
+    return Functionality::Reservation;
+  else if (activeWindow == m_reservationWindow)
+    return Functionality::Reservation;
+  return Functionality::None;
+}
+
 void BaitaAssistant::print()
 {
-  switch ((Functionality)ui->tabWidget->currentIndex())
+  switch (getCurrentFunctionality())
   {
-    case Functionality::NoteMode:
+    case Functionality::Note:
     {
       QString name;
       if (m_settings.m_notesPincodeRequired)
@@ -250,7 +331,7 @@ void BaitaAssistant::print()
       if (note.isValidId())
         print(NotePrinter::build(note, name));
     } break;
-    case Functionality::ReminderMode:
+    case Functionality::Reminder:
     {
       Reminder r;
       if (m_reminder->isSave())
@@ -279,18 +360,23 @@ void BaitaAssistant::print()
           m_reminder->create();
       }
     } break;
-    case Functionality::CalculatorMode:
+    case Functionality::Calculator:
+    {
       print(m_calculator->getFullContent() + Printer::strCmdFullCut());
-      break;
-    case Functionality::ShopMode:
+    } break;
+    case Functionality::Shop:
+    {
       print(ShoppingListPrinter::build(m_shop->getShoppingList()));
-      break;
-    case Functionality::ReservationMode:
+    } break;
+    case Functionality::Reservation:
     {
       Reservation res = m_reservation->save();
       if (res.isValidId())
         print(ReservationPrinter::build(res));
     } break;
+    case Functionality::None:
+    default:
+      break;
   }
 }
 
@@ -353,32 +439,27 @@ void BaitaAssistant::updateControls()
   ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
   ui->actionShoppingList->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShoppingLists());
 
-  ui->tabWidget->setTabEnabled((int)Functionality::NoteMode,
-                               bIsSQLOk && m_userLogin.hasAccessToNote());
-  ui->tabWidget->setTabEnabled((int)Functionality::ReminderMode,
-                               bIsSQLOk && m_userLogin.hasAccessToReminder());
-  ui->tabWidget->setTabEnabled((int)Functionality::CalculatorMode,
-                               bIsSQLOk && m_userLogin.hasAccessToCalculator());
-  ui->tabWidget->setTabEnabled((int)Functionality::ShopMode,
-                               bIsSQLOk && m_userLogin.hasAccessToShop());
-  ui->tabWidget->setTabEnabled((int)Functionality::ReservationMode,
-                               bIsSQLOk && m_userLogin.hasAccessToReservations());
+  ui->actionNotes->setEnabled(bIsSQLOk && m_userLogin.hasAccessToNote());
+  ui->actionReminders->setEnabled(bIsSQLOk && m_userLogin.hasAccessToReminder());
+  ui->actionCalculator->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCalculator());
+  ui->actionShop->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShop());
+  ui->actionReservations->setEnabled(bIsSQLOk && m_userLogin.hasAccessToReservations());
 
-  switch ((Functionality)ui->tabWidget->currentIndex())
+  switch (getCurrentFunctionality())
   {
-    case Functionality::NoteMode:
+    case Functionality::Note:
       ui->actionPrint->setEnabled(m_note->getNote().isValid());
       break;
-    case Functionality::ReminderMode:
+    case Functionality::Reminder:
       ui->actionPrint->setEnabled(m_reminder->getReminder().isValid());
       break;
-      case Functionality::CalculatorMode:
+      case Functionality::Calculator:
       ui->actionPrint->setEnabled(true);
       break;
-    case Functionality::ShopMode:
+    case Functionality::Shop:
       ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId());
       break;
-    case Functionality::ReservationMode:
+    case Functionality::Reservation:
       ui->actionPrint->setEnabled(m_reservation->getReservation().isValid());
       break;
     default:
@@ -540,3 +621,36 @@ void BaitaAssistant::closeEvent(QCloseEvent* event)
     event->ignore();
 }
 
+void BaitaAssistant::activateWindow()
+{
+  m_noteWindow->hide();
+  m_reminderWindow->hide();
+  m_calculatorWindow->hide();
+  m_shopWindow->hide();
+  m_reservationWindow->hide();
+  if (sender() == ui->actionNotes)
+  {
+    m_noteWindow->showMaximized();
+    ui->mdi->setActiveSubWindow(m_noteWindow);
+  }
+  else if (sender() == ui->actionReminders)
+  {
+    m_reminderWindow->showMaximized();
+    ui->mdi->setActiveSubWindow(m_reminderWindow);
+  }
+  else if (sender() == ui->actionCalculator)
+  {
+    m_calculatorWindow->showMaximized();
+    ui->mdi->setActiveSubWindow(m_calculatorWindow);
+  }
+  else if (sender() == ui->actionShop)
+  {
+    m_shopWindow->showMaximized();
+    ui->mdi->setActiveSubWindow(m_shopWindow);
+  }
+  else if (sender() == ui->actionReservations)
+  {
+    m_reservationWindow->showMaximized();
+    ui->mdi->setActiveSubWindow(m_reservationWindow);
+  }
+}

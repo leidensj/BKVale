@@ -23,8 +23,8 @@
 #define ESC_EXPAND_ON       "\x1b\x57\x31"
 #define ESC_EXPAND_OFF      "\x1b\x57\x30"
 
-#define ESC_BARCODE_HRI_OFF "\x1d\x48\x30"
-#define ESC_BARCODE_HRI_ON  "\x1d\x48\x31"
+#define ESC_BARCODE_HRI_OFF "\x1d\x48\x00"
+#define ESC_BARCODE_HRI_ON  "\x1d\x48\x01"
 #define ESC_BARCODE_HEIGHT  "\x1d\x68"
 #define ESC_BARCODE_CODE39  "\x1d\x6b\x45"
 #define ESC_BARCODE_CODE93  "\x1d\x6b\x48"

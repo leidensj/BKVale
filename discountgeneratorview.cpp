@@ -1,21 +1,52 @@
-/*#include "discountgeneratorview.h"
+#include "discountgeneratorview.h"
 #include "jlineedit.h"
-#include "jdatabasepicker.h"
+#include "jdoublespinbox.h"
 #include "jdatabase.h"
+#include "jspinbox.h"
+#include "discounttablewidget.h"
+#include <QGroupBox>
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
 #include <QTabWidget>
 #include <QSplitter>
 #include <QMessageBox>
+#include <QRadioButton>
+#include <QCheckBox>
+#include <QDateEdit>
 
-CategoryView::CategoryView(QWidget* parent)
+QString getRandomString(const int length = 10)
+{
+  const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+
+  QString randomString;
+  for(int i = 0; i < length; ++i)
+  {
+    int idx = qrand() % possibleCharacters.length();
+    QChar nextChar = possibleCharacters.at(idx);
+    randomString.append(nextChar);
+  }
+  return randomString;
+}
+
+DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
   : QFrame(parent)
   , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
-  , m_edName(nullptr)
-  , m_imagePicker(nullptr)
+  , m_edCode(nullptr)
+  , m_cbExpires(nullptr)
+  , m_dtExp(nullptr)
+  , m_rdValue(nullptr)
+  , m_rdPercentage(nullptr)
+  , m_rdProduct(nullptr)
+  , m_spnValue(nullptr)
+  , m_spnPercentage(nullptr)
+  , m_btnAdd(nullptr)
+  , m_btnRemove(nullptr)
+  , m_table(nullptr)
+  , m_database(nullptr)
+  , m_cbUsed(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -31,50 +62,126 @@ CategoryView::CategoryView(QWidget* parent)
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
-  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
-  m_edName->setPlaceholderText(tr("*"));
-  m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
+  m_edCode = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags2);
+  m_edCode->setPlaceholderText(tr("*"));
+  m_edCode->setMaxLength(DISCOUNT_CODE_MAX_LENGTH);
+  m_edCode->setReadOnly(true);
 
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
-                                      tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      true,
-                                      true,
-                                      false);
+  m_cbExpires = new QCheckBox;
+  m_cbExpires->setText(tr("Expira em:"));
 
-  QHBoxLayout* buttonlayout = new QHBoxLayout;
-  buttonlayout->setContentsMargins(0, 0, 0, 0);
-  buttonlayout->addWidget(m_btnCreate);
-  buttonlayout->addWidget(m_btnSave);
-  buttonlayout->setAlignment(Qt::AlignLeft);
+  m_dtExp = new QDateEdit;
+  m_dtExp->setCalendarPopup(true);
+  m_dtExp->setDate(QDate::currentDate());
 
-  QFormLayout* namelayout = new QFormLayout;
-  namelayout->setContentsMargins(0, 0, 0, 0);
-  namelayout->addRow(tr("Nome:"), m_edName);
+  m_rdValue = new QRadioButton;
+  m_rdValue->setText(tr("Valor"));
 
-  QVBoxLayout* tablayout = new QVBoxLayout;
-  tablayout->setAlignment(Qt::AlignTop);
-  tablayout->addLayout(namelayout);
-  tablayout->addWidget(m_imagePicker);
+  m_rdPercentage = new QRadioButton;
+  m_rdPercentage->setText(tr("Porcentagem"));
 
-  QFrame* tabframe = new QFrame;
-  tabframe->setLayout(tablayout);
+  m_rdProduct = new QRadioButton;
+  m_rdProduct->setText(tr("Produto"));
+
+  m_spnValue = new JDoubleSpinBox;
+  m_spnValue->setMinimum(0.0);
+  m_spnValue->setMaximum(99999999.0);
+
+  m_spnPercentage = new JDoubleSpinBox;
+  m_spnPercentage->setMinimum(0.0);
+  m_spnPercentage->setMaximum(100.0);
+  m_spnPercentage->setSuffix("%");
+
+  m_btnAdd = new QPushButton;
+  m_btnAdd->setFlat(true);
+  m_btnAdd->setText("");
+  m_btnAdd->setIconSize(QSize(24, 24));
+  m_btnAdd->setIcon(QIcon(":/icons/res/additem.png"));
+  m_btnAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
+  m_btnAdd->setToolTip(tr("Adicionar item (Alt++)"));
+
+  m_btnRemove = new QPushButton;
+  m_btnRemove->setFlat(true);
+  m_btnRemove->setText("");
+  m_btnRemove->setIconSize(QSize(24, 24));
+  m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
+  m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
+  m_btnRemove->setToolTip(tr("Remover item (Alt+-)"));
+
+  m_table = new DiscountTableWidget;
+
+  m_cbUsed = new QCheckBox;
+  m_cbUsed->setText(tr("Desconto já usado."));
+  m_cbUsed->setEnabled(false);
+
+  QHBoxLayout* buttonLayout = new QHBoxLayout;
+  buttonLayout->setContentsMargins(0, 0, 0, 0);
+  buttonLayout->addWidget(m_btnCreate);
+  buttonLayout->addWidget(m_btnSave);
+  buttonLayout->setAlignment(Qt::AlignLeft);
+
+  QFormLayout* codeLayout = new QFormLayout;
+  codeLayout->setContentsMargins(0, 0, 0, 0);
+  codeLayout->addRow(tr("Código:"), m_edCode);
+
+  QHBoxLayout* expLayout = new QHBoxLayout;
+  expLayout->setContentsMargins(0, 0, 0, 0);
+  expLayout->addWidget(m_cbExpires);
+  expLayout->addWidget(m_dtExp);
+
+  QHBoxLayout* valueLayout = new QHBoxLayout;
+  valueLayout->setContentsMargins(0, 0, 0, 0);
+  valueLayout->setAlignment(Qt::AlignLeft);
+  valueLayout->addWidget(m_rdValue);
+  valueLayout->addStretch();
+  valueLayout->addWidget(m_spnValue);
+
+  QHBoxLayout* percentageLayout = new QHBoxLayout;
+  percentageLayout->setContentsMargins(0, 0, 0, 0);
+  percentageLayout->setAlignment(Qt::AlignLeft);
+  percentageLayout->addWidget(m_rdPercentage);
+  percentageLayout->addStretch();
+  percentageLayout->addWidget(m_spnPercentage);
+
+  QHBoxLayout* productButtonsLayout = new QHBoxLayout;
+  productButtonsLayout->setContentsMargins(0, 0, 0, 0);
+  productButtonsLayout->setAlignment(Qt::AlignLeft);
+  productButtonsLayout->addWidget(m_btnAdd);
+  productButtonsLayout->addWidget(m_btnRemove);
+
+  QVBoxLayout* productLayout = new QVBoxLayout;
+  productLayout->setContentsMargins(0, 0, 0, 0);
+  productLayout->setAlignment(Qt::AlignTop);
+  productLayout->addWidget(m_rdProduct);
+  productLayout->addLayout(productButtonsLayout);
+  productLayout->addWidget(m_table);
+
+  QVBoxLayout* tabLayout = new QVBoxLayout;
+  tabLayout->setAlignment(Qt::AlignTop);
+  tabLayout->addWidget(m_cbUsed);
+  tabLayout->addLayout(codeLayout);
+  tabLayout->addLayout(expLayout);
+  tabLayout->addLayout(valueLayout);
+  tabLayout->addLayout(percentageLayout);
+  tabLayout->addLayout(productLayout);
+
+  QFrame* tabFrame = new QFrame;
+  tabFrame->setLayout(tabLayout);
 
   QTabWidget* tabWidget = new QTabWidget;
-  tabWidget->addTab(tabframe,
-                    QIcon(":/icons/res/category.png"),
-                    tr("Categoria"));
+  tabWidget->addTab(tabFrame,
+                    QIcon(":/icons/res/description.png"),
+                    tr("Informações"));
 
-  QVBoxLayout* viewlayout = new QVBoxLayout;
-  viewlayout->setContentsMargins(0, 0, 0, 0);
-  viewlayout->setAlignment(Qt::AlignTop);
-  viewlayout->addLayout(buttonlayout);
-  viewlayout->addWidget(tabWidget);
+  QVBoxLayout* viewLayout = new QVBoxLayout;
+  viewLayout->setAlignment(Qt::AlignTop);
+  viewLayout->addLayout(buttonLayout);
+  viewLayout->addWidget(tabWidget);
 
   QFrame* viewFrame = new QFrame;
-  viewFrame->setLayout(viewlayout);
+  viewFrame->setLayout(viewLayout);
 
-  m_database = new JDatabase(CATEGORY_SQL_TABLE_NAME);
+  m_database = new JDatabase("");
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);
@@ -100,55 +207,111 @@ CategoryView::CategoryView(QWidget* parent)
                    SIGNAL(itemRemovedSignal(qlonglong)),
                    this,
                    SLOT(itemRemoved(qlonglong)));
+  QObject::connect(m_rdValue,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_rdPercentage,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_rdProduct,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+  QObject::connect(m_cbExpires,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(updateControls()));
+
+  create();
 }
 
-void CategoryView::itemSelected(const JItem& jItem)
+void DiscountGeneratorView::itemSelected(const JItem& jItem)
 {
-  const Category& category = dynamic_cast<const Category&>(jItem);
-  if (category.isValidId())
-    setCategory(category);
+  const Discount& o = dynamic_cast<const Discount&>(jItem);
+  if (o.isValidId())
+    setDiscount(o);
 }
 
-void CategoryView::itemRemoved(qlonglong id)
+void DiscountGeneratorView::itemRemoved(qlonglong id)
 {
   if (m_currentId == id)
     create();
 }
 
-void CategoryView::save()
+void DiscountGeneratorView::save()
 {
-  Category category = getCategory();
-  if (m_database->save(category))
+  Discount o = getDiscount();
+  if (m_database->save(o))
     create();
 }
 
-void CategoryView::create()
+void DiscountGeneratorView::create()
 {
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_currentId = INVALID_ID;
-  setCategory(Category());
-  m_edName->setFocus();
+  setDiscount(Discount());
 }
 
-Category CategoryView::getCategory() const
+Discount DiscountGeneratorView::getDiscount() const
 {
-  Category category;
-  category.m_id = m_currentId;
-  category.m_image.m_id = m_imagePicker->getId();
-  category.m_name = m_edName->text();
-  return category;
+  Discount o;
+  o.m_id = m_currentId;
+  o.m_code = m_edCode->text();
+  o.m_bExpires = m_cbExpires->isChecked();
+  o.m_dtExp = m_dtExp->date();
+  o.m_type = m_rdPercentage->isChecked()
+             ? Discount::Type::Percentage
+             : m_rdValue->isChecked()
+             ? Discount::Type::Value
+             : m_rdProduct->isChecked()
+             ? Discount::Type::Product
+             : Discount::Type::None;
+  o.m_value = m_spnValue->value();
+  o.m_percentage = m_spnPercentage->value();
+  o.m_items = m_table->getDiscountItems();
+  o.m_bUsed = m_cbUsed->isChecked();
+  return o;
 }
 
-void CategoryView::setCategory(const Category &category)
+void DiscountGeneratorView::setDiscount(const Discount &o)
 {
-  QString strIcon = category.isValidId()
+  QString strIcon = o.isValidId()
                     ? ":/icons/res/saveas.png"
                     : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(strIcon));
-  m_currentId = category.m_id;
-  m_edName->setText(category.m_name);
-  m_imagePicker->setItem(category.m_image.m_id,
-                         category.m_image.m_name,
-                         category.m_image.m_image);
-}*/
+  m_currentId = o.m_id;
+  m_cbUsed->setChecked(o.m_bUsed);
+  m_cbUsed->setVisible(o.m_bUsed);
+  m_edCode->setText(o.isValidId() ? o.m_code : getRandomString());
+  m_cbExpires->setChecked(o.m_bExpires);
+  m_dtExp->setDate(o.m_dtExp);
+  m_rdValue->setChecked(o.m_type == Discount::Type::Value);
+  m_rdPercentage->setChecked(o.m_type == Discount::Type::Percentage);
+  m_rdProduct->setChecked(o.m_type == Discount::Type::Product);
+  m_spnValue->setValue(o.m_value);
+  m_spnPercentage->setValue(o.m_percentage);
+  m_table->setDiscountItems(o.m_items);
+  updateControls();
+}
 
+void DiscountGeneratorView::updateControls()
+{
+  m_spnValue->setEnabled(m_rdValue->isChecked());
+  m_spnPercentage->setEnabled(m_rdPercentage->isChecked());
+  m_btnAdd->setEnabled(m_rdProduct->isChecked());
+  m_btnRemove->setEnabled(m_rdProduct->isChecked());
+  m_table->setEnabled(m_rdProduct->isChecked());
+  m_dtExp->setEnabled(m_cbExpires->isChecked());
+  if (sender() == m_rdValue)
+  {
+    m_spnValue->setFocus();
+    m_spnValue->selectAll();
+  }
+  if (sender() == m_rdPercentage)
+  {
+    m_spnPercentage->setFocus();
+    m_spnPercentage->selectAll();
+  }
+}

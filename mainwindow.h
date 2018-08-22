@@ -79,6 +79,7 @@ private slots:
   void openPersonsDialog();
   void openShoppingListDialog();
   void openActiveUsersDialog();
+  void openDiscountMgtDialog();
   void openProductBarcodeDialog();
   void activateWindow();
 };

@@ -6,7 +6,7 @@
 DiscountTableWidget::DiscountTableWidget(QWidget* parent)
   : QTableWidget(parent)
 {
-  setColumnCount(2);
+  setColumnCount(3);
   QStringList headers;
   headers << "Quantidade" << "Unidade" << "Produto";
   setHorizontalHeaderLabels(headers);

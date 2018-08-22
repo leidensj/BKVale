@@ -8,7 +8,7 @@ class JSpinBox : public QSpinBox
 {
   Q_OBJECT
 public:
-  JSpinBox(bool enterAsTab,
+  JSpinBox(bool enterAsTab = true,
            QWidget* parent = nullptr);
 
 public:

@@ -5,6 +5,7 @@
 #include "product.h"
 #include <QVector>
 #include <QMetaType>
+#include <QDate>
 
 struct DiscountItem : JItem
 {
@@ -61,8 +62,12 @@ struct Discount : public JItem
 
   QString m_code;
   Type m_type;
+  double m_value;
+  double m_percentage;
   QVector<DiscountItem> m_items;
   bool m_bUsed;
+  bool m_bExpires;
+  QDate m_dtExp;
 
   Discount()
   {
@@ -73,8 +78,12 @@ struct Discount : public JItem
   {
     m_id = INVALID_ID;
     m_type = Type::None;
+    m_value = 0.0;
+    m_percentage = 0.0;
     m_items.clear();
     m_bUsed = false;
+    m_bExpires = false;
+    m_dtExp = QDate::currentDate();
   }
 
   bool operator !=(const JItem& other) const
@@ -83,7 +92,11 @@ struct Discount : public JItem
     return
         m_type != another.m_type ||
         m_items != another.m_items ||
-        m_bUsed != another.m_bUsed;
+        m_bUsed != another.m_bUsed ||
+        m_bExpires != another.m_bExpires ||
+        m_dtExp != another.m_dtExp ||
+        m_value != another.m_value ||
+        m_percentage != another.m_percentage;
   }
 
   bool operator ==(const JItem& other) const

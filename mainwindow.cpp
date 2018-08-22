@@ -14,6 +14,7 @@
 #include "personview.h"
 #include "shoppinglistview.h"
 #include "reservationview.h"
+#include "discountgeneratorview.h"
 #include "shopview.h"
 #include "jdatabase.h"
 #include "productbarcodeview.h"
@@ -183,6 +184,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(openProductBarcodeDialog()));
+
+  QObject::connect(ui->actionDiscount,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openDiscountMgtDialog()));
 
   QObject::connect(ui->actionExit,
                    SIGNAL(triggered(bool)),
@@ -605,6 +611,20 @@ void BaitaAssistant::openProductBarcodeDialog()
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Códigos"));
   dlg.setWindowIcon(QIcon(":/icons/res/barcode.png"));
+  dlg.setModal(true);
+  dlg.exec();
+}
+
+void BaitaAssistant::openDiscountMgtDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout;
+  dlg.setLayout(layout);
+  DiscountGeneratorView* w = new DiscountGeneratorView(this);
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Descontos"));
+  dlg.setWindowIcon(QIcon(":/icons/res/discount.png"));
   dlg.setModal(true);
   dlg.exec();
 }

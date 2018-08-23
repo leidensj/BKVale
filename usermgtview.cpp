@@ -34,6 +34,7 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   , m_accessImage(nullptr)
   , m_accessReservation(nullptr)
   , m_accessSettings(nullptr)
+  , m_accessProductBarcode(nullptr)
   , m_database(nullptr)
 {
   m_create = new QPushButton;
@@ -132,6 +133,10 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
   m_accessSettings->setText(tr("Configurações"));
 
+  m_accessProductBarcode = new QCheckBox;
+  m_accessProductBarcode->setIcon(QIcon(":/icons/res/barcode.png"));
+  m_accessProductBarcode->setText(tr("Códigos"));
+
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
   buttonlayout->addWidget(m_create);
@@ -157,6 +162,7 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   tabPermissionslayout->addWidget(m_accessReservation);
   tabPermissionslayout->addWidget(m_accessUser);
   tabPermissionslayout->addWidget(m_accessProduct);
+  tabPermissionslayout->addWidget(m_accessProductBarcode);
   tabPermissionslayout->addWidget(m_accessPerson);
   tabPermissionslayout->addWidget(m_accessEmployee);
   tabPermissionslayout->addWidget(m_accessSupplier);
@@ -253,6 +259,7 @@ User UserMgtView::getUser() const
   user.m_bAccessSettings = m_accessSettings->isChecked();
   user.m_bAccessReservation = m_accessReservation->isChecked();
   user.m_bAccessShoppingList = m_accessShoppingList->isChecked();
+  user.m_bAccessProductBarcode = m_accessProductBarcode->isChecked();
   return user;
 }
 
@@ -280,6 +287,7 @@ void UserMgtView::setUser(const User& user)
   m_accessSettings->setChecked(user.m_bAccessSettings);
   m_accessReservation->setChecked(user.m_bAccessReservation);
   m_accessShoppingList->setChecked(user.m_bAccessShoppingList);
+  m_accessProductBarcode->setChecked(user.m_bAccessProductBarcode);
   m_user->setFocus();
 }
 

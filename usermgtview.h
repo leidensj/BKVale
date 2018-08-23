@@ -45,6 +45,7 @@ private:
   QCheckBox* m_accessImage;
   QCheckBox* m_accessReservation;
   QCheckBox* m_accessSettings;
+  QCheckBox* m_accessProductBarcode;
   JDatabase* m_database;
 
 public slots:

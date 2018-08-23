@@ -434,6 +434,7 @@ void BaitaAssistant::updateControls()
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
   ui->actionProducts->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProducts());
+  ui->actionProductBarcodes->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProductBarcode());
   ui->actionPersons->setEnabled(bIsSQLOk && m_userLogin.hasAccessToPersons());
   ui->actionCategories->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCategories());
   ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
@@ -653,4 +654,5 @@ void BaitaAssistant::activateWindow()
     m_reservationWindow->showMaximized();
     ui->mdi->setActiveSubWindow(m_reservationWindow);
   }
+  updateControls();
 }

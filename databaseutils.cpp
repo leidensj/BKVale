@@ -155,7 +155,8 @@ bool BaitaSQL::createTables(QString& error)
                           USER_SQL_COL13 " BOOLEAN,"
                           USER_SQL_COL14 " BOOLEAN,"
                           USER_SQL_COL15 " BOOLEAN,"
-                          USER_SQL_COL16 " BOOLEAN)");
+                          USER_SQL_COL16 " BOOLEAN,"
+                          USER_SQL_COL17 " BOOLEAN)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
@@ -340,11 +341,12 @@ bool BaitaSQL::createTables(QString& error)
                     USER_SQL_COL13 ","
                     USER_SQL_COL14 ","
                     USER_SQL_COL15 ","
-                    USER_SQL_COL16 ")"
+                    USER_SQL_COL16 ","
+                    USER_SQL_COL17 ")"
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
                     ":_password,"
-                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
+                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
       query.prepare(str);
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();
@@ -1334,7 +1336,8 @@ bool UserSQL::insert(const User& user,
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16 ")"
+                USER_SQL_COL16 ","
+                USER_SQL_COL17 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -1351,7 +1354,8 @@ bool UserSQL::insert(const User& user,
                 "(:_v13),"
                 "(:_v14),"
                 "(:_v15),"
-                "(:_v16))");
+                "(:_v16),"
+                "(:_v17))");
   query.bindValue(":_v01", user.m_strUser);
   query.bindValue(":_v02", user.strEncryptedPassword());
   query.bindValue(":_v03", user.m_bAccessNote);
@@ -1368,6 +1372,7 @@ bool UserSQL::insert(const User& user,
   query.bindValue(":_v14", user.m_bAccessShoppingList);
   query.bindValue(":_v15", user.m_bAccessEmployee);
   query.bindValue(":_v16", user.m_bAccessSupplier);
+  query.bindValue(":_v17", user.m_bAccessProductBarcode);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -1401,7 +1406,8 @@ bool UserSQL::update(const User& user,
               USER_SQL_COL13" = (:_v13),"
               USER_SQL_COL14" = (:_v14),"
               USER_SQL_COL15" = (:_v15),"
-              USER_SQL_COL16" = (:_v16)"
+              USER_SQL_COL16" = (:_v16),"
+              USER_SQL_COL17" = (:_v17)"
               " WHERE " SQL_COLID " = (:_v00)";
 
 
@@ -1427,6 +1433,7 @@ bool UserSQL::update(const User& user,
   query.bindValue(":_v14", user.m_bAccessShoppingList);
   query.bindValue(":_v15", user.m_bAccessEmployee);
   query.bindValue(":_v16", user.m_bAccessSupplier);
+  query.bindValue(":_v17", user.m_bAccessProductBarcode);
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
@@ -1461,7 +1468,8 @@ bool UserSQL::select(User& user,
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16
+                USER_SQL_COL16 ","
+                USER_SQL_COL17
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -1488,6 +1496,7 @@ bool UserSQL::select(User& user,
       user.m_bAccessShoppingList = query.value(13).toBool();
       user.m_bAccessEmployee = query.value(14).toBool();
       user.m_bAccessSupplier = query.value(15).toBool();
+      user.m_bAccessProductBarcode = query.value(16).toBool();
     }
     else
     {
@@ -1552,7 +1561,8 @@ bool UserLoginSQL::login(const QString& strUser,
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16
+                USER_SQL_COL16 ","
+                USER_SQL_COL17
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " USER_SQL_COL01 " = (:_v01) AND "
                 USER_SQL_COL02 " = (:_v02) LIMIT 1");
@@ -1582,6 +1592,7 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessShoppingList = query.value(14).toBool();
       m_user.m_bAccessEmployee = query.value(15).toBool();
       m_user.m_bAccessSupplier = query.value(16).toBool();
+      m_user.m_bAccessProductBarcode = query.value(17).toBool();
 
       bSuccess = ActiveUserSQL::execRemove(query, error);
       if (bSuccess)

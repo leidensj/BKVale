@@ -47,6 +47,7 @@ public:
   bool hasAccessToImages() const { return isValid() && m_user.m_bAccessImage; }
   bool hasAccessToReservations() const { return isValid() && m_user.m_bAccessReservation; }
   bool hasAccessToShoppingLists() const { return isValid() && m_user.m_bAccessShoppingList; }
+  bool hasAccessToProductBarcode() const { return isValid() && m_user.m_bAccessProductBarcode; }
 };
 
 namespace BaitaSQL

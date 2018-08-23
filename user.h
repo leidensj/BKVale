@@ -30,6 +30,7 @@ struct User : public JItem
   bool m_bAccessImage;
   bool m_bAccessReservation;
   bool m_bAccessShoppingList;
+  bool m_bAccessProductBarcode;
   Password m_password;
 
   bool operator != (const JItem& other) const
@@ -50,7 +51,8 @@ struct User : public JItem
         m_bAccessReservation != another.m_bAccessReservation ||
         m_bAccessCategory != another.m_bAccessCategory ||
         m_bAccessImage != another.m_bAccessImage ||
-        m_bAccessShoppingList != another.m_bAccessShoppingList;
+        m_bAccessShoppingList != another.m_bAccessShoppingList ||
+        m_bAccessProductBarcode != another.m_bAccessProductBarcode;
   }
 
   bool operator == (const JItem& other) const

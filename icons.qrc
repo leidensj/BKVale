@@ -152,5 +152,6 @@
         <file>res/users.png</file>
         <file>res/barcode.png</file>
         <file>res/barcodescan.png</file>
+        <file>res/discount.png</file>
     </qresource>
 </RCC>

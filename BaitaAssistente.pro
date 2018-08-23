@@ -46,7 +46,9 @@ SOURCES += main.cpp\
     jspinbox.cpp \
     packageeditor.cpp \
     notefilterdlg.cpp \
-    productbarcodeview.cpp
+    productbarcodeview.cpp \
+    discountgeneratorview.cpp \
+    discounttablewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -96,7 +98,10 @@ HEADERS  += mainwindow.h \
     notefilterdlg.h \
     filterdlg.h \
     productbarcode.h \
-    productbarcodeview.h
+    productbarcodeview.h \
+    discount.h \
+    discountgeneratorview.h \
+    discounttablewidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

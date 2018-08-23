@@ -130,6 +130,7 @@
     <addaction name="actionCategories"/>
     <addaction name="actionImages"/>
     <addaction name="actionShoppingList"/>
+    <addaction name="actionDiscount"/>
     <addaction name="actionUsers"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
@@ -387,6 +388,18 @@
    </property>
    <property name="text">
     <string>Reservas</string>
+   </property>
+  </action>
+  <action name="actionDiscount">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/discount.png</normaloff>:/icons/res/discount.png</iconset>
+   </property>
+   <property name="text">
+    <string>Descontos</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar Descontos</string>
    </property>
   </action>
  </widget>

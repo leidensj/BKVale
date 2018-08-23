@@ -8,7 +8,7 @@ class JDoubleSpinBox : public QDoubleSpinBox
 {
   Q_OBJECT
 public:
-  JDoubleSpinBox(bool enterAsTab,
+  JDoubleSpinBox(bool enterAsTab = true,
                  QWidget* parent = nullptr);
 
 public:

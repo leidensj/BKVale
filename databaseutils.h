@@ -16,6 +16,7 @@
 #include "shoppinglist.h"
 #include "reservation.h"
 #include "productbarcode.h"
+#include "discount.h"
 
 class UserLoginSQL
 {
@@ -271,6 +272,21 @@ namespace ActiveUserSQL
 
   bool execRemove(QSqlQuery& query,
                   QString& error);
+}
+
+namespace DiscountSQL
+{
+  bool insert(const Discount& o,
+              QString& error);
+
+  bool update(const Discount& o,
+              QString& error);
+
+  bool select(Discount& o,
+              QString& error);
+
+  bool remove(qlonglong id,
+              QString& error);
 }
 
 #endif // DATABASEUTILS_H

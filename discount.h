@@ -68,22 +68,52 @@ struct Discount : public JItem
   bool m_bUsed;
   bool m_bExpires;
   QDate m_dtExp;
+  QString m_description;
 
   Discount()
   {
     clear();
   }
 
+  static QString strType(Type type)
+  {
+    switch (type)
+    {
+      case Type::Value: return "Valor";
+      case Type::Percentage: return "Porcentagem";
+      case Type::Product: return "Produto";
+      case Type::None:
+      default:
+        return "Nenhum";
+    }
+  }
+
+  static QString getRandomCode(const int length = 10)
+  {
+    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+
+    QString randomString;
+    for(int i = 0; i < length; ++i)
+    {
+      int idx = qrand() % possibleCharacters.length();
+      QChar nextChar = possibleCharacters.at(idx);
+      randomString.append(nextChar);
+    }
+    return randomString;
+  }
+
   void clear()
   {
     m_id = INVALID_ID;
-    m_type = Type::None;
+    m_code = getRandomCode();
+    m_type = Type::Value;
     m_value = 0.0;
     m_percentage = 0.0;
     m_items.clear();
     m_bUsed = false;
     m_bExpires = false;
     m_dtExp = QDate::currentDate();
+    m_description.clear();
   }
 
   bool operator !=(const JItem& other) const
@@ -96,7 +126,8 @@ struct Discount : public JItem
         m_bExpires != another.m_bExpires ||
         m_dtExp != another.m_dtExp ||
         m_value != another.m_value ||
-        m_percentage != another.m_percentage;
+        m_percentage != another.m_percentage ||
+        m_description != another.m_description;
   }
 
   bool operator ==(const JItem& other) const

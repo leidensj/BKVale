@@ -519,18 +519,6 @@ public:
       header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
     }
   }
-
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
-  {
-    if (!index.isValid())
-      return QModelIndex();
-
-    QVariant value = QSqlQueryModel::data(index, role);
-    if (role == Qt::DisplayRole)
-    {
-    }
-    return value;
-  }
 };
 
 class ProductBarcodeTableModel : public JTableModel
@@ -569,6 +557,59 @@ public:
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
       header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
     }
+  }
+};
+
+class DiscountTableModel : public JTableModel
+{
+public:
+  DiscountTableModel(QObject *parent) : JTableModel(parent) {}
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     SQL_COLID ","
+                     DISCOUNT_SQL_COL01 ","
+                     DISCOUNT_SQL_COL04 ","
+                     DISCOUNT_SQL_COL08 ","
+                     DISCOUNT_SQL_COL07
+                     " FROM "
+                     DISCOUNT_SQL_TABLE_NAME);
+    return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Código"));
+    setHeaderData(2, Qt::Horizontal, tr("Tipo"));
+    setHeaderData(3, Qt::Horizontal, tr("Descrição"));
+    setHeaderData(4, Qt::Horizontal, tr("Regatado"));
+    if (header != nullptr && header->count() == 5)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
+    }
+  }
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  {
+    if (!index.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlQueryModel::data(index, role);
+    if (role == Qt::DisplayRole)
+    {
+      if (index.column() == 2)
+        value = Discount::strType((Discount::Type)value.toInt());
+      else if (index.column() == 4)
+        value = value.toBool() ? tr("Sim") : "";
+    }
+    return value;
   }
 };
 
@@ -704,6 +745,8 @@ JDatabase::JDatabase(const QString& tableName,
     model = new ActiveUserTableModel(this);
   else if (tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
     model = new ProductBarcodeTableModel(this);
+  else if (tableName == DISCOUNT_SQL_TABLE_NAME)
+    model = new DiscountTableModel(this);
   else
     model = new JTableModel(this);
 
@@ -911,6 +954,13 @@ void JDatabase::selectItem(qlonglong id)
     bSuccess = ProductBarcodeSQL::select(o, error);
     m_currentItem = new ProductBarcode(o);
   }
+  else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
+  {
+    Discount o;
+    o.m_id = id;
+    bSuccess = DiscountSQL::select(o, error);
+    m_currentItem = new Discount(o);
+  }
   else
   {
     error = tr("Item ainda não implementado.");
@@ -999,6 +1049,8 @@ void JDatabase::removeItem()
       bSuccess = ReservationSQL::remove(id, error);
     else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
       bSuccess = ProductBarcodeSQL::remove(id, error);
+    else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
+      bSuccess = DiscountSQL::remove(id, error);
     else
       error = tr("Item ainda não implementado.");
 
@@ -1032,7 +1084,7 @@ void JDatabase::filterSearchChanged()
     QString columnName;
     if (column > 0)
       columnName = m_proxyModel->headerData(column, Qt::Horizontal).toString().toLower();
-    columnName = tr("Procurar por: ") + columnName;
+    columnName = tr("Procurar por: ") + columnName + " Ctrl+F";
     m_edFilterSearch->setPlaceholderText(columnName);
   }
 
@@ -1160,6 +1212,13 @@ bool JDatabase::save(const JItem& jItem)
     bSuccess = o.isValidId()
                ? ProductBarcodeSQL::update(o, error)
                : ProductBarcodeSQL::insert(o, error);
+  }
+  else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
+  {
+    const Discount& o = dynamic_cast<const Discount&>(jItem);
+    bSuccess = o.isValidId()
+               ? DiscountSQL::update(o, error)
+               : DiscountSQL::insert(o, error);
   }
   else
     error = tr("Item ainda não implementado.");

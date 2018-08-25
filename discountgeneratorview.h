@@ -14,6 +14,7 @@ class JDoubleSpinBox;
 class JSpinBox;
 class QDateEdit;
 class QCheckBox;
+class QPlainTextEdit;
 
 class DiscountGeneratorView : public QFrame
 {
@@ -28,6 +29,9 @@ private slots:
   void itemRemoved(qlonglong id);
   void save();
   void updateControls();
+  void searchProduct();
+  void removeProduct();
+  void setProduct(const Product& product, bool bNewProduct);
 
 public slots:
   void setDiscount(const Discount& o);
@@ -53,6 +57,7 @@ private:
   DiscountTableWidget* m_table;
   JDatabase* m_database;
   QCheckBox* m_cbUsed;
+  QPlainTextEdit* m_teDescription;
 };
 
 #endif // DISCOUNTGENERATORVIEW_H

@@ -14,20 +14,7 @@
 #include <QRadioButton>
 #include <QCheckBox>
 #include <QDateEdit>
-
-QString getRandomString(const int length = 10)
-{
-  const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-
-  QString randomString;
-  for(int i = 0; i < length; ++i)
-  {
-    int idx = qrand() % possibleCharacters.length();
-    QChar nextChar = possibleCharacters.at(idx);
-    randomString.append(nextChar);
-  }
-  return randomString;
-}
+#include <QPlainTextEdit>
 
 DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
   : QFrame(parent)
@@ -114,6 +101,9 @@ DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
   m_cbUsed->setText(tr("Desconto já usado."));
   m_cbUsed->setEnabled(false);
 
+  m_teDescription = new QPlainTextEdit;
+  m_teDescription->setPlaceholderText(tr("Descrição:"));
+
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonLayout->setContentsMargins(0, 0, 0, 0);
   buttonLayout->addWidget(m_btnCreate);
@@ -161,6 +151,7 @@ DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
   tabLayout->addWidget(m_cbUsed);
   tabLayout->addLayout(codeLayout);
   tabLayout->addLayout(expLayout);
+  tabLayout->addWidget(m_teDescription);
   tabLayout->addLayout(valueLayout);
   tabLayout->addLayout(percentageLayout);
   tabLayout->addLayout(productLayout);
@@ -181,7 +172,7 @@ DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
 
-  m_database = new JDatabase("");
+  m_database = new JDatabase(DISCOUNT_SQL_TABLE_NAME);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(m_database);
@@ -223,7 +214,18 @@ DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-
+  QObject::connect(m_btnAdd,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(searchProduct()));
+  QObject::connect(m_btnRemove,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(removeProduct()));
+  QObject::connect(m_table,
+                   SIGNAL(productSignal(const Product&)),
+                   this,
+                   SLOT(searchProduct()));
   create();
 }
 
@@ -272,6 +274,7 @@ Discount DiscountGeneratorView::getDiscount() const
   o.m_percentage = m_spnPercentage->value();
   o.m_items = m_table->getDiscountItems();
   o.m_bUsed = m_cbUsed->isChecked();
+  o.m_description = m_teDescription->toPlainText();
   return o;
 }
 
@@ -284,7 +287,7 @@ void DiscountGeneratorView::setDiscount(const Discount &o)
   m_currentId = o.m_id;
   m_cbUsed->setChecked(o.m_bUsed);
   m_cbUsed->setVisible(o.m_bUsed);
-  m_edCode->setText(o.isValidId() ? o.m_code : getRandomString());
+  m_edCode->setText(o.m_code);
   m_cbExpires->setChecked(o.m_bExpires);
   m_dtExp->setDate(o.m_dtExp);
   m_rdValue->setChecked(o.m_type == Discount::Type::Value);
@@ -293,6 +296,7 @@ void DiscountGeneratorView::setDiscount(const Discount &o)
   m_spnValue->setValue(o.m_value);
   m_spnPercentage->setValue(o.m_percentage);
   m_table->setDiscountItems(o.m_items);
+  m_teDescription->setPlainText(o.m_description);
   updateControls();
 }
 
@@ -314,4 +318,38 @@ void DiscountGeneratorView::updateControls()
     m_spnPercentage->setFocus();
     m_spnPercentage->selectAll();
   }
+}
+
+void DiscountGeneratorView::setProduct(const Product& product, bool bNewProduct)
+{
+  if (bNewProduct)
+  {
+    DiscountItem o;
+    o.m_product = product;
+    m_table->addDiscountItem(o);
+    m_table->setFocus();
+  }
+  else
+  {
+    m_table->setProduct(product);
+  }
+  updateControls();
+}
+
+void DiscountGeneratorView::searchProduct()
+{
+  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
+                        tr("Selecionar Produto"),
+                        QIcon(":/icons/res/item.png"));
+  dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_SELL);
+  dlg.exec();
+  Product* p = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
+  if (p != nullptr && p->isValidId())
+    setProduct(*p, m_btnAdd == sender());
+}
+
+void DiscountGeneratorView::removeProduct()
+{
+  m_table->removeCurrentItem();
+  updateControls();
 }

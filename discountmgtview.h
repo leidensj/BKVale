@@ -1,5 +1,5 @@
-#ifndef DISCOUNTGENERATORVIEW_H
-#define DISCOUNTGENERATORVIEW_H
+#ifndef DISCOUNTMGTVIEW_H
+#define DISCOUNTMGTVIEW_H
 
 #include <QFrame>
 #include "discount.h"
@@ -16,12 +16,12 @@ class QDateEdit;
 class QCheckBox;
 class QPlainTextEdit;
 
-class DiscountGeneratorView : public QFrame
+class DiscountMgtView : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit DiscountGeneratorView(QWidget* parent = nullptr);
+  explicit DiscountMgtView(QWidget* parent = nullptr);
   Discount getDiscount() const;
 
 private slots:

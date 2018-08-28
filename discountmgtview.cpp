@@ -1,4 +1,4 @@
-#include "discountgeneratorview.h"
+#include "discountmgtview.h"
 #include "jlineedit.h"
 #include "jdoublespinbox.h"
 #include "jdatabase.h"
@@ -16,7 +16,7 @@
 #include <QDateEdit>
 #include <QPlainTextEdit>
 
-DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
+DiscountMgtView::DiscountMgtView(QWidget* parent)
   : QFrame(parent)
   , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
@@ -229,34 +229,34 @@ DiscountGeneratorView::DiscountGeneratorView(QWidget* parent)
   create();
 }
 
-void DiscountGeneratorView::itemSelected(const JItem& jItem)
+void DiscountMgtView::itemSelected(const JItem& jItem)
 {
   const Discount& o = dynamic_cast<const Discount&>(jItem);
   if (o.isValidId())
     setDiscount(o);
 }
 
-void DiscountGeneratorView::itemRemoved(qlonglong id)
+void DiscountMgtView::itemRemoved(qlonglong id)
 {
   if (m_currentId == id)
     create();
 }
 
-void DiscountGeneratorView::save()
+void DiscountMgtView::save()
 {
   Discount o = getDiscount();
   if (m_database->save(o))
     create();
 }
 
-void DiscountGeneratorView::create()
+void DiscountMgtView::create()
 {
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_currentId = INVALID_ID;
   setDiscount(Discount());
 }
 
-Discount DiscountGeneratorView::getDiscount() const
+Discount DiscountMgtView::getDiscount() const
 {
   Discount o;
   o.m_id = m_currentId;
@@ -278,7 +278,7 @@ Discount DiscountGeneratorView::getDiscount() const
   return o;
 }
 
-void DiscountGeneratorView::setDiscount(const Discount &o)
+void DiscountMgtView::setDiscount(const Discount &o)
 {
   QString strIcon = o.isValidId()
                     ? ":/icons/res/saveas.png"
@@ -300,7 +300,7 @@ void DiscountGeneratorView::setDiscount(const Discount &o)
   updateControls();
 }
 
-void DiscountGeneratorView::updateControls()
+void DiscountMgtView::updateControls()
 {
   m_spnValue->setEnabled(m_rdValue->isChecked());
   m_spnPercentage->setEnabled(m_rdPercentage->isChecked());
@@ -320,7 +320,7 @@ void DiscountGeneratorView::updateControls()
   }
 }
 
-void DiscountGeneratorView::setProduct(const Product& product, bool bNewProduct)
+void DiscountMgtView::setProduct(const Product& product, bool bNewProduct)
 {
   if (bNewProduct)
   {
@@ -336,7 +336,7 @@ void DiscountGeneratorView::setProduct(const Product& product, bool bNewProduct)
   updateControls();
 }
 
-void DiscountGeneratorView::searchProduct()
+void DiscountMgtView::searchProduct()
 {
   JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
                         tr("Selecionar Produto"),
@@ -348,7 +348,7 @@ void DiscountGeneratorView::searchProduct()
     setProduct(*p, m_btnAdd == sender());
 }
 
-void DiscountGeneratorView::removeProduct()
+void DiscountMgtView::removeProduct()
 {
   m_table->removeCurrentItem();
   updateControls();

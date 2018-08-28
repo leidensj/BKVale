@@ -14,7 +14,7 @@
 #include "personview.h"
 #include "shoppinglistview.h"
 #include "reservationview.h"
-#include "discountgeneratorview.h"
+#include "discountmgtview.h"
 #include "shopview.h"
 #include "jdatabase.h"
 #include "productbarcodeview.h"
@@ -621,7 +621,7 @@ void BaitaAssistant::openDiscountMgtDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  DiscountGeneratorView* w = new DiscountGeneratorView(this);
+  DiscountMgtView* w = new DiscountMgtView(this);
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Descontos"));

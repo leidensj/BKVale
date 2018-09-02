@@ -10,6 +10,7 @@
 #include "person.h"
 #include "shoppinglist.h"
 #include "reservation.h"
+#include "discount.h"
 
 namespace Printer
 {
@@ -48,6 +49,12 @@ namespace ShoppingListPrinter
 namespace ReservationPrinter
 {
   QString build(const Reservation& lst);
+}
+
+namespace DiscountPrinter
+{
+  QString build(const Discount& o);
+  QString buildRedeem(const Discount& o);
 }
 
 #endif // PRINTUTILS_H

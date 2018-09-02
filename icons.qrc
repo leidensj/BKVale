@@ -153,5 +153,6 @@
         <file>res/barcode.png</file>
         <file>res/barcodescan.png</file>
         <file>res/discount.png</file>
+        <file>res/redeem.png</file>
     </qresource>
 </RCC>

@@ -88,6 +88,8 @@ struct Discount : public JItem
     }
   }
 
+  QString strExpDate() const { return m_dtExp.toString("dd/MM/yyyy"); }
+
   static QString getRandomCode(const int length = 10)
   {
     const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");

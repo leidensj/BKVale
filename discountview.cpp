@@ -1,9 +1,10 @@
-#include "discountmgtview.h"
+#include "discountview.h"
 #include "jlineedit.h"
 #include "jdoublespinbox.h"
 #include "jdatabase.h"
 #include "jspinbox.h"
 #include "discounttablewidget.h"
+#include "databaseutils.h"
 #include <QGroupBox>
 #include <QPushButton>
 #include <QLayout>
@@ -15,12 +16,16 @@
 #include <QCheckBox>
 #include <QDateEdit>
 #include <QPlainTextEdit>
+#include <QDockWidget>
+#include <QInputDialog>
+#include <QFormLayout>
 
-DiscountMgtView::DiscountMgtView(QWidget* parent)
+DiscountView::DiscountView(QWidget* parent)
   : QFrame(parent)
   , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
-  , m_btnSave(nullptr)
+  , m_btnSearch(nullptr)
+  , m_btnRedeem(nullptr)
   , m_edCode(nullptr)
   , m_cbExpires(nullptr)
   , m_dtExp(nullptr)
@@ -42,12 +47,19 @@ DiscountMgtView::DiscountMgtView(QWidget* parent)
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 
-  m_btnSave = new QPushButton;
-  m_btnSave->setFlat(true);
-  m_btnSave->setText("");
-  m_btnSave->setIconSize(QSize(24, 24));
-  m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
-  m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+  m_btnSearch = new QPushButton;
+  m_btnSearch->setFlat(true);
+  m_btnSearch->setText("");
+  m_btnSearch->setIconSize(QSize(24, 24));
+  m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
+  m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
+
+  m_btnRedeem = new QPushButton;
+  m_btnRedeem->setFlat(true);
+  m_btnRedeem->setText("");
+  m_btnRedeem->setIconSize(QSize(24, 24));
+  m_btnRedeem->setIcon(QIcon(":/icons/res/redeem.png"));
+  m_btnRedeem->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
 
   m_edCode = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags2);
   m_edCode->setPlaceholderText(tr("*"));
@@ -62,17 +74,18 @@ DiscountMgtView::DiscountMgtView(QWidget* parent)
   m_dtExp->setDate(QDate::currentDate());
 
   m_rdValue = new QRadioButton;
-  m_rdValue->setText(tr("Valor"));
+  m_rdValue->setText(tr("Valor:"));
 
   m_rdPercentage = new QRadioButton;
-  m_rdPercentage->setText(tr("Porcentagem"));
+  m_rdPercentage->setText(tr("Porcentagem:"));
 
   m_rdProduct = new QRadioButton;
-  m_rdProduct->setText(tr("Produto"));
+  m_rdProduct->setText(tr("Produto:"));
 
   m_spnValue = new JDoubleSpinBox;
   m_spnValue->setMinimum(0.0);
   m_spnValue->setMaximum(99999999.0);
+  m_spnValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
   m_spnPercentage = new JDoubleSpinBox;
   m_spnPercentage->setMinimum(0.0);
@@ -102,36 +115,20 @@ DiscountMgtView::DiscountMgtView(QWidget* parent)
   m_cbUsed->setEnabled(false);
 
   m_teDescription = new QPlainTextEdit;
-  m_teDescription->setPlaceholderText(tr("Descrição:"));
 
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonLayout->setContentsMargins(0, 0, 0, 0);
   buttonLayout->addWidget(m_btnCreate);
-  buttonLayout->addWidget(m_btnSave);
+  buttonLayout->addWidget(m_btnSearch);
+  buttonLayout->addWidget(m_btnRedeem);
   buttonLayout->setAlignment(Qt::AlignLeft);
 
-  QFormLayout* codeLayout = new QFormLayout;
-  codeLayout->setContentsMargins(0, 0, 0, 0);
-  codeLayout->addRow(tr("Código:"), m_edCode);
-
-  QHBoxLayout* expLayout = new QHBoxLayout;
-  expLayout->setContentsMargins(0, 0, 0, 0);
-  expLayout->addWidget(m_cbExpires);
-  expLayout->addWidget(m_dtExp);
-
-  QHBoxLayout* valueLayout = new QHBoxLayout;
-  valueLayout->setContentsMargins(0, 0, 0, 0);
-  valueLayout->setAlignment(Qt::AlignLeft);
-  valueLayout->addWidget(m_rdValue);
-  valueLayout->addStretch();
-  valueLayout->addWidget(m_spnValue);
-
-  QHBoxLayout* percentageLayout = new QHBoxLayout;
-  percentageLayout->setContentsMargins(0, 0, 0, 0);
-  percentageLayout->setAlignment(Qt::AlignLeft);
-  percentageLayout->addWidget(m_rdPercentage);
-  percentageLayout->addStretch();
-  percentageLayout->addWidget(m_spnPercentage);
+  QFormLayout* formLayout = new QFormLayout;
+  formLayout->setContentsMargins(0, 0, 0, 0);
+  formLayout->addRow(tr("Código:"), m_edCode);
+  formLayout->addRow(m_cbExpires, m_dtExp);
+  formLayout->addRow(m_rdValue, m_spnValue);
+  formLayout->addRow(m_rdPercentage, m_spnPercentage);
 
   QHBoxLayout* productButtonsLayout = new QHBoxLayout;
   productButtonsLayout->setContentsMargins(0, 0, 0, 0);
@@ -142,54 +139,47 @@ DiscountMgtView::DiscountMgtView(QWidget* parent)
   QVBoxLayout* productLayout = new QVBoxLayout;
   productLayout->setContentsMargins(0, 0, 0, 0);
   productLayout->setAlignment(Qt::AlignTop);
-  productLayout->addWidget(m_rdProduct);
   productLayout->addLayout(productButtonsLayout);
   productLayout->addWidget(m_table);
 
-  QVBoxLayout* tabLayout = new QVBoxLayout;
-  tabLayout->setAlignment(Qt::AlignTop);
-  tabLayout->addWidget(m_cbUsed);
-  tabLayout->addLayout(codeLayout);
-  tabLayout->addLayout(expLayout);
-  tabLayout->addWidget(m_teDescription);
-  tabLayout->addLayout(valueLayout);
-  tabLayout->addLayout(percentageLayout);
-  tabLayout->addLayout(productLayout);
+  QFrame* productFrame = new QFrame;
+  productFrame->setLayout(productLayout);
 
-  QFrame* tabFrame = new QFrame;
-  tabFrame->setLayout(tabLayout);
-
-  QTabWidget* tabWidget = new QTabWidget;
-  tabWidget->addTab(tabFrame,
-                    QIcon(":/icons/res/description.png"),
-                    tr("Informações"));
+  formLayout->addRow(m_rdProduct, productFrame);
+  formLayout->addRow(tr("Descrição:"), m_teDescription);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setAlignment(Qt::AlignTop);
   viewLayout->addLayout(buttonLayout);
-  viewLayout->addWidget(tabWidget);
+  viewLayout->addWidget(m_cbUsed);
+  viewLayout->addLayout(formLayout);
 
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
 
   m_database = new JDatabase(DISCOUNT_SQL_TABLE_NAME);
 
+  m_dock = new QDockWidget;
+  m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  m_dock->setFeatures(0);
+  m_dock->setFeatures(QDockWidget::DockWidgetClosable);
+  m_dock->setWindowTitle(tr("Pesquisar"));
+  m_dock->setWidget(m_database);
+
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(m_database);
+  splitter->addWidget(m_dock);
   splitter->addWidget(viewFrame);
 
   QVBoxLayout* mainLayout = new QVBoxLayout();
   mainLayout->addWidget(splitter);
   setLayout(mainLayout);
 
+  m_dock->hide();
+
   QObject::connect(m_btnCreate,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(create()));
-  QObject::connect(m_btnSave,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(save()));
   QObject::connect(m_database,
                    SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
@@ -226,37 +216,36 @@ DiscountMgtView::DiscountMgtView(QWidget* parent)
                    SIGNAL(productSignal(const Product&)),
                    this,
                    SLOT(searchProduct()));
+  QObject::connect(m_btnSearch,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(showSearch()));
+  QObject::connect(m_btnRedeem,
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(redeem()));
   create();
 }
 
-void DiscountMgtView::itemSelected(const JItem& jItem)
+void DiscountView::itemSelected(const JItem& jItem)
 {
   const Discount& o = dynamic_cast<const Discount&>(jItem);
   if (o.isValidId())
     setDiscount(o);
 }
 
-void DiscountMgtView::itemRemoved(qlonglong id)
+void DiscountView::itemRemoved(qlonglong id)
 {
   if (m_currentId == id)
     create();
 }
 
-void DiscountMgtView::save()
+void DiscountView::create()
 {
-  Discount o = getDiscount();
-  if (m_database->save(o))
-    create();
-}
-
-void DiscountMgtView::create()
-{
-  m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
-  m_currentId = INVALID_ID;
   setDiscount(Discount());
 }
 
-Discount DiscountMgtView::getDiscount() const
+Discount DiscountView::getDiscount() const
 {
   Discount o;
   o.m_id = m_currentId;
@@ -278,12 +267,8 @@ Discount DiscountMgtView::getDiscount() const
   return o;
 }
 
-void DiscountMgtView::setDiscount(const Discount &o)
+void DiscountView::setDiscount(const Discount &o)
 {
-  QString strIcon = o.isValidId()
-                    ? ":/icons/res/saveas.png"
-                    : ":/icons/res/save.png";
-  m_btnSave->setIcon(QIcon(strIcon));
   m_currentId = o.m_id;
   m_cbUsed->setChecked(o.m_bUsed);
   m_cbUsed->setVisible(o.m_bUsed);
@@ -300,7 +285,7 @@ void DiscountMgtView::setDiscount(const Discount &o)
   updateControls();
 }
 
-void DiscountMgtView::updateControls()
+void DiscountView::updateControls()
 {
   m_spnValue->setEnabled(m_rdValue->isChecked());
   m_spnPercentage->setEnabled(m_rdPercentage->isChecked());
@@ -320,7 +305,7 @@ void DiscountMgtView::updateControls()
   }
 }
 
-void DiscountMgtView::setProduct(const Product& product, bool bNewProduct)
+void DiscountView::setProduct(const Product& product, bool bNewProduct)
 {
   if (bNewProduct)
   {
@@ -336,7 +321,7 @@ void DiscountMgtView::setProduct(const Product& product, bool bNewProduct)
   updateControls();
 }
 
-void DiscountMgtView::searchProduct()
+void DiscountView::searchProduct()
 {
   JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
                         tr("Selecionar Produto"),
@@ -348,8 +333,41 @@ void DiscountMgtView::searchProduct()
     setProduct(*p, m_btnAdd == sender());
 }
 
-void DiscountMgtView::removeProduct()
+void DiscountView::removeProduct()
 {
   m_table->removeCurrentItem();
   updateControls();
+}
+
+void DiscountView::showSearch()
+{
+  if (m_dock->isVisible())
+    m_dock->close();
+  else
+    m_dock->show();
+}
+
+void DiscountView::redeem()
+{
+  QString code = QInputDialog::getText(this,
+                                       tr("Resgatar Código"),
+                                       tr("Informe o código de desconto:"));
+}
+
+Discount DiscountView::save()
+{
+  Discount o = getDiscount();
+  bool bSuccess = m_database->save(o);
+  if (bSuccess)
+  {
+    QString error;
+    if (DiscountSQL::select(o, error))
+      create();
+    else
+      o.clear();
+  }
+  else
+    o.clear();
+  updateControls();
+  return o;
 }

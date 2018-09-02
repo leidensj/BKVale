@@ -18,7 +18,8 @@ enum class Functionality : int
   Reminder,
   Calculator,
   Shop,
-  Reservation
+  Reservation,
+  Discount
 };
 
 class QLabel;
@@ -28,6 +29,7 @@ class ConsumptionWidget;
 class CalculatorWidget;
 class ShopView;
 class ReservationView;
+class DiscountView;
 class JMdiSubWindow;
 
 class BaitaAssistant : public QMainWindow
@@ -50,6 +52,7 @@ private:
   CalculatorWidget* m_calculator;
   ShopView* m_shop;
   ReservationView* m_reservation;
+  DiscountView* m_discount;
   QSerialPort m_printerSerial;
   QTcpSocket m_printerTCP;
   Settings m_settings;
@@ -60,6 +63,7 @@ private:
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
   JMdiSubWindow* m_reservationWindow;
+  JMdiSubWindow* m_discountWindow;
   bool connectPrinter();
   void disconnectPrinter();
   Functionality getCurrentFunctionality() const;
@@ -79,7 +83,6 @@ private slots:
   void openPersonsDialog();
   void openShoppingListDialog();
   void openActiveUsersDialog();
-  void openDiscountMgtDialog();
   void openProductBarcodeDialog();
   void activateWindow();
 };

@@ -14,7 +14,7 @@
 #include "personview.h"
 #include "shoppinglistview.h"
 #include "reservationview.h"
-#include "discountmgtview.h"
+#include "discountview.h"
 #include "shopview.h"
 #include "jdatabase.h"
 #include "productbarcodeview.h"
@@ -54,6 +54,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_calculator(nullptr)
   , m_shop(nullptr)
   , m_reservation(nullptr)
+  , m_discount(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
   , m_noteWindow(nullptr)
@@ -61,6 +62,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
   , m_reservationWindow(nullptr)
+  , m_discountWindow(nullptr)
 {
   ui->setupUi(this);
   m_note = new NoteView;
@@ -68,7 +70,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_calculator = new CalculatorWidget;
   m_shop = new ShopView;
   m_reservation = new ReservationView;
-
+  m_discount = new DiscountView;
 
   m_noteWindow = new JMdiSubWindow(this);
   m_noteWindow->setWindowTitle(tr("Vales"));
@@ -95,6 +97,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   m_reservationWindow->setWindowIcon(QIcon(":/icons/res/reservation.png"));
   m_reservationWindow->setWidget(m_reservation);
   ui->mdi->addSubWindow(m_reservationWindow);
+  m_discountWindow = new JMdiSubWindow(this);
+  m_discountWindow->setWindowTitle(tr("Descontos"));
+  m_discountWindow->setWindowIcon(QIcon(":/icons/res/discount.png"));
+  m_discountWindow->setWidget(m_discount);
+  ui->mdi->addSubWindow(m_discountWindow);
 
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
@@ -185,11 +192,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(openProductBarcodeDialog()));
 
-  QObject::connect(ui->actionDiscount,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openDiscountMgtDialog()));
-
   QObject::connect(ui->actionExit,
                    SIGNAL(triggered(bool)),
                    this,
@@ -216,6 +218,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SLOT(activateWindow()));
 
   QObject::connect(ui->actionReservations,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(activateWindow()));
+
+  QObject::connect(ui->actionDiscount,
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(activateWindow()));
@@ -316,6 +323,8 @@ Functionality BaitaAssistant::getCurrentFunctionality() const
     return Functionality::Reservation;
   else if (activeWindow == m_reservationWindow)
     return Functionality::Reservation;
+  else if (activeWindow == m_discountWindow)
+    return Functionality::Discount;
   return Functionality::None;
 }
 
@@ -379,6 +388,12 @@ void BaitaAssistant::print()
       Reservation res = m_reservation->save();
       if (res.isValidId())
         print(ReservationPrinter::build(res));
+    } break;
+    case Functionality::Discount:
+    {
+      Discount o = m_discount->save();
+      if (o.isValidId())
+        print(DiscountPrinter::build(o));
     } break;
     case Functionality::None:
     default:
@@ -468,6 +483,9 @@ void BaitaAssistant::updateControls()
       break;
     case Functionality::Reservation:
       ui->actionPrint->setEnabled(m_reservation->getReservation().isValid());
+      break;
+    case Functionality::Discount:
+      ui->actionPrint->setEnabled(m_discount->getDiscount().isValid());
       break;
     default:
       break;
@@ -616,20 +634,6 @@ void BaitaAssistant::openProductBarcodeDialog()
   dlg.exec();
 }
 
-void BaitaAssistant::openDiscountMgtDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  DiscountMgtView* w = new DiscountMgtView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Descontos"));
-  dlg.setWindowIcon(QIcon(":/icons/res/discount.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
-
 void BaitaAssistant::closeEvent(QCloseEvent* event)
 {
   if (QMessageBox::question(this,
@@ -649,6 +653,7 @@ void BaitaAssistant::activateWindow()
   m_calculatorWindow->hide();
   m_shopWindow->hide();
   m_reservationWindow->hide();
+  m_discountWindow->hide();
   if (sender() == ui->actionNotes)
   {
     m_noteWindow->showMaximized();
@@ -673,6 +678,11 @@ void BaitaAssistant::activateWindow()
   {
     m_reservationWindow->showMaximized();
     ui->mdi->setActiveSubWindow(m_reservationWindow);
+  }
+  else if (sender() == ui->actionDiscount)
+  {
+    m_discountWindow->showMaximized();
+    ui->mdi->setActiveSubWindow(m_discountWindow);
   }
   updateControls();
 }

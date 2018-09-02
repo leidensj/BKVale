@@ -175,10 +175,6 @@
         </spacer>
        </item>
       </layout>
-      <zorder>grpSerial</zorder>
-      <zorder>grpEthernet</zorder>
-      <zorder>label_10</zorder>
-      <zorder>layoutWidget</zorder>
      </widget>
      <widget class="QWidget" name="notes">
       <attribute name="icon">

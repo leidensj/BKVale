@@ -19,6 +19,7 @@ struct JItem
   static QString st_strAmmount(double value) { return QString::number(value, 'f', 3); }
   static QString st_strFmt(double value) { return QString::number(value, 'f').remove(QRegExp("\\.?0*$")); }
   static QString st_strInt(int value) { return QString::number(value); }
+  static QString st_strPercentage(int value) { return QString::number(value, 'f', 2) + "%"; }
 };
 
 #endif // JITEM_H

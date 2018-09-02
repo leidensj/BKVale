@@ -107,13 +107,13 @@ namespace
   {
     if (note.m_disccount != 0)
     {
-      strNote += ESC_EXPAND_ON ESC_ALIGN_CENTER ESC_LF;
-      strNote += "Subtotal: R$" + note.strSubTotal() + ESC_LF;
+      strNote += ESC_EXPAND_ON ESC_LF;
+      strNote +=   "Subtotal:  R$" + note.strSubTotal() + ESC_LF;
       if (note.m_disccount > 0)
         strNote += "Acrescimo: R$" + note.strDisccount();
       else if(note.m_disccount < 0)
-        strNote += "Desconto: R$" + note.strDisccount() ;
-      strNote += ESC_EXPAND_OFF ESC_ALIGN_LEFT ESC_LF;
+        strNote += "Desconto:  R$" + note.strDisccount() ;
+      strNote += ESC_EXPAND_OFF ESC_LF;
     }
 
     if (!note.m_observation.isEmpty())
@@ -467,6 +467,97 @@ QString ReservationPrinter::build(const Reservation& res)
 
   return str;
 }
+
+QString DiscountPrinter::build(const Discount& o)
+{
+  QString str;
+  str += ESC_EXPAND_ON
+         ESC_ALIGN_CENTER
+         "CODIGO DE DESCONTO"
+         ESC_EXPAND_OFF
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_BARCODE_HRI_ON
+         ESC_BARCODE_HEIGHT +
+         QString(decToHex[120]) +
+         ESC_BARCODE_CODE93 +
+         QString(decToHex[o.m_code.length()]) +
+         o.m_code +
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_ALIGN_CENTER;
+
+  if (o.m_bExpires)
+    str += "Data de expiracao: " + o.strExpDate();
+  else
+    str += "Sem data de expiracao";
+
+  str += ESC_LF
+         ESC_VERT_TAB
+         ESC_FULL_CUT;
+
+  return str;
+}
+
+QString DiscountPrinter::buildRedeem(const Discount& o)
+{
+  QString str;
+  str += ESC_EXPAND_ON
+         ESC_ALIGN_LEFT
+         "DESCONTO"
+         ESC_EXPAND_OFF
+         ESC_LF;
+
+  switch (o.m_type)
+  {
+    case Discount::Type::Value:
+    {
+      str += ESC_DOUBLE_FONT_ON +
+             JItem::st_strMoney(o.m_value) +
+             ESC_DOUBLE_FONT_OFF;
+    } break;
+    case Discount::Type::Percentage:
+    {
+      str += ESC_DOUBLE_FONT_ON +
+             JItem::st_strPercentage(o.m_percentage) +
+             ESC_DOUBLE_FONT_OFF;
+    } break;
+    case Discount::Type::Product:
+    {
+      for (int i = 0; i != o.m_items.size(); ++i)
+      {
+        str += o.m_items.at(i).m_product.m_name + ESC_LF;
+        QString ammount = o.m_items.at(i).strAmmount() + o.m_items.at(i).m_product.m_unity;
+        QString aux;
+        const int n = TABLE_WIDTH - ammount.length();
+        for (int j = 0; j < n; ++j)
+          aux += ".";
+        str += aux + ESC_STRESS_ON + ammount + ESC_STRESS_OFF;
+      }
+    } break;
+    case Discount::Type::None:
+    default:
+    {
+      str += ESC_EXPAND_ON "ERRO: Tipe de desconto nao definido." ESC_EXPAND_OFF;
+    } break;
+  }
+
+  str += ESC_LF
+         ESC_VERT_TAB;
+
+  if (!o.m_description.isEmpty())
+  {
+    str += o.m_description +
+           ESC_LF
+           ESC_VERT_TAB;
+  }
+
+  str += ESC_FULL_CUT;
+  return str;
+}
+
+
+
 
 // C++
 #include <iostream>

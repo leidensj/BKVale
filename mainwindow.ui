@@ -182,6 +182,7 @@
    <addaction name="actionCalculator"/>
    <addaction name="actionShop"/>
    <addaction name="actionReservations"/>
+   <addaction name="actionDiscount"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">
@@ -399,7 +400,7 @@
     <string>Descontos</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar Descontos</string>
+    <string>Descontos</string>
    </property>
   </action>
  </widget>

@@ -66,6 +66,8 @@ namespace BaitaSQL
   bool init(const QString& hostName,
             int port,
             QString& error);
+
+  QDate getDate(bool dfltMax);
 }
 
 namespace UserSQL
@@ -282,10 +284,19 @@ namespace DiscountSQL
   bool update(const Discount& o,
               QString& error);
 
+  bool execSelect(QSqlQuery& query,
+                  Discount& o,
+                  QString& error);
+
   bool select(Discount& o,
               QString& error);
 
   bool remove(qlonglong id,
+              QString& error);
+
+  bool redeem(const QString& code,
+              Discount& o,
+              bool& redeemed,
               QString& error);
 }
 

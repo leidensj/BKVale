@@ -42,6 +42,7 @@ public slots:
 
 signals:
   void saveSignal();
+  void redeemSignal(const QString& discount);
 
 private:
   qlonglong m_currentId;

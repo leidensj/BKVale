@@ -5,6 +5,7 @@
 #include "jspinbox.h"
 #include "discounttablewidget.h"
 #include "databaseutils.h"
+#include "printutils.h"
 #include <QGroupBox>
 #include <QPushButton>
 #include <QLayout>
@@ -349,9 +350,39 @@ void DiscountView::showSearch()
 
 void DiscountView::redeem()
 {
+  bool ok = false;
   QString code = QInputDialog::getText(this,
                                        tr("Resgatar Código"),
-                                       tr("Informe o código de desconto:"));
+                                       tr("Informe o código de desconto:"),
+                                       QLineEdit::Normal,
+                                       "", &ok);
+
+  if (!ok || code.isEmpty())
+    return;
+
+  bool redeemed = false;
+  Discount o;
+  QString error;
+  bool bSuccess = DiscountSQL::redeem(code, o, redeemed, error);
+  if (bSuccess)
+  {
+    if (redeemed)
+    {
+      bSuccess = false;
+      //TODO permitir usuarios resgatarem codigos resgatados
+      error = tr("Código já resgatado.");
+    }
+    else if (o.m_bExpires && BaitaSQL::getDate(true) > o.m_dtExp)
+    {
+      bSuccess = false;
+      error = tr("Código expirado.");
+    }
+  }
+
+  if (!bSuccess)
+    QMessageBox::critical(this, tr("Erro ao resgatar código"), error, QMessageBox::Ok);
+  else
+    emit redeemSignal(DiscountPrinter::buildRedeem(o));
 }
 
 Discount DiscountView::save()

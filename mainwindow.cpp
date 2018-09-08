@@ -227,6 +227,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    this,
                    SLOT(activateWindow()));
 
+  QObject::connect(m_discount,
+                   SIGNAL(redeemSignal(const QString&)),
+                   this,
+                   SLOT(print(const QString&)));
+
   activateWindow();
   m_settings.load();
   updateControls();

@@ -99,6 +99,15 @@ bool BaitaSQL::init(const QString& hostName,
   return bSuccess;
 }
 
+QDate BaitaSQL::getDate(bool dfltMax)
+{
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  QSqlQuery query(db);
+  if (query.exec("SELECT current_date") && query.next())
+    return query.value(0).toDate();
+  return QDate::fromJulianDay(dfltMax ? Q_INT64_C(784354017364) : Q_INT64_C(-784350574879));
+}
+
 bool BaitaSQL::createTables(QString& error)
 {
   error.clear();
@@ -3004,7 +3013,7 @@ bool DiscountSQL::update(const Discount& o, QString& error)
                 DISCOUNT_SQL_COL05 " = (:_v05),"
                 DISCOUNT_SQL_COL06 " = (:_v06),"
                 DISCOUNT_SQL_COL07 " = (:_v07),"
-                DISCOUNT_SQL_COL08 " = (:_v08)"
+                DISCOUNT_SQL_COL08 " = (:_v08) "
                 "WHERE " SQL_COLID " = (:_v00)");
 
   query.bindValue(":_v00", o.m_id);
@@ -3048,18 +3057,14 @@ bool DiscountSQL::update(const Discount& o, QString& error)
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool DiscountSQL::select(Discount& o, QString& error)
+bool DiscountSQL::execSelect(QSqlQuery& query,
+                             Discount& o,
+                             QString& error)
 {
   error.clear();
   qlonglong id = o.m_id;
   o.clear();
 
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
   query.prepare("SELECT "
                 DISCOUNT_SQL_COL01 ","
                 DISCOUNT_SQL_COL02 ","
@@ -3128,6 +3133,26 @@ bool DiscountSQL::select(Discount& o, QString& error)
     }
   }
 
+  if (!bSuccess)
+  {
+    if (error.isEmpty())
+      error = query.lastError().text();
+    o.clear();
+  }
+
+  return bSuccess;
+}
+
+bool DiscountSQL::select(Discount& o, QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execSelect(query, o, error);
   return finishTransaction(db, query, bSuccess, error);
 }
 
@@ -3146,5 +3171,51 @@ bool DiscountSQL::remove(qlonglong id,
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
   bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool DiscountSQL::redeem(const QString& code,
+                         Discount& o,
+                         bool& redeemed,
+                         QString& error)
+{
+  redeemed = false;
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                SQL_COLID
+                " FROM " DISCOUNT_SQL_TABLE_NAME
+                " WHERE " DISCOUNT_SQL_COL01 " = (:_v01)");
+  query.bindValue(":_v01", code);
+  bool bSuccess = query.exec();
+
+  if (bSuccess && query.next())
+  {
+    o.m_id = query.value(0).toLongLong();
+    bSuccess = execSelect(query, o, error);
+
+    if (bSuccess)
+    {
+      redeemed = o.m_bUsed;
+      query.prepare("UPDATE " DISCOUNT_SQL_TABLE_NAME " SET "
+                    DISCOUNT_SQL_COL07 " = TRUE "
+                    "WHERE " SQL_COLID " = (:_v00)");
+      query.bindValue(":_v00", o.m_id);
+      bSuccess = query.exec();
+      if (bSuccess)
+        o.m_bUsed = true;
+    }
+  }
+  else
+  {
+    error = "Código informado não encontrado.";
+  }
+
   return finishTransaction(db, query, bSuccess, error);
 }

@@ -108,11 +108,11 @@ namespace
     if (note.m_disccount != 0)
     {
       strNote += ESC_EXPAND_ON ESC_LF;
-      strNote +=   "Subtotal:  R$" + note.strSubTotal() + ESC_LF;
+      strNote +=   "Subtotal:  " + note.strSubTotal() + ESC_LF;
       if (note.m_disccount > 0)
-        strNote += "Acrescimo: R$" + note.strDisccount();
+        strNote += "Acrescimo: " + note.strDisccount();
       else if(note.m_disccount < 0)
-        strNote += "Desconto:  R$" + note.strDisccount() ;
+        strNote += "Desconto:  " + note.strDisccount() ;
       strNote += ESC_EXPAND_OFF ESC_LF;
     }
 
@@ -122,7 +122,7 @@ namespace
     strNote += ESC_LF
                ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON
-               "TOTAL R$" +
+               "TOTAL " +
                note.strTotal() +
                ESC_DOUBLE_FONT_OFF
                ESC_LF
@@ -167,8 +167,8 @@ namespace
       {
         QString itemPt1 = note.m_vNoteItem.at(i).strAmmount();
         itemPt1 += note.m_vNoteItem.at(i).m_package.strUnity(note.m_vNoteItem.at(i).m_product.m_unity);
-        itemPt1 += " x R$" + note.m_vNoteItem.at(i).strPrice();
-        QString itemPt2 = "R$" + note.m_vNoteItem.at(i).strSubtotal();
+        itemPt1 += " x " + note.m_vNoteItem.at(i).strPrice();
+        QString itemPt2 = note.m_vNoteItem.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += ".";
@@ -404,7 +404,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
     str += ESC_LF
            "|     |     | ";
     if (lst.m_bPrintPrice)
-      str += "R$ " + lst.m_vItem.at(i).strPrice();
+      str += lst.m_vItem.at(i).strPrice();
 
     str += ESC_EXPAND_OFF
            ESC_LF;
@@ -471,8 +471,17 @@ QString ReservationPrinter::build(const Reservation& res)
 QString DiscountPrinter::build(const Discount& o)
 {
   QString str;
-  str += ESC_EXPAND_ON
-         ESC_ALIGN_CENTER
+  str +=  ESC_EXPAND_ON
+          ESC_ALIGN_CENTER
+          "BAITAKAO"
+          ESC_LF
+          "RUA SINIMBU 175 LOURDES"
+          ESC_LF
+          "32221034 32281666"
+          ESC_LF
+          "WWW.BAITAKAO.COM.BR"
+          ESC_LF
+          ESC_VERT_TAB
          "CODIGO DE DESCONTO"
          ESC_EXPAND_OFF
          ESC_LF
@@ -503,27 +512,37 @@ QString DiscountPrinter::buildRedeem(const Discount& o)
 {
   QString str;
   str += ESC_EXPAND_ON
-         ESC_ALIGN_LEFT
-         "DESCONTO"
+         ESC_ALIGN_CENTER
+         "BAITAKAO"
+         ESC_LF
+         "RUA SINIMBU 175 LOURDES"
+         ESC_LF
+         "32221034 32281666"
+         ESC_LF
+         "WWW.BAITAKAO.COM.BR"
+         ESC_LF
+         ESC_VERT_TAB
          ESC_EXPAND_OFF
-         ESC_LF;
+         ESC_DOUBLE_FONT_ON
+         "DESCONTO"
+         ESC_LF
+         ESC_VERT_TAB;
 
   switch (o.m_type)
   {
     case Discount::Type::Value:
     {
-      str += ESC_DOUBLE_FONT_ON +
-             JItem::st_strMoney(o.m_value) +
+      str += JItem::st_strMoney(o.m_value) +
              ESC_DOUBLE_FONT_OFF;
     } break;
     case Discount::Type::Percentage:
     {
-      str += ESC_DOUBLE_FONT_ON +
-             JItem::st_strPercentage(o.m_percentage) +
+      str += JItem::st_strPercentage(o.m_percentage) +
              ESC_DOUBLE_FONT_OFF;
     } break;
     case Discount::Type::Product:
     {
+      str += ESC_DOUBLE_FONT_OFF ESC_ALIGN_LEFT;
       for (int i = 0; i != o.m_items.size(); ++i)
       {
         str += o.m_items.at(i).m_product.m_name + ESC_LF;

@@ -490,7 +490,8 @@ void BaitaAssistant::updateControls()
       ui->actionPrint->setEnabled(m_reservation->getReservation().isValid());
       break;
     case Functionality::Discount:
-      ui->actionPrint->setEnabled(m_discount->getDiscount().isValid());
+      ui->actionPrint->setEnabled(m_discount->getDiscount().isValid() &&
+                                  !m_discount->getDiscount().m_bRedeemed);
       break;
     default:
       break;

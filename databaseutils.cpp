@@ -2964,7 +2964,7 @@ bool DiscountSQL::insert(const Discount& o, QString& error)
     query.bindValue(":_v04", (int)o.m_type);
     query.bindValue(":_v05", o.m_value);
     query.bindValue(":_v06", o.m_percentage);
-    query.bindValue(":_v07", o.m_bUsed);
+    query.bindValue(":_v07", o.m_bRedeemed);
     query.bindValue(":_v08", o.m_description);
     bool bSuccess = query.exec();
 
@@ -3023,7 +3023,7 @@ bool DiscountSQL::update(const Discount& o, QString& error)
   query.bindValue(":_v04", (int)o.m_type);
   query.bindValue(":_v05", o.m_value);
   query.bindValue(":_v06", o.m_percentage);
-  query.bindValue(":_v07", o.m_bUsed);
+  query.bindValue(":_v07", o.m_bRedeemed);
   query.bindValue(":_v08", o.m_description);
   bool bSuccess = query.exec();
 
@@ -3090,7 +3090,7 @@ bool DiscountSQL::execSelect(QSqlQuery& query,
       o.m_type = (Discount::Type)query.value(3).toInt();
       o.m_value = query.value(4).toDouble();
       o.m_percentage = query.value(5).toDouble();
-      o.m_bUsed = query.value(6).toBool();
+      o.m_bRedeemed = query.value(6).toBool();
       o.m_description = query.value(7).toString();
     }
     else
@@ -3202,18 +3202,19 @@ bool DiscountSQL::redeem(const QString& code,
 
     if (bSuccess)
     {
-      redeemed = o.m_bUsed;
+      redeemed = o.m_bRedeemed;
       query.prepare("UPDATE " DISCOUNT_SQL_TABLE_NAME " SET "
                     DISCOUNT_SQL_COL07 " = TRUE "
                     "WHERE " SQL_COLID " = (:_v00)");
       query.bindValue(":_v00", o.m_id);
       bSuccess = query.exec();
       if (bSuccess)
-        o.m_bUsed = true;
+        o.m_bRedeemed = true;
     }
   }
   else
   {
+    bSuccess = false;
     error = "Código informado não encontrado.";
   }
 

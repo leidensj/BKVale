@@ -16,6 +16,7 @@ class QDateEdit;
 class QCheckBox;
 class QPlainTextEdit;
 class QDockWidget;
+class QLabel;
 
 class DiscountView : public QFrame
 {
@@ -61,7 +62,7 @@ private:
   QPushButton* m_btnRemove;
   DiscountTableWidget* m_table;
   JDatabase* m_database;
-  QCheckBox* m_cbUsed;
+  QLabel* m_lblRedeemed;
   QPlainTextEdit* m_teDescription;
   QDockWidget* m_dock;
 };

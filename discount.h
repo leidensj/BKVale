@@ -65,7 +65,7 @@ struct Discount : public JItem
   double m_value;
   double m_percentage;
   QVector<DiscountItem> m_items;
-  bool m_bUsed;
+  bool m_bRedeemed;
   bool m_bExpires;
   QDate m_dtExp;
   QString m_description;
@@ -112,7 +112,7 @@ struct Discount : public JItem
     m_value = 0.0;
     m_percentage = 0.0;
     m_items.clear();
-    m_bUsed = false;
+    m_bRedeemed = false;
     m_bExpires = false;
     m_dtExp = QDate::currentDate();
     m_description.clear();
@@ -124,7 +124,7 @@ struct Discount : public JItem
     return
         m_type != another.m_type ||
         m_items != another.m_items ||
-        m_bUsed != another.m_bUsed ||
+        m_bRedeemed != another.m_bRedeemed ||
         m_bExpires != another.m_bExpires ||
         m_dtExp != another.m_dtExp ||
         m_value != another.m_value ||

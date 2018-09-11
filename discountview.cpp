@@ -20,6 +20,7 @@
 #include <QDockWidget>
 #include <QInputDialog>
 #include <QFormLayout>
+#include <QLabel>
 
 DiscountView::DiscountView(QWidget* parent)
   : QFrame(parent)
@@ -39,7 +40,7 @@ DiscountView::DiscountView(QWidget* parent)
   , m_btnRemove(nullptr)
   , m_table(nullptr)
   , m_database(nullptr)
-  , m_cbUsed(nullptr)
+  , m_lblRedeemed(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -111,9 +112,16 @@ DiscountView::DiscountView(QWidget* parent)
 
   m_table = new DiscountTableWidget;
 
-  m_cbUsed = new QCheckBox;
-  m_cbUsed->setText(tr("Desconto já usado."));
-  m_cbUsed->setEnabled(false);
+  m_lblRedeemed = new QLabel;
+  m_lblRedeemed->setText(tr("Desconto já resgatado."));
+  {
+    QFont font = m_lblRedeemed->font();
+    font.setBold(true);
+    m_lblRedeemed->setFont(font);
+    QPalette palette = m_lblRedeemed->palette();
+    palette.setColor(QPalette::ColorRole::Foreground, Qt::red);
+    m_lblRedeemed->setPalette(palette);
+  }
 
   m_teDescription = new QPlainTextEdit;
 
@@ -152,7 +160,7 @@ DiscountView::DiscountView(QWidget* parent)
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setAlignment(Qt::AlignTop);
   viewLayout->addLayout(buttonLayout);
-  viewLayout->addWidget(m_cbUsed);
+  viewLayout->addWidget(m_lblRedeemed);
   viewLayout->addLayout(formLayout);
 
   QFrame* viewFrame = new QFrame;
@@ -263,7 +271,7 @@ Discount DiscountView::getDiscount() const
   o.m_value = m_spnValue->value();
   o.m_percentage = m_spnPercentage->value();
   o.m_items = m_table->getDiscountItems();
-  o.m_bUsed = m_cbUsed->isChecked();
+  o.m_bRedeemed = m_lblRedeemed->isVisible();
   o.m_description = m_teDescription->toPlainText();
   return o;
 }
@@ -271,8 +279,7 @@ Discount DiscountView::getDiscount() const
 void DiscountView::setDiscount(const Discount &o)
 {
   m_currentId = o.m_id;
-  m_cbUsed->setChecked(o.m_bUsed);
-  m_cbUsed->setVisible(o.m_bUsed);
+  m_lblRedeemed->setVisible(o.m_bRedeemed);
   m_edCode->setText(o.m_code);
   m_cbExpires->setChecked(o.m_bExpires);
   m_dtExp->setDate(o.m_dtExp);
@@ -288,12 +295,20 @@ void DiscountView::setDiscount(const Discount &o)
 
 void DiscountView::updateControls()
 {
-  m_spnValue->setEnabled(m_rdValue->isChecked());
-  m_spnPercentage->setEnabled(m_rdPercentage->isChecked());
-  m_btnAdd->setEnabled(m_rdProduct->isChecked());
-  m_btnRemove->setEnabled(m_rdProduct->isChecked());
-  m_table->setEnabled(m_rdProduct->isChecked());
-  m_dtExp->setEnabled(m_cbExpires->isChecked());
+  const bool bRedeemed = m_lblRedeemed->isVisible();
+  m_edCode->setEnabled(!bRedeemed);
+  m_cbExpires->setEnabled(!bRedeemed);
+  m_rdValue->setEnabled(!bRedeemed);
+  m_rdPercentage->setEnabled(!bRedeemed);
+  m_rdProduct->setEnabled(!bRedeemed);
+  m_teDescription->setEnabled(!bRedeemed);
+
+  m_spnValue->setEnabled(!bRedeemed && m_rdValue->isChecked());
+  m_spnPercentage->setEnabled(!bRedeemed && m_rdPercentage->isChecked());
+  m_btnAdd->setEnabled(!bRedeemed && m_rdProduct->isChecked());
+  m_btnRemove->setEnabled(!bRedeemed && m_rdProduct->isChecked());
+  m_table->setEnabled(!bRedeemed && m_rdProduct->isChecked());
+  m_dtExp->setEnabled(!bRedeemed && m_cbExpires->isChecked());
   if (sender() == m_rdValue)
   {
     m_spnValue->setFocus();

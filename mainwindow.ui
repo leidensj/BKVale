@@ -183,7 +183,6 @@
    <addaction name="actionShop"/>
    <addaction name="actionReservations"/>
    <addaction name="actionDiscount"/>
-   <addaction name="actionRedeemCode"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">
@@ -402,15 +401,6 @@
    </property>
    <property name="toolTip">
     <string>Descontos</string>
-   </property>
-  </action>
-  <action name="actionRedeemCode">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/redeem.png</normaloff>:/icons/res/redeem.png</iconset>
-   </property>
-   <property name="text">
-    <string>Resgatar</string>
    </property>
   </action>
  </widget>

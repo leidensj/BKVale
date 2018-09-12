@@ -28,11 +28,8 @@ protected:
   void keyPressEvent(QKeyEvent *event);
 
 private:
-  QString text(int row, int column) const;
-  void setText(int row, int column, const QString& str);
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
-  double evaluate(int row, int column) const;
 
 private slots:
   void update(int row, int column);

@@ -1,7 +1,7 @@
 #include "notetablewidget.h"
-#include "tinyexpr.h"
 #include <QHeaderView>
 #include <QKeyEvent>
+#include "jtablewidgetitem.h"
 
 NoteTableWidget::NoteTableWidget(QWidget* parent)
   : QTableWidget(parent)
@@ -81,17 +81,17 @@ void NoteTableWidget::keyPressEvent(QKeyEvent *event)
 
 double NoteTableWidget::computePrice(int row) const
 {
-  const double ammount = text(row, (int)NoteColumn::Ammount).toDouble();
-  const double subTotal = text(row, (int)NoteColumn::SubTotal).toDouble();
+  const double ammount = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Ammount))->getValue();
+  const double subTotal = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal))->getValue();
   const double price = ammount ? subTotal / ammount : 0.0;
   return price;
 }
 
 double NoteTableWidget::computeSubTotal(int row) const
 {
-  const double ammount = text(row, (int)NoteColumn::Ammount).toDouble();
-  const double unitValue = text(row, (int)NoteColumn::Price).toDouble();
-  const double subTotal = ammount * unitValue;
+  const double ammount = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Ammount))->getValue();
+  const double price = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Price))->getValue();
+  const double subTotal = ammount * price;
   return subTotal;
 }
 
@@ -99,37 +99,8 @@ double NoteTableWidget::computeTotal() const
 {
   double total = 0.0;
   for (int row = 0; row != rowCount(); ++row)
-    total += text(row, (int)NoteColumn::SubTotal).toDouble();
+    total += ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal))->getValue();
   return total;
-}
-
-double NoteTableWidget::evaluate(int row, int column) const
-{
-  auto pt = item(row, column);
-  if (pt == nullptr)
-    return 0.0;
-  auto exp = pt->text().toStdString();
-  int error = 0;
-  double res = te_interp(exp.c_str(), &error);
-  if (!error)
-    pt->setData(Qt::UserRole, res);
-  return pt->data(Qt::UserRole).toDouble();
-}
-
-QString NoteTableWidget::text(int row, int column) const
-{
-  QString str;
-  auto p = item(row, (int)column);
-  if (p != nullptr)
-    str = p->text();
-  return str;
-}
-
-void NoteTableWidget::setText(int row, int column, const QString& str)
-{
-  auto p = item(row, column);
-  if (p != nullptr)
-    p->setText(str);
 }
 
 QVector<NoteItem> NoteTableWidget::getNoteItems() const
@@ -138,8 +109,8 @@ QVector<NoteItem> NoteTableWidget::getNoteItems() const
   for (int i = 0; i != rowCount(); ++i)
   {
     NoteItem noteItem = item(i, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
-    noteItem.m_ammount = text(i, (int)NoteColumn::Ammount).toDouble();
-    noteItem.m_price = text(i, (int)NoteColumn::Price).toDouble();
+    noteItem.m_ammount = ((DoubleTableWidgetItem*)item(i, (int)NoteColumn::SubTotal))->getValue();
+    noteItem.m_price = ((DoubleTableWidgetItem*)item(i, (int)NoteColumn::Price))->getValue();
     vNoteItem.push_back(noteItem);
   }
   return vNoteItem;
@@ -150,10 +121,13 @@ void NoteTableWidget::addNoteItem(const NoteItem& noteItem)
   blockSignals(true);
   insertRow(rowCount());
   int row = rowCount() - 1;
-  setItem(row, (int)NoteColumn::Ammount, new QTableWidgetItem);
+  setItem(row, (int)NoteColumn::Ammount, new DoubleTableWidgetItem(JItem::DataType::Ammount,
+                                                                   DoubleTableWidgetItem::Color::Background));
   setItem(row, (int)NoteColumn::Description, new QTableWidgetItem);
-  setItem(row, (int)NoteColumn::Price, new QTableWidgetItem);
-  setItem(row, (int)NoteColumn::SubTotal, new QTableWidgetItem);
+  setItem(row, (int)NoteColumn::Price, new DoubleTableWidgetItem(JItem::DataType::Money,
+                                                                 DoubleTableWidgetItem::Color::Background));
+  setItem(row, (int)NoteColumn::SubTotal, new DoubleTableWidgetItem(JItem::DataType::Money,
+                                                                    DoubleTableWidgetItem::Color::Foreground));
   setItem(row, (int)NoteColumn::Unity, new QTableWidgetItem);
   setCurrentCell(row, (int)NoteColumn::Ammount);
   setNoteItem(noteItem);
@@ -218,9 +192,9 @@ void NoteTableWidget::setNoteItem(const NoteItem& noteItem)
     QVariant var;
     var.setValue(noteItem);
     item(currentRow(), (int)NoteColumn::Description)->setData(Qt::UserRole, var);
-    item(currentRow(), (int)NoteColumn::Ammount)->setText(noteItem.strAmmount());
-    item(currentRow(), (int)NoteColumn::Price)->setText(noteItem.strPrice());
-    item(currentRow(), (int)NoteColumn::SubTotal)->setText(noteItem.strSubtotal());
+    ((DoubleTableWidgetItem*)item(currentRow(), (int)NoteColumn::Ammount))->setValue(noteItem.m_ammount);
+    ((DoubleTableWidgetItem*)item(currentRow(), (int)NoteColumn::Price))->setValue(noteItem.m_price);
+    ((DoubleTableWidgetItem*)item(currentRow(), (int)NoteColumn::SubTotal))->setValue(noteItem.subtotal());
     item(currentRow(), (int)NoteColumn::Description)->setTextColor(QColor(Qt::darkGray));
     item(currentRow(), (int)NoteColumn::Unity)->setTextColor(QColor(Qt::darkGray));
     setProduct(noteItem.m_product);
@@ -246,39 +220,32 @@ void NoteTableWidget::update(int row, int column)
     } break;
     case NoteColumn::Ammount:
     {
-      double value = evaluate(row, column);
-      setText(row, column, JItem::st_strAmmount(value));
-      setText(row, (int)NoteColumn::SubTotal, JItem::st_strMoney(computeSubTotal(row)));
+      auto ptAmmount = (DoubleTableWidgetItem*)item(row, column);
+      ptAmmount->evaluate();
+      auto ptSubtotal = (DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal);
+      ptSubtotal->setValue(computeSubTotal(row));
     } break;
     case NoteColumn::Price:
     {
-      double value = evaluate(row, column);
-      setText(row, column, JItem::st_strMoney(value));
-      setText(row, (int)NoteColumn::SubTotal, JItem::st_strMoney(computeSubTotal(row)));
+      auto ptPrice = (DoubleTableWidgetItem*)item(row, column);
+      ptPrice->evaluate();
+      auto ptSubtotal = (DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal);
+      ptSubtotal->setValue(computeSubTotal(row));
     } break;
     case NoteColumn::SubTotal:
     {
-      setText(row, column, JItem::st_strMoney(evaluate(row, column)));
-      setText(row, (int)NoteColumn::Price, JItem::st_strMoney(computePrice(row)));
+      auto ptSubtotal = (DoubleTableWidgetItem*)item(row, column);
+      ptSubtotal->evaluate();
+      auto ptPrice = (DoubleTableWidgetItem*)item(row, (int)NoteColumn::Price);
+      ptPrice->setValue(computePrice(row));
+      //Re-compute subtotal
+      ptSubtotal->setValue(computeSubTotal(row));
     } break;
     case NoteColumn::Description:
     default:
       break;
   }
 
-  double subTotal = text(row, (int)NoteColumn::SubTotal).toDouble();
-  double price = text(row, (int)NoteColumn::Price).toDouble();
-  double ammount = text(row, (int)NoteColumn::Ammount).toDouble();
-
-  item(row, (int)NoteColumn::SubTotal)->setTextColor(QColor(subTotal >= 0
-                                                            ? Qt::red
-                                                            : Qt::darkGreen));
-  item(row, (int)NoteColumn::Price)->setBackgroundColor(price == 0.0
-                                                        ? QColor(255, 200, 200)
-                                                        : QColor(Qt::white));
-  item(row, (int)NoteColumn::Ammount)->setBackgroundColor(ammount == 0
-                                                          ? QColor(255, 200, 200)
-                                                          : QColor(Qt::white));
   blockSignals(false);
   emitChangedSignal();
 }

@@ -48,7 +48,8 @@ SOURCES += main.cpp\
     notefilterdlg.cpp \
     productbarcodeview.cpp \
     discounttablewidget.cpp \
-    discountview.cpp
+    discountview.cpp \
+    jtablewidgetitem.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -101,7 +102,8 @@ HEADERS  += mainwindow.h \
     productbarcodeview.h \
     discount.h \
     discounttablewidget.h \
-    discountview.h
+    discountview.h \
+    jtablewidgetitem.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

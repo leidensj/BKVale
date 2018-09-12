@@ -65,6 +65,10 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   , m_discountWindow(nullptr)
 {
   ui->setupUi(this);
+
+  QTime time = QTime::currentTime();
+  qsrand((uint)time.msec());
+
   m_note = new NoteView;
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;

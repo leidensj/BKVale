@@ -60,7 +60,7 @@ struct Discount : public JItem
     Product
   };
 
-  QString m_code;
+  mutable QString m_code;
   Type m_type;
   double m_value;
   double m_percentage;
@@ -107,7 +107,7 @@ struct Discount : public JItem
   void clear()
   {
     m_id = INVALID_ID;
-    m_code = getRandomCode();
+    m_code.clear();
     m_type = Type::Value;
     m_value = 0.0;
     m_percentage = 0.0;

@@ -28,6 +28,7 @@ DiscountView::DiscountView(QWidget* parent)
   , m_btnCreate(nullptr)
   , m_btnSearch(nullptr)
   , m_btnRedeem(nullptr)
+  , m_lblCode(nullptr)
   , m_edCode(nullptr)
   , m_cbExpires(nullptr)
   , m_dtExp(nullptr)
@@ -63,6 +64,8 @@ DiscountView::DiscountView(QWidget* parent)
   m_btnRedeem->setIcon(QIcon(":/icons/res/redeem.png"));
   m_btnRedeem->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
 
+  m_lblCode = new QLabel;
+  m_lblCode->setText(tr("Código:"));
   m_edCode = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags2);
   m_edCode->setPlaceholderText(tr("*"));
   m_edCode->setMaxLength(DISCOUNT_CODE_MAX_LENGTH);
@@ -134,7 +137,7 @@ DiscountView::DiscountView(QWidget* parent)
 
   QFormLayout* formLayout = new QFormLayout;
   formLayout->setContentsMargins(0, 0, 0, 0);
-  formLayout->addRow(tr("Código:"), m_edCode);
+  formLayout->addRow(m_lblCode, m_edCode);
   formLayout->addRow(m_cbExpires, m_dtExp);
   formLayout->addRow(m_rdValue, m_spnValue);
   formLayout->addRow(m_rdPercentage, m_spnPercentage);
@@ -295,6 +298,8 @@ void DiscountView::setDiscount(const Discount &o)
 
 void DiscountView::updateControls()
 {
+  m_lblCode->setVisible(!m_edCode->text().isEmpty());
+  m_edCode->setVisible(!m_edCode->text().isEmpty());
   const bool bRedeemed = m_lblRedeemed->isVisible();
   m_edCode->setEnabled(!bRedeemed);
   m_cbExpires->setEnabled(!bRedeemed);

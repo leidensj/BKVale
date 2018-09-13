@@ -2940,33 +2940,48 @@ bool DiscountSQL::insert(const Discount& o, QString& error)
   db.transaction();
   QSqlQuery query(db);
 
-  query.prepare("INSERT INTO " DISCOUNT_SQL_TABLE_NAME " ("
-                DISCOUNT_SQL_COL01 ","
-                DISCOUNT_SQL_COL02 ","
-                DISCOUNT_SQL_COL03 ","
-                DISCOUNT_SQL_COL04 ","
-                DISCOUNT_SQL_COL05 ","
-                DISCOUNT_SQL_COL06 ","
-                DISCOUNT_SQL_COL07 ","
-                DISCOUNT_SQL_COL08
-                ") VALUES ("
-                "(:_v01),"
-                "(:_v02),"
-                "(:_v03),"
-                "(:_v04),"
-                "(:_v05),"
-                "(:_v06),"
-                "(:_v07),"
-                "(:_v08))");
+  bool bSuccess = false;
+
+  do
+  {
+    o.m_code = Discount::getRandomCode();
+    query.prepare("SELECT " SQL_COLID " FROM "
+                  DISCOUNT_SQL_TABLE_NAME " WHERE "
+                  DISCOUNT_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", o.m_code);
-    query.bindValue(":_v02", o.m_bExpires);
-    query.bindValue(":_v03", o.m_dtExp);
-    query.bindValue(":_v04", (int)o.m_type);
-    query.bindValue(":_v05", o.m_value);
-    query.bindValue(":_v06", o.m_percentage);
-    query.bindValue(":_v07", o.m_bRedeemed);
-    query.bindValue(":_v08", o.m_description);
-    bool bSuccess = query.exec();
+    bSuccess = query.exec();
+  } while (bSuccess && query.next());
+
+  if (bSuccess)
+  {
+    query.prepare("INSERT INTO " DISCOUNT_SQL_TABLE_NAME " ("
+                  DISCOUNT_SQL_COL01 ","
+                  DISCOUNT_SQL_COL02 ","
+                  DISCOUNT_SQL_COL03 ","
+                  DISCOUNT_SQL_COL04 ","
+                  DISCOUNT_SQL_COL05 ","
+                  DISCOUNT_SQL_COL06 ","
+                  DISCOUNT_SQL_COL07 ","
+                  DISCOUNT_SQL_COL08
+                  ") VALUES ("
+                  "(:_v01),"
+                  "(:_v02),"
+                  "(:_v03),"
+                  "(:_v04),"
+                  "(:_v05),"
+                  "(:_v06),"
+                  "(:_v07),"
+                  "(:_v08))");
+      query.bindValue(":_v01", o.m_code);
+      query.bindValue(":_v02", o.m_bExpires);
+      query.bindValue(":_v03", o.m_dtExp);
+      query.bindValue(":_v04", (int)o.m_type);
+      query.bindValue(":_v05", o.m_value);
+      query.bindValue(":_v06", o.m_percentage);
+      query.bindValue(":_v07", o.m_bRedeemed);
+      query.bindValue(":_v08", o.m_description);
+      bSuccess = query.exec();
+  }
 
   if (bSuccess)
   {

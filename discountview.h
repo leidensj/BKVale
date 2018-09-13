@@ -50,6 +50,7 @@ private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnSearch;
   QPushButton* m_btnRedeem;
+  QLabel* m_lblCode;
   JLineEdit* m_edCode;
   QCheckBox* m_cbExpires;
   QDateEdit* m_dtExp;

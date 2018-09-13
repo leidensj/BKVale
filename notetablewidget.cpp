@@ -109,7 +109,7 @@ QVector<NoteItem> NoteTableWidget::getNoteItems() const
   for (int i = 0; i != rowCount(); ++i)
   {
     NoteItem noteItem = item(i, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
-    noteItem.m_ammount = ((DoubleTableWidgetItem*)item(i, (int)NoteColumn::SubTotal))->getValue();
+    noteItem.m_ammount = ((DoubleTableWidgetItem*)item(i, (int)NoteColumn::Ammount))->getValue();
     noteItem.m_price = ((DoubleTableWidgetItem*)item(i, (int)NoteColumn::Price))->getValue();
     vNoteItem.push_back(noteItem);
   }

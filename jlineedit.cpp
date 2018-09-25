@@ -1,4 +1,5 @@
 #include "jlineedit.h"
+#include "tinyexpr.h"
 
 namespace
 {
@@ -75,4 +76,53 @@ void JLineEdit::setTextBlockingSignals(const QString& str)
   blockSignals(true);
   setText(str);
   blockSignals(false);
+}
+
+JExpLineEdit::JExpLineEdit(JItem::DataType type,
+                           Input input,
+                           int flags, double
+                           defaultValue,
+                           QWidget* parent)
+  : JLineEdit(input, flags, parent)
+  , m_dataType(type)
+  , m_defaultValue(defaultValue)
+  , m_currentValue(defaultValue)
+{
+  setTextBlockingSignals(JItem::st_str(m_defaultValue, m_dataType));
+  QObject::connect(this,
+                   SIGNAL(editingFinished()),
+                   this,
+                   SLOT(evaluate()));
+}
+
+double JExpLineEdit::getValue() const
+{
+  return m_currentValue;
+}
+
+void JExpLineEdit::evaluate()
+{
+  auto stdExp = text().toStdString();
+  int error = 0;
+  double val = te_interp(stdExp.c_str(), &error);
+  if (!error)
+  {
+    m_currentValue = val;
+    setTextBlockingSignals(JItem::st_str(val, m_dataType));
+  }
+  else
+  {
+    m_currentValue = m_defaultValue;
+    setTextBlockingSignals(JItem::st_str(m_defaultValue, m_dataType));
+  }
+
+  QPalette _palette = palette();
+  _palette.setColor(QPalette::ColorRole::Text, val >= 0 ? Qt::red : Qt::darkGreen);
+  setPalette(_palette);
+}
+
+void JExpLineEdit::setText(const QString& text)
+{
+  QLineEdit::setText(text);
+  evaluate();
 }

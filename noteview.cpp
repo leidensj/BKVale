@@ -5,7 +5,6 @@
 #include "jdatabasepicker.h"
 #include "jdatabase.h"
 #include "jlineedit.h"
-#include "tinyexpr.h"
 #include "packageeditor.h"
 #include "productbarcode.h"
 #include <QLineEdit>
@@ -212,7 +211,7 @@ NoteView::NoteView(QWidget *parent)
     m_edTotal->setPalette(palette);
   }
 
-  m_edDisccount = new JLineEdit(JLineEdit::Input::BasicMath, 0);
+  m_edDisccount = new JExpLineEdit(JItem::DataType::Money, JLineEdit::Input::BasicMath, JLineEdit::st_defaultFlags1, 0.0);
   m_edDisccount->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, 0.0);
@@ -372,7 +371,7 @@ Note NoteView::getNote() const
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_bCash = m_cbCash->isChecked();
   note.m_observation = m_teObservation->toPlainText();
-  note.m_disccount = m_edDisccount->text().toDouble();
+  note.m_disccount = m_edDisccount->getValue();
   note.m_vNoteItem = m_table->getNoteItems();
   return note;
 }
@@ -422,31 +421,16 @@ void NoteView::updateControls()
                             ? ":/icons/res/calendarok.png"
                             : ":/icons/res/calendarwarning.png"));
 
-  // evaluate disccount
-  auto exp = m_edDisccount->text().toStdString();
-  int error = 0;
-  double disccount = te_interp(exp.c_str(), &error);
-  if (!error)
-    m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, disccount);
-  else
-    m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, 0.0);
-  disccount = m_edDisccount->property(DISCCOUNT_LAST_VALUE_PROP).toDouble();
-  m_edDisccount->setText(JItem::st_strMoney(disccount));
-  QPalette palette = m_edDisccount->palette();
-  palette.setColor(QPalette::ColorRole::Text,
-                   disccount >= 0 ? Qt::red : Qt::darkGreen);
-  m_edDisccount->setPalette(palette);
-
-  double total = m_table->computeTotal() + disccount;
+  double total = m_table->computeTotal() + m_edDisccount->getValue();
 
   if (m_table->hasItems() || total != 0)
     m_edTotal->setText(JItem::st_strMoney(total));
   else
     m_edTotal->clear();
 
-  palette.setColor(QPalette::ColorRole::Text,
-                   total >= 0 ? Qt::red : Qt::darkGreen);
-  m_edTotal->setPalette(palette);
+  QPalette _palette = m_edTotal->palette();
+  _palette.setColor(QPalette::ColorRole::Text, total >= 0 ? Qt::red : Qt::darkGreen);
+  m_edTotal->setPalette(_palette);
 
   emit changedSignal();
 }

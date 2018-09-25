@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QValidator>
 #include <QRegExpValidator>
+#include "jitem.h"
 
 class JRegExpValidator: public QRegExpValidator
 {
@@ -45,7 +46,7 @@ public:
 
   explicit JLineEdit(Input input,
                      int flags = st_defaultFlags1,
-                     QWidget* parent = 0);
+                     QWidget* parent = nullptr);
 
   void setTextBlockingSignals(const QString& str);
 
@@ -59,6 +60,29 @@ signals:
   void enterSignal();
   void keyDownSignal();
   void keyUpSignal();
+};
+
+class JExpLineEdit : public JLineEdit
+{
+  Q_OBJECT
+
+public:
+  JExpLineEdit(JItem::DataType type = JItem::DataType::Fmt,
+               Input input = Input::BasicMath,
+               int flags = st_defaultFlags1,
+               double defaultValue = 0.0,
+               QWidget* parent = nullptr);
+
+  double getValue() const;
+  void setText(const QString& text);
+
+private slots:
+  void evaluate();
+
+private:
+  const JItem::DataType m_dataType;
+  const double m_defaultValue;
+  double m_currentValue;
 };
 
 #endif // JLINEEDIT_H

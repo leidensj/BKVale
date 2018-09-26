@@ -211,7 +211,7 @@ NoteView::NoteView(QWidget *parent)
     m_edTotal->setPalette(palette);
   }
 
-  m_edDisccount = new JExpLineEdit(JItem::DataType::Money, JLineEdit::Input::BasicMath, JLineEdit::st_defaultFlags1, 0.0);
+  m_edDisccount = new JExpLineEdit(JItem::DataType::Money);
   m_edDisccount->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, 0.0);
@@ -264,9 +264,9 @@ NoteView::NoteView(QWidget *parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
                    this,
@@ -548,10 +548,10 @@ void NoteView::itemSelected(const JItem& jItem)
   setNote(note);
 }
 
-void NoteView::itemRemoved(qlonglong id)
+void NoteView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (id == m_lastId)
+  if (ids.contains(m_lastId))
     m_lastId = INVALID_ID;
-  if (id == m_currentId)
+  if (ids.contains(m_currentId))
     create();
 }

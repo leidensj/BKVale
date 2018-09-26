@@ -97,9 +97,9 @@ CategoryView::CategoryView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 }
 
 void CategoryView::itemSelected(const JItem& jItem)
@@ -109,9 +109,9 @@ void CategoryView::itemSelected(const JItem& jItem)
     setCategory(category);
 }
 
-void CategoryView::itemRemoved(qlonglong id)
+void CategoryView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (m_currentId == id)
+  if (ids.contains(m_currentId))
     create();
 }
 

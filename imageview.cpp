@@ -85,9 +85,9 @@ ImageView::ImageView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 }
 
 void ImageView::setImage(const Image& image)
@@ -125,9 +125,9 @@ void ImageView::itemSelected(const JItem& jItem)
     setImage(image);
 }
 
-void ImageView::itemRemoved(qlonglong id)
+void ImageView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (m_currentId == id)
+  if (ids.contains(m_currentId))
     create();
 }
 

@@ -28,7 +28,7 @@ private slots:
   void setCapitalization(int state);
   void search();
   void itemSelected(const JItem& jItem);
-  void itemRemoved(qlonglong id);
+  void itemsRemoved(const QVector<qlonglong>& ids);
 
 public slots:
   void create();

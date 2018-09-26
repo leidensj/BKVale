@@ -82,7 +82,7 @@ private slots:
   void filterSearchEnter();
   void containsPressed();
   void enableControls();
-  void removeItem();
+  void removeItems();
   void focusFilterSearch();
   void emitCurrentRowChangedSignal();
   void showFilter();
@@ -90,7 +90,7 @@ private slots:
 
 signals:
   void itemSelectedSignal(const JItem& jItem);
-  void itemRemovedSignal(qlonglong id);
+  void itemsRemovedSignal(const QVector<qlonglong>& ids);
   void currentRowChangedSignal(int row);
 };
 

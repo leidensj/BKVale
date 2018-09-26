@@ -25,7 +25,7 @@ public:
 private slots:
   void save();
   void itemSelected(const JItem& jItem);
-  void itemRemoved(qlonglong id);
+  void itemsRemoved(const QVector<qlonglong>& ids);
 
   void create();
   void addItem();

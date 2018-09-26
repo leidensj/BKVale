@@ -98,9 +98,9 @@ ProductBarcodeView::ProductBarcodeView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 }
 
 ProductBarcodeView::~ProductBarcodeView()
@@ -142,9 +142,9 @@ void ProductBarcodeView::itemSelected(const JItem& jItem)
     setProductBarcode(barcode);
 }
 
-void ProductBarcodeView::itemRemoved(qlonglong id)
+void ProductBarcodeView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (id == m_currentId)
+  if (ids.contains(m_currentId))
     create();
 }
 

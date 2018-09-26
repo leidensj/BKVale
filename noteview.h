@@ -59,7 +59,7 @@ private slots:
   void showSearch();
   void lastItemSelected();
   void itemSelected(const JItem& jItem);
-  void itemRemoved(qlonglong id);
+  void itemsRemoved(const QVector<qlonglong>& ids);
   void setProduct(const Product& product, bool bNewProduct);
   void searchProduct();
   void searchProductByBarcode();

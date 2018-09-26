@@ -197,9 +197,9 @@ DiscountView::DiscountView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
   QObject::connect(m_rdValue,
                    SIGNAL(clicked(bool)),
                    this,
@@ -246,9 +246,9 @@ void DiscountView::itemSelected(const JItem& jItem)
     setDiscount(o);
 }
 
-void DiscountView::itemRemoved(qlonglong id)
+void DiscountView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (m_currentId == id)
+  if (ids.contains(m_currentId))
     create();
 }
 

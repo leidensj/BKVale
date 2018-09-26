@@ -28,7 +28,7 @@ public:
 
 private slots:
   void itemSelected(const JItem& jItem);
-  void itemRemoved(qlonglong id);
+  void itemsRemoved(const QVector<qlonglong>& ids);
   void searchProduct();
   void removeProduct();
   void setProduct(const Product& product, bool bNewProduct);

@@ -163,9 +163,9 @@ ProductView::ProductView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 }
 
 ProductView::~ProductView()
@@ -223,9 +223,9 @@ void ProductView::itemSelected(const JItem& jItem)
     setProduct(product);
 }
 
-void ProductView::itemRemoved(qlonglong id)
+void ProductView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (id == m_currentId)
+  if (ids.contains(m_currentId))
     create();
 }
 

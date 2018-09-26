@@ -232,9 +232,9 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
                    SLOT(itemSelected(const JItem&)));
 
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 
   create();
 }
@@ -316,11 +316,11 @@ void UserMgtView::itemSelected(const JItem& jItem)
     setUser(user);
 }
 
-void UserMgtView::itemRemoved(qlonglong id)
+void UserMgtView::itemsRemoved(const QVector<qlonglong>& ids)
 {
   if (!m_bHasLoggedUserChanged)
-    m_bHasLoggedUserChanged = m_bHasLoggedUserChanged == id;
-  if (m_currentId == id)
+    m_bHasLoggedUserChanged = ids.contains(m_bHasLoggedUserChanged);
+  if (ids.contains(m_currentId))
     create();
 }
 

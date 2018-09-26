@@ -661,6 +661,7 @@ JDatabase::JDatabase(const QString& tableName,
   m_btnRemove->setIconSize(QSize(24, 24));
   m_btnRemove->setToolTip(tr("Remover (Del)"));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
+  m_btnOpen->setShortcut(QKeySequence(Qt::Key_Delete));
 
   m_btnFilter = new QPushButton();
   m_btnFilter->setFlat(true);
@@ -711,7 +712,7 @@ JDatabase::JDatabase(const QString& tableName,
 
   m_table = new JTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_table->setSelectionMode(QAbstractItemView::MultiSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
   m_table->setSortingEnabled(true);
   m_table->horizontalHeader()->setHighlightSections(false);
@@ -804,7 +805,7 @@ JDatabase::JDatabase(const QString& tableName,
     QObject::connect(m_btnRemove,
                      SIGNAL(clicked(bool)),
                      this,
-                     SLOT(removeItem()));
+                     SLOT(removeItems()));
     QObject::connect(m_table,
                      SIGNAL(doubleClicked(const QModelIndex&)),
                      this,
@@ -1013,59 +1014,61 @@ void JDatabase::enableControls()
   m_btnRemove->setEnabled(bSelected);
 }
 
-void JDatabase::removeItem()
+void JDatabase::removeItems()
 {
-  QModelIndex idx = m_proxyModel->mapToSource(m_table->currentIndex());
-  if (idx.isValid())
+  JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
+  QModelIndexList lst = m_table->selectionModel()->selectedIndexes();
+
+  QVector<qlonglong> ids;
+  for (int i = 0; i != lst.size(); ++i)
   {
-    if (QMessageBox::question(this,
-                              tr("Remover item"),
-                              tr("Tem certeza que deseja remover o item selecionado?"),
-                              QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
-    {
-      return;
-    }
-    JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
-    qlonglong id = model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong();
-    bool bSuccess = false;
+    QModelIndex idx = m_proxyModel->mapToSource(lst.at(i));
+    if (idx.isValid())
+      ids.push_back(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong());
+  }
+
+  if (ids.size() == 0)
+    return;
+
+  if (QMessageBox::question(this,
+                            tr("Remover itens"),
+                            tr("Tem certeza que deseja remover os itens selecionados?"),
+                            QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
+  {
+    return;
+  }
+
+  for (int i = 0; i != ids.size(); ++i)
+  {
+    qlonglong id = ids.at(i);
     QString error;
     if (m_tableName == IMAGE_SQL_TABLE_NAME)
-      bSuccess = ImageSQL::remove(id, error);
+      ImageSQL::remove(id, error);
     else if (m_tableName == PERSON_SQL_TABLE_NAME)
-      bSuccess = PersonSQL::remove(id, error);
+      PersonSQL::remove(id, error);
     else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
-      bSuccess = CategorySQL::remove(id, error);
+      CategorySQL::remove(id, error);
     else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
-      bSuccess = ProductSQL::remove(id, error);
+      ProductSQL::remove(id, error);
     else if (m_tableName == NOTE_SQL_TABLE_NAME)
-      bSuccess = NoteSQL::remove(id, error);
+      NoteSQL::remove(id, error);
     else if (m_tableName == USER_SQL_TABLE_NAME)
-      bSuccess = UserSQL::remove(id, error);
+      UserSQL::remove(id, error);
     else if (m_tableName == REMINDER_SQL_TABLE_NAME)
-      bSuccess = ReminderSQL::remove(id, error);
+      ReminderSQL::remove(id, error);
     else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-      bSuccess = ShoppingListSQL::remove(id, error);
+      ShoppingListSQL::remove(id, error);
     else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
-      bSuccess = ReservationSQL::remove(id, error);
+      ReservationSQL::remove(id, error);
     else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
-      bSuccess = ProductBarcodeSQL::remove(id, error);
+      ProductBarcodeSQL::remove(id, error);
     else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
-      bSuccess = DiscountSQL::remove(id, error);
+      DiscountSQL::remove(id, error);
     else
       error = tr("Item ainda não implementado.");
 
-    if (bSuccess)
-    {
-      emit itemRemovedSignal(id);
-      refresh();
-    }
-    else
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("O seguinte erro ocorreu ao remover o item com ID "
-                               "'%1':\n'%2'").arg(QString::number(id), error));
-    }
+    emit itemsRemovedSignal(ids);
+    refresh();
   }
 }
 
@@ -1084,7 +1087,7 @@ void JDatabase::filterSearchChanged()
     QString columnName;
     if (column > 0)
       columnName = m_proxyModel->headerData(column, Qt::Horizontal).toString().toLower();
-    columnName = tr("Procurar por: ") + columnName + " Ctrl+F";
+    columnName = tr("Procurar por: ") + columnName;
     m_edFilterSearch->setPlaceholderText(columnName);
   }
 

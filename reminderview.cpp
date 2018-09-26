@@ -169,9 +169,9 @@ ReminderView::ReminderView(QWidget *parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 
   setCapitalization(m_cbCapitalization->checkState());
   create();
@@ -218,9 +218,9 @@ void ReminderView::itemSelected(const JItem& jItem)
     setReminder(reminder);
 }
 
-void ReminderView::itemRemoved(qlonglong id)
+void ReminderView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (id == m_currentId)
+  if (ids.contains(m_currentId))
     create();
 }
 

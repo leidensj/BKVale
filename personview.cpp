@@ -494,9 +494,9 @@ PersonView::PersonView(bool bAccessEmployee,
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 
   switchUserType();
   updateControls();
@@ -789,9 +789,9 @@ void PersonView::itemSelected(const JItem& jItem)
   setPerson(person);
 }
 
-void PersonView::itemRemoved(qlonglong id)
+void PersonView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (id == m_currentId)
+  if (ids.contains(m_currentId))
     create();
 }
 

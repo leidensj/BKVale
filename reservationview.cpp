@@ -124,9 +124,9 @@ ReservationView::ReservationView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
                    this,
@@ -141,9 +141,9 @@ void ReservationView::itemSelected(const JItem& jItem)
     setReservation(res);
 }
 
-void ReservationView::itemRemoved(qlonglong id)
+void ReservationView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (m_currentId == id)
+  if (ids.contains(m_currentId))
     create();
 }
 

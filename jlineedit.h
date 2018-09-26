@@ -45,7 +45,7 @@ public:
                                       (int)Flags::ArrowsAsTab;
 
   explicit JLineEdit(Input input,
-                     int flags = st_defaultFlags1,
+                     int flags = st_defaultFlags2,
                      QWidget* parent = nullptr);
 
   void setTextBlockingSignals(const QString& str);
@@ -68,13 +68,13 @@ class JExpLineEdit : public JLineEdit
 
 public:
   JExpLineEdit(JItem::DataType type = JItem::DataType::Fmt,
-               Input input = Input::BasicMath,
                int flags = st_defaultFlags1,
                double defaultValue = 0.0,
                QWidget* parent = nullptr);
 
   double getValue() const;
   void setText(const QString& text);
+  QString text() const;
 
 private slots:
   void evaluate();

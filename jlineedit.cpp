@@ -79,20 +79,19 @@ void JLineEdit::setTextBlockingSignals(const QString& str)
 }
 
 JExpLineEdit::JExpLineEdit(JItem::DataType type,
-                           Input input,
-                           int flags, double
-                           defaultValue,
+                           int flags,
+                           double defaultValue,
                            QWidget* parent)
-  : JLineEdit(input, flags, parent)
+  : JLineEdit(Input::All, flags, parent)
   , m_dataType(type)
   , m_defaultValue(defaultValue)
   , m_currentValue(defaultValue)
 {
-  setTextBlockingSignals(JItem::st_str(m_defaultValue, m_dataType));
   QObject::connect(this,
                    SIGNAL(editingFinished()),
                    this,
                    SLOT(evaluate()));
+  evaluate();
 }
 
 double JExpLineEdit::getValue() const
@@ -102,7 +101,7 @@ double JExpLineEdit::getValue() const
 
 void JExpLineEdit::evaluate()
 {
-  auto stdExp = text().toStdString();
+  auto stdExp = QLineEdit::text().toStdString();
   int error = 0;
   double val = te_interp(stdExp.c_str(), &error);
   if (!error)
@@ -125,4 +124,9 @@ void JExpLineEdit::setText(const QString& text)
 {
   QLineEdit::setText(text);
   evaluate();
+}
+
+QString JExpLineEdit::text() const
+{
+  return JItem::st_str(getValue(), m_dataType);
 }

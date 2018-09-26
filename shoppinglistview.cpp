@@ -275,9 +275,9 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    this,
                    SLOT(updateControls()));
   QObject::connect(m_database,
-                   SIGNAL(itemRemovedSignal(qlonglong)),
+                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
                    this,
-                   SLOT(itemRemoved(qlonglong)));
+                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
   QObject::connect(m_database,
                    SIGNAL(itemSelectedSignal(const JItem&)),
                    this,
@@ -358,9 +358,9 @@ void ShoppingListView::itemSelected(const JItem& jItem)
     setShoppingList(list);
 }
 
-void ShoppingListView::itemRemoved(qlonglong id)
+void ShoppingListView::itemsRemoved(const QVector<qlonglong>& ids)
 {
-  if (id == m_currentId)
+  if (ids.contains(m_currentId))
     create();
 }
 

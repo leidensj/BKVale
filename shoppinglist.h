@@ -24,7 +24,9 @@ enum class ShoppingListColumn : int
 struct ShoppingListItem : JItem
 {
   Product m_product;
+  bool m_bAmmount;
   double m_ammount;
+  bool m_bPrice;
   double m_price;
   Package m_package;
 
@@ -32,7 +34,9 @@ struct ShoppingListItem : JItem
   {
     m_id = INVALID_ID;
     m_product.clear();
+    m_bAmmount = true;
     m_ammount = 0.0;
+    m_bPrice = true;
     m_price = 0.0;
     m_package.clear();
   }
@@ -58,7 +62,9 @@ struct ShoppingListItem : JItem
         m_product.m_id != another.m_product.m_id ||
         m_ammount != another.m_ammount ||
         m_price != another.m_price ||
-        m_package != another.m_package;
+        m_package != another.m_package ||
+        m_bAmmount != another.m_bAmmount ||
+        m_bPrice != another.m_bPrice;
   }
 
   bool operator ==(const JItem& other) const
@@ -78,13 +84,6 @@ struct ShoppingList : public JItem
   bool m_weekDays[7];
   bool m_monthDays[31];
   QVector<ShoppingListItem> m_vItem;
-  bool m_bSupplierCalls;
-  bool m_bCallSupplier;
-  bool m_bWhatsapp;
-  bool m_bVisit;
-  bool m_bPrintAmmount;
-  bool m_bPrintPrice;
-
   void clear()
   {
     m_id = INVALID_ID;
@@ -97,12 +96,6 @@ struct ShoppingList : public JItem
     for (int i = 0; i != 31; ++i)
       m_monthDays[i] = false;
     m_vItem.clear();
-    m_bSupplierCalls = false;
-    m_bCallSupplier = false;
-    m_bWhatsapp = false;
-    m_bVisit = false;
-    m_bPrintAmmount = true;
-    m_bPrintPrice = true;
   }
 
   ShoppingList()
@@ -166,21 +159,12 @@ struct ShoppingList : public JItem
     return strMonthDays;
   }
 
-  bool hasContact() const
-  {
-    return m_bSupplierCalls || m_bCallSupplier || m_bVisit || m_bWhatsapp;
-  }
-
   bool operator !=(const JItem& other) const
   {
     const ShoppingList& another = dynamic_cast<const ShoppingList&>(other);
     bool b = m_supplier.m_id != another.m_supplier.m_id ||
              m_description != another.m_description ||
-             m_vItem != another.m_vItem ||
-             m_bSupplierCalls != another.m_bSupplierCalls ||
-             m_bCallSupplier != another.m_bCallSupplier ||
-             m_bWhatsapp != another.m_bWhatsapp ||
-             m_bVisit != another.m_bVisit;
+             m_vItem != another.m_vItem;
     if (!b)
     {
       for (int i = 0; i != 7; ++i)

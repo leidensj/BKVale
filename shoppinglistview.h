@@ -12,6 +12,7 @@ class QCheckBox;
 class JLineEdit;
 class ShoppingListTable;
 class QTabWidget;
+class QPlainTextEdit;
 
 class ShoppingListView : public QFrame
 {
@@ -45,17 +46,9 @@ private:
 
   JDatabase* m_database;
   JLineEdit* m_edTitle;
-  JLineEdit* m_edDescription;
+  QPlainTextEdit* m_teDescription;
   JDatabasePicker* m_supplierPicker;
   JDatabasePicker* m_imagePicker;
-
-  QCheckBox* m_cbPrintAmmount;
-  QCheckBox* m_cbPrintPrice;
-
-  QCheckBox* m_cbSupplierCalls;
-  QCheckBox* m_cbCallSupplier;
-  QCheckBox* m_cbWhatsapp;
-  QCheckBox* m_cbVisit;
 
   ShoppingListTable* m_table;
   QTabWidget* m_tabWidget;

@@ -8,6 +8,7 @@
 #include "packageeditor.h"
 #include "jlineedit.h"
 #include <QSplitter>
+#include <QPlainTextEdit>
 #include <QTabWidget>
 #include <QLabel>
 #include <QFormLayout>
@@ -54,15 +55,9 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_btnRemove(nullptr)
   , m_database(nullptr)
   , m_edTitle(nullptr)
-  , m_edDescription(nullptr)
+  , m_teDescription(nullptr)
   , m_supplierPicker(nullptr)
   , m_imagePicker(nullptr)
-  , m_cbPrintAmmount(nullptr)
-  , m_cbPrintPrice(nullptr)
-  , m_cbSupplierCalls(nullptr)
-  , m_cbCallSupplier(nullptr)
-  , m_cbWhatsapp(nullptr)
-  , m_cbVisit(nullptr)
   , m_table(nullptr)
   , m_tabWidget(nullptr)
 {
@@ -108,24 +103,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                                       false);
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
-  m_edDescription = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                  JLineEdit::st_defaultFlags1);
-  m_cbPrintAmmount = new QCheckBox;
-  m_cbPrintAmmount->setText(tr("Imprimir quantidade recomendada"));
-  m_cbPrintPrice = new QCheckBox;
-  m_cbPrintPrice->setText(tr("Imprimir preço sugerido"));
-  m_cbSupplierCalls = new QCheckBox;
-  m_cbSupplierCalls->setText(tr("O fornecedor liga"));
-  //m_cbSupplierCalls->setIcon(QIcon(":/icons/res/phone.png"));
-  m_cbCallSupplier = new QCheckBox;
-  m_cbCallSupplier->setText(tr("Ligar para o fornecedor"));
-  //m_cbCallSupplier->setIcon(QIcon(":/icons/res/phoneback.png"));
-  m_cbWhatsapp = new QCheckBox;
-  m_cbWhatsapp->setText(tr("Whatsapp"));
-  //m_cbWhatsapp->setIcon(QIcon(":/icons/res/whatsapp.png"));
-  m_cbVisit = new QCheckBox;
-  m_cbVisit->setText(tr("Visita presencial"));
-  //m_cbVisit->setIcon(QIcon(":/icons/res/visit.png"));
+  m_teDescription = new QPlainTextEdit;
 
   m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME);
 
@@ -185,20 +163,9 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   QFormLayout* viewFormLayout = new QFormLayout;
   viewFormLayout->addRow(tr("Título:"), m_edTitle);
-  viewFormLayout->addRow(tr("Descrição:"), m_edDescription);
-
-  QVBoxLayout* viewLayout = new QVBoxLayout;
-  viewLayout->setAlignment(Qt::AlignTop);
-  viewLayout->addLayout(viewFormLayout);
-  viewLayout->addWidget(m_supplierPicker);
-  viewLayout->addWidget(m_imagePicker);
-  viewLayout->addWidget(m_cbPrintAmmount);
-  viewLayout->addWidget(m_cbPrintPrice);
-  viewLayout->addWidget(new QLabel(tr("Contato:")));
-  viewLayout->addWidget(m_cbCallSupplier);
-  viewLayout->addWidget(m_cbSupplierCalls);
-  viewLayout->addWidget(m_cbWhatsapp);
-  viewLayout->addWidget(m_cbVisit);
+  viewFormLayout->addWidget(m_supplierPicker);
+  viewFormLayout->addWidget(m_imagePicker);
+  viewFormLayout->addRow(tr("Descrição:"), m_teDescription);
 
   QVBoxLayout* calendarLayout = new QVBoxLayout;
   calendarLayout->setAlignment(Qt::AlignTop);
@@ -218,7 +185,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   listLayout->addWidget(m_table);
 
   QFrame* tabView = new QFrame;
-  tabView->setLayout(viewLayout);
+  tabView->setLayout(viewFormLayout);
 
   QFrame* tabList = new QFrame;
   tabList->setLayout(listLayout);
@@ -378,15 +345,9 @@ void ShoppingListView::setShoppingList(const ShoppingList& lst)
   m_btnSave->setIcon(QIcon(strIcon));
   m_currentId = lst.m_id;
   m_edTitle->setText(lst.m_title);
-  m_edDescription->setText(lst.m_description);
+  m_teDescription->setPlainText(lst.m_description);
   m_supplierPicker->setItem(lst.m_supplier);
   m_imagePicker->setItem(lst.m_image);
-  m_cbPrintAmmount->setChecked(lst.m_bPrintAmmount);
-  m_cbPrintPrice->setChecked(lst.m_bPrintPrice);
-  m_cbCallSupplier->setChecked(lst.m_bCallSupplier);
-  m_cbSupplierCalls->setChecked(lst.m_bSupplierCalls);
-  m_cbWhatsapp->setChecked(lst.m_bWhatsapp);
-  m_cbVisit->setChecked(lst.m_bVisit);
   for (int i = 0; i != 7; ++i)
     m_vbtnWeek[i]->setChecked(lst.m_weekDays[i]);
   for (int i = 0; i != 31; ++i)
@@ -400,15 +361,9 @@ ShoppingList ShoppingListView::getShoppingList() const
   ShoppingList lst;
   lst.m_id = m_currentId;
   lst.m_title = m_edTitle->text();
-  lst.m_description = m_edDescription->text();
+  lst.m_description = m_teDescription->toPlainText();
   lst.m_supplier.m_id = m_supplierPicker->getId();
   lst.m_image.m_id = m_imagePicker->getId();
-  lst.m_bPrintAmmount = m_cbPrintAmmount->isChecked();
-  lst.m_bPrintPrice = m_cbPrintPrice->isChecked();
-  lst.m_bCallSupplier = m_cbCallSupplier->isChecked();
-  lst.m_bSupplierCalls = m_cbSupplierCalls->isChecked();
-  lst.m_bWhatsapp = m_cbWhatsapp->isChecked();
-  lst.m_bVisit = m_cbVisit->isChecked();
   for (int i = 0; i != 7; ++i)
     lst.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
   for (int i = 0; i != 31; ++i)

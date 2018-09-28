@@ -273,14 +273,8 @@ bool BaitaSQL::createTables(QString& error)
                           SHOPPING_LIST_SQL_COL02 " INTEGER,"
                           SHOPPING_LIST_SQL_COL03 " TEXT NOT NULL,"
                           SHOPPING_LIST_SQL_COL04 " TEXT,"
-                          SHOPPING_LIST_SQL_COL05 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL06 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL07 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL08 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL09 " TEXT,"
-                          SHOPPING_LIST_SQL_COL10 " TEXT,"
-                          SHOPPING_LIST_SQL_COL11 " BOOLEAN,"
-                          SHOPPING_LIST_SQL_COL12 " BOOLEAN,"
+                          SHOPPING_LIST_SQL_COL05 " TEXT,"
+                          SHOPPING_LIST_SQL_COL06 " TEXT,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL01 ") REFERENCES "
                           PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL02 ") REFERENCES "
@@ -296,6 +290,8 @@ bool BaitaSQL::createTables(QString& error)
                           SHOPPING_LIST_ITEMS_SQL_COL05 " BOOLEAN,"
                           SHOPPING_LIST_ITEMS_SQL_COL06 " TEXT,"
                           SHOPPING_LIST_ITEMS_SQL_COL07 " REAL,"
+                          SHOPPING_LIST_ITEMS_SQL_COL08 " BOOLEAN,"
+                          SHOPPING_LIST_ITEMS_SQL_COL09 " BOOLEAN,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL01 ") REFERENCES "
                           SHOPPING_LIST_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL02 ") REFERENCES "
@@ -881,6 +877,7 @@ bool ProductSQL::remove(qlonglong id,
     return false;
 
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
@@ -975,19 +972,7 @@ bool CategorySQL::insert(const Category& category,
   if (bSuccess)
     category.m_id = query.lastInsertId().toLongLong();
 
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool CategorySQL::update(const Category& category,
@@ -1026,19 +1011,7 @@ bool CategorySQL::update(const Category& category,
     bSuccess = query.exec();
   }
 
-  if (!bSuccess)
-  {
-    error = query.lastError().text();
-    db.rollback();
-    return false;
-  }
-  else
-    bSuccess = db.commit();
-
-  if (!bSuccess)
-    error = db.lastError().text();
-
-  return bSuccess;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool CategorySQL::remove(qlonglong id,
@@ -1050,16 +1023,14 @@ bool CategorySQL::remove(qlonglong id,
     return false;
 
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " CATEGORY_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
+  bool bSuccess = query.exec();
 
-  if (query.exec())
-    return true;
-
-  error = query.lastError().text();
-  return false;
+  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool ImageSQL::execSelect(QSqlQuery& query,
@@ -2300,26 +2271,14 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
           SHOPPING_LIST_SQL_COL03 ","
           SHOPPING_LIST_SQL_COL04 ","
           SHOPPING_LIST_SQL_COL05 ","
-          SHOPPING_LIST_SQL_COL06 ","
-          SHOPPING_LIST_SQL_COL07 ","
-          SHOPPING_LIST_SQL_COL08 ","
-          SHOPPING_LIST_SQL_COL09 ","
-          SHOPPING_LIST_SQL_COL10 ","
-          SHOPPING_LIST_SQL_COL11 ","
-          SHOPPING_LIST_SQL_COL12
+          SHOPPING_LIST_SQL_COL06
           ") VALUES ("
           "%3"
           "%4"
           "(:_v03),"
           "(:_v04),"
           "(:_v05),"
-          "(:_v06),"
-          "(:_v07),"
-          "(:_v08),"
-          "(:_v09),"
-          "(:_v10),"
-          "(:_v11),"
-          "(:_v12))").arg(
+          "(:_v06))").arg(
           shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 "," : "",
           shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 "," : "",
           shoppingList.m_supplier.isValidId() ? "(:_v01)," : "",
@@ -2331,14 +2290,8 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
     query.bindValue(":_v02", shoppingList.m_image.m_id);
   query.bindValue(":_v03", shoppingList.m_title);
   query.bindValue(":_v04", shoppingList.m_description);
-  query.bindValue(":_v05", shoppingList.m_bSupplierCalls);
-  query.bindValue(":_v06", shoppingList.m_bCallSupplier);
-  query.bindValue(":_v07", shoppingList.m_bWhatsapp);
-  query.bindValue(":_v08", shoppingList.m_bVisit);
-  query.bindValue(":_v09", shoppingList.getWeekDays());
-  query.bindValue(":_v10", shoppingList.getMonthDays());
-  query.bindValue(":_v11", shoppingList.m_bPrintPrice);
-  query.bindValue(":_v12", shoppingList.m_bPrintAmmount);
+  query.bindValue(":_v05", shoppingList.getWeekDays());
+  query.bindValue(":_v06", shoppingList.getMonthDays());
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -2354,7 +2307,9 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
                     SHOPPING_LIST_ITEMS_SQL_COL04 ","
                     SHOPPING_LIST_ITEMS_SQL_COL05 ","
                     SHOPPING_LIST_ITEMS_SQL_COL06 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL07
+                    SHOPPING_LIST_ITEMS_SQL_COL07 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL08 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL09
                     ") VALUES ("
                     "(:_v01),"
                     "%2"
@@ -2362,7 +2317,9 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
                     "(:_v04),"
                     "(:_v05),"
                     "(:_v06),"
-                    "(:_v07))").arg(
+                    "(:_v07),"
+                    "(:_v08),"
+                    "(:_v09))").arg(
                     shoppingList.m_vItem.at(i).m_product.isValidId() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
                     shoppingList.m_vItem.at(i).m_product.isValidId() ? "(:_v02)," : ""));
 
@@ -2374,6 +2331,8 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
       query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
       query.bindValue(":_v06", shoppingList.m_vItem.at(i).m_package.m_unity);
       query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_package.m_ammount);
+      query.bindValue(":_v08", shoppingList.m_vItem.at(i).m_bAmmount);
+      query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_bPrice);
       bSuccess = query.exec();
       if (bSuccess)
         shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
@@ -2403,13 +2362,7 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                 SHOPPING_LIST_SQL_COL03 " = (:_v03),"
                 SHOPPING_LIST_SQL_COL04 " = (:_v04),"
                 SHOPPING_LIST_SQL_COL05 " = (:_v05),"
-                SHOPPING_LIST_SQL_COL06 " = (:_v06),"
-                SHOPPING_LIST_SQL_COL07 " = (:_v07),"
-                SHOPPING_LIST_SQL_COL08 " = (:_v08),"
-                SHOPPING_LIST_SQL_COL09 " = (:_v09),"
-                SHOPPING_LIST_SQL_COL10 " = (:_v10),"
-                SHOPPING_LIST_SQL_COL11 " = (:_v11),"
-                SHOPPING_LIST_SQL_COL12 " = (:_v12) "
+                SHOPPING_LIST_SQL_COL06 " = (:_v06) "
                 "WHERE " SQL_COLID " = (:_v00)").arg(
                 shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 " = (:_v01)," : "",
                 shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 " = (:_v02)," : ""));
@@ -2421,14 +2374,8 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
     query.bindValue(":_v02", shoppingList.m_image.m_id);
   query.bindValue(":_v03", shoppingList.m_title);
   query.bindValue(":_v04", shoppingList.m_description);
-  query.bindValue(":_v05", shoppingList.m_bSupplierCalls);
-  query.bindValue(":_v06", shoppingList.m_bCallSupplier);
-  query.bindValue(":_v07", shoppingList.m_bWhatsapp);
-  query.bindValue(":_v08", shoppingList.m_bVisit);
-  query.bindValue(":_v09", shoppingList.getWeekDays());
-  query.bindValue(":_v10", shoppingList.getMonthDays());
-  query.bindValue(":_v11", shoppingList.m_bPrintPrice);
-  query.bindValue(":_v12", shoppingList.m_bPrintAmmount);
+  query.bindValue(":_v05", shoppingList.getWeekDays());
+  query.bindValue(":_v06", shoppingList.getMonthDays());
   bool bSuccess = query.exec();
 
   query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
@@ -2447,7 +2394,9 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                     SHOPPING_LIST_ITEMS_SQL_COL04 ","
                     SHOPPING_LIST_ITEMS_SQL_COL05 ","
                     SHOPPING_LIST_ITEMS_SQL_COL06 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL07
+                    SHOPPING_LIST_ITEMS_SQL_COL07 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL08 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL09
                     ") VALUES ("
                     "(:_v01),"
                     "%2"
@@ -2455,7 +2404,9 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                     "(:_v04),"
                     "(:_v05),"
                     "(:_v06),"
-                    "(:_v07))").arg(
+                    "(:_v07),"
+                    "(:_v08),"
+                    "(:_v09))").arg(
                     shoppingList.m_vItem.at(i).m_product.isValidId() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
                     shoppingList.m_vItem.at(i).m_product.isValidId() ? "(:_v02)," : ""));
       query.bindValue(":_v01", shoppingList.m_id);
@@ -2466,6 +2417,8 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
       query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
       query.bindValue(":_v06", shoppingList.m_vItem.at(i).m_package.m_unity);
       query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_package.m_ammount);
+      query.bindValue(":_v08", shoppingList.m_vItem.at(i).m_bAmmount);
+      query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_bPrice);
       bSuccess = query.exec();
       if (bSuccess)
         shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
@@ -2496,13 +2449,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
                 SHOPPING_LIST_SQL_COL03 ","
                 SHOPPING_LIST_SQL_COL04 ","
                 SHOPPING_LIST_SQL_COL05 ","
-                SHOPPING_LIST_SQL_COL06 ","
-                SHOPPING_LIST_SQL_COL07 ","
-                SHOPPING_LIST_SQL_COL08 ","
-                SHOPPING_LIST_SQL_COL09 ","
-                SHOPPING_LIST_SQL_COL10 ","
-                SHOPPING_LIST_SQL_COL11 ","
-                SHOPPING_LIST_SQL_COL12
+                SHOPPING_LIST_SQL_COL06
                 " FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -2517,14 +2464,8 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
       shoppingList.m_image.m_id = query.value(1).toLongLong();
       shoppingList.m_title = query.value(2).toString();
       shoppingList.m_description = query.value(3).toString();
-      shoppingList.m_bSupplierCalls = query.value(4).toBool();
-      shoppingList.m_bCallSupplier = query.value(5).toBool();
-      shoppingList.m_bWhatsapp = query.value(6).toBool();
-      shoppingList.m_bVisit = query.value(7).toBool();
-      shoppingList.setWeekDays(query.value(8).toString());
-      shoppingList.setMonthDays(query.value(9).toString());
-      shoppingList.m_bPrintPrice = query.value(10).toBool();
-      shoppingList.m_bPrintAmmount = query.value(11).toBool();
+      shoppingList.setWeekDays(query.value(4).toString());
+      shoppingList.setMonthDays(query.value(5).toString());
     }
     else
     {
@@ -2542,7 +2483,9 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
                   SHOPPING_LIST_ITEMS_SQL_COL04 ","
                   SHOPPING_LIST_ITEMS_SQL_COL05 ","
                   SHOPPING_LIST_ITEMS_SQL_COL06 ","
-                  SHOPPING_LIST_ITEMS_SQL_COL07
+                  SHOPPING_LIST_ITEMS_SQL_COL07 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL08 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL09
                   " FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME
                   " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", shoppingList.m_id);
@@ -2559,6 +2502,8 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
         item.m_package.m_bIsPackage = query.value(4).toBool();
         item.m_package.m_unity = query.value(5).toString();
         item.m_package.m_ammount = query.value(6).toDouble();
+        item.m_bAmmount= query.value(7).toDouble();
+        item.m_bPrice = query.value(8).toDouble();
         shoppingList.m_vItem.push_back(item);
       }
     }
@@ -2918,6 +2863,7 @@ bool ProductBarcodeSQL::remove(qlonglong id,
     return false;
 
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PRODUCT_BARCODE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

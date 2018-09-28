@@ -68,9 +68,9 @@ void ShopView::updateControls()
                             ? ":/icons/res/calendarok.png"
                             : ":/icons/res/calendarwarning.png"));
   m_lblWeekDay->setText(date.toString("dddd"));
-  QString filter(SHOPPING_LIST_SQL_COL09 " LIKE '%" SHOPPING_LIST_SEPARATOR +
+  QString filter(SHOPPING_LIST_SQL_COL05 " LIKE '%" SHOPPING_LIST_SEPARATOR +
                  QString::number(date.dayOfWeek()) + SHOPPING_LIST_SEPARATOR "%'"
-                 " OR " SHOPPING_LIST_SQL_COL10 " LIKE '%" SHOPPING_LIST_SEPARATOR +
+                 " OR " SHOPPING_LIST_SQL_COL06 " LIKE '%" SHOPPING_LIST_SEPARATOR +
                  QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
   m_database->setFixedFilter(filter);
 }

@@ -329,7 +329,7 @@ Functionality BaitaAssistant::getCurrentFunctionality() const
   else if (activeWindow == m_calculatorWindow)
     return Functionality::Calculator;
   else if (activeWindow == m_shopWindow)
-    return Functionality::Reservation;
+    return Functionality::Shop;
   else if (activeWindow == m_reservationWindow)
     return Functionality::Reservation;
   else if (activeWindow == m_discountWindow)

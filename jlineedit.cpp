@@ -116,7 +116,7 @@ void JExpLineEdit::evaluate()
   }
 
   QPalette _palette = palette();
-  _palette.setColor(QPalette::ColorRole::Text, val >= 0 ? Qt::red : Qt::darkGreen);
+  _palette.setColor(QPalette::ColorRole::Text, m_currentValue >= 0 ? Qt::red : Qt::darkGreen);
   setPalette(_palette);
 }
 

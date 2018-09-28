@@ -12,6 +12,15 @@ void DoubleTableWidgetItem::setValue(double val)
 {
   setData(Qt::UserRole, val);
   setText(JItem::st_str(val, m_type));
+
+  if (flags() & Qt::ItemIsUserCheckable)
+  {
+    if (checkState() == Qt::Unchecked)
+      setFlags(flags() & ~Qt::ItemIsEditable);
+    else
+      setFlags(flags() | Qt::ItemIsEditable);
+  }
+
   switch (m_color)
   {
     case Color::Background:

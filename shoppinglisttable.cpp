@@ -1,5 +1,6 @@
 #include "shoppinglisttable.h"
 #include "tinyexpr.h"
+#include "jtablewidgetitem.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 
@@ -78,27 +79,16 @@ void ShoppingListTable::keyPressEvent(QKeyEvent *event)
   }
 }
 
-double ShoppingListTable::evaluate(int row, int column) const
-{
-  auto pt = item(row, column);
-  if (pt == nullptr)
-    return 0.0;
-  auto exp = pt->text().toStdString();
-  int error = 0;
-  double res = te_interp(exp.c_str(), &error);
-  if (!error)
-    pt->setData(Qt::UserRole, res);
-  return pt->data(Qt::UserRole).toDouble();
-}
-
 QVector<ShoppingListItem> ShoppingListTable::getShoppingItems() const
 {
   QVector<ShoppingListItem> v;
   for (int i = 0; i != rowCount(); ++i)
   {
     ShoppingListItem o = item(i, (int)::ShoppingListColumn::Description)->data(Qt::UserRole).value<ShoppingListItem>();
-    o.m_ammount = item(i, (int)ShoppingListColumn::Ammount)->text().toDouble();
-    o.m_price = item(i, (int)ShoppingListColumn::Price)->text().toDouble();
+    o.m_ammount = ((DoubleTableWidgetItem*)item(i, (int)ShoppingListColumn::Ammount))->getValue();
+    o.m_price = ((DoubleTableWidgetItem*)item(i, (int)ShoppingListColumn::Price))->getValue();
+    o.m_bAmmount = item(i, (int)ShoppingListColumn::Ammount)->checkState();
+    o.m_bPrice = item(i, (int)ShoppingListColumn::Price)->checkState();
     v.push_back(o);
   }
   return v;
@@ -111,8 +101,12 @@ void ShoppingListTable::addShoppingItem(const ShoppingListItem& o)
   int row = rowCount() - 1;
   setItem(row, (int)ShoppingListColumn::Unity, new QTableWidgetItem);
   setItem(row, (int)ShoppingListColumn::Description, new QTableWidgetItem);
-  setItem(row, (int)ShoppingListColumn::Ammount, new QTableWidgetItem);
-  setItem(row, (int)ShoppingListColumn::Price, new QTableWidgetItem);
+  auto ptAmmount = new DoubleTableWidgetItem(JItem::DataType::Ammount, DoubleTableWidgetItem::Color::None);
+  ptAmmount->setFlags(ptAmmount->flags() | Qt::ItemIsUserCheckable);
+  setItem(row, (int)ShoppingListColumn::Ammount, ptAmmount);
+  auto ptPrice = new DoubleTableWidgetItem(JItem::DataType::Money, DoubleTableWidgetItem::Color::None);
+  ptPrice->setFlags(ptPrice->flags() | Qt::ItemIsUserCheckable);
+  setItem(row, (int)ShoppingListColumn::Price, ptPrice);
   setCurrentCell(row, (int)ShoppingListColumn::Ammount);
   setShoppingItem(o);
   blockSignals(false);
@@ -176,8 +170,10 @@ void ShoppingListTable::setShoppingItem(const ShoppingListItem& o)
     QVariant var;
     var.setValue(o);
     item(currentRow(), (int)ShoppingListColumn::Description)->setData(Qt::UserRole, var);
-    item(currentRow(), (int)ShoppingListColumn::Ammount)->setText(o.strAmmount());
-    item(currentRow(), (int)ShoppingListColumn::Price)->setText(o.strPrice());
+    ((DoubleTableWidgetItem*)item(currentRow(), (int)ShoppingListColumn::Ammount))->setValue(o.m_ammount);
+    item(currentRow(), (int)ShoppingListColumn::Ammount)->setCheckState(o.m_bAmmount ? Qt::Checked : Qt::Unchecked);
+    ((DoubleTableWidgetItem*)item(currentRow(), (int)ShoppingListColumn::Price))->setValue(o.m_price);
+    item(currentRow(), (int)ShoppingListColumn::Price)->setCheckState(o.m_bPrice ? Qt::Checked : Qt::Unchecked);
     item(currentRow(), (int)ShoppingListColumn::Description)->setTextColor(QColor(Qt::darkGray));
     item(currentRow(), (int)ShoppingListColumn::Unity)->setTextColor(QColor(Qt::darkGray));
     setProduct(o.m_product);
@@ -202,14 +198,10 @@ void ShoppingListTable::update(int row, int column)
     {
     } break;
     case ShoppingListColumn::Ammount:
-    {
-      double value = evaluate(row, column);
-      item(row, column)->setText(JItem::st_strAmmount(value));
-    } break;
     case ShoppingListColumn::Price:
     {
-      double value = evaluate(row, column);
-      item(row, column)->setText(JItem::st_strMoney(value));
+      auto pt = static_cast<DoubleTableWidgetItem*>(item(row, column));
+      pt->evaluate();
     } break;
     case ShoppingListColumn::Description:
     default:

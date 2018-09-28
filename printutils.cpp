@@ -369,44 +369,31 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
         str += lst.m_supplier.m_vPhone.at(i).getFormattedPhone() + ESC_LF;
       }
     }
-
-    if (lst.m_bCallSupplier)
-      str += "Ligar para o fornecedor" ESC_LF;
-
-    if (lst.m_bSupplierCalls)
-      str += "Fornecedor liga" ESC_LF;
-
-    if (lst.m_bWhatsapp)
-      str += "Whatsapp" ESC_LF;
-
-    if (lst.m_bVisit)
-      str += "Visita presencial" ESC_LF;
   }
 
   str += ESC_LF;
 
   if (lst.m_vItem.size() != 0)
-    str += ESC_EXPAND_ON
-           "| EST | COM | REC "
+    str += ESC_ALIGN_LEFT
+           ESC_DOUBLE_FONT_ON
+           "[ EST ][ COM ][ REC ]"
            ESC_LF;
 
   for (int i = 0; i != lst.m_vItem.size(); ++i)
   {
-    str += ESC_EXPAND_OFF
-           ESC_ALIGN_LEFT +
+    str += ESC_DOUBLE_FONT_OFF +
            lst.m_vItem.at(i).m_product.m_name +
            ESC_LF
-           ESC_EXPAND_ON
-           "|     |     | ";
-    if (lst.m_bPrintAmmount)
-      str += JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
-             lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity);
-    str += ESC_LF
-           "|     |     | ";
-    if (lst.m_bPrintPrice)
-      str += lst.m_vItem.at(i).strPrice();
-
-    str += ESC_EXPAND_OFF
+           ESC_DOUBLE_FONT_ON
+           "[     ][     ]";
+    if (lst.m_vItem.at(i).m_bAmmount)
+      str += "[" + JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
+             lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity) + "]";
+    if (lst.m_vItem.at(i).m_bPrice)
+      str += ESC_LF ESC_DOUBLE_FONT_OFF
+             "Preco sugerido: " +
+             lst.m_vItem.at(i).strPrice();
+    str += ESC_DOUBLE_FONT_OFF
            ESC_LF;
   }
 

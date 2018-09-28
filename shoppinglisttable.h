@@ -26,9 +26,6 @@ public:
 protected:
   void keyPressEvent(QKeyEvent *event);
 
-private:
-  double evaluate(int row, int column) const;
-
 private slots:
   void update(int row, int column);
   void emitChangedSignal();

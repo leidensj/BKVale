@@ -15,10 +15,15 @@ struct Employee
 {
   bool m_bIsEmployee;
   QString m_pincode;
+  bool m_bNoteEdit;
+  bool m_bNoteRemove;
+
   void clear()
   {
     m_bIsEmployee = false;
     m_pincode.clear();
+    m_bNoteEdit = false;
+    m_bNoteRemove = false;
   }
 
   Employee()

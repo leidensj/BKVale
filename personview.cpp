@@ -112,6 +112,8 @@ PersonView::PersonView(bool bAccessEmployee,
   , m_btnAddAddress(nullptr)
   , m_btnRemoveAddress(nullptr)
   , m_lstAddress(nullptr)
+  , m_cbNoteEdit(nullptr)
+  , m_cbNoteRemove(nullptr)
   , m_database(nullptr)
   , m_tab(nullptr)
   , m_grpEmployee(nullptr)
@@ -182,6 +184,23 @@ PersonView::PersonView(bool bAccessEmployee,
     f.setBold(true);
     m_edPinCode->setFont(f);
   }
+
+  m_cbNoteEdit = new QCheckBox;
+  m_cbNoteEdit->setText(tr("Criar/Editar"));
+  m_cbNoteEdit->setIcon(QIcon(":/icons/res/file.png"));
+
+  m_cbNoteRemove = new QCheckBox;
+  m_cbNoteRemove->setText(tr("Remover"));
+  m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
+
+  QGroupBox* grpNote = new QGroupBox;
+  grpNote->setTitle(tr("Vales"));
+
+  QVBoxLayout* grpNoteLayout = new QVBoxLayout;
+  grpNoteLayout->addWidget(m_cbNoteEdit);
+  grpNoteLayout->addWidget(m_cbNoteRemove);
+
+  grpNote->setLayout(grpNoteLayout);
 
   m_edPhoneNumber = new JLineEdit(JLineEdit::Input::Numeric,
                                   JLineEdit::st_defaultFlags2);
@@ -356,6 +375,7 @@ PersonView::PersonView(bool bAccessEmployee,
   pincodeLayout->addWidget(new QLabel(tr("Código PIN")));
   pincodeLayout->addWidget(m_edPinCode);
   employeeLayout->addLayout(pincodeLayout);
+  employeeLayout->addWidget(grpNote);
   m_grpEmployee->setLayout(employeeLayout);
 
   QVBoxLayout* employeeFrameLayout = new QVBoxLayout;
@@ -527,6 +547,8 @@ Person PersonView::getPerson() const
   person.m_supplier.m_bIsSupplier = m_grpSupplier->isChecked();
   person.m_employee.m_bIsEmployee = m_grpEmployee->isChecked();
   person.m_employee.m_pincode = m_grpEmployee->isChecked() ? m_edPinCode->text() : "";
+  person.m_employee.m_bNoteEdit = m_grpEmployee->isChecked() && m_cbNoteEdit->isChecked();
+  person.m_employee.m_bNoteRemove = m_grpEmployee->isChecked() && m_cbNoteRemove->isChecked();
 
   for (int i = 0; i != m_lstPhone->count(); ++i)
     person.m_vPhone.push_back(m_lstPhone->item(i)->data(Qt::UserRole).value<Phone>());
@@ -555,9 +577,9 @@ void PersonView::setPerson(const Person &person)
   m_grpEmployee->setChecked(person.m_employee.m_bIsEmployee);
   switchUserType();
 
-  m_edPinCode->clear();
-  if (person.m_employee.m_bIsEmployee)
-    m_edPinCode->setText(person.m_employee.m_pincode);
+  m_edPinCode->setText(person.m_employee.m_pincode);
+  m_cbNoteEdit->setChecked(person.m_employee.m_bNoteEdit);
+  m_cbNoteRemove->setChecked(person.m_employee.m_bNoteRemove);
 
   m_lstPhone->clear();
   m_lstAddress->clear();

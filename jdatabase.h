@@ -51,7 +51,7 @@ public:
   QString getTableName() const;
   JItem* getCurrentItem() const;
 
-  bool save(const JItem& jItem);
+  bool save(const JItem& jItem, Person* pEmployee = nullptr);
 
 public slots:
   void refresh();

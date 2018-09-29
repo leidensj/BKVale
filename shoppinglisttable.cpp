@@ -101,12 +101,8 @@ void ShoppingListTable::addShoppingItem(const ShoppingListItem& o)
   int row = rowCount() - 1;
   setItem(row, (int)ShoppingListColumn::Unity, new QTableWidgetItem);
   setItem(row, (int)ShoppingListColumn::Description, new QTableWidgetItem);
-  auto ptAmmount = new DoubleTableWidgetItem(JItem::DataType::Ammount, DoubleTableWidgetItem::Color::None);
-  ptAmmount->setFlags(ptAmmount->flags() | Qt::ItemIsUserCheckable);
-  setItem(row, (int)ShoppingListColumn::Ammount, ptAmmount);
-  auto ptPrice = new DoubleTableWidgetItem(JItem::DataType::Money, DoubleTableWidgetItem::Color::None);
-  ptPrice->setFlags(ptPrice->flags() | Qt::ItemIsUserCheckable);
-  setItem(row, (int)ShoppingListColumn::Price, ptPrice);
+  setItem(row, (int)ShoppingListColumn::Ammount, new DoubleTableWidgetItem(JItem::DataType::Ammount, DoubleTableWidgetItem::Color::None, true));
+  setItem(row, (int)ShoppingListColumn::Price, new DoubleTableWidgetItem(JItem::DataType::Money, DoubleTableWidgetItem::Color::None, true));
   setCurrentCell(row, (int)ShoppingListColumn::Ammount);
   setShoppingItem(o);
   blockSignals(false);

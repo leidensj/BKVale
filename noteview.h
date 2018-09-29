@@ -70,7 +70,7 @@ public slots:
   void create();
   void setNote(const Note& note);
   void updateControls();
-  Note save();
+  Note save(Person& employee);
 
 signals:
   void changedSignal();

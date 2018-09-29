@@ -343,17 +343,10 @@ void BaitaAssistant::print()
   {
     case Functionality::Note:
     {
-      QString name;
-      if (m_settings.m_notesPincodeRequired)
-      {
-        PinCodeView w(this);
-        if (!w.exec() || !w.getCurrentPerson().isValidId())
-          return;
-        name = w.getCurrentPerson().strAliasName();
-      }
-      Note note = m_note->save();
+      Person person;
+      Note note = m_note->save(person);
       if (note.isValidId())
-        print(NotePrinter::build(note, name));
+        print(NotePrinter::build(note, person.strAliasName()));
     } break;
     case Functionality::Reminder:
     {

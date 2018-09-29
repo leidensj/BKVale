@@ -204,6 +204,8 @@ bool BaitaSQL::createTables(QString& error)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
                           EMPLOYEE_SQL_COL01 " INTEGER PRIMARY KEY,"
                           EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
+                          EMPLOYEE_SQL_COL03 " BOOLEAN,"
+                          EMPLOYEE_SQL_COL04 " BOOLEAN,"
                           "FOREIGN KEY(" EMPLOYEE_SQL_COL01 ") REFERENCES "
                           PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
@@ -1697,7 +1699,9 @@ bool PersonSQL::execSelect(QSqlQuery& query,
   if (bSuccess)
   {
     query.prepare("SELECT "
-                  EMPLOYEE_SQL_COL02
+                  EMPLOYEE_SQL_COL02 ","
+                  EMPLOYEE_SQL_COL03 ","
+                  EMPLOYEE_SQL_COL04
                   " FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", id);
@@ -1706,6 +1710,8 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     {
       person.m_employee.m_bIsEmployee = true;
       person.m_employee.m_pincode = query.value(0).toString();
+      person.m_employee.m_bNoteEdit = query.value(1).toBool();
+      person.m_employee.m_bNoteRemove = query.value(2).toBool();
     }
   }
 
@@ -1895,12 +1901,18 @@ bool PersonSQL::insert(const Person& person,
     {
       query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
                     EMPLOYEE_SQL_COL01 ","
-                    EMPLOYEE_SQL_COL02 ")"
+                    EMPLOYEE_SQL_COL02 ","
+                    EMPLOYEE_SQL_COL03 ","
+                    EMPLOYEE_SQL_COL04 ")"
                     " VALUES ("
                     "(:_v01),"
-                    "(:_v02))");
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04))");
       query.bindValue(":_v01", person.m_id);
       query.bindValue(":_v02", person.m_employee.m_pincode);
+      query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
+      query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
       bSuccess = query.exec();
     }
 
@@ -2053,12 +2065,18 @@ bool PersonSQL::update(const Person& person,
   {
     query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
                   EMPLOYEE_SQL_COL01 ","
-                  EMPLOYEE_SQL_COL02 ")"
+                  EMPLOYEE_SQL_COL02 ","
+                  EMPLOYEE_SQL_COL03 ","
+                  EMPLOYEE_SQL_COL04 ")"
                   " VALUES ("
                   "(:_v01),"
-                  "(:_v02))");
+                  "(:_v02),"
+                  "(:_v03),"
+                  "(:_v04))");
     query.bindValue(":_v01", person.m_id);
     query.bindValue(":_v02", person.m_employee.m_pincode);
+    query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
+    query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
     bSuccess = query.exec();
   }
 

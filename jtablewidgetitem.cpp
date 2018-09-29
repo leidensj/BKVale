@@ -1,11 +1,13 @@
 #include "jtablewidgetitem.h"
 #include "tinyexpr.h"
 
-DoubleTableWidgetItem::DoubleTableWidgetItem(JItem::DataType type, Color color)
+DoubleTableWidgetItem::DoubleTableWidgetItem(JItem::DataType type, Color color, bool bCheckable)
   : m_type(type)
   , m_color(color)
+  , m_bCheckable(bCheckable)
 {
-
+  if (m_bCheckable)
+    setFlags(flags() | Qt::ItemIsUserCheckable);
 }
 
 void DoubleTableWidgetItem::setValue(double val)
@@ -13,7 +15,7 @@ void DoubleTableWidgetItem::setValue(double val)
   setData(Qt::UserRole, val);
   setText(JItem::st_str(val, m_type));
 
-  if (flags() & Qt::ItemIsUserCheckable)
+  if (m_bCheckable)
   {
     if (checkState() == Qt::Unchecked)
       setFlags(flags() & ~Qt::ItemIsEditable);

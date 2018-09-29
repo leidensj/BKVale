@@ -106,6 +106,9 @@ private:
   QPushButton* m_btnRemoveAddress;
   QListWidget* m_lstAddress;
 
+  QCheckBox* m_cbNoteEdit;
+  QCheckBox* m_cbNoteRemove;
+
   JDatabase* m_database;
   QTabWidget* m_tab;
   QGroupBox* m_grpEmployee;

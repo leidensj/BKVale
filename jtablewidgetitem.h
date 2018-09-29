@@ -14,7 +14,7 @@ public:
     Foreground
   };
 
-  DoubleTableWidgetItem(JItem::DataType type, Color color);
+  DoubleTableWidgetItem(JItem::DataType type, Color color, bool bCheckable = false);
   bool evaluate(const QString& exp);
   void evaluate();
   void setValue(double val);
@@ -23,6 +23,7 @@ public:
 private:
   const JItem::DataType m_type;
   const Color m_color;
+  const bool m_bCheckable;
 };
 
 #endif // JTABLEWIDGETITEM_H

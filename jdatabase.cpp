@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "databaseutils.h"
 #include "notefilterdlg.h"
+#include "pincodeview.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
@@ -473,7 +474,7 @@ public:
       if (idx.column() == 2)
       {
         QDateTime dt = QDateTime::fromString(value.toString(), Qt::ISODate);
-        value = dt.toString("yyy//MM/dd HH:mm");
+        value = dt.toString("yyyy/MM/dd HH:mm");
       }
     }
     return value;
@@ -712,7 +713,9 @@ JDatabase::JDatabase(const QString& tableName,
 
   m_table = new JTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_table->setSelectionMode(QAbstractItemView::MultiSelection);
+  m_table->setSelectionMode(m_mode == Mode::Full
+                            ? QAbstractItemView::ExtendedSelection
+                            : QAbstractItemView::SingleSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
   m_table->setSortingEnabled(true);
   m_table->horizontalHeader()->setHighlightSections(false);
@@ -1038,6 +1041,20 @@ void JDatabase::removeItems()
     return;
   }
 
+  PinCodeView w(this);
+  if (!w.exec())
+    return;
+
+  Person person = w.getCurrentPerson();
+  if (!person.isValidId() || !person.m_employee.m_bIsEmployee)
+  {
+    QMessageBox::warning(this,
+                         tr("Erro"),
+                         tr("Pincode informado não encontrado."),
+                         QMessageBox::Ok);
+    return;
+  }
+
   for (int i = 0; i != ids.size(); ++i)
   {
     qlonglong id = ids.at(i);
@@ -1051,7 +1068,17 @@ void JDatabase::removeItems()
     else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
       ProductSQL::remove(id, error);
     else if (m_tableName == NOTE_SQL_TABLE_NAME)
+    {
+      if (!person.m_employee.m_bNoteRemove)
+      {
+        QMessageBox::warning(this,
+                             tr("Erro"),
+                             tr("Funcionário não possui permissão."),
+                             QMessageBox::Ok);
+        return;
+      }
       NoteSQL::remove(id, error);
+    }
     else if (m_tableName == USER_SQL_TABLE_NAME)
       UserSQL::remove(id, error);
     else if (m_tableName == REMINDER_SQL_TABLE_NAME)
@@ -1142,8 +1169,25 @@ JItem* JDatabase::getCurrentItem() const
   return m_currentItem;
 }
 
-bool JDatabase::save(const JItem& jItem)
+bool JDatabase::save(const JItem& jItem, Person* pEmployee)
 {
+  if (pEmployee != nullptr)
+  {
+    PinCodeView w(this);
+    if (!w.exec())
+      return false;
+
+    *pEmployee = w.getCurrentPerson();
+    if (!pEmployee->isValidId() || !pEmployee->m_employee.m_bIsEmployee)
+    {
+      QMessageBox::warning(this,
+                           tr("Aviso"),
+                           tr("Pincode informado não encontrado."),
+                           QMessageBox::Ok);
+      return false;
+    }
+  }
+
   QString error;
   bool bSuccess = false;
   if (m_tableName == IMAGE_SQL_TABLE_NAME)
@@ -1176,6 +1220,15 @@ bool JDatabase::save(const JItem& jItem)
   }
   else if (m_tableName == NOTE_SQL_TABLE_NAME)
   {
+    if (pEmployee != nullptr && !pEmployee->m_employee.m_bNoteEdit)
+    {
+      QMessageBox::warning(this,
+                           tr("Aviso"),
+                           tr("Funcionário não possui permissão."),
+                           QMessageBox::Ok);
+      return false;
+    }
+
     const Note& o = dynamic_cast<const Note&>(jItem);
     bSuccess = o.isValidId()
                ? NoteSQL::update(o, error)

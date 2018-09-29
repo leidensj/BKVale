@@ -517,10 +517,10 @@ void NoteView::showSearch()
     m_dock->show();
 }
 
-Note NoteView::save()
+Note NoteView::save(Person& employee)
 {
   Note note = getNote();
-  bool bSuccess = m_database->save(note);
+  bool bSuccess = m_database->save(note, &employee);
   if (bSuccess)
   {
     m_lastId = note.m_id;

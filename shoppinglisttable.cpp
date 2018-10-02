@@ -27,6 +27,7 @@ ShoppingListTable::ShoppingListTable(QWidget* parent)
   setSelectionBehavior(QAbstractItemView::SelectItems);
   setSelectionMode(QAbstractItemView::SingleSelection);
   horizontalHeader()->setHighlightSections(false);
+  verticalHeader()->setSectionsMovable(true);
   verticalHeader()->setHighlightSections(false);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Description, QHeaderView::Stretch);
@@ -84,11 +85,12 @@ QVector<ShoppingListItem> ShoppingListTable::getShoppingItems() const
   QVector<ShoppingListItem> v;
   for (int i = 0; i != rowCount(); ++i)
   {
-    ShoppingListItem o = item(i, (int)::ShoppingListColumn::Description)->data(Qt::UserRole).value<ShoppingListItem>();
-    o.m_ammount = ((DoubleTableWidgetItem*)item(i, (int)ShoppingListColumn::Ammount))->getValue();
-    o.m_price = ((DoubleTableWidgetItem*)item(i, (int)ShoppingListColumn::Price))->getValue();
-    o.m_bAmmount = item(i, (int)ShoppingListColumn::Ammount)->checkState();
-    o.m_bPrice = item(i, (int)ShoppingListColumn::Price)->checkState();
+    int idx = verticalHeader()->logicalIndex(i);
+    ShoppingListItem o = item(idx, (int)::ShoppingListColumn::Description)->data(Qt::UserRole).value<ShoppingListItem>();
+    o.m_ammount = ((DoubleTableWidgetItem*)item(idx, (int)ShoppingListColumn::Ammount))->getValue();
+    o.m_price = ((DoubleTableWidgetItem*)item(idx, (int)ShoppingListColumn::Price))->getValue();
+    o.m_bAmmount = item(idx, (int)ShoppingListColumn::Ammount)->checkState();
+    o.m_bPrice = item(idx, (int)ShoppingListColumn::Price)->checkState();
     v.push_back(o);
   }
   return v;

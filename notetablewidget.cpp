@@ -27,6 +27,7 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
   setSelectionMode(QAbstractItemView::SingleSelection);
   horizontalHeader()->setHighlightSections(false);
   verticalHeader()->setHighlightSections(false);
+  verticalHeader()->setSectionsMovable(true);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Description, QHeaderView::Stretch);
@@ -108,9 +109,10 @@ QVector<NoteItem> NoteTableWidget::getNoteItems() const
   QVector<NoteItem> vNoteItem;
   for (int i = 0; i != rowCount(); ++i)
   {
-    NoteItem noteItem = item(i, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
-    noteItem.m_ammount = ((DoubleTableWidgetItem*)item(i, (int)NoteColumn::Ammount))->getValue();
-    noteItem.m_price = ((DoubleTableWidgetItem*)item(i, (int)NoteColumn::Price))->getValue();
+    int idx = verticalHeader()->logicalIndex(i);
+    NoteItem noteItem = item(idx, (int)::NoteColumn::Description)->data(Qt::UserRole).value<NoteItem>();
+    noteItem.m_ammount = ((DoubleTableWidgetItem*)item(idx, (int)NoteColumn::Ammount))->getValue();
+    noteItem.m_price = ((DoubleTableWidgetItem*)item(idx, (int)NoteColumn::Price))->getValue();
     vNoteItem.push_back(noteItem);
   }
   return vNoteItem;

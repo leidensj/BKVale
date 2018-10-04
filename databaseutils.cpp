@@ -277,6 +277,7 @@ bool BaitaSQL::createTables(QString& error)
                           SHOPPING_LIST_SQL_COL04 " TEXT,"
                           SHOPPING_LIST_SQL_COL05 " TEXT,"
                           SHOPPING_LIST_SQL_COL06 " TEXT,"
+                          SHOPPING_LIST_SQL_COL07 " INTEGER,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL01 ") REFERENCES "
                           PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL02 ") REFERENCES "
@@ -2289,14 +2290,16 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
           SHOPPING_LIST_SQL_COL03 ","
           SHOPPING_LIST_SQL_COL04 ","
           SHOPPING_LIST_SQL_COL05 ","
-          SHOPPING_LIST_SQL_COL06
+          SHOPPING_LIST_SQL_COL06 ","
+          SHOPPING_LIST_SQL_COL07
           ") VALUES ("
           "%3"
           "%4"
           "(:_v03),"
           "(:_v04),"
           "(:_v05),"
-          "(:_v06))").arg(
+          "(:_v06),"
+          "(:_v07))").arg(
           shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 "," : "",
           shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 "," : "",
           shoppingList.m_supplier.isValidId() ? "(:_v01)," : "",
@@ -2310,6 +2313,7 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
   query.bindValue(":_v04", shoppingList.m_description);
   query.bindValue(":_v05", shoppingList.getWeekDays());
   query.bindValue(":_v06", shoppingList.getMonthDays());
+  query.bindValue(":_v07", shoppingList.m_nLines);
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -2380,7 +2384,8 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                 SHOPPING_LIST_SQL_COL03 " = (:_v03),"
                 SHOPPING_LIST_SQL_COL04 " = (:_v04),"
                 SHOPPING_LIST_SQL_COL05 " = (:_v05),"
-                SHOPPING_LIST_SQL_COL06 " = (:_v06) "
+                SHOPPING_LIST_SQL_COL05 " = (:_v06),"
+                SHOPPING_LIST_SQL_COL06 " = (:_v07) "
                 "WHERE " SQL_COLID " = (:_v00)").arg(
                 shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 " = (:_v01)," : "",
                 shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 " = (:_v02)," : ""));
@@ -2394,6 +2399,7 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
   query.bindValue(":_v04", shoppingList.m_description);
   query.bindValue(":_v05", shoppingList.getWeekDays());
   query.bindValue(":_v06", shoppingList.getMonthDays());
+  query.bindValue(":_v07", shoppingList.m_nLines);
   bool bSuccess = query.exec();
 
   query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
@@ -2467,7 +2473,8 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
                 SHOPPING_LIST_SQL_COL03 ","
                 SHOPPING_LIST_SQL_COL04 ","
                 SHOPPING_LIST_SQL_COL05 ","
-                SHOPPING_LIST_SQL_COL06
+                SHOPPING_LIST_SQL_COL06 ","
+                SHOPPING_LIST_SQL_COL07
                 " FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id);
@@ -2484,6 +2491,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
       shoppingList.m_description = query.value(3).toString();
       shoppingList.setWeekDays(query.value(4).toString());
       shoppingList.setMonthDays(query.value(5).toString());
+      shoppingList.setMonthDays(query.value(6).toInt());
     }
     else
     {

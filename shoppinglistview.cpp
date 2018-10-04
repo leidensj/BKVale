@@ -7,6 +7,7 @@
 #include "shoppinglisttable.h"
 #include "packageeditor.h"
 #include "jlineedit.h"
+#include "jspinbox.h"
 #include <QSplitter>
 #include <QPlainTextEdit>
 #include <QTabWidget>
@@ -55,6 +56,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_btnRemove(nullptr)
   , m_database(nullptr)
   , m_edTitle(nullptr)
+  , m_snLines(nullptr)
   , m_teDescription(nullptr)
   , m_supplierPicker(nullptr)
   , m_imagePicker(nullptr)
@@ -103,6 +105,11 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                                       false);
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
+
+  m_snLines = new JSpinBox;
+  m_snLines->setMinimum(0);
+  m_snLines->setMaximum(30);
+
   m_teDescription = new QPlainTextEdit;
 
   m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME);
@@ -165,6 +172,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   viewFormLayout->addRow(tr("Título:"), m_edTitle);
   viewFormLayout->addWidget(m_supplierPicker);
   viewFormLayout->addWidget(m_imagePicker);
+  viewFormLayout->addRow(tr("Linhas:"), m_snLines);
   viewFormLayout->addRow(tr("Descrição:"), m_teDescription);
 
   QVBoxLayout* calendarLayout = new QVBoxLayout;
@@ -348,6 +356,7 @@ void ShoppingListView::setShoppingList(const ShoppingList& lst)
   m_teDescription->setPlainText(lst.m_description);
   m_supplierPicker->setItem(lst.m_supplier);
   m_imagePicker->setItem(lst.m_image);
+  m_snLines->setValue(lst.m_nLines);
   for (int i = 0; i != 7; ++i)
     m_vbtnWeek[i]->setChecked(lst.m_weekDays[i]);
   for (int i = 0; i != 31; ++i)
@@ -364,6 +373,7 @@ ShoppingList ShoppingListView::getShoppingList() const
   lst.m_description = m_teDescription->toPlainText();
   lst.m_supplier.m_id = m_supplierPicker->getId();
   lst.m_image.m_id = m_imagePicker->getId();
+  lst.m_nLines = m_snLines->value();
   for (int i = 0; i != 7; ++i)
     lst.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
   for (int i = 0; i != 31; ++i)

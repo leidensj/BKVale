@@ -13,6 +13,7 @@ class JLineEdit;
 class ShoppingListTable;
 class QTabWidget;
 class QPlainTextEdit;
+class JSpinBox;
 
 class ShoppingListView : public QFrame
 {
@@ -46,6 +47,7 @@ private:
 
   JDatabase* m_database;
   JLineEdit* m_edTitle;
+  JSpinBox* m_snLines;
   QPlainTextEdit* m_teDescription;
   JDatabasePicker* m_supplierPicker;
   JDatabasePicker* m_imagePicker;

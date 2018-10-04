@@ -81,6 +81,7 @@ struct ShoppingList : public JItem
   QString m_description;
   Person m_supplier;
   Image m_image;
+  int m_nLines;
   bool m_weekDays[7];
   bool m_monthDays[31];
   QVector<ShoppingListItem> m_vItem;
@@ -96,6 +97,7 @@ struct ShoppingList : public JItem
     for (int i = 0; i != 31; ++i)
       m_monthDays[i] = false;
     m_vItem.clear();
+    m_nLines = 0;
   }
 
   ShoppingList()
@@ -164,6 +166,7 @@ struct ShoppingList : public JItem
     const ShoppingList& another = dynamic_cast<const ShoppingList&>(other);
     bool b = m_supplier.m_id != another.m_supplier.m_id ||
              m_description != another.m_description ||
+             m_nLines != another.m_nLines ||
              m_vItem != another.m_vItem;
     if (!b)
     {

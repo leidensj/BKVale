@@ -2491,7 +2491,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
       shoppingList.m_description = query.value(3).toString();
       shoppingList.setWeekDays(query.value(4).toString());
       shoppingList.setMonthDays(query.value(5).toString());
-      shoppingList.setMonthDays(query.value(6).toInt());
+      shoppingList.m_nLines = query.value(6).toInt();
     }
     else
     {

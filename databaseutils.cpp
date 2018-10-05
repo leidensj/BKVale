@@ -2384,8 +2384,8 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                 SHOPPING_LIST_SQL_COL03 " = (:_v03),"
                 SHOPPING_LIST_SQL_COL04 " = (:_v04),"
                 SHOPPING_LIST_SQL_COL05 " = (:_v05),"
-                SHOPPING_LIST_SQL_COL05 " = (:_v06),"
-                SHOPPING_LIST_SQL_COL06 " = (:_v07) "
+                SHOPPING_LIST_SQL_COL06 " = (:_v06),"
+                SHOPPING_LIST_SQL_COL07 " = (:_v07) "
                 "WHERE " SQL_COLID " = (:_v00)").arg(
                 shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 " = (:_v01)," : "",
                 shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 " = (:_v02)," : ""));

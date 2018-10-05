@@ -31,5 +31,6 @@
 
 #define TABLE_WIDTH           48
 #define TABLE_MAX_VALUE       10000
+#define TABLE_FULL_LINE "________________________________________________"
 
 #endif // ESC_H

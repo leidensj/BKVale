@@ -397,8 +397,15 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
            ESC_LF;
   }
 
-  str += ESC_ALIGN_LEFT
-         ESC_LF
+  str += ESC_ALIGN_LEFT;
+
+  if (lst.m_nLines > 0)
+  {
+    for (int i = 0; i != lst.m_nLines; ++i)
+      str += ESC_VERT_TAB TABLE_FULL_LINE ESC_LF;
+  }
+
+  str += ESC_LF
          ESC_VERT_TAB
          ESC_FULL_CUT;
 

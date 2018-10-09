@@ -49,7 +49,8 @@ SOURCES += main.cpp\
     productbarcodeview.cpp \
     discounttablewidget.cpp \
     discountview.cpp \
-    jtablewidgetitem.cpp
+    jtablewidgetitem.cpp \
+    jitemview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -103,7 +104,8 @@ HEADERS  += mainwindow.h \
     discount.h \
     discounttablewidget.h \
     discountview.h \
-    jtablewidgetitem.h
+    jtablewidgetitem.h \
+    jitemview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

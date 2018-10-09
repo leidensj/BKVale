@@ -41,6 +41,11 @@ struct Category : public JItem
   {
     return !m_name.isEmpty();
   }
+
+  QString strTableName() const
+  {
+    return CATEGORY_SQL_TABLE_NAME;
+  }
 };
 
 #endif // CATEGORY_H

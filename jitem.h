@@ -22,6 +22,7 @@ struct JItem
   bool isValidId() const { return IS_VALID_ID(m_id); }
   virtual bool isValid() const { return true; }
   virtual void clear() { m_id = INVALID_ID; }
+  virtual QString strTableName() const { return ""; }
   virtual bool operator ==(const JItem& other) const { return m_id == other.m_id; }
   virtual bool operator !=(const JItem& other) const { return !(*this != other); }
   static QString st_strMoney(double value) { return "R$" + QString::number(value, 'f', 2); }

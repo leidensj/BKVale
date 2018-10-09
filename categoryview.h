@@ -1,41 +1,28 @@
 #ifndef CATEGORYVIEW_H
 #define CATEGORYVIEW_H
 
-#include <QFrame>
 #include "category.h"
+#include "jitemview.h"
 
 class QPushButton;
 class JLineEdit;
 class JDatabasePicker;
-class JDatabase;
 
-class CategoryView : public QFrame
+class CategoryView : public JItemView
 {
   Q_OBJECT
 
 public:
   explicit CategoryView(QWidget* parent = 0);
-  Category getCategory() const;
-
-private slots:
-  void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
-  void save();
+  const JItem& getItem() const;
 
 public slots:
-  void setCategory(const Category& category);
   void create();
 
-signals:
-  void saveSignal();
-
 private:
-  qlonglong m_currentId;
-  QPushButton* m_btnCreate;
-  QPushButton* m_btnSave;
   JLineEdit* m_edName;
   JDatabasePicker* m_imagePicker;
-  JDatabase* m_database;
+  void setItem(const JItem& o);
 };
 
 #endif // CATEGORYVIEW_H

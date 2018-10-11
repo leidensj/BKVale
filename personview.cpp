@@ -1,7 +1,6 @@
 #include "personview.h"
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
-#include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
 #include <QTabWidget>
@@ -20,7 +19,6 @@
 #include <QMessageBox>
 #include "jdatabase.h"
 #include "databaseutils.h"
-#include <QSplitter>
 #include <QAction>
 #include <QGroupBox>
 
@@ -71,10 +69,7 @@ namespace
 PersonView::PersonView(bool bAccessEmployee,
                        bool bAccessSupplier,
                        QWidget* parent)
-  : QFrame(parent)
-  , m_currentId(INVALID_ID)
-  , m_btnCreate(nullptr)
-  , m_btnSave(nullptr)
+  : JItemView(PERSON_SQL_TABLE_NAME, parent)
   , m_addressPage(nullptr)
   , m_rdoPerson(nullptr)
   , m_rdoCompany(nullptr)
@@ -114,25 +109,9 @@ PersonView::PersonView(bool bAccessEmployee,
   , m_lstAddress(nullptr)
   , m_cbNoteEdit(nullptr)
   , m_cbNoteRemove(nullptr)
-  , m_database(nullptr)
-  , m_tab(nullptr)
   , m_grpEmployee(nullptr)
   , m_grpSupplier(nullptr)
 {
-  m_btnCreate = new QPushButton();
-  m_btnCreate->setFlat(true);
-  m_btnCreate->setText("");
-  m_btnCreate->setIconSize(QSize(24, 24));
-  m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
-  m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-
-  m_btnSave = new QPushButton();
-  m_btnSave->setFlat(true);
-  m_btnSave->setText("");
-  m_btnSave->setIconSize(QSize(24, 24));
-  m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
-  m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
-
   m_rdoPerson = new QRadioButton;
   m_rdoPerson->setText(tr("Fisíca"));
   m_rdoPerson->setChecked(true);
@@ -314,12 +293,6 @@ PersonView::PersonView(bool bAccessEmployee,
   phoneInformationLayout->addWidget(m_edPhoneName);
   phoneInformationLayout->addLayout(phoneNumberLayout);
 
-  QHBoxLayout* buttonLayout = new QHBoxLayout();
-  buttonLayout->setContentsMargins(0, 0, 0, 0);
-  buttonLayout->setAlignment(Qt::AlignLeft);
-  buttonLayout->addWidget(m_btnCreate);
-  buttonLayout->addWidget(m_btnSave);
-
   QHBoxLayout* personLayout = new QHBoxLayout;
   personLayout->setAlignment(Qt::AlignLeft);
   personLayout->addWidget(new QLabel(tr("Tipo de pessoa:")));
@@ -408,7 +381,6 @@ PersonView::PersonView(bool bAccessEmployee,
   QFrame* addressFrame = new QFrame;
   addressFrame->setLayout(addressLayout);
 
-  m_tab = new QTabWidget;
   m_tab->addTab(informationFrame,
                 QIcon(":/icons/res/details.png"),
                 tr("Informações"));
@@ -427,24 +399,6 @@ PersonView::PersonView(bool bAccessEmployee,
                 QIcon(":/icons/res/address.png"),
                 tr("Endereço"));
 
-  m_database = new JDatabase(PERSON_SQL_TABLE_NAME);
-
-  QVBoxLayout* viewLayout = new QVBoxLayout;
-  viewLayout->setAlignment(Qt::AlignTop);
-  viewLayout->addLayout(buttonLayout);
-  viewLayout->addWidget(m_tab);
-
-  QFrame* viewFrame = new QFrame;
-  viewFrame->setLayout(viewLayout);
-
-  QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(m_database);
-  splitter->addWidget(viewFrame);
-
-  QVBoxLayout* mainlayout = new QVBoxLayout;
-  mainlayout->addWidget(splitter);
-  setLayout(mainlayout);
-
   QObject::connect(m_rdoCompany,
                    SIGNAL(toggled(bool)),
                    this,
@@ -461,10 +415,6 @@ PersonView::PersonView(bool bAccessEmployee,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_btnCreate,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(create()));
   QObject::connect(m_cbBirthDate,
                    SIGNAL(clicked(bool)),
                    this,
@@ -505,18 +455,6 @@ PersonView::PersonView(bool bAccessEmployee,
                    SIGNAL(currentRowChanged(int)),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_btnSave,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(save()));
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(itemSelected(const JItem&)));
-  QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
-                   this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
 
   switchUserType();
   updateControls();
@@ -528,84 +466,82 @@ PersonView::~PersonView()
 
 }
 
-Person PersonView::getPerson() const
+const JItem& PersonView::getItem() const
 {
-  Person person;
-  person.m_id = m_currentId;
-  person.m_image.m_id = m_imagePicker->getId();
-  person.m_name = m_edName->text();
-  person.m_alias = m_edAlias->text();
-  person.m_email = m_edEmail->text();
-  person.m_CPF_CNPJ = m_edCpfCnpj->text();
-  person.m_RG_IE = m_edRgIE->text();
-  person.m_details = m_edDetails->text();
-  person.m_dtBirth = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked()
+  static Person o;
+  o.m_id = m_currentId;
+  o.m_image.m_id = m_imagePicker->getId();
+  o.m_name = m_edName->text();
+  o.m_alias = m_edAlias->text();
+  o.m_email = m_edEmail->text();
+  o.m_CPF_CNPJ = m_edCpfCnpj->text();
+  o.m_RG_IE = m_edRgIE->text();
+  o.m_details = m_edDetails->text();
+  o.m_dtBirth = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked()
                      ? m_dtBirthDate->date() : QDate(1800, 1, 1);
-  person.m_dtCreation = m_dtCreationDate->date();
-  person.m_bCompany = m_rdoCompany->isChecked();
+  o.m_dtCreation = m_dtCreationDate->date();
+  o.m_bCompany = m_rdoCompany->isChecked();
 
-  person.m_supplier.m_bIsSupplier = m_grpSupplier->isChecked();
-  person.m_employee.m_bIsEmployee = m_grpEmployee->isChecked();
-  person.m_employee.m_pincode = m_grpEmployee->isChecked() ? m_edPinCode->text() : "";
-  person.m_employee.m_bNoteEdit = m_grpEmployee->isChecked() && m_cbNoteEdit->isChecked();
-  person.m_employee.m_bNoteRemove = m_grpEmployee->isChecked() && m_cbNoteRemove->isChecked();
+  o.m_supplier.m_bIsSupplier = m_grpSupplier->isChecked();
+  o.m_employee.m_bIsEmployee = m_grpEmployee->isChecked();
+  o.m_employee.m_pincode = m_grpEmployee->isChecked() ? m_edPinCode->text() : "";
+  o.m_employee.m_bNoteEdit = m_grpEmployee->isChecked() && m_cbNoteEdit->isChecked();
+  o.m_employee.m_bNoteRemove = m_grpEmployee->isChecked() && m_cbNoteRemove->isChecked();
 
   for (int i = 0; i != m_lstPhone->count(); ++i)
-    person.m_vPhone.push_back(m_lstPhone->item(i)->data(Qt::UserRole).value<Phone>());
+    o.m_vPhone.push_back(m_lstPhone->item(i)->data(Qt::UserRole).value<Phone>());
 
   for (int i = 0; i != m_lstAddress->count(); ++i)
-    person.m_vAddress.push_back(m_lstAddress->item(i)->data(Qt::UserRole).value<Address>());
+    o.m_vAddress.push_back(m_lstAddress->item(i)->data(Qt::UserRole).value<Address>());
 
-  return person;
+  return o;
 }
 
-void PersonView::setPerson(const Person &person)
+void PersonView::setItem(const JItem &o)
 {
-  m_currentId = person.m_id;
-  m_imagePicker->setItem(person.m_image.m_id, person.m_image.m_name, person.m_image.m_image);
-  m_edName->setText(person.m_name);
-  m_edAlias->setText(person.m_alias);
-  m_edEmail->setText(person.m_email);
-  m_edCpfCnpj->setText(person.m_CPF_CNPJ);
-  m_edRgIE->setText(person.m_RG_IE);
-  m_edDetails->setText(person.m_details);
-  m_cbBirthDate->setChecked(person.m_dtBirth.year() != 1);
-  m_dtBirthDate->setDate(m_cbBirthDate->isChecked() ? person.m_dtBirth : QDate(1800, 1, 1));
-  m_dtCreationDate->setDate(person.m_dtCreation);
-  m_rdoCompany->setChecked(person.m_bCompany);
-  m_grpSupplier->setChecked(person.m_supplier.m_bIsSupplier);
-  m_grpEmployee->setChecked(person.m_employee.m_bIsEmployee);
+  auto _o = dynamic_cast<const Person&>(o);
+  m_currentId = _o.m_id;
+  m_imagePicker->setItem(_o.m_image);
+  m_edName->setText(_o.m_name);
+  m_edAlias->setText(_o.m_alias);
+  m_edEmail->setText(_o.m_email);
+  m_edCpfCnpj->setText(_o.m_CPF_CNPJ);
+  m_edRgIE->setText(_o.m_RG_IE);
+  m_edDetails->setText(_o.m_details);
+  m_cbBirthDate->setChecked(_o.m_dtBirth.year() != 1);
+  m_dtBirthDate->setDate(m_cbBirthDate->isChecked() ? _o.m_dtBirth : QDate(1800, 1, 1));
+  m_dtCreationDate->setDate(_o.m_dtCreation);
+  m_rdoCompany->setChecked(_o.m_bCompany);
+  m_grpSupplier->setChecked(_o.m_supplier.m_bIsSupplier);
+  m_grpEmployee->setChecked(_o.m_employee.m_bIsEmployee);
   switchUserType();
 
-  m_edPinCode->setText(person.m_employee.m_pincode);
-  m_cbNoteEdit->setChecked(person.m_employee.m_bNoteEdit);
-  m_cbNoteRemove->setChecked(person.m_employee.m_bNoteRemove);
+  m_edPinCode->setText(_o.m_employee.m_pincode);
+  m_cbNoteEdit->setChecked(_o.m_employee.m_bNoteEdit);
+  m_cbNoteRemove->setChecked(_o.m_employee.m_bNoteRemove);
 
   m_lstPhone->clear();
   m_lstAddress->clear();
 
   clearPhone();
-  for (int i = 0; i != person.m_vPhone.size(); ++i)
-    addPhone(person.m_vPhone.at(i));
+  for (int i = 0; i != _o.m_vPhone.size(); ++i)
+    addPhone(_o.m_vPhone.at(i));
 
   clearAddress();
-  for (int i = 0; i != m_lstAddress->count(); ++i)
-    addAddress(person.m_vAddress.at(i));
+  for (int i = 0; i != _o.m_vAddress.size(); ++i)
+    addAddress(_o.m_vAddress.at(i));
 }
 
 void PersonView::create()
 {
+  selectItem(Person());
   m_tab->setCurrentIndex(0);
-  m_currentId = INVALID_ID;
-  setPerson(Person());
   updateControls();
+  m_edName->setFocus();
 }
 
 void PersonView::updateControls()
 {
-  m_btnSave->setIcon(QIcon(IS_VALID_ID(m_currentId)
-                           ? ":/icons/res/saveas.png"
-                           : ":/icons/res/save.png"));
   m_edPinCode->setEnabled(m_grpEmployee->isChecked());
   m_dtBirthDate->setEnabled(m_cbBirthDate->isChecked());
   if (m_cbBirthDate->isChecked() &&
@@ -803,22 +739,4 @@ void PersonView::processPostalCode()
                                 "Internet.").arg(m_edAddressPostalCode->text()),
                              QMessageBox::Ok);
   }
-}
-
-void PersonView::itemSelected(const JItem& jItem)
-{
-  const Person& person = dynamic_cast<const Person&>(jItem);
-  setPerson(person);
-}
-
-void PersonView::itemsRemoved(const QVector<qlonglong>& ids)
-{
-  if (ids.contains(m_currentId))
-    create();
-}
-
-void PersonView::save()
-{
-  if (m_database->save(getPerson()))
-    create();
 }

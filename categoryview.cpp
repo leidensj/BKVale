@@ -56,6 +56,7 @@ const JItem& CategoryView::getItem() const
 void CategoryView::setItem(const JItem& o)
 {
   auto ref = static_cast<const Category&>(o);
+  m_currentId = o.m_id;
   m_edName->setText(ref.m_name);
   m_imagePicker->setItem(ref.m_image);
 }

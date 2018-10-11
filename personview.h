@@ -6,8 +6,8 @@
 #include "address.h"
 #include "phone.h"
 #include "person.h"
+#include "jitemview.h"
 
-class QPushButton;
 class AddressPageView;
 class QTabWidget;
 class QLabel;
@@ -19,13 +19,12 @@ class QCheckBox;
 class QSpinBox;
 class QListWidget;
 class QComboBox;
-class JDatabase;
 class QGroupBox;
 
 Q_DECLARE_METATYPE(Phone)
 Q_DECLARE_METATYPE(Address)
 
-class PersonView : public QFrame
+class PersonView : public JItemView
 {
   Q_OBJECT
 
@@ -34,7 +33,7 @@ public:
                       bool bAccessSupplier,
                       QWidget* parent = 0);
   ~PersonView();
-  Person getPerson() const;
+  const JItem& getItem() const;
 
 private slots:
   void updateControls();
@@ -53,20 +52,11 @@ private slots:
   void clearAddress();
   void processPostalCode();
 
-  void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
-  void save();
-
 public slots:
-  void setPerson(const Person& person);
   void create();
 
 private:
-  qlonglong m_currentId;
-  QPushButton* m_btnCreate;
-  QPushButton* m_btnSave;
   AddressPageView* m_addressPage;
-
   QRadioButton* m_rdoPerson;
   QRadioButton* m_rdoCompany;
   JLineEdit* m_edName;
@@ -109,10 +99,10 @@ private:
   QCheckBox* m_cbNoteEdit;
   QCheckBox* m_cbNoteRemove;
 
-  JDatabase* m_database;
-  QTabWidget* m_tab;
   QGroupBox* m_grpEmployee;
   QGroupBox* m_grpSupplier;
+
+  void setItem(const JItem &o);
 };
 
 #endif // PERSONVIEW_H

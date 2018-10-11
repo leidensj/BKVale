@@ -3,39 +3,28 @@
 
 #include <QFrame>
 #include "productbarcode.h"
+#include "jitemview.h"
 
-class QPushButton;
 class JLineEdit;
 class JDatabasePicker;
-class JDatabase;
-class QTabWidget;
 
-class ProductBarcodeView : public QFrame
+class ProductBarcodeView : public JItemView
 {
   Q_OBJECT
 
 public:
   explicit ProductBarcodeView(QWidget* parent = 0);
   ~ProductBarcodeView();
-  ProductBarcode getProductBarcode() const;
-
-private slots:
-  void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
-  void save();
+ const JItem& getItem() const;
 
 public slots:
-  void setProductBarcode(const ProductBarcode& barcode);
   void create();
 
 private:
-  qlonglong m_currentId;
-  QPushButton* m_btnCreate;
-  QPushButton* m_btnSave;
   JDatabasePicker* m_productPicker;
   JLineEdit* m_edCode;
-  JDatabase* m_database;
-  QTabWidget* m_tab;
+
+  void setItem(const JItem& o);
 };
 
 #endif // PRODUCTBARCODEVIEW_H

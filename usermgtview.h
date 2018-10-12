@@ -3,30 +3,33 @@
 
 #include <QFrame>
 #include "user.h"
+#include "jitemview.h"
 
 class QCheckBox;
 class JLineEdit;
-class QPushButton;
 class QLabel;
-class JDatabase;
 
-class UserMgtView : public QFrame
+class UserMgtView : public JItemView
 {
   Q_OBJECT
 
 public:
   explicit UserMgtView(qlonglong currentLoggedId, QWidget* parent = 0);
-  User getUser() const;
-  void setUser(const User& user);
+  const JItem& getItem() const;
+
   QString getPassword() const;
   bool hasLoggedUserChanged() const;
 
+public slots:
+  void create();
+
+protected slots:
+  void itemsRemoved(const QVector<qlonglong>& ids);
+  void save();
+
 private:
   qlonglong m_currentLoggedId;
-  int m_currentId;
   bool m_bHasLoggedUserChanged;
-  QPushButton* m_create;
-  QPushButton* m_save;
   JLineEdit* m_user;
   QLabel* m_lblPasswordMsg;
   JLineEdit* m_password;
@@ -46,19 +49,11 @@ private:
   QCheckBox* m_accessReservation;
   QCheckBox* m_accessSettings;
   QCheckBox* m_accessProductBarcode;
-  JDatabase* m_database;
 
-public slots:
-  void create();
+  void setItem(const JItem& o);
 
 private slots:
-  void save();
-  void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
   void viewPassword(bool b);
-
-signals:
-  saveSignal();
 };
 
 #endif // USERMGTVIEW_H

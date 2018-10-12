@@ -4,32 +4,27 @@
 #include <QFrame>
 #include <QVector>
 #include "shoppinglist.h"
+#include "jitemview.h"
 
-class JDatabase;
-class QPushButton;
 class JDatabasePicker;
 class QCheckBox;
 class JLineEdit;
 class ShoppingListTable;
-class QTabWidget;
 class QPlainTextEdit;
 class JSpinBox;
 
-class ShoppingListView : public QFrame
+class ShoppingListView : public JItemView
 {
   Q_OBJECT
 
 public:
   explicit ShoppingListView(QWidget* parent = nullptr);
-  void setShoppingList(const ShoppingList& lst);
-  ShoppingList getShoppingList() const;
+  const JItem& getItem() const;
+
+public slots:
+  void create();
 
 private slots:
-  void save();
-  void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
-
-  void create();
   void addItem();
   void removeItem();
   void editProduct();
@@ -38,14 +33,9 @@ private slots:
   void updateControls();
 
 private:
-  qlonglong m_currentId;
-  QPushButton* m_btnCreate;
-  QPushButton* m_btnSave;
-
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
 
-  JDatabase* m_database;
   JLineEdit* m_edTitle;
   JSpinBox* m_snLines;
   QPlainTextEdit* m_teDescription;
@@ -53,10 +43,10 @@ private:
   JDatabasePicker* m_imagePicker;
 
   ShoppingListTable* m_table;
-  QTabWidget* m_tabWidget;
 
   QPushButton* m_vbtnMonth[31];
   QPushButton* m_vbtnWeek[7];
+  void setItem(const JItem& o);
 };
 
 #endif // SHOPPINGLISTVIEW_H

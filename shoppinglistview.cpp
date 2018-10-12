@@ -1,8 +1,6 @@
 #include "shoppinglistview.h"
-#include <QPushButton>
 #include <QCheckBox>
 #include <QLayout>
-#include "jdatabase.h"
 #include "jdatabasepicker.h"
 #include "shoppinglisttable.h"
 #include "packageeditor.h"
@@ -48,35 +46,16 @@ QPushButton* weekButtonFactory(int n)
 }
 
 ShoppingListView::ShoppingListView(QWidget* parent)
-  : QFrame(parent)
-  , m_currentId(INVALID_ID)
-  , m_btnCreate(nullptr)
-  , m_btnSave(nullptr)
+  : JItemView(SHOPPING_LIST_SQL_TABLE_NAME, parent)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
-  , m_database(nullptr)
   , m_edTitle(nullptr)
   , m_snLines(nullptr)
   , m_teDescription(nullptr)
   , m_supplierPicker(nullptr)
   , m_imagePicker(nullptr)
   , m_table(nullptr)
-  , m_tabWidget(nullptr)
 {
-  m_btnCreate = new QPushButton;
-  m_btnCreate->setFlat(true);
-  m_btnCreate->setIconSize(QSize(24, 24));
-  m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
-  m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-  m_btnCreate->setToolTip(tr("Novo (Ctrl+N)"));
-
-  m_btnSave = new QPushButton;
-  m_btnSave->setFlat(true);
-  m_btnSave->setIconSize(QSize(24, 24));
-  m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
-  m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
-  m_btnSave->setToolTip(tr("Salvar (Ctrl+S)"));
-
   m_btnAdd = new QPushButton;
   m_btnAdd->setFlat(true);
   m_btnAdd->setIconSize(QSize(24, 24));
@@ -112,19 +91,11 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   m_teDescription = new QPlainTextEdit;
 
-  m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME);
-
   for (int i = 0; i != 31; ++i)
     m_vbtnMonth[i] = monthButtonFactory(i);
 
   for (int i = 0; i != 7; ++i)
     m_vbtnWeek[i] = weekButtonFactory(i);
-
-  QHBoxLayout* buttonLayout = new QHBoxLayout;
-  buttonLayout->setAlignment(Qt::AlignLeft);
-  buttonLayout->setContentsMargins(0, 0, 0, 0);
-  buttonLayout->addWidget(m_btnCreate);
-  buttonLayout->addWidget(m_btnSave);
 
   QHBoxLayout* tableButtonLayout = new QHBoxLayout;
   tableButtonLayout->setAlignment(Qt::AlignLeft);
@@ -201,32 +172,15 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   QFrame* tabCalendar = new QFrame;
   tabCalendar->setLayout(calendarLayout);
 
-  m_tabWidget = new QTabWidget;
-  m_tabWidget->addTab(tabView,
-                      QIcon(":/icons/res/details.png"),
-                      tr("Informações"));
-  m_tabWidget->addTab(tabList,
-                      QIcon(":/icons/res/item.png"),
-                      tr("Produtos"));
-  m_tabWidget->addTab(tabCalendar,
-                      QIcon(":/icons/res/calendar.png"),
-                      tr("Calendário"));
-
-  QVBoxLayout* mainLayout = new QVBoxLayout;
-  mainLayout->addLayout(buttonLayout);
-  mainLayout->addWidget(m_tabWidget);
-
-  QFrame* viewFrame = new QFrame;
-  viewFrame->setLayout(mainLayout);
-
-  QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(m_database);
-  splitter->addWidget(viewFrame);
-
-  QVBoxLayout* frameLayout = new QVBoxLayout;
-  frameLayout->setContentsMargins(0, 0, 0, 0);
-  frameLayout->addWidget(splitter);
-  setLayout(frameLayout);
+  m_tab->addTab(tabView,
+                QIcon(":/icons/res/shopmgt.png"),
+                tr("Lista de Compras"));
+  m_tab->addTab(tabList,
+                QIcon(":/icons/res/item.png"),
+                tr("Produtos"));
+  m_tab->addTab(tabCalendar,
+                QIcon(":/icons/res/calendar.png"),
+                tr("Calendário"));
 
   QObject::connect(m_btnAdd,
                    SIGNAL(clicked(bool)),
@@ -249,22 +203,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
-                   this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(itemSelected(const JItem&)));
-  QObject::connect(m_btnSave,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(save()));
-  QObject::connect(m_btnCreate,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(create()));
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 }
@@ -322,62 +260,42 @@ void ShoppingListView::updateControls()
 
 void ShoppingListView::create()
 {
-  setShoppingList(ShoppingList());
-  m_tabWidget->setCurrentIndex(0);
-}
-
-void ShoppingListView::itemSelected(const JItem& jItem)
-{
-  const ShoppingList& list = dynamic_cast<const ShoppingList&>(jItem);
-  if (list.isValidId())
-    setShoppingList(list);
-}
-
-void ShoppingListView::itemsRemoved(const QVector<qlonglong>& ids)
-{
-  if (ids.contains(m_currentId))
-    create();
-}
-
-void ShoppingListView::save()
-{
-  if (m_database->save(getShoppingList()))
-    create();
-}
-
-void ShoppingListView::setShoppingList(const ShoppingList& lst)
-{
-  QString strIcon = lst.isValidId()
-                    ? ":/icons/res/saveas.png"
-                    : ":/icons/res/save.png";
-  m_btnSave->setIcon(QIcon(strIcon));
-  m_currentId = lst.m_id;
-  m_edTitle->setText(lst.m_title);
-  m_teDescription->setPlainText(lst.m_description);
-  m_supplierPicker->setItem(lst.m_supplier);
-  m_imagePicker->setItem(lst.m_image);
-  m_snLines->setValue(lst.m_nLines);
-  for (int i = 0; i != 7; ++i)
-    m_vbtnWeek[i]->setChecked(lst.m_weekDays[i]);
-  for (int i = 0; i != 31; ++i)
-    m_vbtnMonth[i]->setChecked(lst.m_monthDays[i]);
-  m_table->setShoppingItems(lst.m_vItem);
+  selectItem(ShoppingList());
+  m_tab->setCurrentIndex(0);
+  m_edTitle->setFocus();
   updateControls();
 }
 
-ShoppingList ShoppingListView::getShoppingList() const
+void ShoppingListView::setItem(const JItem& o)
 {
-  ShoppingList lst;
-  lst.m_id = m_currentId;
-  lst.m_title = m_edTitle->text();
-  lst.m_description = m_teDescription->toPlainText();
-  lst.m_supplier.m_id = m_supplierPicker->getId();
-  lst.m_image.m_id = m_imagePicker->getId();
-  lst.m_nLines = m_snLines->value();
+  auto _o = dynamic_cast<const ShoppingList&>(o);
+  m_currentId = _o.m_id;
+  m_edTitle->setText(_o.m_title);
+  m_teDescription->setPlainText(_o.m_description);
+  m_supplierPicker->setItem(_o.m_supplier);
+  m_imagePicker->setItem(_o.m_image);
+  m_snLines->setValue(_o.m_nLines);
   for (int i = 0; i != 7; ++i)
-    lst.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
+    m_vbtnWeek[i]->setChecked(_o.m_weekDays[i]);
   for (int i = 0; i != 31; ++i)
-    lst.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
-  lst.m_vItem = m_table->getShoppingItems();
-  return lst;
+    m_vbtnMonth[i]->setChecked(_o.m_monthDays[i]);
+  m_table->setShoppingItems(_o.m_vItem);
+  updateControls();
+}
+
+const JItem& ShoppingListView::getItem() const
+{
+  static ShoppingList o;
+  o.m_id = m_currentId;
+  o.m_title = m_edTitle->text();
+  o.m_description = m_teDescription->toPlainText();
+  o.m_supplier.m_id = m_supplierPicker->getId();
+  o.m_image.m_id = m_imagePicker->getId();
+  o.m_nLines = m_snLines->value();
+  for (int i = 0; i != 7; ++i)
+    o.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
+  for (int i = 0; i != 31; ++i)
+    o.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
+  o.m_vItem = m_table->getShoppingItems();
+  return o;
 }

@@ -1,20 +1,15 @@
 #include "usermgtview.h"
 #include <QCheckBox>
 #include "jlineedit.h"
-#include "jdatabase.h"
-#include <QPushButton>
 #include <QLabel>
 #include <QLayout>
 #include <QRegExpValidator>
 #include <QGroupBox>
 #include <QMessageBox>
-#include <QTabWidget>
-#include <QSplitter>
 
 UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
-  : QFrame(parent)
+  : JItemView(USER_SQL_TABLE_NAME, parent)
   , m_currentLoggedId(currentLoggedId)
-  , m_currentId(INVALID_ID)
   , m_bHasLoggedUserChanged(false)
   , m_user(nullptr)
   , m_lblPasswordMsg(nullptr)
@@ -35,22 +30,7 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   , m_accessReservation(nullptr)
   , m_accessSettings(nullptr)
   , m_accessProductBarcode(nullptr)
-  , m_database(nullptr)
 {
-  m_create = new QPushButton;
-  m_create->setFlat(true);
-  m_create->setText("");
-  m_create->setIconSize(QSize(24, 24));
-  m_create->setIcon(QIcon(":/icons/res/file.png"));
-  m_create->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-
-  m_save = new QPushButton;
-  m_save->setFlat(true);
-  m_save->setText("");
-  m_save->setIconSize(QSize(24, 24));
-  m_save->setIcon(QIcon(":/icons/res/save.png"));
-  m_save->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
-
   QLabel* lblUser = new QLabel;
   lblUser->setPixmap(QIcon(":/icons/res/user.png").pixmap(QSize(24, 24)));
   lblUser->setMinimumSize(24, 24);
@@ -137,12 +117,6 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   m_accessProductBarcode->setIcon(QIcon(":/icons/res/barcode.png"));
   m_accessProductBarcode->setText(tr("Códigos"));
 
-  QHBoxLayout* buttonlayout = new QHBoxLayout;
-  buttonlayout->setContentsMargins(0, 0, 0, 0);
-  buttonlayout->addWidget(m_create);
-  buttonlayout->addWidget(m_save);
-  buttonlayout->setAlignment(Qt::AlignLeft);
-
   QHBoxLayout* userlayout = new QHBoxLayout;
   userlayout->setContentsMargins(0, 0, 0, 0);
   userlayout->addWidget(lblUser);
@@ -183,119 +157,76 @@ UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
   QFrame* tabPermissionsFrame = new QFrame;
   tabPermissionsFrame->setLayout(tabPermissionslayout);
 
-  QTabWidget* tabWidget = new QTabWidget;
-  tabWidget->addTab(tabUserFrame,
-                    QIcon(":/icons/res/user.png"),
-                    tr("Usuário"));
+  m_tab->addTab(tabUserFrame,
+                QIcon(":/icons/res/user.png"),
+                tr("Usuário"));
 
-  tabWidget->addTab(tabPermissionsFrame,
-                    QIcon(":/icons/res/usershield.png"),
-                    tr("Permissões"));
-
-  m_database = new JDatabase(USER_SQL_TABLE_NAME);
-  m_database->setContentsMargins(0, 0, 9, 0);
-
-  QVBoxLayout* viewLayout = new QVBoxLayout;
-  viewLayout->addLayout(buttonlayout);
-  viewLayout->addWidget(tabWidget);
-
-  QFrame* viewFrame = new QFrame;
-  viewFrame->setLayout(viewLayout);
-
-  QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(m_database);
-  splitter->addWidget(viewFrame);
-
-  QHBoxLayout* mainlayout = new QHBoxLayout();
-  mainlayout->addWidget(splitter);
-  mainlayout->setContentsMargins(0, 0, 0, 0);
-  setLayout(mainlayout);
-
-  QObject::connect(m_create,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(create()));
-
-  QObject::connect(m_save,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(save()));
+  m_tab->addTab(tabPermissionsFrame,
+                QIcon(":/icons/res/usershield.png"),
+                tr("Permissões"));
 
   QObject::connect(m_viewPassword,
                    SIGNAL(toggled(bool)),
                    this,
                    SLOT(viewPassword(bool)));
 
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(itemSelected(const JItem&)));
-
-  QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
-                   this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
-
   create();
 }
 
-User UserMgtView::getUser() const
+const JItem& UserMgtView::getItem() const
 {
-  User user;
-  user.m_id = m_currentId;
-  user.m_strUser = m_user->text();
-  user.m_password = m_password->text();
-  user.m_bAccessNote = m_accessNote->isChecked();
-  user.m_bAccessReminder = m_accessReminder->isChecked();
-  user.m_bAccessCalculator = m_accessCalculator->isChecked();
-  user.m_bAccessShop = m_accessShop->isChecked();
-  user.m_bAccessUser = m_accessUser->isChecked();
-  user.m_bAccessProduct = m_accessProduct->isChecked();
-  user.m_bAccessPerson = m_accessPerson->isChecked();
-  user.m_bAccessEmployee = m_accessEmployee->isChecked();
-  user.m_bAccessSupplier = m_accessSupplier->isChecked();
-  user.m_bAccessCategory = m_accessCategory->isChecked();
-  user.m_bAccessImage = m_accessImage->isChecked();
-  user.m_bAccessSettings = m_accessSettings->isChecked();
-  user.m_bAccessReservation = m_accessReservation->isChecked();
-  user.m_bAccessShoppingList = m_accessShoppingList->isChecked();
-  user.m_bAccessProductBarcode = m_accessProductBarcode->isChecked();
-  return user;
+  static User o;
+  o.m_id = m_currentId;
+  o.m_strUser = m_user->text();
+  o.m_password = m_password->text();
+  o.m_bAccessNote = m_accessNote->isChecked();
+  o.m_bAccessReminder = m_accessReminder->isChecked();
+  o.m_bAccessCalculator = m_accessCalculator->isChecked();
+  o.m_bAccessShop = m_accessShop->isChecked();
+  o.m_bAccessUser = m_accessUser->isChecked();
+  o.m_bAccessProduct = m_accessProduct->isChecked();
+  o.m_bAccessPerson = m_accessPerson->isChecked();
+  o.m_bAccessEmployee = m_accessEmployee->isChecked();
+  o.m_bAccessSupplier = m_accessSupplier->isChecked();
+  o.m_bAccessCategory = m_accessCategory->isChecked();
+  o.m_bAccessImage = m_accessImage->isChecked();
+  o.m_bAccessSettings = m_accessSettings->isChecked();
+  o.m_bAccessReservation = m_accessReservation->isChecked();
+  o.m_bAccessShoppingList = m_accessShoppingList->isChecked();
+  o.m_bAccessProductBarcode = m_accessProductBarcode->isChecked();
+  return o;
 }
 
-void UserMgtView::setUser(const User& user)
+void UserMgtView::setItem(const JItem& o)
 {
-  m_save->setIcon(QIcon(user.isValidId()
-                        ? ":/icons/res/saveas.png"
-                        : ":/icons/res/save.png"));
-  if (user.isValidId())
+  auto _o = dynamic_cast<const User&>(o);
+  if (_o.isValidId())
     m_lblPasswordMsg->show();
-  m_currentId = user.m_id;
-  m_user->setText(user.m_strUser);
+  m_currentId = _o.m_id;
+  m_user->setText(_o.m_strUser);
   m_password->setText("");
-  m_accessNote->setChecked(user.m_bAccessNote);
-  m_accessReminder->setChecked(user.m_bAccessReminder);
-  m_accessCalculator->setChecked(user.m_bAccessCalculator);
-  m_accessShop->setChecked(user.m_bAccessShop);
-  m_accessUser->setChecked(user.m_bAccessUser);
-  m_accessProduct->setChecked(user.m_bAccessProduct);
-  m_accessPerson->setChecked(user.m_bAccessPerson);
-  m_accessEmployee->setChecked(user.m_bAccessEmployee);
-  m_accessSupplier->setChecked(user.m_bAccessSupplier);
-  m_accessCategory->setChecked(user.m_bAccessCategory);
-  m_accessImage->setChecked(user.m_bAccessImage);
-  m_accessSettings->setChecked(user.m_bAccessSettings);
-  m_accessReservation->setChecked(user.m_bAccessReservation);
-  m_accessShoppingList->setChecked(user.m_bAccessShoppingList);
-  m_accessProductBarcode->setChecked(user.m_bAccessProductBarcode);
-  m_user->setFocus();
+  m_accessNote->setChecked(_o.m_bAccessNote);
+  m_accessReminder->setChecked(_o.m_bAccessReminder);
+  m_accessCalculator->setChecked(_o.m_bAccessCalculator);
+  m_accessShop->setChecked(_o.m_bAccessShop);
+  m_accessUser->setChecked(_o.m_bAccessUser);
+  m_accessProduct->setChecked(_o.m_bAccessProduct);
+  m_accessPerson->setChecked(_o.m_bAccessPerson);
+  m_accessEmployee->setChecked(_o.m_bAccessEmployee);
+  m_accessSupplier->setChecked(_o.m_bAccessSupplier);
+  m_accessCategory->setChecked(_o.m_bAccessCategory);
+  m_accessImage->setChecked(_o.m_bAccessImage);
+  m_accessSettings->setChecked(_o.m_bAccessSettings);
+  m_accessReservation->setChecked(_o.m_bAccessReservation);
+  m_accessShoppingList->setChecked(_o.m_bAccessShoppingList);
+  m_accessProductBarcode->setChecked(_o.m_bAccessProductBarcode);
 }
 
 void UserMgtView::create()
 {
+  selectItem(User());
   m_lblPasswordMsg->hide();
-  User user;
-  setUser(user);
+  m_user->setFocus();
 }
 
 QString UserMgtView::getPassword() const
@@ -309,29 +240,18 @@ void UserMgtView::viewPassword(bool b)
                              : QLineEdit::EchoMode::Password);
 }
 
-void UserMgtView::itemSelected(const JItem& jItem)
-{
-  const User& user = dynamic_cast<const User&>(jItem);
-  if (user.isValidId())
-    setUser(user);
-}
-
 void UserMgtView::itemsRemoved(const QVector<qlonglong>& ids)
 {
   if (!m_bHasLoggedUserChanged)
     m_bHasLoggedUserChanged = ids.contains(m_bHasLoggedUserChanged);
-  if (ids.contains(m_currentId))
-    create();
+  JItemView::itemsRemoved(ids);
 }
 
 void UserMgtView::save()
 {
-  if (m_database->save(getUser()))
-  {
-    if (!m_bHasLoggedUserChanged)
-      m_bHasLoggedUserChanged = m_currentId == m_currentLoggedId;
-    create();
-  }
+  if (!m_bHasLoggedUserChanged)
+    m_bHasLoggedUserChanged = m_currentId == m_currentLoggedId;
+  JItemView::save();
 }
 
 bool UserMgtView::hasLoggedUserChanged() const

@@ -4,38 +4,27 @@
 #include <QFrame>
 #include "product.h"
 #include "category.h"
+#include "jitemview.h"
 
 class QLabel;
 class JLineEdit;
 class JDoubleSpinBox;
-class QPushButton;
 class QCheckBox;
 class JDatabasePicker;
-class JDatabase;
-class QTabWidget;
 
-class ProductView : public QFrame
+class ProductView : public JItemView
 {
   Q_OBJECT
 
 public:
   explicit ProductView(QWidget* parent = 0);
   ~ProductView();
-  Product getProduct() const;
-
-private slots:
-  void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
-  void save();
+  const JItem& getItem() const;
 
 public slots:
-  void setProduct(const Product& product);
   void create();
 
 private:
-  qlonglong m_currentId;
-  QPushButton* m_btnCreate;
-  QPushButton* m_btnSave;
   JLineEdit* m_edName;
   JLineEdit* m_edUnity;
   JLineEdit* m_edDetails;
@@ -46,8 +35,7 @@ private:
   QCheckBox* m_cbAvailableToSell;
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
-  JDatabase* m_database;
-  QTabWidget* m_tab;
+  void setItem(const JItem& o);
 };
 
 #endif // PRODUCTVIEW_H

@@ -17,6 +17,7 @@
 #include "reservation.h"
 #include "productbarcode.h"
 #include "discount.h"
+#include "stock.h"
 
 class UserLoginSQL
 {

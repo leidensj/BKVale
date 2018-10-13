@@ -105,7 +105,8 @@ HEADERS  += mainwindow.h \
     discounttablewidget.h \
     discountview.h \
     jtablewidgetitem.h \
-    jitemview.h
+    jitemview.h \
+    stock.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

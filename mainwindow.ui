@@ -125,12 +125,18 @@
      <addaction name="actionProductBarcodes"/>
      <addaction name="actionPrices"/>
     </widget>
+    <widget class="QMenu" name="menuEstoque">
+     <property name="title">
+      <string>Estoque</string>
+     </property>
+     <addaction name="actionStockAisles"/>
+    </widget>
     <addaction name="menuProdutos"/>
+    <addaction name="menuEstoque"/>
     <addaction name="actionPersons"/>
     <addaction name="actionCategories"/>
     <addaction name="actionImages"/>
     <addaction name="actionShoppingList"/>
-    <addaction name="actionDiscount"/>
     <addaction name="actionUsers"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
@@ -401,6 +407,15 @@
    </property>
    <property name="toolTip">
     <string>Descontos</string>
+   </property>
+  </action>
+  <action name="actionStockAisles">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/stockaisle.png</normaloff>:/icons/res/stockaisle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Setores do Estoque</string>
    </property>
   </action>
  </widget>

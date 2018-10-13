@@ -949,7 +949,7 @@ bool CategorySQL::select(Category& category,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool CategorySQL::insert(const Category& category,
+bool CategorySQL::insert(const Category& o,
                          QString& error)
 {
   error.clear();
@@ -964,21 +964,22 @@ bool CategorySQL::insert(const Category& category,
         QString("INSERT INTO " CATEGORY_SQL_TABLE_NAME " ("
                 CATEGORY_SQL_COL01 ","
                 CATEGORY_SQL_COL02 ")"
-                " VALUES (") +
-                (category.m_image.isValidId()
-                 ? "(:_v01)," : "NULL,") +
-                "(:_v02))");
-  if (category.m_image.isValidId())
-    query.bindValue(":_v01", category.m_image.m_id);
-  query.bindValue(":_v02", category.m_name);
+                " VALUES ("
+                "%1,"
+                "(:_v02))").arg(o.m_image.isValidId() ? "(:_v01)" : "NULL"));
+
+  if (o.m_image.isValidId())
+    query.bindValue(":_v01", o.m_image.m_id);
+  query.bindValue(":_v02", o.m_name);
+
   bool bSuccess = query.exec();
   if (bSuccess)
-    category.m_id = query.lastInsertId().toLongLong();
+    o.m_id = query.lastInsertId().toLongLong();
 
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool CategorySQL::update(const Category& category,
+bool CategorySQL::update(const Category& o,
                          QString& error)
 {
   error.clear();
@@ -989,31 +990,18 @@ bool CategorySQL::update(const Category& category,
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
+  query.prepare(
+        QString("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
+                CATEGORY_SQL_COL01 " = %1,"
                 CATEGORY_SQL_COL02 " = (:_v02)"
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", category.m_id);
-  query.bindValue(":_v02", category.m_name);
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    if (category.m_image.isValidId())
-    {
-      query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                    CATEGORY_SQL_COL01 " = (:_v01)"
-                    " WHERE " SQL_COLID " = (:_v00)");
-      query.bindValue(":_v01", category.m_image.m_id);
-    }
-    else
-    {
-      query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                    CATEGORY_SQL_COL01 " = NULL"
-                    " WHERE " SQL_COLID " = (:_v00)");
-    }
-    query.bindValue(":_v00", category.m_id);
-    bSuccess = query.exec();
-  }
+                " WHERE " SQL_COLID " = (:_v00)").arg(o.m_image.isValidId() ? "(:_v01)" : "NULL"));
+  query.bindValue(":_v00", o.m_id);
+  query.bindValue(":_v02", o.m_name);
 
+  if (o.m_image.isValidId())
+    query.bindValue(":_v01", o.m_image.m_id);
+
+  bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
 

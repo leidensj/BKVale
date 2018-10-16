@@ -1,5 +1,6 @@
 #include "jtablewidgetitem.h"
 #include "tinyexpr.h"
+#include "product.h"
 
 DoubleTableWidgetItem::DoubleTableWidgetItem(JItem::DataType type, Color color, bool bCheckable)
   : m_type(type)
@@ -56,4 +57,15 @@ void DoubleTableWidgetItem::evaluate()
 {
   if (!evaluate(text()))
     setValue(getValue());
+}
+
+void ProductTableWidgetItem::setItem(const JItem& o)
+{
+  m_product = o;
+  setText(m_product.m_name);
+}
+
+const JItem& ProductTableWidgetItem::getItem() const
+{
+  return m_product;
 }

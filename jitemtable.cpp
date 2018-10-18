@@ -1,5 +1,6 @@
 #include "jitemtable.h"
 #include <QTableWidget>
+#include <QKeyEvent>
 
 JTable::JTable(QWidget* parent)
  : QTableWidget(parent)
@@ -26,12 +27,13 @@ JTable::JTable(QWidget* parent)
   QObject::connect(this,
                    SIGNAL(cellDoubleClicked(int, int)),
                    this,
-                   SLOT(emitEditSignal(int, int)));
+                   SLOT(itemDoubleClicked(int, int)));
 }
 
-void JTable::removeCurrentItem()
+void JTable::removeItem()
 {
-  removeRow(currentRow());
+  if (isValidRow(currentRow()))
+    removeRow(currentRow());
 }
 
 void JTable::removeAllItems()
@@ -42,12 +44,6 @@ void JTable::removeAllItems()
 bool JTable::hasItems() const
 {
   return rowCount() != 0;
-}
-
-void JTable::addItems(const QVector<JItem>& v)
-{
-  for (int i = 0; i != v.size(); ++i)
-    addItem(v.at(i));
 }
 
 void JTable::keyPressEvent(QKeyEvent *event)
@@ -83,4 +79,9 @@ void JTable::keyPressEvent(QKeyEvent *event)
 void JTable::emitChangedSignal()
 {
   emit changedSignal();
+}
+
+bool JTable::isValidRow(int row) const
+{
+  return row >= 0 && row < rowCount();
 }

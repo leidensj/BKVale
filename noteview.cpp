@@ -195,7 +195,7 @@ NoteView::NoteView(QWidget *parent)
   frame->setLayout(vlayout1);
   frame->setFixedHeight(frame->sizeHint().height());
 
-  m_table = new NoteTableWidget();
+  m_table = new NoteTableWidget;
 
   m_edTotal = new QLineEdit();
   m_edTotal->setReadOnly(true);
@@ -214,7 +214,6 @@ NoteView::NoteView(QWidget *parent)
   m_edDisccount = new JExpLineEdit(JItem::DataType::Money);
   m_edDisccount->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
   m_edDisccount->setAlignment(Qt::AlignRight);
-  m_edDisccount->setProperty(DISCCOUNT_LAST_VALUE_PROP, 0.0);
 
   QHBoxLayout* totalLayout = new QHBoxLayout;
   totalLayout->setContentsMargins(0, 0, 0, 0);
@@ -274,19 +273,11 @@ NoteView::NoteView(QWidget *parent)
   QObject::connect(m_btnAdd,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(searchProduct()));
+                   SLOT(addProduct()));
   QObject::connect(m_btnAddBarcode,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(searchProductByBarcode()));
-  QObject::connect(m_table,
-                   SIGNAL(productSignal(const Product&)),
-                   this,
-                   SLOT(searchProduct()));
-  QObject::connect(m_table,
-                   SIGNAL(packageSignal(const Package&, const QString&)),
-                   this,
-                   SLOT(editPackage(const Package&, const QString&)));
+                   SLOT(addProductByBarcode()));
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
@@ -348,16 +339,9 @@ NoteView::~NoteView()
 
 }
 
-void NoteView::addNoteItem(const NoteItem& noteItem)
-{
-  m_table->addNoteItem(noteItem);
-  m_table->setFocus();
-  updateControls();
-}
-
 void NoteView::removeItem()
 {
-  m_table->removeCurrentItem();
+  m_table->removeItem();
   if (!m_table->hasItems())
     m_supplierPicker->setFocus();
   updateControls();
@@ -372,7 +356,8 @@ Note NoteView::getNote() const
   note.m_bCash = m_cbCash->isChecked();
   note.m_observation = m_teObservation->toPlainText();
   note.m_disccount = m_edDisccount->getValue();
-  note.m_vNoteItem = m_table->getNoteItems();
+  for (int i = 0; i != m_table->rowCount(); ++i)
+    note.m_vNoteItem.push_back(dynamic_cast<const NoteItem&>(m_table->getItem(i)));
   return note;
 }
 
@@ -384,7 +369,8 @@ void NoteView::setNote(const Note& note)
   m_dtDate->setDate(note.m_date);
   m_snNumber->setValue(note.m_number);
   m_cbCash->setChecked(note.m_bCash);
-  m_table->setNoteItems(note.m_vNoteItem);
+  for (int i = 0; i != note.m_vNoteItem.size(); ++i)
+    m_table->addItem(note.m_vNoteItem.at(i));
   m_supplierPicker->setItem(note.m_supplier);
   m_teObservation->setPlainText(note.m_observation);
   m_edDisccount->setText(note.strDisccount());
@@ -457,56 +443,14 @@ void NoteView::setToday()
   updateControls();
 }
 
-void NoteView::setProduct(const Product& product, bool bNewProduct)
+void NoteView::addProduct()
 {
-  if (bNewProduct)
-  {
-    NoteItem noteItem;
-    if (IS_VALID_ID(m_supplierPicker->getId()))
-    {
-      noteItem = NoteSQL::selectLastItem(m_supplierPicker->getId(), product.m_id);
-      noteItem.m_ammount = 0.0;
-    }
-    noteItem.m_product = product;
-    addNoteItem(noteItem);
-  }
-  else
-  {
-    m_table->setProduct(product);
-  }
+  m_table->addItemAndLoadPrices(m_supplierPicker->getId());
 }
 
-void NoteView::searchProduct()
+void NoteView::addProductByBarcode()
 {
-  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
-                        tr("Selecionar Produto"),
-                        QIcon(":/icons/res/item.png"));
-  dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_NOTE);
-  dlg.exec();
-  Product* p = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
-  if (p != nullptr && p->isValidId())
-    setProduct(*p, m_btnAdd == sender());
-}
-
-void NoteView::searchProductByBarcode()
-{
-  JDatabaseSelector dlg(PRODUCT_BARCODE_SQL_TABLE_NAME,
-                        tr("Selecionar Produto"),
-                        QIcon(":/icons/res/item.png"));
-  dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_NOTE);
-  dlg.exec();
-  ProductBarcode* p = static_cast<ProductBarcode*>(dlg.getDatabase()->getCurrentItem());
-  if (p != nullptr && p->isValidId())
-    setProduct(p->m_product, true);
-}
-
-void NoteView::editPackage(const Package& package, const QString& productUnity)
-{
-  PackageEditor dlg(package, productUnity);
-  if (dlg.exec())
-  {
-    m_table->setPackage(dlg.getPackage());
-  }
+  m_table->addItemAndLoadPricesByBarcode(m_supplierPicker->getId());
 }
 
 void NoteView::showSearch()

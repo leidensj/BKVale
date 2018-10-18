@@ -1,44 +1,31 @@
 #ifndef NOTETABLEWIDGET_H
 #define NOTETABLEWIDGET_H
 
-#include <QTableWidget>
+#include "jitemtable.h"
 #include "note.h"
 
-class QKeyEvent;
-
-class NoteTableWidget : public QTableWidget
+class NoteTableWidget : public JTable
 {
   Q_OBJECT
 
 public:
-  explicit NoteTableWidget(QWidget* parent = 0);
-  QVector<NoteItem> getNoteItems() const;
-  void setNoteItems(const QVector<NoteItem>& vNoteItem);
-  void setProduct(const Product& product);
-  void setPackage(const Package& package);
-  void setNoteItem(const NoteItem& noteItem);
-  void addNoteItem(const NoteItem& noteItem);
+  explicit NoteTableWidget(QWidget* parent = nullptr);
+  const JItem& getItem(int row) const;
+
+public slots:
+  void addItem(const JItem& o);
+  void addItemAndLoadPrices(qlonglong supplierId);
+  void addItemAndLoadPricesByBarcode(qlonglong supplierId);
   double computeTotal() const;
 
-
-
-protected:
-  void keyPressEvent(QKeyEvent *event);
-
 private:
+  mutable NoteItem m_ref;
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
 
-private slots:
+protected slots:
   void update(int row, int column);
-  void emitChangedSignal();
-  void emitEditSignal(int row, int column);
-
-signals:
-  void changedSignal();
-  void packageSignal(const Package& package,
-                     const QString& productUnity);
-  void productSignal(const Product& product);
+  void itemDoubleClicked(int row, int column);
 };
 
 #endif // NOTETABLEWIDGET_H

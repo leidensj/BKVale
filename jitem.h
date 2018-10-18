@@ -2,7 +2,6 @@
 #define JITEM_H
 
 #include "defines.h"
-#include <QVector>
 #include <QRegExp>
 
 struct JItem

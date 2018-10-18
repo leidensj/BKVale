@@ -60,11 +60,8 @@ private slots:
   void lastItemSelected();
   void itemSelected(const JItem& jItem);
   void itemsRemoved(const QVector<qlonglong>& ids);
-  void setProduct(const Product& product, bool bNewProduct);
-  void searchProduct();
-  void searchProductByBarcode();
-  void editPackage(const Package& package,
-                   const QString& productUnity);
+  void addProduct();
+  void addProductByBarcode();
 
 public slots:
   void create();

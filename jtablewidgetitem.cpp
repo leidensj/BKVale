@@ -1,6 +1,10 @@
 #include "jtablewidgetitem.h"
+#include "jdatabase.h"
 #include "tinyexpr.h"
 #include "product.h"
+#include "productbarcode.h"
+#include "packageeditor.h"
+#include <QObject>
 
 DoubleTableWidgetItem::DoubleTableWidgetItem(JItem::DataType type, Color color, bool bCheckable)
   : m_type(type)
@@ -59,9 +63,26 @@ void DoubleTableWidgetItem::evaluate()
     setValue(getValue());
 }
 
+PackageTableWidgetItem::PackageTableWidgetItem()
+  : QTableWidgetItem()
+{
+  setFlags(Qt::NoItemFlags |
+           Qt::ItemIsSelectable |
+           Qt::ItemIsEnabled);
+}
+
+JItemTableWidgetItem::JItemTableWidgetItem()
+  : QTableWidgetItem()
+{
+  setTextColor(QColor(Qt::darkGray));
+  setFlags(Qt::NoItemFlags |
+           Qt::ItemIsSelectable |
+           Qt::ItemIsEnabled);
+}
+
 void ProductTableWidgetItem::setItem(const JItem& o)
 {
-  m_product = o;
+  m_product = dynamic_cast<const Product&>(o);
   setText(m_product.m_name);
 }
 
@@ -69,3 +90,50 @@ const JItem& ProductTableWidgetItem::getItem() const
 {
   return m_product;
 }
+
+void ProductTableWidgetItem::selectItem(const QString& fixedFilter)
+{
+  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
+                        QObject::tr("Selecionar Produto"),
+                        QIcon(":/icons/res/item.png"));
+  dlg.getDatabase()->setFixedFilter(fixedFilter);
+  if (dlg.exec())
+  {
+    Product* p = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
+    if (p != nullptr && p->isValidId())
+      setItem(*p);
+  }
+}
+
+void ProductTableWidgetItem::selectItemByBarcode(const QString& fixedFilter)
+{
+  JDatabaseSelector dlg(PRODUCT_BARCODE_SQL_TABLE_NAME,
+                        QObject::tr("Selecionar Produto"),
+                        QIcon(":/icons/res/item.png"));
+  dlg.getDatabase()->setFixedFilter(fixedFilter);
+  if (dlg.exec())
+  {
+    ProductBarcode* p = static_cast<ProductBarcode*>(dlg.getDatabase()->getCurrentItem());
+    if (p != nullptr && p->isValidId())
+      setItem(p->m_product);
+  }
+}
+
+void PackageTableWidgetItem::setItem(const Package& o, const QString& productUnity)
+{
+  m_package = o;
+  setText(m_package.strFormattedUnity(productUnity));
+}
+
+const Package& PackageTableWidgetItem::getItem() const
+{
+  return m_package;
+}
+
+void PackageTableWidgetItem::selectItem(const QString& productUnity)
+{
+  PackageEditor dlg(getItem(), productUnity);
+  if (dlg.exec())
+    setItem(dlg.getPackage(), productUnity);
+}
+

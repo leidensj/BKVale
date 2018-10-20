@@ -12,12 +12,6 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
   headers << "Quantidade" << "Unidade" << "Produto" << "Preço" << "Subtotal";
   setHorizontalHeaderLabels(headers);
 
-
-  setSelectionBehavior(QAbstractItemView::SelectItems);
-  setSelectionMode(QAbstractItemView::SingleSelection);
-  horizontalHeader()->setHighlightSections(false);
-  verticalHeader()->setHighlightSections(false);
-  verticalHeader()->setSectionsMovable(true);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Description, QHeaderView::Stretch);
@@ -69,14 +63,21 @@ void NoteTableWidget::addItemAndLoadPrices(qlonglong supplierId)
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
   ptProductCell->selectItem(PRODUCT_FILTER_NOTE);
-  auto product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  NoteItem noteItem;
-  if (IS_VALID_ID(supplierId))
-    noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
-  auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
-  ptPriceCell->setValue(noteItem.m_price);
-  auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)NoteColumn::Unity));
-  ptPackageCell->setItem(noteItem.m_package, product.m_unity);
+  const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
+  if (product.isValidId())
+  {
+    NoteItem noteItem;
+    if (IS_VALID_ID(supplierId))
+      noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
+    auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
+    ptPriceCell->setValue(noteItem.m_price);
+    auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)NoteColumn::Unity));
+    ptPackageCell->setItem(noteItem.m_package, product.m_unity);
+  }
+  else
+    removeItem();
+
+  setFocus();
 }
 
 void NoteTableWidget::addItemAndLoadPricesByBarcode(qlonglong supplierId)
@@ -85,19 +86,26 @@ void NoteTableWidget::addItemAndLoadPricesByBarcode(qlonglong supplierId)
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
   ptProductCell->selectItemByBarcode(PRODUCT_FILTER_NOTE);
-  NoteItem noteItem;
-  auto product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  if (IS_VALID_ID(supplierId))
-    noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
-  auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
-  ptPriceCell->setValue(noteItem.m_price);
-  auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)NoteColumn::Unity));
-  ptPackageCell->setItem(noteItem.m_package, product.m_unity);
+  const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
+  if (product.isValidId())
+  {
+    NoteItem noteItem;
+    if (IS_VALID_ID(supplierId))
+      noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
+    auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
+    ptPriceCell->setValue(noteItem.m_price);
+    auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)NoteColumn::Unity));
+    ptPackageCell->setItem(noteItem.m_package, product.m_unity);
+  }
+  else
+    removeItem();
+
+  setFocus();
 }
 
 void NoteTableWidget::addItem(const JItem& o)
 {
-  auto _o = dynamic_cast<const NoteItem&>(o);
+  const NoteItem& _o = dynamic_cast<const NoteItem&>(o);
 
   blockSignals(true);
 
@@ -119,6 +127,7 @@ void NoteTableWidget::addItem(const JItem& o)
   ((ProductTableWidgetItem*)item(row, (int)NoteColumn::Description))->setItem(_o.m_product);
   ((PackageTableWidgetItem*)item(row, (int)NoteColumn::Unity))->setItem(_o.m_package, _o.m_product.m_unity);
 
+  setCurrentCell(row, (int)NoteColumn::Ammount);
   blockSignals(false);
 }
 

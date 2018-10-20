@@ -72,16 +72,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
                                          tr("Fornecedor"),
-                                         QIcon(":/icons/res/supplier.png"),
-                                         true,
-                                         true,
-                                         false);
+                                         QIcon(":/icons/res/supplier.png"));
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      true,
-                                      true,
-                                      false);
+                                      QIcon(":/icons/res/icon.png"));
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
 
@@ -141,8 +135,8 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   QFormLayout* viewFormLayout = new QFormLayout;
   viewFormLayout->addRow(tr("Título:"), m_edTitle);
-  viewFormLayout->addWidget(m_supplierPicker);
-  viewFormLayout->addWidget(m_imagePicker);
+  viewFormLayout->addRow(m_supplierPicker->m_text + ":", m_supplierPicker);
+  viewFormLayout->addRow(m_imagePicker->m_text + ":", m_imagePicker);
   viewFormLayout->addRow(tr("Linhas:"), m_snLines);
   viewFormLayout->addRow(tr("Descrição:"), m_teDescription);
 
@@ -191,15 +185,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    this,
                    SLOT(removeItem()));
   QObject::connect(m_table,
-                   SIGNAL(productSignal(const Product&)),
-                   this,
-                   SLOT(editProduct()));
-  QObject::connect(m_table,
-                   SIGNAL(packageSignal(const Package&,
-                                        const QString&)),
-                   this,
-                   SLOT(editPackage(const Package&, const QString&)));
-  QObject::connect(m_table,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
@@ -209,47 +194,15 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
 void ShoppingListView::addItem()
 {
-  JDatabaseSelector w(PRODUCT_SQL_TABLE_NAME, tr("Produto"), QIcon(":/icons/res/item.png"), this);
-  w.getDatabase()->setFixedFilter(PRODUCT_FILTER_SHOP);
-  if (w.exec())
-  {
-    Product* p = static_cast<Product*>(w.getDatabase()->getCurrentItem());
-    if (p != nullptr && p->isValidId())
-    {
-      ShoppingListItem o;
-      o.m_product = *p;
-      m_table->addShoppingItem(o);
-    }
-  }
+  m_table->addItem();
+  updateControls();
+  m_table->setFocus();
 }
 
 void ShoppingListView::removeItem()
 {
-  m_table->removeCurrentItem();
+  m_table->removeItem();
   updateControls();
-}
-
-void ShoppingListView::editProduct()
-{
-  JDatabaseSelector w(PRODUCT_SQL_TABLE_NAME, tr("Produto"), QIcon(":/icons/res/item.png"), this);
-  w.getDatabase()->setFixedFilter(PRODUCT_FILTER_SHOP);
-  if (w.exec())
-  {
-    Product* p = static_cast<Product*>(w.getDatabase()->getCurrentItem());
-    if (p != nullptr)
-    {
-      Product o = *p;
-      m_table->setProduct(o);
-    }
-  }
-}
-
-void ShoppingListView::editPackage(const Package& package,
-                                   const QString& productUnity)
-{
-  PackageEditor dlg(package, productUnity);
-  if (dlg.exec())
-    m_table->setPackage(dlg.getPackage());
 }
 
 void ShoppingListView::updateControls()
@@ -279,13 +232,15 @@ void ShoppingListView::setItem(const JItem& o)
     m_vbtnWeek[i]->setChecked(_o.m_weekDays[i]);
   for (int i = 0; i != 31; ++i)
     m_vbtnMonth[i]->setChecked(_o.m_monthDays[i]);
-  m_table->setShoppingItems(_o.m_vItem);
+  for (int i = 0; i != _o.m_vItem.size(); ++i)
+    m_table->addItem(_o.m_vItem.at(i));
   updateControls();
 }
 
 const JItem& ShoppingListView::getItem() const
 {
   static ShoppingList o;
+  o.clear();
   o.m_id = m_currentId;
   o.m_title = m_edTitle->text();
   o.m_description = m_teDescription->toPlainText();
@@ -296,6 +251,7 @@ const JItem& ShoppingListView::getItem() const
     o.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
   for (int i = 0; i != 31; ++i)
     o.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
-  o.m_vItem = m_table->getShoppingItems();
+  for (int i = 0; i != m_table->rowCount(); ++i)
+    o.m_vItem.push_back(dynamic_cast<const ShoppingListItem&>(m_table->getItem(i)));
   return o;
 }

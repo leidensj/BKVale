@@ -27,9 +27,6 @@ public slots:
 private slots:
   void addItem();
   void removeItem();
-  void editProduct();
-  void editPackage(const Package& package,
-                   const QString& productUnity);
   void updateControls();
 
 private:

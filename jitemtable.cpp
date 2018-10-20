@@ -14,6 +14,12 @@ JTable::JTable(QWidget* parent)
   f.setCapitalization(QFont::Capitalize);
   horizontalHeader()->setFont(f);
 
+  setSelectionBehavior(QAbstractItemView::SelectItems);
+  setSelectionMode(QAbstractItemView::SingleSelection);
+  horizontalHeader()->setHighlightSections(false);
+  verticalHeader()->setSectionsMovable(true);
+  verticalHeader()->setHighlightSections(false);
+
   QObject::connect(this,
                    SIGNAL(cellChanged(int, int)),
                    this,

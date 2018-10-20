@@ -1198,21 +1198,21 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
   }
   else if (m_tableName == PERSON_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const Person&>(jItem);
+    const Person& o = dynamic_cast<const Person&>(jItem);
     bSuccess = o.isValidId()
                ? PersonSQL::update(o, error)
                : PersonSQL::insert(o, error);
   }
   else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const Category&>(jItem);
+    const Category& o = dynamic_cast<const Category&>(jItem);
     bSuccess = o.isValidId()
                ? CategorySQL::update(o, error)
                : CategorySQL::insert(o, error);
   }
   else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const Product&>(jItem);
+    const Product& o = dynamic_cast<const Product&>(jItem);
     bSuccess = o.isValidId()
                ? ProductSQL::update(o, error)
                : ProductSQL::insert(o, error);
@@ -1228,55 +1228,56 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
       return false;
     }
 
-    auto o = dynamic_cast<const Note&>(jItem);
+    const Note& o = dynamic_cast<const Note&>(jItem);
     bSuccess = o.isValidId()
                ? NoteSQL::update(o, error)
                : NoteSQL::insert(o, error);
   }
   else if (m_tableName == USER_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const User&>(jItem);
+    const User& o = dynamic_cast<const User&>(jItem);
     bSuccess = o.isValidId()
                ? UserSQL::update(o, error)
                : UserSQL::insert(o, error);
   }
   else if (m_tableName == REMINDER_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const Reminder&>(jItem);
+    const Reminder& o = dynamic_cast<const Reminder&>(jItem);
     bSuccess = o.isValidId()
                ? ReminderSQL::update(o, error)
                : ReminderSQL::insert(o, error);
   }
   else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const ShoppingList&>(jItem);
+    const ShoppingList& o = dynamic_cast<const ShoppingList&>(jItem);
     bSuccess = o.isValidId()
                ? ShoppingListSQL::update(o, error)
                : ShoppingListSQL::insert(o, error);
   }
   else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const Reservation&>(jItem);
+    const Reservation& o = dynamic_cast<const Reservation&>(jItem);
     bSuccess = o.isValidId()
                ? ReservationSQL::update(o, error)
                : ReservationSQL::insert(o, error);
   }
   else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const ProductBarcode&>(jItem);
+    const ProductBarcode& o = dynamic_cast<const ProductBarcode&>(jItem);
     bSuccess = o.isValidId()
                ? ProductBarcodeSQL::update(o, error)
                : ProductBarcodeSQL::insert(o, error);
   }
   else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
   {
-    auto o = dynamic_cast<const Discount&>(jItem);
+    const Discount& o = dynamic_cast<const Discount&>(jItem);
     bSuccess = o.isValidId()
                ? DiscountSQL::update(o, error)
                : DiscountSQL::insert(o, error);
   }
   else
     error = tr("Item ainda não implementado.");
+
 
   if (bSuccess)
     refresh();

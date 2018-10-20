@@ -51,7 +51,8 @@ SOURCES += main.cpp\
     discountview.cpp \
     jtablewidgetitem.cpp \
     jitemview.cpp \
-    jitemtable.cpp
+    jitemtable.cpp \
+    phonetablewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -108,7 +109,8 @@ HEADERS  += mainwindow.h \
     jtablewidgetitem.h \
     jitemview.h \
     stock.h \
-    jitemtable.h
+    jitemtable.h \
+    phonetablewidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

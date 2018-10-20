@@ -5,6 +5,7 @@
 #include "productbarcode.h"
 #include "packageeditor.h"
 #include <QObject>
+#include <QPixmap>
 
 DoubleTableWidgetItem::DoubleTableWidgetItem(JItem::DataType type, Color color, bool bCheckable)
   : m_type(type)
@@ -12,7 +13,11 @@ DoubleTableWidgetItem::DoubleTableWidgetItem(JItem::DataType type, Color color, 
   , m_bCheckable(bCheckable)
 {
   if (m_bCheckable)
-    setFlags(flags() | Qt::ItemIsUserCheckable);
+    setFlags(Qt::NoItemFlags |
+             Qt::ItemIsSelectable |
+             Qt::ItemIsEnabled |
+             Qt::ItemIsEditable |
+             Qt::ItemIsUserCheckable);
 }
 
 void DoubleTableWidgetItem::setValue(double val)
@@ -66,6 +71,7 @@ void DoubleTableWidgetItem::evaluate()
 PackageTableWidgetItem::PackageTableWidgetItem()
   : QTableWidgetItem()
 {
+  setTextColor(QColor(Qt::darkGray));
   setFlags(Qt::NoItemFlags |
            Qt::ItemIsSelectable |
            Qt::ItemIsEnabled);
@@ -84,6 +90,10 @@ void ProductTableWidgetItem::setItem(const JItem& o)
 {
   m_product = dynamic_cast<const Product&>(o);
   setText(m_product.m_name);
+
+  QPixmap pixmap(QSize(16, 16));
+  pixmap.loadFromData(m_product.m_image.m_image);
+  setIcon(QIcon(pixmap));
 }
 
 const JItem& ProductTableWidgetItem::getItem() const

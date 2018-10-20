@@ -17,9 +17,7 @@ CategoryView::CategoryView(QWidget* parent)
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"),
-                                      true,
-                                      true,
-                                      false);
+                                      JDatabasePicker::Flags::TextGroup);
 
   QFormLayout* namelayout = new QFormLayout;
   namelayout->setContentsMargins(0, 0, 0, 0);

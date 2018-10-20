@@ -16,9 +16,7 @@ ProductBarcodeView::ProductBarcodeView(QWidget* parent)
   m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME,
                                          tr("Produto"),
                                          QIcon(":/icons/res/item.png"),
-                                         true,
-                                         false,
-                                         false);
+                                         JDatabasePicker::Flags::TextGroup);
 
   m_edCode = new JLineEdit(JLineEdit::Input::All,
                            JLineEdit::st_defaultFlags1);

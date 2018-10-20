@@ -20,12 +20,19 @@ class JDatabasePicker : public QFrame
   Q_OBJECT
 
 public:
+
+  enum Flags
+  {
+    TextPlaceholder = 0x1,
+    TextGroup = 0x2,
+    Multipicker = 0x4,
+    HideImage = 0x8
+  };
+
   explicit JDatabasePicker(const QString& tableName,
                            const QString& text,
                            const QIcon& icon,
-                           bool bShowImage,
-                           bool bDisplayGroup,
-                           bool bMultipicker,
+                           int flags = 0,
                            QWidget* parent = nullptr);
 
   qlonglong getId() const;
@@ -50,7 +57,7 @@ signals:
   void changedSignal();
 
 private:
-  bool m_bMultipicker;
+  int m_flags;
   JDatabaseSelector* m_selector;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;

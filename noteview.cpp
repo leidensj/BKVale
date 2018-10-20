@@ -181,9 +181,7 @@ NoteView::NoteView(QWidget *parent)
   m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
                                          tr("Fornecedor"),
                                          QIcon(":/icons/res/supplier.png"),
-                                         true,
-                                         false,
-                                         false);
+                                         JDatabasePicker::Flags::TextPlaceholder);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->addLayout(hlayout2);

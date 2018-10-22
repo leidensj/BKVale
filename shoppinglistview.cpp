@@ -188,6 +188,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
+  QObject::connect(m_supplierPicker,
+                   SIGNAL(changedSignal()),
+                   this,
+                   SLOT(updateControls()));
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 }
@@ -209,6 +213,7 @@ void ShoppingListView::updateControls()
 {
   m_btnAdd->setEnabled(m_table->rowCount() < SHOPPING_LIST_MAX_NUMBER_OF_ITEMS);
   m_btnRemove->setEnabled(m_table->currentRow() != -1);
+  m_table->showSupplierColumn(IS_VALID_ID(m_supplierPicker->getId()));
 }
 
 void ShoppingListView::create()
@@ -232,6 +237,7 @@ void ShoppingListView::setItem(const JItem& o)
     m_vbtnWeek[i]->setChecked(_o.m_weekDays[i]);
   for (int i = 0; i != 31; ++i)
     m_vbtnMonth[i]->setChecked(_o.m_monthDays[i]);
+  m_table->removeAllItems();
   for (int i = 0; i != _o.m_vItem.size(); ++i)
     m_table->addItem(_o.m_vItem.at(i));
   updateControls();

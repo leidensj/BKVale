@@ -67,6 +67,12 @@ void JTable::keyPressEvent(QKeyEvent *event)
                        event->count());
     QTableWidget::keyPressEvent(&modEvent);
   }
+  else if (event->key() == Qt::Key_Delete)
+  {
+    if (currentIndex().isValid())
+      emit deletePressedSignal(currentIndex().row(), currentIndex().column());
+    QTableWidget::keyPressEvent(event);
+  }
   else
   {
     QKeyEvent modEvent(event->type(),
@@ -80,6 +86,7 @@ void JTable::keyPressEvent(QKeyEvent *event)
                        event->count());
     QTableWidget::keyPressEvent(&modEvent);
   }
+
 }
 
 void JTable::emitChangedSignal()

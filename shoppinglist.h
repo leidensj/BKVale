@@ -18,7 +18,8 @@ enum class ShoppingListColumn : int
   Unity,
   Description,
   Ammount,
-  Price
+  Price,
+  Supplier
 };
 
 struct ShoppingListItem : JItem

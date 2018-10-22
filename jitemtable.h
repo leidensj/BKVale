@@ -33,6 +33,7 @@ protected:
 
 signals:
   void changedSignal();
+  void deletePressedSignal(int row, int column);
 };
 
 #endif // JITEMTABLE_H

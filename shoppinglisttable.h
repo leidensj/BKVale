@@ -16,10 +16,12 @@ public:
 public slots:
   void addItem(const JItem& o);
   void addItem();
+  void showSupplierColumn(bool b);
 
 protected slots:
   void update(int row, int column);
   void itemDoubleClicked(int row, int column);
+  void deletePressed(int row, int column);
 
 private:
   mutable ShoppingListItem m_ref;

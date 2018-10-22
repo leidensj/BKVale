@@ -147,3 +147,31 @@ void PackageTableWidgetItem::selectItem(const QString& productUnity)
     setItem(dlg.getPackage(), productUnity);
 }
 
+void PersonTableWidgetItem::setItem(const JItem& o)
+{
+  m_person = dynamic_cast<const Person&>(o);
+  setText(m_person.strAliasName());
+
+  QPixmap pixmap(QSize(16, 16));
+  pixmap.loadFromData(m_person.m_image.m_image);
+  setIcon(QIcon(pixmap));
+}
+
+const JItem& PersonTableWidgetItem::getItem() const
+{
+  return m_person;
+}
+
+void PersonTableWidgetItem::selectItem(const QString& fixedFilter)
+{
+  JDatabaseSelector dlg(PERSON_SQL_TABLE_NAME,
+                        QObject::tr("Selecionar Pessoa"),
+                        QIcon(":/icons/res/person.png"));
+  dlg.getDatabase()->setFixedFilter(fixedFilter);
+  if (dlg.exec())
+  {
+    Person* p = static_cast<Person*>(dlg.getDatabase()->getCurrentItem());
+    if (p != nullptr && p->isValidId())
+      setItem(*p);
+  }
+}

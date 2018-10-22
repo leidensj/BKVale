@@ -9,13 +9,19 @@ ShoppingListTable::ShoppingListTable(QWidget* parent)
 {
   setColumnCount(SHOPPING_LIST_NUMBER_OF_COLUMNS);
   QStringList headers;
-  headers << "Unidade" << "Descrição" << "Quantidade" << "Preço";
+  headers << "Unidade" << "Produto" << "Quantidade" << "Preço" << "Fornecedor";
   setHorizontalHeaderLabels(headers);
 
+  setSortingEnabled(true);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Description, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Price, QHeaderView::ResizeToContents);
+
+  QObject::connect(this,
+                   SIGNAL(deletePressedSignal(int,int)),
+                   this,
+                   SLOT(deletePressed(int,int)));
 }
 
 const JItem& ShoppingListTable::getItem(int row) const
@@ -47,6 +53,8 @@ void ShoppingListTable::addItem(const JItem& o)
   setItem(row, (int)ShoppingListColumn::Price, new DoubleTableWidgetItem(JItem::DataType::Money,
                                                                          DoubleTableWidgetItem::Color::None,
                                                                          true));
+  setItem(row, (int)ShoppingListColumn::Supplier, new PersonTableWidgetItem);
+
   setCurrentCell(row, (int)ShoppingListColumn::Ammount);
 
   const ShoppingListItem& _o = dynamic_cast<const ShoppingListItem&>(o);
@@ -104,4 +112,24 @@ void ShoppingListTable::itemDoubleClicked(int row, int column)
     auto ptPackage = (PackageTableWidgetItem*)item(row, column);
     ptPackage->selectItem(dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
   }
+  else if (column == (int)ShoppingListColumn::Supplier)
+  {
+    auto ptSupplier = (PersonTableWidgetItem*)item(row, column);
+    ptSupplier->selectItem(PERSON_FILTER_SUPPLIER);
+  }
+}
+
+void ShoppingListTable::deletePressed(int row, int column)
+{
+  if (column == (int)ShoppingListColumn::Supplier)
+  {
+    auto ptSupplier = (PersonTableWidgetItem*)item(row, column);
+    ptSupplier->setItem(Person());
+  }
+}
+
+void ShoppingListTable::showSupplierColumn(bool b)
+{
+  b ? showColumn((int)ShoppingListColumn::Supplier)
+    : hideColumn((int)ShoppingListColumn::Supplier);
 }

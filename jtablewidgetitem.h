@@ -4,6 +4,7 @@
 #include <QTableWidgetItem>
 #include <jitem.h>
 #include "product.h"
+#include "person.h"
 
 class DoubleTableWidgetItem : public QTableWidgetItem
 {
@@ -57,6 +58,17 @@ public:
 
 private:
   Product m_product;
+};
+
+class PersonTableWidgetItem : public JItemTableWidgetItem
+{
+public:
+  void setItem(const JItem& o);
+  const JItem& getItem() const;
+  void selectItem(const QString& fixedFilter);
+
+private:
+  Person m_person;
 };
 
 #endif // JTABLEWIDGETITEM_H

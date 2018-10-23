@@ -37,6 +37,7 @@ public:
 
   qlonglong getId() const;
   QVector<qlonglong> getIds() const;
+  bool isValidId() const;
 
   const QString m_text;
 

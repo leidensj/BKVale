@@ -213,7 +213,7 @@ void ShoppingListView::updateControls()
 {
   m_btnAdd->setEnabled(m_table->rowCount() < SHOPPING_LIST_MAX_NUMBER_OF_ITEMS);
   m_btnRemove->setEnabled(m_table->currentRow() != -1);
-  m_table->showSupplierColumn(IS_VALID_ID(m_supplierPicker->getId()));
+  m_table->showSupplierColumn(m_supplierPicker->isValidId());
 }
 
 void ShoppingListView::create()

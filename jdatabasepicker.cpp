@@ -250,6 +250,11 @@ qlonglong JDatabasePicker::getId() const
   return m_flags & Flags::Multipicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong();
 }
 
+bool JDatabasePicker::isValidId() const
+{
+  return getId() != INVALID_ID;
+}
+
 QVector<qlonglong> JDatabasePicker::getIds() const
 {
   QVector<qlonglong> v;

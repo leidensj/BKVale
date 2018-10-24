@@ -68,7 +68,7 @@ QString NoteFilterDlg::getFilter() const
                  m_dtBegin->date().toString(Qt::ISODate) + "' AND '" +
                  m_dtEnd->date().toString(Qt::ISODate) + "' ";
 
-  QVector<qlonglong> vSupplier = m_supplierPicker->getIds();
+  QVector<Id> vSupplier = m_supplierPicker->getIds();
 
   if (!vSupplier.isEmpty())
   {
@@ -76,12 +76,12 @@ QString NoteFilterDlg::getFilter() const
       strFilter += " AND ";
     strFilter += " " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 " IN (";
     for (int i = 0; i != vSupplier.size(); ++i)
-      strFilter += QString::number(vSupplier.at(i)) + ",";
+      strFilter += vSupplier.at(i).str() + ",";
     strFilter.chop(1);
     strFilter += ") ";
   }
 
-  QVector<qlonglong> vProduct = m_productPicker->getIds();
+  QVector<Id> vProduct = m_productPicker->getIds();
 
   if (!vProduct.isEmpty())
   {
@@ -92,7 +92,7 @@ QString NoteFilterDlg::getFilter() const
                  NOTE_ITEMS_SQL_TABLE_NAME " WHERE "
                  NOTE_ITEMS_SQL_COL02 " IN (";
     for (int i = 0; i != vProduct.size(); ++i)
-      strFilter += QString::number(vProduct.at(i)) + ",";
+      strFilter += vProduct.at(i).str() + ",";
     strFilter.chop(1);
     strFilter += ")) ";
   }

@@ -15,7 +15,7 @@ struct Phone : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_countryCode = PHONE_DEFAULT_COUNTRY_CODE_VALUE;
     m_code = PHONE_DEFAULT_CODE_VALUE;
     m_number.clear();

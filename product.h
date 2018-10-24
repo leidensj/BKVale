@@ -66,7 +66,7 @@ struct Product : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_category.clear();
     m_image.clear();
     m_name.clear();

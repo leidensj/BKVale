@@ -30,7 +30,7 @@ struct Reminder : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_title.clear();
     m_message.clear();
     m_bFavorite = false;

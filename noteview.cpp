@@ -27,8 +27,6 @@
 
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
-  , m_currentId(INVALID_ID)
-  , m_lastId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnOpenLast(nullptr)
   , m_btnSearch(nullptr)
@@ -261,9 +259,9 @@ NoteView::NoteView(QWidget *parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
+                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
+                   SLOT(itemsRemoved(const QVector<Id>&)));
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
                    this,
@@ -384,14 +382,14 @@ void NoteView::create()
 
 void NoteView::supplierChanged()
 {
-  if (IS_VALID_ID(m_supplierPicker->getId()))
+  if (m_supplierPicker->getId().isValid())
   {
     if (m_table->hasItems())
     {
       m_table->setCurrentCell(0, 0);
       m_table->setFocus();
     }
-    else if (!IS_VALID_ID(m_currentId))
+    else if (!m_currentId.isValid())
       m_btnAdd->click();
   }
   updateControls();
@@ -400,7 +398,7 @@ void NoteView::supplierChanged()
 void NoteView::updateControls()
 {
   m_btnRemove->setEnabled(m_table->currentRow() >= 0);
-  m_btnOpenLast->setEnabled(IS_VALID_ID(m_lastId));
+  m_btnOpenLast->setEnabled(m_lastId.isValid());
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
                             ? ":/icons/res/calendarok.png"
                             : ":/icons/res/calendarwarning.png"));
@@ -429,8 +427,8 @@ void NoteView::checkDate()
   fmt.setFontOverline(true);
   m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
-  bool bIsEditMode = IS_VALID_ID(m_currentId);
-  bool bIsDirty = IS_VALID_ID(m_supplierPicker->getId()) || m_table->hasItems();
+  bool bIsEditMode = m_currentId.isValid();
+  bool bIsDirty = m_supplierPicker->getId().isValid() || m_table->hasItems();
   if (!bIsEditMode && !bIsDirty)
     setToday();
 }
@@ -479,7 +477,7 @@ Note NoteView::save(Person& employee)
 
 void NoteView::lastItemSelected()
 {
-  if (m_lastId != INVALID_ID)
+  if (m_lastId.isValid())
   m_database->selectItem(m_lastId);
 }
 
@@ -490,10 +488,10 @@ void NoteView::itemSelected(const JItem& jItem)
   setNote(note);
 }
 
-void NoteView::itemsRemoved(const QVector<qlonglong>& ids)
+void NoteView::itemsRemoved(const QVector<Id>& ids)
 {
   if (ids.contains(m_lastId))
-    m_lastId = INVALID_ID;
+    m_lastId.clear();
   if (ids.contains(m_currentId))
     create();
 }

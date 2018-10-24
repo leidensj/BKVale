@@ -91,7 +91,7 @@ namespace
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
-               (note.m_supplier.isValidId()
+               (note.m_supplier.m_id.isValid()
                ? (note.m_supplier.m_alias.isEmpty()
                ? note.m_supplier.m_name
                : note.m_supplier.m_alias)
@@ -148,10 +148,8 @@ namespace
                  "________________________________"
                  ESC_LF
                  "Assinatura " +
-                 (note.m_supplier.isValidId()
-                  ? (note.m_supplier.m_alias.isEmpty()
-                     ? note.m_supplier.m_name
-                     : note.m_supplier.m_alias)
+                 (note.m_supplier.m_id.isValid()
+                  ? (note.m_supplier.strAliasName())
                   : "fornecedor") +
                  ESC_LF;
     }
@@ -349,7 +347,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
            lst.m_description +
            ESC_LF;
 
-  if (lst.m_supplier.isValidId())
+  if (lst.m_supplier.m_id.isValid())
   {
     str += ESC_VERT_TAB
            ESC_ALIGN_CENTER

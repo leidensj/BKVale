@@ -31,8 +31,8 @@ public:
   void addNoteItem(const NoteItem& noteItem);
 
 private:
-  qlonglong m_currentId;
-  qlonglong m_lastId;
+  Id m_currentId;
+  Id m_lastId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnSearch;
@@ -59,7 +59,7 @@ private slots:
   void showSearch();
   void lastItemSelected();
   void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
+  void itemsRemoved(const QVector<Id>& ids);
   void addProduct();
   void addProductByBarcode();
 

@@ -11,7 +11,7 @@ struct ProductBarcode : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_product.clear();
     m_code.clear();
   }
@@ -36,7 +36,7 @@ struct ProductBarcode : public JItem
 
   bool isValid() const
   {
-    return m_product.isValidId() && !m_code.isEmpty();
+    return m_product.m_id.isValid() && !m_code.isEmpty();
   }
 };
 

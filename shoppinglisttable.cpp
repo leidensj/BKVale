@@ -12,7 +12,6 @@ ShoppingListTable::ShoppingListTable(QWidget* parent)
   headers << "Unidade" << "Produto" << "Quantidade" << "Preço" << "Fornecedor";
   setHorizontalHeaderLabels(headers);
 
-  setSortingEnabled(true);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Description, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Ammount, QHeaderView::ResizeToContents);
@@ -71,10 +70,10 @@ void ShoppingListTable::addItem(const JItem& o)
 void ShoppingListTable::addItem()
 {
   addItem(ShoppingListItem());
-  itemDoubleClicked(rowCount() - 1, (int)ShoppingListColumn::Description);
+  itemActivate(rowCount() - 1, (int)ShoppingListColumn::Description);
   auto ptProductCell = (ProductTableWidgetItem*)item(rowCount() - 1, (int)ShoppingListColumn::Description);
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  if (!product.isValidId())
+  if (!product.m_id.isValid())
     removeItem();
 }
 
@@ -97,7 +96,7 @@ void ShoppingListTable::update(int row, int column)
   emitChangedSignal();
 }
 
-void ShoppingListTable::itemDoubleClicked(int row, int column)
+void ShoppingListTable::itemActivate(int row, int column)
 {
   if (column == (int)ShoppingListColumn::Description)
   {
@@ -119,7 +118,7 @@ void ShoppingListTable::itemDoubleClicked(int row, int column)
   }
 }
 
-void ShoppingListTable::deletePressed(int row, int column)
+void ShoppingListTable::itemDelete(int row, int column)
 {
   if (column == (int)ShoppingListColumn::Supplier)
   {

@@ -24,7 +24,6 @@
 
 DiscountView::DiscountView(QWidget* parent)
   : QFrame(parent)
-  , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnSearch(nullptr)
   , m_btnRedeem(nullptr)
@@ -197,9 +196,9 @@ DiscountView::DiscountView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
+                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
+                   SLOT(itemsRemoved(const QVector<Id>&)));
   QObject::connect(m_rdValue,
                    SIGNAL(clicked(bool)),
                    this,
@@ -242,11 +241,11 @@ DiscountView::DiscountView(QWidget* parent)
 void DiscountView::itemSelected(const JItem& jItem)
 {
   const Discount& o = dynamic_cast<const Discount&>(jItem);
-  if (o.isValidId())
+  if (o.m_id.isValid())
     setDiscount(o);
 }
 
-void DiscountView::itemsRemoved(const QVector<qlonglong>& ids)
+void DiscountView::itemsRemoved(const QVector<Id>& ids)
 {
   if (ids.contains(m_currentId))
     create();
@@ -350,7 +349,7 @@ void DiscountView::searchProduct()
   dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_SELL);
   dlg.exec();
   Product* p = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
-  if (p != nullptr && p->isValidId())
+  if (p != nullptr && p->m_id.isValid())
     setProduct(*p, m_btnAdd == sender());
 }
 

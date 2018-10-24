@@ -11,11 +11,11 @@ struct Stock : public JItem
   double m_ammount;
   QDateTime m_timestamp;
   Person m_employee;
-  qlonglong m_noteId;
+  Id m_noteId;
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_product.clear();
     m_ammount = 0.0;
     m_timestamp = QDateTime::currentDateTime();

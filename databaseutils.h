@@ -32,8 +32,8 @@ private:
   User m_user;
 
 public:
-  qlonglong getId() const { return m_user.m_id; }
-  bool isValid() const { return IS_VALID_ID(m_user.m_id); }
+  Id getId() const { return m_user.m_id; }
+  bool isValid() const { return m_user.m_id.isValid(); }
   QString strUser() const { return m_user.m_strUser; }
   bool hasAccessToNote() const { return isValid() && m_user.m_bAccessNote; }
   bool hasAccessToReminder() const { return isValid() && m_user.m_bAccessReminder; }
@@ -82,7 +82,7 @@ namespace UserSQL
   bool select(User& user,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 }
 
@@ -97,11 +97,11 @@ namespace NoteSQL
   bool select(Note& note,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 
-  NoteItem selectLastItem(qlonglong supplierId,
-                          qlonglong productId);
+  NoteItem selectLastItem(Id supplierId,
+                          Id productId);
 }
 
 namespace ProductSQL
@@ -119,7 +119,7 @@ bool insert(const Product& product,
 bool update(const Product& product,
             QString& error);
 
-bool remove(qlonglong id,
+bool remove(Id id,
             QString& error);
 }
 
@@ -138,7 +138,7 @@ bool insert(const ProductBarcode& barcode,
 bool update(const ProductBarcode& barcode,
             QString& error);
 
-bool remove(qlonglong id,
+bool remove(Id id,
             QString& error);
 }
 
@@ -157,7 +157,7 @@ namespace CategorySQL
   bool update(const Category& category,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 }
 
@@ -176,7 +176,7 @@ namespace ImageSQL
   bool update(const Image& image,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 }
 
@@ -195,7 +195,7 @@ namespace ReminderSQL
   bool select(Reminder& reminder,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 }
 
@@ -219,7 +219,7 @@ namespace PersonSQL
   bool update(const Person& person,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 
   bool isValidPinCode(const QString& pincode,
@@ -241,7 +241,7 @@ namespace ShoppingListSQL
   bool update(const ShoppingList& shoppingList,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 }
 
@@ -260,7 +260,7 @@ namespace ReservationSQL
   bool update(const Reservation& res,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 }
 
@@ -292,7 +292,7 @@ namespace DiscountSQL
   bool select(Discount& o,
               QString& error);
 
-  bool remove(qlonglong id,
+  bool remove(Id id,
               QString& error);
 
   bool redeem(const QString& code,

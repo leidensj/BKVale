@@ -15,7 +15,6 @@
 
 ReservationView::ReservationView(QWidget* parent)
   : QFrame(parent)
-  , m_currentId(INVALID_ID)
   , m_btnCreate(nullptr)
   , m_btnSearch(nullptr)
   , m_snNumber(nullptr)
@@ -124,9 +123,9 @@ ReservationView::ReservationView(QWidget* parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
+                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
+                   SLOT(itemsRemoved(const QVector<Id>&)));
   QObject::connect(m_btnSearch,
                    SIGNAL(clicked(bool)),
                    this,
@@ -137,11 +136,11 @@ ReservationView::ReservationView(QWidget* parent)
 void ReservationView::itemSelected(const JItem& jItem)
 {
   const Reservation& res = dynamic_cast<const Reservation&>(jItem);
-  if (res.isValidId())
+  if (res.m_id.isValid())
     setReservation(res);
 }
 
-void ReservationView::itemsRemoved(const QVector<qlonglong>& ids)
+void ReservationView::itemsRemoved(const QVector<Id>& ids)
 {
   if (ids.contains(m_currentId))
     create();

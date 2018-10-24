@@ -33,7 +33,7 @@ struct ShoppingListItem : JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_product.clear();
     m_bAmmount = true;
     m_ammount = 0.0;
@@ -53,7 +53,7 @@ struct ShoppingListItem : JItem
   QString strPrice() const { return st_strMoney(m_price); }
   bool isValid() const
   {
-    return m_product.isValidId();
+    return m_product.m_id.isValid();
   }
 
   bool operator !=(const JItem& other) const
@@ -88,7 +88,7 @@ struct ShoppingList : public JItem
   QVector<ShoppingListItem> m_vItem;
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_title.clear();
     m_description.clear();
     m_supplier.clear();

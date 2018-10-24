@@ -28,7 +28,7 @@ public:
 
 private slots:
   void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
+  void itemsRemoved(const QVector<Id>& ids);
   void searchProduct();
   void removeProduct();
   void setProduct(const Product& product, bool bNewProduct);
@@ -46,7 +46,7 @@ signals:
   void redeemSignal(const QString& discount);
 
 private:
-  qlonglong m_currentId;
+  Id m_currentId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSearch;
   QPushButton* m_btnRedeem;

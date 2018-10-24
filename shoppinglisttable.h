@@ -20,8 +20,8 @@ public slots:
 
 protected slots:
   void update(int row, int column);
-  void itemDoubleClicked(int row, int column);
-  void deletePressed(int row, int column);
+  void itemActivate(int row, int column);
+  void itemDelete(int row, int column);
 
 private:
   mutable ShoppingListItem m_ref;

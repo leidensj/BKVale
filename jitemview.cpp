@@ -8,7 +8,6 @@
 
 JItemView::JItemView(const QString& tableName, QWidget* parent)
   : QFrame(parent)
-  , m_currentId(INVALID_ID)
   , m_tab(nullptr)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
@@ -68,22 +67,22 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
                    this,
                    SLOT(selectItem(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
+                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
+                   SLOT(itemsRemoved(const QVector<Id>&)));
 }
 
 void JItemView::selectItem(const JItem& o)
 {
   setItem(o);
-  QString strIcon = o.isValidId()
+  QString strIcon = o.m_id.isValid()
                     ? ":/icons/res/saveas.png"
                     : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(strIcon));
   m_currentId = o.m_id;
 }
 
-void JItemView::itemsRemoved(const QVector<qlonglong>& ids)
+void JItemView::itemsRemoved(const QVector<Id>& ids)
 {
   if (ids.contains(m_currentId))
     create();

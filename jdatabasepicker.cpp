@@ -164,18 +164,18 @@ void JDatabasePicker::setItem(const JItem& jItem)
   }
 }
 
-void JDatabasePicker::setItem(qlonglong id,
+void JDatabasePicker::setItem(Id id,
                               const QString& name,
                               const QByteArray& arImage)
 {
   if (m_flags & Flags::Multipicker)
   {
-    if (id != INVALID_ID)
+    if (id.isValid())
     {
       bool bFound = false;
       for (int i = 0; i != m_list->count(); ++i)
       {
-        if (m_list->item(i)->data(Qt::UserRole).toLongLong() == id)
+        if (m_list->item(i)->data(Qt::UserRole).toLongLong() == id.get())
         {
           bFound = true;
           break;
@@ -185,15 +185,16 @@ void JDatabasePicker::setItem(qlonglong id,
       if (!bFound)
       {
         m_list->addItem(name);
-        m_list->item(m_list->count() - 1)->setData(Qt::UserRole, id);
+        m_list->item(m_list->count() - 1)->setData(Qt::UserRole, id.get());
         emit changedSignal();
       }
     }
   }
   else
   {
-    qlonglong previousId = m_edText->property(ID_PROPERTY).toLongLong();
-    m_edText->setProperty(ID_PROPERTY, id);
+    Id previousId;
+    previousId.set(m_edText->property(ID_PROPERTY).toLongLong());
+    m_edText->setProperty(ID_PROPERTY, id.get());
     m_edText->setText(name);
     m_imageView->setImage(arImage);
     if (previousId != id)
@@ -223,7 +224,8 @@ void JDatabasePicker::clear()
   {
     m_edText->clear();
     m_imageView->clearImage();
-    qlonglong previousId = m_edText->property(ID_PROPERTY).toLongLong();
+    Id previousId;
+    previousId.set(m_edText->property(ID_PROPERTY).toLongLong());
     m_edText->setProperty(ID_PROPERTY, INVALID_ID);
     if (previousId != INVALID_ID)
       emit changedSignal();
@@ -245,21 +247,16 @@ void JDatabasePicker::clearAll()
   }
 }
 
-qlonglong JDatabasePicker::getId() const
+Id JDatabasePicker::getId() const
 {
-  return m_flags & Flags::Multipicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong();
+  return Id(m_flags & Flags::Multipicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong());
 }
 
-bool JDatabasePicker::isValidId() const
+QVector<Id> JDatabasePicker::getIds() const
 {
-  return getId() != INVALID_ID;
-}
-
-QVector<qlonglong> JDatabasePicker::getIds() const
-{
-  QVector<qlonglong> v;
+  QVector<Id> v;
   if (m_flags & Flags::Multipicker)
     for (int i = 0; i != m_list->count(); ++i)
-      v.push_back(m_list->item(i)->data(Qt::UserRole).toLongLong());
+      v.push_back(Id(m_list->item(i)->data(Qt::UserRole).toLongLong()));
   return v;
 }

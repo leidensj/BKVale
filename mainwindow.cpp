@@ -345,7 +345,7 @@ void BaitaAssistant::print()
     {
       Person person;
       Note note = m_note->save(person);
-      if (note.isValidId())
+      if (note.m_id.isValid())
         print(NotePrinter::build(note, person.strAliasName()));
     } break;
     case Functionality::Reminder:
@@ -354,7 +354,7 @@ void BaitaAssistant::print()
       if (m_reminder->isSave())
       {
         r = m_reminder->save();
-        if (r.isValidId())
+        if (r.m_id.isValid())
           print(ReminderPrinter::build(r));
       }
       else
@@ -388,13 +388,13 @@ void BaitaAssistant::print()
     case Functionality::Reservation:
     {
       Reservation res = m_reservation->save();
-      if (res.isValidId())
+      if (res.m_id.isValid())
         print(ReservationPrinter::build(res));
     } break;
     case Functionality::Discount:
     {
       Discount o = m_discount->save();
-      if (o.isValidId())
+      if (o.m_id.isValid())
         print(DiscountPrinter::build(o));
     } break;
     case Functionality::None:
@@ -481,7 +481,7 @@ void BaitaAssistant::updateControls()
       ui->actionPrint->setEnabled(true);
       break;
     case Functionality::Shop:
-      ui->actionPrint->setEnabled(m_shop->getShoppingList().isValidId());
+      ui->actionPrint->setEnabled(m_shop->getShoppingList().m_id.isValid());
       break;
     case Functionality::Reservation:
       ui->actionPrint->setEnabled(m_reservation->getReservation().isValid());

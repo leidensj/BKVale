@@ -20,7 +20,7 @@ public:
   virtual const JItem& getItem() const = 0;
 
 protected slots:
-  virtual void itemsRemoved(const QVector<qlonglong>& ids);
+  virtual void itemsRemoved(const QVector<Id>& ids);
   virtual void save();
 
 public slots:
@@ -31,7 +31,7 @@ signals:
   void saveSignal();
 
 protected:
-  qlonglong m_currentId;
+  Id m_currentId;
   JDatabase* m_database;
   QTabWidget* m_tab;
 

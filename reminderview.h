@@ -28,7 +28,7 @@ private slots:
   void setCapitalization(int state);
   void search();
   void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>& ids);
+  void itemsRemoved(const QVector<Id>& ids);
 
 public slots:
   void create();
@@ -37,7 +37,7 @@ signals:
   void changedSignal();
 
 private:
-  int m_currentId;
+  Id m_currentId;
   JLineEdit* m_edTitle;
   QPlainTextEdit* m_teMessage;
   JLineEdit* m_edBarcode;

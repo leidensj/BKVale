@@ -30,7 +30,7 @@ struct NoteItem : JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_product.clear();
     m_ammount = 0.0;
     m_price = 0.0;
@@ -48,7 +48,7 @@ struct NoteItem : JItem
   QString strPrice() const { return st_strMoney(m_price); }
   bool isValid() const
   {
-    return m_product.isValidId() &&
+    return m_product.m_id.isValid() &&
         m_ammount != 0.0 &&
         m_price != 0.0;
   }
@@ -83,7 +83,7 @@ struct Note : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_number = 0;
     m_supplier.clear();
     m_date = QDate::currentDate();
@@ -100,7 +100,6 @@ struct Note : public JItem
 
   QString strDate() const { return m_date.toString("dd/MM/yyyy"); }
   QString strDayOfWeek() const { return m_date.toString("dddd"); }
-  QString strId() const { return QString::number(m_id); }
   QString strNumber() const { return st_strInt(m_number); }
   QString strDisccount() const { return st_strMoney(m_disccount); }
 

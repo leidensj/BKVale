@@ -868,8 +868,7 @@ void JDatabase::selectItem()
   if (idx.isValid())
   {
     JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
-    qlonglong id = model->record(idx.row()).value(SQL_COLID_NUMBER).toLongLong();
-    selectItem(id);
+    selectItem(Id(model->record(idx.row()).value(SQL_COLID_NUMBER).toLongLong()));
   }
   else
   {
@@ -879,7 +878,7 @@ void JDatabase::selectItem()
   }
 }
 
-void JDatabase::selectItem(qlonglong id)
+void JDatabase::selectItem(Id id)
 {
   if (m_currentItem != nullptr)
     delete m_currentItem;
@@ -979,7 +978,7 @@ void JDatabase::selectItem(qlonglong id)
     QMessageBox::critical(this,
                           tr("Erro"),
                           tr("O seguinte erro ocorreu ao selecionar o item com ID "
-                             "'%1':\n'%2'").arg(QString::number(id), error));
+                             "'%1':\n'%2'").arg(id.str(), error));
   }
 }
 
@@ -1021,12 +1020,12 @@ void JDatabase::removeItems()
   JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
   QModelIndexList lst = m_table->selectionModel()->selectedIndexes();
 
-  QVector<qlonglong> ids;
+  QVector<Id> ids;
   for (int i = 0; i != lst.size(); ++i)
   {
     QModelIndex idx = m_proxyModel->mapToSource(lst.at(i));
     if (idx.isValid())
-      ids.push_back(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong());
+      ids.push_back(Id(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong()));
   }
 
   if (ids.size() == 0)
@@ -1045,7 +1044,7 @@ void JDatabase::removeItems()
     return;
 
   Person person = w.getCurrentPerson();
-  if (!person.isValidId() || !person.m_employee.m_bIsEmployee)
+  if (!person.m_id.isValid() || !person.m_employee.m_bIsEmployee)
   {
     QMessageBox::warning(this,
                          tr("Erro"),
@@ -1056,7 +1055,7 @@ void JDatabase::removeItems()
 
   for (int i = 0; i != ids.size(); ++i)
   {
-    qlonglong id = ids.at(i);
+    Id id = ids.at(i);
     QString error;
     if (m_tableName == IMAGE_SQL_TABLE_NAME)
       ImageSQL::remove(id, error);
@@ -1177,7 +1176,7 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
       return false;
 
     *pEmployee = w.getCurrentPerson();
-    if (!pEmployee->isValidId() || !pEmployee->m_employee.m_bIsEmployee)
+    if (!pEmployee->m_id.isValid() || !pEmployee->m_employee.m_bIsEmployee)
     {
       QMessageBox::warning(this,
                            tr("Aviso"),
@@ -1192,28 +1191,28 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
   if (m_tableName == IMAGE_SQL_TABLE_NAME)
   {
     const Image& o = dynamic_cast<const Image&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? ImageSQL::update(o, error)
                : ImageSQL::insert(o, error);
   }
   else if (m_tableName == PERSON_SQL_TABLE_NAME)
   {
     const Person& o = dynamic_cast<const Person&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? PersonSQL::update(o, error)
                : PersonSQL::insert(o, error);
   }
   else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
   {
     const Category& o = dynamic_cast<const Category&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? CategorySQL::update(o, error)
                : CategorySQL::insert(o, error);
   }
   else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
   {
     const Product& o = dynamic_cast<const Product&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? ProductSQL::update(o, error)
                : ProductSQL::insert(o, error);
   }
@@ -1229,49 +1228,49 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
     }
 
     const Note& o = dynamic_cast<const Note&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? NoteSQL::update(o, error)
                : NoteSQL::insert(o, error);
   }
   else if (m_tableName == USER_SQL_TABLE_NAME)
   {
     const User& o = dynamic_cast<const User&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? UserSQL::update(o, error)
                : UserSQL::insert(o, error);
   }
   else if (m_tableName == REMINDER_SQL_TABLE_NAME)
   {
     const Reminder& o = dynamic_cast<const Reminder&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? ReminderSQL::update(o, error)
                : ReminderSQL::insert(o, error);
   }
   else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
   {
     const ShoppingList& o = dynamic_cast<const ShoppingList&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? ShoppingListSQL::update(o, error)
                : ShoppingListSQL::insert(o, error);
   }
   else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
   {
     const Reservation& o = dynamic_cast<const Reservation&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? ReservationSQL::update(o, error)
                : ReservationSQL::insert(o, error);
   }
   else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
   {
     const ProductBarcode& o = dynamic_cast<const ProductBarcode&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? ProductBarcodeSQL::update(o, error)
                : ProductBarcodeSQL::insert(o, error);
   }
   else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
   {
     const Discount& o = dynamic_cast<const Discount&>(jItem);
-    bSuccess = o.isValidId()
+    bSuccess = o.m_id.isValid()
                ? DiscountSQL::update(o, error)
                : DiscountSQL::insert(o, error);
   }

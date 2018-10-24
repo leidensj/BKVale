@@ -2,7 +2,6 @@
 #define DEFINES_H
 
 #define INVALID_ID 0
-#define IS_VALID_ID(x) (x != INVALID_ID ? true : false)
 
 #define SQL_COLID "_ID"
 #define SQL_COLID_NUMBER 0

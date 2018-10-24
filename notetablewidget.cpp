@@ -57,17 +57,17 @@ const JItem& NoteTableWidget::getItem(int row) const
   return m_ref;
 }
 
-void NoteTableWidget::addItemAndLoadPrices(qlonglong supplierId)
+void NoteTableWidget::addItemAndLoadPrices(Id supplierId)
 {
   addItem(NoteItem());
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
   ptProductCell->selectItem(PRODUCT_FILTER_NOTE);
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  if (product.isValidId())
+  if (product.m_id.isValid())
   {
     NoteItem noteItem;
-    if (IS_VALID_ID(supplierId))
+    if (supplierId.isValid())
       noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
     auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
     ptPriceCell->setValue(noteItem.m_price);
@@ -80,17 +80,17 @@ void NoteTableWidget::addItemAndLoadPrices(qlonglong supplierId)
   setFocus();
 }
 
-void NoteTableWidget::addItemAndLoadPricesByBarcode(qlonglong supplierId)
+void NoteTableWidget::addItemAndLoadPricesByBarcode(Id supplierId)
 {
   addItem(NoteItem());
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
   ptProductCell->selectItemByBarcode(PRODUCT_FILTER_NOTE);
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  if (product.isValidId())
+  if (product.m_id.isValid())
   {
     NoteItem noteItem;
-    if (IS_VALID_ID(supplierId))
+    if (supplierId.isValid())
       noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
     auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
     ptPriceCell->setValue(noteItem.m_price);
@@ -168,7 +168,7 @@ void NoteTableWidget::update(int row, int column)
   emitChangedSignal();
 }
 
-void NoteTableWidget::itemDoubleClicked(int row, int column)
+void NoteTableWidget::itemActivate(int row, int column)
 {
   if (column == (int)NoteColumn::Description)
   {
@@ -183,4 +183,9 @@ void NoteTableWidget::itemDoubleClicked(int row, int column)
     auto ptPackage = (PackageTableWidgetItem*)item(row, column);
     ptPackage->selectItem(dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
   }
+}
+
+void NoteTableWidget::itemDelete(int row, int column)
+{
+
 }

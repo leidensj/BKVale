@@ -7,7 +7,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 
-UserMgtView::UserMgtView(qlonglong currentLoggedId, QWidget* parent)
+UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   : JItemView(USER_SQL_TABLE_NAME, parent)
   , m_currentLoggedId(currentLoggedId)
   , m_bHasLoggedUserChanged(false)
@@ -200,7 +200,7 @@ const JItem& UserMgtView::getItem() const
 void UserMgtView::setItem(const JItem& o)
 {
   auto _o = dynamic_cast<const User&>(o);
-  if (_o.isValidId())
+  if (_o.m_id.isValid())
     m_lblPasswordMsg->show();
   m_currentId = _o.m_id;
   m_user->setText(_o.m_strUser);
@@ -240,7 +240,7 @@ void UserMgtView::viewPassword(bool b)
                              : QLineEdit::EchoMode::Password);
 }
 
-void UserMgtView::itemsRemoved(const QVector<qlonglong>& ids)
+void UserMgtView::itemsRemoved(const QVector<Id>& ids)
 {
   if (!m_bHasLoggedUserChanged)
     m_bHasLoggedUserChanged = ids.contains(m_bHasLoggedUserChanged);

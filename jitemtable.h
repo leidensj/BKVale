@@ -25,7 +25,8 @@ public slots:
 
 protected slots:
   virtual void update(int row, int column) = 0;
-  virtual void itemDoubleClicked(int row, int column) = 0;
+  virtual void itemActivate(int row, int column) = 0;
+  virtual void itemDelete(int row, int column) = 0;
   void emitChangedSignal();
 
 protected:
@@ -33,7 +34,8 @@ protected:
 
 signals:
   void changedSignal();
-  void deletePressedSignal(int row, int column);
+  void deleteSignal(int row, int column);
+  void activateSignal(int row, int column);
 };
 
 #endif // JITEMTABLE_H

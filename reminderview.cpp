@@ -13,7 +13,6 @@
 
 ReminderView::ReminderView(QWidget *parent)
   : QFrame(parent)
-  , m_currentId(INVALID_ID)
   , m_edTitle(nullptr)
   , m_teMessage(nullptr)
   , m_edBarcode(nullptr)
@@ -169,9 +168,9 @@ ReminderView::ReminderView(QWidget *parent)
                    this,
                    SLOT(itemSelected(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
+                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
+                   SLOT(itemsRemoved(const QVector<Id>&)));
 
   setCapitalization(m_cbCapitalization->checkState());
   create();
@@ -214,11 +213,11 @@ void ReminderView::create()
 void ReminderView::itemSelected(const JItem& jItem)
 {
   const Reminder& reminder = dynamic_cast<const Reminder&>(jItem);
-  if (reminder.isValidId())
+  if (reminder.m_id.isValid())
     setReminder(reminder);
 }
 
-void ReminderView::itemsRemoved(const QVector<qlonglong>& ids)
+void ReminderView::itemsRemoved(const QVector<Id>& ids)
 {
   if (ids.contains(m_currentId))
     create();

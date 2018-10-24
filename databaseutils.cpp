@@ -416,7 +416,7 @@ bool NoteSQL::insert(const Note& note,
           QString("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
                   NOTE_SQL_COL01 ","
                   NOTE_SQL_COL02 ",") +
-                  (note.m_supplier.isValidId()
+                  (note.m_supplier.m_id.isValid()
                    ? NOTE_SQL_COL03 "," : "") +
                   NOTE_SQL_COL04 ","
                   NOTE_SQL_COL05 ","
@@ -424,15 +424,15 @@ bool NoteSQL::insert(const Note& note,
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02)," +
-                  (note.m_supplier.isValidId()
+                  (note.m_supplier.m_id.isValid()
                    ? "(:_v03)," : "") +
                   "(:_v04),"
                   "(:_v05),"
                   "(:_v06))");
     query.bindValue(":_v01", note.m_number);
     query.bindValue(":_v02", note.m_date);
-    if (note.m_supplier.isValidId())
-      query.bindValue(":_v03", note.m_supplier.m_id);
+    if (note.m_supplier.m_id.isValid())
+      query.bindValue(":_v03", note.m_supplier.m_id.get());
     query.bindValue(":_v04", note.m_bCash);
     query.bindValue(":_v05", note.m_observation);
     query.bindValue(":_v06", note.m_disccount);
@@ -441,7 +441,7 @@ bool NoteSQL::insert(const Note& note,
 
   if (bSuccess)
   {
-    note.m_id = query.lastInsertId().toLongLong();
+    note.m_id.set(query.lastInsertId().toLongLong());
     for (int i = 0; i != note.m_vNoteItem.size(); ++i)
     {
       query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
@@ -460,8 +460,8 @@ bool NoteSQL::insert(const Note& note,
                     "(:_v05),"
                     "(:_v06),"
                     "(:_v07))");
-      query.bindValue(":_v01", note.m_id);
-      query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id);
+      query.bindValue(":_v01", note.m_id.get());
+      query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
       query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
       query.bindValue(":_v05", note.m_vNoteItem.at(i).m_package.m_bIsPackage);
@@ -469,7 +469,7 @@ bool NoteSQL::insert(const Note& note,
       query.bindValue(":_v07", note.m_vNoteItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
-        note.m_vNoteItem.at(i).m_id = query.lastInsertId().toLongLong();
+        note.m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -492,24 +492,24 @@ bool NoteSQL::update(const Note& note,
   query.prepare(
         QString("UPDATE " NOTE_SQL_TABLE_NAME " SET "
                 NOTE_SQL_COL02 " = (:_v02),") +
-                (note.m_supplier.isValidId()
+                (note.m_supplier.m_id.isValid()
                  ? NOTE_SQL_COL03 " = (:_v03),"
                  : NOTE_SQL_COL03 " = NULL,") +
                 NOTE_SQL_COL04 " = (:_v04),"
                 NOTE_SQL_COL05 " = (:_v05),"
                 NOTE_SQL_COL06 " = (:_v06) "
                 "WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", note.m_id);
+  query.bindValue(":_v00", note.m_id.get());
   query.bindValue(":_v02", note.m_date);
-  if (note.m_supplier.isValidId())
-    query.bindValue(":_v03", note.m_supplier.m_id);
+  if (note.m_supplier.m_id.isValid())
+    query.bindValue(":_v03", note.m_supplier.m_id.get());
   query.bindValue(":_v04", note.m_bCash);
   query.bindValue(":_v05", note.m_observation);
   query.bindValue(":_v06", note.m_disccount);
   bool bSuccess = query.exec();
 
   query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", note.m_id);
+  query.bindValue(":_v01", note.m_id.get());
   bSuccess = query.exec();
 
   if (bSuccess)
@@ -532,8 +532,8 @@ bool NoteSQL::update(const Note& note,
                     "(:_v05),"
                     "(:_v06),"
                     "(:_v07))");
-      query.bindValue(":_v01", note.m_id);
-      query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id);
+      query.bindValue(":_v01", note.m_id.get());
+      query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
       query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
       query.bindValue(":_v05", note.m_vNoteItem.at(i).m_package.m_bIsPackage);
@@ -541,7 +541,7 @@ bool NoteSQL::update(const Note& note,
       query.bindValue(":_v07", note.m_vNoteItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
-        note.m_vNoteItem.at(i).m_id = query.lastInsertId().toLongLong();
+        note.m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -554,7 +554,7 @@ bool NoteSQL::select(Note& note,
                      QString& error)
 {
   error.clear();
-  qlonglong id = note.m_id;
+  Id id = note.m_id;
   note.clear();
 
   if (!BaitaSQL::isOpen(error))
@@ -572,7 +572,7 @@ bool NoteSQL::select(Note& note,
                 NOTE_SQL_COL06
                 " FROM " NOTE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -582,7 +582,7 @@ bool NoteSQL::select(Note& note,
       note.m_id = id;
       note.m_number = query.value(0).toLongLong();
       note.m_date = query.value(1).toDate();
-      note.m_supplier.m_id = query.value(2).toLongLong();
+      note.m_supplier.m_id.set(query.value(2).toLongLong());
       note.m_bCash = query.value(3).toBool();
       note.m_observation = query.value(4).toString();
       note.m_disccount = query.value(5).toDouble();
@@ -607,15 +607,15 @@ bool NoteSQL::select(Note& note,
                   NOTE_ITEMS_SQL_COL07
                   " FROM " NOTE_ITEMS_SQL_TABLE_NAME
                   " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", note.m_id);
+    query.bindValue(":_v01", note.m_id.get());
     bSuccess = query.exec();
     if (bSuccess)
     {
       while (bSuccess && query.next())
       {
         NoteItem noteItem;
-        noteItem.m_id = query.value(0).toLongLong();
-        noteItem.m_product.m_id = query.value(1).toLongLong();
+        noteItem.m_id.set(query.value(0).toLongLong());
+        noteItem.m_product.m_id.set(query.value(1).toLongLong());
         noteItem.m_ammount = query.value(2).toDouble();
         noteItem.m_price = query.value(3).toDouble();
         noteItem.m_package.m_bIsPackage = query.value(4).toBool();
@@ -629,11 +629,11 @@ bool NoteSQL::select(Note& note,
   if (bSuccess)
   {
     QString error2;
-    if (note.m_supplier.isValidId())
+    if (note.m_supplier.m_id.isValid())
       PersonSQL::execSelect(query, note.m_supplier, error2);
     for (int i = 0; i != note.m_vNoteItem.size(); ++i)
     {
-      if (note.m_vNoteItem.at(i).m_product.isValidId())
+      if (note.m_vNoteItem.at(i).m_product.m_id.isValid())
         ProductSQL::execSelect(query, note.m_vNoteItem[i].m_product, error2);
     }
   }
@@ -641,7 +641,7 @@ bool NoteSQL::select(Note& note,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool NoteSQL::remove(qlonglong id,
+bool NoteSQL::remove(Id id,
                      QString& error)
 {
   error.clear();
@@ -654,13 +654,13 @@ bool NoteSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
 
-NoteItem NoteSQL::selectLastItem(qlonglong supplierId,
-                                 qlonglong productId)
+NoteItem NoteSQL::selectLastItem(Id supplierId,
+                                 Id productId)
 {
   NoteItem noteItem;
   QString error;
@@ -688,20 +688,20 @@ NoteItem NoteSQL::selectLastItem(qlonglong supplierId,
                 " = (:_v02) "
                 " ORDER BY " NOTE_ITEMS_SQL_TABLE_NAME "." SQL_COLID
                 " DESC LIMIT 1");
-  query.bindValue(":_v01", supplierId);
-  query.bindValue(":_v02", productId);
+  query.bindValue(":_v01", supplierId.get());
+  query.bindValue(":_v02", productId.get());
   bool bSuccess = query.exec();
 
   if (bSuccess && query.next())
   {
-    noteItem.m_id = query.value(0).toLongLong();
-    noteItem.m_product.m_id = query.value(1).toLongLong();
+    noteItem.m_id.set(query.value(0).toLongLong());
+    noteItem.m_product.m_id.set(query.value(1).toLongLong());
     noteItem.m_ammount = query.value(2).toDouble();
     noteItem.m_price = query.value(3).toDouble();
     noteItem.m_package.m_bIsPackage = query.value(4).toBool();
     noteItem.m_package.m_unity = query.value(5).toString();
     noteItem.m_package.m_ammount = query.value(6).toDouble();
-    if (noteItem.m_product.isValidId())
+    if (noteItem.m_product.m_id.isValid())
       ProductSQL::execSelect(query, noteItem.m_product, error);
   }
 
@@ -714,7 +714,7 @@ bool ProductSQL::execSelect(QSqlQuery& query,
                             QString& error)
 {
   error.clear();
-  qlonglong id = product.m_id;
+  Id id = product.m_id;
   product.clear();
 
   query.prepare("SELECT "
@@ -729,7 +729,7 @@ bool ProductSQL::execSelect(QSqlQuery& query,
                 PRODUCT_SQL_COL09
                 " FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   if (bSuccess)
   {
@@ -737,8 +737,8 @@ bool ProductSQL::execSelect(QSqlQuery& query,
     {
       product.m_id = id;
       product.m_name = query.value(0).toString();
-      product.m_category.m_id = query.value(1).toLongLong();
-      product.m_image.m_id = query.value(2).toLongLong();
+      product.m_category.m_id.set(query.value(1).toLongLong());
+      product.m_image.m_id.set(query.value(2).toLongLong());
       product.m_unity = query.value(3).toString();
       product.m_details = query.value(4).toString();
       product.m_bAvailableAtNotes = query.value(5).toBool();
@@ -746,10 +746,10 @@ bool ProductSQL::execSelect(QSqlQuery& query,
       product.m_bAvailableToBuy = query.value(7).toBool();
       product.m_bAvailableToSell = query.value(8).toBool();
 
-      if (bSuccess && product.m_image.isValidId())
+      if (bSuccess && product.m_image.m_id.isValid())
         bSuccess = ImageSQL::execSelect(query, product.m_image, error);
 
-      if (bSuccess && product.m_category.isValidId())
+      if (bSuccess && product.m_category.m_id.isValid())
         bSuccess = CategorySQL::execSelect(query, product.m_category, error);
     }
   }
@@ -802,9 +802,9 @@ bool ProductSQL::insert(const Product& product,
                 PRODUCT_SQL_COL09 ")"
                 " VALUES ("
                 "(:_v01),") +
-        (product.m_category.isValidId()
+        (product.m_category.m_id.isValid()
          ? "(:_v02)," : "NULL,") +
-        (product.m_image.isValidId()
+        (product.m_image.m_id.isValid()
          ? "(:_v03)," : "NULL,") +
                 "(:_v04),"
                 "(:_v05),"
@@ -813,10 +813,10 @@ bool ProductSQL::insert(const Product& product,
                 "(:_v08),"
                 "(:_v09))");
   query.bindValue(":_v01", product.m_name);
-  if (product.m_category.isValidId())
-    query.bindValue(":_v02", product.m_category.m_id);
-  if (product.m_image.isValidId())
-    query.bindValue(":_v03", product.m_image.m_id);
+  if (product.m_category.m_id.isValid())
+    query.bindValue(":_v02", product.m_category.m_id.get());
+  if (product.m_image.m_id.isValid())
+    query.bindValue(":_v03", product.m_image.m_id.get());
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_details);
   query.bindValue(":_v06", product.m_bAvailableAtNotes);
@@ -826,7 +826,7 @@ bool ProductSQL::insert(const Product& product,
 
   bool bSuccess = query.exec();
   if (bSuccess)
-    product.m_id = query.lastInsertId().toLongLong();
+    product.m_id.set(query.lastInsertId().toLongLong());
   return finishTransaction(db, query, bSuccess, error);
 }
 
@@ -845,9 +845,9 @@ bool ProductSQL::update(const Product& product,
         QString("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
                 PRODUCT_SQL_COL01 " = (:_v01),"
                 PRODUCT_SQL_COL02 " = ") +
-        (product.m_category.isValidId() ? "(:_v02)," : "NULL,") +
+        (product.m_category.m_id.isValid() ? "(:_v02)," : "NULL,") +
                 PRODUCT_SQL_COL03 " = " +
-        (product.m_image.isValidId() ? "(:_v03)," : "NULL,") +
+        (product.m_image.m_id.isValid() ? "(:_v03)," : "NULL,") +
                 PRODUCT_SQL_COL04 " = (:_v04),"
                 PRODUCT_SQL_COL05 " = (:_v05),"
                 PRODUCT_SQL_COL06 " = (:_v06),"
@@ -855,12 +855,12 @@ bool ProductSQL::update(const Product& product,
                 PRODUCT_SQL_COL08 " = (:_v08),"
                 PRODUCT_SQL_COL09 " = (:_v09)"
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", product.m_id);
+  query.bindValue(":_v00", product.m_id.get());
   query.bindValue(":_v01", product.m_name);
-  if (product.m_category.isValidId())
-    query.bindValue(":_v02", product.m_category.m_id);
-  if (product.m_image.isValidId())
-    query.bindValue(":_v03", product.m_image.m_id);
+  if (product.m_category.m_id.isValid())
+    query.bindValue(":_v02", product.m_category.m_id.get());
+  if (product.m_image.m_id.isValid())
+    query.bindValue(":_v03", product.m_image.m_id.get());
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_details);
   query.bindValue(":_v06", product.m_bAvailableAtNotes);
@@ -871,7 +871,7 @@ bool ProductSQL::update(const Product& product,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ProductSQL::remove(qlonglong id,
+bool ProductSQL::remove(Id id,
                         QString& error)
 {
   error.clear();
@@ -884,7 +884,7 @@ bool ProductSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
@@ -895,7 +895,7 @@ bool CategorySQL::execSelect(QSqlQuery& query,
                              QString& error)
 {
   error.clear();
-  qlonglong id = category.m_id;
+  Id id = category.m_id;
   category.clear();
 
   query.prepare("SELECT "
@@ -903,7 +903,7 @@ bool CategorySQL::execSelect(QSqlQuery& query,
                 CATEGORY_SQL_COL02
                 " FROM " CATEGORY_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -911,7 +911,7 @@ bool CategorySQL::execSelect(QSqlQuery& query,
     if (query.next())
     {
       category.m_id = id;
-      category.m_image.m_id = query.value(0).toLongLong();
+      category.m_image.m_id.set(query.value(0).toLongLong());
       category.m_name = query.value(1).toString();
     }
     else
@@ -921,7 +921,7 @@ bool CategorySQL::execSelect(QSqlQuery& query,
     }
   }
 
-  if (bSuccess && category.m_image.isValidId())
+  if (bSuccess && category.m_image.m_id.isValid())
     bSuccess = ImageSQL::execSelect(query, category.m_image, error);
 
   if (!bSuccess)
@@ -966,15 +966,15 @@ bool CategorySQL::insert(const Category& o,
                 CATEGORY_SQL_COL02 ")"
                 " VALUES ("
                 "%1,"
-                "(:_v02))").arg(o.m_image.isValidId() ? "(:_v01)" : "NULL"));
+                "(:_v02))").arg(o.m_image.m_id.isValid() ? "(:_v01)" : "NULL"));
 
-  if (o.m_image.isValidId())
-    query.bindValue(":_v01", o.m_image.m_id);
+  if (o.m_image.m_id.isValid())
+    query.bindValue(":_v01", o.m_image.m_id.get());
   query.bindValue(":_v02", o.m_name);
 
   bool bSuccess = query.exec();
   if (bSuccess)
-    o.m_id = query.lastInsertId().toLongLong();
+    o.m_id.set(query.lastInsertId().toLongLong());
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -994,18 +994,18 @@ bool CategorySQL::update(const Category& o,
         QString("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
                 CATEGORY_SQL_COL01 " = %1,"
                 CATEGORY_SQL_COL02 " = (:_v02)"
-                " WHERE " SQL_COLID " = (:_v00)").arg(o.m_image.isValidId() ? "(:_v01)" : "NULL"));
-  query.bindValue(":_v00", o.m_id);
+                " WHERE " SQL_COLID " = (:_v00)").arg(o.m_image.m_id.isValid() ? "(:_v01)" : "NULL"));
+  query.bindValue(":_v00", o.m_id.get());
   query.bindValue(":_v02", o.m_name);
 
-  if (o.m_image.isValidId())
-    query.bindValue(":_v01", o.m_image.m_id);
+  if (o.m_image.m_id.isValid())
+    query.bindValue(":_v01", o.m_image.m_id.get());
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool CategorySQL::remove(qlonglong id,
+bool CategorySQL::remove(Id id,
                          QString& error)
 {
   error.clear();
@@ -1018,7 +1018,7 @@ bool CategorySQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " CATEGORY_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
 
   return finishTransaction(db, query, bSuccess, error);
@@ -1028,14 +1028,14 @@ bool ImageSQL::execSelect(QSqlQuery& query,
                           Image& image,
                           QString& error)
 {
-  qlonglong id = image.m_id;
+  Id id = image.m_id;
   image.clear();
   query.prepare("SELECT "
                 IMAGE_SQL_COL01 ","
                 IMAGE_SQL_COL02
                 " FROM " IMAGE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   if (query.exec())
   {
@@ -1095,7 +1095,7 @@ bool ImageSQL::insert(const Image& image,
 
   bool bSuccess = query.exec();
   if (bSuccess)
-    image.m_id = query.lastInsertId().toLongLong();
+    image.m_id.set(query.lastInsertId().toLongLong());
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -1115,7 +1115,7 @@ bool ImageSQL::update(const Image& image,
                 IMAGE_SQL_COL01 " = (:_v01),"
                 IMAGE_SQL_COL02 " = (:_v02)"
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", image.m_id);
+  query.bindValue(":_v00", image.m_id.get());
   query.bindValue(":_v01", image.m_name);
   query.bindValue(":_v02", image.m_image);
 
@@ -1123,7 +1123,7 @@ bool ImageSQL::update(const Image& image,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ImageSQL::remove(qlonglong id,
+bool ImageSQL::remove(Id id,
                       QString& error)
 {
   error.clear();
@@ -1136,7 +1136,7 @@ bool ImageSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " IMAGE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -1145,7 +1145,7 @@ bool ReminderSQL::execSelect(QSqlQuery& query,
                              Reminder& reminder,
                              QString& error)
 {
-  qlonglong id = reminder.m_id;
+  Id id = reminder.m_id;
   reminder.clear();
   query.prepare("SELECT "
                 REMINDER_SQL_COL01 ","
@@ -1157,7 +1157,7 @@ bool ReminderSQL::execSelect(QSqlQuery& query,
                 REMINDER_SQL_COL07
                 " FROM " REMINDER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   if (query.exec())
   {
@@ -1237,7 +1237,7 @@ bool ReminderSQL::insert(const Reminder& reminder,
 
   bool bSuccess = query.exec();
   if (bSuccess)
-    reminder.m_id = query.lastInsertId().toLongLong();
+    reminder.m_id.set(query.lastInsertId().toLongLong());
   return finishTransaction(db, query, bSuccess, error);
 }
 
@@ -1261,7 +1261,7 @@ bool ReminderSQL::update(const Reminder& reminder,
                 REMINDER_SQL_COL06 " = (:_v06),"
                 REMINDER_SQL_COL07 " = (:_v07)"
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", reminder.m_id);
+  query.bindValue(":_v00", reminder.m_id.get());
   query.bindValue(":_v01", reminder.m_title);
   query.bindValue(":_v02", reminder.m_message);
   query.bindValue(":_v03", reminder.m_bFavorite);
@@ -1274,7 +1274,7 @@ bool ReminderSQL::update(const Reminder& reminder,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReminderSQL::remove(qlonglong id,
+bool ReminderSQL::remove(Id id,
                          QString& error)
 {
   error.clear();
@@ -1287,7 +1287,7 @@ bool ReminderSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " REMINDER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
@@ -1360,7 +1360,7 @@ bool UserSQL::insert(const User& user,
 
   bool bSuccess = query.exec();
   if (bSuccess)
-    user.m_id = query.lastInsertId().toLongLong();
+    user.m_id.set(query.lastInsertId().toLongLong());
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -1399,7 +1399,7 @@ bool UserSQL::update(const User& user,
    db.transaction();
   QSqlQuery query(db);
   query.prepare(strQuery);
-  query.bindValue(":_v00", user.m_id);
+  query.bindValue(":_v00", user.m_id.get());
   query.bindValue(":_v01", user.m_strUser);
   if (!user.m_password.isEmpty())
     query.bindValue(":_v02", user.strEncryptedPassword());
@@ -1427,7 +1427,7 @@ bool UserSQL::select(User& user,
                      QString& error)
 {
   error.clear();
-  qlonglong id = user.m_id;
+  Id id = user.m_id;
   user.clear();
 
   if (!BaitaSQL::isOpen(error))
@@ -1456,7 +1456,7 @@ bool UserSQL::select(User& user,
                 USER_SQL_COL17
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -1492,7 +1492,7 @@ bool UserSQL::select(User& user,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool UserSQL::remove(qlonglong id,
+bool UserSQL::remove(Id id,
                      QString& error)
 {
   error.clear();
@@ -1505,7 +1505,7 @@ bool UserSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
@@ -1559,7 +1559,7 @@ bool UserLoginSQL::login(const QString& strUser,
   {
     if (query.next())
     {
-      m_user.m_id = query.value(0).toLongLong();
+      m_user.m_id.set(query.value(0).toLongLong());
       m_user.m_strUser = query.value(1).toString();
       query.value(2).toString(); // password nao precisamos
       m_user.m_bAccessNote = query.value(3).toBool();
@@ -1648,7 +1648,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
                            QString& error)
 {
   error.clear();
-  qlonglong id = person.m_id;
+  Id id = person.m_id;
   person.clear();
 
   query.prepare("SELECT "
@@ -1664,7 +1664,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
                 PERSON_SQL_COL10
                 " FROM " PERSON_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -1672,7 +1672,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     if (query.next())
     {
       person.m_id = id;
-      person.m_image.m_id = query.value(0).toLongLong();
+      person.m_image.m_id.set(query.value(0).toLongLong());
       person.m_name = query.value(1).toString();
       person.m_alias = query.value(2).toString();
       person.m_email = query.value(3).toString();
@@ -1693,7 +1693,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
                   EMPLOYEE_SQL_COL04
                   " FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", id);
+    query.bindValue(":_v01", id.get());
     bSuccess = query.exec();
     if (bSuccess && query.next())
     {
@@ -1709,7 +1709,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     query.prepare("SELECT * "
                   " FROM " SUPPLIER_SQL_TABLE_NAME
                   " WHERE " SUPPLIER_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", id);
+    query.bindValue(":_v01", id.get());
     bSuccess = query.exec();
     if (bSuccess && query.next())
     {
@@ -1731,12 +1731,12 @@ bool PersonSQL::execSelect(QSqlQuery& query,
                   ADDRESS_SQL_COL09
                   " FROM " ADDRESS_SQL_TABLE_NAME
                   " WHERE " ADDRESS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", id);
+    query.bindValue(":_v01", id.get());
     bSuccess = query.exec();
     while (bSuccess && query.next())
     {
       Address address;
-      address.m_id = query.value(0).toLongLong();
+      address.m_id.set(query.value(0).toLongLong());
       address.m_cep = query.value(1).toString();
       address.m_neighborhood = query.value(2).toString();
       address.m_street = query.value(3).toString();
@@ -1760,12 +1760,12 @@ bool PersonSQL::execSelect(QSqlQuery& query,
                   PHONE_SQL_COL05
                   " FROM " PHONE_SQL_TABLE_NAME
                   " WHERE " PHONE_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", id);
+    query.bindValue(":_v01", id.get());
     bSuccess = query.exec();
     while (bSuccess && query.next())
     {
       Phone phone;
-      phone.m_id = query.value(0).toLongLong();
+      phone.m_id.set(query.value(0).toLongLong());
       query.value(1).toLongLong(); //personId não usamos
       phone.m_countryCode = query.value(2).toInt();
       phone.m_code = query.value(3).toInt();
@@ -1775,7 +1775,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     }
   }
 
-  if (bSuccess && person.m_image.isValidId())
+  if (bSuccess && person.m_image.m_id.isValid())
     bSuccess = ImageSQL::execSelect(query, person.m_image, error);
 
   if (!bSuccess)
@@ -1807,7 +1807,7 @@ bool PersonSQL::execByPinCodeSelect(QSqlQuery& query,
   {
     if (query.next())
     {
-      person.m_id = query.value(0).toLongLong();
+      person.m_id.set(query.value(0).toLongLong());
       bSuccess = execSelect(query, person, error);
     }
     else
@@ -1884,7 +1884,7 @@ bool PersonSQL::insert(const Person& person,
   bool bSuccess = query.exec();
   if (bSuccess)
   {
-    person.m_id = query.lastInsertId().toLongLong();
+    person.m_id.set(query.lastInsertId().toLongLong());
 
     if (person.m_employee.m_bIsEmployee)
     {
@@ -1898,7 +1898,7 @@ bool PersonSQL::insert(const Person& person,
                     "(:_v02),"
                     "(:_v03),"
                     "(:_v04))");
-      query.bindValue(":_v01", person.m_id);
+      query.bindValue(":_v01", person.m_id.get());
       query.bindValue(":_v02", person.m_employee.m_pincode);
       query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
       query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
@@ -1911,17 +1911,17 @@ bool PersonSQL::insert(const Person& person,
                     SUPPLIER_SQL_COL01 ")"
                     " VALUES ("
                     "(:_v01))");
-      query.bindValue(":_v01", person.m_id);
+      query.bindValue(":_v01", person.m_id.get());
       bSuccess = query.exec();
     }
 
-    if (bSuccess && person.m_image.isValidId())
+    if (bSuccess && person.m_image.m_id.isValid())
     {
       query.prepare("UPDATE " PERSON_SQL_TABLE_NAME " SET "
                     PERSON_SQL_COL01 " = (:_v01)"
                     " WHERE " SQL_COLID " = (:_v00)");
-      query.bindValue(":_v00", person.m_id);
-      query.bindValue(":_v01", person.m_image.m_id);
+      query.bindValue(":_v00", person.m_id.get());
+      query.bindValue(":_v01", person.m_image.m_id.get());
       bSuccess = query.exec();
     }
 
@@ -1941,14 +1941,14 @@ bool PersonSQL::insert(const Person& person,
                       "(:_v03),"
                       "(:_v04),"
                       "(:_v05))");
-        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v01", person.m_id.get());
         query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
         query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
         query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
         query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
         bSuccess = query.exec();
         if (bSuccess)
-          person.m_vPhone.at(i).m_id = query.lastInsertId().toLongLong();
+          person.m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
         else
           break;
       }
@@ -1978,7 +1978,7 @@ bool PersonSQL::insert(const Person& person,
                       "(:_v07),"
                       "(:_v08),"
                       "(:_v09))");
-        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v01", person.m_id.get());
         query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
         query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
         query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
@@ -1989,7 +1989,7 @@ bool PersonSQL::insert(const Person& person,
         query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
         bSuccess = query.exec();
         if (bSuccess)
-          person.m_vAddress.at(i).m_id = query.lastInsertId().toLongLong();
+          person.m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
         else
           break;
       }
@@ -2022,7 +2022,7 @@ bool PersonSQL::update(const Person& person,
                 PERSON_SQL_COL09 " = (:_v09),"
                 PERSON_SQL_COL10 " = (:_v10)"
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", person.m_id);
+  query.bindValue(":_v00", person.m_id.get());
   query.bindValue(":_v02", person.m_name);
   query.bindValue(":_v03", person.m_alias);
   query.bindValue(":_v04", person.m_email);
@@ -2038,7 +2038,7 @@ bool PersonSQL::update(const Person& person,
   {
     query.prepare("DELETE FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", person.m_id);
+    query.bindValue(":_v01", person.m_id.get());
     bSuccess = query.exec();
   }
 
@@ -2046,7 +2046,7 @@ bool PersonSQL::update(const Person& person,
   {
     query.prepare("DELETE FROM " SUPPLIER_SQL_TABLE_NAME
                   " WHERE " SUPPLIER_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", person.m_id);
+    query.bindValue(":_v01", person.m_id.get());
     bSuccess = query.exec();
   }
 
@@ -2062,7 +2062,7 @@ bool PersonSQL::update(const Person& person,
                   "(:_v02),"
                   "(:_v03),"
                   "(:_v04))");
-    query.bindValue(":_v01", person.m_id);
+    query.bindValue(":_v01", person.m_id.get());
     query.bindValue(":_v02", person.m_employee.m_pincode);
     query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
     query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
@@ -2075,31 +2075,31 @@ bool PersonSQL::update(const Person& person,
                   SUPPLIER_SQL_COL01 ")"
                   " VALUES ("
                   "(:_v01))");
-    query.bindValue(":_v01", person.m_id);
+    query.bindValue(":_v01", person.m_id.get());
     bSuccess = query.exec();
   }
 
-  if (bSuccess && person.m_image.isValidId())
+  if (bSuccess && person.m_image.m_id.isValid())
   {
     query.prepare("UPDATE " PERSON_SQL_TABLE_NAME " SET "
                   PERSON_SQL_COL01 " = (:_v01)"
                                    " WHERE " SQL_COLID " = (:_v00)");
-    query.bindValue(":_v00", person.m_id);
-    query.bindValue(":_v01", person.m_image.m_id);
+    query.bindValue(":_v00", person.m_id.get());
+    query.bindValue(":_v01", person.m_image.m_id.get());
     bSuccess = query.exec();
   }
 
   if (bSuccess)
   {
     query.prepare("DELETE FROM " ADDRESS_SQL_TABLE_NAME " WHERE " ADDRESS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", person.m_id);
+    query.bindValue(":_v01", person.m_id.get());
     bSuccess = query.exec();
   }
 
   if (bSuccess)
   {
     query.prepare("DELETE FROM " PHONE_SQL_TABLE_NAME " WHERE " PHONE_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", person.m_id);
+    query.bindValue(":_v01", person.m_id.get());
     bSuccess = query.exec();
   }
 
@@ -2107,7 +2107,7 @@ bool PersonSQL::update(const Person& person,
   {
     for (int i = 0; i != person.m_vPhone.size(); ++i)
     {
-      if (person.m_vPhone.at(i).isValidId())
+      if (person.m_vPhone.at(i).m_id.isValid())
       {
         query.prepare("UPDATE " PHONE_SQL_TABLE_NAME " SET "
                       PHONE_SQL_COL01 " = (:_v01),"
@@ -2116,8 +2116,8 @@ bool PersonSQL::update(const Person& person,
                       PHONE_SQL_COL04 " = (:_v04),"
                       PHONE_SQL_COL05 " = (:_v05) "
                       " WHERE " SQL_COLID " = (:_v00)");
-        query.bindValue(":_v00", person.m_vPhone.at(i).m_id);
-        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v00", person.m_vPhone.at(i).m_id.get());
+        query.bindValue(":_v01", person.m_id.get());
         query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
         query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
         query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
@@ -2140,14 +2140,14 @@ bool PersonSQL::update(const Person& person,
                       "(:_v03),"
                       "(:_v04),"
                       "(:_v05))");
-        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v01", person.m_id.get());
         query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
         query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
         query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
         query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
         bSuccess = query.exec();
         if (bSuccess)
-          person.m_vPhone.at(i).m_id = query.lastInsertId().toLongLong();
+          person.m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
         else
           break;
       }
@@ -2158,7 +2158,7 @@ bool PersonSQL::update(const Person& person,
   {
     for (int i = 0; i != person.m_vAddress.size(); ++i)
     {
-      if (person.m_vAddress.at(i).isValidId())
+      if (person.m_vAddress.at(i).m_id.isValid())
       {
         query.prepare("UPDATE " ADDRESS_SQL_TABLE_NAME " SET "
                       ADDRESS_SQL_COL01 " = (:_v01),"
@@ -2171,8 +2171,8 @@ bool PersonSQL::update(const Person& person,
                       ADDRESS_SQL_COL08 " = (:_v08),"
                       ADDRESS_SQL_COL09 " = (:_v09) "
                       "WHERE " SQL_COLID " = (:_v00)");
-        query.bindValue(":_v00", person.m_vAddress.at(i).m_id);
-        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v00", person.m_vAddress.at(i).m_id.get());
+        query.bindValue(":_v01", person.m_id.get());
         query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
         query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
         query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
@@ -2207,7 +2207,7 @@ bool PersonSQL::update(const Person& person,
                       "(:_v07),"
                       "(:_v08),"
                       "(:_v09))");
-        query.bindValue(":_v01", person.m_id);
+        query.bindValue(":_v01", person.m_id.get());
         query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
         query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
         query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
@@ -2218,7 +2218,7 @@ bool PersonSQL::update(const Person& person,
         query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
         bSuccess = query.exec();
         if (bSuccess)
-          person.m_vAddress.at(i).m_id = query.lastInsertId().toLongLong();
+          person.m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
         else
           break;
       }
@@ -2228,7 +2228,7 @@ bool PersonSQL::update(const Person& person,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool PersonSQL::remove(qlonglong id,
+bool PersonSQL::remove(Id id,
                        QString& error)
 {
   error.clear();
@@ -2240,7 +2240,7 @@ bool PersonSQL::remove(qlonglong id,
   db.transaction();
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PERSON_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -2288,15 +2288,15 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
           "(:_v05),"
           "(:_v06),"
           "(:_v07))").arg(
-          shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 "," : "",
-          shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 "," : "",
-          shoppingList.m_supplier.isValidId() ? "(:_v01)," : "",
-          shoppingList.m_image.isValidId() ? "(:_v02)," : ""));
+          shoppingList.m_supplier.m_id.isValid() ? SHOPPING_LIST_SQL_COL01 "," : "",
+          shoppingList.m_image.m_id.isValid() ? SHOPPING_LIST_SQL_COL02 "," : "",
+          shoppingList.m_supplier.m_id.isValid() ? "(:_v01)," : "",
+          shoppingList.m_image.m_id.isValid() ? "(:_v02)," : ""));
 
-  if (shoppingList.m_supplier.isValidId())
-    query.bindValue(":_v01", shoppingList.m_supplier.m_id);
-  if (shoppingList.m_image.isValidId())
-    query.bindValue(":_v02", shoppingList.m_image.m_id);
+  if (shoppingList.m_supplier.m_id.isValid())
+    query.bindValue(":_v01", shoppingList.m_supplier.m_id.get());
+  if (shoppingList.m_image.m_id.isValid())
+    query.bindValue(":_v02", shoppingList.m_image.m_id.get());
   query.bindValue(":_v03", shoppingList.m_title);
   query.bindValue(":_v04", shoppingList.m_description);
   query.bindValue(":_v05", shoppingList.getWeekDays());
@@ -2306,7 +2306,7 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
 
   if (bSuccess)
   {
-    shoppingList.m_id = query.lastInsertId().toLongLong();
+    shoppingList.m_id.set(query.lastInsertId().toLongLong());
     for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
     {
       query.prepare(
@@ -2330,12 +2330,12 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
                     "(:_v07),"
                     "(:_v08),"
                     "(:_v09))").arg(
-                    shoppingList.m_vItem.at(i).m_product.isValidId() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
-                    shoppingList.m_vItem.at(i).m_product.isValidId() ? "(:_v02)," : ""));
+                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
+                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? "(:_v02)," : ""));
 
-      query.bindValue(":_v01", shoppingList.m_id);
-      if (shoppingList.m_vItem.at(i).m_product.isValidId())
-        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id);
+      query.bindValue(":_v01", shoppingList.m_id.get());
+      if (shoppingList.m_vItem.at(i).m_product.m_id.isValid())
+        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
       query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
       query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
@@ -2345,7 +2345,7 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
       query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_bPrice);
       bSuccess = query.exec();
       if (bSuccess)
-        shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
+        shoppingList.m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -2375,14 +2375,14 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                 SHOPPING_LIST_SQL_COL06 " = (:_v06),"
                 SHOPPING_LIST_SQL_COL07 " = (:_v07) "
                 "WHERE " SQL_COLID " = (:_v00)").arg(
-                shoppingList.m_supplier.isValidId() ? SHOPPING_LIST_SQL_COL01 " = (:_v01)," : "",
-                shoppingList.m_image.isValidId() ? SHOPPING_LIST_SQL_COL02 " = (:_v02)," : ""));
+                shoppingList.m_supplier.m_id.isValid() ? SHOPPING_LIST_SQL_COL01 " = (:_v01)," : "",
+                shoppingList.m_image.m_id.isValid() ? SHOPPING_LIST_SQL_COL02 " = (:_v02)," : ""));
 
-  query.bindValue(":_v00", shoppingList.m_id);
-  if (shoppingList.m_supplier.isValidId())
-    query.bindValue(":_v01", shoppingList.m_supplier.m_id);
-  if (shoppingList.m_image.isValidId())
-    query.bindValue(":_v02", shoppingList.m_image.m_id);
+  query.bindValue(":_v00", shoppingList.m_id.get());
+  if (shoppingList.m_supplier.m_id.isValid())
+    query.bindValue(":_v01", shoppingList.m_supplier.m_id.get());
+  if (shoppingList.m_image.m_id.isValid())
+    query.bindValue(":_v02", shoppingList.m_image.m_id.get());
   query.bindValue(":_v03", shoppingList.m_title);
   query.bindValue(":_v04", shoppingList.m_description);
   query.bindValue(":_v05", shoppingList.getWeekDays());
@@ -2391,7 +2391,7 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
   bool bSuccess = query.exec();
 
   query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", shoppingList.m_id);
+  query.bindValue(":_v01", shoppingList.m_id.get());
   bSuccess = query.exec();
 
   if (bSuccess)
@@ -2419,11 +2419,11 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                     "(:_v07),"
                     "(:_v08),"
                     "(:_v09))").arg(
-                    shoppingList.m_vItem.at(i).m_product.isValidId() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
-                    shoppingList.m_vItem.at(i).m_product.isValidId() ? "(:_v02)," : ""));
-      query.bindValue(":_v01", shoppingList.m_id);
-      if (shoppingList.m_vItem.at(i).m_product.isValidId())
-        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id);
+                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
+                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? "(:_v02)," : ""));
+      query.bindValue(":_v01", shoppingList.m_id.get());
+      if (shoppingList.m_vItem.at(i).m_product.m_id.isValid())
+        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
       query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
       query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
@@ -2433,7 +2433,7 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
       query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_bPrice);
       bSuccess = query.exec();
       if (bSuccess)
-        shoppingList.m_vItem.at(i).m_id = query.lastInsertId().toLongLong();
+        shoppingList.m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -2446,7 +2446,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
                              QString& error)
 {
   error.clear();
-  qlonglong id = shoppingList.m_id;
+  Id id = shoppingList.m_id;
   shoppingList.clear();
 
   if (!BaitaSQL::isOpen(error))
@@ -2465,7 +2465,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
                 SHOPPING_LIST_SQL_COL07
                 " FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -2473,8 +2473,8 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
     if (query.next())
     {
       shoppingList.m_id = id;
-      shoppingList.m_supplier.m_id = query.value(0).toLongLong();
-      shoppingList.m_image.m_id = query.value(1).toLongLong();
+      shoppingList.m_supplier.m_id.set(query.value(0).toLongLong());
+      shoppingList.m_image.m_id.set(query.value(1).toLongLong());
       shoppingList.m_title = query.value(2).toString();
       shoppingList.m_description = query.value(3).toString();
       shoppingList.setWeekDays(query.value(4).toString());
@@ -2502,15 +2502,15 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
                   SHOPPING_LIST_ITEMS_SQL_COL09
                   " FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME
                   " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", shoppingList.m_id);
+    query.bindValue(":_v01", shoppingList.m_id.get());
     bSuccess = query.exec();
     if (bSuccess)
     {
       while (bSuccess && query.next())
       {
         ShoppingListItem item;
-        item.m_id = query.value(0).toLongLong();
-        item.m_product.m_id = query.value(1).toLongLong();
+        item.m_id.set(query.value(0).toLongLong());
+        item.m_product.m_id.set(query.value(1).toLongLong());
         item.m_ammount = query.value(2).toDouble();
         item.m_price = query.value(3).toDouble();
         item.m_package.m_bIsPackage = query.value(4).toBool();
@@ -2526,13 +2526,13 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
   if (bSuccess)
   {
     QString error2;
-    if (shoppingList.m_supplier.isValidId())
+    if (shoppingList.m_supplier.m_id.isValid())
       PersonSQL::execSelect(query, shoppingList.m_supplier, error2);
-    if (shoppingList.m_image.isValidId())
+    if (shoppingList.m_image.m_id.isValid())
       ImageSQL::execSelect(query, shoppingList.m_image, error2);
     for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
     {
-      if (shoppingList.m_vItem.at(i).m_product.isValidId())
+      if (shoppingList.m_vItem.at(i).m_product.m_id.isValid())
         ProductSQL::execSelect(query, shoppingList.m_vItem[i].m_product, error);
     }
   }
@@ -2540,7 +2540,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ShoppingListSQL::remove(qlonglong id,
+bool ShoppingListSQL::remove(Id id,
                              QString& error)
 {
   error.clear();
@@ -2553,7 +2553,7 @@ bool ShoppingListSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -2563,7 +2563,7 @@ bool ReservationSQL::execSelect(QSqlQuery& query,
                                 QString& error)
 {
   error.clear();
-  qlonglong id = res.m_id;
+  Id id = res.m_id;
   res.clear();
 
   query.prepare("SELECT "
@@ -2576,7 +2576,7 @@ bool ReservationSQL::execSelect(QSqlQuery& query,
                 RESERVATION_SQL_COL07
                 " FROM " RESERVATION_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -2663,7 +2663,7 @@ bool ReservationSQL::insert(const Reservation& res,
 
   bool bSuccess = query.exec();
   if (bSuccess)
-    res.m_id = query.lastInsertId().toLongLong();
+    res.m_id.set(query.lastInsertId().toLongLong());
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -2689,7 +2689,7 @@ bool ReservationSQL::update(const Reservation& res,
                 RESERVATION_SQL_COL07 " = (:_v07)"
                 " WHERE " SQL_COLID " = (:_v00)");
 
-  query.bindValue(":_v00", res.m_id);
+  query.bindValue(":_v00", res.m_id.get());
   query.bindValue(":_v01", res.m_number);
   query.bindValue(":_v02", res.m_name);
   query.bindValue(":_v03", res.m_location);
@@ -2701,7 +2701,7 @@ bool ReservationSQL::update(const Reservation& res,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ReservationSQL::remove(qlonglong id,
+bool ReservationSQL::remove(Id id,
                             QString& error)
 {
   error.clear();
@@ -2714,7 +2714,7 @@ bool ReservationSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " RESERVATION_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
@@ -2766,7 +2766,7 @@ bool ProductBarcodeSQL::execSelect(QSqlQuery& query,
                                    QString& error)
 {
   error.clear();
-  qlonglong id = barcode.m_id;
+  Id id = barcode.m_id;
   barcode.clear();
 
   query.prepare("SELECT "
@@ -2774,7 +2774,7 @@ bool ProductBarcodeSQL::execSelect(QSqlQuery& query,
                 PRODUCT_BARCODE_SQL_COL02
                 " FROM " PRODUCT_BARCODE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   if (bSuccess)
   {
@@ -2782,7 +2782,7 @@ bool ProductBarcodeSQL::execSelect(QSqlQuery& query,
     if (bSuccess)
     {
       barcode.m_id = id;
-      barcode.m_product.m_id = query.value(0).toLongLong();
+      barcode.m_product.m_id.set(query.value(0).toLongLong());
       barcode.m_code = query.value(1).toString();
     }
     else
@@ -2792,7 +2792,7 @@ bool ProductBarcodeSQL::execSelect(QSqlQuery& query,
     }
   }
 
-  if (barcode.m_product.isValidId())
+  if (barcode.m_product.m_id.isValid())
     ProductSQL::execSelect(query, barcode.m_product, error);
 
   if (!bSuccess)
@@ -2836,12 +2836,12 @@ bool ProductBarcodeSQL::insert(const ProductBarcode& barcode,
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02))");
-  query.bindValue(":_v01", barcode.m_product.m_id);
+  query.bindValue(":_v01", barcode.m_product.m_id.get());
   query.bindValue(":_v02", barcode.m_code);
 
   bool bSuccess = query.exec();
   if (bSuccess)
-    barcode.m_id = query.lastInsertId().toLongLong();
+    barcode.m_id.set(query.lastInsertId().toLongLong());
   return finishTransaction(db, query, bSuccess, error);
 }
 
@@ -2861,14 +2861,14 @@ bool ProductBarcodeSQL::update(const ProductBarcode& barcode,
                 PRODUCT_BARCODE_SQL_COL01 " = (:_v01),"
                 PRODUCT_BARCODE_SQL_COL02 " = (:_v02)") +
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", barcode.m_id);
-  query.bindValue(":_v01", barcode.m_product.m_id);
+  query.bindValue(":_v00", barcode.m_id.get());
+  query.bindValue(":_v01", barcode.m_product.m_id.get());
   query.bindValue(":_v02", barcode.m_code);
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ProductBarcodeSQL::remove(qlonglong id,
+bool ProductBarcodeSQL::remove(Id id,
                                QString& error)
 {
   error.clear();
@@ -2881,7 +2881,7 @@ bool ProductBarcodeSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " PRODUCT_BARCODE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -2945,7 +2945,7 @@ bool DiscountSQL::insert(const Discount& o, QString& error)
 
   if (bSuccess)
   {
-    o.m_id = query.lastInsertId().toLongLong();
+    o.m_id.set(query.lastInsertId().toLongLong());
     for (int i = 0; i != o.m_items.size(); ++i)
     {
       query.prepare("INSERT INTO " DISCOUNT_ITEMS_SQL_TABLE_NAME " ("
@@ -2956,12 +2956,12 @@ bool DiscountSQL::insert(const Discount& o, QString& error)
                     "(:_v01),"
                     "(:_v02),"
                     "(:_v03))");
-      query.bindValue(":_v01", o.m_id);
-      query.bindValue(":_v02", o.m_items.at(i).m_product.m_id);
+      query.bindValue(":_v01", o.m_id.get());
+      query.bindValue(":_v02", o.m_items.at(i).m_product.m_id.get());
       query.bindValue(":_v03", o.m_items.at(i).m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
-        o.m_items.at(i).m_id = query.lastInsertId().toLongLong();
+        o.m_items.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -2991,7 +2991,7 @@ bool DiscountSQL::update(const Discount& o, QString& error)
                 DISCOUNT_SQL_COL08 " = (:_v08) "
                 "WHERE " SQL_COLID " = (:_v00)");
 
-  query.bindValue(":_v00", o.m_id);
+  query.bindValue(":_v00", o.m_id.get());
   query.bindValue(":_v01", o.m_code);
   query.bindValue(":_v02", o.m_bExpires);
   query.bindValue(":_v03", o.m_dtExp);
@@ -3003,7 +3003,7 @@ bool DiscountSQL::update(const Discount& o, QString& error)
   bool bSuccess = query.exec();
 
   query.prepare("DELETE FROM " DISCOUNT_ITEMS_SQL_TABLE_NAME " WHERE " DISCOUNT_ITEMS_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", o.m_id);
+  query.bindValue(":_v01", o.m_id.get());
   bSuccess = query.exec();
 
   if (bSuccess)
@@ -3018,12 +3018,12 @@ bool DiscountSQL::update(const Discount& o, QString& error)
                     "(:_v01),"
                     "(:_v02),"
                     "(:_v03))");
-      query.bindValue(":_v01", o.m_id);
-      query.bindValue(":_v02", o.m_items.at(i).m_product.m_id);
+      query.bindValue(":_v01", o.m_id.get());
+      query.bindValue(":_v02", o.m_items.at(i).m_product.m_id.get());
       query.bindValue(":_v03", o.m_items.at(i).m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
-        o.m_items.at(i).m_id = query.lastInsertId().toLongLong();
+        o.m_items.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -3037,7 +3037,7 @@ bool DiscountSQL::execSelect(QSqlQuery& query,
                              QString& error)
 {
   error.clear();
-  qlonglong id = o.m_id;
+  Id id = o.m_id;
   o.clear();
 
   query.prepare("SELECT "
@@ -3051,7 +3051,7 @@ bool DiscountSQL::execSelect(QSqlQuery& query,
                 DISCOUNT_SQL_COL08
                 " FROM " DISCOUNT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -3083,15 +3083,15 @@ bool DiscountSQL::execSelect(QSqlQuery& query,
                   DISCOUNT_ITEMS_SQL_COL03
                   " FROM " DISCOUNT_ITEMS_SQL_TABLE_NAME
                   " WHERE " DISCOUNT_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", o.m_id);
+    query.bindValue(":_v01", o.m_id.get());
     bSuccess = query.exec();
     if (bSuccess)
     {
       while (bSuccess && query.next())
       {
         DiscountItem oi;
-        oi.m_id = query.value(0).toLongLong();
-        oi.m_product.m_id = query.value(1).toLongLong();
+        oi.m_id.set(query.value(0).toLongLong());
+        oi.m_product.m_id.set(query.value(1).toLongLong());
         oi.m_ammount = query.value(2).toDouble();
         o.m_items.push_back(oi);
       }
@@ -3103,7 +3103,7 @@ bool DiscountSQL::execSelect(QSqlQuery& query,
     QString error2;
     for (int i = 0; i != o.m_items.size(); ++i)
     {
-      if (o.m_items.at(i).m_product.isValidId())
+      if (o.m_items.at(i).m_product.m_id.isValid())
         ProductSQL::execSelect(query, o.m_items[i].m_product, error2);
     }
   }
@@ -3131,8 +3131,8 @@ bool DiscountSQL::select(Discount& o, QString& error)
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool DiscountSQL::remove(qlonglong id,
-                     QString& error)
+bool DiscountSQL::remove(Id id,
+                         QString& error)
 {
   error.clear();
 
@@ -3144,7 +3144,7 @@ bool DiscountSQL::remove(qlonglong id,
   QSqlQuery query(db);
   query.prepare("DELETE FROM " DISCOUNT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id);
+  query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -3172,7 +3172,7 @@ bool DiscountSQL::redeem(const QString& code,
 
   if (bSuccess && query.next())
   {
-    o.m_id = query.value(0).toLongLong();
+    o.m_id.set(query.value(0).toLongLong());
     bSuccess = execSelect(query, o, error);
 
     if (bSuccess)
@@ -3181,7 +3181,7 @@ bool DiscountSQL::redeem(const QString& code,
       query.prepare("UPDATE " DISCOUNT_SQL_TABLE_NAME " SET "
                     DISCOUNT_SQL_COL07 " = TRUE "
                     "WHERE " SQL_COLID " = (:_v00)");
-      query.bindValue(":_v00", o.m_id);
+      query.bindValue(":_v00", o.m_id.get());
       bSuccess = query.exec();
       if (bSuccess)
         o.m_bRedeemed = true;

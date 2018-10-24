@@ -23,7 +23,7 @@ public:
 
 private slots:
   void itemSelected(const JItem& jItem);
-  void itemsRemoved(const QVector<qlonglong>&);
+  void itemsRemoved(const QVector<Id>&);
   void showSearch();
 
 public slots:
@@ -35,7 +35,7 @@ signals:
   void saveSignal();
 
 private:
-  qlonglong m_currentId;
+  Id m_currentId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSearch;
   JSpinBox* m_snNumber;

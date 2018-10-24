@@ -110,7 +110,7 @@ void ProductTableWidgetItem::selectItem(const QString& fixedFilter)
   if (dlg.exec())
   {
     Product* p = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
-    if (p != nullptr && p->isValidId())
+    if (p != nullptr && p->m_id.isValid())
       setItem(*p);
   }
 }
@@ -124,7 +124,7 @@ void ProductTableWidgetItem::selectItemByBarcode(const QString& fixedFilter)
   if (dlg.exec())
   {
     ProductBarcode* p = static_cast<ProductBarcode*>(dlg.getDatabase()->getCurrentItem());
-    if (p != nullptr && p->isValidId())
+    if (p != nullptr && p->m_id.isValid())
       setItem(p->m_product);
   }
 }
@@ -171,7 +171,7 @@ void PersonTableWidgetItem::selectItem(const QString& fixedFilter)
   if (dlg.exec())
   {
     Person* p = static_cast<Person*>(dlg.getDatabase()->getCurrentItem());
-    if (p != nullptr && p->isValidId())
+    if (p != nullptr && p->m_id.isValid())
       setItem(*p);
   }
 }

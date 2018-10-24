@@ -15,7 +15,7 @@ struct Category : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_name.clear();
     m_image.clear();
   }

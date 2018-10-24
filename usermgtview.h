@@ -14,7 +14,7 @@ class UserMgtView : public JItemView
   Q_OBJECT
 
 public:
-  explicit UserMgtView(qlonglong currentLoggedId, QWidget* parent = 0);
+  explicit UserMgtView(Id currentLoggedId, QWidget* parent = 0);
   const JItem& getItem() const;
 
   QString getPassword() const;
@@ -24,11 +24,11 @@ public slots:
   void create();
 
 protected slots:
-  void itemsRemoved(const QVector<qlonglong>& ids);
+  void itemsRemoved(const QVector<Id>& ids);
   void save();
 
 private:
-  qlonglong m_currentLoggedId;
+  Id m_currentLoggedId;
   bool m_bHasLoggedUserChanged;
   JLineEdit* m_user;
   QLabel* m_lblPasswordMsg;

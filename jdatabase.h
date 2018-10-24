@@ -56,7 +56,7 @@ public:
 public slots:
   void refresh();
   void selectItem();
-  void selectItem(qlonglong id);
+  void selectItem(Id id);
   void setFixedFilter(const QString& fixedFilter);
   void clearFilterSearch();
 
@@ -90,7 +90,7 @@ private slots:
 
 signals:
   void itemSelectedSignal(const JItem& jItem);
-  void itemsRemovedSignal(const QVector<qlonglong>& ids);
+  void itemsRemovedSignal(const QVector<Id>& ids);
   void currentRowChangedSignal(int row);
 };
 

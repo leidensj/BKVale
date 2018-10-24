@@ -23,7 +23,7 @@ struct DiscountItem : JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_product.clear();
     m_ammount = 0.0;
   }
@@ -106,7 +106,7 @@ struct Discount : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_code.clear();
     m_type = Type::Value;
     m_value = 0.0;

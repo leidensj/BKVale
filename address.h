@@ -27,7 +27,7 @@ struct Address : public JItem
 
   void clear()
   {
-    m_id = INVALID_ID;
+    m_id.clear();
     m_cep.clear();
     m_neighborhood.clear();
     m_street.clear();

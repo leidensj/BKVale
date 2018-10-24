@@ -14,8 +14,8 @@ public:
 
 public slots:
   void addItem(const JItem& o);
-  void addItemAndLoadPrices(qlonglong supplierId);
-  void addItemAndLoadPricesByBarcode(qlonglong supplierId);
+  void addItemAndLoadPrices(Id supplierId);
+  void addItemAndLoadPricesByBarcode(Id supplierId);
   double computeTotal() const;
 
 private:
@@ -25,7 +25,8 @@ private:
 
 protected slots:
   void update(int row, int column);
-  void itemDoubleClicked(int row, int column);
+  void itemActivate(int row, int column);
+  void itemDelete(int row, int column);
 };
 
 #endif // NOTETABLEWIDGET_H

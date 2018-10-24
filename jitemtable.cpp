@@ -33,7 +33,7 @@ JTable::JTable(QWidget* parent)
   QObject::connect(this,
                    SIGNAL(cellDoubleClicked(int, int)),
                    this,
-                   SLOT(itemDoubleClicked(int, int)));
+                   SLOT(itemActivate(int,int)));
 }
 
 void JTable::removeItem()
@@ -70,7 +70,13 @@ void JTable::keyPressEvent(QKeyEvent *event)
   else if (event->key() == Qt::Key_Delete)
   {
     if (currentIndex().isValid())
-      emit deletePressedSignal(currentIndex().row(), currentIndex().column());
+      emit deleteSignal(currentIndex().row(), currentIndex().column());
+    QTableWidget::keyPressEvent(event);
+  }
+  else if (event->key() == Qt::Key_Space)
+  {
+    if (currentIndex().isValid())
+      emit activateSignal(currentIndex().row(), currentIndex().column());
     QTableWidget::keyPressEvent(event);
   }
   else

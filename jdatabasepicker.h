@@ -35,9 +35,8 @@ public:
                            int flags = 0,
                            QWidget* parent = nullptr);
 
-  qlonglong getId() const;
-  QVector<qlonglong> getIds() const;
-  bool isValidId() const;
+  Id getId() const;
+  QVector<Id> getIds() const;
 
   const QString m_text;
 
@@ -47,7 +46,7 @@ public slots:
   void clear();
   void clearAll();
   void setItem(const JItem& jItem);
-  void setItem(qlonglong id,
+  void setItem(Id id,
                const QString& name,
                const QByteArray& arImage);
 

@@ -18,6 +18,7 @@
 #include "shopview.h"
 #include "jdatabase.h"
 #include "productbarcodeview.h"
+#include "timecard.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -235,6 +236,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(redeemSignal(const QString&)),
                    this,
                    SLOT(print(const QString&)));
+
+  QObject::connect(ui->actionTimeCard,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(testTimeAccess()));
 
   activateWindow();
   m_settings.load();
@@ -688,4 +694,9 @@ void BaitaAssistant::activateWindow()
     ui->mdi->setActiveSubWindow(m_discountWindow);
   }
   updateControls();
+}
+
+void BaitaAssistant::testTimeAccess()
+{
+  TimeCard c;
 }

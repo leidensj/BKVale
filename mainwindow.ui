@@ -189,6 +189,7 @@
    <addaction name="actionShop"/>
    <addaction name="actionReservations"/>
    <addaction name="actionDiscount"/>
+   <addaction name="actionTimeCard"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">
@@ -416,6 +417,15 @@
    </property>
    <property name="text">
     <string>Setores do Estoque</string>
+   </property>
+  </action>
+  <action name="actionTimeCard">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/settings.png</normaloff>:/icons/res/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Livro Ponto</string>
    </property>
   </action>
  </widget>

@@ -85,6 +85,8 @@ private slots:
   void openActiveUsersDialog();
   void openProductBarcodeDialog();
   void activateWindow();
+
+  void testTimeAccess();
 };
 
 #endif // MAINWINDOW_H

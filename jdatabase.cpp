@@ -224,7 +224,7 @@ public:
     {
       header->hideSection(0);
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
     }
   }
 };

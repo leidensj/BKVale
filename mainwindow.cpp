@@ -19,6 +19,7 @@
 #include "jdatabase.h"
 #include "productbarcodeview.h"
 #include "timecard.h"
+#include "storeview.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -241,6 +242,11 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
                    SIGNAL(triggered(bool)),
                    this,
                    SLOT(testTimeAccess()));
+
+  QObject::connect(ui->actionStores,
+                   SIGNAL(triggered(bool)),
+                   this,
+                   SLOT(openStoreDialog()));
 
   activateWindow();
   m_settings.load();
@@ -639,6 +645,20 @@ void BaitaAssistant::openProductBarcodeDialog()
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Códigos"));
   dlg.setWindowIcon(QIcon(":/icons/res/barcode.png"));
+  dlg.setModal(true);
+  dlg.exec();
+}
+
+void BaitaAssistant::openStoreDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout;
+  dlg.setLayout(layout);
+  StoreView* w = new StoreView(this);
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Lojas"));
+  dlg.setWindowIcon(QIcon(":/icons/res/store.png"));
   dlg.setModal(true);
   dlg.exec();
 }

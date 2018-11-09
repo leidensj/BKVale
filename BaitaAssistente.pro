@@ -53,7 +53,8 @@ SOURCES += main.cpp\
     jitemview.cpp \
     jitemtable.cpp \
     phonetablewidget.cpp \
-    timecard.cpp
+    timecard.cpp \
+    storeview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -112,7 +113,9 @@ HEADERS  += mainwindow.h \
     stock.h \
     jitemtable.h \
     phonetablewidget.h \
-    timecard.h
+    timecard.h \
+    store.h \
+    storeview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

@@ -155,5 +155,6 @@
         <file>res/discount.png</file>
         <file>res/redeem.png</file>
         <file>res/stockaisle.png</file>
+        <file>res/store.png</file>
     </qresource>
 </RCC>

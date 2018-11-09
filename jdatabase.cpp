@@ -614,6 +614,42 @@ public:
   }
 };
 
+class StoreTableModel : public JTableModel
+{
+public:
+  StoreTableModel(QObject *parent)
+    : JTableModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     STORE_SQL_TABLE_NAME "." SQL_COLID ","
+                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL02
+                     " FROM "
+                     STORE_SQL_TABLE_NAME
+                     " LEFT OUTER JOIN "
+                     PERSON_SQL_TABLE_NAME
+                     " ON " STORE_SQL_TABLE_NAME "." STORE_SQL_COL01
+                     " = " PERSON_SQL_TABLE_NAME "." SQL_COLID);
+    return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JTableModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    if (header != nullptr && header->count() == 2)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+};
+
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
 {
@@ -740,6 +776,8 @@ JDatabase::JDatabase(const QString& tableName,
     model = new ProductTableModel(this);
   else if (tableName == CATEGORY_SQL_TABLE_NAME)
     model = new CategoryTableModel(this);
+  else if (tableName == STORE_SQL_TABLE_NAME)
+    model = new StoreTableModel(this);
   else if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     model = new ShoppingListTableModel(this);
   else if (tableName == RESERVATION_SQL_TABLE_NAME)
@@ -907,6 +945,13 @@ void JDatabase::selectItem(Id id)
     bSuccess = CategorySQL::select(o, error);
     m_currentItem = new Category(o);
   }
+  else if (m_tableName == STORE_SQL_TABLE_NAME)
+  {
+    Store o;
+    o.m_id = id;
+    bSuccess = StoreSQL::select(o, error);
+    m_currentItem = new Store(o);
+  }
   else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
   {
     Product o;
@@ -1063,6 +1108,8 @@ void JDatabase::removeItems()
       PersonSQL::remove(id, error);
     else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
       CategorySQL::remove(id, error);
+    else if (m_tableName == STORE_SQL_TABLE_NAME)
+      StoreSQL::remove(id, error);
     else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
       ProductSQL::remove(id, error);
     else if (m_tableName == NOTE_SQL_TABLE_NAME)
@@ -1208,6 +1255,13 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
     bSuccess = o.m_id.isValid()
                ? CategorySQL::update(o, error)
                : CategorySQL::insert(o, error);
+  }
+  else if (m_tableName == STORE_SQL_TABLE_NAME)
+  {
+    const Store& o = dynamic_cast<const Store&>(jItem);
+    bSuccess = o.m_id.isValid()
+               ? StoreSQL::update(o, error)
+               : StoreSQL::insert(o, error);
   }
   else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
   {

@@ -201,21 +201,6 @@ bool BaitaSQL::createTables(QString& error)
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
-                          EMPLOYEE_SQL_COL01 " INTEGER PRIMARY KEY,"
-                          EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
-                          EMPLOYEE_SQL_COL03 " BOOLEAN,"
-                          EMPLOYEE_SQL_COL04 " BOOLEAN,"
-                          "FOREIGN KEY(" EMPLOYEE_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SUPPLIER_SQL_TABLE_NAME " ("
-                          SUPPLIER_SQL_COL01 " INTEGER PRIMARY KEY,"
-                          "FOREIGN KEY(" SUPPLIER_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
-
-  if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " ADDRESS_SQL_TABLE_NAME " ("
                         SQL_COLID " SERIAL PRIMARY KEY,"
                         ADDRESS_SQL_COL01 " INTEGER,"
@@ -240,6 +225,38 @@ bool BaitaSQL::createTables(QString& error)
                         PHONE_SQL_COL05 " TEXT,"
                         "FOREIGN KEY(" PHONE_SQL_COL01 ") REFERENCES "
                         PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          STORE_SQL_COL01 " INTEGER,"
+                          STORE_SQL_COL02 " INTEGER,"
+                          STORE_SQL_COL03 " INTEGER,"
+                          STORE_SQL_COL04 " TEXT,"
+                          "FOREIGN KEY(" STORE_SQL_COL01 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                          "FOREIGN KEY(" STORE_SQL_COL02 ") REFERENCES "
+                          ADDRESS_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                          "FOREIGN KEY(" STORE_SQL_COL03 ") REFERENCES "
+                          PHONE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
+                          EMPLOYEE_SQL_COL01 " INTEGER PRIMARY KEY,"
+                          EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
+                          EMPLOYEE_SQL_COL03 " BOOLEAN,"
+                          EMPLOYEE_SQL_COL04 " BOOLEAN,"
+                          EMPLOYEE_SQL_COL05 " INTEGER,"
+                          "FOREIGN KEY(" EMPLOYEE_SQL_COL01 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" EMPLOYEE_SQL_COL05 ") REFERENCES "
+                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SUPPLIER_SQL_TABLE_NAME " ("
+                          SUPPLIER_SQL_COL01 " INTEGER PRIMARY KEY,"
+                          "FOREIGN KEY(" SUPPLIER_SQL_COL01 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("
@@ -1690,6 +1707,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     query.prepare("SELECT "
                   EMPLOYEE_SQL_COL02 ","
                   EMPLOYEE_SQL_COL03 ","
+                  EMPLOYEE_SQL_COL05 ","
                   EMPLOYEE_SQL_COL04
                   " FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
@@ -1701,6 +1719,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
       person.m_employee.m_pincode = query.value(0).toString();
       person.m_employee.m_bNoteEdit = query.value(1).toBool();
       person.m_employee.m_bNoteRemove = query.value(2).toBool();
+      person.m_employee.m_storeId = query.value(3).toLongLong();
     }
   }
 
@@ -1892,16 +1911,19 @@ bool PersonSQL::insert(const Person& person,
                     EMPLOYEE_SQL_COL01 ","
                     EMPLOYEE_SQL_COL02 ","
                     EMPLOYEE_SQL_COL03 ","
-                    EMPLOYEE_SQL_COL04 ")"
+                    EMPLOYEE_SQL_COL04 ","
+                    EMPLOYEE_SQL_COL05 ")"
                     " VALUES ("
                     "(:_v01),"
                     "(:_v02),"
                     "(:_v03),"
-                    "(:_v04))");
+                    "(:_v04),"
+                    "(:_v05))");
       query.bindValue(":_v01", person.m_id.get());
       query.bindValue(":_v02", person.m_employee.m_pincode);
       query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
       query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
+      query.bindValue(":_v05", person.m_employee.m_storeId.get());
       bSuccess = query.exec();
     }
 
@@ -2056,16 +2078,19 @@ bool PersonSQL::update(const Person& person,
                   EMPLOYEE_SQL_COL01 ","
                   EMPLOYEE_SQL_COL02 ","
                   EMPLOYEE_SQL_COL03 ","
-                  EMPLOYEE_SQL_COL04 ")"
+                  EMPLOYEE_SQL_COL04 ","
+                  EMPLOYEE_SQL_COL05 ")"
                   " VALUES ("
                   "(:_v01),"
                   "(:_v02),"
                   "(:_v03),"
-                  "(:_v04))");
+                  "(:_v04),"
+                  "(:_v05))");
     query.bindValue(":_v01", person.m_id.get());
     query.bindValue(":_v02", person.m_employee.m_pincode);
     query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
     query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
+    query.bindValue(":_v05", person.m_employee.m_storeId.get());
     bSuccess = query.exec();
   }
 
@@ -3192,6 +3217,161 @@ bool DiscountSQL::redeem(const QString& code,
     bSuccess = false;
     error = "Código informado não encontrado.";
   }
+
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+
+
+
+
+
+
+
+
+
+bool StoreSQL::execSelect(QSqlQuery& query,
+                          Store& o,
+                          QString& error)
+{
+  error.clear();
+  Id id = o.m_id;
+  o.clear();
+
+  query.prepare("SELECT "
+                STORE_SQL_COL01 ","
+                STORE_SQL_COL02 ","
+                STORE_SQL_COL03 ","
+                STORE_SQL_COL04
+                " FROM " STORE_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id.get());
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      o.m_id = id;
+      o.m_person.m_id = query.value(0).toLongLong();
+      o.m_address.m_id = query.value(1).toLongLong();
+      o.m_phone.m_id = query.value(2).toLongLong();
+      o.m_name = query.value(3).toLongLong();
+    }
+    else
+    {
+      error = "Loja não encontrada.";
+      bSuccess = false;
+    }
+  }
+
+  if (bSuccess && o.m_person.m_id.isValid())
+    bSuccess = PersonSQL::execSelect(query, o.m_person, error);
+
+  // TODO Separar Address e Phone e suas funções
+
+  if (!bSuccess)
+  {
+    if (error.isEmpty())
+      error = query.lastError().text();
+    o.clear();
+  }
+
+  return bSuccess;
+}
+
+bool StoreSQL::select(Store& o,
+                      QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  bool bSuccess = execSelect(query, o, error);
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool StoreSQL::insert(const Store& o,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("INSERT INTO " STORE_SQL_TABLE_NAME " ("
+                STORE_SQL_COL01 ","
+                STORE_SQL_COL02 ","
+                STORE_SQL_COL03 ","
+                STORE_SQL_COL04 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04))");
+
+  query.bindValue(":_v01", o.m_person.m_id.getIdNull());
+  query.bindValue(":_v02", o.m_address.m_id.getIdNull());
+  query.bindValue(":_v03", o.m_phone.m_id.getIdNull());
+  query.bindValue(":_v04", o.m_name);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+    o.m_id.set(query.lastInsertId().toLongLong());
+
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool StoreSQL::update(const Store& o,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("UPDATE " STORE_SQL_TABLE_NAME " SET "
+                STORE_SQL_COL01 " = (:_v01),"
+                STORE_SQL_COL02 " = (:_v02),"
+                STORE_SQL_COL03 " = (:_v03),"
+                STORE_SQL_COL04 " = (:_v04)"
+                " WHERE " SQL_COLID " = (:_v00)");
+
+  query.bindValue(":_v00", o.m_id.get());
+  query.bindValue(":_v01", o.m_person.m_id.getIdNull());
+  query.bindValue(":_v02", o.m_address.m_id.getIdNull());
+  query.bindValue(":_v03", o.m_phone.m_id.getIdNull());
+  query.bindValue(":_v04", o.m_name);
+
+  bool bSuccess = query.exec();
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool StoreSQL::remove(Id id,
+                      QString& error)
+{
+  error.clear();
+
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  query.prepare("DELETE FROM " STORE_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id.get());
+  bool bSuccess = query.exec();
 
   return finishTransaction(db, query, bSuccess, error);
 }

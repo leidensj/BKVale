@@ -138,6 +138,7 @@
     <addaction name="actionImages"/>
     <addaction name="actionShoppingList"/>
     <addaction name="actionUsers"/>
+    <addaction name="actionStores"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
     <property name="title">
@@ -426,6 +427,18 @@
    </property>
    <property name="text">
     <string>Livro Ponto</string>
+   </property>
+  </action>
+  <action name="actionStores">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/store.png</normaloff>:/icons/res/store.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lojas</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar Lojas</string>
    </property>
   </action>
  </widget>

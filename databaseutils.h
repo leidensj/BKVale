@@ -18,6 +18,7 @@
 #include "productbarcode.h"
 #include "discount.h"
 #include "stock.h"
+#include "store.h"
 
 class UserLoginSQL
 {
@@ -298,6 +299,25 @@ namespace DiscountSQL
   bool redeem(const QString& code,
               Discount& o,
               bool& redeemed,
+              QString& error);
+}
+
+namespace StoreSQL
+{
+ bool execSelect(QSqlQuery& query,
+                 Store& o,
+                 QString& error);
+
+  bool select(Store& o,
+              QString& error);
+
+  bool insert(const Store& o,
+              QString& error);
+
+  bool update(const Store& o,
+              QString& error);
+
+  bool remove(Id id,
               QString& error);
 }
 

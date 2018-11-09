@@ -84,6 +84,7 @@ private slots:
   void openShoppingListDialog();
   void openActiveUsersDialog();
   void openProductBarcodeDialog();
+  void openStoreDialog();
   void activateWindow();
 
   void testTimeAccess();

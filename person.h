@@ -17,6 +17,7 @@ struct Employee
   QString m_pincode;
   bool m_bNoteEdit;
   bool m_bNoteRemove;
+  Id m_storeId;
 
   void clear()
   {
@@ -24,6 +25,7 @@ struct Employee
     m_pincode.clear();
     m_bNoteEdit = false;
     m_bNoteRemove = false;
+    m_storeId.clear();
   }
 
   Employee()

@@ -3,6 +3,7 @@
 
 #include "defines.h"
 #include <QRegExp>
+#include <QVariant>
 
 class Id
 {
@@ -14,9 +15,10 @@ public:
   static QString st_str(qlonglong id) { return QString::number(id); }
   bool isValid() const { return st_isValid(m_id); }
   void clear() { m_id = INVALID_ID; }
-  void set(qlonglong id) { m_id = id; }
+  void set(qlonglong id) { m_id = id > INVALID_ID ? id: INVALID_ID; }
   QString str() const { return st_str(m_id); }
   qlonglong get() const { return m_id; }
+  QVariant getIdNull() const { return isValid() ? m_id : QVariant(QVariant::LongLong); }
   Id() { clear(); }
   Id(qlonglong id) : m_id(id) { }
   bool operator ==(const Id& other) const { return m_id == other.m_id; }

@@ -81,10 +81,9 @@ TimeCard::TimeCard(QWidget* parent)
     dt = dt.addDays(1);
   }
   html +=
-
                  "</table>"
                  "<br>"
-                 "<table border=\"1\" cellpadding=\"2\" align=\"center\" width=\"100%\ style=\"border-style:solid;\">"
+                 "<table border=\"1\" cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-style:solid;\">"
                    "<tr>"
                      "<td width=\"40%\">TOTAL DE HORAS NORMAIS</td>"
                      "<td width=\"10%\">(H.N.)</td>"

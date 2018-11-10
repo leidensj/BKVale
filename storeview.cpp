@@ -18,6 +18,7 @@ StoreView::StoreView(QWidget* parent)
   m_personPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
                                        tr("Empresa"),
                                        QIcon(":/icons/res/person.png"));
+  m_personPicker->getDatabase()->setFixedFilter(PERSON_FILTER_COMPANY);
 
   QFormLayout* tablayout = new QFormLayout;
   tablayout->setAlignment(Qt::AlignTop);

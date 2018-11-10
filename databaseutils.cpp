@@ -241,16 +241,23 @@ bool BaitaSQL::createTables(QString& error)
                           PHONE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          STORE_EMPLOYEES_SQL_COL01 " INTEGER NOT NULL,"
+                          STORE_EMPLOYEES_SQL_COL02 " INTEGER NOT NULL,"
+                          "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL01 ") REFERENCES "
+                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL02 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
                           EMPLOYEE_SQL_COL01 " INTEGER PRIMARY KEY,"
                           EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
                           EMPLOYEE_SQL_COL03 " BOOLEAN,"
                           EMPLOYEE_SQL_COL04 " BOOLEAN,"
-                          EMPLOYEE_SQL_COL05 " INTEGER,"
                           "FOREIGN KEY(" EMPLOYEE_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" EMPLOYEE_SQL_COL05 ") REFERENCES "
-                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SUPPLIER_SQL_TABLE_NAME " ("
@@ -1707,8 +1714,8 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     query.prepare("SELECT "
                   EMPLOYEE_SQL_COL02 ","
                   EMPLOYEE_SQL_COL03 ","
-                  EMPLOYEE_SQL_COL05 ","
-                  EMPLOYEE_SQL_COL04
+                  EMPLOYEE_SQL_COL04 ","
+                  EMPLOYEE_SQL_COL05
                   " FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", id.get());
@@ -3257,6 +3264,21 @@ bool StoreSQL::execSelect(QSqlQuery& query,
       o.m_address.m_id = query.value(1).toLongLong();
       o.m_phone.m_id = query.value(2).toLongLong();
       o.m_name = query.value(3).toLongLong();
+
+      query.prepare("SELECT "
+                    SQL_COLID ","
+                    STORE_EMPLOYEES_SQL_COL02
+                    " FROM " STORE_EMPLOYEES_SQL_TABLE_NAME
+                    " WHERE " STORE_EMPLOYEES_SQL_COL01 " = (:_v01)");
+      query.bindValue(":_v01", o.m_id.get());
+      bSuccess = query.exec();
+      if (bSuccess)
+      {
+        while (query.next())
+        {
+
+        }
+      }
     }
     else
     {

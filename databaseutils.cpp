@@ -248,7 +248,7 @@ bool BaitaSQL::createTables(QString& error)
                           "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL01 ") REFERENCES "
                           STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL02 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+                          EMPLOYEE_SQL_TABLE_NAME "(" EMPLOYEE_SQL_COL01 ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
@@ -1714,8 +1714,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
     query.prepare("SELECT "
                   EMPLOYEE_SQL_COL02 ","
                   EMPLOYEE_SQL_COL03 ","
-                  EMPLOYEE_SQL_COL04 ","
-                  EMPLOYEE_SQL_COL05
+                  EMPLOYEE_SQL_COL04
                   " FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", id.get());
@@ -1726,7 +1725,6 @@ bool PersonSQL::execSelect(QSqlQuery& query,
       person.m_employee.m_pincode = query.value(0).toString();
       person.m_employee.m_bNoteEdit = query.value(1).toBool();
       person.m_employee.m_bNoteRemove = query.value(2).toBool();
-      person.m_employee.m_storeId = query.value(3).toLongLong();
     }
   }
 
@@ -1918,19 +1916,16 @@ bool PersonSQL::insert(const Person& person,
                     EMPLOYEE_SQL_COL01 ","
                     EMPLOYEE_SQL_COL02 ","
                     EMPLOYEE_SQL_COL03 ","
-                    EMPLOYEE_SQL_COL04 ","
-                    EMPLOYEE_SQL_COL05 ")"
-                    " VALUES ("
+                    EMPLOYEE_SQL_COL04
+                    ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
                     "(:_v03),"
-                    "(:_v04),"
-                    "(:_v05))");
+                    "(:_v04))");
       query.bindValue(":_v01", person.m_id.get());
       query.bindValue(":_v02", person.m_employee.m_pincode);
       query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
       query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
-      query.bindValue(":_v05", person.m_employee.m_storeId.get());
       bSuccess = query.exec();
     }
 
@@ -2086,18 +2081,15 @@ bool PersonSQL::update(const Person& person,
                   EMPLOYEE_SQL_COL02 ","
                   EMPLOYEE_SQL_COL03 ","
                   EMPLOYEE_SQL_COL04 ","
-                  EMPLOYEE_SQL_COL05 ")"
-                  " VALUES ("
+                  ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
                   "(:_v03),"
-                  "(:_v04),"
-                  "(:_v05))");
+                  "(:_v04))");
     query.bindValue(":_v01", person.m_id.get());
     query.bindValue(":_v02", person.m_employee.m_pincode);
     query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
     query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
-    query.bindValue(":_v05", person.m_employee.m_storeId.get());
     bSuccess = query.exec();
   }
 
@@ -3263,7 +3255,7 @@ bool StoreSQL::execSelect(QSqlQuery& query,
       o.m_person.m_id = query.value(0).toLongLong();
       o.m_address.m_id = query.value(1).toLongLong();
       o.m_phone.m_id = query.value(2).toLongLong();
-      o.m_name = query.value(3).toLongLong();
+      o.m_name = query.value(3).toString();
 
       query.prepare("SELECT "
                     SQL_COLID ","
@@ -3276,7 +3268,10 @@ bool StoreSQL::execSelect(QSqlQuery& query,
       {
         while (query.next())
         {
-
+          StoreEmployee _o;
+          _o.m_id.set(query.value(0).toLongLong());
+          _o.m_employee.m_id.set(query.value(1).toLongLong());
+          o.m_vEmployee.push_back(_o);
         }
       }
     }
@@ -3289,6 +3284,19 @@ bool StoreSQL::execSelect(QSqlQuery& query,
 
   if (bSuccess && o.m_person.m_id.isValid())
     bSuccess = PersonSQL::execSelect(query, o.m_person, error);
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != o.m_vEmployee.size(); ++i)
+    {
+      if (o.m_vEmployee.at(i).m_id.isValid())
+      {
+        QString error2;
+        PersonSQL::execSelect(query, o.m_vEmployee[i].m_employee, error2);
+      }
+    }
+  }
+
 
   // TODO Separar Address e Phone e suas funções
 
@@ -3346,7 +3354,25 @@ bool StoreSQL::insert(const Store& o,
 
   bool bSuccess = query.exec();
   if (bSuccess)
+  {
     o.m_id.set(query.lastInsertId().toLongLong());
+    for (int i = 0; i != o.m_vEmployee.size(); ++i)
+    {
+      query.prepare("INSERT INTO " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
+                    STORE_EMPLOYEES_SQL_COL01 ","
+                    STORE_EMPLOYEES_SQL_COL02
+                    ") VALUES ("
+                    "(:_v01),"
+                    "(:_v02))");
+      query.bindValue(":_v01", o.m_id.getIdNull());
+      query.bindValue(":_v02", o.m_vEmployee.at(i).m_id.getIdNull());
+      bSuccess = query.exec();
+      if (bSuccess)
+        o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
+      else
+        break;
+    }
+  }
 
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -3376,6 +3402,35 @@ bool StoreSQL::update(const Store& o,
   query.bindValue(":_v04", o.m_name);
 
   bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " STORE_EMPLOYEES_SQL_TABLE_NAME
+                  " WHERE " STORE_EMPLOYEES_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", o.m_id.get());
+    bSuccess = query.exec();
+  }
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != o.m_vEmployee.size(); ++i)
+    {
+      query.prepare("INSERT INTO " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
+                    STORE_EMPLOYEES_SQL_COL01 ","
+                    STORE_EMPLOYEES_SQL_COL02
+                    ") VALUES ("
+                    "(:_v01),"
+                    "(:_v02))");
+      query.bindValue(":_v01", o.m_id.getIdNull());
+      query.bindValue(":_v02", o.m_vEmployee.at(i).m_id.getIdNull());
+      bSuccess = query.exec();
+      if (bSuccess)
+        o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
+      else
+        break;
+    }
+  }
+
   return finishTransaction(db, query, bSuccess, error);
 }
 

@@ -55,7 +55,7 @@ SOURCES += main.cpp\
     phonetablewidget.cpp \
     timecard.cpp \
     storeview.cpp \
-    persontablewidget.cpp
+    storeemployeetablewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -117,7 +117,7 @@ HEADERS  += mainwindow.h \
     timecard.h \
     store.h \
     storeview.h \
-    persontablewidget.h
+    storeemployeetablewidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

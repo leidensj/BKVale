@@ -170,15 +170,6 @@ PersonView::PersonView(bool bAccessEmployee,
   m_cbNoteRemove->setText(tr("Remover"));
   m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
-  QGroupBox* grpNote = new QGroupBox;
-  grpNote->setTitle(tr("Vales"));
-
-  QVBoxLayout* grpNoteLayout = new QVBoxLayout;
-  grpNoteLayout->addWidget(m_cbNoteEdit);
-  grpNoteLayout->addWidget(m_cbNoteRemove);
-
-  grpNote->setLayout(grpNoteLayout);
-
   m_edPhoneNumber = new JLineEdit(JLineEdit::Input::Numeric,
                                   JLineEdit::st_defaultFlags2);
   m_edPhoneName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
@@ -333,20 +324,12 @@ PersonView::PersonView(bool bAccessEmployee,
   m_grpEmployee->setCheckable(true);
   m_grpEmployee->setChecked(false);
   m_grpEmployee->setFlat(true);
-  QLabel* lblPincode = new QLabel();
-  lblPincode->setPixmap(QIcon(":/icons/res/pincode.png").pixmap(QSize(16, 16)));
-  lblPincode->setMinimumSize(16, 16);
-  lblPincode->setMaximumSize(16, 16);
-  lblPincode->setScaledContents(true);
-  QVBoxLayout* employeeLayout = new QVBoxLayout;
+
+  QFormLayout* employeeLayout = new QFormLayout;
   employeeLayout->setAlignment(Qt::AlignTop);
-  QHBoxLayout* pincodeLayout = new QHBoxLayout;
-  pincodeLayout->setContentsMargins(0, 0, 0, 0);
-  pincodeLayout->addWidget(lblPincode);
-  pincodeLayout->addWidget(new QLabel(tr("Código PIN")));
-  pincodeLayout->addWidget(m_edPinCode);
-  employeeLayout->addLayout(pincodeLayout);
-  employeeLayout->addWidget(grpNote);
+  employeeLayout->addRow(tr("Pincode:"), m_edPinCode);
+  employeeLayout->addRow(tr("Vales:"), m_cbNoteEdit);
+  employeeLayout->addRow("", m_cbNoteRemove);
   m_grpEmployee->setLayout(employeeLayout);
 
   QVBoxLayout* employeeFrameLayout = new QVBoxLayout;

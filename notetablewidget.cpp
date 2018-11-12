@@ -5,7 +5,7 @@
 #include "jtablewidgetitem.h"
 
 NoteTableWidget::NoteTableWidget(QWidget* parent)
-  : JTable(parent)
+  : JTable((int)Flags::NoFlags, parent)
 {
   setColumnCount(NOTE_NUMBER_OF_COLUMNS);
   QStringList headers;

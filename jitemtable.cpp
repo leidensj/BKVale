@@ -2,17 +2,26 @@
 #include <QTableWidget>
 #include <QKeyEvent>
 
-JTable::JTable(QWidget* parent)
+JTable::JTable(int flags, QWidget* parent)
  : QTableWidget(parent)
 {
-  QFont f = font();
-  f.setPointSize(12);
-  f.setCapitalization(QFont::AllUppercase);
-  setFont(f);
-  f = horizontalHeader()->font();
-  f.setPointSize(12);
-  f.setCapitalization(QFont::Capitalize);
-  horizontalHeader()->setFont(f);
+  if (flags & (int)Flags::BigFont)
+  {
+    QFont f = font();
+    f.setPointSize(12);
+    setFont(f);
+    f = horizontalHeader()->font();
+    f.setPointSize(12);
+  }
+
+  if (flags & (int)Flags::Uppercase)
+  {
+    QFont f = font();
+    f.setCapitalization(QFont::AllUppercase);
+    setFont(f);
+    f.setCapitalization(QFont::Capitalize);
+    horizontalHeader()->setFont(f);
+  }
 
   setSelectionBehavior(QAbstractItemView::SelectItems);
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -103,4 +112,9 @@ void JTable::emitChangedSignal()
 bool JTable::isValidRow(int row) const
 {
   return row >= 0 && row < rowCount();
+}
+
+bool JTable::isValidCurrentRow() const
+{
+  return isValidRow(currentRow());
 }

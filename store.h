@@ -3,6 +3,22 @@
 
 #include "jitem.h"
 #include "person.h"
+#include <QVector>
+
+struct StoreEmployee : public JItem
+{
+  Person m_employee;
+
+  void clear()
+  {
+    m_employee.clear();
+  }
+
+  StoreEmployee()
+  {
+    clear();
+  }
+};
 
 struct Store : public JItem
 {
@@ -10,6 +26,7 @@ struct Store : public JItem
   Address m_address;
   Phone m_phone;
   QString m_name;
+  QVector<StoreEmployee> m_vEmployee;
 
   void clear()
   {
@@ -17,6 +34,7 @@ struct Store : public JItem
     m_address.clear();
     m_phone.clear();
     m_name.clear();
+    m_vEmployee.clear();
   }
 
   Store()

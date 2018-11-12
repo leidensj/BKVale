@@ -5,7 +5,7 @@
 #include <QKeyEvent>
 
 ShoppingListTable::ShoppingListTable(QWidget* parent)
-  : JTable(parent)
+  : JTable((int) Flags::NoFlags, parent)
 {
   setColumnCount(SHOPPING_LIST_NUMBER_OF_COLUMNS);
   QStringList headers;

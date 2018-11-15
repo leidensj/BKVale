@@ -21,7 +21,7 @@ class JDatabasePicker : public QFrame
 
 public:
 
-  enum Flags
+  enum class Flags
   {
     TextPlaceholder = 0x1,
     TextGroup = 0x2,

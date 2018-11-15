@@ -141,7 +141,7 @@ PersonView::PersonView(bool bAccessEmployee,
   m_dtBirthDate->setSpecialValueText(tr("Não informada"));
   m_cbBirthDate = new QCheckBox;
   m_cbBirthDate->setChecked(false);
-  m_cbBirthDate->setText(tr("Data de nascimento:"));
+  m_cbBirthDate->setText(tr("Nascimento:"));
 
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
@@ -281,13 +281,9 @@ PersonView::PersonView(bool bAccessEmployee,
   phoneInformationLayout->addWidget(m_edPhoneName);
   phoneInformationLayout->addLayout(phoneNumberLayout);
 
-  QHBoxLayout* personLayout = new QHBoxLayout;
-  personLayout->setAlignment(Qt::AlignLeft);
-  personLayout->addWidget(new QLabel(tr("Tipo de pessoa:")));
-  personLayout->addWidget(m_rdoPerson);
-  personLayout->addWidget(m_rdoCompany);
-
   QFormLayout* formLayout = new QFormLayout;
+  formLayout->addRow(tr("Tipo:"), m_rdoPerson);
+  formLayout->addRow("", m_rdoCompany);
   formLayout->addRow(tr("Data de criação:"), m_dtCreationDate);
   formLayout->addRow(m_lblName, m_edName);
   formLayout->addRow(m_lblAlias, m_edAlias);

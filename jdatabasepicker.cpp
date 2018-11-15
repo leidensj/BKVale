@@ -3,6 +3,7 @@
 #include "jimageview.h"
 #include "defines.h"
 #include "jdatabase.h"
+#include "store.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QGroupBox>
@@ -45,7 +46,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
     m_edText->setReadOnly(true);
   }
 
-  if (m_flags & (int)Flags::TextPlaceholder && !(flags & Flags::Multipicker))
+  if (m_flags & (int)Flags::TextPlaceholder && !(m_flags & (int)Flags::Multipicker))
   {
     m_edText->setPlaceholderText(m_text);
   }
@@ -57,21 +58,21 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   m_btnClear->setIcon(QIcon(":/icons/res/remove.png"));
   m_btnClear->setToolTip(tr("Remover ") + m_text);
 
-  if (!(flags & Flags::Multipicker))
+  if (!(flags & (int)Flags::Multipicker))
     m_imageView = new JImageView(false, 24);
 
   QHBoxLayout* hlayout0 = new QHBoxLayout;
   QVBoxLayout* vlayout0 = new QVBoxLayout;
 
   QGroupBox* group = nullptr;
-  if (m_flags & Flags::TextGroup && !(m_flags & Flags::Multipicker))
+  if (m_flags & (int)Flags::TextGroup && !(m_flags & (int)Flags::Multipicker))
   {
     group = new QGroupBox();
     group->setTitle(m_text);
     group->setLayout(hlayout0);
   }
 
-  if (m_flags & Flags::Multipicker)
+  if (m_flags & (int)Flags::Multipicker)
   {
     hlayout0->setContentsMargins(0, 0, 0, 0);
     hlayout0->setAlignment(Qt::AlignLeft);
@@ -91,7 +92,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
     hlayout0->addWidget(m_edText);
     hlayout0->addWidget(m_btnClear);
 
-    if (m_flags & Flags::HideImage)
+    if (m_flags & (int)Flags::HideImage)
     {
       m_imageView->hide();
     }
@@ -104,7 +105,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
     hlayout0->addWidget(m_imageView);
     vlayout0->setContentsMargins(0, 0, 0, 0);
     vlayout0->setAlignment(Qt::AlignTop);
-    if (m_flags & Flags::TextGroup)
+    if (m_flags & (int)Flags::TextGroup)
       vlayout0->addWidget(group);
     else
       vlayout0->addLayout(hlayout0);
@@ -112,7 +113,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
 
   setLayout(vlayout0);
 
-  if (m_flags & Flags::Multipicker)
+  if (m_flags & (int)Flags::Multipicker)
     setFixedHeight(sizeHint().height());
 
   m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, this);
@@ -162,13 +163,18 @@ void JDatabasePicker::setItem(const JItem& jItem)
     const Product& o = dynamic_cast<const Product&>(jItem);
     setItem(o.m_id, o.m_name, o.m_image.m_image);
   }
+  else if (tableName == STORE_SQL_TABLE_NAME)
+  {
+    const Store& o = dynamic_cast<const Store&>(jItem);
+    setItem(o.m_id, o.m_name, o.m_person.m_image.m_image);
+  }
 }
 
 void JDatabasePicker::setItem(Id id,
                               const QString& name,
                               const QByteArray& arImage)
 {
-  if (m_flags & Flags::Multipicker)
+  if (m_flags & (int)Flags::Multipicker)
   {
     if (id.isValid())
     {
@@ -211,7 +217,7 @@ void JDatabasePicker::searchItem()
 
 void JDatabasePicker::clear()
 {
-  if (m_flags & Flags::Multipicker)
+  if (m_flags & (int)Flags::Multipicker)
   {
     auto pt = m_list->takeItem(m_list->currentRow());
     if (pt != nullptr)
@@ -234,7 +240,7 @@ void JDatabasePicker::clear()
 
 void JDatabasePicker::clearAll()
 {
-  if (m_flags & Flags::Multipicker)
+  if (m_flags & (int)Flags::Multipicker)
   {
     bool bChanged = m_list->count() != 0;
     m_list->clear();
@@ -249,13 +255,13 @@ void JDatabasePicker::clearAll()
 
 Id JDatabasePicker::getId() const
 {
-  return Id(m_flags & Flags::Multipicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong());
+  return Id(m_flags & (int)Flags::Multipicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong());
 }
 
 QVector<Id> JDatabasePicker::getIds() const
 {
   QVector<Id> v;
-  if (m_flags & Flags::Multipicker)
+  if (m_flags & (int)Flags::Multipicker)
     for (int i = 0; i != m_list->count(); ++i)
       v.push_back(Id(m_list->item(i)->data(Qt::UserRole).toLongLong()));
   return v;

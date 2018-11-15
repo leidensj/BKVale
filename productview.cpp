@@ -57,11 +57,11 @@ ProductView::ProductView(QWidget* parent)
   m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME,
                                          tr("Categoria"),
                                          QIcon(":/icons/res/category.png"),
-                                         JDatabasePicker::Flags::TextGroup);
+                                         (int)JDatabasePicker::Flags::TextGroup);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"),
-                                      JDatabasePicker::Flags::TextGroup);
+                                      (int)JDatabasePicker::Flags::TextGroup);
 
   QFormLayout* formlayout = new QFormLayout;
   formlayout->setContentsMargins(0, 0, 0, 0);

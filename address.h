@@ -50,6 +50,18 @@ struct Address : public JItem
         getBRState().m_abv + ".";
   }
 
+  QString getFormattedAddress2() const
+  {
+    return m_street + ", Nº " +
+        QString::number(m_number) + ". " +
+        m_neighborhood;
+  }
+
+  QString getFormattedAddress3() const
+  {
+    return m_city + " / " + getBRState().m_abv + ".";
+  }
+
   bool operator !=(const JItem& other) const
   {
     const Address& another = dynamic_cast<const Address&>(other);

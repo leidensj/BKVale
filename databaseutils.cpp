@@ -3365,7 +3365,7 @@ bool StoreSQL::insert(const Store& o,
                     "(:_v01),"
                     "(:_v02))");
       query.bindValue(":_v01", o.m_id.getIdNull());
-      query.bindValue(":_v02", o.m_vEmployee.at(i).m_id.getIdNull());
+      query.bindValue(":_v02", o.m_vEmployee.at(i).m_employee.m_id.get());
       bSuccess = query.exec();
       if (bSuccess)
         o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
@@ -3422,7 +3422,7 @@ bool StoreSQL::update(const Store& o,
                     "(:_v01),"
                     "(:_v02))");
       query.bindValue(":_v01", o.m_id.getIdNull());
-      query.bindValue(":_v02", o.m_vEmployee.at(i).m_id.getIdNull());
+      query.bindValue(":_v02", o.m_vEmployee.at(i).m_employee.m_id.get());
       bSuccess = query.exec();
       if (bSuccess)
         o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());

@@ -627,6 +627,7 @@ public:
   {
     QString strQuery("SELECT "
                      STORE_SQL_TABLE_NAME "." SQL_COLID ","
+                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL04 ","
                      PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL02
                      " FROM "
                      STORE_SQL_TABLE_NAME
@@ -642,10 +643,12 @@ public:
     JTableModel::select("");
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("Nome"));
-    if (header != nullptr && header->count() == 2)
+    setHeaderData(2, Qt::Horizontal, tr("Empresa"));
+    if (header != nullptr && header->count() == 3)
     {
       header->hideSection(0);
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
     }
   }
 };

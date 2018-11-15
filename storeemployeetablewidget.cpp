@@ -28,7 +28,7 @@ const JItem& StoreEmployeeTableWidget::getItem(int row) const
 
 void StoreEmployeeTableWidget::addItem()
 {
-  addItem(Person());
+  addItem(StoreEmployee());
   int row = rowCount() - 1;
   auto ptEmployeeCell = dynamic_cast<PersonTableWidgetItem*>(item(row, (int)Column::Name));
   ptEmployeeCell->selectItem(PERSON_FILTER_EMPLOYEE);

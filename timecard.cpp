@@ -3,11 +3,40 @@
 #include <QPrinter>
 #include <QDate>
 #include "jitem.h"
+#include "jdatabasepicker.h"
+#include <QDateEdit>
+#include <QFormLayout>
+#include <QDialogButtonBox>
+#include <QIcon>
+#include <QFileDialog>
 
 TimeCard::TimeCard(QWidget* parent)
- : QFrame(parent)
+ : QDialog(parent)
+ , m_storePicker(nullptr)
+ , m_date(nullptr)
 {
-  QDate dt(QDate::currentDate());
+  m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME, tr("Loja"), QIcon(":/icons/res/store.png"));
+  m_date = new QDateEdit(QDate::currentDate());
+  m_date->setDisplayFormat("MMMM yyyy");
+
+  QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+
+  connect(buttons, SIGNAL(accepted()), this, SLOT(saveAndAccept()));
+  connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+
+  QFormLayout* formLayout = new QFormLayout;
+  formLayout->addRow(tr("Loja:"), m_storePicker);
+  formLayout->addRow(tr("Data:"), m_date);
+
+  QVBoxLayout* ltMain = new QVBoxLayout;
+  ltMain->addLayout(formLayout);
+  ltMain->addWidget(buttons);
+  setLayout(ltMain);
+}
+
+void TimeCard::saveAndAccept()
+{
+  QDate dt(m_date->date());
   QString html;
   html = "<html>"
                  "<body>"
@@ -121,11 +150,17 @@ TimeCard::TimeCard(QWidget* parent)
   QTextDocument doc;
   doc.setHtml(html);
 
+  QString fileName = QFileDialog::getSaveFileName(this,
+                                                  tr("Salvar livro ponto"),
+                                                  QDir::currentPath(),
+                                                  tr("PDF (*.pdf)"));
+
   doc.setDocumentMargin(20);
   QPrinter printer(QPrinter::PrinterResolution);
   printer.setOutputFormat(QPrinter::PdfFormat);
   printer.setPaperSize(QPrinter::A4);
-  printer.setOutputFileName("test.pdf");
+  printer.setOutputFileName(fileName);
   doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
   doc.print(&printer);
+  accept();
 }

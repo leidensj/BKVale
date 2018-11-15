@@ -718,5 +718,6 @@ void BaitaAssistant::activateWindow()
 
 void BaitaAssistant::testTimeAccess()
 {
-  TimeCard c;
+  TimeCard c(this);
+  c.exec();
 }

@@ -94,6 +94,8 @@ const JItem& StoreView::getItem() const
   m_ref.m_id = m_currentId;
   m_ref.m_person.m_id = m_personPicker->getId();
   m_ref.m_name = m_edName->text();
+  for (int i = 0; i != m_employeeTable->rowCount(); ++i)
+    m_ref.m_vEmployee.push_back(dynamic_cast<const StoreEmployee&>(m_employeeTable->getItem(i)));
   return m_ref;
 }
 

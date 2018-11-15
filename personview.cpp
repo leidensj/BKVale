@@ -145,8 +145,7 @@ PersonView::PersonView(bool bAccessEmployee,
 
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      JDatabasePicker::Flags::TextGroup);
+                                      QIcon(":/icons/res/icon.png"));
   m_dtCreationDate = new QDateEdit;
   m_dtCreationDate->setCalendarPopup(true);
   m_dtCreationDate->setDisplayFormat("dd/MM/yyyy");
@@ -289,7 +288,6 @@ PersonView::PersonView(bool bAccessEmployee,
   personLayout->addWidget(m_rdoCompany);
 
   QFormLayout* formLayout = new QFormLayout;
-  formLayout->setContentsMargins(0, 0, 0, 0);
   formLayout->addRow(tr("Data de criação:"), m_dtCreationDate);
   formLayout->addRow(m_lblName, m_edName);
   formLayout->addRow(m_lblAlias, m_edAlias);
@@ -297,17 +295,8 @@ PersonView::PersonView(bool bAccessEmployee,
   formLayout->addRow(m_lblCpfCnpj, m_edCpfCnpj);
   formLayout->addRow(m_lblRgIE, m_edRgIE);
   formLayout->addRow(tr("Detalhes:"), m_edDetails);
-
-  QHBoxLayout* dateLayout = new QHBoxLayout;
-  dateLayout->setAlignment(Qt::AlignLeft);
-  dateLayout->addWidget(m_cbBirthDate);
-  dateLayout->addWidget(m_dtBirthDate);
-
-  QVBoxLayout* informationLayout = new QVBoxLayout;
-  informationLayout->addLayout(personLayout);
-  informationLayout->addLayout(formLayout);
-  informationLayout->addLayout(dateLayout);
-  informationLayout->addWidget(m_imagePicker);
+  formLayout->addRow(m_cbBirthDate, m_dtBirthDate);
+  formLayout->addRow(tr("Imagem:"), m_imagePicker);
 
   QVBoxLayout* phoneLayout = new QVBoxLayout;
   phoneLayout->addLayout(phoneButtonLayout);
@@ -348,7 +337,7 @@ PersonView::PersonView(bool bAccessEmployee,
   supplierFrameLayout->addWidget(m_grpSupplier);
 
   QFrame* informationFrame = new QFrame;
-  informationFrame->setLayout(informationLayout);
+  informationFrame->setLayout(formLayout);
 
   QFrame* employeeFrame = new QFrame;
   employeeFrame->setLayout(employeeFrameLayout);

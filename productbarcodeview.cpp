@@ -15,23 +15,18 @@ ProductBarcodeView::ProductBarcodeView(QWidget* parent)
 {
   m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME,
                                          tr("Produto"),
-                                         QIcon(":/icons/res/item.png"),
-                                         (int)JDatabasePicker::Flags::TextGroup);
+                                         QIcon(":/icons/res/item.png"));
 
   m_edCode = new JLineEdit(JLineEdit::Input::All,
                            JLineEdit::st_defaultFlags1);
   m_edCode->setPlaceholderText("*");
 
-  QFormLayout* codeLayout = new QFormLayout;
-  codeLayout->addRow(tr("Código:"), m_edCode);
-
-  QVBoxLayout* tabInfoLayout = new QVBoxLayout;
-  tabInfoLayout->setAlignment(Qt::AlignTop);
-  tabInfoLayout->addWidget(m_productPicker);
-  tabInfoLayout->addLayout(codeLayout);
+  QFormLayout* ltForm = new QFormLayout;
+  ltForm->addRow(tr("Produto:"), m_productPicker);
+  ltForm->addRow(tr("Código:"), m_edCode);
 
   QFrame* tabInfoFrame = new QFrame;
-  tabInfoFrame->setLayout(tabInfoLayout);
+  tabInfoFrame->setLayout(ltForm);
 
   m_tab->addTab(tabInfoFrame,
                 QIcon(":/icons/res/barcode.png"),

@@ -16,20 +16,15 @@ CategoryView::CategoryView(QWidget* parent)
 
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      (int)JDatabasePicker::Flags::TextGroup);
+                                      QIcon(":/icons/res/icon.png"));
 
-  QFormLayout* namelayout = new QFormLayout;
-  namelayout->setContentsMargins(0, 0, 0, 0);
-  namelayout->addRow(tr("Nome:"), m_edName);
-
-  QVBoxLayout* tablayout = new QVBoxLayout;
-  tablayout->setAlignment(Qt::AlignTop);
-  tablayout->addLayout(namelayout);
-  tablayout->addWidget(m_imagePicker);
+  QFormLayout* ltForm = new QFormLayout;
+  ltForm->setContentsMargins(0, 0, 0, 0);
+  ltForm->addRow(tr("Nome:"), m_edName);
+  ltForm->addRow(tr("Imagem:"), m_imagePicker);
 
   QFrame* tabframe = new QFrame;
-  tabframe->setLayout(tablayout);
+  tabframe->setLayout(ltForm);
 
   m_tab->addTab(tabframe,
                 QIcon(":/icons/res/category.png"),

@@ -423,7 +423,7 @@
   <action name="actionTimeCard">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/settings.png</normaloff>:/icons/res/settings.png</iconset>
+     <normaloff>:/icons/res/timecard.png</normaloff>:/icons/res/timecard.png</iconset>
    </property>
    <property name="text">
     <string>Livro Ponto</string>

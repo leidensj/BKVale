@@ -56,24 +56,17 @@ ProductView::ProductView(QWidget* parent)
 
   m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME,
                                          tr("Categoria"),
-                                         QIcon(":/icons/res/category.png"),
-                                         (int)JDatabasePicker::Flags::TextGroup);
+                                         QIcon(":/icons/res/category.png"));
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
                                       tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"),
-                                      (int)JDatabasePicker::Flags::TextGroup);
+                                      QIcon(":/icons/res/icon.png"));
 
   QFormLayout* formlayout = new QFormLayout;
-  formlayout->setContentsMargins(0, 0, 0, 0);
   formlayout->addRow(tr("Nome:"), m_edName);
   formlayout->addRow(tr("Unidade:"), m_edUnity);
   formlayout->addRow(tr("Detalhes:"), m_edDetails);
-
-  QVBoxLayout* tabInfoLayout = new QVBoxLayout;
-  tabInfoLayout->setAlignment(Qt::AlignTop);
-  tabInfoLayout->addLayout(formlayout);
-  tabInfoLayout->addWidget(m_categoryPicker);
-  tabInfoLayout->addWidget(m_imagePicker);
+  formlayout->addRow(tr("Categoria:"), m_categoryPicker);
+  formlayout->addRow(tr("Imagem:"), m_imagePicker);
 
   QVBoxLayout* tabAvailablelayout = new QVBoxLayout;
   tabAvailablelayout->addWidget(m_cbAvailableAtNotes);
@@ -84,7 +77,7 @@ ProductView::ProductView(QWidget* parent)
   tabAvailablelayout->setAlignment(Qt::AlignTop);
 
   QFrame* tabInfoFrame = new QFrame;
-  tabInfoFrame->setLayout(tabInfoLayout);
+  tabInfoFrame->setLayout(formlayout);
 
   QFrame* tabAvailableFrame = new QFrame;
   tabAvailableFrame->setLayout(tabAvailablelayout);

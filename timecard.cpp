@@ -10,13 +10,18 @@
 #include <QDialogButtonBox>
 #include <QIcon>
 #include <QFileDialog>
+#include <QLocale>
+#include <QPushButton>
 #include "jdatabase.h"
 
 TimeCard::TimeCard(QWidget* parent)
  : QDialog(parent)
  , m_storePicker(nullptr)
  , m_date(nullptr)
+ , m_buttons(nullptr)
 {
+  setWindowTitle(tr("Livro Ponto"));
+  setWindowIcon(QIcon(":/icons/res/timecard.png"));
   m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME,
                                       tr("Loja"),
                                       QIcon(":/icons/res/store.png"),
@@ -24,10 +29,10 @@ TimeCard::TimeCard(QWidget* parent)
   m_date = new QDateEdit(QDate::currentDate());
   m_date->setDisplayFormat("MMMM yyyy");
 
-  QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+  m_buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
 
-  connect(buttons, SIGNAL(accepted()), this, SLOT(saveAndAccept()));
-  connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveAndAccept()));
+  connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
   QFormLayout* formLayout = new QFormLayout;
   formLayout->addRow(tr("Loja:"), m_storePicker);
@@ -35,8 +40,18 @@ TimeCard::TimeCard(QWidget* parent)
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(formLayout);
-  ltMain->addWidget(buttons);
+  ltMain->addWidget(m_buttons);
   setLayout(ltMain);
+
+  connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  updateControls();
+}
+
+void TimeCard::updateControls()
+{
+  QPushButton* pt = m_buttons->button(QDialogButtonBox::Save);
+  if (pt != nullptr)
+    pt->setEnabled(m_storePicker->getId().isValid());
 }
 
 void TimeCard::saveAndAccept()
@@ -63,23 +78,27 @@ void TimeCard::saveAndAccept()
       "<html>"
         "<body>"
           "<table align=\"center\" width=\"100%\" height=\"100%\" style=\"page-break-after:always;\">"
-            "<tr><td align=\"center\" style=\"padding:80px;font-size:48pt;\">%1</td></tr>"
+            "<tr><td align=\"center\" style=\"padding:80px;font-size:48pt;\"><font face=\"verdana\">%1</font></td></tr>"
             "<tr><td align=\"center\" style=\"font-size:36pt;\">Livro Ponto</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:36pt;\">%2</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:36pt;\">A</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:36pt;\">%3</td></tr>"
             "<tr><td align=\"center\" style=\"padding-top:80px;font-size:18pt;\">%4</td></tr>"
-            "<tr><td align=\"center\" style=\"font-size:18pt;\">%5</td></tr>"
-            "<tr><td align=\"center\" style=\"font-size:18pt;\">%6</td></tr>"
-            "<tr><td align=\"center\" style=\"font-size:18pt;\">%7</td></tr>"
-            "<tr><td align=\"center\" style=\"font-size:18pt;\">%8</td></tr>"
+            "<tr><td align=\"center\" style=\"font-size:14pt;\">%5</td></tr>"
+            "<tr><td align=\"center\" style=\"font-size:14pt;\">%6</td></tr>"
+            "<tr><td align=\"center\" style=\"font-size:14pt;\">%7</td></tr>"
+            "<tr><td align=\"center\" style=\"font-size:14pt;\">%8</td></tr>"
           "</table>").arg(o.m_name,
                           idt.toString("dd/MM/yyyy"),
                           fdt.toString("dd/MM/yyyy"),
                           o.m_person.m_name,
                           o.m_person.m_vAddress.isEmpty() ? "" : o.m_person.m_vAddress.at(0).getFormattedAddress2(),
-                          o.m_person.m_vAddress.isEmpty() ? "" : o.m_person.m_vAddress.at(0).m_cep,
-                          o.m_person.m_vAddress.isEmpty() ? "" : o.m_person.m_vAddress.at(0).getFormattedAddress3());
+                          o.m_person.m_vAddress.isEmpty() ? "" : "CEP: " + o.m_person.m_vAddress.at(0).m_cep,
+                          o.m_person.m_vAddress.isEmpty() ? "" : o.m_person.m_vAddress.at(0).getFormattedAddress3(),
+                          "CNPJ: " + o.m_person.m_CPF_CNPJ);
+
+  QLocale br(QLocale::Portuguese, QLocale::Brazil);
+
   for (int i = 0; i != o.m_vEmployee.size(); ++i)
   {
     /* 1 - Nome funcionário
@@ -101,7 +120,7 @@ void TimeCard::saveAndAccept()
             "<th>Assinatura</th>"
             "<th colspan=\"2\">Hora</th>"
           "</tr>").arg(o.m_vEmployee.at(i).m_employee.m_name,
-                       idt.toString("MMMM").toUpper(),
+                       br.toString(idt, "MMMM").toUpper(),
                        idt.toString("yyyy"));
     dt = idt;
     const int daysInMonth = dt.daysInMonth();
@@ -120,7 +139,7 @@ void TimeCard::saveAndAccept()
              "<td width=\"5%\"></td>"
              "<td width=\"5%\"></td>"
            "</tr>").arg(dt.toString("dd"),
-                        dt.toString("dddd"));
+                        br.toString(dt, "dddd"));
       dt = dt.addDays(1);
     }
   }

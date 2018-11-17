@@ -156,5 +156,6 @@
         <file>res/redeem.png</file>
         <file>res/stockaisle.png</file>
         <file>res/store.png</file>
+        <file>res/timecard.png</file>
     </qresource>
 </RCC>

@@ -5,6 +5,7 @@
 
 class JDatabasePicker;
 class QDateEdit;
+class QDialogButtonBox;
 
 class TimeCard : public QDialog
 {
@@ -15,10 +16,12 @@ public:
 
 private slots:
   void saveAndAccept();
+  void updateControls();
 
 private:
   JDatabasePicker* m_storePicker;
   QDateEdit* m_date;
+  QDialogButtonBox* m_buttons;
 };
 
 #endif // TIMECARD_H

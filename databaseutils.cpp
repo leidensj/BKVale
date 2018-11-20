@@ -2080,7 +2080,7 @@ bool PersonSQL::update(const Person& person,
                   EMPLOYEE_SQL_COL01 ","
                   EMPLOYEE_SQL_COL02 ","
                   EMPLOYEE_SQL_COL03 ","
-                  EMPLOYEE_SQL_COL04 ","
+                  EMPLOYEE_SQL_COL04
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"

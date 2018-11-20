@@ -20,7 +20,7 @@ StoreView::StoreView(QWidget* parent)
   m_edName->setPlaceholderText(tr("*"));
 
   m_personPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
-                                       tr("Empresa"),
+                                       tr("Cadastro"),
                                        QIcon(":/icons/res/person.png"));
   m_personPicker->getDatabase()->setFixedFilter(PERSON_FILTER_COMPANY);
 
@@ -39,7 +39,7 @@ StoreView::StoreView(QWidget* parent)
   QFormLayout* tablayout = new QFormLayout;
   tablayout->setAlignment(Qt::AlignTop);
   tablayout->addRow(tr("Nome:"), m_edName);
-  tablayout->addRow(tr("Empresa:"), m_personPicker);
+  tablayout->addRow(tr("Cadastro:"), m_personPicker);
 
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(tablayout);

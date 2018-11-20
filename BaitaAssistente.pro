@@ -55,7 +55,9 @@ SOURCES += main.cpp\
     phonetablewidget.cpp \
     timecard.cpp \
     storeview.cpp \
-    storeemployeetablewidget.cpp
+    storeemployeetablewidget.cpp \
+    timeintervaldlg.cpp \
+    jtimeedit.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -117,7 +119,9 @@ HEADERS  += mainwindow.h \
     timecard.h \
     store.h \
     storeview.h \
-    storeemployeetablewidget.h
+    storeemployeetablewidget.h \
+    timeintervaldlg.h \
+    jtimeedit.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

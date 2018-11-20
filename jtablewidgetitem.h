@@ -28,6 +28,13 @@ private:
   const bool m_bCheckable;
 };
 
+class TimeIntervalsTableWidgetItem : public QTableWidgetItem
+{
+public:
+  TimeIntervalsTableWidgetItem();
+  void selectItem();
+};
+
 class PackageTableWidgetItem : public QTableWidgetItem
 {
 public:

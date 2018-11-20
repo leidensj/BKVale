@@ -25,8 +25,7 @@ public:
   {
     TextPlaceholder = 0x1,
     TextGroup = 0x2,
-    Multipicker = 0x4,
-    HideImage = 0x8
+    Multipicker = 0x4
   };
 
   explicit JDatabasePicker(const QString& tableName,

@@ -19,7 +19,6 @@ CategoryView::CategoryView(QWidget* parent)
                                       QIcon(":/icons/res/icon.png"));
 
   QFormLayout* ltForm = new QFormLayout;
-  ltForm->setContentsMargins(0, 0, 0, 0);
   ltForm->addRow(tr("Nome:"), m_edName);
   ltForm->addRow(tr("Imagem:"), m_imagePicker);
 

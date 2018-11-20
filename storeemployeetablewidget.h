@@ -10,7 +10,8 @@ class StoreEmployeeTableWidget : public JTable
 
   enum class Column
   {
-    Name
+    Name,
+    WorkingHours
   };
 
 public:

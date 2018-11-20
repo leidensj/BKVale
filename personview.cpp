@@ -478,6 +478,7 @@ void PersonView::setItem(const JItem &o)
   m_dtBirthDate->setDate(m_cbBirthDate->isChecked() ? _o.m_dtBirth : QDate(1800, 1, 1));
   m_dtCreationDate->setDate(_o.m_dtCreation);
   m_rdoCompany->setChecked(_o.m_bCompany);
+  m_rdoPerson->setChecked(!_o.m_bCompany);
   m_grpSupplier->setChecked(_o.m_supplier.m_bIsSupplier);
   m_grpEmployee->setChecked(_o.m_employee.m_bIsEmployee);
   switchUserType();

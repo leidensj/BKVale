@@ -60,6 +60,7 @@ signals:
   void enterSignal();
   void keyDownSignal();
   void keyUpSignal();
+  void deleteSignal();
 };
 
 class JExpLineEdit : public JLineEdit

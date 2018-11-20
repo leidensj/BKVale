@@ -24,8 +24,7 @@ TimeCard::TimeCard(QWidget* parent)
   setWindowIcon(QIcon(":/icons/res/timecard.png"));
   m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME,
                                       tr("Loja"),
-                                      QIcon(":/icons/res/store.png"),
-                                      (int)JDatabasePicker::Flags::HideImage);
+                                      QIcon(":/icons/res/store.png"));
   m_date = new QDateEdit(QDate::currentDate());
   m_date->setDisplayFormat("MMMM yyyy");
 

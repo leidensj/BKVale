@@ -4,6 +4,7 @@
 #include "product.h"
 #include "productbarcode.h"
 #include "packageeditor.h"
+#include "timeintervaldlg.h"
 #include <QObject>
 #include <QPixmap>
 
@@ -174,4 +175,21 @@ void PersonTableWidgetItem::selectItem(const QString& fixedFilter)
     if (p != nullptr && p->m_id.isValid())
       setItem(*p);
   }
+}
+
+TimeIntervalsTableWidgetItem::TimeIntervalsTableWidgetItem()
+{
+  setTextColor(QColor(Qt::darkGray));
+  setFlags(Qt::NoItemFlags |
+           Qt::ItemIsSelectable |
+           Qt::ItemIsEnabled);
+}
+
+
+
+void TimeIntervalsTableWidgetItem::selectItem()
+{
+  TimeIntervalDlg dlg;
+  if (dlg.exec())
+    setText("dlg.getText()");
 }

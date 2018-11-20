@@ -7,12 +7,13 @@
 StoreEmployeeTableWidget::StoreEmployeeTableWidget(QWidget* parent)
   : JTable((int)Flags::NoFlags, parent)
 {
-  setColumnCount(1);
+  setColumnCount(2);
   QStringList headers;
-  headers << "Nome";
+  headers << "Nome" << "Horas";
   setHorizontalHeaderLabels(headers);
 
-  horizontalHeader()->setSectionResizeMode((int)Column::Name, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)Column::Name, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::WorkingHours, QHeaderView::Stretch);
 }
 
 const JItem& StoreEmployeeTableWidget::getItem(int row) const
@@ -48,6 +49,7 @@ void StoreEmployeeTableWidget::addItem(const JItem& o)
   insertRow(rowCount());
   int row = rowCount() - 1;
   setItem(row, (int)Column::Name, new PersonTableWidgetItem);
+  setItem(row, (int)Column::WorkingHours, new TimeIntervalsTableWidgetItem);
   setCurrentCell(row, (int)Column::Name);
 
   ((PersonTableWidgetItem*)item(row, (int)Column::Name))->setItem(_o.m_employee);
@@ -69,6 +71,11 @@ void StoreEmployeeTableWidget::itemActivate(int row, int column)
   {
     auto ptEmployee = (PersonTableWidgetItem*)item(row, column);
     ptEmployee->selectItem(PERSON_FILTER_EMPLOYEE);
+  }
+  else if (column == (int)Column::WorkingHours)
+  {
+    auto ptHours = (TimeIntervalsTableWidgetItem*)item(row, column);
+    ptHours->selectItem();
   }
 }
 

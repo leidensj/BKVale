@@ -157,5 +157,6 @@
         <file>res/stockaisle.png</file>
         <file>res/store.png</file>
         <file>res/timecard.png</file>
+        <file>res/timespan.png</file>
     </qresource>
 </RCC>

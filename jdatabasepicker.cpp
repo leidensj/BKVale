@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QListWidget>
 #include <QLabel>
+#include <QAction>
 
 #define ID_PROPERTY "id"
 
@@ -35,6 +36,13 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   m_btnSearch->setIcon(QIcon(":/icons/res/binoculars.png"));
   m_btnSearch->setToolTip(tr("Selecionar ") + m_text);
 
+  m_btnClear = new QPushButton();
+  m_btnClear->setFlat(true);
+  m_btnClear->setText("");
+  m_btnClear->setIconSize(QSize(16, 16));
+  m_btnClear->setIcon(QIcon(":/icons/res/remove.png"));
+  m_btnClear->setToolTip(tr("Remover ") + m_text);
+
   if (m_flags & (int)Flags::Multipicker)
   {
     m_list = new QListWidget;
@@ -44,19 +52,19 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
     m_edText = new JLineEdit(JLineEdit::Input::All,
                              JLineEdit::st_defaultFlags1);
     m_edText->setReadOnly(true);
+    m_btnSearch->hide();
+    m_btnClear->hide();
+    QAction* action = m_edText->addAction(QIcon(":/icons/res/binoculars.png"), QLineEdit::LeadingPosition);
+    QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(searchItem()));
+    connect(action2, SIGNAL(triggered(bool)), this, SLOT(clear()));
+    connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   }
 
   if (m_flags & (int)Flags::TextPlaceholder && !(m_flags & (int)Flags::Multipicker))
   {
     m_edText->setPlaceholderText(m_text);
   }
-
-  m_btnClear = new QPushButton();
-  m_btnClear->setFlat(true);
-  m_btnClear->setText("");
-  m_btnClear->setIconSize(QSize(16, 16));
-  m_btnClear->setIcon(QIcon(":/icons/res/remove.png"));
-  m_btnClear->setToolTip(tr("Remover ") + m_text);
 
   if (!(flags & (int)Flags::Multipicker))
     m_imageView = new JImageView(false, 24);
@@ -92,16 +100,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
     hlayout0->addWidget(m_edText);
     hlayout0->addWidget(m_btnClear);
 
-    if (m_flags & (int)Flags::HideImage)
-    {
-      m_imageView->hide();
-    }
-    else
-    {
-      QFrame* sep = new QFrame;
-      sep->setFrameShape(QFrame::VLine);
-      hlayout0->addWidget(sep);
-    }
+    m_imageView->hide();
     hlayout0->addWidget(m_imageView);
     vlayout0->setContentsMargins(0, 0, 0, 0);
     vlayout0->setAlignment(Qt::AlignTop);
@@ -203,6 +202,7 @@ void JDatabasePicker::setItem(Id id,
     m_edText->setProperty(ID_PROPERTY, id.get());
     m_edText->setText(name);
     m_imageView->setImage(arImage);
+    m_imageView->hasImage() ? m_imageView->show() : m_imageView->hide();
     if (previousId != id)
       emit changedSignal();
   }

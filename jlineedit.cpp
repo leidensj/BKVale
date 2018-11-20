@@ -67,6 +67,8 @@ void JLineEdit::keyPressEvent(QKeyEvent *event)
       focusPreviousChild();
     emit keyUpSignal();
   }
+  else if (event->key() == Qt::Key_Delete)
+    emit deleteSignal();
   else
     QLineEdit::keyPressEvent(event);
 }

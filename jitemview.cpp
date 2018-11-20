@@ -70,6 +70,8 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
                    SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
                    SLOT(itemsRemoved(const QVector<Id>&)));
+
+  setMinimumWidth(600);
 }
 
 void JItemView::selectItem(const JItem& o)

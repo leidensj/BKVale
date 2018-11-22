@@ -4,10 +4,31 @@
 #include "jitem.h"
 #include "person.h"
 #include <QVector>
+#include <QVariantList>
+
+#define STORE_EMPLOYEE_EVERY_DAY 0
+
+struct StoreEmployeeHour : public JItem
+{
+  int m_day;
+  QTime m_tmBegin;
+  QTime m_tmEnd;
+
+  void clear()
+  {
+    m_day = STORE_EMPLOYEE_EVERY_DAY;
+  }
+
+  StoreEmployeeHour()
+  {
+    clear();
+  }
+};
 
 struct StoreEmployee : public JItem
 {
   Person m_employee;
+  QVector<StoreEmployeeHour> m_hours;
 
   void clear()
   {
@@ -17,6 +38,7 @@ struct StoreEmployee : public JItem
   StoreEmployee()
   {
     clear();
+    m_hours.clear();
   }
 };
 

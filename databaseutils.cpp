@@ -251,6 +251,16 @@ bool BaitaSQL::createTables(QString& error)
                           EMPLOYEE_SQL_TABLE_NAME "(" EMPLOYEE_SQL_COL01 ") ON DELETE CASCADE)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          STORE_EMPLOYEE_HOURS_SQL_COL01 " INTEGER NOT NULL,"
+                          STORE_EMPLOYEE_HOURS_SQL_COL02 " INTEGER,"
+                          STORE_EMPLOYEE_HOURS_SQL_COL03 " TIME,"
+                          STORE_EMPLOYEE_HOURS_SQL_COL04 " TIME,"
+                          "FOREIGN KEY(" STORE_EMPLOYEE_HOURS_SQL_COL01 ") REFERENCES "
+                          STORE_EMPLOYEES_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
                           EMPLOYEE_SQL_COL01 " INTEGER PRIMARY KEY,"
                           EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
@@ -3292,11 +3302,34 @@ bool StoreSQL::execSelect(QSqlQuery& query,
       if (o.m_vEmployee.at(i).m_id.isValid())
       {
         QString error2;
-        PersonSQL::execSelect(query, o.m_vEmployee[i].m_employee, error2);
+        if (PersonSQL::execSelect(query, o.m_vEmployee[i].m_employee, error2))
+        {
+          for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++j)
+          {
+            query.prepare("SELECT "
+                          SQL_COLID ","
+                          STORE_EMPLOYEE_HOURS_SQL_COL02 ","
+                          STORE_EMPLOYEE_HOURS_SQL_COL03 ","
+                          STORE_EMPLOYEE_HOURS_SQL_COL04 ","
+                          " FROM " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME
+                          " WHERE " STORE_EMPLOYEE_HOURS_SQL_COL01 " = (:_v01)");
+            query.bindValue(":_v01", o.m_vEmployee.at(i).m_id.get());
+            if (query.exec())
+            {
+              while (query.next())
+              {
+                StoreEmployeeHour h;
+                h.m_id = query.value(0).toLongLong();
+                h.m_day = query.value(1).toInt();
+                h.m_tmBegin = query.value(2).toTime();
+                h.m_tmEnd = query.value(3).toTime();
+              }
+            }
+          }
+        }
       }
     }
   }
-
 
   // TODO Separar Address e Phone e suas funções
 
@@ -3368,8 +3401,33 @@ bool StoreSQL::insert(const Store& o,
       query.bindValue(":_v02", o.m_vEmployee.at(i).m_employee.m_id.get());
       bSuccess = query.exec();
       if (bSuccess)
+      {
         o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
-      else
+        for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++i)
+        {
+          query.prepare("INSERT INTO " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
+                        STORE_EMPLOYEE_HOURS_SQL_COL01 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL02 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL03 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL04
+                        ") VALUES ("
+                        "(:_v01),"
+                        "(:_v02),"
+                        "(:_v03),"
+                        "(:_v04))");
+          query.bindValue(":_v01", o.m_vEmployee.at(i).m_id.getIdNull());
+          query.bindValue(":_v02", o.m_vEmployee.at(i).m_hours.at(j).m_day);
+          query.bindValue(":_v03", o.m_vEmployee.at(i).m_hours.at(j).m_tmBegin);
+          query.bindValue(":_v04", o.m_vEmployee.at(i).m_hours.at(j).m_tmEnd);
+          bSuccess = query.exec();
+          if (bSuccess)
+            o.m_vEmployee.at(i).m_hours.at(j).m_id.set(query.lastInsertId().toLongLong());
+          else
+            break;
+        }
+      }
+
+      if (!bSuccess)
         break;
     }
   }
@@ -3425,8 +3483,33 @@ bool StoreSQL::update(const Store& o,
       query.bindValue(":_v02", o.m_vEmployee.at(i).m_employee.m_id.get());
       bSuccess = query.exec();
       if (bSuccess)
+      {
         o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
-      else
+        for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++i)
+        {
+          query.prepare("INSERT INTO " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
+                        STORE_EMPLOYEE_HOURS_SQL_COL01 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL02 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL03 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL04
+                        ") VALUES ("
+                        "(:_v01),"
+                        "(:_v02),"
+                        "(:_v03),"
+                        "(:_v04))");
+          query.bindValue(":_v01", o.m_vEmployee.at(i).m_id.getIdNull());
+          query.bindValue(":_v02", o.m_vEmployee.at(i).m_hours.at(j).m_day);
+          query.bindValue(":_v03", o.m_vEmployee.at(i).m_hours.at(j).m_tmBegin);
+          query.bindValue(":_v04", o.m_vEmployee.at(i).m_hours.at(j).m_tmEnd);
+          bSuccess = query.exec();
+          if (bSuccess)
+            o.m_vEmployee.at(i).m_hours.at(j).m_id.set(query.lastInsertId().toLongLong());
+          else
+            break;
+        }
+      }
+
+      if (!bSuccess)
         break;
     }
   }

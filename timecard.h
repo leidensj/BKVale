@@ -6,6 +6,7 @@
 class JDatabasePicker;
 class QDateEdit;
 class QDialogButtonBox;
+class QCheckBox;
 
 class TimeCard : public QDialog
 {
@@ -22,6 +23,7 @@ private:
   JDatabasePicker* m_storePicker;
   QDateEdit* m_date;
   QDialogButtonBox* m_buttons;
+  QCheckBox* m_cbOpenFile;
 };
 
 #endif // TIMECARD_H

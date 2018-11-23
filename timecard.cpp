@@ -13,12 +13,16 @@
 #include <QLocale>
 #include <QPushButton>
 #include "jdatabase.h"
+#include <QDesktopServices>
+#include <QCheckBox>
+#include <QProgressDialog>
 
 TimeCard::TimeCard(QWidget* parent)
  : QDialog(parent)
  , m_storePicker(nullptr)
  , m_date(nullptr)
  , m_buttons(nullptr)
+ , m_cbOpenFile(nullptr)
 {
   setWindowTitle(tr("Livro Ponto"));
   setWindowIcon(QIcon(":/icons/res/timecard.png"));
@@ -30,6 +34,10 @@ TimeCard::TimeCard(QWidget* parent)
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
 
+  m_cbOpenFile = new QCheckBox;
+  m_cbOpenFile->setText(tr("Abrir arquivo automaticamente ao finalizar."));
+  m_cbOpenFile->setCheckState(Qt::Checked);
+
   connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveAndAccept()));
   connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
@@ -39,6 +47,7 @@ TimeCard::TimeCard(QWidget* parent)
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(formLayout);
+  ltMain->addWidget(m_cbOpenFile);
   ltMain->addWidget(m_buttons);
   setLayout(ltMain);
 
@@ -182,13 +191,18 @@ void TimeCard::saveAndAccept()
       "</body>"
       "</html>";
 
-  QTextDocument doc;
-  doc.setHtml(html);
-
   QString fileName = QFileDialog::getSaveFileName(this,
                                                   tr("Salvar livro ponto"),
                                                   "/desktop/livro_" + idt.toString("yyyy") + "_" + idt.toString("MM") + ".pdf",
                                                   tr("PDF (*.pdf)"));
+
+  QProgressDialog progress(tr("Gerando livro ponto..."), QString(), 0, 3, this);
+  progress.setWindowModality(Qt::WindowModal);
+
+  QTextDocument doc;
+  doc.setHtml(html);
+
+  progress.setValue(1);
 
   doc.setDocumentMargin(20);
   QPrinter printer(QPrinter::PrinterResolution);
@@ -196,6 +210,10 @@ void TimeCard::saveAndAccept()
   printer.setPaperSize(QPrinter::A4);
   printer.setOutputFileName(fileName);
   doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+  progress.setValue(2);
   doc.print(&printer);
+  progress.setValue(3);
   accept();
+  if (m_cbOpenFile->isChecked())
+    QDesktopServices::openUrl(QUrl(fileName, QUrl::TolerantMode));
 }

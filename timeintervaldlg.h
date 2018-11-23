@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QVector>
+#include <timeinterval.h>
 
 class JSpinBox;
 class QDialogButtonBox;
@@ -14,6 +15,8 @@ class TimeIntervalDlg : public QDialog
 
 public:
   explicit TimeIntervalDlg(QWidget* parent = nullptr);
+  void setItems(const QVector<TimeInterval>& v);
+  const QVector<TimeInterval>& get() const;
 
 private slots:
   void validate();

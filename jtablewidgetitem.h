@@ -3,8 +3,10 @@
 
 #include <QTableWidgetItem>
 #include <jitem.h>
+#include <QVector>
 #include "product.h"
 #include "person.h"
+#include "store.h"
 
 class DoubleTableWidgetItem : public QTableWidgetItem
 {
@@ -26,13 +28,6 @@ private:
   const JItem::DataType m_type;
   const Color m_color;
   const bool m_bCheckable;
-};
-
-class TimeIntervalsTableWidgetItem : public QTableWidgetItem
-{
-public:
-  TimeIntervalsTableWidgetItem();
-  void selectItem();
 };
 
 class PackageTableWidgetItem : public QTableWidgetItem
@@ -76,6 +71,18 @@ public:
 
 private:
   Person m_person;
+};
+
+class TimeIntervalsTableWidgetItem : public QTableWidgetItem
+{
+public:
+  TimeIntervalsTableWidgetItem();
+  void setItems(const QVector<TimeInterval>& v);
+  const QVector<TimeInterval>& getItem() const;
+  void selectItem();
+
+private:
+  QVector<TimeInterval> m_timeIntervals;
 };
 
 #endif // JTABLEWIDGETITEM_H

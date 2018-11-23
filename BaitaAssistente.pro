@@ -121,7 +121,8 @@ HEADERS  += mainwindow.h \
     storeview.h \
     storeemployeetablewidget.h \
     timeintervaldlg.h \
-    jtimeedit.h
+    jtimeedit.h \
+    timeinterval.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

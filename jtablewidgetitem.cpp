@@ -185,11 +185,19 @@ TimeIntervalsTableWidgetItem::TimeIntervalsTableWidgetItem()
            Qt::ItemIsEnabled);
 }
 
-
-
 void TimeIntervalsTableWidgetItem::selectItem()
 {
   TimeIntervalDlg dlg;
   if (dlg.exec())
     setText("dlg.getText()");
+}
+
+void TimeIntervalsTableWidgetItem::setItems(const QVector<TimeInterval>& v)
+{
+
+}
+
+const TimeIntervalsTableWidgetItem::QVector<TimeInterval>& getItem() const
+{
+
 }

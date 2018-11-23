@@ -74,3 +74,13 @@ void TimeIntervalDlg::adjustControls()
   }
   setMaximumHeight(sizeHint().height());
 }
+
+void TimeIntervalDlg::setItems(const QVector<TimeInterval>& v)
+{
+
+}
+
+const QVector<TimeInterval>& TimeIntervalDlg::get() const
+{
+
+}

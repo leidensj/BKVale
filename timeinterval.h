@@ -1,11 +1,11 @@
 #ifndef TIMEINTERVAL_H
 #define TIMEINTERVAL_H
 
-#include "jitem.h"
-
 #define TIME_INTERVAL_EVERY_DAY 0
 
-struct TimeInterval : public JItem
+#include <QTime>
+
+struct TimeInterval
 {
   int m_day;
   QTime m_tmBegin;

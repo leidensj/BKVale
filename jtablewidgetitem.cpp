@@ -188,16 +188,23 @@ TimeIntervalsTableWidgetItem::TimeIntervalsTableWidgetItem()
 void TimeIntervalsTableWidgetItem::selectItem()
 {
   TimeIntervalDlg dlg;
+  dlg.setItems(m_timeIntervals);
   if (dlg.exec())
-    setText("dlg.getText()");
+    setItems(dlg.getItems());
 }
 
 void TimeIntervalsTableWidgetItem::setItems(const QVector<TimeInterval>& v)
 {
-
+  m_timeIntervals = v;
+  QString str;
+  for (int i = 0; i != v.size(); ++i)
+    str += v.at(i).m_tmBegin.toString("hh:mm") + "-" + v.at(i).m_tmEnd.toString("hh:mm") + " ";
+  if (v.size() > 0)
+    str.chop(1);
+  setText(str);
 }
 
-const TimeIntervalsTableWidgetItem::QVector<TimeInterval>& getItem() const
+const QVector<TimeInterval>& TimeIntervalsTableWidgetItem::getItems() const
 {
-
+  return m_timeIntervals;
 }

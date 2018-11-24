@@ -16,7 +16,7 @@ class TimeIntervalDlg : public QDialog
 public:
   explicit TimeIntervalDlg(QWidget* parent = nullptr);
   void setItems(const QVector<TimeInterval>& v);
-  const QVector<TimeInterval>& get() const;
+  QVector<TimeInterval> getItems() const;
 
 private slots:
   void validate();

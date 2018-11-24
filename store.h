@@ -22,6 +22,16 @@ struct StoreEmployee : public JItem
     clear();
     m_hours.clear();
   }
+
+  QString strHours() const
+  {
+    QString str;
+    for (int i = 0; i != m_hours.size(); ++i)
+      str += m_hours.at(i).m_tmBegin.toString("hh:mm") + "-" + m_hours.at(i).m_tmEnd.toString("hh:mm") + " ";
+    if (m_hours.size() > 0)
+      str.chop(1);
+    return str;
+  }
 };
 
 struct Store : public JItem

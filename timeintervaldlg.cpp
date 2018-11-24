@@ -77,10 +77,22 @@ void TimeIntervalDlg::adjustControls()
 
 void TimeIntervalDlg::setItems(const QVector<TimeInterval>& v)
 {
-
+  for (int i = 0; i != (v.size() < 10 ? v.size() : 10); ++i)
+  {
+    m_tmBegin[i]->setTime(v.at(i).m_tmBegin);
+    m_tmEnd[i]->setTime(v.at(i).m_tmEnd);
+  }
 }
 
-const QVector<TimeInterval>& TimeIntervalDlg::get() const
+QVector<TimeInterval> TimeIntervalDlg::getItems() const
 {
-
+  QVector<TimeInterval> v;
+  for (int i = 0; i != m_spn->value(); ++i)
+  {
+    TimeInterval o;
+    o.m_tmBegin = m_tmBegin[i]->time();
+    o.m_tmEnd = m_tmEnd[i]->time();
+    v.push_back(o);
+  }
+  return v;
 }

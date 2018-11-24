@@ -252,7 +252,6 @@ bool BaitaSQL::createTables(QString& error)
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
                           STORE_EMPLOYEE_HOURS_SQL_COL01 " INTEGER NOT NULL,"
                           STORE_EMPLOYEE_HOURS_SQL_COL02 " INTEGER,"
                           STORE_EMPLOYEE_HOURS_SQL_COL03 " TIME,"
@@ -3230,15 +3229,6 @@ bool DiscountSQL::redeem(const QString& code,
   return finishTransaction(db, query, bSuccess, error);
 }
 
-
-
-
-
-
-
-
-
-
 bool StoreSQL::execSelect(QSqlQuery& query,
                           Store& o,
                           QString& error)
@@ -3304,30 +3294,26 @@ bool StoreSQL::execSelect(QSqlQuery& query,
         QString error2;
         if (PersonSQL::execSelect(query, o.m_vEmployee[i].m_employee, error2))
         {
-          for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++j)
+          query.prepare("SELECT "
+                        STORE_EMPLOYEE_HOURS_SQL_COL02 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL03 ","
+                        STORE_EMPLOYEE_HOURS_SQL_COL04
+                        " FROM " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME
+                        " WHERE " STORE_EMPLOYEE_HOURS_SQL_COL01 " = (:_v01)");
+          query.bindValue(":_v01", o.m_vEmployee.at(i).m_id.get());
+          bSuccess = query.exec();
+          while (bSuccess && query.next())
           {
-            query.prepare("SELECT "
-                          SQL_COLID ","
-                          STORE_EMPLOYEE_HOURS_SQL_COL02 ","
-                          STORE_EMPLOYEE_HOURS_SQL_COL03 ","
-                          STORE_EMPLOYEE_HOURS_SQL_COL04 ","
-                          " FROM " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME
-                          " WHERE " STORE_EMPLOYEE_HOURS_SQL_COL01 " = (:_v01)");
-            query.bindValue(":_v01", o.m_vEmployee.at(i).m_id.get());
-            if (query.exec())
-            {
-              while (query.next())
-              {
-                StoreEmployeeHour h;
-                h.m_id = query.value(0).toLongLong();
-                h.m_day = query.value(1).toInt();
-                h.m_tmBegin = query.value(2).toTime();
-                h.m_tmEnd = query.value(3).toTime();
-              }
-            }
+            TimeInterval h;
+            h.m_day = query.value(0).toInt();
+            h.m_tmBegin = query.value(1).toTime();
+            h.m_tmEnd = query.value(2).toTime();
+            o.m_vEmployee[i].m_hours.push_back(h);
           }
         }
       }
+      if (!bSuccess)
+        break;
     }
   }
 
@@ -3403,7 +3389,7 @@ bool StoreSQL::insert(const Store& o,
       if (bSuccess)
       {
         o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
-        for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++i)
+        for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++j)
         {
           query.prepare("INSERT INTO " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
                         STORE_EMPLOYEE_HOURS_SQL_COL01 ","
@@ -3420,9 +3406,7 @@ bool StoreSQL::insert(const Store& o,
           query.bindValue(":_v03", o.m_vEmployee.at(i).m_hours.at(j).m_tmBegin);
           query.bindValue(":_v04", o.m_vEmployee.at(i).m_hours.at(j).m_tmEnd);
           bSuccess = query.exec();
-          if (bSuccess)
-            o.m_vEmployee.at(i).m_hours.at(j).m_id.set(query.lastInsertId().toLongLong());
-          else
+          if (!bSuccess)
             break;
         }
       }
@@ -3485,7 +3469,7 @@ bool StoreSQL::update(const Store& o,
       if (bSuccess)
       {
         o.m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
-        for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++i)
+        for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++j)
         {
           query.prepare("INSERT INTO " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
                         STORE_EMPLOYEE_HOURS_SQL_COL01 ","
@@ -3502,9 +3486,7 @@ bool StoreSQL::update(const Store& o,
           query.bindValue(":_v03", o.m_vEmployee.at(i).m_hours.at(j).m_tmBegin);
           query.bindValue(":_v04", o.m_vEmployee.at(i).m_hours.at(j).m_tmEnd);
           bSuccess = query.exec();
-          if (bSuccess)
-            o.m_vEmployee.at(i).m_hours.at(j).m_id.set(query.lastInsertId().toLongLong());
-          else
+          if (!bSuccess)
             break;
         }
       }

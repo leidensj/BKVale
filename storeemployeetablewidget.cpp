@@ -23,6 +23,7 @@ const JItem& StoreEmployeeTableWidget::getItem(int row) const
   {
     int idx = verticalHeader()->logicalIndex(row);
     m_ref.m_employee = dynamic_cast<const Person&>(((PersonTableWidgetItem*)item(idx, (int)Column::Name))->getItem());
+    m_ref.m_hours = ((TimeIntervalsTableWidgetItem*)item(idx, (int)Column::WorkingHours))->getItems();
   }
   return m_ref;
 }
@@ -53,6 +54,7 @@ void StoreEmployeeTableWidget::addItem(const JItem& o)
   setCurrentCell(row, (int)Column::Name);
 
   ((PersonTableWidgetItem*)item(row, (int)Column::Name))->setItem(_o.m_employee);
+  ((TimeIntervalsTableWidgetItem*)item(row, (int)Column::WorkingHours))->setItems(_o.m_hours);
 
   setCurrentCell(row, (int)Column::Name);
   blockSignals(false);

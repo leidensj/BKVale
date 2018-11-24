@@ -101,7 +101,7 @@ const JItem& StoreView::getItem() const
 
 void StoreView::setItem(const JItem& o)
 {
-  auto ref = static_cast<const Store&>(o);
+  const Store& ref = static_cast<const Store&>(o);
   m_currentId = o.m_id;
   m_edName->setText(ref.m_name);
   m_personPicker->setItem(ref.m_person);

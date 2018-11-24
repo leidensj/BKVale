@@ -113,23 +113,24 @@ void TimeCard::saveAndAccept()
      * 2 - MÊS
      * 3 - ANO */
     html += QString(
-        "<h2 align=\"center\">REGISTRO PONTO</h2>"
-        "<p>Nome: %1 Horário:18h00m 21h:30m 22h00m 01h20m</p>"
-        "<table border=\"1\" align=\"center\" width=\"100%\">"
-          "<tr><th colspan=\"2\">%2 %3</th>"
-            "<th colspan=\"3\">ENTRADA</th>"
-            "<th colspan=\"3\">SAIDA</th>"
-          "</tr>"
-          "<tr>"
-            "<th>Dia</th>"
-            "<th>Semana</th>"
-            "<th>Assinatura</th>"
-            "<th colspan=\"2\">Hora</th>"
-            "<th>Assinatura</th>"
-            "<th colspan=\"2\">Hora</th>"
-          "</tr>").arg(o.m_vEmployee.at(i).m_employee.m_name,
-                       br.toString(idt, "MMMM").toUpper(),
-                       idt.toString("yyyy"));
+      "<h2 align=\"center\">REGISTRO PONTO</h2>"
+      "<p>Nome: %1 Horário: %2</p>"
+      "<table border=\"1\" align=\"center\" width=\"100%\">"
+        "<tr><th colspan=\"2\">%3 %4</th>"
+          "<th colspan=\"3\">ENTRADA</th>"
+          "<th colspan=\"3\">SAIDA</th>"
+        "</tr>"
+        "<tr>"
+          "<th>Dia</th>"
+          "<th>Semana</th>"
+          "<th>Assinatura</th>"
+          "<th colspan=\"2\">Hora</th>"
+          "<th>Assinatura</th>"
+          "<th colspan=\"2\">Hora</th>"
+        "</tr>").arg(o.m_vEmployee.at(i).m_employee.m_name,
+                     o.m_vEmployee.at(i).strHours(),
+                     br.toString(idt, "MMMM").toUpper(),
+                     idt.toString("yyyy"));
     dt = idt;
     const int daysInMonth = dt.daysInMonth();
     for (int i = 0; i != daysInMonth; ++i)
@@ -137,25 +138,24 @@ void TimeCard::saveAndAccept()
       /* 1 - Data dd
        * 2 - Data dddd */
       html += QString(
-          "<tr>"
-           "<td width=\"5%\">%1</td>"
-             "<td width=\"15%\">%2</td>"
-             "<td width=\"30%\"></td>"
-             "<td width=\"5%\"></td>"
-             "<td width=\"5%\"></td>"
-             "<td width=\"30%\"></td>"
-             "<td width=\"5%\"></td>"
-             "<td width=\"5%\"></td>"
-           "</tr>").arg(dt.toString("dd"),
-                        br.toString(dt, "dddd"));
+        "<tr>"
+         "<td width=\"5%\">%1</td>"
+           "<td width=\"15%\">%2</td>"
+           "<td width=\"30%\"></td>"
+           "<td width=\"5%\"></td>"
+           "<td width=\"5%\"></td>"
+           "<td width=\"30%\"></td>"
+           "<td width=\"5%\"></td>"
+           "<td width=\"5%\"></td>"
+         "</tr>").arg(dt.toString("dd"),
+                      br.toString(dt, "dddd"));
       dt = dt.addDays(1);
     }
-  }
 
-  html +=
+    html += QString(
       "</table>"
       "<br>"
-      "<table border=\"1\" cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-style:solid;\">"
+      "<table border=\"1\" cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-style:solid;%1\">"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS NORMAIS</td>"
       "<td width=\"10%\">(H.N.)</td>"
@@ -187,9 +187,12 @@ void TimeCard::saveAndAccept()
       "<td width=\"50%\"></td>"
       "</tr>"
       "</tr>"
-      "</table>"
-      "</body>"
-      "</html>";
+      "</table>").arg(i == (o.m_vEmployee.size() - 1) ? "" : "page-break-after:always;");
+  }
+
+  html +=
+    "</body>"
+    "</html>";
 
   QString fileName = QFileDialog::getSaveFileName(this,
                                                   tr("Salvar livro ponto"),

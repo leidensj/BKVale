@@ -78,7 +78,7 @@ class TimeIntervalsTableWidgetItem : public QTableWidgetItem
 public:
   TimeIntervalsTableWidgetItem();
   void setItems(const QVector<TimeInterval>& v);
-  const QVector<TimeInterval>& getItem() const;
+  const QVector<TimeInterval>& getItems() const;
   void selectItem();
 
 private:

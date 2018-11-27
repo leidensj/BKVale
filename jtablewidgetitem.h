@@ -2,11 +2,35 @@
 #define JTABLEWIDGETITEM_H
 
 #include <QTableWidgetItem>
+#include <QDialog>
 #include <jitem.h>
 #include <QVector>
 #include "product.h"
 #include "person.h"
 #include "store.h"
+#include "phone.h"
+
+class JSpinBox;
+class JLineEdit;
+class QDialogButtonBox;
+
+class PhoneEditorDlg : public QDialog
+{
+  Q_OBJECT
+private:
+  Id m_currentId;
+  JSpinBox* m_spnCountryCode;
+  JSpinBox* m_spnCode;
+  JLineEdit* m_edNumber;
+  JLineEdit* m_edName;
+  QDialogButtonBox* m_btn;
+private slots:
+  void updateControls();
+public:
+  explicit PhoneEditorDlg(QWidget* parent = nullptr);
+  Phone getPhone() const;
+  void setPhone(const Phone& o);
+};
 
 class DoubleTableWidgetItem : public QTableWidgetItem
 {
@@ -28,6 +52,30 @@ private:
   const JItem::DataType m_type;
   const Color m_color;
   const bool m_bCheckable;
+};
+
+class TimeIntervalsTableWidgetItem : public QTableWidgetItem
+{
+public:
+  TimeIntervalsTableWidgetItem();
+  void setItems(const QVector<TimeInterval>& v);
+  const QVector<TimeInterval>& getItems() const;
+  void selectItem();
+
+private:
+  QVector<TimeInterval> m_timeIntervals;
+};
+
+class PhoneEditorTableWidgetItem : public QTableWidgetItem
+{
+public:
+  PhoneEditorTableWidgetItem();
+  void setItem(const Phone& o);
+  const Phone& getItem() const;
+  bool selectItem();
+
+private:
+  Phone m_o;
 };
 
 class PackageTableWidgetItem : public QTableWidgetItem
@@ -71,18 +119,6 @@ public:
 
 private:
   Person m_person;
-};
-
-class TimeIntervalsTableWidgetItem : public QTableWidgetItem
-{
-public:
-  TimeIntervalsTableWidgetItem();
-  void setItems(const QVector<TimeInterval>& v);
-  const QVector<TimeInterval>& getItems() const;
-  void selectItem();
-
-private:
-  QVector<TimeInterval> m_timeIntervals;
 };
 
 #endif // JTABLEWIDGETITEM_H

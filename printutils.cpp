@@ -364,7 +364,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
       {
         if (!lst.m_supplier.m_vPhone.at(i).m_name.isEmpty())
           str += lst.m_supplier.m_vPhone.at(i).m_name + " ";
-        str += lst.m_supplier.m_vPhone.at(i).getFormattedPhone() + ESC_LF;
+        str += lst.m_supplier.m_vPhone.at(i).strFormattedPhone() + ESC_LF;
       }
     }
   }

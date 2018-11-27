@@ -5,8 +5,91 @@
 #include "productbarcode.h"
 #include "packageeditor.h"
 #include "timeintervaldlg.h"
+#include "jspinbox.h"
+#include "jlineedit.h"
 #include <QObject>
 #include <QPixmap>
+#include <QLayout>
+#include <QDialogButtonBox>
+#include <QPushButton>
+
+PhoneEditorDlg::PhoneEditorDlg(QWidget* parent)
+  : QDialog(parent)
+  , m_spnCountryCode(nullptr)
+  , m_spnCode(nullptr)
+  , m_edNumber(nullptr)
+  , m_edName(nullptr)
+{
+  setWindowTitle(tr("Telefone"));
+  setWindowIcon(QIcon(":/icons/res/phone.png"));
+
+  m_edNumber = new JLineEdit(JLineEdit::Input::Numeric,
+                             JLineEdit::st_defaultFlags2);
+  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+                           JLineEdit::st_defaultFlags1);
+  m_edName->setPlaceholderText(tr("Nome (opcional)"));
+  m_edNumber->setPlaceholderText(tr("*"));
+  m_spnCountryCode = new JSpinBox;
+  m_spnCountryCode->setMinimum(0);
+  m_spnCountryCode->setMaximum(999999);
+  m_spnCountryCode->setPrefix("+");
+  m_spnCountryCode->setValue(55);
+  m_spnCode = new JSpinBox;
+  m_spnCode->setMinimum(0);
+  m_spnCode->setMaximum(999999);
+  m_spnCode->setPrefix("(");
+  m_spnCode->setValue(54);
+  m_spnCode->setSuffix(")");
+
+  m_btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+  QHBoxLayout* ltNumber = new QHBoxLayout;
+  ltNumber->setContentsMargins(0, 0, 0, 0);
+  ltNumber->addWidget(m_spnCountryCode);
+  ltNumber->addWidget(m_spnCode);
+  ltNumber->addWidget(m_edNumber);
+
+  QVBoxLayout* ltPhone = new QVBoxLayout;
+  ltPhone->addWidget(m_edName);
+  ltPhone->addLayout(ltNumber);
+  ltPhone->addWidget(m_btn);
+
+  setLayout(ltPhone);
+
+  connect(m_btn, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(m_btn, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_edNumber, SIGNAL(textChanged(const QString&)), this, SLOT(updateControls()));
+
+  setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  updateControls();
+}
+
+void PhoneEditorDlg::updateControls()
+{
+  auto pt = m_btn->button(QDialogButtonBox::Ok);
+  if (pt != nullptr)
+    pt->setEnabled(!m_edNumber->text().isEmpty());
+}
+
+Phone PhoneEditorDlg::getPhone() const
+{
+  Phone o;
+  o.m_id = m_currentId;
+  o.m_countryCode = m_spnCountryCode->value();
+  o.m_code = m_spnCode->value();
+  o.m_name = m_edName->text();
+  o.m_number = m_edNumber->text();
+  return o;
+}
+
+void PhoneEditorDlg::setPhone(const Phone& o)
+{
+  m_currentId = o.m_id;
+  m_spnCountryCode->setValue(o.m_countryCode);
+  m_spnCode->setValue(o.m_code);
+  m_edName->setText(o.m_name);
+  m_edNumber->setText(o.m_number);
+}
 
 DoubleTableWidgetItem::DoubleTableWidgetItem(JItem::DataType type, Color color, bool bCheckable)
   : m_type(type)
@@ -207,4 +290,35 @@ void TimeIntervalsTableWidgetItem::setItems(const QVector<TimeInterval>& v)
 const QVector<TimeInterval>& TimeIntervalsTableWidgetItem::getItems() const
 {
   return m_timeIntervals;
+}
+
+PhoneEditorTableWidgetItem::PhoneEditorTableWidgetItem()
+{
+  setTextColor(QColor(Qt::darkGray));
+  setFlags(Qt::NoItemFlags |
+           Qt::ItemIsSelectable |
+           Qt::ItemIsEnabled);
+}
+
+void PhoneEditorTableWidgetItem::setItem(const Phone& o)
+{
+  m_o = o;
+  setText(o.strFormattedPhoneWithName());
+}
+
+const Phone& PhoneEditorTableWidgetItem::getItem() const
+{
+  return m_o;
+}
+
+bool PhoneEditorTableWidgetItem::selectItem()
+{
+  PhoneEditorDlg dlg;
+  dlg.setPhone(m_o);
+  if (dlg.exec())
+  {
+    setItem(dlg.getPhone());
+    return true;
+  }
+  return false;
 }

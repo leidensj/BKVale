@@ -4,10 +4,30 @@
 #include "jitemtable.h"
 #include "phone.h"
 
-class PhoneTableWidget
+class PhoneTableWidget : public JTable
 {
+  Q_OBJECT
+
+  enum class Column
+  {
+    Phone
+  };
+
 public:
-  PhoneTableWidget();
+  explicit PhoneTableWidget(QWidget* parent = nullptr);
+  const JItem& getItem(int row) const;
+
+public slots:
+  void addItem(const JItem& o);
+  void addItem();
+
+private:
+  mutable Phone m_ref;
+
+protected slots:
+  void update(int row, int column);
+  void itemActivate(int row, int column);
+  void itemDelete(int row, int column);
 };
 
-#endif // PHONETABLEWIDGET_H
+#endif // STOREEMPLOYEETABLEWIDGET_H

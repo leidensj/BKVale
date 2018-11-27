@@ -47,7 +47,7 @@ struct Phone : public JItem
     return !m_number.isEmpty();
   }
 
-  QString getFormattedPhone() const
+  QString strFormattedPhone() const
   {
     return
       "+" +
@@ -56,6 +56,15 @@ struct Phone : public JItem
       QString::number(m_code) +
       ") " +
       m_number;
+  }
+
+  QString strFormattedPhoneWithName() const
+  {
+    QString str;
+    if (!m_name.isEmpty())
+      str += m_name + " ";
+    str += strFormattedPhone();
+    return str;
   }
 };
 

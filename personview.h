@@ -8,6 +8,7 @@
 #include "person.h"
 #include "jitemview.h"
 
+
 class AddressPageView;
 class QTabWidget;
 class QLabel;
@@ -20,8 +21,8 @@ class QSpinBox;
 class QListWidget;
 class QComboBox;
 class QGroupBox;
+class PhoneTableWidget;
 
-Q_DECLARE_METATYPE(Phone)
 Q_DECLARE_METATYPE(Address)
 
 class PersonView : public JItemView
@@ -38,12 +39,6 @@ public:
 private slots:
   void updateControls();
   void switchUserType();
-  Phone getPhone() const;
-  void addPhone();
-  void addPhone(const Phone& phone);
-  void removePhone();
-  void openPhone();
-  void clearPhone();
   Address getAddress() const;
   void addAddress();
   void addAddress(const Address& address);
@@ -75,13 +70,9 @@ private:
   QDateEdit* m_dtCreationDate;
   JLineEdit* m_edPinCode;
 
-  QSpinBox* m_spnPhoneCountryCode;
-  QSpinBox* m_spnPhoneCode;
-  JLineEdit* m_edPhoneNumber;
-  JLineEdit* m_edPhoneName;
-  QPushButton* m_btnAddPhone;
-  QPushButton* m_btnRemovePhone;
-  QListWidget* m_lstPhone;
+  PhoneTableWidget* m_phoneTable;
+  QPushButton* m_btnPhoneAdd;
+  QPushButton* m_btnPhoneRemove;
 
   JLineEdit* m_edAddressPostalCode;
   QPushButton* m_btnAddressPostalCode;

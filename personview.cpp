@@ -21,6 +21,7 @@
 #include "databaseutils.h"
 #include <QAction>
 #include <QGroupBox>
+#include "phonetablewidget.h"
 
 // Serviço de busca de cep em:
 // http://postmon.com.br/
@@ -88,13 +89,9 @@ PersonView::PersonView(bool bAccessEmployee,
   , m_imagePicker(nullptr)
   , m_dtCreationDate(nullptr)
   , m_edPinCode(nullptr)
-  , m_spnPhoneCountryCode(nullptr)
-  , m_spnPhoneCode(nullptr)
-  , m_edPhoneNumber(nullptr)
-  , m_edPhoneName(nullptr)
-  , m_btnAddPhone(nullptr)
-  , m_btnRemovePhone(nullptr)
-  , m_lstPhone(nullptr)
+  , m_phoneTable(nullptr)
+  , m_btnPhoneAdd(nullptr)
+  , m_btnPhoneRemove(nullptr)
   , m_edAddressPostalCode(nullptr)
   , m_btnAddressPostalCode(nullptr)
   , m_edAddressNeighborhood(nullptr)
@@ -169,34 +166,13 @@ PersonView::PersonView(bool bAccessEmployee,
   m_cbNoteRemove->setText(tr("Remover"));
   m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
-  m_edPhoneNumber = new JLineEdit(JLineEdit::Input::Numeric,
-                                  JLineEdit::st_defaultFlags2);
-  m_edPhoneName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                JLineEdit::st_defaultFlags1);
-  m_edPhoneName->setPlaceholderText(tr("Nome (opcional)"));
-  m_edPhoneNumber->setPlaceholderText(tr("*"));
-  m_spnPhoneCountryCode = new QSpinBox;
-  m_spnPhoneCountryCode->setMinimum(0);
-  m_spnPhoneCountryCode->setMaximum(999999);
-  m_spnPhoneCountryCode->setPrefix("+");
-  m_spnPhoneCountryCode->setValue(55);
-  m_spnPhoneCode = new QSpinBox;
-  m_spnPhoneCode->setMinimum(0);
-  m_spnPhoneCode->setMaximum(999999);
-  m_spnPhoneCode->setPrefix("(");
-  m_spnPhoneCode->setValue(54);
-  m_spnPhoneCode->setSuffix(")");
-  m_btnAddPhone = new QPushButton;
-  m_btnAddPhone->setFlat(true);
-  m_btnAddPhone->setIconSize(QSize(16, 16));
-  m_btnAddPhone->setIcon(QIcon(":/icons/res/additem.png"));
-  m_btnAddPhone->setToolTip(tr("Adicionar telefone"));
-  m_btnRemovePhone = new QPushButton;
-  m_btnRemovePhone->setFlat(true);
-  m_btnRemovePhone->setIconSize(QSize(16, 16));
-  m_btnRemovePhone->setIcon(QIcon(":/icons/res/removeitem.png"));
-  m_btnRemovePhone->setToolTip(tr("Remover telefone"));
-  m_lstPhone = new QListWidget;
+  m_phoneTable = new PhoneTableWidget;
+  m_btnPhoneAdd = new QPushButton(QIcon(":/icons/res/additem.png"), "");
+  m_btnPhoneAdd->setFlat(true);
+  m_btnPhoneAdd->setIconSize(QSize(24, 24));
+  m_btnPhoneRemove = new QPushButton(QIcon(":/icons/res/removeitem.png"), "");
+  m_btnPhoneRemove->setFlat(true);
+  m_btnPhoneRemove->setIconSize(QSize(24, 24));
 
   m_edAddressPostalCode = new JLineEdit(JLineEdit::Input::Numeric,
                                         JLineEdit::st_defaultFlags2);
@@ -265,22 +241,6 @@ PersonView::PersonView(bool bAccessEmployee,
   addressInformationLayout->addRow(tr("Complemento:"), m_edAddressComplement);
   addressInformationLayout->addRow(tr("Referência:"), m_edAddressReference);
 
-  QHBoxLayout* phoneButtonLayout = new QHBoxLayout;
-  phoneButtonLayout->setContentsMargins(0, 0, 0, 0);
-  phoneButtonLayout->setAlignment(Qt::AlignLeft);
-  phoneButtonLayout->addWidget(m_btnAddPhone);
-  phoneButtonLayout->addWidget(m_btnRemovePhone);
-
-  QHBoxLayout* phoneNumberLayout = new QHBoxLayout;
-  phoneNumberLayout->setContentsMargins(0, 0, 0, 0);
-  phoneNumberLayout->addWidget(m_spnPhoneCountryCode);
-  phoneNumberLayout->addWidget(m_spnPhoneCode);
-  phoneNumberLayout->addWidget(m_edPhoneNumber);
-
-  QVBoxLayout* phoneInformationLayout = new QVBoxLayout;
-  phoneInformationLayout->addWidget(m_edPhoneName);
-  phoneInformationLayout->addLayout(phoneNumberLayout);
-
   QFormLayout* formLayout = new QFormLayout;
   formLayout->addRow(tr("Tipo:"), m_rdoPerson);
   formLayout->addRow("", m_rdoCompany);
@@ -294,15 +254,20 @@ PersonView::PersonView(bool bAccessEmployee,
   formLayout->addRow(m_cbBirthDate, m_dtBirthDate);
   formLayout->addRow(tr("Imagem:"), m_imagePicker);
 
-  QVBoxLayout* phoneLayout = new QVBoxLayout;
-  phoneLayout->addLayout(phoneButtonLayout);
-  phoneLayout->addLayout(phoneInformationLayout);
-  phoneLayout->addWidget(m_lstPhone);
-
   QVBoxLayout* addressLayout = new QVBoxLayout();
   addressLayout->addLayout(addressButtonlayout);
   addressLayout->addLayout(addressInformationLayout);
   addressLayout->addWidget(m_lstAddress);
+
+  QVBoxLayout* ltPhoneBtn = new QVBoxLayout;
+  ltPhoneBtn->setContentsMargins(0, 0, 0, 0);
+  ltPhoneBtn->setAlignment(Qt::AlignTop);
+  ltPhoneBtn->addWidget(m_btnPhoneAdd);
+  ltPhoneBtn->addWidget(m_btnPhoneRemove);
+
+  QHBoxLayout* ltPhone = new QHBoxLayout;
+  ltPhone->addWidget(m_phoneTable);
+  ltPhone->addLayout(ltPhoneBtn);
 
   m_grpEmployee = new QGroupBox;
   m_grpEmployee->setTitle(tr("Disponível como funcionário"));
@@ -342,7 +307,7 @@ PersonView::PersonView(bool bAccessEmployee,
   supplierFrame->setLayout(supplierFrameLayout);
 
   QFrame* phoneFrame = new QFrame;
-  phoneFrame->setLayout(phoneLayout);
+  phoneFrame->setLayout(ltPhone);
 
   QFrame* addressFrame = new QFrame;
   addressFrame->setLayout(addressLayout);
@@ -385,20 +350,16 @@ PersonView::PersonView(bool bAccessEmployee,
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_btnAddPhone,
+  QObject::connect(m_btnPhoneAdd,
                    SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(addPhone()));
-  QObject::connect(m_btnRemovePhone,
+                   m_phoneTable,
+                   SLOT(addItem()));
+  QObject::connect(m_btnPhoneRemove,
                    SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(removePhone()));
-  QObject::connect(m_lstPhone,
-                   SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-                   this,
-                   SLOT(openPhone()));
-  QObject::connect(m_lstPhone,
-                   SIGNAL(currentRowChanged(int)),
+                   m_phoneTable,
+                   SLOT(removeItem()));
+  QObject::connect(m_phoneTable,
+                   SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
   QObject::connect(m_btnAddressPostalCode,
@@ -454,8 +415,8 @@ const JItem& PersonView::getItem() const
   o.m_employee.m_bNoteEdit = m_grpEmployee->isChecked() && m_cbNoteEdit->isChecked();
   o.m_employee.m_bNoteRemove = m_grpEmployee->isChecked() && m_cbNoteRemove->isChecked();
 
-  for (int i = 0; i != m_lstPhone->count(); ++i)
-    o.m_vPhone.push_back(m_lstPhone->item(i)->data(Qt::UserRole).value<Phone>());
+  for (int i = 0; i != m_phoneTable->rowCount(); ++i)
+    o.m_vPhone.push_back(dynamic_cast<const Phone&>(m_phoneTable->getItem(i)));
 
   for (int i = 0; i != m_lstAddress->count(); ++i)
     o.m_vAddress.push_back(m_lstAddress->item(i)->data(Qt::UserRole).value<Address>());
@@ -487,12 +448,11 @@ void PersonView::setItem(const JItem &o)
   m_cbNoteEdit->setChecked(_o.m_employee.m_bNoteEdit);
   m_cbNoteRemove->setChecked(_o.m_employee.m_bNoteRemove);
 
-  m_lstPhone->clear();
+  m_phoneTable->removeAllItems();
   m_lstAddress->clear();
 
-  clearPhone();
   for (int i = 0; i != _o.m_vPhone.size(); ++i)
-    addPhone(_o.m_vPhone.at(i));
+    m_phoneTable->addItem(_o.m_vPhone.at(i));
 
   clearAddress();
   for (int i = 0; i != _o.m_vAddress.size(); ++i)
@@ -515,7 +475,7 @@ void PersonView::updateControls()
       m_dtBirthDate->date() == m_dtBirthDate->minimumDate())
     m_dtBirthDate->setDate(QDate::currentDate());
 
-  m_btnRemovePhone->setEnabled(m_lstPhone->currentRow() != -1);
+  m_btnPhoneRemove->setEnabled(m_phoneTable->isValidCurrentRow());
   m_btnRemoveAddress->setEnabled(m_lstAddress->currentRow() != -1);
 }
 
@@ -533,6 +493,8 @@ void PersonView::switchUserType()
     m_edRgIE->setInputMask("");
     m_cbBirthDate->setEnabled(false);
     m_dtBirthDate->setEnabled(false);
+    m_grpEmployee->setChecked(false);
+    m_grpEmployee->setEnabled(false);
   }
   else
   {
@@ -546,62 +508,9 @@ void PersonView::switchUserType()
     m_edRgIE->setInputMask("9999999999;_");
     m_cbBirthDate->setEnabled(true);
     m_dtBirthDate->setEnabled(true);
+    m_grpEmployee->setEnabled(true);
   }
   updateControls();
-}
-
-Phone PersonView::getPhone() const
-{
-  Phone phone;
-  phone.m_code = m_spnPhoneCode->value();
-  phone.m_countryCode = m_spnPhoneCountryCode->value();
-  phone.m_number = m_edPhoneNumber->text();
-  phone.m_name = m_edPhoneName->text();
-  return phone;
-}
-
-void PersonView::addPhone()
-{
-  addPhone(getPhone());
-  clearPhone();
-}
-
-void PersonView::addPhone(const Phone& phone)
-{
-  QVariant var;
-  var.setValue(phone);
-  QListWidgetItem* p = new QListWidgetItem;
-  p->setText(phone.getFormattedPhone());
-  p->setData(Qt::UserRole, var);
-  m_lstPhone->addItem(p);
-}
-
-void PersonView::removePhone()
-{
-  QListWidgetItem* p = m_lstPhone->takeItem(m_lstPhone->currentRow());
-  if (p != nullptr)
-    delete p;
-}
-
-void PersonView::openPhone()
-{
-  QListWidgetItem* p = m_lstPhone->item(m_lstPhone->currentRow());
-  if (p != nullptr)
-  {
-    Phone phone = p->data(Qt::UserRole).value<Phone>();
-    m_spnPhoneCode->setValue(phone.m_code);
-    m_spnPhoneCountryCode->setValue(phone.m_countryCode);
-    m_edPhoneNumber->setText(phone.m_number);
-    m_edPhoneName->setText(phone.m_name);
-  }
-}
-
-void PersonView::clearPhone()
-{
-  m_spnPhoneCode->setValue(PHONE_DEFAULT_CODE_VALUE);
-  m_spnPhoneCountryCode->setValue(PHONE_DEFAULT_COUNTRY_CODE_VALUE);
-  m_edPhoneNumber->clear();
-  m_edPhoneName->clear();
 }
 
 Address PersonView::getAddress() const

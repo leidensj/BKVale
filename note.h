@@ -6,7 +6,6 @@
 #include <QStringList>
 #include <QVector>
 #include <QDate>
-#include <QMetaType>
 #include "person.h"
 #include "product.h"
 #include "defines.h"
@@ -68,8 +67,6 @@ struct NoteItem : JItem
     return !(*this != other);
   }
 };
-
-Q_DECLARE_METATYPE(NoteItem)
 
 struct Note : public JItem
 {

@@ -109,13 +109,11 @@ void TimeCard::saveAndAccept()
 
   for (int i = 0; i != o.m_vEmployee.size(); ++i)
   {
-    /* 1 - Página
-     * 2 - Nome funcionário
-     * 3 - Horário
-     * 4 - MÊS
-     * 5 - ANO */
+    /* 1 - Nome funcionário
+     * 2 - Horário
+     * 3 - MÊS
+     * 4 - ANO */
     html += QString(
-      "<p align=\"right\">%1</p>"
       "<h2 align=\"center\">REGISTRO PONTO</h2>"
       "<p>Nome: %2 Horário: %3</p>"
       "<table border=\"1\" align=\"center\" width=\"100%\">"
@@ -130,8 +128,7 @@ void TimeCard::saveAndAccept()
           "<th colspan=\"2\">Hora</th>"
           "<th>Assinatura</th>"
           "<th colspan=\"2\">Hora</th>"
-        "</tr>").arg(QString::number(i + 1),
-                     o.m_vEmployee.at(i).m_employee.m_name,
+        "</tr>").arg(o.m_vEmployee.at(i).m_employee.m_name,
                      o.m_vEmployee.at(i).strHours(),
                      br.toString(idt, "MMMM").toUpper(),
                      idt.toString("yyyy"));
@@ -191,7 +188,10 @@ void TimeCard::saveAndAccept()
       "<td width=\"50%\"></td>"
       "</tr>"
       "</tr>"
-      "</table>").arg(i == (o.m_vEmployee.size() - 1) ? "" : "page-break-after:always;");
+      "</table>"
+      "<br>"
+      "<p align=\"right\">%1</p>").arg(QString::number(i + 1),
+                                       i == (o.m_vEmployee.size() - 1) ? "" : "page-break-after:always;");
   }
 
   html +=

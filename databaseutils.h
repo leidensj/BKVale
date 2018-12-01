@@ -321,4 +321,24 @@ namespace StoreSQL
               QString& error);
 }
 
+namespace AddressSQL
+{
+ bool execSelect(QSqlQuery& query,
+                 Address& o,
+                 QString& error);
+
+  bool select(Address& o,
+              QString& error);
+}
+
+namespace PhoneSQL
+{
+ bool execSelect(QSqlQuery& query,
+                 Phone& o,
+                 QString& error);
+
+  bool select(Phone& o,
+              QString& error);
+}
+
 #endif // DATABASEUTILS_H

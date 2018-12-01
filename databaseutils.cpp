@@ -1753,31 +1753,25 @@ bool PersonSQL::execSelect(QSqlQuery& query,
   if (bSuccess)
   {
     query.prepare("SELECT "
-                  SQL_COLID ","
-                  ADDRESS_SQL_COL02 ","
-                  ADDRESS_SQL_COL03 ","
-                  ADDRESS_SQL_COL04 ","
-                  ADDRESS_SQL_COL05 ","
-                  ADDRESS_SQL_COL06 ","
-                  ADDRESS_SQL_COL07 ","
-                  ADDRESS_SQL_COL08 ","
-                  ADDRESS_SQL_COL09
+                  SQL_COLID
                   " FROM " ADDRESS_SQL_TABLE_NAME
                   " WHERE " ADDRESS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", id.get());
     bSuccess = query.exec();
+    QVector<Id> ids;
     while (bSuccess && query.next())
     {
+      Id id;
+      id.set(query.value(0).toLongLong());
+      ids.push_back(id);
+    }
+
+    for (int i = 0; i != ids.size(); ++i)
+    {
+      QString error2;
       Address address;
-      address.m_id.set(query.value(0).toLongLong());
-      address.m_cep = query.value(1).toString();
-      address.m_neighborhood = query.value(2).toString();
-      address.m_street = query.value(3).toString();
-      address.m_number = query.value(4).toInt();
-      address.m_city = query.value(5).toString();
-      address.m_state = (Address::EBRState)query.value(6).toInt();
-      address.m_complement = query.value(7).toString();
-      address.m_reference = query.value(8).toString();
+      address.m_id.set(ids.at(i).get());
+      AddressSQL::execSelect(query, address, error2);
       person.m_vAddress.push_back(address);
     }
   }
@@ -1785,25 +1779,25 @@ bool PersonSQL::execSelect(QSqlQuery& query,
   if (bSuccess)
   {
     query.prepare("SELECT "
-                  SQL_COLID ","
-                  PHONE_SQL_COL01 ","
-                  PHONE_SQL_COL02 ","
-                  PHONE_SQL_COL03 ","
-                  PHONE_SQL_COL04 ","
-                  PHONE_SQL_COL05
+                  SQL_COLID
                   " FROM " PHONE_SQL_TABLE_NAME
                   " WHERE " PHONE_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", id.get());
     bSuccess = query.exec();
+    QVector<Id> ids;
     while (bSuccess && query.next())
     {
+      Id id;
+      id.set(query.value(0).toLongLong());
+      ids.push_back(id);
+    }
+
+    for (int i = 0; i != ids.size(); ++i)
+    {
+      QString error2;
       Phone phone;
-      phone.m_id.set(query.value(0).toLongLong());
-      query.value(1).toLongLong(); //personId não usamos
-      phone.m_countryCode = query.value(2).toInt();
-      phone.m_code = query.value(3).toInt();
-      phone.m_number = query.value(4).toString();
-      phone.m_name = query.value(5).toString();
+      phone.m_id.set(ids.at(i).get());
+      PhoneSQL::execSelect(query, phone, error2);
       person.m_vPhone.push_back(phone);
     }
   }
@@ -3515,5 +3509,137 @@ bool StoreSQL::remove(Id id,
   query.bindValue(":_v00", id.get());
   bool bSuccess = query.exec();
 
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool PhoneSQL::execSelect(QSqlQuery& query,
+                          Phone& o,
+                          QString& error)
+{
+  error.clear();
+  Id id = o.m_id;
+  o.clear();
+
+  query.prepare("SELECT "
+                PHONE_SQL_COL01 ","
+                PHONE_SQL_COL02 ","
+                PHONE_SQL_COL03 ","
+                PHONE_SQL_COL04 ","
+                PHONE_SQL_COL05
+                " FROM " PHONE_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id.get());
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      o.m_id = id;
+      query.value(0).toLongLong(); //personId não usamos
+      o.m_countryCode = query.value(1).toInt();
+      o.m_code = query.value(2).toInt();
+      o.m_number = query.value(3).toString();
+      o.m_name = query.value(4).toString();
+    }
+    else
+    {
+      error = "Telefone não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  if (!bSuccess)
+  {
+    if (error.isEmpty())
+      error = query.lastError().text();
+    o.clear();
+  }
+
+  return bSuccess;
+}
+
+bool PhoneSQL::select(Phone& o,
+                      QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  bool bSuccess = execSelect(query, o, error);
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool AddressSQL::execSelect(QSqlQuery& query,
+                            Address& o,
+                            QString& error)
+{
+  error.clear();
+  Id id = o.m_id;
+  o.clear();
+
+  query.prepare("SELECT "
+                ADDRESS_SQL_COL01 ","
+                ADDRESS_SQL_COL02 ","
+                ADDRESS_SQL_COL03 ","
+                ADDRESS_SQL_COL04 ","
+                ADDRESS_SQL_COL05 ","
+                ADDRESS_SQL_COL06 ","
+                ADDRESS_SQL_COL07 ","
+                ADDRESS_SQL_COL08 ","
+                ADDRESS_SQL_COL09
+                " FROM " ADDRESS_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id.get());
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      o.m_id = id;
+      query.value(0).toLongLong(); // PersonId não usamoe
+      o.m_cep = query.value(0).toString();
+      o.m_neighborhood = query.value(1).toString();
+      o.m_street = query.value(2).toString();
+      o.m_number = query.value(3).toInt();
+      o.m_city = query.value(4).toString();
+      o.m_state = (Address::EBRState)query.value(5).toInt();
+      o.m_complement = query.value(6).toString();
+      o.m_reference = query.value(7).toString();
+    }
+    else
+    {
+      error = "Endereço não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  if (!bSuccess)
+  {
+    if (error.isEmpty())
+      error = query.lastError().text();
+    o.clear();
+  }
+
+  return bSuccess;
+}
+
+bool AddressSQL::select(Address& o,
+                        QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  bool bSuccess = execSelect(query, o, error);
   return finishTransaction(db, query, bSuccess, error);
 }

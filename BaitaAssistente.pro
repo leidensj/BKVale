@@ -57,7 +57,8 @@ SOURCES += main.cpp\
     storeview.cpp \
     storeemployeetablewidget.cpp \
     timeintervaldlg.cpp \
-    jtimeedit.cpp
+    jtimeedit.cpp \
+    addresstablewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -122,7 +123,8 @@ HEADERS  += mainwindow.h \
     storeemployeetablewidget.h \
     timeintervaldlg.h \
     jtimeedit.h \
-    timeinterval.h
+    timeinterval.h \
+    addresstablewidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

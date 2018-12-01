@@ -9,14 +9,26 @@
 #include "person.h"
 #include "store.h"
 #include "phone.h"
+#include "address.h"
 
 class JSpinBox;
 class JLineEdit;
+class JSpinBox;
 class QDialogButtonBox;
+class QComboBox;
 
 class PhoneEditorDlg : public QDialog
 {
   Q_OBJECT
+
+public:
+  explicit PhoneEditorDlg(QWidget* parent = nullptr);
+  Phone getPhone() const;
+  void setPhone(const Phone& o);
+
+private slots:
+  void updateControls();
+
 private:
   Id m_currentId;
   JSpinBox* m_spnCountryCode;
@@ -24,12 +36,33 @@ private:
   JLineEdit* m_edNumber;
   JLineEdit* m_edName;
   QDialogButtonBox* m_btn;
+};
+
+class AddressEditorDlg : public QDialog
+{
+  Q_OBJECT
+
+public:
+  explicit AddressEditorDlg(QWidget* parent = nullptr);
+  Address getAddress() const;
+  void setAddress(const Address& o);
+
 private slots:
   void updateControls();
-public:
-  explicit PhoneEditorDlg(QWidget* parent = nullptr);
-  Phone getPhone() const;
-  void setPhone(const Phone& o);
+  void processPostalCode();
+
+private:
+  Id m_currentId;
+  JLineEdit* m_edPostalCode;
+  QPushButton* m_btnPostalCode;
+  JLineEdit* m_edNeighborhood;
+  JLineEdit* m_edStreet;
+  JSpinBox* m_spnNumber;
+  JLineEdit* m_edCity;
+  QComboBox* m_cbState;
+  JLineEdit* m_edComplement;
+  JLineEdit* m_edReference;
+  QDialogButtonBox* m_btn;
 };
 
 class DoubleTableWidgetItem : public QTableWidgetItem
@@ -76,6 +109,18 @@ public:
 
 private:
   Phone m_o;
+};
+
+class AddressEditorTableWidgetItem : public QTableWidgetItem
+{
+public:
+  AddressEditorTableWidgetItem();
+  void setItem(const Address& o);
+  const Address& getItem() const;
+  bool selectItem();
+
+private:
+  Address m_o;
 };
 
 class PackageTableWidgetItem : public QTableWidgetItem

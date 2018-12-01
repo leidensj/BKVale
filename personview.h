@@ -3,13 +3,9 @@
 
 #include <QFrame>
 #include <QVector>
-#include "address.h"
-#include "phone.h"
 #include "person.h"
 #include "jitemview.h"
 
-
-class AddressPageView;
 class QTabWidget;
 class QLabel;
 class QRadioButton;
@@ -22,8 +18,7 @@ class QListWidget;
 class QComboBox;
 class QGroupBox;
 class PhoneTableWidget;
-
-Q_DECLARE_METATYPE(Address)
+class AddressTableWidget;
 
 class PersonView : public JItemView
 {
@@ -39,19 +34,11 @@ public:
 private slots:
   void updateControls();
   void switchUserType();
-  Address getAddress() const;
-  void addAddress();
-  void addAddress(const Address& address);
-  void removeAddress();
-  void openAddress();
-  void clearAddress();
-  void processPostalCode();
 
 public slots:
   void create();
 
 private:
-  AddressPageView* m_addressPage;
   QRadioButton* m_rdoPerson;
   QRadioButton* m_rdoCompany;
   JLineEdit* m_edName;
@@ -70,22 +57,13 @@ private:
   QDateEdit* m_dtCreationDate;
   JLineEdit* m_edPinCode;
 
-  PhoneTableWidget* m_phoneTable;
+  PhoneTableWidget* m_tblPhone;
   QPushButton* m_btnPhoneAdd;
   QPushButton* m_btnPhoneRemove;
 
-  JLineEdit* m_edAddressPostalCode;
-  QPushButton* m_btnAddressPostalCode;
-  JLineEdit* m_edAddressNeighborhood;
-  JLineEdit* m_edAddressStreet;
-  QSpinBox* m_spnAddressNumber;
-  JLineEdit* m_edAddressCity;
-  QComboBox* m_cbAddressState;
-  JLineEdit* m_edAddressComplement;
-  JLineEdit* m_edAddressReference;
-  QPushButton* m_btnAddAddress;
-  QPushButton* m_btnRemoveAddress;
-  QListWidget* m_lstAddress;
+  AddressTableWidget* m_tblAddress;
+  QPushButton* m_btnAddressAdd;
+  QPushButton* m_btnAddressRemove;
 
   QCheckBox* m_cbNoteEdit;
   QCheckBox* m_cbNoteRemove;

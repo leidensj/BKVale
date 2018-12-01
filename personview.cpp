@@ -8,70 +8,20 @@
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QLabel>
-#include <QSpinBox>
 #include <QListWidget>
 #include <QComboBox>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QEventLoop>
-#include <QByteArray>
-#include <QDomDocument>
 #include <QMessageBox>
 #include "jdatabase.h"
 #include "databaseutils.h"
 #include <QAction>
 #include <QGroupBox>
 #include "phonetablewidget.h"
-
-// Serviço de busca de cep em:
-// http://postmon.com.br/
-// Exemplo
-/*
- * <result>
- *    <complemento>até 1020/1021</complemento>
- *    <bairro>Nossa Senhora de Lourdes</bairro>
- *    <cidade>Caxias do Sul</cidade>
- *    <logradouro>Rua Sinimbu</logradouro>
- *    <estado_info>
- *         <area_km2>281.737,947</area_km2>
- *         <codigo_ibge>43</codigo_ibge>
- *         <nome>Rio Grande do Sul</nome>
- *    </estado_info>
- *    <cep>95020000</cep>
- *    <cidade_info>
- *       <area_km2>1652,308</area_km2>
- *       <codigo_ibge>4305108</codigo_ibge>
- *    </cidade_info>
- *    <estado>RS</estado>
- * </result>
-*/
-
-namespace
-{
-  QString searchPostalCode(const QString& postalCode)
-  {
-    QString url("http://api.postmon.com.br/v1/cep/" + postalCode + "?format=xml");
-    QNetworkAccessManager manager;
-    QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
-
-    QEventLoop loop;
-    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
-    loop.exec();
-
-    QByteArray bts = reply->readAll();
-    QString str(bts);
-
-    delete reply;
-    return str;
-  }
-}
+#include "addresstablewidget.h"
 
 PersonView::PersonView(bool bAccessEmployee,
                        bool bAccessSupplier,
                        QWidget* parent)
   : JItemView(PERSON_SQL_TABLE_NAME, parent)
-  , m_addressPage(nullptr)
   , m_rdoPerson(nullptr)
   , m_rdoCompany(nullptr)
   , m_edName(nullptr)
@@ -89,21 +39,12 @@ PersonView::PersonView(bool bAccessEmployee,
   , m_imagePicker(nullptr)
   , m_dtCreationDate(nullptr)
   , m_edPinCode(nullptr)
-  , m_phoneTable(nullptr)
+  , m_tblPhone(nullptr)
   , m_btnPhoneAdd(nullptr)
   , m_btnPhoneRemove(nullptr)
-  , m_edAddressPostalCode(nullptr)
-  , m_btnAddressPostalCode(nullptr)
-  , m_edAddressNeighborhood(nullptr)
-  , m_edAddressStreet(nullptr)
-  , m_spnAddressNumber(nullptr)
-  , m_edAddressCity(nullptr)
-  , m_cbAddressState(nullptr)
-  , m_edAddressComplement(nullptr)
-  , m_edAddressReference(nullptr)
-  , m_btnAddAddress(nullptr)
-  , m_btnRemoveAddress(nullptr)
-  , m_lstAddress(nullptr)
+  , m_tblAddress(nullptr)
+  , m_btnAddressAdd(nullptr)
+  , m_btnAddressRemove(nullptr)
   , m_cbNoteEdit(nullptr)
   , m_cbNoteRemove(nullptr)
   , m_grpEmployee(nullptr)
@@ -166,7 +107,7 @@ PersonView::PersonView(bool bAccessEmployee,
   m_cbNoteRemove->setText(tr("Remover"));
   m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
-  m_phoneTable = new PhoneTableWidget;
+  m_tblPhone = new PhoneTableWidget;
   m_btnPhoneAdd = new QPushButton(QIcon(":/icons/res/additem.png"), "");
   m_btnPhoneAdd->setFlat(true);
   m_btnPhoneAdd->setIconSize(QSize(24, 24));
@@ -174,72 +115,17 @@ PersonView::PersonView(bool bAccessEmployee,
   m_btnPhoneRemove->setFlat(true);
   m_btnPhoneRemove->setIconSize(QSize(24, 24));
 
-  m_edAddressPostalCode = new JLineEdit(JLineEdit::Input::Numeric,
-                                        JLineEdit::st_defaultFlags2);
-  m_edAddressPostalCode->setInputMask(ADDRESS_CEP_MASK);
-  m_btnAddressPostalCode = new QPushButton();
-  m_btnAddressPostalCode->setFlat(true);
-  m_btnAddressPostalCode->setIconSize(QSize(16, 16));
-  m_btnAddressPostalCode->setIcon(QIcon(":/icons/res/process.png"));
-  m_btnAddressPostalCode->setToolTip(tr("Buscar CEP"));
-  m_edAddressNeighborhood = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                          JLineEdit::st_defaultFlags1);
-  m_edAddressNeighborhood->setPlaceholderText(tr("*"));
-  m_edAddressStreet = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                    JLineEdit::st_defaultFlags1);
-  m_edAddressStreet->setPlaceholderText(tr("*"));
-  m_spnAddressNumber = new QSpinBox();
-  m_spnAddressNumber->setMinimum(0);
-  m_spnAddressNumber->setMaximum(999999);
-  m_spnAddressNumber->setPrefix(tr("Nº "));
-  m_edAddressCity = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                  JLineEdit::st_defaultFlags1);
-  m_edAddressCity->setPlaceholderText(tr("*"));
-  m_cbAddressState = new QComboBox();
-  for (int i = 0; i != ADDRESS_NUMBER_OF_BRAZILIAN_STATES; ++i)
-    m_cbAddressState->addItem(Address::st_getBRState((Address::EBRState)i).m_name);
-  m_cbAddressState->setCurrentIndex((int)Address::EBRState::RS);
-  m_edAddressComplement = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                        JLineEdit::st_defaultFlags1);
-  m_edAddressReference = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                       JLineEdit::st_defaultFlags1);
-  m_btnAddAddress = new QPushButton();
-  m_btnAddAddress->setFlat(true);
-  m_btnAddAddress->setIconSize(QSize(16, 16));
-  m_btnAddAddress->setIcon(QIcon(":/icons/res/additem.png"));
-  m_btnAddAddress->setToolTip(tr("Adicionar endereço"));
-  m_btnRemoveAddress = new QPushButton();
-  m_btnRemoveAddress->setFlat(true);
-  m_btnRemoveAddress->setIconSize(QSize(16, 16));
-  m_btnRemoveAddress->setIcon(QIcon(":/icons/res/removeitem.png"));
-  m_btnRemoveAddress->setToolTip(tr("Remover endereço"));
-  m_lstAddress = new QListWidget;
-
-  QHBoxLayout* addressButtonlayout = new QHBoxLayout();
-  addressButtonlayout->setContentsMargins(0, 0, 0, 0);
-  addressButtonlayout->setAlignment(Qt::AlignLeft);
-  addressButtonlayout->addWidget(m_btnAddAddress);
-  addressButtonlayout->addWidget(m_btnRemoveAddress);
-
-  QHBoxLayout* addressPostalCodeLayout = new QHBoxLayout();
-  addressPostalCodeLayout->setContentsMargins(0, 0, 0, 0);
-  addressPostalCodeLayout->addWidget(m_edAddressPostalCode);
-  addressPostalCodeLayout->addWidget(m_btnAddressPostalCode);
-
-  QHBoxLayout* addressStreetLayout = new QHBoxLayout();
-  addressStreetLayout->setContentsMargins(0, 0, 0, 0);
-  addressStreetLayout->addWidget(m_edAddressStreet);
-  addressStreetLayout->addWidget(m_spnAddressNumber);
-
-  QFormLayout* addressInformationLayout = new QFormLayout();
-  addressInformationLayout->setContentsMargins(0, 0, 0, 0);
-  addressInformationLayout->addRow(tr("CEP:"), addressPostalCodeLayout);
-  addressInformationLayout->addRow(tr("Rua:"), addressStreetLayout);
-  addressInformationLayout->addRow(tr("Bairro:"), m_edAddressNeighborhood);
-  addressInformationLayout->addRow(tr("Cidade:"), m_edAddressCity);
-  addressInformationLayout->addRow(tr("Estado:"), m_cbAddressState);
-  addressInformationLayout->addRow(tr("Complemento:"), m_edAddressComplement);
-  addressInformationLayout->addRow(tr("Referência:"), m_edAddressReference);
+  m_tblAddress = new AddressTableWidget;
+  m_btnAddressAdd = new QPushButton;
+  m_btnAddressAdd->setFlat(true);
+  m_btnAddressAdd->setIconSize(QSize(24, 24));
+  m_btnAddressAdd->setIcon(QIcon(":/icons/res/additem.png"));
+  m_btnAddressAdd->setToolTip(tr("Adicionar endereço"));
+  m_btnAddressRemove = new QPushButton;
+  m_btnAddressRemove->setFlat(true);
+  m_btnAddressRemove->setIconSize(QSize(24, 24));
+  m_btnAddressRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
+  m_btnAddressRemove->setToolTip(tr("Remover endereço"));
 
   QFormLayout* formLayout = new QFormLayout;
   formLayout->addRow(tr("Tipo:"), m_rdoPerson);
@@ -254,11 +140,6 @@ PersonView::PersonView(bool bAccessEmployee,
   formLayout->addRow(m_cbBirthDate, m_dtBirthDate);
   formLayout->addRow(tr("Imagem:"), m_imagePicker);
 
-  QVBoxLayout* addressLayout = new QVBoxLayout();
-  addressLayout->addLayout(addressButtonlayout);
-  addressLayout->addLayout(addressInformationLayout);
-  addressLayout->addWidget(m_lstAddress);
-
   QVBoxLayout* ltPhoneBtn = new QVBoxLayout;
   ltPhoneBtn->setContentsMargins(0, 0, 0, 0);
   ltPhoneBtn->setAlignment(Qt::AlignTop);
@@ -266,8 +147,18 @@ PersonView::PersonView(bool bAccessEmployee,
   ltPhoneBtn->addWidget(m_btnPhoneRemove);
 
   QHBoxLayout* ltPhone = new QHBoxLayout;
-  ltPhone->addWidget(m_phoneTable);
+  ltPhone->addWidget(m_tblPhone);
   ltPhone->addLayout(ltPhoneBtn);
+
+  QVBoxLayout* ltAddressBtn = new QVBoxLayout;
+  ltAddressBtn->setContentsMargins(0, 0, 0, 0);
+  ltAddressBtn->setAlignment(Qt::AlignTop);
+  ltAddressBtn->addWidget(m_btnAddressAdd);
+  ltAddressBtn->addWidget(m_btnAddressRemove);
+
+  QHBoxLayout* ltAddress = new QHBoxLayout;
+  ltAddress->addWidget(m_tblAddress);
+  ltAddress->addLayout(ltAddressBtn);
 
   m_grpEmployee = new QGroupBox;
   m_grpEmployee->setTitle(tr("Disponível como funcionário"));
@@ -310,7 +201,7 @@ PersonView::PersonView(bool bAccessEmployee,
   phoneFrame->setLayout(ltPhone);
 
   QFrame* addressFrame = new QFrame;
-  addressFrame->setLayout(addressLayout);
+  addressFrame->setLayout(ltAddress);
 
   m_tab->addTab(informationFrame,
                 QIcon(":/icons/res/details.png"),
@@ -352,34 +243,26 @@ PersonView::PersonView(bool bAccessEmployee,
                    SLOT(updateControls()));
   QObject::connect(m_btnPhoneAdd,
                    SIGNAL(clicked(bool)),
-                   m_phoneTable,
+                   m_tblPhone,
                    SLOT(addItem()));
   QObject::connect(m_btnPhoneRemove,
                    SIGNAL(clicked(bool)),
-                   m_phoneTable,
+                   m_tblPhone,
                    SLOT(removeItem()));
-  QObject::connect(m_phoneTable,
+  QObject::connect(m_tblPhone,
                    SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
-  QObject::connect(m_btnAddressPostalCode,
+  QObject::connect(m_btnAddressAdd,
                    SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(processPostalCode()));
-  QObject::connect(m_btnAddAddress,
+                   m_tblAddress,
+                   SLOT(addItem()));
+  QObject::connect(m_btnAddressRemove,
                    SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(addAddress()));
-  QObject::connect(m_btnRemoveAddress,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(removeAddress()));
-  QObject::connect(m_lstAddress,
-                   SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-                   this,
-                   SLOT(openAddress()));
-  QObject::connect(m_lstAddress,
-                   SIGNAL(currentRowChanged(int)),
+                   m_tblAddress,
+                   SLOT(removeItem()));
+  QObject::connect(m_tblAddress,
+                   SIGNAL(changedSignal()),
                    this,
                    SLOT(updateControls()));
 
@@ -415,11 +298,11 @@ const JItem& PersonView::getItem() const
   o.m_employee.m_bNoteEdit = m_grpEmployee->isChecked() && m_cbNoteEdit->isChecked();
   o.m_employee.m_bNoteRemove = m_grpEmployee->isChecked() && m_cbNoteRemove->isChecked();
 
-  for (int i = 0; i != m_phoneTable->rowCount(); ++i)
-    o.m_vPhone.push_back(dynamic_cast<const Phone&>(m_phoneTable->getItem(i)));
+  for (int i = 0; i != m_tblPhone->rowCount(); ++i)
+    o.m_vPhone.push_back(dynamic_cast<const Phone&>(m_tblPhone->getItem(i)));
 
-  for (int i = 0; i != m_lstAddress->count(); ++i)
-    o.m_vAddress.push_back(m_lstAddress->item(i)->data(Qt::UserRole).value<Address>());
+  for (int i = 0; i != m_tblAddress->rowCount(); ++i)
+    o.m_vAddress.push_back(dynamic_cast<const Address&>(m_tblAddress->getItem(i)));
 
   return o;
 }
@@ -448,15 +331,14 @@ void PersonView::setItem(const JItem &o)
   m_cbNoteEdit->setChecked(_o.m_employee.m_bNoteEdit);
   m_cbNoteRemove->setChecked(_o.m_employee.m_bNoteRemove);
 
-  m_phoneTable->removeAllItems();
-  m_lstAddress->clear();
+  m_tblPhone->removeAllItems();
+  m_tblAddress->removeAllItems();
 
   for (int i = 0; i != _o.m_vPhone.size(); ++i)
-    m_phoneTable->addItem(_o.m_vPhone.at(i));
+    m_tblPhone->addItem(_o.m_vPhone.at(i));
 
-  clearAddress();
   for (int i = 0; i != _o.m_vAddress.size(); ++i)
-    addAddress(_o.m_vAddress.at(i));
+    m_tblAddress->addItem(_o.m_vAddress.at(i));
 }
 
 void PersonView::create()
@@ -475,8 +357,8 @@ void PersonView::updateControls()
       m_dtBirthDate->date() == m_dtBirthDate->minimumDate())
     m_dtBirthDate->setDate(QDate::currentDate());
 
-  m_btnPhoneRemove->setEnabled(m_phoneTable->isValidCurrentRow());
-  m_btnRemoveAddress->setEnabled(m_lstAddress->currentRow() != -1);
+  m_btnPhoneRemove->setEnabled(m_tblPhone->isValidCurrentRow());
+  m_btnAddressRemove->setEnabled(m_tblAddress->isValidCurrentRow());
 }
 
 void PersonView::switchUserType()
@@ -511,108 +393,4 @@ void PersonView::switchUserType()
     m_grpEmployee->setEnabled(true);
   }
   updateControls();
-}
-
-Address PersonView::getAddress() const
-{
-  Address address;
-  address.m_cep = m_edAddressPostalCode->text();
-  address.m_neighborhood = m_edAddressNeighborhood->text();
-  address.m_street = m_edAddressStreet->text();
-  address.m_number = m_spnAddressNumber->value();
-  address.m_city = m_edAddressCity->text();
-  address.m_state = (Address::EBRState)m_cbAddressState->currentIndex();
-  address.m_complement = m_edAddressComplement->text();
-  address.m_reference = m_edAddressReference->text();
-  return address;
-}
-
-void PersonView::addAddress()
-{
-  addAddress(getAddress());
-  clearAddress();
-}
-
-void PersonView::addAddress(const Address& address)
-{
-  QVariant var;
-  var.setValue(address);
-  QListWidgetItem* p = new QListWidgetItem;
-  p->setText(address.getFormattedAddress());
-  p->setData(Qt::UserRole, var);
-  m_lstAddress->addItem(p);
-}
-
-void PersonView::removeAddress()
-{
-  QListWidgetItem* p = m_lstAddress->takeItem(m_lstAddress->currentRow());
-  if (p != nullptr)
-    delete p;
-}
-
-void PersonView::openAddress()
-{
-  QListWidgetItem* p = m_lstAddress->item(m_lstAddress->currentRow());
-  if (p != nullptr)
-  {
-    Address address = p->data(Qt::UserRole).value<Address>();
-    m_edAddressPostalCode->setText(address.m_cep);
-    m_edAddressNeighborhood->setText(address.m_neighborhood);
-    m_edAddressStreet->setText(address.m_street);
-    m_spnAddressNumber->setValue(address.m_number);
-    m_edAddressCity->setText(address.m_city);
-    m_cbAddressState->setCurrentIndex((int)address.m_state);
-    m_edAddressComplement->setText(address.m_complement);
-    m_edAddressReference->setText(address.m_reference);
-  }
-}
-
-void PersonView::clearAddress()
-{
-  m_edAddressPostalCode->clear();
-  m_edAddressNeighborhood->clear();
-  m_edAddressStreet->clear();
-  m_spnAddressNumber->setValue(0);
-  m_edAddressCity->clear();
-  m_cbAddressState->setCurrentIndex((int)Address::EBRState::RS);
-  m_edAddressComplement->clear();
-  m_edAddressReference->clear();
-}
-
-void PersonView::processPostalCode()
-{
-  QDomDocument doc;
-  bool bSuccess = doc.setContent(searchPostalCode(m_edAddressPostalCode->text()));
-  if (bSuccess)
-  {
-    QDomElement root = doc.documentElement();
-    bSuccess = root.tagName() == "result";
-    if (bSuccess)
-    {
-      QDomNodeList nodes = root.childNodes();
-      for (int i = 0; i != nodes.size(); ++i)
-      {
-        QString strNode = nodes.at(i).toElement().tagName();
-        QString text = nodes.at(i).toElement().text().toUpper();
-        if (strNode == "bairro")
-          m_edAddressNeighborhood->setText(text);
-        else if (strNode == "cidade")
-          m_edAddressCity->setText(text);
-        else if (strNode == "logradouro")
-          m_edAddressStreet->setText(text);
-        else if (strNode == "estado")
-          m_cbAddressState->setCurrentIndex((int)Address::st_getEBRState(text));
-      }
-    }
-  }
-
-  if (!bSuccess)
-  {
-    QMessageBox::information(this,
-                             tr("CEP não encontrado"),
-                             tr("Verifique se o CEP '%1' informado "
-                                "está correto e se há conexão com a "
-                                "Internet.").arg(m_edAddressPostalCode->text()),
-                             QMessageBox::Ok);
-  }
 }

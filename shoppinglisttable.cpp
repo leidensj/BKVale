@@ -16,11 +16,6 @@ ShoppingListTable::ShoppingListTable(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Description, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Price, QHeaderView::ResizeToContents);
-
-  QObject::connect(this,
-                   SIGNAL(deletePressedSignal(int,int)),
-                   this,
-                   SLOT(deletePressed(int,int)));
 }
 
 const JItem& ShoppingListTable::getItem(int row) const

@@ -47,8 +47,7 @@ QPushButton* weekButtonFactory(int n)
 
 ShoppingListView::ShoppingListView(QWidget* parent)
   : JItemView(SHOPPING_LIST_SQL_TABLE_NAME, parent)
-  , m_btnAdd(nullptr)
-  , m_btnRemove(nullptr)
+  , m_tableButtons(nullptr)
   , m_edTitle(nullptr)
   , m_snLines(nullptr)
   , m_teDescription(nullptr)
@@ -56,20 +55,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_imagePicker(nullptr)
   , m_table(nullptr)
 {
-  m_btnAdd = new QPushButton;
-  m_btnAdd->setFlat(true);
-  m_btnAdd->setIconSize(QSize(24, 24));
-  m_btnAdd->setIcon(QIcon(":/icons/res/additem.png"));
-  m_btnAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
-  m_btnAdd->setToolTip(tr("Adicionar (Alt++)"));
-
-  m_btnRemove = new QPushButton;
-  m_btnRemove->setFlat(true);
-  m_btnRemove->setIconSize(QSize(24, 24));
-  m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
-  m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
-  m_btnRemove->setToolTip(tr("Remover (Alt+-)"));
-
   m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
                                          tr("Fornecedor"),
                                          QIcon(":/icons/res/supplier.png"));
@@ -90,12 +75,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   for (int i = 0; i != 7; ++i)
     m_vbtnWeek[i] = weekButtonFactory(i);
-
-  QHBoxLayout* tableButtonLayout = new QHBoxLayout;
-  tableButtonLayout->setAlignment(Qt::AlignLeft);
-  tableButtonLayout->setContentsMargins(0, 0, 0, 0);
-  tableButtonLayout->addWidget(m_btnAdd);
-  tableButtonLayout->addWidget(m_btnRemove);
 
   QHBoxLayout* monthLayout1 = new QHBoxLayout;
   monthLayout1->setContentsMargins(0, 0, 0, 0);
@@ -153,9 +132,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   calendarLayout->addLayout(monthLayout5);
 
   m_table = new ShoppingListTable;
-  QVBoxLayout* listLayout = new QVBoxLayout;
-  listLayout->addLayout(tableButtonLayout);
+  m_tableButtons = new JTableButtons(m_table, SHOPPING_LIST_MAX_NUMBER_OF_ITEMS);
+  QHBoxLayout* listLayout = new QHBoxLayout;
   listLayout->addWidget(m_table);
+  listLayout->addWidget(m_tableButtons);
 
   QFrame* tabView = new QFrame;
   tabView->setLayout(viewFormLayout);
@@ -176,43 +156,14 @@ ShoppingListView::ShoppingListView(QWidget* parent)
                 QIcon(":/icons/res/calendar.png"),
                 tr("Calendário"));
 
-  QObject::connect(m_btnAdd,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(addItem()));
-  QObject::connect(m_btnRemove,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(removeItem()));
-  QObject::connect(m_table,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_supplierPicker,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
+  connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_table, SIGNAL(changedSignal()), this, SLOT(updateControls()));
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 }
 
-void ShoppingListView::addItem()
-{
-  m_table->addItem();
-  updateControls();
-  m_table->setFocus();
-}
-
-void ShoppingListView::removeItem()
-{
-  m_table->removeItem();
-  updateControls();
-}
-
 void ShoppingListView::updateControls()
 {
-  m_btnAdd->setEnabled(m_table->rowCount() < SHOPPING_LIST_MAX_NUMBER_OF_ITEMS);
-  m_btnRemove->setEnabled(m_table->currentRow() != -1);
   m_table->showSupplierColumn(!m_supplierPicker->getId().isValid());
 }
 

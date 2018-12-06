@@ -12,6 +12,7 @@ class JLineEdit;
 class ShoppingListTable;
 class QPlainTextEdit;
 class JSpinBox;
+class JTableButtons;
 
 class ShoppingListView : public JItemView
 {
@@ -25,13 +26,10 @@ public slots:
   void create();
 
 private slots:
-  void addItem();
-  void removeItem();
   void updateControls();
 
 private:
-  QPushButton* m_btnAdd;
-  QPushButton* m_btnRemove;
+  JTableButtons* m_tableButtons;
 
   JLineEdit* m_edTitle;
   JSpinBox* m_snLines;

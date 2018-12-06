@@ -4,6 +4,7 @@
 #include "jitem.h"
 #include "product.h"
 #include "person.h"
+#include "store.h"
 
 struct Stock : public JItem
 {

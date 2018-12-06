@@ -7,6 +7,7 @@
 #include "jitem.h"
 
 class QKeyEvent;
+class QPushButton;
 
 class JTable : public QTableWidget
 {
@@ -40,11 +41,30 @@ protected slots:
 
 protected:
   void keyPressEvent(QKeyEvent *event);
+  void setHeaderIcon(int pos, const QIcon& icon);
+  void setHeaderIconSearchable(int pos);
 
 signals:
   void changedSignal();
   void deleteSignal(int row, int column);
   void activateSignal(int row, int column);
+};
+
+class JTableButtons : public QWidget
+{
+  Q_OBJECT
+
+public:
+  explicit JTableButtons(JTable* table, int maxNumberofItems = 100, int orientation = Qt::Vertical, QWidget* parent = nullptr);
+
+private slots:
+  void updateControls();
+
+private:
+  JTable* m_table;
+  int m_max;
+  QPushButton* m_btnAdd;
+  QPushButton* m_btnRemove;
 };
 
 #endif // JITEMTABLE_H

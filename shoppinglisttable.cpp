@@ -16,6 +16,9 @@ ShoppingListTable::ShoppingListTable(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Description, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Price, QHeaderView::ResizeToContents);
+
+  setHeaderIconSearchable((int)ShoppingListColumn::Description);
+  setHeaderIconSearchable((int)ShoppingListColumn::Supplier);
 }
 
 const JItem& ShoppingListTable::getItem(int row) const
@@ -30,6 +33,7 @@ const JItem& ShoppingListTable::getItem(int row) const
     m_ref.m_bPrice = ((DoubleTableWidgetItem*)item(idx, (int)ShoppingListColumn::Price))->checkState() == Qt::Checked;
     m_ref.m_package = ((PackageTableWidgetItem*)item(idx, (int)ShoppingListColumn::Unity))->getItem();
     m_ref.m_product = dynamic_cast<const Product&>(((ProductTableWidgetItem*)item(idx, (int)ShoppingListColumn::Description))->getItem());
+    m_ref.m_supplier = dynamic_cast<const Person&>
   }
   return m_ref;
 }

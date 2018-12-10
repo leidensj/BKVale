@@ -128,6 +128,11 @@ void JExpLineEdit::setText(const QString& text)
   evaluate();
 }
 
+void JExpLineEdit::setText(double val)
+{
+  setText(QString::number(val));
+}
+
 QString JExpLineEdit::text() const
 {
   return JItem::st_str(getValue(), m_dataType);

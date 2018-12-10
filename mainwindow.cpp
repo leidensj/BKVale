@@ -299,6 +299,7 @@ bool BaitaAssistant::connectPrinter()
   {
     m_printerSerial.setPortName(m_settings.m_serialPort);
     bSuccess = m_printerSerial.open(QIODevice::ReadWrite);
+    m_printerSerial.clear();
     if (bSuccess)
       bSuccess = Printer::printString(&m_printerSerial,
                                       m_settings.m_bIsPrinterEthernet,

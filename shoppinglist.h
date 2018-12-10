@@ -29,6 +29,7 @@ struct ShoppingListItem : JItem
   bool m_bPrice;
   double m_price;
   Package m_package;
+  Person m_supplier;
 
   void clear()
   {
@@ -39,6 +40,7 @@ struct ShoppingListItem : JItem
     m_bPrice = true;
     m_price = 0.0;
     m_package.clear();
+    m_supplier.clear();
   }
 
   ShoppingListItem()
@@ -64,7 +66,8 @@ struct ShoppingListItem : JItem
         m_price != another.m_price ||
         m_package != another.m_package ||
         m_bAmmount != another.m_bAmmount ||
-        m_bPrice != another.m_bPrice;
+        m_bPrice != another.m_bPrice ||
+        m_supplier.m_id.get() != another.m_id.get();
   }
 
   bool operator ==(const JItem& other) const

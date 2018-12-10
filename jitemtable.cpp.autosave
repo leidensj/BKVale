@@ -80,7 +80,8 @@ void JTable::keyPressEvent(QKeyEvent *event)
                        event->count());
     QTableWidget::keyPressEvent(&modEvent);
   }
-  else if (event->key() == Qt::Key_Escape)
+  else if (event->key() == Qt::Key_Escape ||
+           event->key() == Qt::Key_Backspace)
   {
     if (currentIndex().isValid())
       emit deleteSignal(currentIndex().row(), currentIndex().column());

@@ -369,7 +369,7 @@ void NoteView::setNote(const Note& note)
     m_table->addItem(note.m_vNoteItem.at(i));
   m_supplierPicker->setItem(note.m_supplier);
   m_teObservation->setPlainText(note.m_observation);
-  m_edDisccount->setText(note.strDisccount());
+  m_edDisccount->setText(note.m_disccount);
   updateControls();
 }
 

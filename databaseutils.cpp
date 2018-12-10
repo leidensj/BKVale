@@ -319,8 +319,8 @@ bool BaitaSQL::createTables(QString& error)
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          SHOPPING_LIST_ITEMS_SQL_COL01 " INTEGER,"
-                          SHOPPING_LIST_ITEMS_SQL_COL02 " INTEGER,"
+                          SHOPPING_LIST_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
+                          SHOPPING_LIST_ITEMS_SQL_COL02 " INTEGER NOT NULL,"
                           SHOPPING_LIST_ITEMS_SQL_COL03 " REAL,"
                           SHOPPING_LIST_ITEMS_SQL_COL04 " REAL,"
                           SHOPPING_LIST_ITEMS_SQL_COL05 " BOOLEAN,"
@@ -328,10 +328,13 @@ bool BaitaSQL::createTables(QString& error)
                           SHOPPING_LIST_ITEMS_SQL_COL07 " REAL,"
                           SHOPPING_LIST_ITEMS_SQL_COL08 " BOOLEAN,"
                           SHOPPING_LIST_ITEMS_SQL_COL09 " BOOLEAN,"
+                          SHOPPING_LIST_ITEMS_SQL_COL10 " INTEGER,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL01 ") REFERENCES "
                           SHOPPING_LIST_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL02 ") REFERENCES "
-                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL10 ") REFERENCES "
+                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " RESERVATION_SQL_TABLE_NAME " ("
@@ -2336,33 +2339,31 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
     shoppingList.m_id.set(query.lastInsertId().toLongLong());
     for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
     {
-      query.prepare(
-            QString("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
+      query.prepare("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
                     SHOPPING_LIST_ITEMS_SQL_COL01 ","
-                    "%1"
+                    SHOPPING_LIST_ITEMS_SQL_COL02 ","
                     SHOPPING_LIST_ITEMS_SQL_COL03 ","
                     SHOPPING_LIST_ITEMS_SQL_COL04 ","
                     SHOPPING_LIST_ITEMS_SQL_COL05 ","
                     SHOPPING_LIST_ITEMS_SQL_COL06 ","
                     SHOPPING_LIST_ITEMS_SQL_COL07 ","
                     SHOPPING_LIST_ITEMS_SQL_COL08 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL09
+                    SHOPPING_LIST_ITEMS_SQL_COL09 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL10
                     ") VALUES ("
                     "(:_v01),"
-                    "%2"
+                    "(:_v02),"
                     "(:_v03),"
                     "(:_v04),"
                     "(:_v05),"
                     "(:_v06),"
                     "(:_v07),"
                     "(:_v08),"
-                    "(:_v09))").arg(
-                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
-                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? "(:_v02)," : ""));
+                    "(:_v09),"
+                    "(:_v10))";
 
       query.bindValue(":_v01", shoppingList.m_id.get());
-      if (shoppingList.m_vItem.at(i).m_product.m_id.isValid())
-        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
+      query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
       query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
       query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
@@ -2370,6 +2371,7 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
       query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_package.m_ammount);
       query.bindValue(":_v08", shoppingList.m_vItem.at(i).m_bAmmount);
       query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_bPrice);
+      query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_supplier.m_id.getIdNull());
       bSuccess = query.exec();
       if (bSuccess)
         shoppingList.m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
@@ -2425,32 +2427,30 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
   {
     for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
     {
-      query.prepare(
-            QString("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
+      query.prepare("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
                     SHOPPING_LIST_ITEMS_SQL_COL01 ","
-                    "%1"
+                    SHOPPING_LIST_ITEMS_SQL_COL02 ","
                     SHOPPING_LIST_ITEMS_SQL_COL03 ","
                     SHOPPING_LIST_ITEMS_SQL_COL04 ","
                     SHOPPING_LIST_ITEMS_SQL_COL05 ","
                     SHOPPING_LIST_ITEMS_SQL_COL06 ","
                     SHOPPING_LIST_ITEMS_SQL_COL07 ","
                     SHOPPING_LIST_ITEMS_SQL_COL08 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL09
+                    SHOPPING_LIST_ITEMS_SQL_COL09 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL10
                     ") VALUES ("
                     "(:_v01),"
-                    "%2"
+                    "(:_v02),"
                     "(:_v03),"
                     "(:_v04),"
                     "(:_v05),"
                     "(:_v06),"
                     "(:_v07),"
                     "(:_v08),"
-                    "(:_v09))").arg(
-                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? SHOPPING_LIST_ITEMS_SQL_COL02 "," : "",
-                    shoppingList.m_vItem.at(i).m_product.m_id.isValid() ? "(:_v02)," : ""));
+                    "(:_v09),"
+                    "(:_v10))";
       query.bindValue(":_v01", shoppingList.m_id.get());
-      if (shoppingList.m_vItem.at(i).m_product.m_id.isValid())
-        query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
+      query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);
       query.bindValue(":_v04", shoppingList.m_vItem.at(i).m_price);
       query.bindValue(":_v05", shoppingList.m_vItem.at(i).m_package.m_bIsPackage);
@@ -2458,6 +2458,7 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
       query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_package.m_ammount);
       query.bindValue(":_v08", shoppingList.m_vItem.at(i).m_bAmmount);
       query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_bPrice);
+      query.bindValue(":_v10", shoppingList.m_vItem.at(i).m_supplier.m_id.getIdNull());
       bSuccess = query.exec();
       if (bSuccess)
         shoppingList.m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
@@ -2526,7 +2527,8 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
                   SHOPPING_LIST_ITEMS_SQL_COL06 ","
                   SHOPPING_LIST_ITEMS_SQL_COL07 ","
                   SHOPPING_LIST_ITEMS_SQL_COL08 ","
-                  SHOPPING_LIST_ITEMS_SQL_COL09
+                  SHOPPING_LIST_ITEMS_SQL_COL09 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL10
                   " FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME
                   " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", shoppingList.m_id.get());
@@ -2545,6 +2547,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
         item.m_package.m_ammount = query.value(6).toDouble();
         item.m_bAmmount= query.value(7).toDouble();
         item.m_bPrice = query.value(8).toDouble();
+        item.m_supplier.m_id.set(query.value(8).toDouble());
         shoppingList.m_vItem.push_back(item);
       }
     }
@@ -2552,17 +2555,24 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
 
   if (bSuccess)
   {
-    QString error2;
-    if (shoppingList.m_supplier.m_id.isValid())
-      PersonSQL::execSelect(query, shoppingList.m_supplier, error2);
-    if (shoppingList.m_image.m_id.isValid())
-      ImageSQL::execSelect(query, shoppingList.m_image, error2);
     for (int i = 0; i != shoppingList.m_vItem.size(); ++i)
     {
+      if (shoppingList.m_vItem.at(i).m_supplier.m_id.isValid())
+        bSuccess = PersonSQL::execSelect(query, shoppingList.m_vItem[i].m_supplier, error);
+      if (!bSuccess)
+        break;
       if (shoppingList.m_vItem.at(i).m_product.m_id.isValid())
-        ProductSQL::execSelect(query, shoppingList.m_vItem[i].m_product, error);
+        bSuccess = ProductSQL::execSelect(query, shoppingList.m_vItem[i].m_product, error);
+      if (!bSuccess)
+        break;
     }
   }
+
+  if (bSuccess && shoppingList.m_supplier.m_id.isValid())
+    bSuccess = PersonSQL::execSelect(query, shoppingList.m_supplier, error);
+
+  if (bSuccess && shoppingList.m_image.m_id.isValid())
+    bSuccess = ImageSQL::execSelect(query, shoppingList.m_image, error);
 
   return finishTransaction(db, query, bSuccess, error);
 }

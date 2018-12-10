@@ -75,6 +75,7 @@ public:
 
   double getValue() const;
   void setText(const QString& text);
+  void setText(double val);
   QString text() const;
 
 private slots:

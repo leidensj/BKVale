@@ -210,5 +210,6 @@ const JItem& ShoppingListView::getItem() const
     o.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
   for (int i = 0; i != m_table->rowCount(); ++i)
     o.m_vItem.push_back(dynamic_cast<const ShoppingListItem&>(m_table->getItem(i)));
+
   return o;
 }

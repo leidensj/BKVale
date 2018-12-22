@@ -2300,33 +2300,26 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
-  query.prepare(
-        QString(
-          "INSERT INTO " SHOPPING_LIST_SQL_TABLE_NAME " ("
-          "%1"
-          "%2"
-          SHOPPING_LIST_SQL_COL03 ","
-          SHOPPING_LIST_SQL_COL04 ","
-          SHOPPING_LIST_SQL_COL05 ","
-          SHOPPING_LIST_SQL_COL06 ","
-          SHOPPING_LIST_SQL_COL07
-          ") VALUES ("
-          "%3"
-          "%4"
-          "(:_v03),"
-          "(:_v04),"
-          "(:_v05),"
-          "(:_v06),"
-          "(:_v07))").arg(
-          shoppingList.m_supplier.m_id.isValid() ? SHOPPING_LIST_SQL_COL01 "," : "",
-          shoppingList.m_image.m_id.isValid() ? SHOPPING_LIST_SQL_COL02 "," : "",
-          shoppingList.m_supplier.m_id.isValid() ? "(:_v01)," : "",
-          shoppingList.m_image.m_id.isValid() ? "(:_v02)," : ""));
+  query.prepare("INSERT INTO " SHOPPING_LIST_SQL_TABLE_NAME " ("
+                SHOPPING_LIST_SQL_COL01 ","
+                SHOPPING_LIST_SQL_COL02 ","
+                SHOPPING_LIST_SQL_COL03 ","
+                SHOPPING_LIST_SQL_COL04 ","
+                SHOPPING_LIST_SQL_COL05 ","
+                SHOPPING_LIST_SQL_COL06 ","
+                SHOPPING_LIST_SQL_COL07
+                ") VALUES ("
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04),"
+                "(:_v05),"
+                "(:_v06),"
+                "(:_v07))");
 
-  if (shoppingList.m_supplier.m_id.isValid())
-    query.bindValue(":_v01", shoppingList.m_supplier.m_id.get());
-  if (shoppingList.m_image.m_id.isValid())
-    query.bindValue(":_v02", shoppingList.m_image.m_id.get());
+
+  query.bindValue(":_v01", shoppingList.m_supplier.m_id.getIdNull());
+  query.bindValue(":_v02", shoppingList.m_image.m_id.getIdNull());
   query.bindValue(":_v03", shoppingList.m_title);
   query.bindValue(":_v04", shoppingList.m_description);
   query.bindValue(":_v05", shoppingList.getWeekDays());
@@ -2360,7 +2353,7 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
                     "(:_v07),"
                     "(:_v08),"
                     "(:_v09),"
-                    "(:_v10))";
+                    "(:_v10))");
 
       query.bindValue(":_v01", shoppingList.m_id.get());
       query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
@@ -2371,7 +2364,7 @@ bool ShoppingListSQL::insert(const ShoppingList& shoppingList,
       query.bindValue(":_v07", shoppingList.m_vItem.at(i).m_package.m_ammount);
       query.bindValue(":_v08", shoppingList.m_vItem.at(i).m_bAmmount);
       query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_bPrice);
-      query.bindValue(":_v09", shoppingList.m_vItem.at(i).m_supplier.m_id.getIdNull());
+      query.bindValue(":_v10", shoppingList.m_vItem.at(i).m_supplier.m_id.getIdNull());
       bSuccess = query.exec();
       if (bSuccess)
         shoppingList.m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
@@ -2394,24 +2387,19 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
-  query.prepare(
-        QString("UPDATE " SHOPPING_LIST_SQL_TABLE_NAME " SET "
-                "%1"
-                "%2"
+  query.prepare("UPDATE " SHOPPING_LIST_SQL_TABLE_NAME " SET "
+                SHOPPING_LIST_SQL_COL03 " = (:_v01),"
+                SHOPPING_LIST_SQL_COL03 " = (:_v02),"
                 SHOPPING_LIST_SQL_COL03 " = (:_v03),"
                 SHOPPING_LIST_SQL_COL04 " = (:_v04),"
                 SHOPPING_LIST_SQL_COL05 " = (:_v05),"
                 SHOPPING_LIST_SQL_COL06 " = (:_v06),"
                 SHOPPING_LIST_SQL_COL07 " = (:_v07) "
-                "WHERE " SQL_COLID " = (:_v00)").arg(
-                shoppingList.m_supplier.m_id.isValid() ? SHOPPING_LIST_SQL_COL01 " = (:_v01)," : "",
-                shoppingList.m_image.m_id.isValid() ? SHOPPING_LIST_SQL_COL02 " = (:_v02)," : ""));
+                "WHERE " SQL_COLID " = (:_v00)");
 
   query.bindValue(":_v00", shoppingList.m_id.get());
-  if (shoppingList.m_supplier.m_id.isValid())
-    query.bindValue(":_v01", shoppingList.m_supplier.m_id.get());
-  if (shoppingList.m_image.m_id.isValid())
-    query.bindValue(":_v02", shoppingList.m_image.m_id.get());
+  query.bindValue(":_v01", shoppingList.m_supplier.m_id.getIdNull());
+  query.bindValue(":_v02", shoppingList.m_image.m_id.getIdNull());
   query.bindValue(":_v03", shoppingList.m_title);
   query.bindValue(":_v04", shoppingList.m_description);
   query.bindValue(":_v05", shoppingList.getWeekDays());
@@ -2448,7 +2436,7 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
                     "(:_v07),"
                     "(:_v08),"
                     "(:_v09),"
-                    "(:_v10))";
+                    "(:_v10))");
       query.bindValue(":_v01", shoppingList.m_id.get());
       query.bindValue(":_v02", shoppingList.m_vItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", shoppingList.m_vItem.at(i).m_ammount);

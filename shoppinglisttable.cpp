@@ -33,7 +33,7 @@ const JItem& ShoppingListTable::getItem(int row) const
     m_ref.m_bPrice = ((DoubleTableWidgetItem*)item(idx, (int)ShoppingListColumn::Price))->checkState() == Qt::Checked;
     m_ref.m_package = ((PackageTableWidgetItem*)item(idx, (int)ShoppingListColumn::Unity))->getItem();
     m_ref.m_product = dynamic_cast<const Product&>(((ProductTableWidgetItem*)item(idx, (int)ShoppingListColumn::Description))->getItem());
-    m_ref.m_supplier = dynamic_cast<const Person&>
+    m_ref.m_supplier = dynamic_cast<const Person&>(((PersonTableWidgetItem*)item(idx, (int)ShoppingListColumn::Supplier))->getItem());
   }
   return m_ref;
 }

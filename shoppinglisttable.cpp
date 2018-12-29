@@ -62,7 +62,7 @@ void ShoppingListTable::addItem(const JItem& o)
   ((DoubleTableWidgetItem*)item(row, (int)ShoppingListColumn::Price))->setCheckState(_o.m_bPrice ? Qt::Checked : Qt::Unchecked);
   ((ProductTableWidgetItem*)item(row, (int)ShoppingListColumn::Description))->setItem(_o.m_product);
   ((PackageTableWidgetItem*)item(row, (int)ShoppingListColumn::Unity))->setItem(_o.m_package, _o.m_product.m_unity);
-
+  ((PersonTableWidgetItem*)item(row, (int)ShoppingListColumn::Supplier))->setItem(_o.m_supplier);
   blockSignals(false);
 }
 
@@ -100,7 +100,7 @@ void ShoppingListTable::itemActivate(int row, int column)
   if (column == (int)ShoppingListColumn::Description)
   {
     auto ptProduct = (ProductTableWidgetItem*)item(row, column);
-    ptProduct->selectItem(PRODUCT_FILTER_SHOP);
+    ptProduct->selectItem(PRODUCT_FILTER_BUY);
     auto ptPackage = (PackageTableWidgetItem*)item(row, (int)ShoppingListColumn::Unity);
     ptPackage->setItem(Package(), dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
   }

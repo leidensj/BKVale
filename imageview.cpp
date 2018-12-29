@@ -31,9 +31,9 @@ ImageView::ImageView(QWidget* parent)
                    this,
                    SLOT(selectItem(const JItem&)));
   QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<qlonglong>&)),
+                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
-                   SLOT(itemsRemoved(const QVector<qlonglong>&)));
+                   SLOT(itemsRemoved(const QVector<Id>&)));
 }
 
 void ImageView::setItem(const JItem& o)

@@ -28,11 +28,8 @@ private:
   JLineEdit* m_edName;
   JLineEdit* m_edUnity;
   JLineEdit* m_edDetails;
-  QCheckBox* m_cbAvailableAtNotes;
-  QCheckBox* m_cbAvailableAtShop;
-  QCheckBox* m_cbAvailableAtConsumption;
-  QCheckBox* m_cbAvailableToBuy;
-  QCheckBox* m_cbAvailableToSell;
+  QCheckBox* m_cbBuy;
+  QCheckBox* m_cbSell;
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
   void setItem(const JItem& o);

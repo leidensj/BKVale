@@ -177,8 +177,6 @@ bool BaitaSQL::createTables(QString& error)
                         PRODUCT_SQL_COL05 " TEXT,"
                         PRODUCT_SQL_COL06 " BOOLEAN,"
                         PRODUCT_SQL_COL07 " BOOLEAN,"
-                        PRODUCT_SQL_COL08 " BOOLEAN,"
-                        PRODUCT_SQL_COL09 " BOOLEAN,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL02 ") REFERENCES "
                         CATEGORY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PRODUCT_SQL_COL03 ") REFERENCES "
@@ -760,9 +758,7 @@ bool ProductSQL::execSelect(QSqlQuery& query,
                 PRODUCT_SQL_COL04 ","
                 PRODUCT_SQL_COL05 ","
                 PRODUCT_SQL_COL06 ","
-                PRODUCT_SQL_COL07 ","
-                PRODUCT_SQL_COL08 ","
-                PRODUCT_SQL_COL09
+                PRODUCT_SQL_COL07
                 " FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id.get());
@@ -777,10 +773,8 @@ bool ProductSQL::execSelect(QSqlQuery& query,
       product.m_image.m_id.set(query.value(2).toLongLong());
       product.m_unity = query.value(3).toString();
       product.m_details = query.value(4).toString();
-      product.m_bAvailableAtNotes = query.value(5).toBool();
-      product.m_bAvailableAtShop = query.value(6).toBool();
-      product.m_bAvailableToBuy = query.value(7).toBool();
-      product.m_bAvailableToSell = query.value(8).toBool();
+      product.m_bBuy = query.value(5).toBool();
+      product.m_bSell = query.value(6).toBool();
 
       if (bSuccess && product.m_image.m_id.isValid())
         bSuccess = ImageSQL::execSelect(query, product.m_image, error);
@@ -825,40 +819,29 @@ bool ProductSQL::insert(const Product& product,
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
-  query.prepare(
-        QString("INSERT INTO " PRODUCT_SQL_TABLE_NAME " ("
+  query.prepare("INSERT INTO " PRODUCT_SQL_TABLE_NAME " ("
                 PRODUCT_SQL_COL01 ","
                 PRODUCT_SQL_COL02 ","
                 PRODUCT_SQL_COL03 ","
                 PRODUCT_SQL_COL04 ","
                 PRODUCT_SQL_COL05 ","
                 PRODUCT_SQL_COL06 ","
-                PRODUCT_SQL_COL07 ","
-                PRODUCT_SQL_COL08 ","
-                PRODUCT_SQL_COL09 ")"
+                PRODUCT_SQL_COL07 ")"
                 " VALUES ("
-                "(:_v01),") +
-        (product.m_category.m_id.isValid()
-         ? "(:_v02)," : "NULL,") +
-        (product.m_image.m_id.isValid()
-         ? "(:_v03)," : "NULL,") +
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
                 "(:_v04),"
                 "(:_v05),"
                 "(:_v06),"
-                "(:_v07),"
-                "(:_v08),"
-                "(:_v09))");
+                "(:_v07))");
   query.bindValue(":_v01", product.m_name);
-  if (product.m_category.m_id.isValid())
-    query.bindValue(":_v02", product.m_category.m_id.get());
-  if (product.m_image.m_id.isValid())
-    query.bindValue(":_v03", product.m_image.m_id.get());
+  query.bindValue(":_v02", product.m_category.m_id.getIdNull());
+  query.bindValue(":_v03", product.m_image.m_id.getIdNull());
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_details);
-  query.bindValue(":_v06", product.m_bAvailableAtNotes);
-  query.bindValue(":_v07", product.m_bAvailableAtShop);
-  query.bindValue(":_v08", product.m_bAvailableToBuy);
-  query.bindValue(":_v09", product.m_bAvailableToSell);
+  query.bindValue(":_v06", product.m_bBuy);
+  query.bindValue(":_v07", product.m_bSell);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -877,32 +860,23 @@ bool ProductSQL::update(const Product& product,
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
-  query.prepare(
-        QString("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
+  query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
                 PRODUCT_SQL_COL01 " = (:_v01),"
-                PRODUCT_SQL_COL02 " = ") +
-        (product.m_category.m_id.isValid() ? "(:_v02)," : "NULL,") +
-                PRODUCT_SQL_COL03 " = " +
-        (product.m_image.m_id.isValid() ? "(:_v03)," : "NULL,") +
+                PRODUCT_SQL_COL02 " = (:_v02),"
+                PRODUCT_SQL_COL03 " = (:_v03),"
                 PRODUCT_SQL_COL04 " = (:_v04),"
                 PRODUCT_SQL_COL05 " = (:_v05),"
                 PRODUCT_SQL_COL06 " = (:_v06),"
-                PRODUCT_SQL_COL07 " = (:_v07),"
-                PRODUCT_SQL_COL08 " = (:_v08),"
-                PRODUCT_SQL_COL09 " = (:_v09)"
+                PRODUCT_SQL_COL07 " = (:_v07)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", product.m_id.get());
   query.bindValue(":_v01", product.m_name);
-  if (product.m_category.m_id.isValid())
-    query.bindValue(":_v02", product.m_category.m_id.get());
-  if (product.m_image.m_id.isValid())
-    query.bindValue(":_v03", product.m_image.m_id.get());
+  query.bindValue(":_v02", product.m_category.m_id.getIdNull());
+  query.bindValue(":_v03", product.m_image.m_id.getIdNull());
   query.bindValue(":_v04", product.m_unity);
   query.bindValue(":_v05", product.m_details);
-  query.bindValue(":_v06", product.m_bAvailableAtNotes);
-  query.bindValue(":_v07", product.m_bAvailableAtShop);
-  query.bindValue(":_v08", product.m_bAvailableToBuy);
-  query.bindValue(":_v09", product.m_bAvailableToSell);
+  query.bindValue(":_v06", product.m_bBuy);
+  query.bindValue(":_v07", product.m_bSell);
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
 }
@@ -2388,8 +2362,8 @@ bool ShoppingListSQL::update(const ShoppingList& shoppingList,
   db.transaction();
   QSqlQuery query(db);
   query.prepare("UPDATE " SHOPPING_LIST_SQL_TABLE_NAME " SET "
-                SHOPPING_LIST_SQL_COL03 " = (:_v01),"
-                SHOPPING_LIST_SQL_COL03 " = (:_v02),"
+                SHOPPING_LIST_SQL_COL01 " = (:_v01),"
+                SHOPPING_LIST_SQL_COL02 " = (:_v02),"
                 SHOPPING_LIST_SQL_COL03 " = (:_v03),"
                 SHOPPING_LIST_SQL_COL04 " = (:_v04),"
                 SHOPPING_LIST_SQL_COL05 " = (:_v05),"
@@ -2535,7 +2509,7 @@ bool ShoppingListSQL::select(ShoppingList& shoppingList,
         item.m_package.m_ammount = query.value(6).toDouble();
         item.m_bAmmount= query.value(7).toDouble();
         item.m_bPrice = query.value(8).toDouble();
-        item.m_supplier.m_id.set(query.value(8).toDouble());
+        item.m_supplier.m_id.set(query.value(9).toDouble());
         shoppingList.m_vItem.push_back(item);
       }
     }

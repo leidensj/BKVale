@@ -31,7 +31,7 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
                                         (int)JDatabasePicker::Flags::Multipicker);
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
-  m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_NOTE);
+  m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);
 
   QHBoxLayout* dateLayout = new QHBoxLayout;
   dateLayout->setContentsMargins(0, 0, 0, 0);

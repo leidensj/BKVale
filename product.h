@@ -57,12 +57,8 @@ struct Product : public JItem
   QString m_name;
   QString m_unity;
   QString m_details;
-  bool m_bAvailableAtNotes;
-  bool m_bAvailableAtShop;
-  bool m_bAvailableAtConsumption;
-  bool m_bAvailableToBuy;
-  bool m_bAvailableToSell;
-  bool m_bAvailableAtShoppingList;
+  bool m_bBuy;
+  bool m_bSell;
 
   void clear()
   {
@@ -72,12 +68,8 @@ struct Product : public JItem
     m_name.clear();
     m_unity.clear();
     m_details.clear();
-    m_bAvailableAtNotes = false;
-    m_bAvailableAtShop = false;
-    m_bAvailableAtConsumption = false;
-    m_bAvailableToBuy = false;
-    m_bAvailableToSell = false;
-    m_bAvailableAtShoppingList = false;
+    m_bBuy = false;
+    m_bSell = false;
   }
 
   Product()
@@ -94,12 +86,8 @@ struct Product : public JItem
         m_name != another.m_name ||
         m_unity != another.m_unity ||
         m_details != another.m_details ||
-        m_bAvailableAtNotes != another.m_bAvailableAtNotes ||
-        m_bAvailableAtShop != another.m_bAvailableAtShop ||
-        m_bAvailableAtConsumption != another.m_bAvailableAtConsumption ||
-        m_bAvailableToBuy != another.m_bAvailableToBuy ||
-        m_bAvailableToSell != another.m_bAvailableToSell ||
-        m_bAvailableAtShoppingList != another.m_bAvailableAtShoppingList;
+        m_bBuy != another.m_bBuy ||
+        m_bSell != another.m_bSell;
   }
 
   bool operator == (const JItem& other) const

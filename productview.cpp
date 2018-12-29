@@ -12,11 +12,8 @@ ProductView::ProductView(QWidget* parent)
   , m_edName(nullptr)
   , m_edUnity(nullptr)
   , m_edDetails(nullptr)
-  , m_cbAvailableAtNotes(nullptr)
-  , m_cbAvailableAtShop(nullptr)
-  , m_cbAvailableAtConsumption(nullptr)
-  , m_cbAvailableToBuy(nullptr)
-  , m_cbAvailableToSell(nullptr)
+  , m_cbBuy(nullptr)
+  , m_cbSell(nullptr)
   , m_categoryPicker(nullptr)
   , m_imagePicker(nullptr)
 {
@@ -34,25 +31,11 @@ ProductView::ProductView(QWidget* parent)
                               JLineEdit::st_defaultFlags1);
   m_edDetails->setMaxLength(PRODUCT_MAX_DETAILS_LENGTH);
 
-  m_cbAvailableAtNotes = new QCheckBox;
-  m_cbAvailableAtNotes->setText(tr("Vales"));
-  m_cbAvailableAtNotes->setIcon(QIcon(":/icons/res/note.png"));
+  m_cbBuy = new QCheckBox;
+  m_cbBuy->setIcon(QIcon(":/icons/res/buy.png"));
 
-  m_cbAvailableAtShop = new QCheckBox;
-  m_cbAvailableAtShop->setText(tr("Compras"));
-  m_cbAvailableAtShop->setIcon(QIcon(":/icons/res/shop.png"));
-
-  m_cbAvailableAtConsumption = new QCheckBox;
-  m_cbAvailableAtConsumption->setText(tr("Consumo"));
-  m_cbAvailableAtConsumption->setIcon(QIcon(":/icons/res/stock.png"));
-
-  m_cbAvailableToBuy = new QCheckBox;
-  m_cbAvailableToBuy->setText(tr("Compra"));
-  m_cbAvailableToBuy->setIcon(QIcon(":/icons/res/buy.png"));
-
-  m_cbAvailableToSell = new QCheckBox;
-  m_cbAvailableToSell->setText(tr("Venda"));
-  m_cbAvailableToSell->setIcon(QIcon(":/icons/res/sell.png"));
+  m_cbSell = new QCheckBox;
+  m_cbSell->setIcon(QIcon(":/icons/res/sell.png"));
 
   m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME,
                                          tr("Categoria"),
@@ -67,28 +50,15 @@ ProductView::ProductView(QWidget* parent)
   formlayout->addRow(tr("Detalhes:"), m_edDetails);
   formlayout->addRow(tr("Categoria:"), m_categoryPicker);
   formlayout->addRow(tr("Imagem:"), m_imagePicker);
-
-  QVBoxLayout* tabAvailablelayout = new QVBoxLayout;
-  tabAvailablelayout->addWidget(m_cbAvailableAtNotes);
-  tabAvailablelayout->addWidget(m_cbAvailableAtShop);
-  tabAvailablelayout->addWidget(m_cbAvailableAtConsumption);
-  tabAvailablelayout->addWidget(m_cbAvailableToBuy);
-  tabAvailablelayout->addWidget(m_cbAvailableToSell);
-  tabAvailablelayout->setAlignment(Qt::AlignTop);
+  formlayout->addRow(tr("Compra:"), m_cbBuy);
+  formlayout->addRow(tr("Venda:"), m_cbSell);
 
   QFrame* tabInfoFrame = new QFrame;
   tabInfoFrame->setLayout(formlayout);
 
-  QFrame* tabAvailableFrame = new QFrame;
-  tabAvailableFrame->setLayout(tabAvailablelayout);
-
   m_tab->addTab(tabInfoFrame,
                 QIcon(":/icons/res/item.png"),
                 tr("Produto"));
-
-  m_tab->addTab(tabAvailableFrame,
-                QIcon(":/icons/res/check.png"),
-                tr("Disponibilidade"));
 }
 
 ProductView::~ProductView()
@@ -103,11 +73,8 @@ const JItem& ProductView::getItem() const
   o.m_name = m_edName->text();
   o.m_unity = m_edUnity->text();
   o.m_details = m_edDetails->text();
-  o.m_bAvailableAtNotes = m_cbAvailableAtNotes->isChecked();
-  o.m_bAvailableAtShop = m_cbAvailableAtShop->isChecked();
-  o.m_bAvailableAtConsumption = m_cbAvailableAtConsumption->isChecked();
-  o.m_bAvailableToBuy = m_cbAvailableToBuy->isChecked();
-  o.m_bAvailableToSell = m_cbAvailableToSell->isChecked();
+  o.m_bBuy = m_cbBuy->isChecked();
+  o.m_bSell = m_cbSell->isChecked();
   o.m_category.m_id = m_categoryPicker->getId();
   o.m_image.m_id = m_imagePicker->getId();
   return o;
@@ -120,11 +87,8 @@ void ProductView::setItem(const JItem &o)
   m_edName->setText(_o.m_name);
   m_edUnity->setText(_o.m_unity);
   m_edDetails->setText(_o.m_details);
-  m_cbAvailableAtNotes->setChecked(_o.m_bAvailableAtNotes);
-  m_cbAvailableAtShop->setChecked(_o.m_bAvailableAtShop);
-  m_cbAvailableAtConsumption->setChecked(_o.m_bAvailableAtConsumption);
-  m_cbAvailableToBuy->setChecked(_o.m_bAvailableToBuy);
-  m_cbAvailableToSell->setChecked(_o.m_bAvailableToSell);
+  m_cbBuy->setChecked(_o.m_bBuy);
+  m_cbSell->setChecked(_o.m_bSell);
   m_categoryPicker->setItem(_o.m_category);
   m_imagePicker->setItem(_o.m_image);
 }

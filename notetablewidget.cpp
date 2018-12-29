@@ -62,7 +62,7 @@ void NoteTableWidget::addItemAndLoadPrices(Id supplierId)
   addItem(NoteItem());
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
-  ptProductCell->selectItem(PRODUCT_FILTER_NOTE);
+  ptProductCell->selectItem(PRODUCT_FILTER_BUY);
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
   if (product.m_id.isValid())
   {
@@ -85,7 +85,7 @@ void NoteTableWidget::addItemAndLoadPricesByBarcode(Id supplierId)
   addItem(NoteItem());
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
-  ptProductCell->selectItemByBarcode(PRODUCT_FILTER_NOTE);
+  ptProductCell->selectItemByBarcode(PRODUCT_FILTER_BUY);
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
   if (product.m_id.isValid())
   {
@@ -173,7 +173,7 @@ void NoteTableWidget::itemActivate(int row, int column)
   if (column == (int)NoteColumn::Description)
   {
     auto ptProduct = (ProductTableWidgetItem*)item(row, column);
-    ptProduct->selectItem(PRODUCT_FILTER_NOTE);
+    ptProduct->selectItem(PRODUCT_FILTER_BUY);
     auto ptPackage = (PackageTableWidgetItem*)item(row, (int)NoteColumn::Unity);
     ptPackage->setItem(Package(), dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
   }
@@ -185,7 +185,7 @@ void NoteTableWidget::itemActivate(int row, int column)
   }
 }
 
-void NoteTableWidget::itemDelete(int row, int column)
+void NoteTableWidget::itemDelete(int /*row*/, int /*column*/)
 {
 
 }

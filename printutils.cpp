@@ -380,19 +380,21 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
   for (int i = 0; i != lst.m_vItem.size(); ++i)
   {
     str += ESC_DOUBLE_FONT_OFF +
-           lst.m_vItem.at(i).m_product.m_name +
-           ESC_LF
+           lst.m_vItem.at(i).m_product.m_name;
+    if (!lst.m_supplier.m_id.isValid() && lst.m_vItem.at(i).m_supplier.isValid())
+      str += ESC_LF "Fornecedor: " +
+             lst.m_vItem.at(i).m_supplier.strAliasName();
+    if (lst.m_vItem.at(i).m_bPrice)
+      str += ESC_LF "Preco sugerido: " +
+             lst.m_vItem.at(i).strPrice();
+    str += ESC_LF
            ESC_DOUBLE_FONT_ON
            "[     ][     ]";
     if (lst.m_vItem.at(i).m_bAmmount)
       str += "[" + JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
              lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity) + "]";
-    if (lst.m_vItem.at(i).m_bPrice)
-      str += ESC_LF ESC_DOUBLE_FONT_OFF
-             "Preco sugerido: " +
-             lst.m_vItem.at(i).strPrice();
-    str += ESC_DOUBLE_FONT_OFF
-           ESC_LF;
+    str += ESC_DOUBLE_FONT_OFF;
+    str += ESC_LF;
   }
 
   str += ESC_ALIGN_LEFT;

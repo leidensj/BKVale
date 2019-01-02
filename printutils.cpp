@@ -375,26 +375,42 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
     str += ESC_ALIGN_LEFT
            ESC_DOUBLE_FONT_ON
            "[ EST ][ COM ][ REC ]"
-           ESC_LF;
+           ESC_LF
+           ESC_DOUBLE_FONT_OFF;
 
+  Id lastSupplier, supplier;
   for (int i = 0; i != lst.m_vItem.size(); ++i)
   {
-    str += ESC_DOUBLE_FONT_OFF +
-           lst.m_vItem.at(i).m_product.m_name;
-    if (!lst.m_supplier.m_id.isValid() && lst.m_vItem.at(i).m_supplier.isValid())
-      str += ESC_LF "Fornecedor: " +
-             lst.m_vItem.at(i).m_supplier.strAliasName();
+    supplier = lst.m_vItem.at(i).m_supplier.m_id;
+    bool bPrintSupplier = ((!lastSupplier.isValid() && supplier.isValid()) ||
+                          (lastSupplier.isValid() && supplier.isValid() && lastSupplier != supplier)) &&
+                          !lst.m_supplier.m_id.isValid();
+    bool bPrintSeparator = ((lastSupplier.isValid() && !supplier.isValid()) ||
+                           (lastSupplier.isValid() && supplier.isValid() && lastSupplier != supplier)) &&
+                           !lst.m_supplier.m_id.isValid();
+    lastSupplier = supplier;
+
+    if (bPrintSeparator)
+      str += TABLE_FULL_LINE ESC_LF;
+
+    if (bPrintSupplier && !bPrintSeparator)
+      str += TABLE_FULL_LINE ESC_LF;
+
+    if (bPrintSupplier)
+      str +=  ESC_ALIGN_CENTER "Fornecedor: " + lst.m_vItem.at(i).m_supplier.strAliasName() + ESC_LF ESC_ALIGN_LEFT;
+
+    str += lst.m_vItem.at(i).m_product.m_name + ESC_LF;
+
     if (lst.m_vItem.at(i).m_bPrice)
-      str += ESC_LF "Preco sugerido: " +
-             lst.m_vItem.at(i).strPrice();
-    str += ESC_LF
-           ESC_DOUBLE_FONT_ON
-           "[     ][     ]";
+      str += "Preco sugerido: " + lst.m_vItem.at(i).strPrice() + ESC_LF;
+
+    str += ESC_DOUBLE_FONT_ON "[     ][     ]";
+
     if (lst.m_vItem.at(i).m_bAmmount)
       str += "[" + JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
              lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity) + "]";
-    str += ESC_DOUBLE_FONT_OFF;
-    str += ESC_LF;
+
+    str += ESC_DOUBLE_FONT_OFF ESC_LF;
   }
 
   str += ESC_ALIGN_LEFT;

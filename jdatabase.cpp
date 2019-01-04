@@ -522,10 +522,10 @@ public:
   }
 };
 
-class ProductBarcodeTableModel : public JTableModel
+class ProductCodeItemTableModel : public JTableModel
 {
 public:
-  ProductBarcodeTableModel(QObject *parent)
+  ProductCodeItemTableModel(QObject *parent)
     : JTableModel(parent)
   {
 
@@ -534,14 +534,14 @@ public:
   QString getStrQuery()
   {
     QString strQuery("SELECT "
-                     PRODUCT_BARCODE_SQL_TABLE_NAME "." SQL_COLID ","
-                     PRODUCT_BARCODE_SQL_TABLE_NAME "." PRODUCT_BARCODE_SQL_COL02 ","
+                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." SQL_COLID ","
+                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL02 ","
                      PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01
                      " FROM "
-                     PRODUCT_BARCODE_SQL_TABLE_NAME
+                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
                      " LEFT OUTER JOIN "
                      PRODUCT_SQL_TABLE_NAME
-                     " ON " PRODUCT_BARCODE_SQL_TABLE_NAME "." PRODUCT_BARCODE_SQL_COL01
+                     " ON " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL01
                      " = " PRODUCT_SQL_TABLE_NAME "." SQL_COLID);
     return strQuery;
   }
@@ -787,8 +787,8 @@ JDatabase::JDatabase(const QString& tableName,
     model = new ReservationTableModel(this);
   else if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
     model = new ActiveUserTableModel(this);
-  else if (tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
-    model = new ProductBarcodeTableModel(this);
+  else if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    model = new ProductCodeItemTableModel(this);
   else if (tableName == DISCOUNT_SQL_TABLE_NAME)
     model = new DiscountTableModel(this);
   else

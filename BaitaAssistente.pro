@@ -107,7 +107,6 @@ HEADERS  += mainwindow.h \
     escpos.h \
     notefilterdlg.h \
     filterdlg.h \
-    productbarcode.h \
     productbarcodeview.h \
     discount.h \
     discounttablewidget.h \

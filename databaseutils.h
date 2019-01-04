@@ -15,7 +15,6 @@
 #include "address.h"
 #include "shoppinglist.h"
 #include "reservation.h"
-#include "productbarcode.h"
 #include "discount.h"
 #include "stock.h"
 #include "store.h"
@@ -50,7 +49,7 @@ public:
   bool hasAccessToImages() const { return isValid() && m_user.m_bAccessImage; }
   bool hasAccessToReservations() const { return isValid() && m_user.m_bAccessReservation; }
   bool hasAccessToShoppingLists() const { return isValid() && m_user.m_bAccessShoppingList; }
-  bool hasAccessToProductBarcode() const { return isValid() && m_user.m_bAccessProductBarcode; }
+  bool hasAccessToProductCode() const { return isValid() && m_user.m_bAccessProductCode; }
 };
 
 namespace BaitaSQL
@@ -114,29 +113,14 @@ bool execSelect(QSqlQuery& query,
 bool select(Product& product,
             QString& error);
 
+bool select(Product& product,
+            const ProductCode& code,
+            QString& error);
+
 bool insert(const Product& product,
             QString& error);
 
 bool update(const Product& product,
-            QString& error);
-
-bool remove(Id id,
-            QString& error);
-}
-
-namespace ProductBarcodeSQL
-{
-bool execSelect(QSqlQuery& query,
-                ProductBarcode& barcode,
-                QString& error);
-
-bool select(ProductBarcode& barcode,
-            QString& error);
-
-bool insert(const ProductBarcode& barcode,
-            QString& error);
-
-bool update(const ProductBarcode& barcode,
             QString& error);
 
 bool remove(Id id,

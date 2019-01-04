@@ -50,6 +50,33 @@ struct Package
   }
 };
 
+struct ProductCode : public JItem
+{
+  QString m_code;
+
+  void clear()
+  {
+    m_id.clear();
+    m_code.clear();
+  }
+
+  ProductCode()
+  {
+    clear();
+  }
+
+  bool operator != (const JItem& other) const
+  {
+    const ProductCode& another = dynamic_cast<const ProductCode&>(other);
+    return m_code != another.m_code;
+  }
+
+  bool operator == (const JItem& other) const
+  {
+    return !(*this != other);
+  }
+};
+
 struct Product : public JItem
 {
   Category m_category;
@@ -59,6 +86,7 @@ struct Product : public JItem
   QString m_details;
   bool m_bBuy;
   bool m_bSell;
+  QVector<ProductCode> m_vCodeItem;
 
   void clear()
   {
@@ -87,7 +115,8 @@ struct Product : public JItem
         m_unity != another.m_unity ||
         m_details != another.m_details ||
         m_bBuy != another.m_bBuy ||
-        m_bSell != another.m_bSell;
+        m_bSell != another.m_bSell ||
+        m_vCodeItem != another.m_vCodeItem;
   }
 
   bool operator == (const JItem& other) const

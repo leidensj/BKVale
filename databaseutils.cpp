@@ -346,12 +346,12 @@ bool BaitaSQL::createTables(QString& error)
                           RESERVATION_SQL_COL07 " TEXT)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_BARCODE_SQL_TABLE_NAME " ("
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          PRODUCT_BARCODE_SQL_COL01 " INTEGER NOT NULL,"
-                          PRODUCT_BARCODE_SQL_COL02 " TEXT UNIQUE NOT NULL CHECK ("
-                          PRODUCT_BARCODE_SQL_COL02 " <> ''),"
-                          "FOREIGN KEY(" PRODUCT_BARCODE_SQL_COL01 ") REFERENCES "
+                          PRODUCT_CODE_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
+                          PRODUCT_CODE_ITEMS_SQL_COL02 " TEXT UNIQUE NOT NULL CHECK ("
+                          PRODUCT_CODE_ITEMS_SQL_COL02 " <> ''),"
+                          "FOREIGN KEY(" PRODUCT_CODE_ITEMS_SQL_COL01 ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
@@ -808,6 +808,40 @@ bool ProductSQL::select(Product& product,
   return finishTransaction(db, query, bSuccess, error);
 }
 
+bool ProductSQL::select(Product& product,
+                        const ProductCode& code,
+                        QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                PRODUCT_CODE_ITEMS_SQL_COL01
+                " FROM " PRODUCT_SQL_TABLE_NAME
+                " WHERE " PRODUCT_CODE_ITEMS_SQL_COL02 " = (:_v02)");
+  query.bindValue(":_v02", code.m_code);
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      product.m_id.set(query.value(0).toLongLong());
+      bSuccess = execSelect(query, product, error);
+    }
+    else
+    {
+      bSuccess = false;
+      error = "Código do produto não encontrado.";
+    }
+  }
+  return finishTransaction(db, query, bSuccess, error);
+}
+
 bool ProductSQL::insert(const Product& product,
                         QString& error)
 {
@@ -845,7 +879,33 @@ bool ProductSQL::insert(const Product& product,
 
   bool bSuccess = query.exec();
   if (bSuccess)
+  {
     product.m_id.set(query.lastInsertId().toLongLong());
+    query.prepare("DELETE FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
+                  " WHERE " PRODUCT_CODE_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", product.m_id.get());
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      for (int i = 0; i != product.m_vCodeItem.size(); ++i)
+      {
+        query.prepare("INSERT INTO " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
+                      PRODUCT_CODE_ITEMS_SQL_COL01 ","
+                      PRODUCT_CODE_ITEMS_SQL_COL02 ")"
+                      " VALUES ("
+                      "(:_v01),"
+                      "(:_v02))");
+        query.bindValue(":_v01", product.m_id.get());
+        query.bindValue(":_v02", product.m_vCodeItem.at(i).m_code);
+        bSuccess = query.exec();
+        if (bSuccess)
+          product.m_vCodeItem[i].m_id.set(query.lastInsertId().toLongLong());
+        else
+          break;
+      }
+    }
+  }
+
   return finishTransaction(db, query, bSuccess, error);
 }
 
@@ -878,6 +938,34 @@ bool ProductSQL::update(const Product& product,
   query.bindValue(":_v06", product.m_bBuy);
   query.bindValue(":_v07", product.m_bSell);
   bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
+                  " WHERE " PRODUCT_CODE_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", product.m_id.get());
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      for (int i = 0; i != product.m_vCodeItem.size(); ++i)
+      {
+        query.prepare("INSERT INTO " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
+                      PRODUCT_CODE_ITEMS_SQL_COL01 ","
+                      PRODUCT_CODE_ITEMS_SQL_COL02 ")"
+                      " VALUES ("
+                      "(:_v01),"
+                      "(:_v02))");
+        query.bindValue(":_v01", product.m_id.get());
+        query.bindValue(":_v02", product.m_vCodeItem.at(i).m_code);
+        bSuccess = query.exec();
+        if (bSuccess)
+          product.m_vCodeItem[i].m_id.set(query.lastInsertId().toLongLong());
+        else
+          break;
+      }
+    }
+  }
+
   return finishTransaction(db, query, bSuccess, error);
 }
 
@@ -1366,7 +1454,7 @@ bool UserSQL::insert(const User& user,
   query.bindValue(":_v14", user.m_bAccessShoppingList);
   query.bindValue(":_v15", user.m_bAccessEmployee);
   query.bindValue(":_v16", user.m_bAccessSupplier);
-  query.bindValue(":_v17", user.m_bAccessProductBarcode);
+  query.bindValue(":_v17", user.m_bAccessProductCode);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -1427,7 +1515,7 @@ bool UserSQL::update(const User& user,
   query.bindValue(":_v14", user.m_bAccessShoppingList);
   query.bindValue(":_v15", user.m_bAccessEmployee);
   query.bindValue(":_v16", user.m_bAccessSupplier);
-  query.bindValue(":_v17", user.m_bAccessProductBarcode);
+  query.bindValue(":_v17", user.m_bAccessProductCode);
 
   bool bSuccess = query.exec();
   return finishTransaction(db, query, bSuccess, error);
@@ -1490,7 +1578,7 @@ bool UserSQL::select(User& user,
       user.m_bAccessShoppingList = query.value(13).toBool();
       user.m_bAccessEmployee = query.value(14).toBool();
       user.m_bAccessSupplier = query.value(15).toBool();
-      user.m_bAccessProductBarcode = query.value(16).toBool();
+      user.m_bAccessProductCode = query.value(16).toBool();
     }
     else
     {
@@ -1586,7 +1674,7 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessShoppingList = query.value(14).toBool();
       m_user.m_bAccessEmployee = query.value(15).toBool();
       m_user.m_bAccessSupplier = query.value(16).toBool();
-      m_user.m_bAccessProductBarcode = query.value(17).toBool();
+      m_user.m_bAccessProductCode = query.value(17).toBool();
 
       bSuccess = ActiveUserSQL::execRemove(query, error);
       if (bSuccess)
@@ -2758,131 +2846,6 @@ bool ActiveUserSQL::execRemove(QSqlQuery& query, QString& error)
   query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
                 " WHERE " ACTIVE_USERS_SQL_COL01 " = pg_backend_pid()");
   return query.exec();
-}
-
-bool ProductBarcodeSQL::execSelect(QSqlQuery& query,
-                                   ProductBarcode& barcode,
-                                   QString& error)
-{
-  error.clear();
-  Id id = barcode.m_id;
-  barcode.clear();
-
-  query.prepare("SELECT "
-                PRODUCT_BARCODE_SQL_COL01 ","
-                PRODUCT_BARCODE_SQL_COL02
-                " FROM " PRODUCT_BARCODE_SQL_TABLE_NAME
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    bSuccess = query.next();
-    if (bSuccess)
-    {
-      barcode.m_id = id;
-      barcode.m_product.m_id.set(query.value(0).toLongLong());
-      barcode.m_code = query.value(1).toString();
-    }
-    else
-    {
-      error = "Código não encontrado.";
-      bSuccess = false;
-    }
-  }
-
-  if (barcode.m_product.m_id.isValid())
-    ProductSQL::execSelect(query, barcode.m_product, error);
-
-  if (!bSuccess)
-  {
-    if (error.isEmpty())
-      error = query.lastError().text();
-    barcode.clear();
-  }
-
-  return bSuccess;
-}
-
-bool ProductBarcodeSQL::select(ProductBarcode& barcode,
-                               QString& error)
-{
-  error.clear();
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  bool bSuccess = execSelect(query, barcode, error);
-  return finishTransaction(db, query, bSuccess, error);
-}
-
-bool ProductBarcodeSQL::insert(const ProductBarcode& barcode,
-                               QString& error)
-{
-  error.clear();
-
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  query.prepare("INSERT INTO " PRODUCT_BARCODE_SQL_TABLE_NAME " ("
-                PRODUCT_BARCODE_SQL_COL01 ","
-                PRODUCT_BARCODE_SQL_COL02 ")"
-                " VALUES ("
-                "(:_v01),"
-                "(:_v02))");
-  query.bindValue(":_v01", barcode.m_product.m_id.get());
-  query.bindValue(":_v02", barcode.m_code);
-
-  bool bSuccess = query.exec();
-  if (bSuccess)
-    barcode.m_id.set(query.lastInsertId().toLongLong());
-  return finishTransaction(db, query, bSuccess, error);
-}
-
-bool ProductBarcodeSQL::update(const ProductBarcode& barcode,
-                               QString& error)
-{
-  error.clear();
-
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  query.prepare(
-        QString("UPDATE " PRODUCT_BARCODE_SQL_TABLE_NAME " SET "
-                PRODUCT_BARCODE_SQL_COL01 " = (:_v01),"
-                PRODUCT_BARCODE_SQL_COL02 " = (:_v02)") +
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", barcode.m_id.get());
-  query.bindValue(":_v01", barcode.m_product.m_id.get());
-  query.bindValue(":_v02", barcode.m_code);
-  bool bSuccess = query.exec();
-  return finishTransaction(db, query, bSuccess, error);
-}
-
-bool ProductBarcodeSQL::remove(Id id,
-                               QString& error)
-{
-  error.clear();
-
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  query.prepare("DELETE FROM " PRODUCT_BARCODE_SQL_TABLE_NAME
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
-  bool bSuccess = query.exec();
-  return finishTransaction(db, query, bSuccess, error);
 }
 
 bool DiscountSQL::insert(const Discount& o, QString& error)

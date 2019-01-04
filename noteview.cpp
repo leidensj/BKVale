@@ -6,7 +6,6 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
 #include "packageeditor.h"
-#include "productbarcode.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -30,7 +29,7 @@ NoteView::NoteView(QWidget *parent)
   , m_btnCreate(nullptr)
   , m_btnOpenLast(nullptr)
   , m_btnSearch(nullptr)
-  , m_btnAddBarcode(nullptr)
+  , m_btnAddCode(nullptr)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
   , m_snNumber(nullptr)
@@ -69,13 +68,13 @@ NoteView::NoteView(QWidget *parent)
   QFrame* vFrame0 = new QFrame;
   vFrame0->setFrameShape(QFrame::VLine);
 
-  m_btnAddBarcode = new QPushButton();
-  m_btnAddBarcode->setFlat(true);
-  m_btnAddBarcode->setText("");
-  m_btnAddBarcode->setIconSize(QSize(24, 24));
-  m_btnAddBarcode->setIcon(QIcon(":/icons/res/barcodescan.png"));
-  m_btnAddBarcode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
-  m_btnAddBarcode->setToolTip(tr("Adicionar item (Alt+*)"));
+  m_btnAddCode = new QPushButton();
+  m_btnAddCode->setFlat(true);
+  m_btnAddCode->setText("");
+  m_btnAddCode->setIconSize(QSize(24, 24));
+  m_btnAddCode->setIcon(QIcon(":/icons/res/barcodescan.png"));
+  m_btnAddCode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
+  m_btnAddCode->setToolTip(tr("Adicionar item (Alt+*)"));
 
   m_btnAdd = new QPushButton();
   m_btnAdd->setFlat(true);
@@ -100,7 +99,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout1->addWidget(m_btnSearch);
   hlayout1->addWidget(m_btnOpenLast);
   hlayout1->addWidget(vFrame0);
-  hlayout1->addWidget(m_btnAddBarcode);
+  hlayout1->addWidget(m_btnAddCode);
   hlayout1->addWidget(m_btnAdd);
   hlayout1->addWidget(m_btnRemove);
 
@@ -270,10 +269,10 @@ NoteView::NoteView(QWidget *parent)
                    SIGNAL(clicked(bool)),
                    this,
                    SLOT(addProduct()));
-  QObject::connect(m_btnAddBarcode,
+  QObject::connect(m_btnAddCode,
                    SIGNAL(clicked(bool)),
                    this,
-                   SLOT(addProductByBarcode()));
+                   SLOT(addProduct()));
   QObject::connect(m_btnRemove,
                    SIGNAL(clicked(bool)),
                    this,
@@ -441,12 +440,7 @@ void NoteView::setToday()
 
 void NoteView::addProduct()
 {
-  m_table->addItemAndLoadPrices(m_supplierPicker->getId());
-}
-
-void NoteView::addProductByBarcode()
-{
-  m_table->addItemAndLoadPricesByBarcode(m_supplierPicker->getId());
+  m_table->addItemAndLoadPrices(m_supplierPicker->getId(), sender() == m_btnAddCode);
 }
 
 void NoteView::showSearch()

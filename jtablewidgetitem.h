@@ -149,7 +149,7 @@ public:
   void setItem(const JItem& o);
   const JItem& getItem() const;
   void selectItem(const QString& fixedFilter);
-  void selectItemByBarcode(const QString& fixedFilter);
+  void selectItemByCode(const QString& fixedFilter);
 
 private:
   Product m_product;

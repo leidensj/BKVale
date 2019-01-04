@@ -29,7 +29,6 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   , m_accessImage(nullptr)
   , m_accessReservation(nullptr)
   , m_accessSettings(nullptr)
-  , m_accessProductBarcode(nullptr)
 {
   QLabel* lblUser = new QLabel;
   lblUser->setPixmap(QIcon(":/icons/res/user.png").pixmap(QSize(24, 24)));
@@ -113,10 +112,6 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
   m_accessSettings->setText(tr("Configurações"));
 
-  m_accessProductBarcode = new QCheckBox;
-  m_accessProductBarcode->setIcon(QIcon(":/icons/res/barcode.png"));
-  m_accessProductBarcode->setText(tr("Códigos"));
-
   QHBoxLayout* userlayout = new QHBoxLayout;
   userlayout->setContentsMargins(0, 0, 0, 0);
   userlayout->addWidget(lblUser);
@@ -136,7 +131,6 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   tabPermissionslayout->addWidget(m_accessReservation);
   tabPermissionslayout->addWidget(m_accessUser);
   tabPermissionslayout->addWidget(m_accessProduct);
-  tabPermissionslayout->addWidget(m_accessProductBarcode);
   tabPermissionslayout->addWidget(m_accessPerson);
   tabPermissionslayout->addWidget(m_accessEmployee);
   tabPermissionslayout->addWidget(m_accessSupplier);
@@ -193,7 +187,6 @@ const JItem& UserMgtView::getItem() const
   o.m_bAccessSettings = m_accessSettings->isChecked();
   o.m_bAccessReservation = m_accessReservation->isChecked();
   o.m_bAccessShoppingList = m_accessShoppingList->isChecked();
-  o.m_bAccessProductBarcode = m_accessProductBarcode->isChecked();
   return o;
 }
 
@@ -219,7 +212,6 @@ void UserMgtView::setItem(const JItem& o)
   m_accessSettings->setChecked(_o.m_bAccessSettings);
   m_accessReservation->setChecked(_o.m_bAccessReservation);
   m_accessShoppingList->setChecked(_o.m_bAccessShoppingList);
-  m_accessProductBarcode->setChecked(_o.m_bAccessProductBarcode);
 }
 
 void UserMgtView::create()

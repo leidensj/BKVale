@@ -39,6 +39,7 @@ public slots:
   void create();
 
 private:
+  mutable Person m_ref;
   QRadioButton* m_rdoPerson;
   QRadioButton* m_rdoCompany;
   JLineEdit* m_edName;

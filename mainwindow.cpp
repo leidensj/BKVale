@@ -17,7 +17,6 @@
 #include "discountview.h"
 #include "shopview.h"
 #include "jdatabase.h"
-#include "productbarcodeview.h"
 #include "timecard.h"
 #include "storeview.h"
 #include <QMessageBox>
@@ -118,135 +117,31 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   statusBar()->addWidget(m_statusDatabasePath);
   statusBar()->addWidget(m_statusUserName);
 
-  QObject::connect(ui->actionPrint,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(print()));
-
-  QObject::connect(ui->actionSettings,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openSettingsDialog()));
-
-  QObject::connect(ui->actionInfo,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(showInfo()));
-
-  QObject::connect(m_note,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
-
-  QObject::connect(m_reminder,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
-
-  QObject::connect(ui->actionProducts,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openProductsDialog()));
-
-  QObject::connect(ui->actionCategories,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openCategoriesDialog()));
-
-  QObject::connect(ui->actionUsers,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openUsersDialog()));
-
-  QObject::connect(ui->actionImages,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openImagesDialog()));
-
-  QObject::connect(m_calculator,
-                   SIGNAL(lineSignal(const QString&)),
-                   this,
-                   SLOT(print(const QString&)));
-
-  QObject::connect(ui->actionLogin,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openLoginDialog()));
-
-  QObject::connect(ui->actionPersons,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openPersonsDialog()));
-
-  QObject::connect(ui->actionShoppingList,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openShoppingListDialog()));
-
-  QObject::connect(m_shop,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
-
-  QObject::connect(ui->actionActiveUsers,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openActiveUsersDialog()));
-
-  QObject::connect(ui->actionProductBarcodes,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openProductBarcodeDialog()));
-
-  QObject::connect(ui->actionExit,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(close()));
-
-  QObject::connect(ui->actionNotes,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(activateWindow()));
-
-  QObject::connect(ui->actionReminders,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(activateWindow()));
-
-  QObject::connect(ui->actionCalculator,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(activateWindow()));
-
-  QObject::connect(ui->actionShop,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(activateWindow()));
-
-  QObject::connect(ui->actionReservations,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(activateWindow()));
-
-  QObject::connect(ui->actionDiscount,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(activateWindow()));
-
-  QObject::connect(m_discount,
-                   SIGNAL(redeemSignal(const QString&)),
-                   this,
-                   SLOT(print(const QString&)));
-
-  QObject::connect(ui->actionTimeCard,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(testTimeAccess()));
-
-  QObject::connect(ui->actionStores,
-                   SIGNAL(triggered(bool)),
-                   this,
-                   SLOT(openStoreDialog()));
+  connect(ui->actionPrint, SIGNAL(triggered(bool)), this, SLOT(print()));
+  connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
+  connect(ui->actionInfo, SIGNAL(triggered(bool)), this, SLOT(showInfo()));
+  connect(m_note, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_reminder, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(ui->actionProducts, SIGNAL(triggered(bool)), this, SLOT(openProductsDialog()));
+  connect(ui->actionCategories, SIGNAL(triggered(bool)), this, SLOT(openCategoriesDialog()));
+  connect(ui->actionUsers, SIGNAL(triggered(bool)), this, SLOT(openUsersDialog()));
+  connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openImagesDialog()));
+  connect(m_calculator, SIGNAL(lineSignal(const QString&)), this, SLOT(print(const QString&)));
+  connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
+  connect(ui->actionPersons, SIGNAL(triggered(bool)), this, SLOT(openPersonsDialog()));
+  connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(openShoppingListDialog()));
+  connect(m_shop, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
+  connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(close()));
+  connect(ui->actionNotes, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionShop, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionReservations, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionDiscount, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(m_discount, SIGNAL(redeemSignal(const QString&)), this, SLOT(print(const QString&)));
+  connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
+  connect(ui->actionStores, SIGNAL(triggered(bool)), this, SLOT(openStoreDialog()));
 
   activateWindow();
   m_settings.load();
@@ -470,7 +365,6 @@ void BaitaAssistant::updateControls()
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
   ui->actionProducts->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProducts());
-  ui->actionProductBarcodes->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProductBarcode());
   ui->actionPersons->setEnabled(bIsSQLOk && m_userLogin.hasAccessToPersons());
   ui->actionCategories->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCategories());
   ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
@@ -632,20 +526,6 @@ void BaitaAssistant::openActiveUsersDialog()
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Usuários Ativos"));
   dlg.setWindowIcon(QIcon(":/icons/res/users.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
-
-void BaitaAssistant::openProductBarcodeDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  ProductBarcodeView* w = new ProductBarcodeView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Códigos"));
-  dlg.setWindowIcon(QIcon(":/icons/res/barcode.png"));
   dlg.setModal(true);
   dlg.exec();
 }

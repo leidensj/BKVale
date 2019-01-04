@@ -36,7 +36,7 @@ private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnSearch;
-  QPushButton* m_btnAddBarcode;
+  QPushButton* m_btnAddCode;
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;
@@ -61,7 +61,6 @@ private slots:
   void itemSelected(const JItem& jItem);
   void itemsRemoved(const QVector<Id>& ids);
   void addProduct();
-  void addProductByBarcode();
 
 public slots:
   void create();

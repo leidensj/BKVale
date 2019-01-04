@@ -2,6 +2,7 @@
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
 #include "jdoublespinbox.h"
+#include "productcodetablewidget.h"
 #include <QLayout>
 #include <QCheckBox>
 #include <QFormLayout>
@@ -16,6 +17,7 @@ ProductView::ProductView(QWidget* parent)
   , m_cbSell(nullptr)
   , m_categoryPicker(nullptr)
   , m_imagePicker(nullptr)
+  , m_tbCode(nullptr)
 {
   m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                            JLineEdit::st_defaultFlags1);
@@ -44,6 +46,13 @@ ProductView::ProductView(QWidget* parent)
                                       tr("Imagem"),
                                       QIcon(":/icons/res/icon.png"));
 
+  m_tbCode = new ProductCodeTableWidget;
+  JTableButtons* btns = new JTableButtons(m_tbCode);
+
+  QHBoxLayout* ltCode = new QHBoxLayout;
+  ltCode->addWidget(m_tbCode);
+  ltCode->addWidget(btns);
+
   QFormLayout* formlayout = new QFormLayout;
   formlayout->addRow(tr("Nome:"), m_edName);
   formlayout->addRow(tr("Unidade:"), m_edUnity);
@@ -56,9 +65,16 @@ ProductView::ProductView(QWidget* parent)
   QFrame* tabInfoFrame = new QFrame;
   tabInfoFrame->setLayout(formlayout);
 
+  QFrame* tabCodeFrame = new QFrame;
+  tabCodeFrame->setLayout(ltCode);
+
   m_tab->addTab(tabInfoFrame,
                 QIcon(":/icons/res/item.png"),
                 tr("Produto"));
+
+  m_tab->addTab(tabCodeFrame,
+                QIcon(":/icons/res/barcode.png"),
+                tr("Códigos"));
 }
 
 ProductView::~ProductView()
@@ -68,16 +84,18 @@ ProductView::~ProductView()
 
 const JItem& ProductView::getItem() const
 {
-  static Product o;
-  o.m_id = m_currentId;
-  o.m_name = m_edName->text();
-  o.m_unity = m_edUnity->text();
-  o.m_details = m_edDetails->text();
-  o.m_bBuy = m_cbBuy->isChecked();
-  o.m_bSell = m_cbSell->isChecked();
-  o.m_category.m_id = m_categoryPicker->getId();
-  o.m_image.m_id = m_imagePicker->getId();
-  return o;
+  m_ref.clear();
+  m_ref.m_id = m_currentId;
+  m_ref.m_name = m_edName->text();
+  m_ref.m_unity = m_edUnity->text();
+  m_ref.m_details = m_edDetails->text();
+  m_ref.m_bBuy = m_cbBuy->isChecked();
+  m_ref.m_bSell = m_cbSell->isChecked();
+  m_ref.m_category.m_id = m_categoryPicker->getId();
+  m_ref.m_image.m_id = m_imagePicker->getId();
+  for (int i = 0; i != m_tbCode->rowCount(); ++i)
+    m_ref.m_vCode.push_back(dynamic_cast<const ProductCode&>(m_tbCode->getItem(i)));
+  return m_ref;
 }
 
 void ProductView::setItem(const JItem &o)
@@ -91,6 +109,9 @@ void ProductView::setItem(const JItem &o)
   m_cbSell->setChecked(_o.m_bSell);
   m_categoryPicker->setItem(_o.m_category);
   m_imagePicker->setItem(_o.m_image);
+  m_tbCode->removeAllItems();
+  for (int i = 0; i != _o.m_vCode.size(); ++i)
+    m_tbCode->addItem(_o.m_vCode.at(i));
 }
 
 void ProductView::create()

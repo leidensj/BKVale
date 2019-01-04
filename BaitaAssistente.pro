@@ -46,7 +46,6 @@ SOURCES += main.cpp\
     jspinbox.cpp \
     packageeditor.cpp \
     notefilterdlg.cpp \
-    productbarcodeview.cpp \
     discounttablewidget.cpp \
     discountview.cpp \
     jtablewidgetitem.cpp \
@@ -58,7 +57,8 @@ SOURCES += main.cpp\
     storeemployeetablewidget.cpp \
     timeintervaldlg.cpp \
     jtimeedit.cpp \
-    addresstablewidget.cpp
+    addresstablewidget.cpp \
+    productcodetablewidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -107,7 +107,6 @@ HEADERS  += mainwindow.h \
     escpos.h \
     notefilterdlg.h \
     filterdlg.h \
-    productbarcodeview.h \
     discount.h \
     discounttablewidget.h \
     discountview.h \
@@ -123,7 +122,8 @@ HEADERS  += mainwindow.h \
     timeintervaldlg.h \
     jtimeedit.h \
     timeinterval.h \
-    addresstablewidget.h
+    addresstablewidget.h \
+    productcodetablewidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

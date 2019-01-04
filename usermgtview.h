@@ -48,7 +48,6 @@ private:
   QCheckBox* m_accessImage;
   QCheckBox* m_accessReservation;
   QCheckBox* m_accessSettings;
-  QCheckBox* m_accessProductBarcode;
 
   void setItem(const JItem& o);
 

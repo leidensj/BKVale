@@ -57,35 +57,15 @@ const JItem& NoteTableWidget::getItem(int row) const
   return m_ref;
 }
 
-void NoteTableWidget::addItemAndLoadPrices(Id supplierId)
+void NoteTableWidget::addItemAndLoadPrices(Id supplierId, bool bCode)
 {
   addItem(NoteItem());
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
-  ptProductCell->selectItem(PRODUCT_FILTER_BUY);
-  const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  if (product.m_id.isValid())
-  {
-    NoteItem noteItem;
-    if (supplierId.isValid())
-      noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
-    auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
-    ptPriceCell->setValue(noteItem.m_price);
-    auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)NoteColumn::Unity));
-    ptPackageCell->setItem(noteItem.m_package, product.m_unity);
-  }
+  if (bCode)
+    ptProductCell->selectItemByCode(PRODUCT_FILTER_BUY);
   else
-    removeItem();
-
-  setFocus();
-}
-
-void NoteTableWidget::addItemAndLoadPricesByBarcode(Id supplierId)
-{
-  addItem(NoteItem());
-  int row = rowCount() - 1;
-  auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)NoteColumn::Description));
-  ptProductCell->selectItemByBarcode(PRODUCT_FILTER_BUY);
+    ptProductCell->selectItem(PRODUCT_FILTER_BUY);
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
   if (product.m_id.isValid())
   {

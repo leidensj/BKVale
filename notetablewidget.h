@@ -14,8 +14,7 @@ public:
 
 public slots:
   void addItem(const JItem& o);
-  void addItemAndLoadPrices(Id supplierId);
-  void addItemAndLoadPricesByBarcode(Id supplierId);
+  void addItemAndLoadPrices(Id supplierId, bool bCode);
   double computeTotal() const;
 
 private:

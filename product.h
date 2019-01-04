@@ -86,7 +86,7 @@ struct Product : public JItem
   QString m_details;
   bool m_bBuy;
   bool m_bSell;
-  QVector<ProductCode> m_vCodeItem;
+  QVector<ProductCode> m_vCode;
 
   void clear()
   {
@@ -98,6 +98,7 @@ struct Product : public JItem
     m_details.clear();
     m_bBuy = false;
     m_bSell = false;
+    m_vCode.clear();
   }
 
   Product()
@@ -116,7 +117,7 @@ struct Product : public JItem
         m_details != another.m_details ||
         m_bBuy != another.m_bBuy ||
         m_bSell != another.m_bSell ||
-        m_vCodeItem != another.m_vCodeItem;
+        m_vCode != another.m_vCode;
   }
 
   bool operator == (const JItem& other) const

@@ -11,6 +11,7 @@ class JLineEdit;
 class JDoubleSpinBox;
 class QCheckBox;
 class JDatabasePicker;
+class ProductCodeTableWidget;
 
 class ProductView : public JItemView
 {
@@ -25,6 +26,7 @@ public slots:
   void create();
 
 private:
+  mutable Product m_ref;
   JLineEdit* m_edName;
   JLineEdit* m_edUnity;
   JLineEdit* m_edDetails;
@@ -32,6 +34,7 @@ private:
   QCheckBox* m_cbSell;
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
+  ProductCodeTableWidget* m_tbCode;
   void setItem(const JItem& o);
 };
 

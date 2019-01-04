@@ -2,7 +2,6 @@
 #include "jdatabase.h"
 #include "tinyexpr.h"
 #include "product.h"
-#include "productbarcode.h"
 #include "packageeditor.h"
 #include "timeintervaldlg.h"
 #include "jspinbox.h"
@@ -410,17 +409,17 @@ void ProductTableWidgetItem::selectItem(const QString& fixedFilter)
   }
 }
 
-void ProductTableWidgetItem::selectItemByBarcode(const QString& fixedFilter)
+void ProductTableWidgetItem::selectItemByCode(const QString& fixedFilter)
 {
-  JDatabaseSelector dlg(PRODUCT_BARCODE_SQL_TABLE_NAME,
+  JDatabaseSelector dlg(PRODUCT_CODE_ITEMS_SQL_TABLE_NAME,
                         QObject::tr("Selecionar Produto"),
                         QIcon(":/icons/res/item.png"));
   dlg.getDatabase()->setFixedFilter(fixedFilter);
   if (dlg.exec())
   {
-    ProductBarcode* p = static_cast<ProductBarcode*>(dlg.getDatabase()->getCurrentItem());
+    Product* p = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());
     if (p != nullptr && p->m_id.isValid())
-      setItem(p->m_product);
+      setItem(*p);
   }
 }
 

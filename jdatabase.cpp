@@ -522,10 +522,10 @@ public:
   }
 };
 
-class ProductCodeItemTableModel : public JTableModel
+class ProductCodeTableModel : public JTableModel
 {
 public:
-  ProductCodeItemTableModel(QObject *parent)
+  ProductCodeTableModel(QObject *parent)
     : JTableModel(parent)
   {
 
@@ -788,7 +788,7 @@ JDatabase::JDatabase(const QString& tableName,
   else if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
     model = new ActiveUserTableModel(this);
   else if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
-    model = new ProductCodeItemTableModel(this);
+    model = new ProductCodeTableModel(this);
   else if (tableName == DISCOUNT_SQL_TABLE_NAME)
     model = new DiscountTableModel(this);
   else
@@ -997,12 +997,13 @@ void JDatabase::selectItem(Id id)
     bSuccess = ReservationSQL::select(o, error);
     m_currentItem = new Reservation(o);
   }
-  else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
+  else if (m_tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
   {
-    ProductBarcode o;
-    o.m_id = id;
-    bSuccess = ProductBarcodeSQL::select(o, error);
-    m_currentItem = new ProductBarcode(o);
+    Product o;
+    ProductCode code;
+    code.m_id = id;
+    bSuccess = ProductSQL::selectByCode(o, code, error);
+    m_currentItem = new Product(o);
   }
   else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
   {
@@ -1135,12 +1136,10 @@ void JDatabase::removeItems()
       ShoppingListSQL::remove(id, error);
     else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
       ReservationSQL::remove(id, error);
-    else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
-      ProductBarcodeSQL::remove(id, error);
     else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
       DiscountSQL::remove(id, error);
     else
-      error = tr("Item ainda não implementado.");
+      error = tr("Não suportado.");
 
     emit itemsRemovedSignal(ids);
     refresh();
@@ -1317,13 +1316,6 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
                ? ReservationSQL::update(o, error)
                : ReservationSQL::insert(o, error);
   }
-  else if (m_tableName == PRODUCT_BARCODE_SQL_TABLE_NAME)
-  {
-    const ProductBarcode& o = dynamic_cast<const ProductBarcode&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? ProductBarcodeSQL::update(o, error)
-               : ProductBarcodeSQL::insert(o, error);
-  }
   else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
   {
     const Discount& o = dynamic_cast<const Discount&>(jItem);
@@ -1332,7 +1324,7 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
                : DiscountSQL::insert(o, error);
   }
   else
-    error = tr("Item ainda não implementado.");
+    error = tr("Não suportado.");
 
 
   if (bSuccess)

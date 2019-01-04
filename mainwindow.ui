@@ -117,22 +117,7 @@
     <property name="title">
      <string>Cadastros</string>
     </property>
-    <widget class="QMenu" name="menuProdutos">
-     <property name="title">
-      <string>Produtos</string>
-     </property>
-     <addaction name="actionProducts"/>
-     <addaction name="actionProductBarcodes"/>
-     <addaction name="actionPrices"/>
-    </widget>
-    <widget class="QMenu" name="menuEstoque">
-     <property name="title">
-      <string>Estoque</string>
-     </property>
-     <addaction name="actionStockAisles"/>
-    </widget>
-    <addaction name="menuProdutos"/>
-    <addaction name="menuEstoque"/>
+    <addaction name="actionProducts"/>
     <addaction name="actionPersons"/>
     <addaction name="actionCategories"/>
     <addaction name="actionImages"/>
@@ -330,18 +315,6 @@
     <string>Sair</string>
    </property>
   </action>
-  <action name="actionProductBarcodes">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/barcode.png</normaloff>:/icons/res/barcode.png</iconset>
-   </property>
-   <property name="text">
-    <string>Códigos</string>
-   </property>
-   <property name="toolTip">
-    <string>Gerenciar códigos</string>
-   </property>
-  </action>
   <action name="actionUsers">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -409,15 +382,6 @@
    </property>
    <property name="toolTip">
     <string>Descontos</string>
-   </property>
-  </action>
-  <action name="actionStockAisles">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/stockaisle.png</normaloff>:/icons/res/stockaisle.png</iconset>
-   </property>
-   <property name="text">
-    <string>Setores do Estoque</string>
    </property>
   </action>
   <action name="actionTimeCard">

@@ -49,7 +49,6 @@ public:
   bool hasAccessToImages() const { return isValid() && m_user.m_bAccessImage; }
   bool hasAccessToReservations() const { return isValid() && m_user.m_bAccessReservation; }
   bool hasAccessToShoppingLists() const { return isValid() && m_user.m_bAccessShoppingList; }
-  bool hasAccessToProductCode() const { return isValid() && m_user.m_bAccessProductCode; }
 };
 
 namespace BaitaSQL
@@ -113,9 +112,9 @@ bool execSelect(QSqlQuery& query,
 bool select(Product& product,
             QString& error);
 
-bool select(Product& product,
-            const ProductCode& code,
-            QString& error);
+bool selectByCode(Product& product,
+                  const ProductCode& code,
+                  QString& error);
 
 bool insert(const Product& product,
             QString& error);

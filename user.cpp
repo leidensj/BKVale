@@ -25,7 +25,6 @@ void User::clear()
   m_bAccessImage = false;
   m_bAccessReservation = false;
   m_bAccessShoppingList = false;
-  m_bAccessProductBarcode = false;
   m_password.clear();
 }
 

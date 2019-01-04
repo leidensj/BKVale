@@ -74,8 +74,7 @@ PersonView::PersonView(bool bAccessEmployee,
   m_dtBirthDate = new QDateEdit;
   m_dtBirthDate->setCalendarPopup(true);
   m_dtBirthDate->setDisplayFormat("dd/MM/yyyy");
-  m_dtBirthDate->setMinimumDate(QDate(1800, 1, 1));
-  m_dtBirthDate->setDate(QDate(1800, 1, 1));
+  m_dtBirthDate->setDate(QDate::currentDate());
   m_dtBirthDate->setSpecialValueText(tr("Não informada"));
   m_cbBirthDate = new QCheckBox;
   m_cbBirthDate->setChecked(false);
@@ -278,33 +277,33 @@ PersonView::~PersonView()
 
 const JItem& PersonView::getItem() const
 {
-  static Person o;
-  o.m_id = m_currentId;
-  o.m_image.m_id = m_imagePicker->getId();
-  o.m_name = m_edName->text();
-  o.m_alias = m_edAlias->text();
-  o.m_email = m_edEmail->text();
-  o.m_CPF_CNPJ = m_edCpfCnpj->text();
-  o.m_RG_IE = m_edRgIE->text();
-  o.m_details = m_edDetails->text();
-  o.m_dtBirth = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked()
-                     ? m_dtBirthDate->date() : QDate(1800, 1, 1);
-  o.m_dtCreation = m_dtCreationDate->date();
-  o.m_bCompany = m_rdoCompany->isChecked();
+  m_ref.clear();
+  m_ref.m_id = m_currentId;
+  m_ref.m_image.m_id = m_imagePicker->getId();
+  m_ref.m_name = m_edName->text();
+  m_ref.m_alias = m_edAlias->text();
+  m_ref.m_email = m_edEmail->text();
+  m_ref.m_CPF_CNPJ = m_edCpfCnpj->text();
+  m_ref.m_RG_IE = m_edRgIE->text();
+  m_ref.m_details = m_edDetails->text();
+  m_ref.m_dtBirth = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked()
+                     ? m_dtBirthDate->date() : QDate::currentDate();
+  m_ref.m_dtCreation = m_dtCreationDate->date();
+  m_ref.m_bCompany = m_rdoCompany->isChecked();
 
-  o.m_supplier.m_bIsSupplier = m_grpSupplier->isChecked();
-  o.m_employee.m_bIsEmployee = m_grpEmployee->isChecked();
-  o.m_employee.m_pincode = m_grpEmployee->isChecked() ? m_edPinCode->text() : "";
-  o.m_employee.m_bNoteEdit = m_grpEmployee->isChecked() && m_cbNoteEdit->isChecked();
-  o.m_employee.m_bNoteRemove = m_grpEmployee->isChecked() && m_cbNoteRemove->isChecked();
+  m_ref.m_supplier.m_bIsSupplier = m_grpSupplier->isChecked();
+  m_ref.m_employee.m_bIsEmployee = m_grpEmployee->isChecked();
+  m_ref.m_employee.m_pincode = m_grpEmployee->isChecked() ? m_edPinCode->text() : "";
+  m_ref.m_employee.m_bNoteEdit = m_grpEmployee->isChecked() && m_cbNoteEdit->isChecked();
+  m_ref.m_employee.m_bNoteRemove = m_grpEmployee->isChecked() && m_cbNoteRemove->isChecked();
 
   for (int i = 0; i != m_tblPhone->rowCount(); ++i)
-    o.m_vPhone.push_back(dynamic_cast<const Phone&>(m_tblPhone->getItem(i)));
+    m_ref.m_vPhone.push_back(dynamic_cast<const Phone&>(m_tblPhone->getItem(i)));
 
   for (int i = 0; i != m_tblAddress->rowCount(); ++i)
-    o.m_vAddress.push_back(dynamic_cast<const Address&>(m_tblAddress->getItem(i)));
+    m_ref.m_vAddress.push_back(dynamic_cast<const Address&>(m_tblAddress->getItem(i)));
 
-  return o;
+  return m_ref;
 }
 
 void PersonView::setItem(const JItem &o)

@@ -3,6 +3,7 @@
 #include "jtablewidgetitem.h"
 #include <QHeaderView>
 #include <QKeyEvent>
+#include <QMessageBox>
 
 ShoppingListTable::ShoppingListTable(QWidget* parent)
   : JTable((int) Flags::NoFlags, parent)
@@ -74,6 +75,22 @@ void ShoppingListTable::addItem()
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
   if (!product.m_id.isValid())
     removeItem();
+  else
+  {
+    for (int i = 0; i != rowCount() - 1; ++i)
+    {
+      getItem(i);
+      if (m_ref.m_product.m_id != product.m_id)
+        continue;
+
+      if (QMessageBox::question(this,
+                            tr("Produto duplicado"),
+                            tr("O produto '%1' já consta na lista. Deseja adicioná-lo novamente?").arg(product.m_name),
+                            QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
+        removeItem();
+      break;
+    }
+  }
 }
 
 void ShoppingListTable::update(int row, int column)

@@ -117,20 +117,11 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
 
   m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, this);
 
-  QObject::connect(m_btnSearch,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(searchItem()));
-
-  QObject::connect(m_selector->getDatabase(),
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(setItem(const JItem&)));
-
-  QObject::connect(m_btnClear,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(clear()));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(searchItem()));
+  connect(m_selector->getDatabase(), SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(setItem(const JItem&)));
+  connect(m_btnClear, SIGNAL(clicked(bool)), this, SLOT(clear()));
+  connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
+  connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clearAll()));
 }
 
 JDatabase* JDatabasePicker::getDatabase() const

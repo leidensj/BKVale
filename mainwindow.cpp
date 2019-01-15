@@ -291,7 +291,7 @@ void BaitaAssistant::print()
     } break;
     case Functionality::Shop:
     {
-      print(ShoppingListPrinter::build(m_shop->getShoppingList()));
+      print(ShoppingListPrinter::build(m_shop->getShoppingList(), m_shop->printCount()));
     } break;
     case Functionality::Reservation:
     {

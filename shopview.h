@@ -8,6 +8,7 @@ class JDatabase;
 class QDateEdit;
 class QPushButton;
 class QLabel;
+class QCheckBox;
 
 class ShopView : public QFrame
 {
@@ -16,6 +17,7 @@ class ShopView : public QFrame
 public:
   ShopView(QWidget* parent = nullptr);
   ShoppingList getShoppingList() const;
+  bool printCount() const;
 
 private slots:
   void updateControls();
@@ -27,6 +29,7 @@ private:
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLabel* m_lblWeekDay;
+  QCheckBox* m_cbPrintCount;
 
 signals:
   void changedSignal();

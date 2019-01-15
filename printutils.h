@@ -43,7 +43,7 @@ namespace ReminderPrinter
 
 namespace ShoppingListPrinter
 {
-  QString build(const ShoppingList& lst);
+  QString build(const ShoppingList& lst, bool bPrintCount);
 }
 
 namespace ReservationPrinter

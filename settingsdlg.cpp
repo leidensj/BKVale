@@ -35,8 +35,6 @@ void SettingsDlg::doDataExchange(bool toUI)
     ui->cbSerialPort->setCurrentIndex(ui->cbSerialPort->findText(m_settings.m_serialPort, Qt::MatchExactly));
     ui->edEthernetIP->setText(m_settings.m_ethernetIP);
     ui->sbEthernetPort->setValue(m_settings.m_ethernetPort);
-    ui->spNotesDefaultNumber->setValue(m_settings.m_notesDefaultNumber);
-    ui->cbNotePIN->setChecked(m_settings.m_notesPincodeRequired);
   }
   else
   {
@@ -44,8 +42,6 @@ void SettingsDlg::doDataExchange(bool toUI)
     m_settings.m_serialPort = ui->cbSerialPort->currentText();
     m_settings.m_ethernetIP = ui->edEthernetIP->text();
     m_settings.m_ethernetPort = ui->sbEthernetPort->value();
-    m_settings.m_notesDefaultNumber = ui->spNotesDefaultNumber->value();
-    m_settings.m_notesPincodeRequired = ui->cbNotePIN->isChecked();
   }
 }
 

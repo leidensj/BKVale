@@ -8,6 +8,7 @@
 #include <QDateEdit>
 #include <QLayout>
 #include <QMessageBox>
+#include <QCheckBox>
 
 ShopView::ShopView(QWidget* parent)
   : QFrame(parent)
@@ -15,6 +16,7 @@ ShopView::ShopView(QWidget* parent)
   , m_dtDate(nullptr)
   , m_btnToday(nullptr)
   , m_lblWeekDay(nullptr)
+  , m_cbPrintCount(nullptr)
 {
   m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME, JDatabase::Mode::ReadOnly);
   m_database->layout()->setContentsMargins(0, 0, 0, 0);
@@ -27,6 +29,11 @@ ShopView::ShopView(QWidget* parent)
   m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
   m_btnToday->setToolTip(tr("Usar a data de hoje"));
   m_lblWeekDay = new QLabel;
+  m_cbPrintCount = new QCheckBox;
+  m_cbPrintCount->setText(tr("Imprimir contagem"));
+  m_cbPrintCount->setChecked(true);
+  QFrame* vFrame0 = new QFrame;
+  vFrame0->setFrameShape(QFrame::VLine);
 
   QHBoxLayout* headerLayout = new QHBoxLayout;
   headerLayout->setContentsMargins(0, 0, 0, 0);
@@ -34,28 +41,18 @@ ShopView::ShopView(QWidget* parent)
   headerLayout->addWidget(m_dtDate);
   headerLayout->addWidget(m_btnToday);
   headerLayout->addWidget(m_lblWeekDay);
+  headerLayout->addWidget(vFrame0);
+  headerLayout->addWidget(m_cbPrintCount);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addLayout(headerLayout);
   mainLayout->addWidget(m_database);
   setLayout(mainLayout);
 
-  QObject::connect(m_btnToday,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(setToday()));
-  QObject::connect(m_dtDate,
-                   SIGNAL(dateChanged(const QDate&)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_dtDate,
-                   SIGNAL(dateChanged(const QDate&)),
-                   this,
-                   SLOT(emitChangedSignal()));
-  QObject::connect(m_database,
-                   SIGNAL(currentRowChangedSignal(int)),
-                   this,
-                   SLOT(emitChangedSignal()));
+  connect(m_btnToday, SIGNAL(clicked(bool)), this, SLOT(setToday()));
+  connect(m_dtDate, SIGNAL(dateChanged(const QDate&)), this, SLOT(updateControls()));
+  connect(m_dtDate, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitChangedSignal()));
+  connect(m_database, SIGNAL(currentRowChangedSignal(int)), this, SLOT(emitChangedSignal()));
 
   setToday();
   updateControls();
@@ -94,4 +91,9 @@ ShoppingList ShopView::getShoppingList() const
 void ShopView::emitChangedSignal()
 {
   emit changedSignal();
+}
+
+bool ShopView::printCount() const
+{
+  return m_cbPrintCount->isChecked();
 }

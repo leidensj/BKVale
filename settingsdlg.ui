@@ -176,57 +176,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="notes">
-      <attribute name="icon">
-       <iconset resource="icons.qrc">
-        <normaloff>:/icons/res/note.png</normaloff>:/icons/res/note.png</iconset>
-      </attribute>
-      <attribute name="title">
-       <string>Vales</string>
-      </attribute>
-      <layout class="QFormLayout" name="formLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="text">
-          <string>Número inicial</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="spNotesDefaultNumber">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
-         </property>
-         <property name="value">
-          <number>1000</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QCheckBox" name="cbNotePIN">
-         <property name="text">
-          <string>Exigir código PIN</string>
-         </property>
-         <property name="icon">
-          <iconset resource="icons.qrc">
-           <normaloff>:/icons/res/pincode.png</normaloff>:/icons/res/pincode.png</iconset>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item>

@@ -319,7 +319,7 @@ QString ReminderPrinter::build(const Reminder& r)
   return str;
 }
 
-QString ShoppingListPrinter::build(const ShoppingList& lst)
+QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
 {
   QString str;
   str += ESC_EXPAND_ON
@@ -371,7 +371,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
 
   str += ESC_LF;
 
-  if (lst.m_vItem.size() != 0)
+  if (lst.m_vItem.size() != 0 && bPrintCount)
     str += ESC_ALIGN_LEFT
            ESC_DOUBLE_FONT_ON
            "[ EST ][ COM ][ REC ]"
@@ -404,13 +404,14 @@ QString ShoppingListPrinter::build(const ShoppingList& lst)
     if (lst.m_vItem.at(i).m_bPrice)
       str += "Preco sugerido: " + lst.m_vItem.at(i).strPrice() + ESC_LF;
 
-    str += ESC_DOUBLE_FONT_ON "[     ][     ]";
-
-    if (lst.m_vItem.at(i).m_bAmmount)
-      str += "[" + JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
-             lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity) + "]";
-
-    str += ESC_DOUBLE_FONT_OFF ESC_LF;
+    if (bPrintCount)
+    {
+      str += ESC_DOUBLE_FONT_ON "[     ][     ]";
+      if (lst.m_vItem.at(i).m_bAmmount)
+        str += "[" + JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
+               lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity) + "]";
+      str += ESC_DOUBLE_FONT_OFF ESC_LF;
+    }
   }
 
   str += ESC_ALIGN_LEFT;

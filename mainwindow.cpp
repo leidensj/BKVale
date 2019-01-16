@@ -267,22 +267,26 @@ void BaitaAssistant::print()
       }
       else
       {
+        bool ok = false;
         int nCopies = QInputDialog::getInt(this,
                                            tr("Imprimir Lembrete"),
                                            tr("Número de cópias:"),
-                                           1, 1, 100);
-        r = m_reminder->getReminder();
-        QString str = ReminderPrinter::build(r);
-        bool bSuccess= false;
-        for (int i = 0; i != nCopies; ++i)
+                                           1, 1, 100, 1, &ok);
+        if (ok)
         {
-          bSuccess = print(str);
-          if (!bSuccess)
-            break;
-        }
+          r = m_reminder->getReminder();
+          QString str = ReminderPrinter::build(r);
+          bool bSuccess= false;
+          for (int i = 0; i != nCopies; ++i)
+          {
+            bSuccess = print(str);
+            if (!bSuccess)
+              break;
+          }
 
-        if (bSuccess)
-          m_reminder->create();
+          if (bSuccess)
+            m_reminder->create();
+        }
       }
     } break;
     case Functionality::Calculator:

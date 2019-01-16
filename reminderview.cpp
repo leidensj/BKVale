@@ -143,34 +143,14 @@ ReminderView::ReminderView(QWidget *parent)
 
   m_dock->close();
 
-  QObject::connect(m_edTitle,
-                   SIGNAL(textEdited(const QString&)),
-                   this,
-                   SLOT(emitChangedSignal()));
-  QObject::connect(m_teMessage,
-                   SIGNAL(textChanged()),
-                   this,
-                   SLOT(emitChangedSignal()));
-  QObject::connect(m_cbCapitalization,
-                   SIGNAL(stateChanged(int)),
-                   this,
-                   SLOT(setCapitalization(int)));
-  QObject::connect(m_btnCreate,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(create()));
-  QObject::connect(m_btnSearch,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(search()));
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(itemSelected(const JItem&)));
-  QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
-                   this,
-                   SLOT(itemsRemoved(const QVector<Id>&)));
+  connect(m_edTitle, SIGNAL(textEdited(const QString&)), this, SLOT(emitChangedSignal()));
+  connect(m_teMessage, SIGNAL(textChanged()), this, SLOT(emitChangedSignal()));
+  connect(m_edBarcode, SIGNAL(textChanged(const QString&)), this, SLOT(emitChangedSignal());
+  connect(m_cbCapitalization, SIGNAL(stateChanged(int)), this, SLOT(setCapitalization(int)));
+  connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(search()));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(itemSelected(const JItem&)));
+  connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
 
   setCapitalization(m_cbCapitalization->checkState());
   create();

@@ -435,7 +435,7 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
 
 void CalculatorWidget::clear()
 {
-  m_edDisplay->setText("0");
+  m_edDisplay->setText("");
 }
 
 void CalculatorWidget::reset()

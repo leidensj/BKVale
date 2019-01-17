@@ -145,7 +145,7 @@ ReminderView::ReminderView(QWidget *parent)
 
   connect(m_edTitle, SIGNAL(textEdited(const QString&)), this, SLOT(emitChangedSignal()));
   connect(m_teMessage, SIGNAL(textChanged()), this, SLOT(emitChangedSignal()));
-  connect(m_edBarcode, SIGNAL(textChanged(const QString&)), this, SLOT(emitChangedSignal());
+  connect(m_edBarcode, SIGNAL(textChanged(const QString&)), this, SLOT(emitChangedSignal()));
   connect(m_cbCapitalization, SIGNAL(stateChanged(int)), this, SLOT(setCapitalization(int)));
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(search()));

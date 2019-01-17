@@ -72,6 +72,10 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
                    SLOT(itemsRemoved(const QVector<Id>&)));
 
   setMinimumWidth(600);
+  QList<int> l;
+  l.push_back(0);
+  l.push_back(600);
+  splitter->setSizes(l);
 }
 
 void JItemView::selectItem(const JItem& o)

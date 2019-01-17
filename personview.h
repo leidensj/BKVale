@@ -69,8 +69,11 @@ private:
   QCheckBox* m_cbNoteEdit;
   QCheckBox* m_cbNoteRemove;
 
-  QGroupBox* m_grpEmployee;
-  QGroupBox* m_grpSupplier;
+  QCheckBox* m_cbEmployee;
+  QCheckBox* m_cbSupplier;
+
+  const bool m_bHasAccessToEmployees;
+  const bool m_bHasAccessToSuppliers;
 
   void setItem(const JItem &o);
 };

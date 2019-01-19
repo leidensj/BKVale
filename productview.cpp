@@ -35,9 +35,11 @@ ProductView::ProductView(QWidget* parent)
 
   m_cbBuy = new QCheckBox;
   m_cbBuy->setIcon(QIcon(":/icons/res/buy.png"));
+  m_cbBuy->setText(tr("Compra"));
 
   m_cbSell = new QCheckBox;
   m_cbSell->setIcon(QIcon(":/icons/res/sell.png"));
+  m_cbSell->setText(tr("Venda"));
 
   m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME,
                                          tr("Categoria"),
@@ -59,8 +61,6 @@ ProductView::ProductView(QWidget* parent)
   formlayout->addRow(tr("Detalhes:"), m_edDetails);
   formlayout->addRow(tr("Categoria:"), m_categoryPicker);
   formlayout->addRow(tr("Imagem:"), m_imagePicker);
-  formlayout->addRow(tr("Compra:"), m_cbBuy);
-  formlayout->addRow(tr("Venda:"), m_cbSell);
 
   QFrame* tabInfoFrame = new QFrame;
   tabInfoFrame->setLayout(formlayout);

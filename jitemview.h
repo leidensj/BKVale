@@ -22,6 +22,7 @@ public:
 protected slots:
   virtual void itemsRemoved(const QVector<Id>& ids);
   virtual void save();
+  virtual void showSearch();
 
 public slots:
   virtual void selectItem(const JItem& o);
@@ -38,6 +39,7 @@ protected:
 private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
+  QPushButton* m_btnSearch;
   virtual void setItem(const JItem& o) = 0;
 };
 

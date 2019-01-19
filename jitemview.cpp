@@ -11,6 +11,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   , m_tab(nullptr)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
+  , m_btnSearch(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -26,10 +27,17 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
+  m_btnSearch = new QPushButton;
+  m_btnSearch->setFlat(true);
+  m_btnSearch->setText("");
+  m_btnSearch->setIconSize(QSize(24, 24));
+  m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
+
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
   buttonlayout->addWidget(m_btnCreate);
   buttonlayout->addWidget(m_btnSave);
+  buttonlayout->addWidget(m_btnSearch);
   buttonlayout->setAlignment(Qt::AlignLeft);
 
   m_tab = new QTabWidget;
@@ -54,28 +62,19 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   mainLayout->addWidget(splitter);
   setLayout(mainLayout);
 
-  QObject::connect(m_btnCreate,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(create()));
-  QObject::connect(m_btnSave,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(save()));
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(selectItem(const JItem&)));
-  QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
-                   this,
-                   SLOT(itemsRemoved(const QVector<Id>&)));
+  connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
+  connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(selectItem(const JItem&)));
+  connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(showSearch()));
 
   setMinimumWidth(600);
-  QList<int> l;
-  l.push_back(0);
-  l.push_back(600);
-  splitter->setSizes(l);
+  m_database->setVisible(false);
+}
+
+void JItemView::showSearch()
+{
+  m_database->setVisible(m_database->isHidden());
 }
 
 void JItemView::selectItem(const JItem& o)

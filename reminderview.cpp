@@ -1,6 +1,7 @@
 #include "reminderview.h"
 #include "jlineedit.h"
 #include "jdatabase.h"
+#include "jspinbox.h"
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QRadioButton>
@@ -10,6 +11,8 @@
 #include <QSplitter>
 #include <QMessageBox>
 #include <QLabel>
+#include <QDialog>
+#include <QDialogButtonBox>
 
 ReminderView::ReminderView(QWidget *parent)
   : QFrame(parent)
@@ -23,7 +26,6 @@ ReminderView::ReminderView(QWidget *parent)
   , m_cbBarcodeHRI(nullptr)
   , m_btnCreate(nullptr)
   , m_btnSearch(nullptr)
-  , m_cbSave(nullptr)
   , m_database(nullptr)
   , m_dock(nullptr)
 {
@@ -39,10 +41,6 @@ ReminderView::ReminderView(QWidget *parent)
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-  m_cbSave = new QCheckBox();
-  m_cbSave->setText(tr("Salvar lembrete"));
-  m_cbSave->setIcon(QIcon(":/icons/res/save.png"));
-  m_cbSave->setChecked(true);
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags2);
   m_edTitle->setPlaceholderText(tr("Título"));
@@ -82,44 +80,38 @@ ReminderView::ReminderView(QWidget *parent)
   QFrame* vFrame1 = new QFrame;
   vFrame1->setFrameShape(QFrame::VLine);
 
-  QHBoxLayout* hlayout1 = new QHBoxLayout;
-  hlayout1->setContentsMargins(0, 0, 0, 0);
-  hlayout1->setAlignment(Qt::AlignLeft);
-  hlayout1->addWidget(m_btnCreate);
-  hlayout1->addWidget(m_btnSearch);
-  hlayout1->addWidget(vFrame1);
-  hlayout1->addWidget(m_cbSave);
-
   QFrame* vFrame2 = new QFrame;
   vFrame2->setFrameShape(QFrame::VLine);
 
   QFrame* vFrame3 = new QFrame;
   vFrame3->setFrameShape(QFrame::VLine);
 
+  QHBoxLayout* hlayout1 = new QHBoxLayout;
+  hlayout1->setContentsMargins(0, 0, 0, 0);
+  hlayout1->setAlignment(Qt::AlignLeft);
+  hlayout1->addWidget(m_btnCreate);
+  hlayout1->addWidget(m_btnSearch);
+  hlayout1->addWidget(vFrame1);
+  hlayout1->addWidget(m_cbCapitalization);
+  hlayout1->addWidget(vFrame2);
+  hlayout1->addWidget(m_rdSize1);
+  hlayout1->addWidget(m_rdSize2);
+  hlayout1->addWidget(vFrame3);
+  hlayout1->addWidget(m_cbFavorite);
+
   QHBoxLayout* hlayout2 = new QHBoxLayout;
   hlayout2->setContentsMargins(0, 0, 0, 0);
   hlayout2->setAlignment(Qt::AlignLeft);
-  hlayout2->addWidget(m_cbCapitalization);
-  hlayout2->addWidget(vFrame2);
-  hlayout2->addWidget(m_rdSize1);
-  hlayout2->addWidget(m_rdSize2);
-  hlayout2->addWidget(vFrame3);
-  hlayout2->addWidget(m_cbFavorite);
-
-  QHBoxLayout* hlayout3 = new QHBoxLayout;
-  hlayout3->setContentsMargins(0, 0, 0, 0);
-  hlayout3->setAlignment(Qt::AlignLeft);
-  hlayout3->addWidget(lblBarcode);
-  hlayout3->addWidget(m_edBarcode);
-  hlayout3->addWidget(m_cbBarcodeHRI);
+  hlayout2->addWidget(lblBarcode);
+  hlayout2->addWidget(m_edBarcode);
+  hlayout2->addWidget(m_cbBarcodeHRI);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setContentsMargins(9, 0, 0, 0);
   viewLayout->addLayout(hlayout1);
   viewLayout->addWidget(m_edTitle);
-  viewLayout->addLayout(hlayout2);
   viewLayout->addWidget(m_teMessage);
-  viewLayout->addLayout(hlayout3);
+  viewLayout->addLayout(hlayout2);
 
   QFrame* viewFrame = new QFrame;
   viewFrame->setLayout(viewLayout);
@@ -187,7 +179,6 @@ void ReminderView::create()
 {
   Reminder reminder;
   setReminder(reminder);
-  m_cbSave->setChecked(false);
 }
 
 void ReminderView::itemSelected(const JItem& jItem)
@@ -203,14 +194,9 @@ void ReminderView::itemsRemoved(const QVector<Id>& ids)
     create();
 }
 
-Reminder ReminderView::save()
+bool ReminderView::save()
 {
-  Reminder r = getReminder();
-  if (m_database->save(r))
-    create();
-  else
-    r.clear();
-  return r;
+  return m_database->save(getReminder());
 }
 
 void ReminderView::emitChangedSignal()
@@ -277,7 +263,38 @@ void ReminderView::search()
     m_dock->show();
 }
 
-bool ReminderView::isSave() const
+ReminderPrintDialog::ReminderPrintDialog(QWidget* parent)
+  : QDialog(parent)
+  , m_spnCopies(nullptr)
+  , m_cbSave(nullptr)
+{
+  m_spnCopies = new JSpinBox;
+  m_spnCopies->setMinimum(1);
+  m_spnCopies->setMaximum(100);
+  m_spnCopies->setSuffix(tr(" cópias"));
+  m_cbSave = new QCheckBox;
+  m_cbSave->setIcon(QIcon(":/icons/res/save.png"));
+  m_cbSave->setText(tr("Salvar lembrete"));
+  m_cbSave->setChecked(true);
+
+  QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
+
+  QVBoxLayout* lt = new QVBoxLayout;
+  lt->addWidget(m_spnCopies);
+  lt->addWidget(m_cbSave);
+  lt->addWidget(btn);
+
+  setLayout(lt);
+}
+
+int ReminderPrintDialog::getCopies() const
+{
+  return m_spnCopies->value();
+}
+
+bool ReminderPrintDialog::getSave() const
 {
   return m_cbSave->isChecked();
 }

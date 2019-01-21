@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include "reminder.h"
+#include <QDialog>
 
 class JLineEdit;
 class QPlainTextEdit;
@@ -11,6 +12,7 @@ class QRadioButton;
 class QPushButton;
 class QDockWidget;
 class JDatabase;
+class JSpinBox;
 
 class ReminderView : public QFrame
 {
@@ -20,8 +22,7 @@ public:
   explicit ReminderView(QWidget *parent = 0);
   Reminder getReminder() const;
   void setReminder(const Reminder& reminder);
-  Reminder save();
-  bool isSave() const;
+  bool save();
 
 private slots:
   void emitChangedSignal();
@@ -48,9 +49,22 @@ private:
   QCheckBox* m_cbBarcodeHRI;
   QPushButton* m_btnCreate;
   QPushButton* m_btnSearch;
-  QCheckBox* m_cbSave;
   JDatabase* m_database;
   QDockWidget* m_dock;
+};
+
+class ReminderPrintDialog : public QDialog
+{
+  Q_OBJECT
+
+public:
+  explicit ReminderPrintDialog(QWidget* parent = nullptr);
+  int getCopies() const;
+  bool getSave() const;
+
+private:
+  JSpinBox* m_spnCopies;
+  QCheckBox* m_cbSave;
 };
 
 #endif // REMINDERVIEW_H

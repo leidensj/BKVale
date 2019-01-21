@@ -61,6 +61,8 @@ ProductView::ProductView(QWidget* parent)
   formlayout->addRow(tr("Detalhes:"), m_edDetails);
   formlayout->addRow(tr("Categoria:"), m_categoryPicker);
   formlayout->addRow(tr("Imagem:"), m_imagePicker);
+  formlayout->addRow("", m_cbBuy);
+  formlayout->addRow("", m_cbSell);
 
   QFrame* tabInfoFrame = new QFrame;
   tabInfoFrame->setLayout(formlayout);

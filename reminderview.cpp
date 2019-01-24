@@ -285,8 +285,14 @@ ReminderPrintDialog::ReminderPrintDialog(QWidget* parent)
   lt->addWidget(m_spnCopies);
   lt->addWidget(m_cbSave);
   lt->addWidget(btn);
+  lt->setSizeConstraint(QLayout::SetFixedSize);
+
+  setWindowTitle(tr("Imprimir"));
+  setWindowIcon(QIcon(":/icons/res/printers.png"));
 
   setLayout(lt);
+  m_spnCopies->setFocus();
+  m_spnCopies->selectAll();
 }
 
 int ReminderPrintDialog::getCopies() const

@@ -31,20 +31,9 @@ JTable::JTable(int flags, QWidget* parent)
   verticalHeader()->setSectionsMovable(true);
   verticalHeader()->setHighlightSections(false);
 
-  QObject::connect(this,
-                   SIGNAL(cellChanged(int, int)),
-                   this,
-                   SLOT(update(int, int)));
-
-  QObject::connect(this,
-                   SIGNAL(currentCellChanged(int, int, int, int)),
-                   this,
-                   SLOT(emitChangedSignal()));
-
-  QObject::connect(this,
-                   SIGNAL(cellDoubleClicked(int, int)),
-                   this,
-                   SLOT(itemActivate(int,int)));
+  QObject::connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(update(int, int)));
+  QObject::connect(this, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(emitChangedSignal()));
+  QObject::connect(this, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(itemActivate(int,int)));
 }
 
 void JTable::removeItem()

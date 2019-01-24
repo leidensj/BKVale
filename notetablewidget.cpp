@@ -11,6 +11,7 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
   QStringList headers;
   headers << "Quantidade" << "Unidade" << "Produto" << "Preço" << "Subtotal";
   setHorizontalHeaderLabels(headers);
+  setHeaderIconSearchable((int)NoteColumn::Description);
 
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)NoteColumn::Unity, QHeaderView::ResizeToContents);

@@ -49,28 +49,35 @@ JLineEdit::JLineEdit(Input input,
 
 void JLineEdit::keyPressEvent(QKeyEvent *event)
 {
-  if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+  switch (event->key())
   {
-    if (m_flags & (int)Flags::EnterAsTab)
-      focusNextChild();
-    emit enterSignal();
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+    {
+      if (m_flags & (int)Flags::EnterAsTab)
+        focusNextChild();
+      emit enterSignal();
+    } break;
+    case Qt::Key_Down:
+    {
+      if (m_flags & (int)Flags::ArrowsAsTab)
+        focusNextChild();
+      emit keyDownSignal();
+    } break;
+    case Qt::Key_Up:
+    {
+      if (m_flags && (int)Flags::ArrowsAsTab)
+        focusPreviousChild();
+      emit keyUpSignal();
+    } break;
+    case Qt::Key_Delete:
+    {
+      emit deleteSignal();
+      QLineEdit::keyPressEvent(event);
+    } break;
+    default:
+      QLineEdit::keyPressEvent(event);
   }
-  else if (event->key() == Qt::Key_Down)
-  {
-    if (m_flags & (int)Flags::ArrowsAsTab)
-      focusNextChild();
-    emit keyDownSignal();
-  }
-  else if (event->key() == Qt::Key_Up)
-  {
-    if (m_flags && (int)Flags::ArrowsAsTab)
-      focusPreviousChild();
-    emit keyUpSignal();
-  }
-  else if (event->key() == Qt::Key_Delete)
-    emit deleteSignal();
-  else
-    QLineEdit::keyPressEvent(event);
 }
 
 void JLineEdit::setTextBlockingSignals(const QString& str)
@@ -89,10 +96,7 @@ JExpLineEdit::JExpLineEdit(JItem::DataType type,
   , m_defaultValue(defaultValue)
   , m_currentValue(defaultValue)
 {
-  QObject::connect(this,
-                   SIGNAL(editingFinished()),
-                   this,
-                   SLOT(evaluate()));
+  connect(this, SIGNAL(editingFinished()), this, SLOT(evaluate()));
   evaluate();
 }
 

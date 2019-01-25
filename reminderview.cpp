@@ -288,7 +288,7 @@ ReminderPrintDialog::ReminderPrintDialog(QWidget* parent)
   lt->setSizeConstraint(QLayout::SetFixedSize);
 
   setWindowTitle(tr("Imprimir"));
-  setWindowIcon(QIcon(":/icons/res/printers.png"));
+  setWindowIcon(QIcon(":/icons/res/printer.png"));
 
   setLayout(lt);
   m_spnCopies->setFocus();

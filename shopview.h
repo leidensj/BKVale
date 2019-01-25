@@ -2,6 +2,7 @@
 #define SHOPVIEW_H
 
 #include <QFrame>
+#include <QDialog>
 #include "shoppinglist.h"
 
 class JDatabase;
@@ -17,7 +18,6 @@ class ShopView : public QFrame
 public:
   ShopView(QWidget* parent = nullptr);
   ShoppingList getShoppingList() const;
-  bool printCount() const;
 
 private slots:
   void updateControls();
@@ -29,10 +29,21 @@ private:
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLabel* m_lblWeekDay;
-  QCheckBox* m_cbPrintCount;
 
 signals:
   void changedSignal();
+};
+
+class ShopPrintDialog : public QDialog
+{
+  Q_OBJECT
+
+public:
+  explicit ShopPrintDialog(QWidget* parent = nullptr);
+  bool getCount() const;
+
+private:
+  QCheckBox* m_cbCount;
 };
 
 #endif // SHOPVIEW_H

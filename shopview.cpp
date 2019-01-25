@@ -9,6 +9,7 @@
 #include <QLayout>
 #include <QMessageBox>
 #include <QCheckBox>
+#include <QDialogButtonBox>
 
 ShopView::ShopView(QWidget* parent)
   : QFrame(parent)
@@ -16,7 +17,6 @@ ShopView::ShopView(QWidget* parent)
   , m_dtDate(nullptr)
   , m_btnToday(nullptr)
   , m_lblWeekDay(nullptr)
-  , m_cbPrintCount(nullptr)
 {
   m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME, JDatabase::Mode::ReadOnly);
   m_database->layout()->setContentsMargins(0, 0, 0, 0);
@@ -29,11 +29,6 @@ ShopView::ShopView(QWidget* parent)
   m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
   m_btnToday->setToolTip(tr("Usar a data de hoje"));
   m_lblWeekDay = new QLabel;
-  m_cbPrintCount = new QCheckBox;
-  m_cbPrintCount->setText(tr("Imprimir contagem"));
-  m_cbPrintCount->setChecked(true);
-  QFrame* vFrame0 = new QFrame;
-  vFrame0->setFrameShape(QFrame::VLine);
 
   QHBoxLayout* headerLayout = new QHBoxLayout;
   headerLayout->setContentsMargins(0, 0, 0, 0);
@@ -41,8 +36,6 @@ ShopView::ShopView(QWidget* parent)
   headerLayout->addWidget(m_dtDate);
   headerLayout->addWidget(m_btnToday);
   headerLayout->addWidget(m_lblWeekDay);
-  headerLayout->addWidget(vFrame0);
-  headerLayout->addWidget(m_cbPrintCount);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addLayout(headerLayout);
@@ -93,7 +86,31 @@ void ShopView::emitChangedSignal()
   emit changedSignal();
 }
 
-bool ShopView::printCount() const
+ShopPrintDialog::ShopPrintDialog(QWidget* parent)
+  : QDialog(parent)
+  , m_cbCount(nullptr)
 {
-  return m_cbPrintCount->isChecked();
+  m_cbCount = new QCheckBox;
+  m_cbCount->setText(tr("Imprimir contagem"));
+  m_cbCount->setChecked(true);
+
+  QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
+
+  QVBoxLayout* lt = new QVBoxLayout;
+  lt->addWidget(m_cbCount);
+  lt->addWidget(btn);
+  lt->setSizeConstraint(QLayout::SetFixedSize);
+
+  setWindowTitle(tr("Imprimir"));
+  setWindowIcon(QIcon(":/icons/res/printer.png"));
+
+  setLayout(lt);
+  m_cbCount->setFocus();
+}
+
+bool ShopPrintDialog::getCount() const
+{
+  return m_cbCount->isChecked();
 }

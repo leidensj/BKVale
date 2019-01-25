@@ -7,7 +7,7 @@
 
 #define MAX_ITEMS 100
 
-class QDateEdit;
+class JDateEdit;
 class QLineEdit;
 class QSpinBox;
 class QPushButton;
@@ -40,7 +40,7 @@ private:
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;
-  QDateEdit* m_dtDate;
+  JDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;

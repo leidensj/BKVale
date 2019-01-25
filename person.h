@@ -56,6 +56,7 @@ struct Person : public JItem
   QString m_CPF_CNPJ;
   QString m_RG_IE;
   QString m_details;
+  bool m_bBirth;
   QDate m_dtBirth;
   QDate m_dtCreation;
   bool m_bCompany;
@@ -83,6 +84,7 @@ struct Person : public JItem
     m_vAddress.clear();
     m_supplier.clear();
     m_employee.clear();
+    m_bBirth = false;
   }
 
   Person()

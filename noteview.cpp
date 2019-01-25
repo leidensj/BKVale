@@ -5,13 +5,13 @@
 #include "jdatabasepicker.h"
 #include "jdatabase.h"
 #include "jlineedit.h"
+#include "jdateedit.h"
 #include "packageeditor.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
 #include <QKeyEvent>
 #include <QLayout>
-#include <QDateEdit>
 #include <QSpinBox>
 #include <QCalendarWidget>
 #include <QTextCharFormat>
@@ -137,7 +137,7 @@ NoteView::NoteView(QWidget *parent)
     lblDate->setFont(font);
   }
 
-  m_dtDate = new QDateEdit();
+  m_dtDate = new JDateEdit;
   m_dtDate->setCalendarPopup(true);
   m_dtDate->setDisplayFormat("dd/MM/yyyy");
   m_dtDate->setDate(QDate::currentDate());
@@ -253,72 +253,24 @@ NoteView::NoteView(QWidget *parent)
   mainLayout->addWidget(splitter);
   setLayout(mainLayout);
 
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(itemSelected(const JItem&)));
-  QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
-                   this,
-                   SLOT(itemsRemoved(const QVector<Id>&)));
-  QObject::connect(m_btnSearch,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(showSearch()));
-  QObject::connect(m_btnAdd,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(addProduct()));
-  QObject::connect(m_btnAddCode,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(addProduct()));
-  QObject::connect(m_btnRemove,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(removeItem()));
-  QObject::connect(m_btnCreate,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(create()));
-  QObject::connect(m_table,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_btnOpenLast,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(lastItemSelected()));
-  QObject::connect(m_dtDate,
-                   SIGNAL(dateChanged(const QDate&)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_btnToday,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(setToday()));
-  QObject::connect(m_cbCash,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_supplierPicker,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(supplierChanged()));
-  QObject::connect(m_edDisccount,
-                   SIGNAL(editingFinished()),
-                   this,
-                   SLOT(updateControls()));
-  QObject::connect(m_edDisccount,
-                   SIGNAL(enterSignal()),
-                   m_table,
-                   SLOT(setFocus()));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(itemSelected(const JItem&)));
+  connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(showSearch()));
+  connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
+  connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
+  connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
+  connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
+  connect(m_table, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
+  connect(m_dtDate, SIGNAL(dateChanged(const QDate&)), this, SLOT(updateControls()));
+  connect(m_btnToday, SIGNAL(clicked(bool)), this, SLOT(setToday()));
+  connect(m_cbCash, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+  connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
+  connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
+  connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
 
   QTimer *timer = new QTimer(this);
-  QObject::connect(timer,
-                   SIGNAL(timeout()),
-                   this,
-                   SLOT(checkDate()));
+  connect(timer, SIGNAL(timeout()), this, SLOT(checkDate()));
   timer->start(60000);
 
   create();

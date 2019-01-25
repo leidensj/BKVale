@@ -194,6 +194,7 @@ bool BaitaSQL::createTables(QString& error)
                           PERSON_SQL_COL08 " DATE,"
                           PERSON_SQL_COL09 " DATE,"
                           PERSON_SQL_COL10 " BOOLEAN,"
+                          PERSON_SQL_COL11 " BOOLEAN,"
                           "FOREIGN KEY(" PERSON_SQL_COL01 ") REFERENCES "
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
@@ -1766,7 +1767,8 @@ bool PersonSQL::execSelect(QSqlQuery& query,
                 PERSON_SQL_COL07 ","
                 PERSON_SQL_COL08 ","
                 PERSON_SQL_COL09 ","
-                PERSON_SQL_COL10
+                PERSON_SQL_COL10 ","
+                PERSON_SQL_COL11
                 " FROM " PERSON_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", id.get());
@@ -1787,6 +1789,7 @@ bool PersonSQL::execSelect(QSqlQuery& query,
       person.m_dtBirth = query.value(7).toDate();
       person.m_dtCreation = query.value(8).toDate();
       person.m_bCompany = query.value(9).toBool();
+      person.m_bBirth = query.value(10).toBool();
     }
   }
 
@@ -1959,7 +1962,8 @@ bool PersonSQL::insert(const Person& person,
                 PERSON_SQL_COL07 ","
                 PERSON_SQL_COL08 ","
                 PERSON_SQL_COL09 ","
-                PERSON_SQL_COL10 ")"
+                PERSON_SQL_COL10 ","
+                PERSON_SQL_COL11 ")"
                 " VALUES ("
                 "(:_v02),"
                 "(:_v03),"
@@ -1969,7 +1973,8 @@ bool PersonSQL::insert(const Person& person,
                 "(:_v07),"
                 "(:_v08),"
                 "(:_v09),"
-                "(:_v10))");
+                "(:_v10),"
+                "(:_v11))");
   query.bindValue(":_v02", person.m_name);
   query.bindValue(":_v03", person.m_alias);
   query.bindValue(":_v04", person.m_email);
@@ -1979,6 +1984,7 @@ bool PersonSQL::insert(const Person& person,
   query.bindValue(":_v08", person.m_dtBirth);
   query.bindValue(":_v09", person.m_dtCreation);
   query.bindValue(":_v10", person.m_bCompany);
+  query.bindValue(":_v10", person.m_bBirth);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -2119,7 +2125,8 @@ bool PersonSQL::update(const Person& person,
                 PERSON_SQL_COL07 " = (:_v07),"
                 PERSON_SQL_COL08 " = (:_v08),"
                 PERSON_SQL_COL09 " = (:_v09),"
-                PERSON_SQL_COL10 " = (:_v10)"
+                PERSON_SQL_COL10 " = (:_v10),"
+                PERSON_SQL_COL11 " = (:_v11)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", person.m_id.get());
   query.bindValue(":_v02", person.m_name);
@@ -2131,6 +2138,7 @@ bool PersonSQL::update(const Person& person,
   query.bindValue(":_v08", person.m_dtBirth);
   query.bindValue(":_v09", person.m_dtCreation);
   query.bindValue(":_v10", person.m_bCompany);
+  query.bindValue(":_v11", person.m_bBirth);
   bool bSuccess = query.exec();
 
   if (bSuccess)

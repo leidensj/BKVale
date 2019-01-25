@@ -228,8 +228,8 @@ const JItem& PersonView::getItem() const
   m_ref.m_CPF_CNPJ = m_edCpfCnpj->text();
   m_ref.m_RG_IE = m_edRgIE->text();
   m_ref.m_details = m_edDetails->text();
-  m_ref.m_dtBirth = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked()
-                     ? m_dtBirthDate->date() : QDate::currentDate();
+  m_ref.m_bBirth = m_cbBirthDate->isChecked() && !m_rdoCompany->isChecked();
+  m_ref.m_dtBirth = m_dtBirthDate->date();
   m_ref.m_dtCreation = m_dtCreationDate->date();
   m_ref.m_bCompany = m_rdoCompany->isChecked();
 
@@ -259,8 +259,8 @@ void PersonView::setItem(const JItem &o)
   m_edCpfCnpj->setText(_o.m_CPF_CNPJ);
   m_edRgIE->setText(_o.m_RG_IE);
   m_edDetails->setText(_o.m_details);
-  m_cbBirthDate->setChecked(_o.m_dtBirth.year() != 1);
-  m_dtBirthDate->setDate(m_cbBirthDate->isChecked() ? _o.m_dtBirth : QDate(1800, 1, 1));
+  m_cbBirthDate->setChecked(_o.m_bBirth && !_o.m_bCompany);
+  m_dtBirthDate->setDate(_o.m_dtBirth);
   m_dtCreationDate->setDate(_o.m_dtCreation);
   m_rdoCompany->setChecked(_o.m_bCompany);
   m_rdoPerson->setChecked(!_o.m_bCompany);

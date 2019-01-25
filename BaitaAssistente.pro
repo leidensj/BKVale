@@ -58,7 +58,8 @@ SOURCES += main.cpp\
     timeintervaldlg.cpp \
     jtimeedit.cpp \
     addresstablewidget.cpp \
-    productcodetablewidget.cpp
+    productcodetablewidget.cpp \
+    jdateedit.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -123,7 +124,8 @@ HEADERS  += mainwindow.h \
     jtimeedit.h \
     timeinterval.h \
     addresstablewidget.h \
-    productcodetablewidget.h
+    productcodetablewidget.h \
+    jdateedit.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

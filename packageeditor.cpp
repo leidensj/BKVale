@@ -24,6 +24,8 @@ PackageEditor::PackageEditor(const Package& package,
   m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
   m_spnAmmount = new JDoubleSpinBox(true);
   m_spnAmmount->setValue(1.0);
+  m_spnAmmount->setMinimum(0.0);
+  m_spnAmmount->setMaximum(999999.0);
 
   QFormLayout* flayout = new QFormLayout;
   flayout->addRow(tr("Unidade:"), m_edUnity);

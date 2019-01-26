@@ -35,7 +35,8 @@ public:
     AlphanumericAndSpaces = 1 << 1,
     Alphanumeric = 1 << 2,
     Numeric = 1 << 3,
-    BasicMath = 1 << 4
+    BasicMath = 1 << 4,
+    ASCII = 1 << 5
   };
 
   static const int st_defaultFlags1 = (int)Flags::ToUpper |

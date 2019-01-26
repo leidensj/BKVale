@@ -15,6 +15,8 @@ QString getRegEx(JLineEdit::Input input)
       return "^[0-9]*$";
     case JLineEdit::Input::BasicMath:
       return "^[0-9/\\-\\*\\+\\.][^,]*$";
+    case JLineEdit::Input::ASCII:
+      return "[ -~]*";
     case JLineEdit::Input::All:
     default:
       return "";
@@ -36,9 +38,7 @@ QValidator::State JRegExpValidator::validate(QString& input, int& pos) const
   return QRegExpValidator::validate(input, pos);
 }
 
-JLineEdit::JLineEdit(Input input,
-                     int flags,
-                     QWidget* parent)
+JLineEdit::JLineEdit(Input input, int flags, QWidget* parent)
   : QLineEdit(parent)
   , m_flags(flags)
 {

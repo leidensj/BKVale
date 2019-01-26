@@ -41,7 +41,7 @@ ReminderView::ReminderView(QWidget *parent)
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-  m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edTitle = new JLineEdit(JLineEdit::Input::ASCII,
                             JLineEdit::st_defaultFlags2);
   m_edTitle->setPlaceholderText(tr("Título"));
   m_teMessage = new QPlainTextEdit();

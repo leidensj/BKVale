@@ -28,6 +28,7 @@ protected slots:
   void save();
 
 private:
+  mutable User m_ref;
   Id m_currentLoggedId;
   bool m_bHasLoggedUserChanged;
   JLineEdit* m_user;

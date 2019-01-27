@@ -196,20 +196,19 @@ void ShoppingListView::setItem(const JItem& o)
 
 const JItem& ShoppingListView::getItem() const
 {
-  static ShoppingList o;
-  o.clear();
-  o.m_id = m_currentId;
-  o.m_title = m_edTitle->text();
-  o.m_description = m_teDescription->toPlainText();
-  o.m_supplier.m_id = m_supplierPicker->getId();
-  o.m_image.m_id = m_imagePicker->getId();
-  o.m_nLines = m_snLines->value();
+  m_ref.clear();
+  m_ref.m_id = m_currentId;
+  m_ref.m_title = m_edTitle->text();
+  m_ref.m_description = m_teDescription->toPlainText();
+  m_ref.m_supplier.m_id = m_supplierPicker->getId();
+  m_ref.m_image.m_id = m_imagePicker->getId();
+  m_ref.m_nLines = m_snLines->value();
   for (int i = 0; i != 7; ++i)
-    o.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
+    m_ref.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
   for (int i = 0; i != 31; ++i)
-    o.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
+    m_ref.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
   for (int i = 0; i != m_table->rowCount(); ++i)
-    o.m_vItem.push_back(dynamic_cast<const ShoppingListItem&>(m_table->getItem(i)));
+    m_ref.m_vItem.push_back(dynamic_cast<const ShoppingListItem&>(m_table->getItem(i)));
 
-  return o;
+  return m_ref;
 }

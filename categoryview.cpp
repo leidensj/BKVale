@@ -38,11 +38,11 @@ void CategoryView::create()
 
 const JItem& CategoryView::getItem() const
 {
-  static Category o;
-  o.m_id = m_currentId;
-  o.m_image.m_id = m_imagePicker->getId();
-  o.m_name = m_edName->text();
-  return o;
+  m_ref.clear();
+  m_ref.m_id = m_currentId;
+  m_ref.m_image.m_id = m_imagePicker->getId();
+  m_ref.m_name = m_edName->text();
+  return m_ref;
 }
 
 void CategoryView::setItem(const JItem& o)

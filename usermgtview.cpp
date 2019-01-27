@@ -169,25 +169,25 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
 
 const JItem& UserMgtView::getItem() const
 {
-  static User o;
-  o.m_id = m_currentId;
-  o.m_strUser = m_user->text();
-  o.m_password = m_password->text();
-  o.m_bAccessNote = m_accessNote->isChecked();
-  o.m_bAccessReminder = m_accessReminder->isChecked();
-  o.m_bAccessCalculator = m_accessCalculator->isChecked();
-  o.m_bAccessShop = m_accessShop->isChecked();
-  o.m_bAccessUser = m_accessUser->isChecked();
-  o.m_bAccessProduct = m_accessProduct->isChecked();
-  o.m_bAccessPerson = m_accessPerson->isChecked();
-  o.m_bAccessEmployee = m_accessEmployee->isChecked();
-  o.m_bAccessSupplier = m_accessSupplier->isChecked();
-  o.m_bAccessCategory = m_accessCategory->isChecked();
-  o.m_bAccessImage = m_accessImage->isChecked();
-  o.m_bAccessSettings = m_accessSettings->isChecked();
-  o.m_bAccessReservation = m_accessReservation->isChecked();
-  o.m_bAccessShoppingList = m_accessShoppingList->isChecked();
-  return o;
+  m_ref.clear();
+  m_ref.m_id = m_currentId;
+  m_ref.m_strUser = m_user->text();
+  m_ref.m_password = m_password->text();
+  m_ref.m_bAccessNote = m_accessNote->isChecked();
+  m_ref.m_bAccessReminder = m_accessReminder->isChecked();
+  m_ref.m_bAccessCalculator = m_accessCalculator->isChecked();
+  m_ref.m_bAccessShop = m_accessShop->isChecked();
+  m_ref.m_bAccessUser = m_accessUser->isChecked();
+  m_ref.m_bAccessProduct = m_accessProduct->isChecked();
+  m_ref.m_bAccessPerson = m_accessPerson->isChecked();
+  m_ref.m_bAccessEmployee = m_accessEmployee->isChecked();
+  m_ref.m_bAccessSupplier = m_accessSupplier->isChecked();
+  m_ref.m_bAccessCategory = m_accessCategory->isChecked();
+  m_ref.m_bAccessImage = m_accessImage->isChecked();
+  m_ref.m_bAccessSettings = m_accessSettings->isChecked();
+  m_ref.m_bAccessReservation = m_accessReservation->isChecked();
+  m_ref.m_bAccessShoppingList = m_accessShoppingList->isChecked();
+  return m_ref;
 }
 
 void UserMgtView::setItem(const JItem& o)

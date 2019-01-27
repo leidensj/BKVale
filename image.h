@@ -10,35 +10,15 @@
 
 struct Image : public JItem
 {
+  Image();
+  void clear();
+  bool operator !=(const JItem& other) const;
+  bool operator ==(const JItem& other) const;
+  bool isValid() const;
+  QString strTableName() const;
+
   QString m_name;
   QByteArray m_image;
-
-  Image()
-  {
-    clear();
-  }
-
-  void clear()
-  {
-    m_id.clear();
-    m_name.clear();
-    m_image.clear();
-  }
-
-  bool operator !=(const JItem& other) const
-  {
-    const Image& another = dynamic_cast<const Image&>(other);
-    return
-        m_name != another.m_name ||
-        m_image != another.m_image;
-  }
-
-  bool operator ==(const JItem& other) const
-  {
-    return !(*this != other);
-  }
-
-  bool isValid() const { return !m_name.isEmpty() && !m_image.isEmpty(); }
 };
 
 #endif // IMAGE_H

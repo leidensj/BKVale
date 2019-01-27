@@ -36,13 +36,13 @@ struct JItem
     Percentage
   };
 
-  virtual ~JItem() {}
   mutable Id m_id;
-  virtual bool isValid() const { return true; }
-  virtual void clear() { m_id.clear(); }
-  virtual QString strTableName() const { return ""; }
-  virtual bool operator ==(const JItem& other) const { return m_id == other.m_id; }
-  virtual bool operator !=(const JItem& other) const { return !(*this == other); }
+  virtual bool isValid() const = 0;
+  virtual void clear() = 0;
+  virtual QString strTableName() const = 0;
+  virtual bool operator ==(const JItem& other) const = 0;
+  virtual bool operator !=(const JItem& other) const = 0;
+
   static QString st_strMoney(double value) { return "R$" + QString::number(value, 'f', 2); }
   static QString st_strAmmount(double value) { return QString::number(value, 'f', 3); }
   static QString st_strFmt(double value) { return QString::number(value, 'f').remove(QRegExp("\\.?0*$")); }

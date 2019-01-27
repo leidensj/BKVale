@@ -8,64 +8,20 @@
 
 struct Phone : public JItem
 {
+  Phone();
+  void clear();
+  bool operator !=(const JItem& other) const;
+  bool operator ==(const JItem& other) const;
+  bool isValid() const;
+  QString strTableName() const;
+
+  QString strFormattedPhone() const;
+  QString strFormattedPhoneWithName() const;
+
   int m_countryCode;
   int m_code;
   QString m_number;
   QString m_name;
-
-  void clear()
-  {
-    m_id.clear();
-    m_countryCode = PHONE_DEFAULT_COUNTRY_CODE_VALUE;
-    m_code = PHONE_DEFAULT_CODE_VALUE;
-    m_number.clear();
-    m_name.clear();
-  }
-
-  Phone()
-  {
-    clear();
-  }
-
-  bool operator !=(const JItem& other) const
-  {
-    const Phone& another = dynamic_cast<const Phone&>(other);
-    return
-        m_countryCode != another.m_countryCode ||
-        m_code != another.m_code ||
-        m_number != another.m_number ||
-        m_name != another.m_name;
-  }
-
-  bool operator ==(const JItem& other) const
-  {
-    return !(*this != other);
-  }
-
-  bool isValid() const
-  {
-    return !m_number.isEmpty();
-  }
-
-  QString strFormattedPhone() const
-  {
-    return
-      "+" +
-      QString::number(m_countryCode) +
-      " (" +
-      QString::number(m_code) +
-      ") " +
-      m_number;
-  }
-
-  QString strFormattedPhoneWithName() const
-  {
-    QString str;
-    if (!m_name.isEmpty())
-      str += m_name + " ";
-    str += strFormattedPhone();
-    return str;
-  }
 };
 
 #endif // PHONENUMBER_H

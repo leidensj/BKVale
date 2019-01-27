@@ -47,11 +47,11 @@ void ImageView::setItem(const JItem& o)
 
 const JItem& ImageView::getItem() const
 {
-  static Image o;
-  o.m_id = m_currentId;
-  o.m_name = m_edImageName->text();
-  o.m_image = m_imageView->getImage();
-  return o;
+  m_ref.clear();
+  m_ref.m_id = m_currentId;
+  m_ref.m_name = m_edImageName->text();
+  m_ref.m_image = m_imageView->getImage();
+  return m_ref;
 }
 
 void ImageView::create()

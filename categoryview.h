@@ -20,6 +20,7 @@ public slots:
   void create();
 
 private:
+  mutable Category m_ref;
   JLineEdit* m_edName;
   JDatabasePicker* m_imagePicker;
   void setItem(const JItem& o);

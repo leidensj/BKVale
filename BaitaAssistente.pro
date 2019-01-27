@@ -59,7 +59,15 @@ SOURCES += main.cpp\
     jtimeedit.cpp \
     addresstablewidget.cpp \
     productcodetablewidget.cpp \
-    jdateedit.cpp
+    jdateedit.cpp \
+    address.cpp \
+    category.cpp \
+    image.cpp \
+    discount.cpp \
+    note.cpp \
+    person.cpp \
+    phone.cpp \
+    product.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \

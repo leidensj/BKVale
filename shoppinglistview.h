@@ -29,6 +29,7 @@ private slots:
   void updateControls();
 
 private:
+  mutable ShoppingList m_ref;
   JTableButtons* m_tableButtons;
 
   JLineEdit* m_edTitle;

@@ -22,6 +22,7 @@ public slots:
   void create();
 
 private:
+  mutable Image m_ref;
   JLineEdit* m_edImageName;
   JImageView* m_imageView;
   void setItem(const JItem& o);

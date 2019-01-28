@@ -1,83 +1,73 @@
 #include "product.h"
 
-struct Package
+Package::Package()
 {
-  bool m_bIsPackage;
-  QString m_unity;
-  double m_ammount;
+  clear();
+}
 
-  void clear()
+  void Package::clear()
   {
     m_bIsPackage = false;
     m_unity.clear();
     m_ammount = 0.0;
   }
 
-  Package()
-  {
-    clear();
-  }
-
-  bool operator !=(const Package& other) const
-  {
-    return
-        m_bIsPackage != other.m_bIsPackage ||
-        m_unity != other.m_unity ||
-        m_ammount != other.m_ammount;
-  }
-
-  QString strFormattedUnity(const QString& productUnity) const
-  {
-    return !m_bIsPackage
-        ? productUnity
-        : m_unity + " (" +
-          QString::number(m_ammount, 'f', 3).remove(QRegExp("\\.?0*$")) +
-          productUnity + ")";
-  }
-
-  QString strUnity(const QString& productUnity) const
-  {
-    return m_bIsPackage ? m_unity : productUnity;
-  }
-};
-
-struct ProductCode : public JItem
+bool Package::operator !=(const Package& other) const
 {
-  QString m_code;
+  return
+      m_bIsPackage != other.m_bIsPackage ||
+      m_unity != other.m_unity ||
+      m_ammount != other.m_ammount;
+}
 
-  void clear()
-  {
-    m_id.clear();
-    m_code.clear();
-  }
-
-  ProductCode()
-  {
-    clear();
-  }
-
-  bool operator != (const JItem& other) const
-  {
-    const ProductCode& another = dynamic_cast<const ProductCode&>(other);
-    return m_code != another.m_code;
-  }
-
-  bool operator == (const JItem& other) const
-  {
-    return !(*this != other);
-  }
-};
-
-struct Product : public JItem
+QString Package::strFormattedUnity(const QString& productUnity) const
 {
-  Category m_category;
-  Image m_image;
-  QString m_name;
-  QString m_unity;
-  QString m_details;
-  bool m_bBuy;
-  bool m_bSell;
-  QVector<ProductCode> m_vCode;
+  return !m_bIsPackage
+      ? productUnity
+      : m_unity + " (" +
+        QString::number(m_ammount, 'f', 3).remove(QRegExp("\\.?0*$")) +
+        productUnity + ")";
+}
+
+QString Package::strUnity(const QString& productUnity) const
+{
+  return m_bIsPackage ? m_unity : productUnity;
+}
+
+ProductCode::ProductCode()
+{
+  clear();
+}
+
+void ProductCode::clear()
+{
+  m_id.clear();
+  m_code.clear();
+}
+
+bool ProductCode::operator != (const JItem& other) const
+{
+  const ProductCode& another = dynamic_cast<const ProductCode&>(other);
+  return m_code != another.m_code;
+}
+
+bool ProductCode::operator == (const JItem& other) const
+{
+  return !(*this != other);
+}
+
+bool ProductCode::isValid() const
+{
+  return !m_code.isEmpty();
+}
+
+QString ProductCode::strTableName() const
+{
+  return PRODUCT_CODE_ITEMS_SQL_TABLE_NAME;
+}
+
+
+
 
   void clear()
   {

@@ -67,7 +67,11 @@ SOURCES += main.cpp\
     note.cpp \
     person.cpp \
     phone.cpp \
-    product.cpp
+    product.cpp \
+    reminder.cpp \
+    reservation.cpp \
+    shoppinglist.cpp \
+    store.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -121,7 +125,6 @@ HEADERS  += mainwindow.h \
     discountview.h \
     jtablewidgetitem.h \
     jitemview.h \
-    stock.h \
     jitemtable.h \
     phonetablewidget.h \
     timecard.h \

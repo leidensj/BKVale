@@ -91,7 +91,7 @@ bool Person::isValid() const
 
 QString Person::strTableName() const
 {
-return PERSON_SQL_TABLE_NAME
+  return PERSON_SQL_TABLE_NAME;
 }
 
 QString Person::strAliasName() const

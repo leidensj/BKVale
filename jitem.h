@@ -37,6 +37,7 @@ struct JItem
   };
 
   mutable Id m_id;
+  virtual ~JItem() { }
   virtual bool isValid() const = 0;
   virtual void clear() = 0;
   virtual QString strTableName() const = 0;

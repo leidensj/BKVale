@@ -62,8 +62,12 @@ bool Address::isValid() const
       !m_street.isEmpty();
 }
 
+QString Address::strTableName() const
+{
+  return ADDRESS_SQL_TABLE_NAME;
+}
 
-static Address::EBRState Address::st_getEBRState(const QString& abv)
+Address::EBRState Address::st_getEBRState(const QString& abv)
 {
   if (abv == "RS")
     return EBRState::RS;
@@ -122,7 +126,7 @@ static Address::EBRState Address::st_getEBRState(const QString& abv)
   else return EBRState::RS;
 }
 
-static Address::BRState Address::st_getBRState(EBRState s)
+Address::BRState Address::st_getBRState(EBRState s)
 {
   switch (s)
   {

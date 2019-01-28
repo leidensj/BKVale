@@ -7,13 +7,18 @@
 #include "jitem.h"
 #include "defines.h"
 
-typedef QString Password;
 
 struct User : public JItem
 {
   User();
-
   void clear();
+  bool operator != (const JItem& other) const;
+  bool operator == (const JItem& other) const;
+  bool isValid() const;
+  QString strTableName() const;
+
+  QString strEncryptedPassword() const;
+  static QString st_strEncryptedPassword(const QString& strPassword);
 
   QString m_strUser;
   bool m_bAccessNote;
@@ -30,41 +35,7 @@ struct User : public JItem
   bool m_bAccessImage;
   bool m_bAccessReservation;
   bool m_bAccessShoppingList;
-  Password m_password;
-
-  bool operator != (const JItem& other) const
-  {
-    const User& another = dynamic_cast<const User&>(other);
-    return
-        m_strUser != another.m_strUser ||
-        m_bAccessNote != another.m_bAccessNote ||
-        m_bAccessReminder != another.m_bAccessReminder ||
-        m_bAccessCalculator != another.m_bAccessCalculator ||
-        m_bAccessShop != another.m_bAccessCalculator ||
-        m_bAccessPerson != another.m_bAccessPerson ||
-        m_bAccessEmployee != another.m_bAccessEmployee ||
-        m_bAccessSupplier != another.m_bAccessSupplier ||
-        m_bAccessUser != another.m_bAccessUser ||
-        m_bAccessProduct != another.m_bAccessProduct ||
-        m_bAccessSettings != another.m_bAccessSettings ||
-        m_bAccessReservation != another.m_bAccessReservation ||
-        m_bAccessCategory != another.m_bAccessCategory ||
-        m_bAccessImage != another.m_bAccessImage ||
-        m_bAccessShoppingList != another.m_bAccessShoppingList;
-  }
-
-  bool operator == (const JItem& other) const
-  {
-    return !(*this != other);
-  }
-
-  bool isValid() const
-  {
-    return m_strUser.length() > 4;
-  }
-
-  QString strEncryptedPassword() const;
-  static QString st_strEncryptedPassword(const QString& strPassword);
+  QString m_password;
 };
 
 #endif // USER_H

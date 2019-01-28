@@ -20,6 +20,16 @@ struct TimeInterval
   {
     clear();
   }
+
+  bool operator != (const TimeInterval& other) const
+  {
+    return m_day != other.m_day || m_tmBegin != other.m_tmBegin || m_tmEnd != other.m_tmEnd;
+  }
+
+  bool operator == (const TimeInterval& other) const
+  {
+    return !(*this != other);
+  }
 };
 
 #endif // TIMEINTERVAL_H

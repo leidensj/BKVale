@@ -32,7 +32,7 @@ bool DiscountItem::operator ==(const JItem& other) const
 
 bool DiscountItem::isValid() const
 {
-  m_ammount >= 0;
+  return m_ammount >= 0;
 }
 
 QString DiscountItem::strTableName() const
@@ -45,7 +45,7 @@ Discount::Discount()
   clear();
 }
 
-static QString Discount::strType(Type type)
+QString Discount::strType(Type type)
 {
   switch (type)
   {
@@ -63,7 +63,7 @@ QString Discount::strExpDate() const
   return m_dtExp.toString("dd/MM/yyyy");
 }
 
-static QString Discount::getRandomCode(const int length = 10)
+QString Discount::getRandomCode(const int length)
 {
   const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 

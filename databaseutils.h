@@ -16,7 +16,6 @@
 #include "shoppinglist.h"
 #include "reservation.h"
 #include "discount.h"
-#include "stock.h"
 #include "store.h"
 
 class UserLoginSQL

@@ -69,12 +69,12 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(showSearch()));
 
   setMinimumWidth(600);
-  m_database->setVisible(false);
+  m_database->hide();
 }
 
 void JItemView::showSearch()
 {
-  m_database->setVisible(m_database->isHidden());
+  m_database->isHidden() ? m_database->show() : m_database->hide();
 }
 
 void JItemView::selectItem(const JItem& o)

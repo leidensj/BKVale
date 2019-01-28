@@ -84,13 +84,6 @@ bool Note::isValid() const
 bool Note::operator !=(const JItem& other) const
 {
   const Note& another = dynamic_cast<const Note&>(other);
-  if (m_vNoteItem.size() != other.size())
-    return true;
-
-  for (int i = 0; i != m_vNoteItem.size(); ++i)
-    if (m_vNoteItem.at(i) != other.at(i))
-      return true;
-
   return
       m_number != another.m_number ||
       m_date != another.m_date ||

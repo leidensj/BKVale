@@ -5,12 +5,12 @@ Package::Package()
   clear();
 }
 
-  void Package::clear()
-  {
-    m_bIsPackage = false;
-    m_unity.clear();
-    m_ammount = 0.0;
-  }
+void Package::clear()
+{
+  m_bIsPackage = false;
+  m_unity.clear();
+  m_ammount = 0.0;
+}
 
 bool Package::operator !=(const Package& other) const
 {
@@ -66,49 +66,51 @@ QString ProductCode::strTableName() const
   return PRODUCT_CODE_ITEMS_SQL_TABLE_NAME;
 }
 
+Product::Product()
+{
+  clear();
+}
 
+void Product::clear()
+{
+  m_id.clear();
+  m_category.clear();
+  m_image.clear();
+  m_name.clear();
+  m_unity.clear();
+  m_details.clear();
+  m_bBuy = false;
+  m_bSell = false;
+  m_vCode.clear();
+}
 
+bool Product::operator != (const JItem& other) const
+{
+  const Product& another = dynamic_cast<const Product&>(other);
+  return
+      m_image.m_id != another.m_image.m_id ||
+      m_category.m_id != another.m_category.m_id ||
+      m_name != another.m_name ||
+      m_unity != another.m_unity ||
+      m_details != another.m_details ||
+      m_bBuy != another.m_bBuy ||
+      m_bSell != another.m_bSell ||
+      m_vCode != another.m_vCode;
+}
 
-  void clear()
-  {
-    m_id.clear();
-    m_category.clear();
-    m_image.clear();
-    m_name.clear();
-    m_unity.clear();
-    m_details.clear();
-    m_bBuy = false;
-    m_bSell = false;
-    m_vCode.clear();
-  }
+bool Product::operator == (const JItem& other) const
+{
+  return !(*this != other);
+}
 
-  Product()
-  {
-    clear();
-  }
+bool Product::isValid() const
+{
+  return
+      !m_name.isEmpty() &&
+      !m_unity.isEmpty();
+}
 
-  bool operator != (const JItem& other) const
-  {
-    const Product& another = dynamic_cast<const Product&>(other);
-    return
-        m_image.m_id != another.m_image.m_id ||
-        m_category.m_id != another.m_category.m_id ||
-        m_name != another.m_name ||
-        m_unity != another.m_unity ||
-        m_details != another.m_details ||
-        m_bBuy != another.m_bBuy ||
-        m_bSell != another.m_bSell ||
-        m_vCode != another.m_vCode;
-  }
-
-  bool operator == (const JItem& other) const
-  {
-    return !(*this != other);
-  }
-
-  bool isValid() const
-  {
-    return
-        !m_name.isEmpty() &&
-        !m_unity.isEmpty();
-  }
+QString Product::strTableName() const
+{
+  return PRODUCT_SQL_TABLE_NAME;
+}

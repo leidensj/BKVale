@@ -25,12 +25,14 @@ struct Address : public JItem
 
   Address();
   void clear();
-  QString getFormattedAddress() const;
-  QString getFormattedAddress2() const;
-  QString getFormattedAddress3() const;
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
+  QString strTableName() const;
+
+  QString getFormattedAddress() const;
+  QString getFormattedAddress2() const;
+  QString getFormattedAddress3() const;
 
   QString m_cep;
   QString m_neighborhood;

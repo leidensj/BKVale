@@ -158,8 +158,10 @@ JTableButtons::JTableButtons(JTable *table, int maxNumberofItems, int orientatio
   }
 
   connect(m_btnAdd, SIGNAL(clicked(bool)), table, SLOT(addItem()));
+  connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_btnRemove, SIGNAL(clicked(bool)), table, SLOT(removeItem()));
   connect(table, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  updateControls();
 }
 
 void JTableButtons::updateControls()

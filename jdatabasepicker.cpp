@@ -17,11 +17,11 @@
 JDatabasePicker::JDatabasePicker(const QString& tableName,
                                  const QString& text,
                                  const QIcon& icon,
-                                 int flags,
+                                 bool bMultiPicker,
                                  QWidget* parent)
  : QFrame(parent)
  , m_text(text)
- , m_flags(flags)
+ , m_bMultiPicker(bMultiPicker)
  , m_selector(nullptr)
  , m_btnSearch(nullptr)
  , m_edText(nullptr)
@@ -43,7 +43,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   m_btnClear->setIcon(QIcon(":/icons/res/remove.png"));
   m_btnClear->setToolTip(tr("Remover ") + m_text);
 
-  if (m_flags & (int)Flags::Multipicker)
+  if (m_bMultiPicker)
   {
     m_list = new QListWidget;
   }
@@ -61,26 +61,13 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
     connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   }
 
-  if (m_flags & (int)Flags::TextPlaceholder && !(m_flags & (int)Flags::Multipicker))
-  {
-    m_edText->setPlaceholderText(m_text);
-  }
-
-  if (!(flags & (int)Flags::Multipicker))
+  if (!m_bMultiPicker)
     m_imageView = new JImageView(false, 24);
 
   QHBoxLayout* hlayout0 = new QHBoxLayout;
   QVBoxLayout* vlayout0 = new QVBoxLayout;
 
-  QGroupBox* group = nullptr;
-  if (m_flags & (int)Flags::TextGroup && !(m_flags & (int)Flags::Multipicker))
-  {
-    group = new QGroupBox();
-    group->setTitle(m_text);
-    group->setLayout(hlayout0);
-  }
-
-  if (m_flags & (int)Flags::Multipicker)
+  if (m_bMultiPicker)
   {
     hlayout0->setContentsMargins(0, 0, 0, 0);
     hlayout0->setAlignment(Qt::AlignLeft);
@@ -104,15 +91,12 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
     hlayout0->addWidget(m_imageView);
     vlayout0->setContentsMargins(0, 0, 0, 0);
     vlayout0->setAlignment(Qt::AlignTop);
-    if (m_flags & (int)Flags::TextGroup)
-      vlayout0->addWidget(group);
-    else
-      vlayout0->addLayout(hlayout0);
+    vlayout0->addLayout(hlayout0);
   }
 
   setLayout(vlayout0);
 
-  if (m_flags & (int)Flags::Multipicker)
+  if (m_bMultiPicker)
     setFixedHeight(sizeHint().height());
 
   m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, this);
@@ -120,8 +104,9 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(searchItem()));
   connect(m_selector->getDatabase(), SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(setItem(const JItem&)));
   connect(m_btnClear, SIGNAL(clicked(bool)), this, SLOT(clear()));
-  connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
-  connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clearAll()));
+  if (!m_bMultiPicker)
+    connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
+    connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clearAll()));
 }
 
 JDatabase* JDatabasePicker::getDatabase() const
@@ -164,7 +149,7 @@ void JDatabasePicker::setItem(Id id,
                               const QString& name,
                               const QByteArray& arImage)
 {
-  if (m_flags & (int)Flags::Multipicker)
+  if (m_bMultiPicker)
   {
     if (id.isValid())
     {
@@ -208,7 +193,7 @@ void JDatabasePicker::searchItem()
 
 void JDatabasePicker::clear()
 {
-  if (m_flags & (int)Flags::Multipicker)
+  if (m_bMultiPicker)
   {
     auto pt = m_list->takeItem(m_list->currentRow());
     if (pt != nullptr)
@@ -231,7 +216,7 @@ void JDatabasePicker::clear()
 
 void JDatabasePicker::clearAll()
 {
-  if (m_flags & (int)Flags::Multipicker)
+  if (m_bMultiPicker)
   {
     bool bChanged = m_list->count() != 0;
     m_list->clear();
@@ -246,14 +231,20 @@ void JDatabasePicker::clearAll()
 
 Id JDatabasePicker::getId() const
 {
-  return Id(m_flags & (int)Flags::Multipicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong());
+  return Id(m_bMultiPicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong());
 }
 
 QVector<Id> JDatabasePicker::getIds() const
 {
   QVector<Id> v;
-  if (m_flags & (int)Flags::Multipicker)
+  if (m_bMultiPicker)
     for (int i = 0; i != m_list->count(); ++i)
       v.push_back(Id(m_list->item(i)->data(Qt::UserRole).toLongLong()));
   return v;
+}
+
+void JDatabasePicker::setPlaceholderText(bool bSet)
+{
+  if (!m_bMultiPicker)
+    m_edText->setText(bSet ? m_text : "");
 }

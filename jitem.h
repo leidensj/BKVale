@@ -70,4 +70,59 @@ struct JItem
   }
 };
 
+/*QString getItemName(const QString& tableName)
+{
+  if (tableName == ADDRESS_SQL_TABLE_NAME)
+    return "Endereço";
+  else if (tableName == CATEGORY_SQL_TABLE_NAME)
+    return "Categoria";
+  else if (tableName == IMAGE_SQL_TABLE_NAME)
+    return "Imagem";
+  else if (tableName == NOTE_SQL_TABLE_NAME)
+    return "Vale";
+  else if (tableName == NOTE_ITEMS_SQL_TABLE_NAME)
+    return "Item de Vale";
+  else if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return "Funcionário";
+  else if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return "Fornecedor";
+  else if (tableName == PERSON_SQL_TABLE_NAME)
+    return "Pessoa";
+  else if (tableName == PHONE_SQL_TABLE_NAME)
+    return "Telefone";
+  else if (tableName == PRODUCT_SQL_TABLE_NAME)
+    return "Produto";
+  else if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    return "Código";
+  else if (tableName == USER_SQL_TABLE_NAME)
+    return "Usuário";
+  else if (tableName == REMINDER_SQL_TABLE_NAME)
+    return "Lembrete";
+  else if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    return "Lista de Compras";
+  else if (tableName == SHOPPING_LIST_ITEMS_SQL_TABLE_NAME)
+    return "Item de Lista de Compras";
+  else if (tableName == RESERVATION_SQL_TABLE_NAME)
+    return "Reserva";
+  else if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+    return "Usuário Ativo";
+  else if (tableName == DISCOUNT_SQL_TABLE_NAME)
+    return "Desconto";
+  else if (tableName == DISCOUNT_ITEMS_SQL_TABLE_NAME)
+    return "Item de Desconto";
+  else if (tableName == STORE_SQL_TABLE_NAME)
+    return "Loja";
+  else if (tableName == STORE_EMPLOYEES_SQL_TABLE_NAME)
+    return "Funcionário da Loja";
+  else if (tableName == STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME)
+    return "Horário de Funcionário da Loja";
+  else
+    return "";
+}
+
+QString getItemIconPath(const QString& tableName)
+{
+  return "";
+}*/
+
 #endif // JITEM_H

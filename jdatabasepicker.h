@@ -20,18 +20,10 @@ class JDatabasePicker : public QFrame
   Q_OBJECT
 
 public:
-
-  enum class Flags
-  {
-    TextPlaceholder = 0x1,
-    TextGroup = 0x2,
-    Multipicker = 0x4
-  };
-
   explicit JDatabasePicker(const QString& tableName,
                            const QString& text,
                            const QIcon& icon,
-                           int flags = 0,
+                           bool bMultiPicker = false,
                            QWidget* parent = nullptr);
 
   Id getId() const;
@@ -39,6 +31,7 @@ public:
 
   const QString m_text;
 
+  void setPlaceholderText(bool bSet);
   JDatabase* getDatabase() const;
 
 public slots:
@@ -56,7 +49,7 @@ signals:
   void changedSignal();
 
 private:
-  int m_flags;
+  bool m_bMultiPicker;
   JDatabaseSelector* m_selector;
   QPushButton* m_btnSearch;
   JLineEdit* m_edText;

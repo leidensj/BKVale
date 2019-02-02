@@ -18,7 +18,6 @@
 #include <QTimer>
 #include <QCheckBox>
 #include <QSplitter>
-#include <QDockWidget>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 
@@ -57,6 +56,7 @@ NoteView::NoteView(QWidget *parent)
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
   m_btnSearch->setToolTip(tr("Procurar vales (Ctrl+F)"));
+  m_btnSearch->setCheckable(true);
 
   m_btnOpenLast = new QPushButton();
   m_btnOpenLast->setFlat(true);
@@ -237,17 +237,11 @@ NoteView::NoteView(QWidget *parent)
   viewFrame->setLayout(viewLayout);
 
   m_database = new JDatabase(NOTE_SQL_TABLE_NAME);
-
-  m_dock = new QDockWidget();
-  m_dock->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-  m_dock->setFeatures(0);
-  m_dock->setFeatures(QDockWidget::DockWidgetClosable);
-  m_dock->setWindowTitle(tr("Pesquisar"));
-  m_dock->setWidget(m_database);
+  m_database->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(m_dock);
   splitter->addWidget(viewFrame);
+  splitter->addWidget(m_database);
 
   QVBoxLayout* mainLayout = new QVBoxLayout();
   mainLayout->addWidget(splitter);
@@ -255,7 +249,7 @@ NoteView::NoteView(QWidget *parent)
 
   connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(itemSelected(const JItem&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
-  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(showSearch()));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), m_database, SLOT(setVisible(bool)));
   connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
@@ -275,7 +269,7 @@ NoteView::NoteView(QWidget *parent)
 
   create();
   checkDate();
-  m_dock->close();
+  m_database->hide();
   updateControls();
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
@@ -393,14 +387,6 @@ void NoteView::setToday()
 void NoteView::addProduct()
 {
   m_table->addItemAndLoadPrices(m_supplierPicker->getId(), sender() == m_btnAddCode);
-}
-
-void NoteView::showSearch()
-{
-  if (m_dock->isVisible())
-    m_dock->close();
-  else
-    m_dock->show();
 }
 
 Note NoteView::save(Person& employee)

@@ -22,7 +22,6 @@ public:
 protected slots:
   virtual void itemsRemoved(const QVector<Id>& ids);
   virtual void save();
-  virtual void showSearch(bool b);
 
 public slots:
   virtual void selectItem(const JItem& o);

@@ -47,7 +47,6 @@ private:
   NoteTableWidget* m_table;
   QCheckBox* m_cbCash;
   JDatabase* m_database;
-  QDockWidget* m_dock;
   QPlainTextEdit* m_teObservation;
   JExpLineEdit* m_edDisccount;
 
@@ -56,7 +55,6 @@ private slots:
   void checkDate();
   void removeItem();
   void supplierChanged();
-  void showSearch();
   void lastItemSelected();
   void itemSelected(const JItem& jItem);
   void itemsRemoved(const QVector<Id>& ids);

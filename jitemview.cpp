@@ -32,6 +32,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnSearch->setText("");
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
+  m_btnSearch->setCheckable(true);
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);
@@ -43,7 +44,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_tab = new QTabWidget;
 
   QVBoxLayout* viewlayout = new QVBoxLayout;
-  viewlayout->setContentsMargins(9, 0, 0, 0);
+  viewlayout->setContentsMargins(0, 0, 9, 0);
   viewlayout->setAlignment(Qt::AlignTop);
   viewlayout->addLayout(buttonlayout);
   viewlayout->addWidget(m_tab);
@@ -52,11 +53,11 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   viewFrame->setLayout(viewlayout);
 
   m_database = new JDatabase(tableName);
-  m_database->layout()->setContentsMargins(0, 0, 9, 0);
+  m_database->layout()->setContentsMargins(9, 0, 0, 0);
 
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(m_database);
   splitter->addWidget(viewFrame);
+  splitter->addWidget(m_database);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(splitter);
@@ -66,15 +67,15 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
   connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(selectItem(const JItem&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
-  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(showSearch()));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(showSearch(bool)));
 
   setMinimumWidth(600);
   m_database->hide();
 }
 
-void JItemView::showSearch()
+void JItemView::showSearch(bool b)
 {
-  m_database->isHidden() ? m_database->show() : m_database->hide();
+  b ? m_database->show() : m_database->hide();
 }
 
 void JItemView::selectItem(const JItem& o)

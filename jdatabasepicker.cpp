@@ -246,5 +246,5 @@ QVector<Id> JDatabasePicker::getIds() const
 void JDatabasePicker::setPlaceholderText(bool bSet)
 {
   if (!m_bMultiPicker)
-    m_edText->setText(bSet ? m_text : "");
+    m_edText->setPlaceholderText(bSet ? m_text : "");
 }

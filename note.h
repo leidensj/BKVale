@@ -41,14 +41,6 @@ struct NoteItem : JItem
 
 struct Note : public JItem
 {
-  mutable qlonglong m_number;
-  QDate m_date;
-  Person m_supplier;
-  bool m_bCash;
-  QString m_observation;
-  QVector<NoteItem> m_vNoteItem;
-  double m_disccount;
-
   Note();
   void clear();
   bool isValid() const;
@@ -64,6 +56,14 @@ struct Note : public JItem
   double subTotal() const;
   QString strTotal() const;
   QString strSubTotal() const;
+
+  mutable qlonglong m_number;
+  QDate m_date;
+  Person m_supplier;
+  bool m_bCash;
+  QString m_observation;
+  QVector<NoteItem> m_vNoteItem;
+  double m_disccount;
 };
 
 #endif // COMMON_H

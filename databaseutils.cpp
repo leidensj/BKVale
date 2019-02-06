@@ -2004,7 +2004,7 @@ bool PersonSQL::insert(const Person& person,
                     "(:_v03),"
                     "(:_v04))");
       query.bindValue(":_v01", person.m_id.get());
-      query.bindValue(":_v02", person.m_employee.m_pincode);
+      query.bindValue(":_v02", person.m_employee.getPincodeNull());
       query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
       query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
       bSuccess = query.exec();
@@ -2170,7 +2170,7 @@ bool PersonSQL::update(const Person& person,
                   "(:_v03),"
                   "(:_v04))");
     query.bindValue(":_v01", person.m_id.get());
-    query.bindValue(":_v02", person.m_employee.m_pincode);
+    query.bindValue(":_v02", person.m_employee.getPincodeNull());
     query.bindValue(":_v03", person.m_employee.m_bNoteEdit);
     query.bindValue(":_v04", person.m_employee.m_bNoteRemove);
     bSuccess = query.exec();

@@ -20,6 +20,8 @@ struct Employee
   QString m_pincode;
   bool m_bNoteEdit;
   bool m_bNoteRemove;
+
+  QVariant getPincodeNull() const { return !m_pincode.isEmpty() ? m_pincode : QVariant(QVariant::String); }
 };
 
 struct Supplier

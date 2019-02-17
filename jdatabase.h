@@ -50,13 +50,16 @@ public:
   ~JDatabase();
   QString getTableName() const;
   JItem* getCurrentItem() const;
+  QVector<Id> getSelectedIds() const;
+  const QVector<JItem*> getCurrentItems() const;
 
   bool save(const JItem& jItem, Person* pEmployee = nullptr);
 
 public slots:
   void refresh();
-  void selectItem();
+  void selectItems();
   void selectItem(Id id);
+  void selectItems(const QVector<Id> ids);
   void setFixedFilter(const QString& fixedFilter);
   void clearFilterSearch();
 
@@ -73,9 +76,11 @@ private:
   QString m_tableName;
   QString m_filter;
   QString m_fixedFilter;
-  JItem* m_currentItem;
+  QVector<JItem*> m_currentItems;
   QSortFilterProxyModel* m_proxyModel;
   NoteFilterDlg* m_noteFilter;
+
+  void clearCurrentItems();
 
 private slots:
   void filterSearchChanged();
@@ -89,7 +94,8 @@ private slots:
   void clearFilter();
 
 signals:
-  void itemSelectedSignal(const JItem& jItem);
+  void itemSelectedSignal(const JItem& item);
+  void itemsSelectedSignal(const QVector<JItem*>& items);
   void itemsRemovedSignal(const QVector<Id>& ids);
   void currentRowChangedSignal(int row);
 };
@@ -110,7 +116,7 @@ protected:
   void closeEvent(QCloseEvent * e);
 
 private slots:
-  void itemSelected(const JItem& jItem);
+  void itemsSelected(const QVector<JItem*>& jItem);
 
 private:
   JDatabase* m_database;

@@ -37,6 +37,7 @@ public:
 public slots:
   void clear();
   void clearAll();
+  void setItems(const QVector<JItem*>& items);
   void setItem(const JItem& jItem);
   void setItem(Id id,
                const QString& name,

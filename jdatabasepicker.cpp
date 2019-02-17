@@ -102,7 +102,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, this);
 
   connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(searchItem()));
-  connect(m_selector->getDatabase(), SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(setItem(const JItem&)));
+  connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItem*>&)), this, SLOT(setItems(const QVector<JItem*>&)));
   connect(m_btnClear, SIGNAL(clicked(bool)), this, SLOT(clear()));
   if (!m_bMultiPicker)
   {
@@ -116,9 +116,19 @@ JDatabase* JDatabasePicker::getDatabase() const
   return m_selector->getDatabase();
 }
 
-void JDatabasePicker::setItem(const JItem& jItem)
+void JDatabasePicker::setItems(const QVector<JItem*>& items)
 {
   m_selector->close();
+  for (int i = 0; i != items.size(); ++i)
+  {
+    if (items.at(i) == nullptr)
+      continue;
+    setItem(*items.at(i));
+  }
+}
+
+void JDatabasePicker::setItem(const JItem& jItem)
+{
   QString tableName = m_selector->getDatabase()->getTableName();
   if (tableName == IMAGE_SQL_TABLE_NAME)
   {

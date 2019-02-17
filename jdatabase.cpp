@@ -682,7 +682,6 @@ JDatabase::JDatabase(const QString& tableName,
   , m_edFilterSearch(nullptr)
   , m_cbContains(nullptr)
   , m_table(nullptr)
-  , m_currentItem(nullptr)
   , m_proxyModel(nullptr)
   , m_noteFilter(nullptr)
 {
@@ -732,8 +731,7 @@ JDatabase::JDatabase(const QString& tableName,
   hlayout0->addWidget(m_btnFilter);
   hlayout0->addWidget(m_btnFilterClear);
 
-  m_edFilterSearch = new JLineEdit(JLineEdit::Input::All,
-                                   (int)JLineEdit::Flags::ToUpper);
+  m_edFilterSearch = new JLineEdit(JLineEdit::Input::All, (int)JLineEdit::Flags::ToUpper);
   m_edFilterSearch->setToolTip(tr("Procurar (Ctrl+F)"));
   m_edFilterSearch->setClearButtonEnabled(true);
 
@@ -751,9 +749,6 @@ JDatabase::JDatabase(const QString& tableName,
 
   m_table = new JTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_table->setSelectionMode(m_mode == Mode::Full
-                            ? QAbstractItemView::ExtendedSelection
-                            : QAbstractItemView::SingleSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
   m_table->setSortingEnabled(true);
   m_table->horizontalHeader()->setHighlightSections(false);
@@ -841,11 +836,11 @@ JDatabase::JDatabase(const QString& tableName,
     QObject::connect(m_table,
                      SIGNAL(enterKeyPressedSignal()),
                      this,
-                     SLOT(selectItem()));
+                     SLOT(selectItems()));
     QObject::connect(m_btnOpen,
                      SIGNAL(clicked(bool)),
                      this,
-                     SLOT(selectItem()));
+                     SLOT(selectItems()));
     QObject::connect(m_btnRemove,
                      SIGNAL(clicked(bool)),
                      this,
@@ -853,7 +848,7 @@ JDatabase::JDatabase(const QString& tableName,
     QObject::connect(m_table,
                      SIGNAL(doubleClicked(const QModelIndex&)),
                      this,
-                     SLOT(selectItem()));
+                     SLOT(selectItems()));
   }
 
   QObject::connect(m_btnFilter,
@@ -897,137 +892,173 @@ JDatabase::JDatabase(const QString& tableName,
 
 JDatabase::~JDatabase()
 {
-  if (m_currentItem != nullptr)
-    delete m_currentItem;
-  m_currentItem = nullptr;
+  clearCurrentItems();
 }
 
-void JDatabase::selectItem()
+void JDatabase::clearCurrentItems()
 {
-  QModelIndex idx = m_proxyModel->mapToSource(m_table->currentIndex());
-  if (idx.isValid())
+  for (int i = 0; i != m_currentItems.size(); ++i)
   {
-    JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
-    selectItem(Id(model->record(idx.row()).value(SQL_COLID_NUMBER).toLongLong()));
+    JItem* pt = m_currentItems.at(i);
+    if (pt != nullptr)
+      delete pt;
   }
-  else
+  m_currentItems.clear();
+}
+
+QVector<Id> JDatabase::getSelectedIds() const
+{
+  JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
+  QModelIndexList lst = m_table->selectionModel()->selectedRows();
+
+  QVector<Id> ids;
+  for (int i = 0; i != lst.size(); ++i)
   {
-    if (m_currentItem != nullptr)
-      delete m_currentItem;
-    m_currentItem = nullptr;
+    QModelIndex idx = m_proxyModel->mapToSource(lst.at(i));
+    if (idx.isValid())
+      ids.push_back(Id(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong()));
   }
+  return ids;
+}
+
+void JDatabase::selectItems()
+{
+  selectItems(getSelectedIds());
 }
 
 void JDatabase::selectItem(Id id)
 {
-  if (m_currentItem != nullptr)
-    delete m_currentItem;
-  m_currentItem = nullptr;
+  QVector<Id> ids;
+  ids.push_back(id);
+  selectItems(ids);
+}
+
+void JDatabase::selectItems(const QVector<Id> ids)
+{
+  clearCurrentItems();
 
   bool bSuccess = false;
-  QString error;
-  if (m_tableName == IMAGE_SQL_TABLE_NAME)
+  for (int i = 0; i != ids.size(); ++i)
   {
-    Image o;
-    o.m_id = id;
-    bSuccess = ImageSQL::select(o, error);
-    m_currentItem = new Image(o);
-  }
-  else if (m_tableName == PERSON_SQL_TABLE_NAME)
-  {
-    Person o;
-    o.m_id = id;
-    bSuccess = PersonSQL::select(o, error);
-    m_currentItem = new Person(o);
-  }
-  else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
-  {
-    Category o;
-    o.m_id = id;
-    bSuccess = CategorySQL::select(o, error);
-    m_currentItem = new Category(o);
-  }
-  else if (m_tableName == STORE_SQL_TABLE_NAME)
-  {
-    Store o;
-    o.m_id = id;
-    bSuccess = StoreSQL::select(o, error);
-    m_currentItem = new Store(o);
-  }
-  else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
-  {
-    Product o;
-    o.m_id = id;
-    bSuccess = ProductSQL::select(o, error);
-    m_currentItem = new Product(o);
-  }
-  else if (m_tableName == NOTE_SQL_TABLE_NAME)
-  {
-    Note o;
-    o.m_id = id;
-    bSuccess = NoteSQL::select(o, error);
-    m_currentItem = new Note(o);
-  }
-  else if (m_tableName == USER_SQL_TABLE_NAME)
-  {
-    User o;
-    o.m_id = id;
-    bSuccess = UserSQL::select(o, error);
-    m_currentItem = new User(o);
-  }
-  else if (m_tableName == REMINDER_SQL_TABLE_NAME)
-  {
-    Reminder o;
-    o.m_id = id;
-    bSuccess = ReminderSQL::select(o, error);
-    m_currentItem = new Reminder(o);
-  }
-  else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-  {
-    ShoppingList o;
-    o.m_id = id;
-    bSuccess = ShoppingListSQL::select(o, error);
-    m_currentItem = new ShoppingList(o);
-  }
-  else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
-  {
-    Reservation o;
-    o.m_id = id;
-    bSuccess = ReservationSQL::select(o, error);
-    m_currentItem = new Reservation(o);
-  }
-  else if (m_tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
-  {
-    Product o;
-    ProductCode code;
-    code.m_id = id;
-    bSuccess = ProductSQL::selectByCode(o, code, error);
-    m_currentItem = new Product(o);
-  }
-  else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
-  {
-    Discount o;
-    o.m_id = id;
-    bSuccess = DiscountSQL::select(o, error);
-    m_currentItem = new Discount(o);
-  }
-  else
-  {
-    error = tr("Item ainda não implementado.");
+    QString error;
+    if (m_tableName == IMAGE_SQL_TABLE_NAME)
+    {
+      Image o;
+      o.m_id = ids.at(i);
+      bSuccess = ImageSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Image(o));
+    }
+    else if (m_tableName == PERSON_SQL_TABLE_NAME)
+    {
+      Person o;
+      o.m_id = ids.at(i);
+      bSuccess = PersonSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Person(o));
+    }
+    else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
+    {
+      Category o;
+      o.m_id = ids.at(i);
+      bSuccess = CategorySQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Category(o));
+    }
+    else if (m_tableName == STORE_SQL_TABLE_NAME)
+    {
+      Store o;
+      o.m_id = ids.at(i);
+      bSuccess = StoreSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Store(o));
+    }
+    else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
+    {
+      Product o;
+      o.m_id = ids.at(i);
+      bSuccess = ProductSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Product(o));
+    }
+    else if (m_tableName == NOTE_SQL_TABLE_NAME)
+    {
+      Note o;
+      o.m_id = ids.at(i);
+      bSuccess = NoteSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Note(o));
+    }
+    else if (m_tableName == USER_SQL_TABLE_NAME)
+    {
+      User o;
+      o.m_id = ids.at(i);
+      bSuccess = UserSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new User(o));
+    }
+    else if (m_tableName == REMINDER_SQL_TABLE_NAME)
+    {
+      Reminder o;
+      o.m_id = ids.at(i);
+      bSuccess = ReminderSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Reminder(o));
+    }
+    else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    {
+      ShoppingList o;
+      o.m_id = ids.at(i);
+      bSuccess = ShoppingListSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new ShoppingList(o));
+    }
+    else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
+    {
+      Reservation o;
+      o.m_id = ids.at(i);
+      bSuccess = ReservationSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Reservation(o));
+    }
+    else if (m_tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    {
+      Product o;
+      ProductCode code;
+      o.m_id = ids.at(i);
+      bSuccess = ProductSQL::selectByCode(o, code, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Product(o));
+    }
+    else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
+    {
+      Discount o;
+      o.m_id = ids.at(i);
+      bSuccess = DiscountSQL::select(o, error);
+      if (bSuccess)
+        m_currentItems.push_back(new Discount(o));
+    }
+    else
+    {
+      error = tr("Item ainda não implementado.");
+    }
+
+    if (!bSuccess)
+    {
+      QMessageBox::critical(this,
+                            tr("Erro"),
+                            tr("O seguinte erro ocorreu ao selecionar o item com ID "
+                               "'%1':\n'%2'").arg(ids.at(i).str(), error));
+    }
   }
 
-  if (bSuccess && m_currentItem != nullptr)
+  if (!m_currentItems.isEmpty())
   {
-    const JItem& jItem = *m_currentItem;
-    emit itemSelectedSignal(jItem);
+    if (m_currentItems.at(0) != nullptr)
+      emit itemSelectedSignal(*m_currentItems.at(0));
+    emit itemsSelectedSignal(m_currentItems);
   }
-  if (!bSuccess)
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("O seguinte erro ocorreu ao selecionar o item com ID "
-                             "'%1':\n'%2'").arg(id.str(), error));
-  }
+
 }
 
 void JDatabase::refresh()
@@ -1065,16 +1096,7 @@ void JDatabase::enableControls()
 
 void JDatabase::removeItems()
 {
-  JTableModel* model = dynamic_cast<JTableModel*>(m_proxyModel->sourceModel());
-  QModelIndexList lst = m_table->selectionModel()->selectedIndexes();
-
-  QVector<Id> ids;
-  for (int i = 0; i != lst.size(); ++i)
-  {
-    QModelIndex idx = m_proxyModel->mapToSource(lst.at(i));
-    if (idx.isValid())
-      ids.push_back(Id(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong()));
-  }
+  QVector<Id> ids = getSelectedIds();
 
   if (ids.size() == 0)
     return;
@@ -1212,7 +1234,7 @@ QString JDatabase::getTableName() const
 
 JItem* JDatabase::getCurrentItem() const
 {
-  return m_currentItem;
+  return m_currentItems.size() != 0 ? m_currentItems.at(0) : nullptr;
 }
 
 bool JDatabase::save(const JItem& jItem, Person* pEmployee)
@@ -1381,13 +1403,10 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
   setWindowTitle(title);
   setWindowIcon(icon);
 
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(itemSelected(const JItem&)));
+  QObject::connect(m_database, SIGNAL(itemsSelectedSignal(const QVector<JItem*>&)), this, SLOT(itemsSelected(const QVector<JItem*>&)));
 }
 
-void JDatabaseSelector::itemSelected(const JItem& /*jItem*/)
+void JDatabaseSelector::itemsSelected(const QVector<JItem*>& /*items*/)
 {
   accept();
 }

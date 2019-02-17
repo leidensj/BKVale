@@ -73,7 +73,7 @@ void ShopView::setToday()
 
 ShoppingList ShopView::getShoppingList() const
 {
-  m_database->selectItem();
+  m_database->selectItems();
   ShoppingList* plst = dynamic_cast<ShoppingList*>(m_database->getCurrentItem());
   ShoppingList lst;
   if (plst != nullptr)

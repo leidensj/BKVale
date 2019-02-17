@@ -105,8 +105,10 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   connect(m_selector->getDatabase(), SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(setItem(const JItem&)));
   connect(m_btnClear, SIGNAL(clicked(bool)), this, SLOT(clear()));
   if (!m_bMultiPicker)
+  {
     connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
     connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clearAll()));
+  }
 }
 
 JDatabase* JDatabasePicker::getDatabase() const

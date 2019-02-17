@@ -757,6 +757,7 @@ JDatabase::JDatabase(const QString& tableName,
   m_table->setEditTriggers(QTableView::NoEditTriggers);
   m_table->setSortingEnabled(true);
   m_table->horizontalHeader()->setHighlightSections(false);
+  m_table->verticalHeader()->hide();
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
   vlayout1->addLayout(hlayout0);
@@ -864,9 +865,7 @@ JDatabase::JDatabase(const QString& tableName,
                    this,
                    SLOT(clearFilter()));
 
-  new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F),
-                this,
-                SLOT(focusFilterSearch()));
+  new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(focusFilterSearch()));
 
   if (m_table->horizontalHeader()->count() > 1)
     m_table->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);

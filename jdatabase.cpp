@@ -749,6 +749,7 @@ JDatabase::JDatabase(const QString& tableName,
 
   m_table = new JTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_table->setSelectionMode(m_mode == Mode::Full ? QAbstractItemView::ExtendedSelection : QAbstractItemView::SingleSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
   m_table->setSortingEnabled(true);
   m_table->horizontalHeader()->setHighlightSections(false);

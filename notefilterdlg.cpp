@@ -105,8 +105,8 @@ void NoteFilterDlg::clearFilter()
   m_cbDate->setChecked(false);
   m_dtBegin->setDate(QDate::currentDate());
   m_dtEnd->setDate(QDate::currentDate());
-  m_supplierPicker->clearAll();
-  m_productPicker->clearAll();
+  m_supplierPicker->clear();
+  m_productPicker->clear();
   updateControls();
 }
 

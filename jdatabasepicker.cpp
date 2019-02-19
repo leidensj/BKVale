@@ -8,7 +8,6 @@
 #include <QLayout>
 #include <QGroupBox>
 #include <QMessageBox>
-#include <QListWidget>
 #include <QLabel>
 #include <QAction>
 
@@ -23,92 +22,36 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
  , m_text(text)
  , m_bMultiPicker(bMultiPicker)
  , m_selector(nullptr)
- , m_btnSearch(nullptr)
  , m_edText(nullptr)
- , m_btnClear(nullptr)
  , m_imageView(nullptr)
- , m_list(nullptr)
 {
-  m_btnSearch = new QPushButton();
-  m_btnSearch->setFlat(true);
-  m_btnSearch->setText("");
-  m_btnSearch->setIconSize(QSize(16, 16));
-  m_btnSearch->setIcon(QIcon(":/icons/res/binoculars.png"));
-  m_btnSearch->setToolTip(tr("Selecionar ") + m_text);
+  m_edText = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags1);
+  m_edText->setReadOnly(true);
+  QAction* action = m_edText->addAction(QIcon(":/icons/res/binoculars.png"), QLineEdit::LeadingPosition);
+  QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);
 
-  m_btnClear = new QPushButton();
-  m_btnClear->setFlat(true);
-  m_btnClear->setText("");
-  m_btnClear->setIconSize(QSize(16, 16));
-  m_btnClear->setIcon(QIcon(":/icons/res/remove.png"));
-  m_btnClear->setToolTip(tr("Remover ") + m_text);
+  m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, bMultiPicker, this);
 
-  if (m_bMultiPicker)
-  {
-    m_list = new QListWidget;
-  }
-  else
-  {
-    m_edText = new JLineEdit(JLineEdit::Input::All,
-                             JLineEdit::st_defaultFlags1);
-    m_edText->setReadOnly(true);
-    m_btnSearch->hide();
-    m_btnClear->hide();
-    QAction* action = m_edText->addAction(QIcon(":/icons/res/binoculars.png"), QLineEdit::LeadingPosition);
-    QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(searchItem()));
-    connect(action2, SIGNAL(triggered(bool)), this, SLOT(clear()));
-    connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
-  }
-
-  if (!m_bMultiPicker)
-    m_imageView = new JImageView(false, 24);
+  m_imageView = new JImageView(false, 24);
+  m_imageView->hide();
 
   QHBoxLayout* hlayout0 = new QHBoxLayout;
-  QVBoxLayout* vlayout0 = new QVBoxLayout;
+  hlayout0->setContentsMargins(0, 0, 0, 0);
+  hlayout0->addWidget(m_edText);
+  hlayout0->addWidget(m_imageView);
 
-  if (m_bMultiPicker)
-  {
-    hlayout0->setContentsMargins(0, 0, 0, 0);
-    hlayout0->setAlignment(Qt::AlignLeft);
-    hlayout0->addWidget(m_btnSearch);
-    hlayout0->addWidget(m_btnClear);
-    hlayout0->addWidget(new QLabel(m_text));
-    vlayout0->setContentsMargins(0, 0, 0, 0);
-    vlayout0->setAlignment(Qt::AlignTop);
-    vlayout0->addLayout(hlayout0);
-    vlayout0->addWidget(m_list);
-    m_list->setFixedHeight(70);
-    vlayout0->addStretch();
-  }
-  else
-  {
-    hlayout0->addWidget(m_btnSearch);
-    hlayout0->addWidget(m_edText);
-    hlayout0->addWidget(m_btnClear);
+  setLayout(hlayout0);
 
-    m_imageView->hide();
-    hlayout0->addWidget(m_imageView);
-    vlayout0->setContentsMargins(0, 0, 0, 0);
-    vlayout0->setAlignment(Qt::AlignTop);
-    vlayout0->addLayout(hlayout0);
-  }
-
-  setLayout(vlayout0);
-
-  if (m_bMultiPicker)
-    setFixedHeight(sizeHint().height());
-
-  m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, this);
-
-  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(searchItem()));
+  connect(action, SIGNAL(triggered(bool)), this, SLOT(searchItem()));
+  connect(action2, SIGNAL(triggered(bool)), this, SLOT(clear()));
+  connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
+  connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
   connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItem*>&)), this, SLOT(setItems(const QVector<JItem*>&)));
-  connect(m_btnClear, SIGNAL(clicked(bool)), this, SLOT(clear()));
-  if (!m_bMultiPicker)
-  {
-    connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
-    connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clearAll()));
-  }
+
+  if (m_bMultiPicker)
+    m_edText->setProperty(ID_PROPERTY, QList<QVariant>());
+  else
+    m_edText->setProperty(ID_PROPERTY, INVALID_ID);
 }
 
 JDatabase* JDatabasePicker::getDatabase() const
@@ -119,56 +62,61 @@ JDatabase* JDatabasePicker::getDatabase() const
 void JDatabasePicker::setItems(const QVector<JItem*>& items)
 {
   m_selector->close();
+  clear();
+  bool bChanged = false;
   for (int i = 0; i != items.size(); ++i)
   {
     if (items.at(i) == nullptr)
       continue;
-    setItem(*items.at(i));
+    if (setItem(*items.at(i)))
+      bChanged = true;
   }
+  if (bChanged)
+    emit changedSignal();
 }
 
-void JDatabasePicker::setItem(const JItem& jItem)
+bool JDatabasePicker::setItem(const JItem& jItem)
 {
   QString tableName = m_selector->getDatabase()->getTableName();
   if (tableName == IMAGE_SQL_TABLE_NAME)
   {
     const Image& o = dynamic_cast<const Image&>(jItem);
-    setItem(o.m_id, o.m_name, o.m_image);
+    return setItem(o.m_id, o.m_name, o.m_image);
   }
   else if (tableName == PERSON_SQL_TABLE_NAME)
   {
     const Person& o = dynamic_cast<const Person&>(jItem);
-    setItem(o.m_id, o.strAliasName(), o.m_image.m_image);
+    return setItem(o.m_id, o.strAliasName(), o.m_image.m_image);
   }
   else if (tableName == CATEGORY_SQL_TABLE_NAME)
   {
     const Category& o = dynamic_cast<const Category&>(jItem);
-    setItem(o.m_id, o.m_name, o.m_image.m_image);
+    return setItem(o.m_id, o.m_name, o.m_image.m_image);
   }
   else if (tableName == PRODUCT_SQL_TABLE_NAME)
   {
     const Product& o = dynamic_cast<const Product&>(jItem);
-    setItem(o.m_id, o.m_name, o.m_image.m_image);
+    return setItem(o.m_id, o.m_name, o.m_image.m_image);
   }
   else if (tableName == STORE_SQL_TABLE_NAME)
   {
     const Store& o = dynamic_cast<const Store&>(jItem);
-    setItem(o.m_id, o.m_name, o.m_person.m_image.m_image);
+    return setItem(o.m_id, o.m_name, o.m_person.m_image.m_image);
   }
+  return false;
 }
 
-void JDatabasePicker::setItem(Id id,
-                              const QString& name,
-                              const QByteArray& arImage)
+bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arImage)
 {
   if (m_bMultiPicker)
   {
+    bool bFound = false;
     if (id.isValid())
     {
-      bool bFound = false;
-      for (int i = 0; i != m_list->count(); ++i)
+      auto lst = m_edText->property(ID_PROPERTY).toList();
+      for (int i = 0; i != lst.size(); ++i)
       {
-        if (m_list->item(i)->data(Qt::UserRole).toLongLong() == id.get())
+        if (lst.at(i).toLongLong() == id.get())
         {
           bFound = true;
           break;
@@ -177,11 +125,18 @@ void JDatabasePicker::setItem(Id id,
 
       if (!bFound)
       {
-        m_list->addItem(name);
-        m_list->item(m_list->count() - 1)->setData(Qt::UserRole, id.get());
-        emit changedSignal();
+        lst.push_back(id.get());
+        m_edText->setProperty(ID_PROPERTY, lst);
+        QString str = m_edText->text();
+        if (!str.isEmpty())
+          str += "; ";
+        str += name;
+        m_edText->setText(str);
+        QString strTooltip = str.replace(';', '\n');
+        m_edText->setToolTip(strTooltip);
       }
     }
+    return !bFound;
   }
   else
   {
@@ -191,10 +146,8 @@ void JDatabasePicker::setItem(Id id,
     m_edText->setText(name);
     m_imageView->setImage(arImage);
     m_imageView->hasImage() ? m_imageView->show() : m_imageView->hide();
-    if (previousId != id)
-      emit changedSignal();
+    return previousId != id;
   }
-
 }
 
 void JDatabasePicker::searchItem()
@@ -207,12 +160,12 @@ void JDatabasePicker::clear()
 {
   if (m_bMultiPicker)
   {
-    auto pt = m_list->takeItem(m_list->currentRow());
-    if (pt != nullptr)
-    {
+    m_edText->setProperty(ID_PROPERTY, QList<QVariant>());
+    QString str = m_edText->text();
+    m_edText->clear();
+    m_edText->setToolTip("");
+    if (!str.isEmpty())
       emit changedSignal();
-      delete pt;
-    }
   }
   else
   {
@@ -226,21 +179,6 @@ void JDatabasePicker::clear()
   }
 }
 
-void JDatabasePicker::clearAll()
-{
-  if (m_bMultiPicker)
-  {
-    bool bChanged = m_list->count() != 0;
-    m_list->clear();
-    if (bChanged)
-      emit changedSignal();
-  }
-  else
-  {
-    clear();
-  }
-}
-
 Id JDatabasePicker::getId() const
 {
   return Id(m_bMultiPicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong());
@@ -250,13 +188,15 @@ QVector<Id> JDatabasePicker::getIds() const
 {
   QVector<Id> v;
   if (m_bMultiPicker)
-    for (int i = 0; i != m_list->count(); ++i)
-      v.push_back(Id(m_list->item(i)->data(Qt::UserRole).toLongLong()));
+  {
+    auto lst = m_edText->property(ID_PROPERTY).toList();
+    for (int i = 0; i != lst.size(); ++i)
+      v.push_back(Id(lst.at(i).toLongLong()));
+  }
   return v;
 }
 
 void JDatabasePicker::setPlaceholderText(bool bSet)
 {
-  if (!m_bMultiPicker)
-    m_edText->setPlaceholderText(bSet ? m_text : "");
+  m_edText->setPlaceholderText(bSet ? m_text : "");
 }

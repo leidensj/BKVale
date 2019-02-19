@@ -40,7 +40,8 @@ public:
   enum class Mode
   {
     Full,
-    Selector,
+    SingleSelector,
+    MultiSelector,
     ReadOnly
   };
 
@@ -108,6 +109,7 @@ public:
   explicit JDatabaseSelector(const QString& tableName,
                              const QString& title,
                              const QIcon& icon,
+                             bool bMultiSelector = false,
                              QWidget* parent = 0);
 
   JDatabase* getDatabase() const;

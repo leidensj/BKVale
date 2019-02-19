@@ -749,7 +749,9 @@ JDatabase::JDatabase(const QString& tableName,
 
   m_table = new JTableView();
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_table->setSelectionMode(m_mode == Mode::Full ? QAbstractItemView::ExtendedSelection : QAbstractItemView::SingleSelection);
+  m_table->setSelectionMode(m_mode == Mode::Full  ? QAbstractItemView::ExtendedSelection
+                                                  : m_mode ==Mode::MultiSelector ? QAbstractItemView::MultiSelection
+                                                                                 : QAbstractItemView::SingleSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
   m_table->setSortingEnabled(true);
   m_table->horizontalHeader()->setHighlightSections(false);
@@ -872,7 +874,7 @@ JDatabase::JDatabase(const QString& tableName,
     m_btnFilterClear->hide();
   }
 
-  if (m_mode == Mode::Selector)
+  if (m_mode == Mode::SingleSelector || m_mode == Mode::MultiSelector)
   {
     m_btnOpen->hide();
     m_btnFilter->hide();
@@ -1084,7 +1086,7 @@ void JDatabase::refresh()
 
   m_proxyModel->invalidate();
   enableControls();
-  if (m_mode == Mode::Selector || m_mode == Mode::ReadOnly)
+  if (m_mode != Mode::Full)
     m_edFilterSearch->setFocus();
 }
 
@@ -1391,11 +1393,12 @@ void JDatabase::clearFilter()
 JDatabaseSelector::JDatabaseSelector(const QString& tableName,
                                      const QString& title,
                                      const QIcon& icon,
+                                     bool bMultiSelector,
                                      QWidget* parent)
   : QDialog(parent)
   , m_database(nullptr)
 {
-  m_database = new JDatabase(tableName, JDatabase::Mode::Selector);
+  m_database = new JDatabase(tableName, bMultiSelector ? JDatabase::Mode::MultiSelector : JDatabase::Mode::SingleSelector);
   QHBoxLayout* hlayout0 = new QHBoxLayout();
   hlayout0->addWidget(m_database);
   setLayout(hlayout0);

@@ -13,7 +13,6 @@ class JLineEdit;
 class JImageView;
 class JDatabaseSelector;
 class JDatabase;
-class QListWidget;
 
 class JDatabasePicker : public QFrame
 {
@@ -36,10 +35,9 @@ public:
 
 public slots:
   void clear();
-  void clearAll();
   void setItems(const QVector<JItem*>& items);
-  void setItem(const JItem& jItem);
-  void setItem(Id id,
+  bool setItem(const JItem& jItem);
+  bool setItem(Id id,
                const QString& name,
                const QByteArray& arImage);
 
@@ -52,11 +50,8 @@ signals:
 private:
   bool m_bMultiPicker;
   JDatabaseSelector* m_selector;
-  QPushButton* m_btnSearch;
   JLineEdit* m_edText;
-  QPushButton* m_btnClear;
   JImageView* m_imageView;
-  QListWidget* m_list;
 };
 
 #endif // JDATABASEPICKER_H

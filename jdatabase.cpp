@@ -15,6 +15,7 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QCheckBox>
+#include <QLabel>
 #include <QSortFilterProxyModel>
 
 class JTableModel : public QSqlQueryModel
@@ -924,6 +925,19 @@ QVector<Id> JDatabase::getSelectedIds() const
   return ids;
 }
 
+void JDatabase::selectIds(const QVector<Id>& ids)
+{
+  for (int i = 0; i != ids.size(); ++i)
+  {
+    QModelIndexList lst = m_proxyModel->match(m_proxyModel->index(0, 0), Qt::EditRole, ids.at(i).get(), 1, Qt::MatchExactly);
+    if (lst.size() != 0)
+      m_table->selectRow(m_proxyModel->mapToSource(lst.at(0)).row());
+  }
+
+  if (ids.size() != 0)
+    m_table->setFocus();
+}
+
 void JDatabase::selectItems()
 {
   selectItems(getSelectedIds());
@@ -1399,9 +1413,12 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
   , m_database(nullptr)
 {
   m_database = new JDatabase(tableName, bMultiSelector ? JDatabase::Mode::MultiSelector : JDatabase::Mode::SingleSelector);
-  QHBoxLayout* hlayout0 = new QHBoxLayout();
-  hlayout0->addWidget(m_database);
-  setLayout(hlayout0);
+  m_database->layout()->setContentsMargins(0, 0, 0, 0);
+  QVBoxLayout* vlayout0 = new QVBoxLayout;
+  if (bMultiSelector)
+    vlayout0->addWidget(new QLabel(tr("Selecione os itens desejados e pressione Enter para confirmar.")));
+  vlayout0->addWidget(m_database);
+  setLayout(vlayout0);
 
   resize(500, 400);
   setWindowTitle(title);

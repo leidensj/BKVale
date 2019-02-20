@@ -11,8 +11,6 @@
 #include <QLabel>
 #include <QAction>
 
-#define ID_PROPERTY "id"
-
 JDatabasePicker::JDatabasePicker(const QString& tableName,
                                  const QString& text,
                                  const QIcon& icon,
@@ -47,11 +45,6 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
   connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItem*>&)), this, SLOT(setItems(const QVector<JItem*>&)));
-
-  if (m_bMultiPicker)
-    m_edText->setProperty(ID_PROPERTY, QList<QVariant>());
-  else
-    m_edText->setProperty(ID_PROPERTY, INVALID_ID);
 }
 
 JDatabase* JDatabasePicker::getDatabase() const
@@ -113,10 +106,9 @@ bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIm
     bool bFound = false;
     if (id.isValid())
     {
-      auto lst = m_edText->property(ID_PROPERTY).toList();
-      for (int i = 0; i != lst.size(); ++i)
+      for (int i = 0; i != m_ids.size(); ++i)
       {
-        if (lst.at(i).toLongLong() == id.get())
+        if (m_ids.at(i) == id)
         {
           bFound = true;
           break;
@@ -125,14 +117,15 @@ bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIm
 
       if (!bFound)
       {
-        lst.push_back(id.get());
-        m_edText->setProperty(ID_PROPERTY, lst);
-        QString str = m_edText->text();
-        if (!str.isEmpty())
-          str += "; ";
-        str += name;
+        m_ids.push_back(id);
+        m_names.push_back(name);
+        QString str, strTooltip;
+        for (int i = 0; i != m_names.size(); ++i)
+        {
+          str += m_names.at(i) + "; ";
+          strTooltip += m_names.at(i) + "\n";
+        }
         m_edText->setText(str);
-        QString strTooltip = str.replace(';', '\n');
         m_edText->setToolTip(strTooltip);
       }
     }
@@ -141,8 +134,10 @@ bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIm
   else
   {
     Id previousId;
-    previousId.set(m_edText->property(ID_PROPERTY).toLongLong());
-    m_edText->setProperty(ID_PROPERTY, id.get());
+    previousId.set(m_ids.isEmpty() ? INVALID_ID : m_ids.at(0).get());
+    m_ids.clear();
+    m_names.clear();
+    m_ids.push_back(id);
     m_edText->setText(name);
     m_imageView->setImage(arImage);
     m_imageView->hasImage() ? m_imageView->show() : m_imageView->hide();
@@ -153,47 +148,29 @@ bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIm
 void JDatabasePicker::searchItem()
 {
   m_selector->getDatabase()->refresh();
+  if (m_bMultiPicker && !m_ids.isEmpty())
+    m_selector->getDatabase()->selectIds(m_ids);
   m_selector->exec();
 }
 
 void JDatabasePicker::clear()
 {
-  if (m_bMultiPicker)
-  {
-    m_edText->setProperty(ID_PROPERTY, QList<QVariant>());
-    QString str = m_edText->text();
-    m_edText->clear();
-    m_edText->setToolTip("");
-    if (!str.isEmpty())
-      emit changedSignal();
-  }
-  else
-  {
-    m_edText->clear();
-    m_imageView->clearImage();
-    Id previousId;
-    previousId.set(m_edText->property(ID_PROPERTY).toLongLong());
-    m_edText->setProperty(ID_PROPERTY, INVALID_ID);
-    if (previousId != INVALID_ID)
-      emit changedSignal();
-  }
+  bool bChanged = !m_edText->text().isEmpty();
+  m_edText->clear();
+  m_ids.clear();
+  m_names.clear();
+  if (bChanged)
+    emit changedSignal();
 }
 
 Id JDatabasePicker::getId() const
 {
-  return Id(m_bMultiPicker ? INVALID_ID : m_edText->property(ID_PROPERTY).toLongLong());
+  return Id(m_bMultiPicker ? INVALID_ID : m_ids.isEmpty() ? INVALID_ID : m_ids.at(0));
 }
 
-QVector<Id> JDatabasePicker::getIds() const
+const QVector<Id>& JDatabasePicker::getIds() const
 {
-  QVector<Id> v;
-  if (m_bMultiPicker)
-  {
-    auto lst = m_edText->property(ID_PROPERTY).toList();
-    for (int i = 0; i != lst.size(); ++i)
-      v.push_back(Id(lst.at(i).toLongLong()));
-  }
-  return v;
+  return m_ids;
 }
 
 void JDatabasePicker::setPlaceholderText(bool bSet)

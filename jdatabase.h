@@ -52,6 +52,7 @@ public:
   QString getTableName() const;
   JItem* getCurrentItem() const;
   QVector<Id> getSelectedIds() const;
+  void selectIds(const QVector<Id>& ids);
   const QVector<JItem*> getCurrentItems() const;
 
   bool save(const JItem& jItem, Person* pEmployee = nullptr);

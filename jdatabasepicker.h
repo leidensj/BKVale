@@ -26,7 +26,7 @@ public:
                            QWidget* parent = nullptr);
 
   Id getId() const;
-  QVector<Id> getIds() const;
+  const QVector<Id>& getIds() const;
 
   const QString m_text;
 
@@ -52,6 +52,8 @@ private:
   JDatabaseSelector* m_selector;
   JLineEdit* m_edText;
   JImageView* m_imageView;
+  QVector<Id> m_ids;
+  QVector<QString> m_names;
 };
 
 #endif // JDATABASEPICKER_H

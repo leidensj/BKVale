@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QStringList>
 #include "note.h"
+#include <QDialog>
 
 #define MAX_ITEMS 100
 
@@ -17,8 +18,20 @@ class JDatabasePicker;
 class QDockWidget;
 class JDatabase;
 class QIODevice;
-class QPlainTextEdit;
 class JExpLineEdit;
+class QPlainTextEdit;
+
+class NoteDetailsDlg : public QDialog
+{
+  Q_OBJECT
+
+  QPlainTextEdit* m_teDetails;
+
+public:
+  explicit NoteDetailsDlg(QWidget* parent = nullptr);
+  void setDetails(const QString& str);
+  QString getDetails() const;
+};
 
 class NoteView : public QFrame
 {
@@ -47,8 +60,9 @@ private:
   NoteTableWidget* m_table;
   QCheckBox* m_cbCash;
   JDatabase* m_database;
-  QPlainTextEdit* m_teObservation;
   JExpLineEdit* m_edDisccount;
+  QPushButton* m_btnDetails;
+  NoteDetailsDlg* m_dlgDetails;
 
 private slots:
   void setToday();
@@ -59,6 +73,7 @@ private slots:
   void itemSelected(const JItem& jItem);
   void itemsRemoved(const QVector<Id>& ids);
   void addProduct();
+  void openDetailsDialog();
 
 public slots:
   void create();

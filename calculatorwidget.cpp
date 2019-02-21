@@ -420,12 +420,11 @@ void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
   }
   else if (Calculator::isDecimal(button))
   {
-    if (Calculator::isEqual(m_lastButton))
+    if (Calculator::isEqual(m_lastButton) ||
+        Calculator::isOP(m_lastButton))
       m_edDisplay->setText("");
     QString strValue = m_edDisplay->text();
     Calculator::removeDecimal(strValue);
-    if (strValue.isEmpty())
-        strValue.append("0");
     strValue.append(Calculator::toStr(button));
     m_edDisplay->setText(strValue);
   }

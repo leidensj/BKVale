@@ -931,7 +931,7 @@ void JDatabase::selectIds(const QVector<Id>& ids)
   {
     QModelIndexList lst = m_proxyModel->match(m_proxyModel->index(0, 0), Qt::EditRole, ids.at(i).get(), 1, Qt::MatchExactly);
     if (lst.size() != 0)
-      m_table->selectRow(m_proxyModel->mapToSource(lst.at(0)).row());
+      m_table->selectRow(lst.at(0).row());
   }
 
   if (ids.size() != 0)

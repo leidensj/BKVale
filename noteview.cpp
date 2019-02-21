@@ -20,6 +20,37 @@
 #include <QSplitter>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QDialogButtonBox>
+
+NoteDetailsDlg::NoteDetailsDlg(QWidget* parent)
+  : QDialog(parent)
+  , m_teDetails(nullptr)
+{
+  m_teDetails = new QPlainTextEdit;
+  QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
+
+  QVBoxLayout* lt = new QVBoxLayout;
+  lt->addWidget(m_teDetails);
+  lt->addWidget(btn);
+
+  setWindowTitle(tr("Observações"));
+  setWindowIcon(QIcon(":/icons/res/details.png"));
+
+  setLayout(lt);
+  m_teDetails->setFocus();
+}
+
+void NoteDetailsDlg::setDetails(const QString& str)
+{
+  m_teDetails->setPlainText(str);
+}
+
+QString NoteDetailsDlg::getDetails() const
+{
+  return m_teDetails->toPlainText();
+}
 
 #define DISCCOUNT_LAST_VALUE_PROP "lastValue"
 
@@ -38,8 +69,9 @@ NoteView::NoteView(QWidget *parent)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
   , m_cbCash(nullptr)
-  , m_teObservation(nullptr)
   , m_edDisccount(nullptr)
+  , m_btnDetails(nullptr)
+  , m_dlgDetails(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -142,14 +174,14 @@ NoteView::NoteView(QWidget *parent)
   m_dtDate->setDisplayFormat("dd/MM/yyyy");
   m_dtDate->setDate(QDate::currentDate());
 
-  m_btnToday = new QPushButton();
+  m_btnToday = new QPushButton;
   m_btnToday->setFlat(true);
   m_btnToday->setText("");
   m_btnToday->setIconSize(QSize(24, 24));
   m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
   m_btnToday->setToolTip(tr("Usar a data de hoje"));
 
-  m_cbCash = new QCheckBox();
+  m_cbCash = new QCheckBox;
   m_cbCash->setText(tr("À vista"));
   m_cbCash->setIconSize(QSize(24,24));
   m_cbCash->setIcon(QIcon(":/icons/res/cash.png"));
@@ -157,11 +189,23 @@ NoteView::NoteView(QWidget *parent)
                           "com espaço para assinatura "
                           "do fornecedor"));
 
+  m_dlgDetails = new NoteDetailsDlg(this);
+
+  m_btnDetails = new QPushButton;
+  m_btnDetails->setFlat(true);
+  m_btnDetails->setText("");
+  m_btnDetails->setIconSize(QSize(24, 24));
+  m_btnDetails->setIcon(QIcon(":/icons/res/details.png"));
+  m_btnDetails->setToolTip(tr("Observações"));
+
   QFrame* line1 = new QFrame;
   line1->setFrameShape(QFrame::VLine);
 
   QFrame* line2 = new QFrame;
   line2->setFrameShape(QFrame::VLine);
+
+  QFrame* line3 = new QFrame;
+  line3->setFrameShape(QFrame::VLine);
 
   QHBoxLayout* hlayout2 = new QHBoxLayout();
   hlayout2->setContentsMargins(0, 0, 0, 0);
@@ -174,6 +218,8 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(m_btnToday);
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
+  hlayout2->addWidget(line3);
+  hlayout2->addWidget(m_btnDetails);
 
   m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
                                          tr("Fornecedor"),
@@ -217,14 +263,9 @@ NoteView::NoteView(QWidget *parent)
   totalLayout->addStretch();
   totalLayout->addWidget(m_edTotal);
 
-  m_teObservation = new QPlainTextEdit;
-  m_teObservation->setPlaceholderText(tr("Observações (opcional):"));
-  m_teObservation->setMaximumHeight(frame->sizeHint().height());
-
   QHBoxLayout* headerlayout = new QHBoxLayout;
   headerlayout->setContentsMargins(0, 0, 0, 0);
   headerlayout->addWidget(frame);
-  headerlayout->addWidget(m_teObservation);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
   viewLayout->setContentsMargins(9, 0, 0, 0);
@@ -262,6 +303,7 @@ NoteView::NoteView(QWidget *parent)
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
+  connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
 
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(checkDate()));
@@ -295,7 +337,7 @@ Note NoteView::getNote() const
   note.m_date = m_dtDate->date();
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_bCash = m_cbCash->isChecked();
-  note.m_observation = m_teObservation->toPlainText();
+  note.m_observation = m_dlgDetails->getDetails();
   note.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
     note.m_vNoteItem.push_back(dynamic_cast<const NoteItem&>(m_table->getItem(i)));
@@ -313,7 +355,7 @@ void NoteView::setNote(const Note& note)
   for (int i = 0; i != note.m_vNoteItem.size(); ++i)
     m_table->addItem(note.m_vNoteItem.at(i));
   m_supplierPicker->setItem(note.m_supplier);
-  m_teObservation->setPlainText(note.m_observation);
+  m_dlgDetails->setDetails(note.m_observation);
   m_edDisccount->setText(note.m_disccount);
   updateControls();
 }
@@ -426,4 +468,11 @@ void NoteView::itemsRemoved(const QVector<Id>& ids)
     m_lastId.clear();
   if (ids.contains(m_currentId))
     create();
+}
+
+void NoteView::openDetailsDialog()
+{
+  QString str = m_dlgDetails->getDetails();
+  if (!m_dlgDetails->exec())
+    m_dlgDetails->setDetails(str);
 }

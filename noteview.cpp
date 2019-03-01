@@ -7,15 +7,13 @@
 #include "jlineedit.h"
 #include "jdateedit.h"
 #include "packageeditor.h"
+#include "jdatepicker.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
 #include <QKeyEvent>
 #include <QLayout>
 #include <QSpinBox>
-#include <QCalendarWidget>
-#include <QTextCharFormat>
-#include <QTimer>
 #include <QCheckBox>
 #include <QSplitter>
 #include <QMessageBox>
@@ -63,8 +61,7 @@ NoteView::NoteView(QWidget *parent)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
   , m_snNumber(nullptr)
-  , m_dtDate(nullptr)
-  , m_btnToday(nullptr)
+  , m_dtPicker(nullptr)
   , m_edTotal(nullptr)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
@@ -161,6 +158,8 @@ NoteView::NoteView(QWidget *parent)
     m_snNumber->setPalette(palette);
   }
 
+  m_dtPicker = new JDatePicker;
+
   QLabel* lblDate = new QLabel();
   lblDate->setText(tr("Data:"));
   {
@@ -168,18 +167,6 @@ NoteView::NoteView(QWidget *parent)
     font.setPointSize(12);
     lblDate->setFont(font);
   }
-
-  m_dtDate = new JDateEdit;
-  m_dtDate->setCalendarPopup(true);
-  m_dtDate->setDisplayFormat("dd/MM/yyyy");
-  m_dtDate->setDate(QDate::currentDate());
-
-  m_btnToday = new QPushButton;
-  m_btnToday->setFlat(true);
-  m_btnToday->setText("");
-  m_btnToday->setIconSize(QSize(24, 24));
-  m_btnToday->setIcon(QIcon(":/icons/res/calendarok.png"));
-  m_btnToday->setToolTip(tr("Usar a data de hoje"));
 
   m_cbCash = new QCheckBox;
   m_cbCash->setText(tr("À vista"));
@@ -214,8 +201,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(m_snNumber);
   hlayout2->addWidget(line1);
   hlayout2->addWidget(lblDate);
-  hlayout2->addWidget(m_dtDate);
-  hlayout2->addWidget(m_btnToday);
+  hlayout2->addWidget(m_dtPicker);
   hlayout2->addWidget(line2);
   hlayout2->addWidget(m_cbCash);
   hlayout2->addWidget(line3);
@@ -297,20 +283,14 @@ NoteView::NoteView(QWidget *parent)
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_table, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
-  connect(m_dtDate, SIGNAL(dateChanged(const QDate&)), this, SLOT(updateControls()));
-  connect(m_btnToday, SIGNAL(clicked(bool)), this, SLOT(setToday()));
+  connect(m_dtPicker, SIGNAL(dateChangedSignal()), this, SLOT(updateControls()));
   connect(m_cbCash, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
 
-  QTimer *timer = new QTimer(this);
-  connect(timer, SIGNAL(timeout()), this, SLOT(checkDate()));
-  timer->start(60000);
-
   create();
-  checkDate();
   m_database->hide();
   updateControls();
 
@@ -334,7 +314,7 @@ Note NoteView::getNote() const
 {
   Note note;
   note.m_id = m_currentId;
-  note.m_date = m_dtDate->date();
+  note.m_date = m_dtPicker->getDate();
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_bCash = m_cbCash->isChecked();
   note.m_observation = m_dlgDetails->getDetails();
@@ -349,7 +329,7 @@ void NoteView::setNote(const Note& note)
   m_currentId = note.m_id;
   m_table->removeAllItems();
   m_supplierPicker->clear();
-  m_dtDate->setDate(note.m_date);
+  m_dtPicker->setDate(note.m_date);
   m_snNumber->setValue(note.m_number);
   m_cbCash->setChecked(note.m_bCash);
   for (int i = 0; i != note.m_vNoteItem.size(); ++i)
@@ -386,9 +366,6 @@ void NoteView::updateControls()
 {
   m_btnRemove->setEnabled(m_table->currentRow() >= 0);
   m_btnOpenLast->setEnabled(m_lastId.isValid());
-  m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
-                            ? ":/icons/res/calendarok.png"
-                            : ":/icons/res/calendarwarning.png"));
 
   double total = m_table->computeTotal() + m_edDisccount->getValue();
 
@@ -402,28 +379,6 @@ void NoteView::updateControls()
   m_edTotal->setPalette(_palette);
 
   emit changedSignal();
-}
-
-void NoteView::checkDate()
-{
-  QTextCharFormat fmt;
-  m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate().addDays(-1), fmt);
-  fmt.setForeground(Qt::darkGreen);
-  fmt.setFontWeight(QFont::ExtraBold);
-  fmt.setFontUnderline(true);
-  fmt.setFontOverline(true);
-  m_dtDate->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
-
-  bool bIsEditMode = m_currentId.isValid();
-  bool bIsDirty = m_supplierPicker->getId().isValid() || m_table->hasItems();
-  if (!bIsEditMode && !bIsDirty)
-    setToday();
-}
-
-void NoteView::setToday()
-{
-  m_dtDate->setDate(QDate::currentDate());
-  updateControls();
 }
 
 void NoteView::addProduct()

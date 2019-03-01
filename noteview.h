@@ -20,6 +20,7 @@ class JDatabase;
 class QIODevice;
 class JExpLineEdit;
 class QPlainTextEdit;
+class JDatePicker;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -53,8 +54,7 @@ private:
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;
-  JDateEdit* m_dtDate;
-  QPushButton* m_btnToday;
+  JDatePicker* m_dtPicker;
   QLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
@@ -65,8 +65,6 @@ private:
   NoteDetailsDlg* m_dlgDetails;
 
 private slots:
-  void setToday();
-  void checkDate();
   void removeItem();
   void supplierChanged();
   void lastItemSelected();

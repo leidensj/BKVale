@@ -71,7 +71,8 @@ SOURCES += main.cpp\
     reminder.cpp \
     reservation.cpp \
     shoppinglist.cpp \
-    store.cpp
+    store.cpp \
+    jdatepicker.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -136,7 +137,8 @@ HEADERS  += mainwindow.h \
     timeinterval.h \
     addresstablewidget.h \
     productcodetablewidget.h \
-    jdateedit.h
+    jdateedit.h \
+    jdatepicker.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

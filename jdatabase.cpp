@@ -68,6 +68,7 @@ public:
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
                      PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL03 ","
+                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL02 ","
                      "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06 ")"
                      " FROM " NOTE_SQL_TABLE_NAME
                      " LEFT OUTER JOIN "
@@ -89,16 +90,18 @@ public:
     setHeaderData(1, Qt::Horizontal, tr("Número"));
     setHeaderData(2, Qt::Horizontal, tr("Data"));
     setHeaderData(3, Qt::Horizontal, tr("Fornecedor"));
-    setHeaderData(4, Qt::Horizontal, tr("Total"));
+    setHeaderData(4, Qt::Horizontal, tr("Fornecedor"));
+    setHeaderData(5, Qt::Horizontal, tr("Total"));
     if (header != nullptr)
     {
-      if (header->count() == 5)
+      if (header->count() == 6)
       {
         header->hideSection(0);
+        header->hideSection(4);
         header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
         header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
         header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
-        header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
+        header->setSectionResizeMode(5, QHeaderView::ResizeMode::ResizeToContents);
       }
     }
   }
@@ -110,7 +113,12 @@ public:
     {
       if (idx.column() == 2)
         value = QDate::fromString(value.toString(), Qt::ISODate).toString("yyyy/MM/dd");
-      else if (idx.column() == 4)
+      else if (idx.column() == 3)
+      {
+        if (value.toString().isEmpty())
+          value = QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 1), role);
+      }
+      else if (idx.column() == 5)
         value = "R$ " + QString::number(value.toDouble(), 'f', 2);
     }
     return value;
@@ -796,6 +804,7 @@ JDatabase::JDatabase(const QString& tableName,
 
   m_proxyModel = new QSortFilterProxyModel(this);
   m_proxyModel->setSourceModel(model);
+  m_proxyModel->setSortRole(Qt::EditRole);
 
   m_tableName = tableName;
   m_table->setModel(m_proxyModel);

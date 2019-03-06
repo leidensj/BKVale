@@ -251,8 +251,17 @@ void BaitaAssistant::print()
   {
     case Functionality::Note:
     {
+      Note note = m_note->getNote();
+      if (note.m_date != QDate::currentDate())
+      {
+        if (QMessageBox::information(this,
+                                     tr("Informação"),
+                                     tr("A data informada é diferente da data de hoje.\nContinuar mesmo assim?"),
+                                     QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
+          return;
+      }
       Person person;
-      Note note = m_note->save(person);
+      note = m_note->save(person);
       if (note.m_id.isValid())
         print(NotePrinter::build(note, person.strAliasName()));
     } break;

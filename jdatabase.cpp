@@ -1111,6 +1111,8 @@ void JDatabase::refresh()
   enableControls();
   if (m_mode != Mode::Full)
     m_edFilterSearch->setFocus();
+
+  emit refreshSignal();
 }
 
 void JDatabase::enableControls()
@@ -1411,6 +1413,19 @@ void JDatabase::clearFilter()
     m_filter = "";
     refresh();
   }
+}
+
+int JDatabase::getNumberOfEntries() const
+{
+  return m_proxyModel->rowCount();
+}
+
+double JDatabase::getSum(int column) const
+{
+  double sum = 0.0;
+  for (int row = 0; row != m_proxyModel->rowCount(); ++row)
+    sum += m_proxyModel->data(m_proxyModel->index(row, column), Qt::EditRole).toDouble();
+  return sum;
 }
 
 JDatabaseSelector::JDatabaseSelector(const QString& tableName,

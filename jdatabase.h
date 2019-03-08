@@ -54,6 +54,8 @@ public:
   QVector<Id> getSelectedIds() const;
   void selectIds(const QVector<Id>& ids);
   const QVector<JItem*> getCurrentItems() const;
+  int getNumberOfEntries() const;
+  double getSum(int column) const;
 
   bool save(const JItem& jItem, Person* pEmployee = nullptr);
 
@@ -100,6 +102,7 @@ signals:
   void itemsSelectedSignal(const QVector<JItem*>& items);
   void itemsRemovedSignal(const QVector<Id>& ids);
   void currentRowChangedSignal(int row);
+  void refreshSignal();
 };
 
 class JDatabaseSelector : public QDialog

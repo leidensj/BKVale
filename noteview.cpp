@@ -69,6 +69,8 @@ NoteView::NoteView(QWidget *parent)
   , m_edDisccount(nullptr)
   , m_btnDetails(nullptr)
   , m_dlgDetails(nullptr)
+  , m_lblEntries(nullptr)
+  , m_lblSum(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -242,6 +244,19 @@ NoteView::NoteView(QWidget *parent)
   m_edDisccount->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
   m_edDisccount->setAlignment(Qt::AlignRight);
 
+  m_lblEntries = new QLabel;
+  {
+    QFont f = m_lblEntries->font();
+    f.setPointSize(8);
+    m_lblEntries->setFont(f);
+  }
+  m_lblSum = new QLabel;
+  {
+    QFont f = m_lblSum->font();
+    f.setPointSize(8);
+    m_lblSum->setFont(f);
+  }
+
   QHBoxLayout* totalLayout = new QHBoxLayout;
   totalLayout->setContentsMargins(0, 0, 0, 0);
   totalLayout->addWidget(new QLabel(tr("Descontos/Acréscimos:")));
@@ -266,9 +281,17 @@ NoteView::NoteView(QWidget *parent)
   m_database = new JDatabase(NOTE_SQL_TABLE_NAME);
   m_database->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
+  QVBoxLayout* databaseLayout = new QVBoxLayout;
+  databaseLayout->addWidget(m_database);
+  databaseLayout->addWidget(m_lblEntries);
+  databaseLayout->addWidget(m_lblSum);
+
+  QFrame* databaseFrame = new QFrame;
+  databaseFrame->setLayout(databaseLayout);
+
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(viewFrame);
-  splitter->addWidget(m_database);
+  splitter->addWidget(databaseFrame);
 
   QVBoxLayout* mainLayout = new QVBoxLayout();
   mainLayout->addWidget(splitter);
@@ -276,7 +299,8 @@ NoteView::NoteView(QWidget *parent)
 
   connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(itemSelected(const JItem&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
-  connect(m_btnSearch, SIGNAL(clicked(bool)), m_database, SLOT(setVisible(bool)));
+  connect(m_database, SIGNAL(refreshSignal()), this, SLOT(updateControls()));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), databaseFrame, SLOT(setVisible(bool)));
   connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
@@ -291,7 +315,7 @@ NoteView::NoteView(QWidget *parent)
   connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
 
   create();
-  m_database->hide();
+  databaseFrame->hide();
   updateControls();
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
@@ -377,6 +401,9 @@ void NoteView::updateControls()
   QPalette _palette = m_edTotal->palette();
   _palette.setColor(QPalette::ColorRole::Text, total >= 0 ? Qt::red : Qt::darkGreen);
   m_edTotal->setPalette(_palette);
+
+  m_lblEntries->setText(tr("Número de entradas: %1").arg(JItem::st_strInt(m_database->getNumberOfEntries())));
+  m_lblSum->setText(tr("Total: %1").arg(JItem::st_strMoney(m_database->getSum(5))));
 
   emit changedSignal();
 }

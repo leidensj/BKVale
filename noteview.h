@@ -21,6 +21,7 @@ class QIODevice;
 class JExpLineEdit;
 class QPlainTextEdit;
 class JDatePicker;
+class QLabel;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -63,6 +64,8 @@ private:
   JExpLineEdit* m_edDisccount;
   QPushButton* m_btnDetails;
   NoteDetailsDlg* m_dlgDetails;
+  QLabel* m_lblEntries;
+  QLabel* m_lblSum;
 
 private slots:
   void removeItem();

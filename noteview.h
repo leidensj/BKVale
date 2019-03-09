@@ -19,7 +19,7 @@ class QDockWidget;
 class JDatabase;
 class QIODevice;
 class JExpLineEdit;
-class QPlainTextEdit;
+class JPlainTextEdit;
 class JDatePicker;
 class QLabel;
 
@@ -27,7 +27,7 @@ class NoteDetailsDlg : public QDialog
 {
   Q_OBJECT
 
-  QPlainTextEdit* m_teDetails;
+  JPlainTextEdit* m_teDetails;
 
 public:
   explicit NoteDetailsDlg(QWidget* parent = nullptr);
@@ -56,7 +56,7 @@ private:
   QPushButton* m_btnRemove;
   QSpinBox* m_snNumber;
   JDatePicker* m_dtPicker;
-  QLineEdit* m_edTotal;
+  JExpLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
   QCheckBox* m_cbCash;

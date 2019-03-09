@@ -17,15 +17,17 @@
 #include <QCheckBox>
 #include <QSplitter>
 #include <QMessageBox>
-#include <QPlainTextEdit>
+#include "jplaintextedit.h"
 #include <QDialogButtonBox>
 
 NoteDetailsDlg::NoteDetailsDlg(QWidget* parent)
   : QDialog(parent)
   , m_teDetails(nullptr)
 {
-  m_teDetails = new QPlainTextEdit;
+  m_teDetails = new JPlainTextEdit;
+  m_teDetails->setPlaceholderText(tr("Shift+Enter para inserir uma quebra de linha"));
   QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(m_teDetails, SIGNAL(enterSignal()), this, SLOT(accept()));
   connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
   connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
 
@@ -226,7 +228,7 @@ NoteView::NoteView(QWidget *parent)
 
   m_table = new NoteTableWidget;
 
-  m_edTotal = new QLineEdit();
+  m_edTotal = new JExpLineEdit(JItem::DataType::Money);
   m_edTotal->setReadOnly(true);
   m_edTotal->setPlaceholderText(tr("TOTAL"));
   m_edTotal->setAlignment(Qt::AlignRight);
@@ -235,14 +237,12 @@ NoteView::NoteView(QWidget *parent)
     QFont font = m_edTotal->font();
     font.setBold(true);
     m_edTotal->setFont(font);
-    QPalette palette = m_edTotal->palette();
-    palette.setColor(QPalette::ColorRole::Text, Qt::red);
-    m_edTotal->setPalette(palette);
   }
 
   m_edDisccount = new JExpLineEdit(JItem::DataType::Money);
   m_edDisccount->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
   m_edDisccount->setAlignment(Qt::AlignRight);
+  m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
   m_lblEntries = new QLabel;
   {
@@ -259,7 +259,6 @@ NoteView::NoteView(QWidget *parent)
 
   QHBoxLayout* totalLayout = new QHBoxLayout;
   totalLayout->setContentsMargins(0, 0, 0, 0);
-  totalLayout->addWidget(new QLabel(tr("Descontos/Acréscimos:")));
   totalLayout->addWidget(m_edDisccount);
   totalLayout->addStretch();
   totalLayout->addWidget(m_edTotal);
@@ -393,14 +392,7 @@ void NoteView::updateControls()
 
   double total = m_table->computeTotal() + m_edDisccount->getValue();
 
-  if (m_table->hasItems() || total != 0)
-    m_edTotal->setText(JItem::st_strMoney(total));
-  else
-    m_edTotal->clear();
-
-  QPalette _palette = m_edTotal->palette();
-  _palette.setColor(QPalette::ColorRole::Text, total >= 0 ? Qt::red : Qt::darkGreen);
-  m_edTotal->setPalette(_palette);
+  m_edTotal->setText(total);
 
   m_lblEntries->setText(tr("Número de entradas: %1").arg(JItem::st_strInt(m_database->getNumberOfEntries())));
   m_lblSum->setText(tr("Total: %1").arg(JItem::st_strMoney(m_database->getSum(5))));

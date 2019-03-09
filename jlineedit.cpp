@@ -116,10 +116,10 @@ void JExpLineEdit::evaluate()
     setTextBlockingSignals(JItem::st_str(val, m_dataType));
   }
   else
-  {
     m_currentValue = m_defaultValue;
-    setTextBlockingSignals(JItem::st_str(m_defaultValue, m_dataType));
-  }
+
+  if (m_currentValue == m_defaultValue)
+    setTextBlockingSignals("");
 
   QPalette _palette = palette();
   _palette.setColor(QPalette::ColorRole::Text, m_currentValue >= 0 ? Qt::red : Qt::darkGreen);

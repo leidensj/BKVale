@@ -72,7 +72,8 @@ SOURCES += main.cpp\
     reservation.cpp \
     shoppinglist.cpp \
     store.cpp \
-    jdatepicker.cpp
+    jdatepicker.cpp \
+    jplaintextedit.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -138,7 +139,8 @@ HEADERS  += mainwindow.h \
     addresstablewidget.h \
     productcodetablewidget.h \
     jdateedit.h \
-    jdatepicker.h
+    jdatepicker.h \
+    jplaintextedit.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

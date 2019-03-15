@@ -264,6 +264,7 @@ void BaitaAssistant::print()
         {
           case QMessageBox::Apply:
             note.m_date = QDate::currentDate();
+            m_note->setNote(note);
             break;
           case QMessageBox::Ignore:
             break;

@@ -240,7 +240,6 @@ NoteView::NoteView(QWidget *parent)
   }
 
   m_edDisccount = new JExpLineEdit(JItem::DataType::Money);
-  m_edDisccount->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 

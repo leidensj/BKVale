@@ -4,6 +4,8 @@
 #include "defines.h"
 #include <QRegExp>
 #include <QVariant>
+#include <QSqlQuery>
+#include <QSqlDatabase>
 
 class Id
 {
@@ -38,7 +40,6 @@ struct JItem
   virtual ~JItem() { }
   virtual bool isValid() const = 0;
   virtual void clear() = 0;
-  virtual QString strTableName() const = 0;
   virtual bool operator ==(const JItem& other) const = 0;
   virtual bool operator !=(const JItem& other) const = 0;
 
@@ -68,59 +69,56 @@ struct JItem
   }
 };
 
-/*QString getItemName(const QString& tableName)
-{
-  if (tableName == ADDRESS_SQL_TABLE_NAME)
-    return "Endereço";
-  else if (tableName == CATEGORY_SQL_TABLE_NAME)
-    return "Categoria";
-  else if (tableName == IMAGE_SQL_TABLE_NAME)
-    return "Imagem";
-  else if (tableName == NOTE_SQL_TABLE_NAME)
-    return "Vale";
-  else if (tableName == NOTE_ITEMS_SQL_TABLE_NAME)
-    return "Item de Vale";
-  else if (tableName == EMPLOYEE_SQL_TABLE_NAME)
-    return "Funcionário";
-  else if (tableName == SUPPLIER_SQL_TABLE_NAME)
-    return "Fornecedor";
-  else if (tableName == PERSON_SQL_TABLE_NAME)
-    return "Pessoa";
-  else if (tableName == PHONE_SQL_TABLE_NAME)
-    return "Telefone";
-  else if (tableName == PRODUCT_SQL_TABLE_NAME)
-    return "Produto";
-  else if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
-    return "Código";
-  else if (tableName == USER_SQL_TABLE_NAME)
-    return "Usuário";
-  else if (tableName == REMINDER_SQL_TABLE_NAME)
-    return "Lembrete";
-  else if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-    return "Lista de Compras";
-  else if (tableName == SHOPPING_LIST_ITEMS_SQL_TABLE_NAME)
-    return "Item de Lista de Compras";
-  else if (tableName == RESERVATION_SQL_TABLE_NAME)
-    return "Reserva";
-  else if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
-    return "Usuário Ativo";
-  else if (tableName == DISCOUNT_SQL_TABLE_NAME)
-    return "Desconto";
-  else if (tableName == DISCOUNT_ITEMS_SQL_TABLE_NAME)
-    return "Item de Desconto";
-  else if (tableName == STORE_SQL_TABLE_NAME)
-    return "Loja";
-  else if (tableName == STORE_EMPLOYEES_SQL_TABLE_NAME)
-    return "Funcionário da Loja";
-  else if (tableName == STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME)
-    return "Horário de Funcionário da Loja";
-  else
-    return "";
-}
 
-QString getItemIconPath(const QString& tableName)
+struct SQL_JItem : public JItem
 {
-  return "";
-}*/
+  virtual ~SQL_JItem() { }
+
+  virtual QString SQL_tableName() const = 0;
+  virtual bool SQL_insert(QString& error) = 0;
+  virtual bool SQL_update(QString& error) = 0;
+  virtual bool SQL_select(QString& error) = 0;
+  virtual bool SQL_remove(QString& error) = 0;
+
+  virtual bool SQL_insert_proc(QSqlQuery& query) = 0;
+  virtual bool SQL_update_proc(QSqlQuery& query) = 0;
+  virtual bool SQL_select_proc(QSqlQuery& query, QString& error) = 0;
+  virtual bool SQL_remove_proc(QSqlQuery& query) = 0;
+
+  static bool SQL_isOpen(QString& error)
+  {
+    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+    error.clear();
+    if (!db.isOpen())
+       error = "Banco de dados não foi aberto.";
+    return db.isOpen();
+  }
+
+  static bool SQL_finish(QSqlDatabase db, const QSqlQuery& query, bool bExecSelectResult, QString& error)
+  {
+    if (!bExecSelectResult)
+    {
+      if (error.isEmpty())
+      {
+        error = query.lastError().text();
+        if (error.isEmpty())
+          error = db.lastError().text();
+      }
+      db.rollback();
+      return false;
+    }
+    else
+      bExecSelectResult = db.commit();
+
+    if (!bExecSelectResult && error.isEmpty())
+    {
+      error = query.lastError().text();
+      if (error.isEmpty())
+        error = db.lastError().text();
+    }
+
+    return bExecSelectResult;
+  }
+};
 
 #endif // JITEM_H

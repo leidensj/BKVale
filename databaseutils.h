@@ -84,47 +84,6 @@ namespace UserSQL
               QString& error);
 }
 
-namespace NoteSQL
-{
-  bool insert(const Note& note,
-              QString& error);
-
-  bool update(const Note& note,
-              QString& error);
-
-  bool select(Note& note,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-
-  NoteItem selectLastItem(Id supplierId,
-                          Id productId);
-}
-
-namespace ProductSQL
-{
-bool execSelect(QSqlQuery& query,
-                Product& product,
-                QString& error);
-
-bool select(Product& product,
-            QString& error);
-
-bool selectByCode(Product& product,
-                  const ProductCode& code,
-                  QString& error);
-
-bool insert(const Product& product,
-            QString& error);
-
-bool update(const Product& product,
-            QString& error);
-
-bool remove(Id id,
-            QString& error);
-}
-
 namespace CategorySQL
 {
  bool execSelect(QSqlQuery& query,
@@ -180,34 +139,6 @@ namespace ReminderSQL
 
   bool remove(Id id,
               QString& error);
-}
-
-namespace PersonSQL
-{
-  bool execSelect(QSqlQuery& query,
-                  Person& person,
-                  QString& error);
-
-  bool execByPinCodeSelect(QSqlQuery& query,
-                           const QString& pincode,
-                           Person& person,
-                           QString& error);
-
-  bool select(Person& person,
-              QString& error);
-
-  bool insert(const Person& person,
-              QString& error);
-
-  bool update(const Person& person,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-
-  bool isValidPinCode(const QString& pincode,
-                      Person& person,
-                      QString& error);
 }
 
 namespace ShoppingListSQL

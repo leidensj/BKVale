@@ -34,14 +34,26 @@ struct ProductCode : public JItem
   QString m_code;
 };
 
-struct Product : public JItem
+struct Product : public SQL_JItem
 {
   Product();
   void clear();
   bool operator != (const JItem& other) const;
   bool operator == (const JItem& other) const;
   bool isValid() const;
-  QString strTableName() const;
+
+  QString SQL_tableName() const;
+  bool SQL_insert(QString& error);
+  bool SQL_update(QString& error);
+  bool SQL_select(QString& error);
+  bool SQL_remove(QString& error);
+
+  bool SQL_insert_proc(QSqlQuery& query);
+  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query);
+
+  bool SQL_select_by_code(const ProductCode& code, QString& error);
 
   Category m_category;
   Image m_image;

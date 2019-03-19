@@ -6,7 +6,7 @@
 #include "defines.h"
 #include "jitem.h"
 
-struct Phone : public JItem
+struct Phone : public SQL_JItem
 {
   Phone();
   void clear();

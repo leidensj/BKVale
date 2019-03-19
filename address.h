@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QString>
 
-struct Address : public JItem
+struct Address : public SQL_JItem
 {
   enum class EBRState : int
   {

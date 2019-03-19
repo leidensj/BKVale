@@ -8,7 +8,7 @@
 #include "defines.h"
 #include "jitem.h"
 
-struct Image : public JItem
+struct Image : public SQL_JItem
 {
   Image();
   void clear();

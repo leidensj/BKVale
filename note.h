@@ -39,14 +39,26 @@ struct NoteItem : JItem
   Package m_package;
 };
 
-struct Note : public JItem
+struct Note : public SQL_JItem
 {
   Note();
   void clear();
   bool isValid() const;
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
-  QString strTableName() const;
+
+  QString SQL_tableName() const;
+  bool SQL_insert(QString& error);
+  bool SQL_update(QString& error);
+  bool SQL_select(QString& error);
+  bool SQL_remove(QString& error);
+
+  bool SQL_insert_proc(QSqlQuery& query);
+  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query);
+
+  static NoteItem SQL_select_last_item(Id supplierId, Id productId);
 
   QString strDate() const;
   QString strDayOfWeek() const;

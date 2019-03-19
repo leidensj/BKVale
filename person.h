@@ -32,15 +32,28 @@ struct Supplier
   bool m_bIsSupplier;
 };
 
-struct Person : public JItem
+struct Person : public SQL_JItem
 {
   Person();
   void clear();
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
-  QString strTableName() const;
   QString strAliasName() const;
+
+  QString SQL_tableName() const;
+  bool SQL_insert(QString& error);
+  bool SQL_update(QString& error);
+  bool SQL_select(QString& error);
+  bool SQL_remove(QString& error);
+
+  bool SQL_insert_proc(QSqlQuery& query);
+  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query);
+
+  bool SQL_select_by_pincode(const QString& pincode, QString& error);
+  bool SQL_select_by_pincode_proc(QSqlQuery& query, const QString& pincode, QString& error);
 
   Image m_image;
   QString m_name;

@@ -75,15 +75,70 @@ struct SQL_JItem : public JItem
   virtual ~SQL_JItem() { }
 
   virtual QString SQL_tableName() const = 0;
-  virtual bool SQL_insert(QString& error) = 0;
-  virtual bool SQL_update(QString& error) = 0;
-  virtual bool SQL_select(QString& error) = 0;
-  virtual bool SQL_remove(QString& error) = 0;
-
   virtual bool SQL_insert_proc(QSqlQuery& query) = 0;
   virtual bool SQL_update_proc(QSqlQuery& query) = 0;
   virtual bool SQL_select_proc(QSqlQuery& query, QString& error) = 0;
   virtual bool SQL_remove_proc(QSqlQuery& query) = 0;
+
+  virtual bool SQL_insert(QString& error)
+  {
+    error.clear();
+
+    if (!SQL_isOpen(error))
+      return false;
+
+    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+    db.transaction();
+    QSqlQuery query(db);
+
+    bool bSuccess = SQL_insert_proc(query);
+    return SQL_finish(db, query, bSuccess, error);
+  }
+
+  virtual bool SQL_update(QString& error)
+  {
+    error.clear();
+
+    if (!SQL_isOpen(error))
+      return false;
+
+    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+    db.transaction();
+    QSqlQuery query(db);
+
+    bool bSuccess = SQL_update_proc(query);
+    return SQL_finish(db, query, bSuccess, error);
+  }
+
+  virtual bool SQL_select(QString& error)
+  {
+    error.clear();
+
+    if (!SQL_isOpen(error))
+      return false;
+
+    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+    db.transaction();
+    QSqlQuery query(db);
+
+    bool bSuccess = SQL_select_proc(query, error);
+    return SQL_finish(db, query, bSuccess, error);
+  }
+
+  virtual bool SQL_remove(QString& error)
+  {
+    error.clear();
+
+    if (!SQL_isOpen(error))
+      return false;
+
+    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+    db.transaction();
+    QSqlQuery query(db);
+
+    bool bSuccess = SQL_remove_proc(query);
+    return SQL_finish(db, query, bSuccess, error);
+  }
 
   static bool SQL_isOpen(QString& error)
   {

@@ -99,65 +99,6 @@ QString SQL_tableName() const
   return PERSON_SQL_TABLE_NAME;
 }
 
-bool Person::SQL_insert(QString& error)
-{
-  error.clear();
-
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_insert_proc(query);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
-bool Person::SQL_update(QString& error)
-{
-  error.clear();
-
-  if (!SQL_isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_update_proc(query);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
-bool Person::SQL_select(QString& error)
-{
-  error.clear();
-  if (!SQL_isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_select_proc(query, error);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
-bool Person::SQL_remove(QString& error)
-{
-  error.clear();
-
-  if (!SQL_isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_remove_proc(query);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
 bool Person::SQL_insert_proc(QSqlQuery& query)
 {
   query.prepare("INSERT INTO " PERSON_SQL_TABLE_NAME " ("

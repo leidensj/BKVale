@@ -43,11 +43,6 @@ struct Product : public SQL_JItem
   bool isValid() const;
 
   QString SQL_tableName() const;
-  bool SQL_insert(QString& error);
-  bool SQL_update(QString& error);
-  bool SQL_select(QString& error);
-  bool SQL_remove(QString& error);
-
   bool SQL_insert_proc(QSqlQuery& query);
   bool SQL_update_proc(QSqlQuery& query);
   bool SQL_select_proc(QSqlQuery& query, QString& error);

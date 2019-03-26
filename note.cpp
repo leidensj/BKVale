@@ -150,67 +150,6 @@ QString Note::SQL_tableName() const
   return NOTE_SQL_TABLE_NAME;
 }
 
-
-bool Note::SQL_insert(QString& error)
-{
-  error.clear();
-
-  if (!SQL_isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_insert_proc(query);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
-bool Note::SQL_update(QString& error)
-{
-  error.clear();
-
-  if (!SQL_isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_update_proc(query);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
-bool Note::SQL_select(QString& error)
-{
-  error.clear();
-
-  if (!SQL_isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_select_proc(query, error);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
-bool Note::SQL_remove(QString& error)
-{
-  error.clear();
-
-  if (!SQL_isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = SQL_remove_proc(query);
-  return SQL_finish(db, query, bSuccess, error);
-}
-
 bool Note::SQL_insert_proc(QSqlQuery& query)
 {
   bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
@@ -342,6 +281,7 @@ bool Note::SQL_update_proc(QSqlQuery& query)
 
 bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 {
+  error.clear();
   query.prepare("SELECT "
                 NOTE_SQL_COL01 ","
                 NOTE_SQL_COL02 ","
@@ -405,13 +345,18 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess)
   {
-    QString error2;
     if (m_supplier.m_id.isValid())
-      m_supplier.SQL_select_proc(query, error2);
+      bSuccess = m_supplier.SQL_select_proc(query, error);
+  }
+
+  if (bSuccess)
+  {
     for (int i = 0; i != m_vNoteItem.size(); ++i)
     {
       if (m_vNoteItem.at(i).m_product.m_id.isValid())
-        m_vNoteItem.at(i).m_product.SQL_select_proc(query, error2);
+        bSuccess = m_vNoteItem.at(i).m_product.SQL_select_proc(query, error);
+      if (!bSuccess)
+        break;
     }
   }
 
@@ -469,10 +414,7 @@ NoteItem Note::SQL_select_last_item(Id supplierId, Id productId)
     o.m_package.m_unity = query.value(5).toString();
     o.m_package.m_ammount = query.value(6).toDouble();
     if (o.m_product.m_id.isValid())
-    {
-      QString error2;
-      o.m_product.SQL_select_proc(query, error2);
-    }
+      bSuccess = o.m_product.SQL_select_proc(query, error);
   }
 
   SQL_finish(db, query, bSuccess, error);

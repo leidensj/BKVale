@@ -129,7 +129,261 @@ bool Discount::isValid() const
   }
 }
 
-QString Discount::strTableName() const
+QString Discount::SQL_tableName() const
 {
   return DISCOUNT_SQL_TABLE_NAME;
+}
+
+bool Discount::SQL_insert_proc(QSqlQuery& query)
+{
+  bool bSuccess = false;
+
+  do
+  {
+    m_code = Discount::getRandomCode();
+    query.prepare("SELECT " SQL_COLID " FROM "
+                  DISCOUNT_SQL_TABLE_NAME " WHERE "
+                  DISCOUNT_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_code);
+    bSuccess = query.exec();
+  } while (bSuccess && query.next());
+
+  if (bSuccess)
+  {
+    query.prepare("INSERT INTO " DISCOUNT_SQL_TABLE_NAME " ("
+                  DISCOUNT_SQL_COL01 ","
+                  DISCOUNT_SQL_COL02 ","
+                  DISCOUNT_SQL_COL03 ","
+                  DISCOUNT_SQL_COL04 ","
+                  DISCOUNT_SQL_COL05 ","
+                  DISCOUNT_SQL_COL06 ","
+                  DISCOUNT_SQL_COL07 ","
+                  DISCOUNT_SQL_COL08
+                  ") VALUES ("
+                  "(:_v01),"
+                  "(:_v02),"
+                  "(:_v03),"
+                  "(:_v04),"
+                  "(:_v05),"
+                  "(:_v06),"
+                  "(:_v07),"
+                  "(:_v08))");
+      query.bindValue(":_v01", m_code);
+      query.bindValue(":_v02", m_bExpires);
+      query.bindValue(":_v03", m_dtExp);
+      query.bindValue(":_v04", (int)m_type);
+      query.bindValue(":_v05", m_value);
+      query.bindValue(":_v06", m_percentage);
+      query.bindValue(":_v07", m_bRedeemed);
+      query.bindValue(":_v08", m_description);
+      bSuccess = query.exec();
+  }
+
+  if (bSuccess)
+  {
+    m_id.set(query.lastInsertId().toLongLong());
+    for (int i = 0; i != m_items.size(); ++i)
+    {
+      query.prepare("INSERT INTO " DISCOUNT_ITEMS_SQL_TABLE_NAME " ("
+                    DISCOUNT_ITEMS_SQL_COL01 ","
+                    DISCOUNT_ITEMS_SQL_COL02 ","
+                    DISCOUNT_ITEMS_SQL_COL03
+                    ") VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03))");
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_items.at(i).m_product.m_id.get());
+      query.bindValue(":_v03", m_items.at(i).m_ammount);
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_items.at(i).m_id.set(query.lastInsertId().toLongLong());
+      else
+        break;
+    }
+  }
+
+  return bSuccess;
+}
+
+bool Discount::SQL_update_proc(QSqlQuery& query)
+{
+  query.prepare("UPDATE " DISCOUNT_SQL_TABLE_NAME " SET "
+                DISCOUNT_SQL_COL01 " = (:_v01),"
+                DISCOUNT_SQL_COL02 " = (:_v02),"
+                DISCOUNT_SQL_COL03 " = (:_v03),"
+                DISCOUNT_SQL_COL04 " = (:_v04),"
+                DISCOUNT_SQL_COL05 " = (:_v05),"
+                DISCOUNT_SQL_COL06 " = (:_v06),"
+                DISCOUNT_SQL_COL07 " = (:_v07),"
+                DISCOUNT_SQL_COL08 " = (:_v08) "
+                "WHERE " SQL_COLID " = (:_v00)");
+
+  query.bindValue(":_v00", m_id.get());
+  query.bindValue(":_v01", m_code);
+  query.bindValue(":_v02", m_bExpires);
+  query.bindValue(":_v03", m_dtExp);
+  query.bindValue(":_v04", (int)m_type);
+  query.bindValue(":_v05", m_value);
+  query.bindValue(":_v06", m_percentage);
+  query.bindValue(":_v07", m_bRedeemed);
+  query.bindValue(":_v08", m_description);
+  bool bSuccess = query.exec();
+
+  query.prepare("DELETE FROM " DISCOUNT_ITEMS_SQL_TABLE_NAME " WHERE " DISCOUNT_ITEMS_SQL_COL01 " = (:_v01)");
+  query.bindValue(":_v01", m_id.get());
+  bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != m_items.size(); ++i)
+    {
+      query.prepare("INSERT INTO " DISCOUNT_ITEMS_SQL_TABLE_NAME " ("
+                    DISCOUNT_ITEMS_SQL_COL01 ","
+                    DISCOUNT_ITEMS_SQL_COL02 ","
+                    DISCOUNT_ITEMS_SQL_COL03
+                    " ) VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03))");
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_items.at(i).m_product.m_id.get());
+      query.bindValue(":_v03", m_items.at(i).m_ammount);
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_items.at(i).m_id.set(query.lastInsertId().toLongLong());
+      else
+        break;
+    }
+  }
+
+  return bSuccess;
+}
+
+bool Discount::SQL_select_proc(QSqlQuery& query, QString& error)
+{
+  error.clear();
+  query.prepare("SELECT "
+                DISCOUNT_SQL_COL01 ","
+                DISCOUNT_SQL_COL02 ","
+                DISCOUNT_SQL_COL03 ","
+                DISCOUNT_SQL_COL04 ","
+                DISCOUNT_SQL_COL05 ","
+                DISCOUNT_SQL_COL06 ","
+                DISCOUNT_SQL_COL07 ","
+                DISCOUNT_SQL_COL08
+                " FROM " DISCOUNT_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", m_id.get());
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      m_id = id;
+      m_code = query.value(0).toString();
+      m_bExpires = query.value(1).toBool();
+      m_dtExp = query.value(2).toDate();
+      m_type = (Discount::Type)query.value(3).toInt();
+      m_value = query.value(4).toDouble();
+      m_percentage = query.value(5).toDouble();
+      m_bRedeemed = query.value(6).toBool();
+      m_description = query.value(7).toString();
+    }
+    else
+    {
+      error = "Desconto não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("SELECT "
+                  SQL_COLID ","
+                  DISCOUNT_ITEMS_SQL_COL02 ","
+                  DISCOUNT_ITEMS_SQL_COL03
+                  " FROM " DISCOUNT_ITEMS_SQL_TABLE_NAME
+                  " WHERE " DISCOUNT_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      while (bSuccess && query.next())
+      {
+        DiscountItem oi;
+        oi.m_id.set(query.value(0).toLongLong());
+        oi.m_product.m_id.set(query.value(1).toLongLong());
+        oi.m_ammount = query.value(2).toDouble();
+        m_items.push_back(oi);
+      }
+    }
+  }
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != m_items.size(); ++i)
+    {
+      if (m_items.at(i).m_product.m_id.isValid())
+        bSuccess = m_items[i].m_product.SQL_select_proc(query, error);
+      if (!bSuccess)
+        break;
+    }
+  }
+
+  return bSuccess;
+}
+
+bool Discount::SQL_remove_proc(QSqlQuery& query)
+{
+  query.prepare("DELETE FROM " DISCOUNT_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id.get());
+  return query.exec();
+}
+
+bool Discount::redeem(const QString& code, bool& redeemed, QString& error)
+{
+  redeemed = false;
+  error.clear();
+
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                SQL_COLID
+                " FROM " DISCOUNT_SQL_TABLE_NAME
+                " WHERE " DISCOUNT_SQL_COL01 " = (:_v01)");
+  query.bindValue(":_v01", code);
+  bool bSuccess = query.exec();
+
+  if (bSuccess && query.next())
+  {
+    m_id.set(query.value(0).toLongLong());
+    bSuccess = SQL_select_proc(query, error);
+
+    if (bSuccess)
+    {
+      redeemed = m_bRedeemed;
+      query.prepare("UPDATE " DISCOUNT_SQL_TABLE_NAME " SET "
+                    DISCOUNT_SQL_COL07 " = TRUE "
+                    "WHERE " SQL_COLID " = (:_v00)");
+      query.bindValue(":_v00", m_id.get());
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_bRedeemed = true;
+    }
+  }
+  else
+  {
+    bSuccess = false;
+    error = "Código informado não encontrado.";
+  }
+
+  return SQL_finish(db, query, bSuccess, error);
 }

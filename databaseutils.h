@@ -84,63 +84,6 @@ namespace UserSQL
               QString& error);
 }
 
-namespace CategorySQL
-{
- bool execSelect(QSqlQuery& query,
-                 Category& category,
-                 QString& error);
-
-  bool select(Category& category,
-              QString& error);
-
-  bool insert(const Category& category,
-              QString& error);
-
-  bool update(const Category& category,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-}
-
-namespace ImageSQL
-{
-  bool execSelect(QSqlQuery& query,
-                  Image& image,
-                  QString& error);
-
-  bool select(Image& image,
-              QString& error);
-
-  bool insert(const Image& image,
-              QString& error);
-
-  bool update(const Image& image,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-}
-
-namespace ReminderSQL
-{
-  bool execSelect(QSqlQuery& query,
-                  Reminder& reminder,
-                  QString& error);
-
-  bool insert(const Reminder& reminder,
-              QString& error);
-
-  bool update(const Reminder& reminder,
-              QString& error);
-
-  bool select(Reminder& reminder,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-}
-
 namespace ShoppingListSQL
 {
  bool execSelect(ShoppingList& shoppingList,
@@ -153,25 +96,6 @@ namespace ShoppingListSQL
               QString& error);
 
   bool update(const ShoppingList& shoppingList,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-}
-
-namespace ReservationSQL
-{
-  bool execSelect(QSqlQuery& query,
-                  Reservation& res,
-                  QString& error);
-
-  bool select(Reservation& res,
-              QString& error);
-
-  bool insert(const Reservation& res,
-              QString& error);
-
-  bool update(const Reservation& res,
               QString& error);
 
   bool remove(Id id,
@@ -191,67 +115,5 @@ namespace ActiveUserSQL
                   QString& error);
 }
 
-namespace DiscountSQL
-{
-  bool insert(const Discount& o,
-              QString& error);
-
-  bool update(const Discount& o,
-              QString& error);
-
-  bool execSelect(QSqlQuery& query,
-                  Discount& o,
-                  QString& error);
-
-  bool select(Discount& o,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-
-  bool redeem(const QString& code,
-              Discount& o,
-              bool& redeemed,
-              QString& error);
-}
-
-namespace StoreSQL
-{
- bool execSelect(QSqlQuery& query,
-                 Store& o,
-                 QString& error);
-
-  bool select(Store& o,
-              QString& error);
-
-  bool insert(const Store& o,
-              QString& error);
-
-  bool update(const Store& o,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-}
-
-namespace AddressSQL
-{
- bool execSelect(QSqlQuery& query,
-                 Address& o,
-                 QString& error);
-
-  bool select(Address& o,
-              QString& error);
-}
-
-namespace PhoneSQL
-{
- bool execSelect(QSqlQuery& query,
-                 Phone& o,
-                 QString& error);
-
-  bool select(Phone& o,
-              QString& error);
-}
 
 #endif // DATABASEUTILS_H

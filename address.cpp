@@ -34,7 +34,7 @@ QString Address::getFormattedAddress2() const
 
 QString Address::getFormattedAddress3() const
 {
-  return m_city + " / " + getBRState().m_abv + ".";
+  return m_city + " / " + getBRState().m_abv;
 }
 
 bool Address::operator !=(const JItem& other) const

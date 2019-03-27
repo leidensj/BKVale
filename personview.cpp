@@ -251,6 +251,10 @@ const JItem& PersonView::getItem() const
 void PersonView::setItem(const JItem &o)
 {
   auto _o = dynamic_cast<const Person&>(o);
+  m_rdoCompany->setChecked(_o.m_bCompany);
+  m_rdoPerson->setChecked(!_o.m_bCompany);
+  switchUserType();
+
   m_currentId = _o.m_id;
   m_imagePicker->setItem(_o.m_image);
   m_edName->setText(_o.m_name);
@@ -262,11 +266,8 @@ void PersonView::setItem(const JItem &o)
   m_cbBirthDate->setChecked(_o.m_bBirth && !_o.m_bCompany);
   m_dtBirthDate->setDate(_o.m_dtBirth);
   m_dtCreationDate->setDate(_o.m_dtCreation);
-  m_rdoCompany->setChecked(_o.m_bCompany);
-  m_rdoPerson->setChecked(!_o.m_bCompany);
   m_cbSupplier->setChecked(_o.m_supplier.m_bIsSupplier);
   m_cbEmployee->setChecked(_o.m_employee.m_bIsEmployee);
-  switchUserType();
 
   m_edPinCode->setText(_o.m_employee.m_pincode);
   m_cbNoteEdit->setChecked(_o.m_employee.m_bNoteEdit);

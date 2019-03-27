@@ -2214,50 +2214,28 @@ bool PersonSQL::update(const Person& person,
   {
     for (int i = 0; i != person.m_vPhone.size(); ++i)
     {
-      if (person.m_vPhone.at(i).m_id.isValid())
-      {
-        query.prepare("UPDATE " PHONE_SQL_TABLE_NAME " SET "
-                      PHONE_SQL_COL01 " = (:_v01),"
-                      PHONE_SQL_COL02 " = (:_v02),"
-                      PHONE_SQL_COL03 " = (:_v03),"
-                      PHONE_SQL_COL04 " = (:_v04),"
-                      PHONE_SQL_COL05 " = (:_v05) "
-                      " WHERE " SQL_COLID " = (:_v00)");
-        query.bindValue(":_v00", person.m_vPhone.at(i).m_id.get());
-        query.bindValue(":_v01", person.m_id.get());
-        query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
-        query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
-        query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
-        query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
-        bSuccess = query.exec();
-        if (!bSuccess)
-          break;
-      }
+      query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
+                    PHONE_SQL_COL01 ","
+                    PHONE_SQL_COL02 ","
+                    PHONE_SQL_COL03 ","
+                    PHONE_SQL_COL04 ","
+                    PHONE_SQL_COL05 ")"
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05))");
+      query.bindValue(":_v01", person.m_id.get());
+      query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
+      query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
+      query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
+      query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
+      bSuccess = query.exec();
+      if (bSuccess)
+        person.m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
-      {
-        query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
-                      PHONE_SQL_COL01 ","
-                      PHONE_SQL_COL02 ","
-                      PHONE_SQL_COL03 ","
-                      PHONE_SQL_COL04 ","
-                      PHONE_SQL_COL05 ")"
-                      " VALUES ("
-                      "(:_v01),"
-                      "(:_v02),"
-                      "(:_v03),"
-                      "(:_v04),"
-                      "(:_v05))");
-        query.bindValue(":_v01", person.m_id.get());
-        query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
-        query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
-        query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
-        query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
-        bSuccess = query.exec();
-        if (bSuccess)
-          person.m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
-        else
-          break;
-      }
+        break;
     }
   }
 
@@ -2265,70 +2243,40 @@ bool PersonSQL::update(const Person& person,
   {
     for (int i = 0; i != person.m_vAddress.size(); ++i)
     {
-      if (person.m_vAddress.at(i).m_id.isValid())
-      {
-        query.prepare("UPDATE " ADDRESS_SQL_TABLE_NAME " SET "
-                      ADDRESS_SQL_COL01 " = (:_v01),"
-                      ADDRESS_SQL_COL02 " = (:_v02),"
-                      ADDRESS_SQL_COL03 " = (:_v03),"
-                      ADDRESS_SQL_COL04 " = (:_v04),"
-                      ADDRESS_SQL_COL05 " = (:_v05),"
-                      ADDRESS_SQL_COL06 " = (:_v06),"
-                      ADDRESS_SQL_COL07 " = (:_v07),"
-                      ADDRESS_SQL_COL08 " = (:_v08),"
-                      ADDRESS_SQL_COL09 " = (:_v09) "
-                      "WHERE " SQL_COLID " = (:_v00)");
-        query.bindValue(":_v00", person.m_vAddress.at(i).m_id.get());
-        query.bindValue(":_v01", person.m_id.get());
-        query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
-        query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
-        query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
-        query.bindValue(":_v05", person.m_vAddress.at(i).m_number);
-        query.bindValue(":_v06", person.m_vAddress.at(i).m_city);
-        query.bindValue(":_v07", (int)person.m_vAddress.at(i).m_state);
-        query.bindValue(":_v08", person.m_vAddress.at(i).m_complement);
-        query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
-        bSuccess = query.exec();
-        if (!bSuccess)
-          break;
-      }
+      query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
+                    ADDRESS_SQL_COL01 ","
+                    ADDRESS_SQL_COL02 ","
+                    ADDRESS_SQL_COL03 ","
+                    ADDRESS_SQL_COL04 ","
+                    ADDRESS_SQL_COL05 ","
+                    ADDRESS_SQL_COL06 ","
+                    ADDRESS_SQL_COL07 ","
+                    ADDRESS_SQL_COL08 ","
+                    ADDRESS_SQL_COL09 ")"
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05),"
+                    "(:_v06),"
+                    "(:_v07),"
+                    "(:_v08),"
+                    "(:_v09))");
+      query.bindValue(":_v01", person.m_id.get());
+      query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
+      query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
+      query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
+      query.bindValue(":_v05", person.m_vAddress.at(i).m_number);
+      query.bindValue(":_v06", person.m_vAddress.at(i).m_city);
+      query.bindValue(":_v07", (int)person.m_vAddress.at(i).m_state);
+      query.bindValue(":_v08", person.m_vAddress.at(i).m_complement);
+      query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
+      bSuccess = query.exec();
+      if (bSuccess)
+        person.m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
-      {
-        query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
-                      ADDRESS_SQL_COL01 ","
-                      ADDRESS_SQL_COL02 ","
-                      ADDRESS_SQL_COL03 ","
-                      ADDRESS_SQL_COL04 ","
-                      ADDRESS_SQL_COL05 ","
-                      ADDRESS_SQL_COL06 ","
-                      ADDRESS_SQL_COL07 ","
-                      ADDRESS_SQL_COL08 ","
-                      ADDRESS_SQL_COL09 ")"
-                      " VALUES ("
-                      "(:_v01),"
-                      "(:_v02),"
-                      "(:_v03),"
-                      "(:_v04),"
-                      "(:_v05),"
-                      "(:_v06),"
-                      "(:_v07),"
-                      "(:_v08),"
-                      "(:_v09))");
-        query.bindValue(":_v01", person.m_id.get());
-        query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
-        query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
-        query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
-        query.bindValue(":_v05", person.m_vAddress.at(i).m_number);
-        query.bindValue(":_v06", person.m_vAddress.at(i).m_city);
-        query.bindValue(":_v07", (int)person.m_vAddress.at(i).m_state);
-        query.bindValue(":_v08", person.m_vAddress.at(i).m_complement);
-        query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
-        bSuccess = query.exec();
-        if (bSuccess)
-          person.m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
-        else
-          break;
-      }
+        break;
     }
   }
 
@@ -3553,14 +3501,14 @@ bool AddressSQL::execSelect(QSqlQuery& query,
     {
       o.m_id = id;
       query.value(0).toLongLong(); // PersonId não usamoe
-      o.m_cep = query.value(0).toString();
-      o.m_neighborhood = query.value(1).toString();
-      o.m_street = query.value(2).toString();
-      o.m_number = query.value(3).toInt();
-      o.m_city = query.value(4).toString();
-      o.m_state = (Address::EBRState)query.value(5).toInt();
-      o.m_complement = query.value(6).toString();
-      o.m_reference = query.value(7).toString();
+      o.m_cep = query.value(1).toString();
+      o.m_neighborhood = query.value(2).toString();
+      o.m_street = query.value(3).toString();
+      o.m_number = query.value(4).toInt();
+      o.m_city = query.value(5).toString();
+      o.m_state = (Address::EBRState)query.value(6).toInt();
+      o.m_complement = query.value(7).toString();
+      o.m_reference = query.value(8).toString();
     }
     else
     {

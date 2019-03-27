@@ -5,6 +5,7 @@
 #include "jitem.h"
 #include "store.h"
 #include "jdatabasepicker.h"
+#include "jspinbox.h"
 #include <QDateEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -22,6 +23,7 @@ TimeCard::TimeCard(QWidget* parent)
  , m_storePicker(nullptr)
  , m_date(nullptr)
  , m_buttons(nullptr)
+ , m_spnExtraPages(nullptr)
  , m_cbOpenFile(nullptr)
 {
   setWindowTitle(tr("Livro Ponto"));
@@ -34,6 +36,10 @@ TimeCard::TimeCard(QWidget* parent)
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
 
+  m_spnExtraPages = new JSpinBox;
+  m_spnExtraPages->setMinimum(0);
+  m_spnExtraPages->setMaximum(9999);
+
   m_cbOpenFile = new QCheckBox;
   m_cbOpenFile->setText(tr("Abrir arquivo automaticamente ao finalizar."));
   m_cbOpenFile->setCheckState(Qt::Checked);
@@ -44,6 +50,7 @@ TimeCard::TimeCard(QWidget* parent)
   QFormLayout* formLayout = new QFormLayout;
   formLayout->addRow(tr("Loja:"), m_storePicker);
   formLayout->addRow(tr("Data:"), m_date);
+  formLayout->addRow(tr("Páginas extras:"), m_spnExtraPages);
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(formLayout);
@@ -107,17 +114,22 @@ void TimeCard::saveAndAccept()
 
   QLocale br(QLocale::Portuguese, QLocale::Brazil);
 
-  for (int i = 0; i != o.m_vEmployee.size(); ++i)
+  for (int i = 0; i != o.m_vEmployee.size() + m_spnExtraPages->value(); ++i)
   {
     /* 1 - Nome funcionário
      * 2 - Horário
      * 3 - MÊS
      * 4 - ANO */
+    QString title("REGISTRO PONTO");
+    QString page(QString::number(i + 1));
+    while (title.length() < (42 - page.length()))
+      title += " ";
+    title += page;
     html += QString(
-      "<h2 align=\"center\">REGISTRO PONTO</h2>"
-      "<p>Nome: %2 Horário: %3</p>"
-      "<table border=\"1\" align=\"center\" width=\"100%\">"
-        "<tr><th colspan=\"2\">%4 %5</th>"
+      "<pre style=\"font-size:16pt;\" align=\"left\"><b>" + title + "</b></pre>"
+      "<p>Nome: %1 Horário: %2</p>"
+      "<table border=\"1\" align=\"center\" width=\"100%\" style=\"border-style:groove;\">"
+        "<tr><th colspan=\"2\">%3 %4</th>"
           "<th colspan=\"3\">ENTRADA</th>"
           "<th colspan=\"3\">SAIDA</th>"
         "</tr>"
@@ -128,8 +140,12 @@ void TimeCard::saveAndAccept()
           "<th colspan=\"2\">Hora</th>"
           "<th>Assinatura</th>"
           "<th colspan=\"2\">Hora</th>"
-        "</tr>").arg(o.m_vEmployee.at(i).m_employee.m_name,
-                     o.m_vEmployee.at(i).strHours(),
+        "</tr>").arg(i >= o.m_vEmployee.size()
+                     ? "_____________________________________"
+                     : o.m_vEmployee.at(i).m_employee.m_name,
+                     i >= o.m_vEmployee.size()
+                     ? "______________________________________"
+                     : o.m_vEmployee.at(i).strHours(),
                      br.toString(idt, "MMMM").toUpper(),
                      idt.toString("yyyy"));
     dt = idt;
@@ -156,7 +172,7 @@ void TimeCard::saveAndAccept()
     html += QString(
       "</table>"
       "<br>"
-      "<table border=\"1\" cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-style:solid;%1\">"
+      "<table border=\"1\" cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-style:groove;%1\">"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS NORMAIS</td>"
       "<td width=\"10%\">(H.N.)</td>"
@@ -188,19 +204,21 @@ void TimeCard::saveAndAccept()
       "<td width=\"50%\"></td>"
       "</tr>"
       "</tr>"
-      "</table>"
-      "<br>"
-      "<p align=\"right\">%1</p>").arg(QString::number(i + 1),
-                                       i == (o.m_vEmployee.size() - 1) ? "" : "page-break-after:always;");
+      "</table>").arg(i == (o.m_vEmployee.size() + m_spnExtraPages->value() - 1) ? "" : "page-break-after:always;");
   }
 
   html +=
     "</body>"
     "</html>";
 
+  Store* p = static_cast<Store*>(m_storePicker->getDatabase()->getCurrentItem());
   QString fileName = QFileDialog::getSaveFileName(this,
                                                   tr("Salvar livro ponto"),
-                                                  "/desktop/livro_" + idt.toString("yyyy") + "_" + idt.toString("MM") + ".pdf",
+                                                  "/desktop/livro_" +
+                                                  idt.toString("yyyy") + "_" +
+                                                  idt.toString("MM") +
+                                                  (p != nullptr ? p->m_name.replace(" ", "") : "") +
+                                                  ".pdf",
                                                   tr("PDF (*.pdf)"));
 
   QProgressDialog progress(tr("Gerando livro ponto..."), QString(), 0, 3, this);

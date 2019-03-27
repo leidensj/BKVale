@@ -414,7 +414,7 @@ Note NoteView::save(Person& employee)
     m_lastId = note.m_id;
     QString error;
     //TODO quickfix
-    NoteSQL::select(note, error);
+    note.SQL_select(error);
     create();
   }
   else

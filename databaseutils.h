@@ -3,20 +3,7 @@
 
 #include <QSqlDatabase>
 #include <QVector>
-#include "user.h"
-#include "note.h"
-#include "product.h"
-#include "reminder.h"
-#include "settings.h"
-#include "category.h"
-#include "image.h"
-#include "person.h"
-#include "phone.h"
-#include "address.h"
-#include "shoppinglist.h"
-#include "reservation.h"
-#include "discount.h"
-#include "store.h"
+#include "jitem.h"
 
 class UserLoginSQL
 {
@@ -67,39 +54,6 @@ namespace BaitaSQL
             QString& error);
 
   QDate getDate(bool dfltMax);
-}
-
-namespace UserSQL
-{
-  bool insert(const User& user,
-              QString& error);
-
-  bool update(const User& user,
-              QString& error);
-
-  bool select(User& user,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
-}
-
-namespace ShoppingListSQL
-{
- bool execSelect(ShoppingList& shoppingList,
-                 QString& error);
-
-  bool select(ShoppingList& shoppingList,
-              QString& error);
-
-  bool insert(const ShoppingList& shoppingList,
-              QString& error);
-
-  bool update(const ShoppingList& shoppingList,
-              QString& error);
-
-  bool remove(Id id,
-              QString& error);
 }
 
 namespace ActiveUserSQL

@@ -971,7 +971,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Image o;
       o.m_id = ids.at(i);
-      bSuccess = ImageSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Image(o));
     }
@@ -979,7 +979,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Person o;
       o.m_id = ids.at(i);
-      bSuccess = PersonSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Person(o));
     }
@@ -987,7 +987,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Category o;
       o.m_id = ids.at(i);
-      bSuccess = CategorySQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Category(o));
     }
@@ -995,7 +995,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Store o;
       o.m_id = ids.at(i);
-      bSuccess = StoreSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Store(o));
     }
@@ -1003,7 +1003,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Product o;
       o.m_id = ids.at(i);
-      bSuccess = ProductSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Product(o));
     }
@@ -1011,7 +1011,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Note o;
       o.m_id = ids.at(i);
-      bSuccess = NoteSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Note(o));
     }
@@ -1019,7 +1019,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       User o;
       o.m_id = ids.at(i);
-      bSuccess = UserSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new User(o));
     }
@@ -1027,7 +1027,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Reminder o;
       o.m_id = ids.at(i);
-      bSuccess = ReminderSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Reminder(o));
     }
@@ -1035,7 +1035,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       ShoppingList o;
       o.m_id = ids.at(i);
-      bSuccess = ShoppingListSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new ShoppingList(o));
     }
@@ -1043,7 +1043,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Reservation o;
       o.m_id = ids.at(i);
-      bSuccess = ReservationSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Reservation(o));
     }
@@ -1052,7 +1052,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
       Product o;
       ProductCode code;
       o.m_id = ids.at(i);
-      bSuccess = ProductSQL::selectByCode(o, code, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Product(o));
     }
@@ -1060,7 +1060,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
     {
       Discount o;
       o.m_id = ids.at(i);
-      bSuccess = DiscountSQL::select(o, error);
+      bSuccess = o.SQL_select(error);
       if (bSuccess)
         m_currentItems.push_back(new Discount(o));
     }

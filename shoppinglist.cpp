@@ -93,11 +93,6 @@ bool ShoppingList::isValid() const
   return b;
 }
 
-QString ShoppingList::strTableName() const
-{
-  return SHOPPING_LIST_SQL_TABLE_NAME;
-}
-
 void ShoppingList::setWeekDays(const QString& strWeekDays)
 {
   for (int i = 0; i != 7; ++i)
@@ -177,4 +172,264 @@ bool ShoppingList::operator !=(const JItem& other) const
 bool ShoppingList::operator ==(const JItem& other) const
 {
   return !(*this != other);
+}
+
+QString ShoppingList::SQL_tableName() const
+{
+  return SHOPPING_LIST_SQL_TABLE_NAME;
+}
+
+bool ShoppingList::SQL_insert_proc(QSqlQuery& query)
+{
+  query.prepare("INSERT INTO " SHOPPING_LIST_SQL_TABLE_NAME " ("
+                SHOPPING_LIST_SQL_COL01 ","
+                SHOPPING_LIST_SQL_COL02 ","
+                SHOPPING_LIST_SQL_COL03 ","
+                SHOPPING_LIST_SQL_COL04 ","
+                SHOPPING_LIST_SQL_COL05 ","
+                SHOPPING_LIST_SQL_COL06 ","
+                SHOPPING_LIST_SQL_COL07
+                ") VALUES ("
+                "(:_v01),"
+                "(:_v02),"
+                "(:_v03),"
+                "(:_v04),"
+                "(:_v05),"
+                "(:_v06),"
+                "(:_v07))");
+
+
+  query.bindValue(":_v01", m_supplier.m_id.getIdNull());
+  query.bindValue(":_v02", m_image.m_id.getIdNull());
+  query.bindValue(":_v03", m_title);
+  query.bindValue(":_v04", m_description);
+  query.bindValue(":_v05", getWeekDays());
+  query.bindValue(":_v06", getMonthDays());
+  query.bindValue(":_v07", m_nLines);
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    m_id.set(query.lastInsertId().toLongLong());
+    for (int i = 0; i != m_vItem.size(); ++i)
+    {
+      query.prepare("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
+                    SHOPPING_LIST_ITEMS_SQL_COL01 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL02 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL03 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL04 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL05 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL06 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL07 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL08 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL09 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL10
+                    ") VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05),"
+                    "(:_v06),"
+                    "(:_v07),"
+                    "(:_v08),"
+                    "(:_v09),"
+                    "(:_v10))");
+
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
+      query.bindValue(":_v03", m_vItem.at(i).m_ammount);
+      query.bindValue(":_v04", m_vItem.at(i).m_price);
+      query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
+      query.bindValue(":_v08", m_vItem.at(i).m_bAmmount);
+      query.bindValue(":_v09", m_vItem.at(i).m_bPrice);
+      query.bindValue(":_v10", m_vItem.at(i).m_supplier.m_id.getIdNull());
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+      else
+        break;
+    }
+  }
+
+  return bSuccess;
+}
+
+bool ShoppingList::SQL_update_proc(QSqlQuery& query)
+{
+  query.prepare("UPDATE " SHOPPING_LIST_SQL_TABLE_NAME " SET "
+                SHOPPING_LIST_SQL_COL01 " = (:_v01),"
+                SHOPPING_LIST_SQL_COL02 " = (:_v02),"
+                SHOPPING_LIST_SQL_COL03 " = (:_v03),"
+                SHOPPING_LIST_SQL_COL04 " = (:_v04),"
+                SHOPPING_LIST_SQL_COL05 " = (:_v05),"
+                SHOPPING_LIST_SQL_COL06 " = (:_v06),"
+                SHOPPING_LIST_SQL_COL07 " = (:_v07) "
+                "WHERE " SQL_COLID " = (:_v00)");
+
+  query.bindValue(":_v00", m_id.get());
+  query.bindValue(":_v01", m_supplier.m_id.getIdNull());
+  query.bindValue(":_v02", m_image.m_id.getIdNull());
+  query.bindValue(":_v03", m_title);
+  query.bindValue(":_v04", m_description);
+  query.bindValue(":_v05", getWeekDays());
+  query.bindValue(":_v06", getMonthDays());
+  query.bindValue(":_v07", m_nLines);
+  bool bSuccess = query.exec();
+
+  query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
+  query.bindValue(":_v01", m_id.get());
+  bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != m_vItem.size(); ++i)
+    {
+      query.prepare("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
+                    SHOPPING_LIST_ITEMS_SQL_COL01 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL02 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL03 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL04 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL05 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL06 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL07 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL08 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL09 ","
+                    SHOPPING_LIST_ITEMS_SQL_COL10
+                    ") VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05),"
+                    "(:_v06),"
+                    "(:_v07),"
+                    "(:_v08),"
+                    "(:_v09),"
+                    "(:_v10))");
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
+      query.bindValue(":_v03", m_vItem.at(i).m_ammount);
+      query.bindValue(":_v04", m_vItem.at(i).m_price);
+      query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
+      query.bindValue(":_v08", m_vItem.at(i).m_bAmmount);
+      query.bindValue(":_v09", m_vItem.at(i).m_bPrice);
+      query.bindValue(":_v10", m_vItem.at(i).m_supplier.m_id.getIdNull());
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+      else
+        break;
+    }
+  }
+
+  return bSuccess;
+}
+
+bool ShoppingList::SQL_select_proc(QSqlQuery& query, QString& error)
+{
+  error.clear();
+  query.prepare("SELECT "
+                SHOPPING_LIST_SQL_COL01 ","
+                SHOPPING_LIST_SQL_COL02 ","
+                SHOPPING_LIST_SQL_COL03 ","
+                SHOPPING_LIST_SQL_COL04 ","
+                SHOPPING_LIST_SQL_COL05 ","
+                SHOPPING_LIST_SQL_COL06 ","
+                SHOPPING_LIST_SQL_COL07
+                " FROM " SHOPPING_LIST_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", m_id.get());
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      m_supplier.m_id.set(query.value(0).toLongLong());
+      m_image.m_id.set(query.value(1).toLongLong());
+      m_title = query.value(2).toString();
+      m_description = query.value(3).toString();
+      setWeekDays(query.value(4).toString());
+      setMonthDays(query.value(5).toString());
+      m_nLines = query.value(6).toInt();
+    }
+    else
+    {
+      error = "Lista não encontrada.";
+      bSuccess = false;
+    }
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("SELECT "
+                  SQL_COLID ","
+                  SHOPPING_LIST_ITEMS_SQL_COL02 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL03 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL04 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL05 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL06 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL07 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL08 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL09 ","
+                  SHOPPING_LIST_ITEMS_SQL_COL10
+                  " FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME
+                  " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      while (bSuccess && query.next())
+      {
+        ShoppingListItem item;
+        item.m_id.set(query.value(0).toLongLong());
+        item.m_product.m_id.set(query.value(1).toLongLong());
+        item.m_ammount = query.value(2).toDouble();
+        item.m_price = query.value(3).toDouble();
+        item.m_package.m_bIsPackage = query.value(4).toBool();
+        item.m_package.m_unity = query.value(5).toString();
+        item.m_package.m_ammount = query.value(6).toDouble();
+        item.m_bAmmount= query.value(7).toDouble();
+        item.m_bPrice = query.value(8).toDouble();
+        item.m_supplier.m_id.set(query.value(9).toDouble());
+        m_vItem.push_back(item);
+      }
+    }
+  }
+
+  if (bSuccess)
+  {
+    for (int i = 0; i != m_vItem.size(); ++i)
+    {
+      if (m_vItem.at(i).m_supplier.m_id.isValid())
+        bSuccess = m_vItem.at(i).m_supplier.SQL_select_proc(query, error);
+      if (!bSuccess)
+        break;
+      if (m_vItem.at(i).m_product.m_id.isValid())
+        bSuccess = m_vItem.at(i).m_product.SQL_select_proc(query, error);
+      if (!bSuccess)
+        break;
+    }
+  }
+
+  if (bSuccess && m_supplier.m_id.isValid())
+    bSuccess = m_supplier.SQL_select_proc(query, error);
+
+  if (bSuccess && m_image.m_id.isValid())
+    bSuccess = m_image.SQL_select_proc(query, error);
+
+  return bSuccess;
+}
+
+bool ShoppingList::SQL_remove_proc(QSqlQuery& query)
+{
+  query.prepare("DELETE FROM " SHOPPING_LIST_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", id.get());
+  return query.exec();
 }

@@ -72,7 +72,7 @@ void NoteTableWidget::addItemAndLoadPrices(Id supplierId, bool bCode)
   {
     NoteItem noteItem;
     if (supplierId.isValid())
-      noteItem = NoteSQL::selectLastItem(supplierId, product.m_id);
+      noteItem = Note::SQL_select_last_item(supplierId, product.m_id);
     auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
     ptPriceCell->setValue(noteItem.m_price);
     auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)NoteColumn::Unity));

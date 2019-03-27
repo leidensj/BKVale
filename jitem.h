@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QSqlQuery>
 #include <QSqlDatabase>
+#include <QSqlError>
 
 class Id
 {

@@ -62,22 +62,17 @@ bool Address::isValid() const
       !m_street.isEmpty();
 }
 
-QString Address::strTableName() const
+QString Address::SQL_tableName() const
 {
   return ADDRESS_SQL_TABLE_NAME;
 }
 
-QString Address::SQL_tableName() const
-{
-
-}
-
-bool Address::SQL_insert_proc(QSqlQuery& /*query*/)
+bool Address::SQL_insert_proc(QSqlQuery& /*query*/) const
 {
   return false;
 }
 
-bool Address::SQL_update_proc(QSqlQuery& /*query*/)
+bool Address::SQL_update_proc(QSqlQuery& /*query*/) const
 {
   return false;
 }
@@ -124,7 +119,7 @@ bool Address::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Address::SQL_remove_proc(QSqlQuery& /*query*/)
+bool Address::SQL_remove_proc(QSqlQuery& /*query*/) const
 {
   return false;
 }

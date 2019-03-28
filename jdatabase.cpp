@@ -1,9 +1,13 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
 #include "defines.h"
-#include "databaseutils.h"
 #include "notefilterdlg.h"
 #include "pincodeview.h"
+#include "jitemhelper.h"
+// TODO REMOVER
+#include "reminder.h"
+#include "discount.h"
+
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
@@ -912,7 +916,7 @@ void JDatabase::clearCurrentItems()
 {
   for (int i = 0; i != m_currentItems.size(); ++i)
   {
-    JItem* pt = m_currentItems.at(i);
+    JItemSQL* pt = m_currentItems.at(i);
     if (pt != nullptr)
       delete pt;
   }
@@ -963,110 +967,16 @@ void JDatabase::selectItems(const QVector<Id> ids)
 {
   clearCurrentItems();
 
-  bool bSuccess = false;
   for (int i = 0; i != ids.size(); ++i)
   {
     QString error;
-    if (m_tableName == IMAGE_SQL_TABLE_NAME)
+    bool bSuccess = false;
+    auto p = JItemHelper::create(m_tableName, ids.at(i));
+    if (p != nullptr)
     {
-      Image o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
+      bSuccess = p->SQL_select(error);
       if (bSuccess)
-        m_currentItems.push_back(new Image(o));
-    }
-    else if (m_tableName == PERSON_SQL_TABLE_NAME)
-    {
-      Person o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Person(o));
-    }
-    else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
-    {
-      Category o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Category(o));
-    }
-    else if (m_tableName == STORE_SQL_TABLE_NAME)
-    {
-      Store o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Store(o));
-    }
-    else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
-    {
-      Product o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Product(o));
-    }
-    else if (m_tableName == NOTE_SQL_TABLE_NAME)
-    {
-      Note o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Note(o));
-    }
-    else if (m_tableName == USER_SQL_TABLE_NAME)
-    {
-      User o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new User(o));
-    }
-    else if (m_tableName == REMINDER_SQL_TABLE_NAME)
-    {
-      Reminder o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Reminder(o));
-    }
-    else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-    {
-      ShoppingList o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new ShoppingList(o));
-    }
-    else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
-    {
-      Reservation o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Reservation(o));
-    }
-    else if (m_tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
-    {
-      Product o;
-      ProductCode code;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Product(o));
-    }
-    else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
-    {
-      Discount o;
-      o.m_id = ids.at(i);
-      bSuccess = o.SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(new Discount(o));
-    }
-    else
-    {
-      error = tr("Item ainda não implementado.");
+        m_currentItems.push_back(p);
     }
 
     if (!bSuccess)
@@ -1084,7 +994,6 @@ void JDatabase::selectItems(const QVector<Id> ids)
       emit itemSelectedSignal(*m_currentItems.at(0));
     emit itemsSelectedSignal(m_currentItems);
   }
-
 }
 
 void JDatabase::refresh()
@@ -1153,19 +1062,8 @@ void JDatabase::removeItems()
 
   for (int i = 0; i != ids.size(); ++i)
   {
-    Id id = ids.at(i);
-    QString error;
-    if (m_tableName == IMAGE_SQL_TABLE_NAME)
-      ImageSQL::remove(id, error);
-    else if (m_tableName == PERSON_SQL_TABLE_NAME)
-      PersonSQL::remove(id, error);
-    else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
-      CategorySQL::remove(id, error);
-    else if (m_tableName == STORE_SQL_TABLE_NAME)
-      StoreSQL::remove(id, error);
-    else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
-      ProductSQL::remove(id, error);
-    else if (m_tableName == NOTE_SQL_TABLE_NAME)
+    // TODO SOLUCAO TEMPORARIA
+    if (m_tableName == NOTE_SQL_TABLE_NAME)
     {
       if (!person.m_employee.m_bNoteRemove)
       {
@@ -1175,24 +1073,20 @@ void JDatabase::removeItems()
                              QMessageBox::Ok);
         return;
       }
-      NoteSQL::remove(id, error);
     }
-    else if (m_tableName == USER_SQL_TABLE_NAME)
-      UserSQL::remove(id, error);
-    else if (m_tableName == REMINDER_SQL_TABLE_NAME)
-      ReminderSQL::remove(id, error);
-    else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-      ShoppingListSQL::remove(id, error);
-    else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
-      ReservationSQL::remove(id, error);
-    else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
-      DiscountSQL::remove(id, error);
-    else
-      error = tr("Não suportado.");
 
-    emit itemsRemovedSignal(ids);
-    refresh();
+    Id id = ids.at(i);
+    auto p = JItemHelper::create(m_tableName, id);
+    if (p != nullptr)
+    {
+      QString error;
+      p->SQL_remove(error);
+      delete p;
+    }
   }
+
+  emit itemsRemovedSignal(ids);
+  refresh();
 }
 
 void JDatabase::filterSearchChanged()
@@ -1260,12 +1154,12 @@ QString JDatabase::getTableName() const
   return m_tableName;
 }
 
-JItem* JDatabase::getCurrentItem() const
+JItemSQL* JDatabase::getCurrentItem() const
 {
   return m_currentItems.size() != 0 ? m_currentItems.at(0) : nullptr;
 }
 
-bool JDatabase::save(const JItem& jItem, Person* pEmployee)
+bool JDatabase::save(const JItemSQL& o, Person* pEmployee)
 {
   if (pEmployee != nullptr)
   {
@@ -1284,44 +1178,8 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
     }
   }
 
-  QString error;
-  bool bSuccess = false;
-  if (m_tableName == IMAGE_SQL_TABLE_NAME)
-  {
-    const Image& o = dynamic_cast<const Image&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? ImageSQL::update(o, error)
-               : ImageSQL::insert(o, error);
-  }
-  else if (m_tableName == PERSON_SQL_TABLE_NAME)
-  {
-    const Person& o = dynamic_cast<const Person&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? PersonSQL::update(o, error)
-               : PersonSQL::insert(o, error);
-  }
-  else if (m_tableName == CATEGORY_SQL_TABLE_NAME)
-  {
-    const Category& o = dynamic_cast<const Category&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? CategorySQL::update(o, error)
-               : CategorySQL::insert(o, error);
-  }
-  else if (m_tableName == STORE_SQL_TABLE_NAME)
-  {
-    const Store& o = dynamic_cast<const Store&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? StoreSQL::update(o, error)
-               : StoreSQL::insert(o, error);
-  }
-  else if (m_tableName == PRODUCT_SQL_TABLE_NAME)
-  {
-    const Product& o = dynamic_cast<const Product&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? ProductSQL::update(o, error)
-               : ProductSQL::insert(o, error);
-  }
-  else if (m_tableName == NOTE_SQL_TABLE_NAME)
+  // TODO SOLUÇÃO TEMPORARIA
+  if (m_tableName == NOTE_SQL_TABLE_NAME)
   {
     if (pEmployee != nullptr && !pEmployee->m_employee.m_bNoteEdit)
     {
@@ -1331,50 +1189,11 @@ bool JDatabase::save(const JItem& jItem, Person* pEmployee)
                            QMessageBox::Ok);
       return false;
     }
+  }
 
-    const Note& o = dynamic_cast<const Note&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? NoteSQL::update(o, error)
-               : NoteSQL::insert(o, error);
-  }
-  else if (m_tableName == USER_SQL_TABLE_NAME)
-  {
-    const User& o = dynamic_cast<const User&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? UserSQL::update(o, error)
-               : UserSQL::insert(o, error);
-  }
-  else if (m_tableName == REMINDER_SQL_TABLE_NAME)
-  {
-    const Reminder& o = dynamic_cast<const Reminder&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? ReminderSQL::update(o, error)
-               : ReminderSQL::insert(o, error);
-  }
-  else if (m_tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-  {
-    const ShoppingList& o = dynamic_cast<const ShoppingList&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? ShoppingListSQL::update(o, error)
-               : ShoppingListSQL::insert(o, error);
-  }
-  else if (m_tableName == RESERVATION_SQL_TABLE_NAME)
-  {
-    const Reservation& o = dynamic_cast<const Reservation&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? ReservationSQL::update(o, error)
-               : ReservationSQL::insert(o, error);
-  }
-  else if (m_tableName == DISCOUNT_SQL_TABLE_NAME)
-  {
-    const Discount& o = dynamic_cast<const Discount&>(jItem);
-    bSuccess = o.m_id.isValid()
-               ? DiscountSQL::update(o, error)
-               : DiscountSQL::insert(o, error);
-  }
-  else
-    error = tr("Não suportado.");
-
+  QString error;
+  bool bSuccess = false;
+  bSuccess = o.SQL_insert_update(error);
 
   if (bSuccess)
     refresh();
@@ -1448,10 +1267,10 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
   setWindowTitle(title);
   setWindowIcon(icon);
 
-  QObject::connect(m_database, SIGNAL(itemsSelectedSignal(const QVector<JItem*>&)), this, SLOT(itemsSelected(const QVector<JItem*>&)));
+  QObject::connect(m_database, SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(itemsSelected(const QVector<JItemSQL*>&)));
 }
 
-void JDatabaseSelector::itemsSelected(const QVector<JItem*>& /*items*/)
+void JDatabaseSelector::itemsSelected(const QVector<JItemSQL*>& /*v*/)
 {
   accept();
 }

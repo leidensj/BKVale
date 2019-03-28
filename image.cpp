@@ -35,7 +35,7 @@ QString Image::SQL_tableName() const
   return IMAGE_SQL_TABLE_NAME;
 }
 
-bool Image::SQL_insert_proc(QSqlQuery& query)
+bool Image::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " IMAGE_SQL_TABLE_NAME " ("
                 IMAGE_SQL_COL01 ","
@@ -53,7 +53,7 @@ bool Image::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Image::SQL_update_proc(QSqlQuery& query)
+bool Image::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " IMAGE_SQL_TABLE_NAME " SET "
                 IMAGE_SQL_COL01 " = (:_v01),"
@@ -93,7 +93,7 @@ bool Image::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Image::SQL_remove_proc(QSqlQuery& query)
+bool Image::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " IMAGE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

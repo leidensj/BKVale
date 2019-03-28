@@ -119,9 +119,9 @@ ReservationView::ReservationView(QWidget* parent)
                    this,
                    SLOT(create()));
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
+                   SIGNAL(itemSelectedSignal(const JItemSQL&)),
                    this,
-                   SLOT(itemSelected(const JItem&)));
+                   SLOT(itemSelected(const JItemSQL&)));
   QObject::connect(m_database,
                    SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
@@ -133,7 +133,7 @@ ReservationView::ReservationView(QWidget* parent)
   m_dock->close();
 }
 
-void ReservationView::itemSelected(const JItem& jItem)
+void ReservationView::itemSelected(const JItemSQL& jItem)
 {
   const Reservation& res = dynamic_cast<const Reservation&>(jItem);
   if (res.m_id.isValid())

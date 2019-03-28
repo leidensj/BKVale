@@ -28,7 +28,7 @@ private slots:
   void emitChangedSignal();
   void setCapitalization(int state);
   void search();
-  void itemSelected(const JItem& jItem);
+  void itemSelected(const JItemSQL& jItem);
   void itemsRemoved(const QVector<Id>& ids);
 
 public slots:

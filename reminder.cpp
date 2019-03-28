@@ -44,7 +44,7 @@ QString Reminder::SQL_tableName() const
   return REMINDER_SQL_TABLE_NAME;
 }
 
-bool Reminder::SQL_insert_proc(QSqlQuery& query)
+bool Reminder::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " REMINDER_SQL_TABLE_NAME " ("
                 REMINDER_SQL_COL01 ","
@@ -76,7 +76,7 @@ bool Reminder::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Reminder::SQL_update_proc(QSqlQuery& query)
+bool Reminder::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME " SET "
                 REMINDER_SQL_COL01 " = (:_v01),"
@@ -117,7 +117,6 @@ bool Reminder::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     if (query.next())
     {
-      m_id = id;
       m_title = query.value(0).toString();
       m_message = query.value(1).toString();
       m_bFavorite = query.value(2).toBool();
@@ -136,7 +135,7 @@ bool Reminder::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Reminder::SQL_remove_proc(QSqlQuery& query)
+bool Reminder::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " REMINDER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

@@ -4,22 +4,7 @@
 #include <QSqlRecord>
 #include <QVariant>
 #include <QHostInfo>
-
-#include "user.h"
-#include "note.h"
-#include "product.h"
-#include "reminder.h"
-#include "settings.h"
-#include "category.h"
-#include "image.h"
-#include "person.h"
-#include "phone.h"
-#include "address.h"
-#include "shoppinglist.h"
-#include "reservation.h"
-#include "discount.h"
-#include "store.h"
-
+#include <QDate>
 
 #define DATABASE_NOT_OPEN_TXT "O banco de dados não foi aberto."
 

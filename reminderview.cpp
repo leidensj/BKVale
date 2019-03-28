@@ -141,7 +141,7 @@ ReminderView::ReminderView(QWidget *parent)
   connect(m_cbCapitalization, SIGNAL(stateChanged(int)), this, SLOT(setCapitalization(int)));
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(search()));
-  connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(itemSelected(const JItem&)));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(itemSelected(const JItemSQL&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
 
   setCapitalization(m_cbCapitalization->checkState());
@@ -181,7 +181,7 @@ void ReminderView::create()
   setReminder(reminder);
 }
 
-void ReminderView::itemSelected(const JItem& jItem)
+void ReminderView::itemSelected(const JItemSQL& jItem)
 {
   const Reminder& reminder = dynamic_cast<const Reminder&>(jItem);
   if (reminder.m_id.isValid())

@@ -84,7 +84,7 @@ ProductView::~ProductView()
 
 }
 
-const JItem& ProductView::getItem() const
+const JItemSQL& ProductView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
@@ -100,7 +100,7 @@ const JItem& ProductView::getItem() const
   return m_ref;
 }
 
-void ProductView::setItem(const JItem &o)
+void ProductView::setItem(const JItemSQL &o)
 {
   auto _o = dynamic_cast<const Product&>(o);
   m_currentId = _o.m_id;

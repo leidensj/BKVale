@@ -3,13 +3,10 @@
 
 #include <QFrame>
 #include <QDialog>
-#include <QSqlDatabase>
 #include <QModelIndex>
 #include <QVector>
 #include <QTableView>
-#include "product.h"
-#include "person.h"
-#include "reminder.h"
+#include "jitemsql.h"
 
 class QPushButton;
 class QCheckBox;
@@ -17,6 +14,7 @@ class JTableView;
 class JLineEdit;
 class QSortFilterProxyModel;
 class NoteFilterDlg;
+class Person;
 
 class JTableView : public QTableView
 {
@@ -50,14 +48,14 @@ public:
                      QWidget *parent = 0);
   ~JDatabase();
   QString getTableName() const;
-  JItem* getCurrentItem() const;
+  JItemSQL* getCurrentItem() const;
   QVector<Id> getSelectedIds() const;
   void selectIds(const QVector<Id>& ids);
-  const QVector<JItem*> getCurrentItems() const;
+  const QVector<JItemSQL*> getCurrentItems() const;
   int getNumberOfEntries() const;
   double getSum(int column) const;
 
-  bool save(const JItem& jItem, Person* pEmployee = nullptr);
+  bool save(const JItemSQL& jItem, Person* pEmployee = nullptr);
 
 public slots:
   void refresh();
@@ -80,7 +78,7 @@ private:
   QString m_tableName;
   QString m_filter;
   QString m_fixedFilter;
-  QVector<JItem*> m_currentItems;
+  QVector<JItemSQL*> m_currentItems;
   QSortFilterProxyModel* m_proxyModel;
   NoteFilterDlg* m_noteFilter;
 
@@ -98,8 +96,8 @@ private slots:
   void clearFilter();
 
 signals:
-  void itemSelectedSignal(const JItem& item);
-  void itemsSelectedSignal(const QVector<JItem*>& items);
+  void itemSelectedSignal(const JItemSQL& item);
+  void itemsSelectedSignal(const QVector<JItemSQL*>& items);
   void itemsRemovedSignal(const QVector<Id>& ids);
   void currentRowChangedSignal(int row);
   void refreshSignal();
@@ -122,7 +120,7 @@ protected:
   void closeEvent(QCloseEvent * e);
 
 private slots:
-  void itemsSelected(const QVector<JItem*>& jItem);
+  void itemsSelected(const QVector<JItemSQL*>& v);
 
 private:
   JDatabase* m_database;

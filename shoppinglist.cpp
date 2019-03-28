@@ -179,7 +179,7 @@ QString ShoppingList::SQL_tableName() const
   return SHOPPING_LIST_SQL_TABLE_NAME;
 }
 
-bool ShoppingList::SQL_insert_proc(QSqlQuery& query)
+bool ShoppingList::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " SHOPPING_LIST_SQL_TABLE_NAME " ("
                 SHOPPING_LIST_SQL_COL01 ","
@@ -257,7 +257,7 @@ bool ShoppingList::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool ShoppingList::SQL_update_proc(QSqlQuery& query)
+bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " SHOPPING_LIST_SQL_TABLE_NAME " SET "
                 SHOPPING_LIST_SQL_COL01 " = (:_v01),"
@@ -407,11 +407,11 @@ bool ShoppingList::SQL_select_proc(QSqlQuery& query, QString& error)
     for (int i = 0; i != m_vItem.size(); ++i)
     {
       if (m_vItem.at(i).m_supplier.m_id.isValid())
-        bSuccess = m_vItem.at(i).m_supplier.SQL_select_proc(query, error);
+        bSuccess = m_vItem[i].m_supplier.SQL_select_proc(query, error);
       if (!bSuccess)
         break;
       if (m_vItem.at(i).m_product.m_id.isValid())
-        bSuccess = m_vItem.at(i).m_product.SQL_select_proc(query, error);
+        bSuccess = m_vItem[i].m_product.SQL_select_proc(query, error);
       if (!bSuccess)
         break;
     }
@@ -426,10 +426,10 @@ bool ShoppingList::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool ShoppingList::SQL_remove_proc(QSqlQuery& query)
+bool ShoppingList::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
+  query.bindValue(":_v00", m_id.get());
   return query.exec();
 }

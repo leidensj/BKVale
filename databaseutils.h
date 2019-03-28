@@ -1,9 +1,8 @@
 #ifndef DATABASEUTILS_H
 #define DATABASEUTILS_H
 
-#include <QSqlDatabase>
 #include <QVector>
-#include "jitem.h"
+#include "user.h"
 
 class UserLoginSQL
 {

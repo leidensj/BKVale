@@ -115,7 +115,7 @@ QString Product::SQL_tableName() const
   return PRODUCT_SQL_TABLE_NAME;
 }
 
-bool Product::SQL_insert_proc(QSqlQuery& query)
+bool Product::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " PRODUCT_SQL_TABLE_NAME " ("
                 PRODUCT_SQL_COL01 ","
@@ -173,7 +173,7 @@ bool Product::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Product::SQL_update_proc(QSqlQuery& query)
+bool Product::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
                 PRODUCT_SQL_COL01 " = (:_v01),"
@@ -283,7 +283,7 @@ bool Product::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Product::SQL_remove_proc(QSqlQuery& query)
+bool Product::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

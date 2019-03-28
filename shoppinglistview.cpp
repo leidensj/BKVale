@@ -175,7 +175,7 @@ void ShoppingListView::create()
   updateControls();
 }
 
-void ShoppingListView::setItem(const JItem& o)
+void ShoppingListView::setItem(const JItemSQL& o)
 {
   auto _o = dynamic_cast<const ShoppingList&>(o);
   m_currentId = _o.m_id;
@@ -194,7 +194,7 @@ void ShoppingListView::setItem(const JItem& o)
   updateControls();
 }
 
-const JItem& ShoppingListView::getItem() const
+const JItemSQL& ShoppingListView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;

@@ -150,7 +150,7 @@ QString Note::SQL_tableName() const
   return NOTE_SQL_TABLE_NAME;
 }
 
-bool Note::SQL_insert_proc(QSqlQuery& query)
+bool Note::SQL_insert_proc(QSqlQuery& query) const
 {
   bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
   if (bSuccess)
@@ -221,7 +221,7 @@ bool Note::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Note::SQL_update_proc(QSqlQuery& query)
+bool Note::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " NOTE_SQL_TABLE_NAME " SET "
                 NOTE_SQL_COL02 " = (:_v02),"
@@ -244,7 +244,7 @@ bool Note::SQL_update_proc(QSqlQuery& query)
 
   if (bSuccess)
   {
-    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
+    for (int i = 0; i != m_vNoteItem.size(); ++i)
     {
       query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
                     NOTE_ITEMS_SQL_COL01 ","
@@ -276,7 +276,8 @@ bool Note::SQL_update_proc(QSqlQuery& query)
         break;
     }
   }
-  return bSuccess
+
+  return bSuccess;
 }
 
 bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
@@ -338,7 +339,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
         o.m_package.m_bIsPackage = query.value(4).toBool();
         o.m_package.m_unity = query.value(5).toString();
         o.m_package.m_ammount = query.value(6).toDouble();
-        o.push_back(o);
+        m_vNoteItem.push_back(o);
       }
     }
   }
@@ -354,7 +355,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
     for (int i = 0; i != m_vNoteItem.size(); ++i)
     {
       if (m_vNoteItem.at(i).m_product.m_id.isValid())
-        bSuccess = m_vNoteItem.at(i).m_product.SQL_select_proc(query, error);
+        bSuccess = m_vNoteItem[i].m_product.SQL_select_proc(query, error);
       if (!bSuccess)
         break;
     }
@@ -363,7 +364,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Note::SQL_remove_proc(QSqlQuery& query)
+bool Note::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

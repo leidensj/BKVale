@@ -41,7 +41,7 @@ QString Reservation::SQL_tableName() const
   return RESERVATION_SQL_TABLE_NAME;
 }
 
-bool Reservation::SQL_insert_proc(QSqlQuery& query)
+bool Reservation::SQL_insert_proc(QSqlQuery& query) const
 {
   query.exec("SELECT MAX(" RESERVATION_SQL_COL01 ") FROM " RESERVATION_SQL_TABLE_NAME);
   m_number = query.next() ? query.value(0).toLongLong() + 1 : 1;
@@ -76,7 +76,7 @@ bool Reservation::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Reservation::SQL_update_proc(QSqlQuery& query)
+bool Reservation::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " RESERVATION_SQL_TABLE_NAME " SET "
                 RESERVATION_SQL_COL01 " = (:_v01),"
@@ -137,7 +137,7 @@ bool Reservation::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Reservation::SQL_remove_proc(QSqlQuery& query)
+bool Reservation::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " RESERVATION_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

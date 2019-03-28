@@ -6,9 +6,9 @@
 #include <QByteArray>
 #include <QVector>
 #include "defines.h"
-#include "jitem.h"
+#include "jitemsql.h"
 
-struct Image : public SQL_JItem
+struct Image : public JItemSQL
 {
   Image();
   void clear();
@@ -16,10 +16,10 @@ struct Image : public SQL_JItem
   bool operator ==(const JItem& other) const;
   bool isValid() const;
   QString SQL_tableName() const;
-  bool SQL_insert_proc(QSqlQuery& query);
-  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
-  bool SQL_remove_proc(QSqlQuery& query);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   QString m_name;
   QByteArray m_image;

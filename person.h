@@ -5,7 +5,7 @@
 #include "phone.h"
 #include "address.h"
 #include "defines.h"
-#include "jitem.h"
+#include "jitemsql.h"
 #include <QObject>
 #include <QString>
 #include <QVector>
@@ -32,7 +32,7 @@ struct Supplier
   bool m_bIsSupplier;
 };
 
-struct Person : public SQL_JItem
+struct Person : public JItemSQL
 {
   Person();
   void clear();
@@ -42,10 +42,10 @@ struct Person : public SQL_JItem
   QString strAliasName() const;
 
   QString SQL_tableName() const;
-  bool SQL_insert_proc(QSqlQuery& query);
-  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
-  bool SQL_remove_proc(QSqlQuery& query);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   bool SQL_select_by_pincode(const QString& pincode, QString& error);
   bool SQL_select_by_pincode_proc(QSqlQuery& query, const QString& pincode, QString& error);

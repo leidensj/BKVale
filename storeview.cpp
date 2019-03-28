@@ -88,7 +88,7 @@ void StoreView::create()
   m_edName->setFocus();
 }
 
-const JItem& StoreView::getItem() const
+const JItemSQL& StoreView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
@@ -99,7 +99,7 @@ const JItem& StoreView::getItem() const
   return m_ref;
 }
 
-void StoreView::setItem(const JItem& o)
+void StoreView::setItem(const JItemSQL& o)
 {
   const Store& ref = static_cast<const Store&>(o);
   m_currentId = o.m_id;

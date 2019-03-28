@@ -82,7 +82,7 @@ QString Store::SQL_tableName() const
   return STORE_SQL_TABLE_NAME;
 }
 
-bool Store::SQL_insert_proc(QSqlQuery& query)
+bool Store::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " STORE_SQL_TABLE_NAME " ("
                 STORE_SQL_COL01 ","
@@ -148,7 +148,7 @@ bool Store::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Store::SQL_update_proc(QSqlQuery& query)
+bool Store::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " STORE_SQL_TABLE_NAME " SET "
                 STORE_SQL_COL01 " = (:_v01),"
@@ -189,7 +189,7 @@ bool Store::SQL_update_proc(QSqlQuery& query)
       if (bSuccess)
       {
         m_vEmployee.at(i).m_id.set(query.lastInsertId().toLongLong());
-        for (int j = 0; j != o.m_vEmployee.at(i).m_hours.size(); ++j)
+        for (int j = 0; j != m_vEmployee.at(i).m_hours.size(); ++j)
         {
           query.prepare("INSERT INTO " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
                         STORE_EMPLOYEE_HOURS_SQL_COL01 ","
@@ -237,7 +237,6 @@ bool Store::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     if (query.next())
     {
-      m_id = id;
       m_person.m_id = query.value(0).toLongLong();
       m_address.m_id = query.value(1).toLongLong();
       m_phone.m_id = query.value(2).toLongLong();
@@ -308,12 +307,12 @@ bool Store::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Store::SQL_remove_proc(QSqlQuery& query)
+bool Store::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " STORE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
-  return bSuccess;
+  query.bindValue(":_v00", m_id.get());
+  return query.exec();
 }
 
 

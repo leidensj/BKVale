@@ -75,7 +75,7 @@ QString User::SQL_tableName() const
   return USER_SQL_TABLE_NAME;
 }
 
-bool User::SQL_insert_proc(QSqlQuery& query)
+bool User::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " USER_SQL_TABLE_NAME " ("
                 USER_SQL_COL01 ","
@@ -135,7 +135,7 @@ bool User::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool User::SQL_update_proc(QSqlQuery& query)
+bool User::SQL_update_proc(QSqlQuery& query) const
 {
   QString strQuery("UPDATE " USER_SQL_TABLE_NAME " SET "
                    USER_SQL_COL01 " = (:_v01),");
@@ -157,7 +157,6 @@ bool User::SQL_update_proc(QSqlQuery& query)
               USER_SQL_COL16" = (:_v16)"
               " WHERE " SQL_COLID " = (:_v00)";
 
-  QSqlQuery query(db);
   query.prepare(strQuery);
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_strUser);
@@ -237,7 +236,7 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool User::SQL_remove_proc(QSqlQuery& query)
+bool User::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

@@ -1,7 +1,7 @@
 #ifndef DISCOUNT_H
 #define DISCOUNT_H
 
-#include "jitem.h"
+#include "jitemsql.h"
 #include "product.h"
 #include <QVector>
 #include <QMetaType>
@@ -30,7 +30,7 @@ struct DiscountItem : JItem
 
 Q_DECLARE_METATYPE(DiscountItem)
 
-struct Discount : public SQL_JItem
+struct Discount : public JItemSQL
 {
   enum class Type
   {
@@ -46,10 +46,10 @@ struct Discount : public SQL_JItem
   bool operator ==(const JItem& other) const;
   bool isValid() const;
   QString SQL_tableName() const;
-  bool SQL_insert_proc(QSqlQuery& query);
-  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
-  bool SQL_remove_proc(QSqlQuery& query);
+  bool SQL_remove_proc(QSqlQuery& query) const;
   bool SQL_redeem(const QString& code, bool& redeemed, QString& error);
 
   static QString strType(Type type);

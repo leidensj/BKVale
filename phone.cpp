@@ -39,12 +39,12 @@ QString Phone::SQL_tableName() const
   return PHONE_SQL_TABLE_NAME;
 }
 
-bool Phone::SQL_insert_proc(QSqlQuery& /*query*/)
+bool Phone::SQL_insert_proc(QSqlQuery& /*query*/) const
 {
   return false;
 }
 
-bool Phone::SQL_update_proc(QSqlQuery& /*query*/)
+bool Phone::SQL_update_proc(QSqlQuery& /*query*/) const
 {
   return false;
 }
@@ -83,7 +83,7 @@ bool Phone::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Phone::SQL_remove_proc(QSqlQuery& /*query*/)
+bool Phone::SQL_remove_proc(QSqlQuery& /*query*/) const
 {
   return false;
 }

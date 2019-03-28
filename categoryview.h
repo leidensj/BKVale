@@ -14,7 +14,7 @@ class CategoryView : public JItemView
 
 public:
   explicit CategoryView(QWidget* parent = 0);
-  const JItem& getItem() const;
+  const JItemSQL& getItem() const;
 
 public slots:
   void create();
@@ -23,7 +23,7 @@ private:
   mutable Category m_ref;
   JLineEdit* m_edName;
   JDatabasePicker* m_imagePicker;
-  void setItem(const JItem& o);
+  void setItem(const JItemSQL& o);
 };
 
 #endif // CATEGORYVIEW_H

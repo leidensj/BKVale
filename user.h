@@ -4,11 +4,11 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
-#include "jitem.h"
+#include "jitemsql.h"
 #include "defines.h"
 
 
-struct User : public SQL_JItem
+struct User : public JItemSQL
 {
   User();
   void clear();
@@ -16,10 +16,10 @@ struct User : public SQL_JItem
   bool operator == (const JItem& other) const;
   bool isValid() const;
   QString SQL_tableName() const;
-  bool SQL_insert_proc(QSqlQuery& query);
-  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
-  bool SQL_remove_proc(QSqlQuery& query);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   QString strEncryptedPassword() const;
   static QString st_strEncryptedPassword(const QString& strPassword);

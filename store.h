@@ -1,7 +1,7 @@
 #ifndef STORE_H
 #define STORE_H
 
-#include "jitem.h"
+#include "jitemsql.h"
 #include "person.h"
 #include "timeinterval.h"
 #include <QVector>
@@ -22,7 +22,7 @@ struct StoreEmployee : public JItem
   QVector<TimeInterval> m_hours;
 };
 
-struct Store : public SQL_JItem
+struct Store : public JItemSQL
 {
   Store();
   void clear();
@@ -30,10 +30,10 @@ struct Store : public SQL_JItem
   bool operator ==(const JItem& other) const;
   bool operator !=(const JItem& other) const;
   QString SQL_tableName() const;
-  bool SQL_insert_proc(QSqlQuery& query);
-  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
-  bool SQL_remove_proc(QSqlQuery& query);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   Person m_person;
   Address m_address;

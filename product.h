@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
-#include "jitem.h"
+#include "jitemsql.h"
 #include "defines.h"
 #include "category.h"
 #include <QRegExp>
@@ -34,7 +34,7 @@ struct ProductCode : public JItem
   QString m_code;
 };
 
-struct Product : public SQL_JItem
+struct Product : public JItemSQL
 {
   Product();
   void clear();
@@ -43,10 +43,10 @@ struct Product : public SQL_JItem
   bool isValid() const;
 
   QString SQL_tableName() const;
-  bool SQL_insert_proc(QSqlQuery& query);
-  bool SQL_update_proc(QSqlQuery& query);
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
-  bool SQL_remove_proc(QSqlQuery& query);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   bool SQL_select_by_code(const ProductCode& code, QString& error);
 

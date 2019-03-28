@@ -15,8 +15,8 @@ class ImageView : public JItemView
 
 public:
   explicit ImageView(QWidget* parent = 0);
-  void setImage(const Image& image);
-  const JItem& getItem() const;
+  void setImage(const JItemSQL& image);
+  const JItemSQL& getItem() const;
 
 public slots:
   void create();
@@ -25,7 +25,7 @@ private:
   mutable Image m_ref;
   JLineEdit* m_edImageName;
   JImageView* m_imageView;
-  void setItem(const JItem& o);
+  void setItem(const JItemSQL& o);
 };
 
 #endif // IMAGEVIEW_H

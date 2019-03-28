@@ -134,7 +134,7 @@ QString Discount::SQL_tableName() const
   return DISCOUNT_SQL_TABLE_NAME;
 }
 
-bool Discount::SQL_insert_proc(QSqlQuery& query)
+bool Discount::SQL_insert_proc(QSqlQuery& query) const
 {
   bool bSuccess = false;
 
@@ -206,7 +206,7 @@ bool Discount::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Discount::SQL_update_proc(QSqlQuery& query)
+bool Discount::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " DISCOUNT_SQL_TABLE_NAME " SET "
                 DISCOUNT_SQL_COL01 " = (:_v01),"
@@ -281,7 +281,6 @@ bool Discount::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     if (query.next())
     {
-      m_id = id;
       m_code = query.value(0).toString();
       m_bExpires = query.value(1).toBool();
       m_dtExp = query.value(2).toDate();
@@ -335,15 +334,15 @@ bool Discount::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Discount::SQL_remove_proc(QSqlQuery& query)
+bool Discount::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " DISCOUNT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
+  query.bindValue(":_v00", m_id.get());
   return query.exec();
 }
 
-bool Discount::redeem(const QString& code, bool& redeemed, QString& error)
+bool Discount::SQL_redeem(const QString& code, bool& redeemed, QString& error)
 {
   redeemed = false;
   error.clear();

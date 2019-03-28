@@ -34,9 +34,8 @@ QString Category::SQL_tableName() const
   return CATEGORY_SQL_TABLE_NAME;
 }
 
-bool Category::SQL_insert_proc(QSqlQuery& query)
+bool Category::SQL_insert_proc(QSqlQuery& query) const
 {
-  error.clear();
   query.prepare("INSERT INTO " CATEGORY_SQL_TABLE_NAME " ("
                 CATEGORY_SQL_COL01 ","
                 CATEGORY_SQL_COL02 ")"
@@ -54,7 +53,7 @@ bool Category::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Category::SQL_update_proc(QSqlQuery& query)
+bool Category::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
                 CATEGORY_SQL_COL01 " = (:_v01),"
@@ -99,7 +98,7 @@ bool Category::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Category::SQL_remove_proc(QSqlQuery& query)
+bool Category::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " CATEGORY_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

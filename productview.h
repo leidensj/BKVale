@@ -20,7 +20,7 @@ class ProductView : public JItemView
 public:
   explicit ProductView(QWidget* parent = 0);
   ~ProductView();
-  const JItem& getItem() const;
+  const JItemSQL& getItem() const;
 
 public slots:
   void create();
@@ -35,7 +35,7 @@ private:
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
   ProductCodeTableWidget* m_tbCode;
-  void setItem(const JItem& o);
+  void setItem(const JItemSQL& o);
 };
 
 #endif // PRODUCTVIEW_H

@@ -94,12 +94,12 @@ QString Person::strAliasName() const
   return m_alias.isEmpty() ? m_name : m_alias;
 }
 
-QString SQL_tableName() const
+QString Person::SQL_tableName() const
 {
   return PERSON_SQL_TABLE_NAME;
 }
 
-bool Person::SQL_insert_proc(QSqlQuery& query)
+bool Person::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " PERSON_SQL_TABLE_NAME " ("
                 PERSON_SQL_COL01 ","
@@ -173,7 +173,7 @@ bool Person::SQL_insert_proc(QSqlQuery& query)
 
     if (bSuccess)
     {
-      for (int i = 0; i != person.m_vPhone.size(); ++i)
+      for (int i = 0; i != m_vPhone.size(); ++i)
       {
         query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
                       PHONE_SQL_COL01 ","
@@ -187,14 +187,14 @@ bool Person::SQL_insert_proc(QSqlQuery& query)
                       "(:_v03),"
                       "(:_v04),"
                       "(:_v05))");
-        query.bindValue(":_v01", person.m_id.get());
-        query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
-        query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
-        query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
-        query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
+        query.bindValue(":_v01", m_id.get());
+        query.bindValue(":_v02", m_vPhone.at(i).m_countryCode);
+        query.bindValue(":_v03", m_vPhone.at(i).m_code);
+        query.bindValue(":_v04", m_vPhone.at(i).m_number);
+        query.bindValue(":_v05", m_vPhone.at(i).m_name);
         bSuccess = query.exec();
         if (bSuccess)
-          person.m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
+          m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
         else
           break;
       }
@@ -202,7 +202,7 @@ bool Person::SQL_insert_proc(QSqlQuery& query)
 
     if (bSuccess)
     {
-      for (int i = 0; i != person.m_vAddress.size(); ++i)
+      for (int i = 0; i != m_vAddress.size(); ++i)
       {
         query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
                       ADDRESS_SQL_COL01 ","
@@ -224,18 +224,18 @@ bool Person::SQL_insert_proc(QSqlQuery& query)
                       "(:_v07),"
                       "(:_v08),"
                       "(:_v09))");
-        query.bindValue(":_v01", person.m_id.get());
-        query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
-        query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
-        query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
-        query.bindValue(":_v05", person.m_vAddress.at(i).m_number);
-        query.bindValue(":_v06", person.m_vAddress.at(i).m_city);
-        query.bindValue(":_v07", (int)person.m_vAddress.at(i).m_state);
-        query.bindValue(":_v08", person.m_vAddress.at(i).m_complement);
-        query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
+        query.bindValue(":_v01", m_id.get());
+        query.bindValue(":_v02", m_vAddress.at(i).m_cep);
+        query.bindValue(":_v03", m_vAddress.at(i).m_neighborhood);
+        query.bindValue(":_v04", m_vAddress.at(i).m_street);
+        query.bindValue(":_v05", m_vAddress.at(i).m_number);
+        query.bindValue(":_v06", m_vAddress.at(i).m_city);
+        query.bindValue(":_v07", (int)m_vAddress.at(i).m_state);
+        query.bindValue(":_v08", m_vAddress.at(i).m_complement);
+        query.bindValue(":_v09", m_vAddress.at(i).m_reference);
         bSuccess = query.exec();
         if (bSuccess)
-          person.m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
+          m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
         else
           break;
       }
@@ -245,7 +245,7 @@ bool Person::SQL_insert_proc(QSqlQuery& query)
   return bSuccess;
 }
 
-bool Person::SQL_update_proc(QSqlQuery& query)
+bool Person::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " PERSON_SQL_TABLE_NAME " SET "
                 PERSON_SQL_COL01 " = (:_v01),"
@@ -278,7 +278,7 @@ bool Person::SQL_update_proc(QSqlQuery& query)
   {
     query.prepare("DELETE FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", person.m_id.get());
+    query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
   }
 
@@ -286,7 +286,7 @@ bool Person::SQL_update_proc(QSqlQuery& query)
   {
     query.prepare("DELETE FROM " SUPPLIER_SQL_TABLE_NAME
                   " WHERE " SUPPLIER_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", person.m_id.get());
+    query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
   }
 
@@ -335,7 +335,7 @@ bool Person::SQL_update_proc(QSqlQuery& query)
 
   if (bSuccess)
   {
-    for (int i = 0; i != person.m_vPhone.size(); ++i)
+    for (int i = 0; i != m_vPhone.size(); ++i)
     {
       query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
                     PHONE_SQL_COL01 ","
@@ -349,14 +349,14 @@ bool Person::SQL_update_proc(QSqlQuery& query)
                                     "(:_v03),"
                                     "(:_v04),"
                                     "(:_v05))");
-      query.bindValue(":_v01", person.m_id.get());
-      query.bindValue(":_v02", person.m_vPhone.at(i).m_countryCode);
-      query.bindValue(":_v03", person.m_vPhone.at(i).m_code);
-      query.bindValue(":_v04", person.m_vPhone.at(i).m_number);
-      query.bindValue(":_v05", person.m_vPhone.at(i).m_name);
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vPhone.at(i).m_countryCode);
+      query.bindValue(":_v03", m_vPhone.at(i).m_code);
+      query.bindValue(":_v04", m_vPhone.at(i).m_number);
+      query.bindValue(":_v05", m_vPhone.at(i).m_name);
       bSuccess = query.exec();
       if (bSuccess)
-        person.m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
+        m_vPhone.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -364,7 +364,7 @@ bool Person::SQL_update_proc(QSqlQuery& query)
 
   if (bSuccess)
   {
-    for (int i = 0; i != person.m_vAddress.size(); ++i)
+    for (int i = 0; i != m_vAddress.size(); ++i)
     {
       query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
                     ADDRESS_SQL_COL01 ","
@@ -386,18 +386,18 @@ bool Person::SQL_update_proc(QSqlQuery& query)
                                       "(:_v07),"
                                       "(:_v08),"
                                       "(:_v09))");
-      query.bindValue(":_v01", person.m_id.get());
-      query.bindValue(":_v02", person.m_vAddress.at(i).m_cep);
-      query.bindValue(":_v03", person.m_vAddress.at(i).m_neighborhood);
-      query.bindValue(":_v04", person.m_vAddress.at(i).m_street);
-      query.bindValue(":_v05", person.m_vAddress.at(i).m_number);
-      query.bindValue(":_v06", person.m_vAddress.at(i).m_city);
-      query.bindValue(":_v07", (int)person.m_vAddress.at(i).m_state);
-      query.bindValue(":_v08", person.m_vAddress.at(i).m_complement);
-      query.bindValue(":_v09", person.m_vAddress.at(i).m_reference);
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vAddress.at(i).m_cep);
+      query.bindValue(":_v03", m_vAddress.at(i).m_neighborhood);
+      query.bindValue(":_v04", m_vAddress.at(i).m_street);
+      query.bindValue(":_v05", m_vAddress.at(i).m_number);
+      query.bindValue(":_v06", m_vAddress.at(i).m_city);
+      query.bindValue(":_v07", (int)m_vAddress.at(i).m_state);
+      query.bindValue(":_v08", m_vAddress.at(i).m_complement);
+      query.bindValue(":_v09", m_vAddress.at(i).m_reference);
       bSuccess = query.exec();
       if (bSuccess)
-        person.m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
+        m_vAddress.at(i).m_id.set(query.lastInsertId().toLongLong());
       else
         break;
     }
@@ -431,7 +431,6 @@ bool Person::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     if (query.next())
     {
-      m_id = id;
       m_image.m_id.set(query.value(0).toLongLong());
       m_name = query.value(1).toString();
       m_alias = query.value(2).toString();
@@ -507,7 +506,7 @@ bool Person::SQL_select_proc(QSqlQuery& query, QString& error)
                   SQL_COLID
                   " FROM " PHONE_SQL_TABLE_NAME
                   " WHERE " PHONE_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", id.get());
+    query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     QVector<Id> ids;
     while (bSuccess && query.next())
@@ -520,7 +519,7 @@ bool Person::SQL_select_proc(QSqlQuery& query, QString& error)
       bSuccess = o.SQL_select_proc(query, error);
       if (!bSuccess)
         break;
-      m_vPhone.push_back(phone);
+      m_vPhone.push_back(o);
     }
   }
 
@@ -530,7 +529,7 @@ bool Person::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Person::SQL_remove_proc(QSqlQuery& query)
+bool Person::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " PERSON_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());

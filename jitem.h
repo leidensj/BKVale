@@ -4,9 +4,6 @@
 #include "defines.h"
 #include <QRegExp>
 #include <QVariant>
-#include <QSqlQuery>
-#include <QSqlDatabase>
-#include <QSqlError>
 
 class Id
 {
@@ -67,113 +64,6 @@ struct JItem
       default:
         return QString::number(value);
     }
-  }
-};
-
-
-struct SQL_JItem : public JItem
-{
-  virtual ~SQL_JItem() { }
-
-  virtual QString SQL_tableName() const = 0;
-  virtual bool SQL_insert_proc(QSqlQuery& query) = 0;
-  virtual bool SQL_update_proc(QSqlQuery& query) = 0;
-  virtual bool SQL_select_proc(QSqlQuery& query, QString& error) = 0;
-  virtual bool SQL_remove_proc(QSqlQuery& query) = 0;
-
-  virtual bool SQL_insert(QString& error)
-  {
-    error.clear();
-
-    if (!SQL_isOpen(error))
-      return false;
-
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    db.transaction();
-    QSqlQuery query(db);
-
-    bool bSuccess = SQL_insert_proc(query);
-    return SQL_finish(db, query, bSuccess, error);
-  }
-
-  virtual bool SQL_update(QString& error)
-  {
-    error.clear();
-
-    if (!SQL_isOpen(error))
-      return false;
-
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    db.transaction();
-    QSqlQuery query(db);
-
-    bool bSuccess = SQL_update_proc(query);
-    return SQL_finish(db, query, bSuccess, error);
-  }
-
-  virtual bool SQL_select(QString& error)
-  {
-    error.clear();
-
-    if (!SQL_isOpen(error))
-      return false;
-
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    db.transaction();
-    QSqlQuery query(db);
-
-    bool bSuccess = SQL_select_proc(query, error);
-    return SQL_finish(db, query, bSuccess, error);
-  }
-
-  virtual bool SQL_remove(QString& error)
-  {
-    error.clear();
-
-    if (!SQL_isOpen(error))
-      return false;
-
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    db.transaction();
-    QSqlQuery query(db);
-
-    bool bSuccess = SQL_remove_proc(query);
-    return SQL_finish(db, query, bSuccess, error);
-  }
-
-  static bool SQL_isOpen(QString& error)
-  {
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    error.clear();
-    if (!db.isOpen())
-       error = "Banco de dados não foi aberto.";
-    return db.isOpen();
-  }
-
-  static bool SQL_finish(QSqlDatabase db, const QSqlQuery& query, bool bExecSelectResult, QString& error)
-  {
-    if (!bExecSelectResult)
-    {
-      if (error.isEmpty())
-      {
-        error = query.lastError().text();
-        if (error.isEmpty())
-          error = db.lastError().text();
-      }
-      db.rollback();
-      return false;
-    }
-    else
-      bExecSelectResult = db.commit();
-
-    if (!bExecSelectResult && error.isEmpty())
-    {
-      error = query.lastError().text();
-      if (error.isEmpty())
-        error = db.lastError().text();
-    }
-
-    return bExecSelectResult;
   }
 };
 

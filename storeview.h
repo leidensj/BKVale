@@ -15,7 +15,7 @@ class StoreView : public JItemView
 
 public:
   explicit StoreView(QWidget* parent = 0);
-  const JItem& getItem() const;
+  const JItemSQL& getItem() const;
 
 public slots:
   void create();
@@ -32,7 +32,7 @@ private:
   StoreEmployeeTableWidget* m_employeeTable;
   QPushButton* m_btnAddEmployee;
   QPushButton* m_btnRemoveEmployee;
-  void setItem(const JItem& o);
+  void setItem(const JItemSQL& o);
 };
 
 #endif // STOREVIEW_H

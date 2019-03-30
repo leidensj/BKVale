@@ -7,6 +7,7 @@ class JDatabasePicker;
 class QDateEdit;
 class QDialogButtonBox;
 class QCheckBox;
+class JSpinBox;
 
 class TimeCard : public QDialog
 {
@@ -23,6 +24,7 @@ private:
   JDatabasePicker* m_storePicker;
   QDateEdit* m_date;
   QDialogButtonBox* m_buttons;
+  JSpinBox* m_spnExtraPages;
   QCheckBox* m_cbOpenFile;
 };
 

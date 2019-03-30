@@ -679,7 +679,8 @@ void JTableView::keyPressEvent(QKeyEvent* event)
   {
     emit enterKeyPressedSignal();
   }
-  QTableView::keyPressEvent(event);
+  else
+    QTableView::keyPressEvent(event);
 }
 
 JDatabase::JDatabase(const QString& tableName,

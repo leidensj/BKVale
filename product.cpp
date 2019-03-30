@@ -226,7 +226,7 @@ bool Product::SQL_update_proc(QSqlQuery& query) const
 
 bool Product::SQL_select_proc(QSqlQuery& query, QString& error)
 {
-  error;
+  error.clear();
 
   query.prepare("SELECT "
                 PRODUCT_SQL_COL01 ","

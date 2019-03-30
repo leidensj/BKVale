@@ -36,7 +36,7 @@ void CategoryView::create()
   m_edName->setFocus();
 }
 
-const JItem& CategoryView::getItem() const
+const JItemSQL& CategoryView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
@@ -45,7 +45,7 @@ const JItem& CategoryView::getItem() const
   return m_ref;
 }
 
-void CategoryView::setItem(const JItem& o)
+void CategoryView::setItem(const JItemSQL& o)
 {
   auto ref = static_cast<const Category&>(o);
   m_currentId = o.m_id;

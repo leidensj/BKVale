@@ -6,7 +6,7 @@
 #include <category.h>
 #include <QVector>
 #include <QSqlDatabase>
-#include "jitem.h"
+#include "jitemsql.h"
 
 class QPushButton;
 class JLineEdit;
@@ -35,8 +35,8 @@ public:
 
 public slots:
   void clear();
-  void setItems(const QVector<JItem*>& items);
-  bool setItem(const JItem& jItem);
+  void setItems(const QVector<JItemSQL*>& v);
+  bool setItem(const JItemSQL& o);
   bool setItem(Id id,
                const QString& name,
                const QByteArray& arImage);

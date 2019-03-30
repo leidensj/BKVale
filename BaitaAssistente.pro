@@ -73,7 +73,9 @@ SOURCES += main.cpp\
     shoppinglist.cpp \
     store.cpp \
     jdatepicker.cpp \
-    jplaintextedit.cpp
+    jplaintextedit.cpp \
+    jitemhelper.cpp \
+    JItemSQL.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -140,7 +142,9 @@ HEADERS  += mainwindow.h \
     productcodetablewidget.h \
     jdateedit.h \
     jdatepicker.h \
-    jplaintextedit.h
+    jplaintextedit.h \
+    jitemhelper.h \
+    jitemsql.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

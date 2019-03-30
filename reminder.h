@@ -3,9 +3,9 @@
 
 #include <QString>
 #include <QObject>
-#include "jitem.h"
+#include "jitemsql.h"
 
-struct Reminder : public JItem
+struct Reminder : public JItemSQL
 {
   enum class Capitalization : int
   {
@@ -25,7 +25,11 @@ struct Reminder : public JItem
   bool operator != (const JItem& other) const;
   bool operator == (const JItem& other) const;
   bool isValid() const;
-  QString strTableName() const;
+  QString SQL_tableName() const;
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   QString m_title;
   QString m_message;

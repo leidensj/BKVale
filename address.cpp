@@ -62,9 +62,66 @@ bool Address::isValid() const
       !m_street.isEmpty();
 }
 
-QString Address::strTableName() const
+QString Address::SQL_tableName() const
 {
   return ADDRESS_SQL_TABLE_NAME;
+}
+
+bool Address::SQL_insert_proc(QSqlQuery& /*query*/) const
+{
+  return false;
+}
+
+bool Address::SQL_update_proc(QSqlQuery& /*query*/) const
+{
+  return false;
+}
+
+bool Address::SQL_select_proc(QSqlQuery& query, QString& error)
+{
+  error.clear();
+  query.prepare("SELECT "
+                ADDRESS_SQL_COL01 ","
+                ADDRESS_SQL_COL02 ","
+                ADDRESS_SQL_COL03 ","
+                ADDRESS_SQL_COL04 ","
+                ADDRESS_SQL_COL05 ","
+                ADDRESS_SQL_COL06 ","
+                ADDRESS_SQL_COL07 ","
+                ADDRESS_SQL_COL08 ","
+                ADDRESS_SQL_COL09
+                " FROM " ADDRESS_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", m_id.get());
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      query.value(0).toLongLong(); // PersonId não usamoe
+      m_cep = query.value(1).toString();
+      m_neighborhood = query.value(2).toString();
+      m_street = query.value(3).toString();
+      m_number = query.value(4).toInt();
+      m_city = query.value(5).toString();
+      m_state = (Address::EBRState)query.value(6).toInt();
+      m_complement = query.value(7).toString();
+      m_reference = query.value(8).toString();
+    }
+    else
+    {
+      error = "Endereço não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  return bSuccess;
+}
+
+bool Address::SQL_remove_proc(QSqlQuery& /*query*/) const
+{
+  return false;
 }
 
 Address::EBRState Address::st_getEBRState(const QString& abv)

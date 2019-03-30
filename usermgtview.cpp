@@ -167,7 +167,7 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   create();
 }
 
-const JItem& UserMgtView::getItem() const
+const JItemSQL& UserMgtView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
@@ -190,7 +190,7 @@ const JItem& UserMgtView::getItem() const
   return m_ref;
 }
 
-void UserMgtView::setItem(const JItem& o)
+void UserMgtView::setItem(const JItemSQL& o)
 {
   auto _o = dynamic_cast<const User&>(o);
   if (_o.m_id.isValid())

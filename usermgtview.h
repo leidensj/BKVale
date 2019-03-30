@@ -15,7 +15,7 @@ class UserMgtView : public JItemView
 
 public:
   explicit UserMgtView(Id currentLoggedId, QWidget* parent = 0);
-  const JItem& getItem() const;
+  const JItemSQL& getItem() const;
 
   QString getPassword() const;
   bool hasLoggedUserChanged() const;
@@ -50,7 +50,7 @@ private:
   QCheckBox* m_accessReservation;
   QCheckBox* m_accessSettings;
 
-  void setItem(const JItem& o);
+  void setItem(const JItemSQL& o);
 
 private slots:
   void viewPassword(bool b);

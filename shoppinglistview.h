@@ -20,7 +20,7 @@ class ShoppingListView : public JItemView
 
 public:
   explicit ShoppingListView(QWidget* parent = nullptr);
-  const JItem& getItem() const;
+  const JItemSQL& getItem() const;
 
 public slots:
   void create();
@@ -42,7 +42,7 @@ private:
 
   QPushButton* m_vbtnMonth[31];
   QPushButton* m_vbtnWeek[7];
-  void setItem(const JItem& o);
+  void setItem(const JItemSQL& o);
 };
 
 #endif // SHOPPINGLISTVIEW_H

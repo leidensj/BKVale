@@ -10,7 +10,7 @@
 #include "person.h"
 #include "product.h"
 #include "defines.h"
-#include "jitem.h"
+#include "jitemsql.h"
 
 enum class ShoppingListColumn : int
 {
@@ -44,14 +44,18 @@ struct ShoppingListItem : JItem
   Person m_supplier;
 };
 
-struct ShoppingList : public JItem
+struct ShoppingList : public JItemSQL
 {
   ShoppingList();
   void clear();
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
-  QString strTableName() const;
+  QString SQL_tableName() const;
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   void setWeekDays(const QString& strWeekDays);
   void setMonthDays(const QString& strMonthDays);

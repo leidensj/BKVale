@@ -192,9 +192,9 @@ DiscountView::DiscountView(QWidget* parent)
                    this,
                    SLOT(create()));
   QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
+                   SIGNAL(itemSelectedSignal(const JItemSQL&)),
                    this,
-                   SLOT(itemSelected(const JItem&)));
+                   SLOT(itemSelected(const JItemSQL&)));
   QObject::connect(m_database,
                    SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
                    this,
@@ -238,7 +238,7 @@ DiscountView::DiscountView(QWidget* parent)
   create();
 }
 
-void DiscountView::itemSelected(const JItem& jItem)
+void DiscountView::itemSelected(const JItemSQL& jItem)
 {
   const Discount& o = dynamic_cast<const Discount&>(jItem);
   if (o.m_id.isValid())
@@ -382,7 +382,7 @@ void DiscountView::redeem()
   bool redeemed = false;
   Discount o;
   QString error;
-  bool bSuccess = DiscountSQL::redeem(code, o, redeemed, error);
+  bool bSuccess = o.SQL_redeem(code, redeemed, error);
   if (bSuccess)
   {
     if (redeemed)
@@ -411,7 +411,7 @@ Discount DiscountView::save()
   if (bSuccess)
   {
     QString error;
-    if (DiscountSQL::select(o, error))
+    if (o.SQL_select(error))
       create();
     else
       o.clear();

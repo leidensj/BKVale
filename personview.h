@@ -29,7 +29,7 @@ public:
                       bool bAccessSupplier,
                       QWidget* parent = 0);
   ~PersonView();
-  const JItem& getItem() const;
+  const JItemSQL& getItem() const;
 
 private slots:
   void updateControls();
@@ -75,7 +75,7 @@ private:
   const bool m_bHasAccessToEmployees;
   const bool m_bHasAccessToSuppliers;
 
-  void setItem(const JItem &o);
+  void setItem(const JItemSQL &o);
 };
 
 #endif // PERSONVIEW_H

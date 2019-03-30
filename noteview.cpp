@@ -295,7 +295,7 @@ NoteView::NoteView(QWidget *parent)
   mainLayout->addWidget(splitter);
   setLayout(mainLayout);
 
-  connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(itemSelected(const JItem&)));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(itemSelected(const JItemSQL&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
   connect(m_database, SIGNAL(refreshSignal()), this, SLOT(updateControls()));
   connect(m_btnSearch, SIGNAL(clicked(bool)), databaseFrame, SLOT(setVisible(bool)));
@@ -413,7 +413,7 @@ Note NoteView::save(Person& employee)
     m_lastId = note.m_id;
     QString error;
     //TODO quickfix
-    NoteSQL::select(note, error);
+    note.SQL_select(error);
     create();
   }
   else
@@ -428,7 +428,7 @@ void NoteView::lastItemSelected()
   m_database->selectItem(m_lastId);
 }
 
-void NoteView::itemSelected(const JItem& jItem)
+void NoteView::itemSelected(const JItemSQL& jItem)
 {
   const Note& note = dynamic_cast<const Note&>(jItem);
   m_lastId = note.m_id;

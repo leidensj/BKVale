@@ -4,16 +4,20 @@
 #include <QObject>
 #include <QString>
 #include "defines.h"
-#include "jitem.h"
+#include "jitemsql.h"
 
-struct Phone : public JItem
+struct Phone : public JItemSQL
 {
   Phone();
   void clear();
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
-  QString strTableName() const;
+  QString SQL_tableName() const;
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   QString strFormattedPhone() const;
   QString strFormattedPhoneWithName() const;

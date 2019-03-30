@@ -27,7 +27,7 @@ public:
   Discount getDiscount() const;
 
 private slots:
-  void itemSelected(const JItem& jItem);
+  void itemSelected(const JItemSQL& jItem);
   void itemsRemoved(const QVector<Id>& ids);
   void searchProduct();
   void removeProduct();

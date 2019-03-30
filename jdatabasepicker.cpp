@@ -4,6 +4,7 @@
 #include "defines.h"
 #include "jdatabase.h"
 #include "store.h"
+#include "product.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QGroupBox>
@@ -44,7 +45,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   connect(action2, SIGNAL(triggered(bool)), this, SLOT(clear()));
   connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
-  connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItem*>&)), this, SLOT(setItems(const QVector<JItem*>&)));
+  connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(setItems(const QVector<JItemSQL*>&)));
 }
 
 JDatabase* JDatabasePicker::getDatabase() const
@@ -52,49 +53,49 @@ JDatabase* JDatabasePicker::getDatabase() const
   return m_selector->getDatabase();
 }
 
-void JDatabasePicker::setItems(const QVector<JItem*>& items)
+void JDatabasePicker::setItems(const QVector<JItemSQL*>& v)
 {
   m_selector->close();
   clear();
   bool bChanged = false;
-  for (int i = 0; i != items.size(); ++i)
+  for (int i = 0; i != v.size(); ++i)
   {
-    if (items.at(i) == nullptr)
+    if (v.at(i) == nullptr)
       continue;
-    if (setItem(*items.at(i)))
+    if (setItem(*v.at(i)))
       bChanged = true;
   }
   if (bChanged)
     emit changedSignal();
 }
 
-bool JDatabasePicker::setItem(const JItem& jItem)
+bool JDatabasePicker::setItem(const JItemSQL& o)
 {
   QString tableName = m_selector->getDatabase()->getTableName();
   if (tableName == IMAGE_SQL_TABLE_NAME)
   {
-    const Image& o = dynamic_cast<const Image&>(jItem);
-    return setItem(o.m_id, o.m_name, o.m_image);
+    const Image& _o = dynamic_cast<const Image&>(o);
+    return setItem(_o.m_id, _o.m_name, _o.m_image);
   }
   else if (tableName == PERSON_SQL_TABLE_NAME)
   {
-    const Person& o = dynamic_cast<const Person&>(jItem);
-    return setItem(o.m_id, o.strAliasName(), o.m_image.m_image);
+    const Person& _o = dynamic_cast<const Person&>(o);
+    return setItem(_o.m_id, _o.strAliasName(), _o.m_image.m_image);
   }
   else if (tableName == CATEGORY_SQL_TABLE_NAME)
   {
-    const Category& o = dynamic_cast<const Category&>(jItem);
-    return setItem(o.m_id, o.m_name, o.m_image.m_image);
+    const Category& _o = dynamic_cast<const Category&>(o);
+    return setItem(_o.m_id, _o.m_name, _o.m_image.m_image);
   }
   else if (tableName == PRODUCT_SQL_TABLE_NAME)
   {
-    const Product& o = dynamic_cast<const Product&>(jItem);
-    return setItem(o.m_id, o.m_name, o.m_image.m_image);
+    const Product& _o = dynamic_cast<const Product&>(o);
+    return setItem(_o.m_id, _o.m_name, _o.m_image.m_image);
   }
   else if (tableName == STORE_SQL_TABLE_NAME)
   {
-    const Store& o = dynamic_cast<const Store&>(jItem);
-    return setItem(o.m_id, o.m_name, o.m_person.m_image.m_image);
+    const Store& _o = dynamic_cast<const Store&>(o);
+    return setItem(_o.m_id, _o.m_name, _o.m_person.m_image.m_image);
   }
   return false;
 }

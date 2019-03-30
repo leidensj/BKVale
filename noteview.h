@@ -71,7 +71,7 @@ private slots:
   void removeItem();
   void supplierChanged();
   void lastItemSelected();
-  void itemSelected(const JItem& jItem);
+  void itemSelected(const JItemSQL& jItem);
   void itemsRemoved(const QVector<Id>& ids);
   void addProduct();
   void openDetailsDialog();

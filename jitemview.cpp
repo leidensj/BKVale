@@ -65,7 +65,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
-  connect(m_database, SIGNAL(itemSelectedSignal(const JItem&)), this, SLOT(selectItem(const JItem&)));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(selectItem(const JItemSQL&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_database, SLOT(setVisible(bool)));
 
@@ -73,7 +73,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_database->hide();
 }
 
-void JItemView::selectItem(const JItem& o)
+void JItemView::selectItem(const JItemSQL& o)
 {
   setItem(o);
   QString strIcon = o.m_id.isValid()

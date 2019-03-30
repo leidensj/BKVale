@@ -217,7 +217,7 @@ PersonView::~PersonView()
 
 }
 
-const JItem& PersonView::getItem() const
+const JItemSQL& PersonView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
@@ -248,7 +248,7 @@ const JItem& PersonView::getItem() const
   return m_ref;
 }
 
-void PersonView::setItem(const JItem &o)
+void PersonView::setItem(const JItemSQL &o)
 {
   auto _o = dynamic_cast<const Person&>(o);
   m_rdoCompany->setChecked(_o.m_bCompany);

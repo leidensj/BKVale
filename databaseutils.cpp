@@ -1,11 +1,10 @@
 #include "databaseutils.h"
-#include "settings.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QVariant>
-#include <QDebug>
 #include <QHostInfo>
+#include <QDate>
 
 #define DATABASE_NOT_OPEN_TXT "O banco de dados não foi aberto."
 
@@ -422,165 +421,16 @@ bool BaitaSQL::createTables(QString& error)
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool NoteSQL::insert(const Note& note,
-                     QString& error)
+UserLoginSQL::UserLoginSQL()
 {
-  error.clear();
 
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  Settings settings;
-  settings.load();
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
-  if (bSuccess)
-  {
-    note.m_number = query.next()
-                    ? query.value(0).toLongLong() + 1
-                    : settings.m_notesDefaultNumber;
-    note.m_number = note.m_number > settings.m_notesDefaultNumber ? note.m_number : settings.m_notesDefaultNumber;
-
-    query.prepare("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
-                  NOTE_SQL_COL01 ","
-                  NOTE_SQL_COL02 ","
-                  NOTE_SQL_COL03 ","
-                  NOTE_SQL_COL04 ","
-                  NOTE_SQL_COL05 ","
-                  NOTE_SQL_COL06
-                  ") VALUES ("
-                  "(:_v01),"
-                  "(:_v02),"
-                  "(:_v03),"
-                  "(:_v04),"
-                  "(:_v05),"
-                  "(:_v06))");
-    query.bindValue(":_v01", note.m_number);
-    query.bindValue(":_v02", note.m_date);
-    query.bindValue(":_v03", note.m_supplier.m_id.getIdNull());
-    query.bindValue(":_v04", note.m_bCash);
-    query.bindValue(":_v05", note.m_observation);
-    query.bindValue(":_v06", note.m_disccount);
-    bSuccess = query.exec();
-  }
-
-  if (bSuccess)
-  {
-    note.m_id.set(query.lastInsertId().toLongLong());
-    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
-    {
-      query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                    NOTE_ITEMS_SQL_COL01 ","
-                    NOTE_ITEMS_SQL_COL02 ","
-                    NOTE_ITEMS_SQL_COL03 ","
-                    NOTE_ITEMS_SQL_COL04 ","
-                    NOTE_ITEMS_SQL_COL05 ","
-                    NOTE_ITEMS_SQL_COL06 ","
-                    NOTE_ITEMS_SQL_COL07
-                    ") VALUES ("
-                    "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
-                    "(:_v04),"
-                    "(:_v05),"
-                    "(:_v06),"
-                    "(:_v07))");
-      query.bindValue(":_v01", note.m_id.get());
-      query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id.get());
-      query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
-      query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
-      query.bindValue(":_v05", note.m_vNoteItem.at(i).m_package.m_bIsPackage);
-      query.bindValue(":_v06", note.m_vNoteItem.at(i).m_package.m_unity);
-      query.bindValue(":_v07", note.m_vNoteItem.at(i).m_package.m_ammount);
-      bSuccess = query.exec();
-      if (bSuccess)
-        note.m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
-      else
-        break;
-    }
-  }
-
-  return finishTransaction(db, query, bSuccess, error);
 }
 
-bool NoteSQL::update(const Note& note,
-                     QString& error)
+bool UserLoginSQL::login(const QString& strUser,
+                         const QString& strPassword,
+                         QString& error)
 {
   error.clear();
-
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  query.prepare("UPDATE " NOTE_SQL_TABLE_NAME " SET "
-                NOTE_SQL_COL02 " = (:_v02),"
-                NOTE_SQL_COL03 " = (:_v03),"
-                NOTE_SQL_COL04 " = (:_v04),"
-                NOTE_SQL_COL05 " = (:_v05),"
-                NOTE_SQL_COL06 " = (:_v06) "
-                "WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", note.m_id.get());
-  query.bindValue(":_v02", note.m_date);
-  query.bindValue(":_v03", note.m_supplier.m_id.getIdNull());
-  query.bindValue(":_v04", note.m_bCash);
-  query.bindValue(":_v05", note.m_observation);
-  query.bindValue(":_v06", note.m_disccount);
-  bool bSuccess = query.exec();
-
-  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", note.m_id.get());
-  bSuccess = query.exec();
-
-  if (bSuccess)
-  {
-    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
-    {
-      query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                    NOTE_ITEMS_SQL_COL01 ","
-                    NOTE_ITEMS_SQL_COL02 ","
-                    NOTE_ITEMS_SQL_COL03 ","
-                    NOTE_ITEMS_SQL_COL04 ","
-                    NOTE_ITEMS_SQL_COL05 ","
-                    NOTE_ITEMS_SQL_COL06 ","
-                    NOTE_ITEMS_SQL_COL07
-                    " ) VALUES ("
-                    "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
-                    "(:_v04),"
-                    "(:_v05),"
-                    "(:_v06),"
-                    "(:_v07))");
-      query.bindValue(":_v01", note.m_id.get());
-      query.bindValue(":_v02", note.m_vNoteItem.at(i).m_product.m_id.get());
-      query.bindValue(":_v03", note.m_vNoteItem.at(i).m_ammount);
-      query.bindValue(":_v04", note.m_vNoteItem.at(i).m_price);
-      query.bindValue(":_v05", note.m_vNoteItem.at(i).m_package.m_bIsPackage);
-      query.bindValue(":_v06", note.m_vNoteItem.at(i).m_package.m_unity);
-      query.bindValue(":_v07", note.m_vNoteItem.at(i).m_package.m_ammount);
-      bSuccess = query.exec();
-      if (bSuccess)
-        note.m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
-      else
-        break;
-    }
-  }
-
-  return finishTransaction(db, query, bSuccess, error);
-}
-
-bool NoteSQL::select(Note& note,
-                     QString& error)
-{
-  error.clear();
-  Id id = note.m_id;
-  note.clear();
 
   if (!BaitaSQL::isOpen(error))
     return false;
@@ -589,347 +439,155 @@ bool NoteSQL::select(Note& note,
   db.transaction();
   QSqlQuery query(db);
   query.prepare("SELECT "
-                NOTE_SQL_COL01 ","
-                NOTE_SQL_COL02 ","
-                NOTE_SQL_COL03 ","
-                NOTE_SQL_COL04 ","
-                NOTE_SQL_COL05 ","
-                NOTE_SQL_COL06
-                " FROM " NOTE_SQL_TABLE_NAME
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
+                SQL_COLID ","
+                USER_SQL_COL01 ","
+                USER_SQL_COL02 ","
+                USER_SQL_COL03 ","
+                USER_SQL_COL04 ","
+                USER_SQL_COL05 ","
+                USER_SQL_COL06 ","
+                USER_SQL_COL07 ","
+                USER_SQL_COL08 ","
+                USER_SQL_COL09 ","
+                USER_SQL_COL10 ","
+                USER_SQL_COL11 ","
+                USER_SQL_COL12 ","
+                USER_SQL_COL13 ","
+                USER_SQL_COL14 ","
+                USER_SQL_COL15 ","
+                USER_SQL_COL16
+                " FROM " USER_SQL_TABLE_NAME
+                " WHERE " USER_SQL_COL01 " = (:_v01) AND "
+                USER_SQL_COL02 " = (:_v02) LIMIT 1");
+  query.bindValue(":_v01", strUser);
+  query.bindValue(":_v02", User::st_strEncryptedPassword(strPassword));
+
   bool bSuccess = query.exec();
 
   if (bSuccess)
   {
     if (query.next())
     {
-      note.m_id = id;
-      note.m_number = query.value(0).toLongLong();
-      note.m_date = query.value(1).toDate();
-      note.m_supplier.m_id.set(query.value(2).toLongLong());
-      note.m_bCash = query.value(3).toBool();
-      note.m_observation = query.value(4).toString();
-      note.m_disccount = query.value(5).toDouble();
-    }
-    else
-    {
-      error = "Vale não encontrado.";
-      bSuccess = false;
-    }
+      m_user.m_id.set(query.value(0).toLongLong());
+      m_user.m_strUser = query.value(1).toString();
+      query.value(2).toString(); // password nao precisamos
+      m_user.m_bAccessNote = query.value(3).toBool();
+      m_user.m_bAccessReminder = query.value(4).toBool();
+      m_user.m_bAccessCalculator = query.value(5).toBool();
+      m_user.m_bAccessShop = query.value(6).toBool();
+      m_user.m_bAccessUser = query.value(7).toBool();
+      m_user.m_bAccessProduct = query.value(8).toBool();
+      m_user.m_bAccessSettings = query.value(9).toBool();
+      m_user.m_bAccessPerson = query.value(10).toBool();
+      m_user.m_bAccessCategory = query.value(11).toBool();
+      m_user.m_bAccessImage = query.value(12).toBool();
+      m_user.m_bAccessReservation = query.value(13).toBool();
+      m_user.m_bAccessShoppingList = query.value(14).toBool();
+      m_user.m_bAccessEmployee = query.value(15).toBool();
+      m_user.m_bAccessSupplier = query.value(16).toBool();
 
-  }
-
-  if (bSuccess)
-  {
-    query.prepare("SELECT "
-                  SQL_COLID ","
-                  NOTE_ITEMS_SQL_COL02 ","
-                  NOTE_ITEMS_SQL_COL03 ","
-                  NOTE_ITEMS_SQL_COL04 ","
-                  NOTE_ITEMS_SQL_COL05 ","
-                  NOTE_ITEMS_SQL_COL06 ","
-                  NOTE_ITEMS_SQL_COL07
-                  " FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                  " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", note.m_id.get());
-    bSuccess = query.exec();
-    if (bSuccess)
-    {
-      while (bSuccess && query.next())
-      {
-        NoteItem noteItem;
-        noteItem.m_id.set(query.value(0).toLongLong());
-        noteItem.m_product.m_id.set(query.value(1).toLongLong());
-        noteItem.m_ammount = query.value(2).toDouble();
-        noteItem.m_price = query.value(3).toDouble();
-        noteItem.m_package.m_bIsPackage = query.value(4).toBool();
-        noteItem.m_package.m_unity = query.value(5).toString();
-        noteItem.m_package.m_ammount = query.value(6).toDouble();
-        note.m_vNoteItem.push_back(noteItem);
-      }
-    }
-  }
-
-  if (bSuccess)
-  {
-    QString error2;
-    if (note.m_supplier.m_id.isValid())
-      PersonSQL::execSelect(query, note.m_supplier, error2);
-    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
-    {
-      if (note.m_vNoteItem.at(i).m_product.m_id.isValid())
-        ProductSQL::execSelect(query, note.m_vNoteItem[i].m_product, error2);
-    }
-  }
-
-  return finishTransaction(db, query, bSuccess, error);
-}
-
-bool NoteSQL::remove(Id id,
-                     QString& error)
-{
-  error.clear();
-
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
-  bool bSuccess = query.exec();
-  return finishTransaction(db, query, bSuccess, error);
-}
-
-NoteItem NoteSQL::selectLastItem(Id supplierId,
-                                 Id productId)
-{
-  NoteItem noteItem;
-  QString error;
-  if (!BaitaSQL::isOpen(error))
-    return noteItem;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  query.prepare("SELECT "
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL05 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL06 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL07
-                " FROM " NOTE_SQL_TABLE_NAME
-                " INNER JOIN " NOTE_ITEMS_SQL_TABLE_NAME
-                " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID
-                " = " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
-                " WHERE " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
-                " = (:_v01)"
-                " AND " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02
-                " = (:_v02) "
-                " ORDER BY " NOTE_ITEMS_SQL_TABLE_NAME "." SQL_COLID
-                " DESC LIMIT 1");
-  query.bindValue(":_v01", supplierId.get());
-  query.bindValue(":_v02", productId.get());
-  bool bSuccess = query.exec();
-
-  if (bSuccess && query.next())
-  {
-    noteItem.m_id.set(query.value(0).toLongLong());
-    noteItem.m_product.m_id.set(query.value(1).toLongLong());
-    noteItem.m_ammount = query.value(2).toDouble();
-    noteItem.m_price = query.value(3).toDouble();
-    noteItem.m_package.m_bIsPackage = query.value(4).toBool();
-    noteItem.m_package.m_unity = query.value(5).toString();
-    noteItem.m_package.m_ammount = query.value(6).toDouble();
-    if (noteItem.m_product.m_id.isValid())
-      ProductSQL::execSelect(query, noteItem.m_product, error);
-  }
-
-  finishTransaction(db, query, bSuccess, error);
-  return noteItem;
-}
-
-bool ProductSQL::execSelect(QSqlQuery& query,
-                            Product& product,
-                            QString& error)
-{
-  error.clear();
-  Id id = product.m_id;
-  product.clear();
-
-  query.prepare("SELECT "
-                PRODUCT_SQL_COL01 ","
-                PRODUCT_SQL_COL02 ","
-                PRODUCT_SQL_COL03 ","
-                PRODUCT_SQL_COL04 ","
-                PRODUCT_SQL_COL05 ","
-                PRODUCT_SQL_COL06 ","
-                PRODUCT_SQL_COL07
-                " FROM " PRODUCT_SQL_TABLE_NAME
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", id.get());
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    if (query.next())
-    {
-      product.m_id = id;
-      product.m_name = query.value(0).toString();
-      product.m_category.m_id.set(query.value(1).toLongLong());
-      product.m_image.m_id.set(query.value(2).toLongLong());
-      product.m_unity = query.value(3).toString();
-      product.m_details = query.value(4).toString();
-      product.m_bBuy = query.value(5).toBool();
-      product.m_bSell = query.value(6).toBool();
-
-      if (bSuccess && product.m_image.m_id.isValid())
-        bSuccess = ImageSQL::execSelect(query, product.m_image, error);
-
-      if (bSuccess && product.m_category.m_id.isValid())
-        bSuccess = CategorySQL::execSelect(query, product.m_category, error);
-
+      bSuccess = ActiveUserSQL::execRemove(query, error);
       if (bSuccess)
       {
-        query.prepare("SELECT "
-                      PRODUCT_CODE_ITEMS_SQL_COL02
-                      " FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
-                      " WHERE " PRODUCT_CODE_ITEMS_SQL_COL01 " = (:_v01)");
-        query.bindValue(":_v01", product.m_id.get());
-        bSuccess = query.exec();
+        bSuccess = ActiveUserSQL::execRefresh(query, error);
         if (bSuccess)
         {
-          while (query.next())
+          query.prepare("SELECT " ACTIVE_USERS_SQL_COL02 ","
+                        ACTIVE_USERS_SQL_COL03 " FROM "
+                        ACTIVE_USERS_SQL_TABLE_NAME " WHERE "
+                        ACTIVE_USERS_SQL_COL02 " = (:v02) LIMIT 1");
+          query.bindValue(":v02", strUser);
+          bSuccess = query.exec();
+          if (bSuccess)
           {
-            ProductCode code;
-            code.m_code = query.value(0).toString();
-            product.m_vCode.push_back(code);
+            if (query.next())
+            {
+              bSuccess = false;
+              error = "Usuário " +
+                      strUser  +
+                      " já logado na máquina " +
+                      query.value(1).toString();
+            }
+            else
+            {
+              query.prepare("SELECT pg_backend_pid()");
+              bSuccess = query.exec();
+              if (bSuccess)
+              {
+                qlonglong pid = 0;
+                if (query.next())
+                  pid = query.value(0).toLongLong();
+                QString strQuery = "INSERT INTO " ACTIVE_USERS_SQL_TABLE_NAME " ("
+                                ACTIVE_USERS_SQL_COL01 ","
+                                ACTIVE_USERS_SQL_COL02 ","
+                                ACTIVE_USERS_SQL_COL03 ","
+                                ACTIVE_USERS_SQL_COL04 ")"
+                                " VALUES ("
+                                "(:_v01),"
+                                "(:_v02),"
+                                "(:_v03),"
+                                "current_timestamp)";
+                query.prepare(strQuery);
+                query.bindValue(":_v01", pid);
+                query.bindValue(":_v02", strUser);
+                query.bindValue(":_v03", QHostInfo::localHostName().toUpper());
+                bSuccess = query.exec();
+              }
+            }
           }
         }
       }
     }
-  }
-
-  if (!bSuccess)
-  {
-    if (error.isEmpty())
-      error = query.lastError().text();
-    product.clear();
-  }
-
-  return bSuccess;
-}
-
-bool ProductSQL::select(Product& product,
-                        QString& error)
-{
-  error.clear();
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-  bool bSuccess = execSelect(query, product, error);
-  return finishTransaction(db, query, bSuccess, error);
-}
-
-bool ProductSQL::selectByCode(Product& product,
-                              const ProductCode& code,
-                              QString& error)
-{
-  error.clear();
-  if (!BaitaSQL::isOpen(error))
-    return false;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  query.prepare(
-        QString("SELECT "
-                PRODUCT_CODE_ITEMS_SQL_COL01
-                " FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
-                " WHERE %1 = (:_v00)").arg(code.m_id.isValid()
-                                           ? SQL_COLID
-                                           : PRODUCT_CODE_ITEMS_SQL_COL02));
-  if (code.m_id.isValid())
-    query.bindValue(":_v00",  code.m_id.get());
-  else
-    query.bindValue(":_v00",  code.m_code);
-
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    if (query.next())
-    {
-      product.m_id.set(query.value(0).toLongLong());
-      bSuccess = execSelect(query, product, error);
-    }
     else
     {
       bSuccess = false;
-      error = "Código do produto não encontrado.";
+      error = "Usuário ou senha inválidos.";
     }
   }
+
+  if (!bSuccess)
+    m_user.clear();
+
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ProductSQL::insert(const Product& product,
-                        QString& error)
+bool ActiveUserSQL::refresh(QString& error)
 {
   error.clear();
-
   if (!BaitaSQL::isOpen(error))
     return false;
-
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   db.transaction();
   QSqlQuery query(db);
-  query.prepare("INSERT INTO " PRODUCT_SQL_TABLE_NAME " ("
-                PRODUCT_SQL_COL01 ","
-                PRODUCT_SQL_COL02 ","
-                PRODUCT_SQL_COL03 ","
-                PRODUCT_SQL_COL04 ","
-                PRODUCT_SQL_COL05 ","
-                PRODUCT_SQL_COL06 ","
-                PRODUCT_SQL_COL07 ")"
-                " VALUES ("
-                "(:_v01),"
-                "(:_v02),"
-                "(:_v03),"
-                "(:_v04),"
-                "(:_v05),"
-                "(:_v06),"
-                "(:_v07))");
-  query.bindValue(":_v01", product.m_name);
-  query.bindValue(":_v02", product.m_category.m_id.getIdNull());
-  query.bindValue(":_v03", product.m_image.m_id.getIdNull());
-  query.bindValue(":_v04", product.m_unity);
-  query.bindValue(":_v05", product.m_details);
-  query.bindValue(":_v06", product.m_bBuy);
-  query.bindValue(":_v07", product.m_bSell);
-
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    product.m_id.set(query.lastInsertId().toLongLong());
-    query.prepare("DELETE FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
-                  " WHERE " PRODUCT_CODE_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", product.m_id.get());
-    bSuccess = query.exec();
-    if (bSuccess)
-    {
-      for (int i = 0; i != product.m_vCode.size(); ++i)
-      {
-        query.prepare("INSERT INTO " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
-                      PRODUCT_CODE_ITEMS_SQL_COL01 ","
-                      PRODUCT_CODE_ITEMS_SQL_COL02 ")"
-                      " VALUES ("
-                      "(:_v01),"
-                      "(:_v02))");
-        query.bindValue(":_v01", product.m_id.get());
-        query.bindValue(":_v02", product.m_vCode.at(i).m_code);
-        bSuccess = query.exec();
-        if (bSuccess)
-          product.m_vCode[i].m_id.set(query.lastInsertId().toLongLong());
-        else
-          break;
-      }
-    }
-  }
-
+  bool bSuccess = execRefresh(query, error);
   return finishTransaction(db, query, bSuccess, error);
 }
 
-bool ProductSQL::update(const Product& product,
-                        QString& error)
+bool ActiveUserSQL::execRefresh(QSqlQuery& query, QString& error)
 {
   error.clear();
+  query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
+                " WHERE " ACTIVE_USERS_SQL_COL01 " NOT IN "
+                "(SELECT pid FROM pg_stat_activity)");
+  return query.exec();
+}
+
+bool ActiveUserSQL::remove(QString& error)
+{
+  error.clear();
+  if (!BaitaSQL::isOpen(error))
+    return false;
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  bool bSuccess = execRemove(query, error);
+  return finishTransaction(db, query, bSuccess, error);
+}
+
+bool ActiveUserSQL::execRemove(QSqlQuery& query, QString& error)
+{
+  error.clear();
+<<<<<<< HEAD
 
   if (!BaitaSQL::isOpen(error))
     return false;
@@ -3540,4 +3198,9 @@ bool AddressSQL::select(Address& o,
 
   bool bSuccess = execSelect(query, o, error);
   return finishTransaction(db, query, bSuccess, error);
+=======
+  query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
+                " WHERE " ACTIVE_USERS_SQL_COL01 " = pg_backend_pid()");
+  return query.exec();
+>>>>>>> refs/remotes/origin/master
 }

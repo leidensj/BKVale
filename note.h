@@ -8,7 +8,7 @@
 #include "person.h"
 #include "product.h"
 #include "defines.h"
-#include "jitem.h"
+#include "jitemsql.h"
 
 enum class NoteColumn : int
 {
@@ -39,14 +39,21 @@ struct NoteItem : JItem
   Package m_package;
 };
 
-struct Note : public JItem
+struct Note : public JItemSQL
 {
   Note();
   void clear();
   bool isValid() const;
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
-  QString strTableName() const;
+
+  QString SQL_tableName() const;
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query) const;
+
+  static NoteItem SQL_select_last_item(Id supplierId, Id productId);
 
   QString strDate() const;
   QString strDayOfWeek() const;

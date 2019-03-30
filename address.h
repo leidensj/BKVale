@@ -2,11 +2,11 @@
 #define ADDRESS_H
 
 #include "defines.h"
-#include "jitem.h"
+#include "jitemsql.h"
 #include <QObject>
 #include <QString>
 
-struct Address : public JItem
+struct Address : public JItemSQL
 {
   enum class EBRState : int
   {
@@ -28,7 +28,11 @@ struct Address : public JItem
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
-  QString strTableName() const;
+  QString SQL_tableName() const;
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query) const;
 
   QString getFormattedAddress() const;
   QString getFormattedAddress2() const;

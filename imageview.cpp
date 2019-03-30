@@ -25,18 +25,9 @@ ImageView::ImageView(QWidget* parent)
   m_tab->addTab(tabframe,
                 QIcon(":/icons/res/icon.png"),
                 tr("Imagem"));
-
-  QObject::connect(m_database,
-                   SIGNAL(itemSelectedSignal(const JItem&)),
-                   this,
-                   SLOT(selectItem(const JItem&)));
-  QObject::connect(m_database,
-                   SIGNAL(itemsRemovedSignal(const QVector<Id>&)),
-                   this,
-                   SLOT(itemsRemoved(const QVector<Id>&)));
 }
 
-void ImageView::setItem(const JItem& o)
+void ImageView::setItem(const JItemSQL& o)
 {
   auto _o = dynamic_cast<const Image&>(o);
   m_currentId = _o.m_id;
@@ -45,7 +36,7 @@ void ImageView::setItem(const JItem& o)
   m_imageView->setImage(_o.m_image);
 }
 
-const JItem& ImageView::getItem() const
+const JItemSQL& ImageView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;

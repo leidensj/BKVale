@@ -404,6 +404,7 @@ void NoteView::addProduct()
   m_table->addItemAndLoadPrices(m_supplierPicker->getId(), sender() == m_btnAddCode);
 }
 
+// TODO, SALVAR QUEM EDITOU O ITEM
 Note NoteView::save(Person& employee)
 {
   Note note = getNote();

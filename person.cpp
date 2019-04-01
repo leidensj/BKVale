@@ -13,6 +13,22 @@ void Employee::clear()
   m_bNoteRemove = false;
 }
 
+bool Employee::hasPermissionToEdit(const QString& tableName) const
+{
+  if (tableName == NOTE_SQL_TABLE_NAME)
+    return m_bNoteEdit;
+  else
+    return false;
+}
+
+bool Employee::hasPermissionToRemove(const QString& tableName) const
+{
+  if (tableName == NOTE_SQL_TABLE_NAME)
+    return m_bNoteRemove;
+  else
+    return false;
+}
+
 Supplier::Supplier()
 {
   clear();

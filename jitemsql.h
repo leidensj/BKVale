@@ -18,6 +18,10 @@ struct JItemSQL : public JItem
   virtual bool SQL_insert_update(QString& error) const;
   virtual bool SQL_select(QString& error);
   virtual bool SQL_remove(QString& error) const;
+
+  virtual bool SQL_authentication_insert_update() const { return false; }
+  virtual bool SQL_authentication_remove() const { return false; }
+
   static bool SQL_isOpen(QString& error);
   static bool SQL_finish(QSqlDatabase db,
                          const QSqlQuery& query,

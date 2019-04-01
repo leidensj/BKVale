@@ -7,5 +7,7 @@ namespace JItemHelper
 {
 JItemSQL* create(const QString& tableName);
 JItemSQL* create(const QString& tableName, Id id);
+bool authenticationToInsertUpdate(const QString& tableName);
+bool authenticationToRemove(const QString& tableName);
 }
 #endif // JITEMHELPER_H

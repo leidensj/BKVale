@@ -1046,35 +1046,28 @@ void JDatabase::removeItems()
     return;
   }
 
-  PinCodeView w(this);
-  if (!w.exec())
-    return;
-
-  Person person = w.getCurrentPerson();
-  if (!person.m_id.isValid() || !person.m_employee.m_bIsEmployee)
+  if (JItemHelper::authenticationToRemove(m_tableName))
   {
-    QMessageBox::warning(this,
-                         tr("Erro"),
-                         tr("Pincode informado não encontrado."),
-                         QMessageBox::Ok);
-    return;
+    PinCodeView w(this);
+    if (!w.exec())
+      return;
+
+    Person person = w.getCurrentPerson();
+    QString error;
+    if (!person.m_id.isValid() || !person.m_employee.m_bIsEmployee)
+      error = tr("Pincode informado não encontrado.");
+    else if (person.m_employee.hasPermissionToRemove(m_tableName))
+      error = tr("Funcionário não possui permissão.");
+
+    if (!error.isEmpty())
+    {
+      QMessageBox::warning(this, tr("Erro"), error, QMessageBox::Ok);
+      return;
+    }
   }
 
   for (int i = 0; i != ids.size(); ++i)
   {
-    // TODO SOLUCAO TEMPORARIA
-    if (m_tableName == NOTE_SQL_TABLE_NAME)
-    {
-      if (!person.m_employee.m_bNoteRemove)
-      {
-        QMessageBox::warning(this,
-                             tr("Erro"),
-                             tr("Funcionário não possui permissão."),
-                             QMessageBox::Ok);
-        return;
-      }
-    }
-
     Id id = ids.at(i);
     auto p = JItemHelper::create(m_tableName, id);
     if (p != nullptr)
@@ -1161,32 +1154,24 @@ JItemSQL* JDatabase::getCurrentItem() const
 
 bool JDatabase::save(const JItemSQL& o, Person* pEmployee)
 {
-  if (pEmployee != nullptr)
+  if (JItemHelper::authenticationToInsertUpdate(m_tableName))
   {
     PinCodeView w(this);
     if (!w.exec())
       return false;
 
-    *pEmployee = w.getCurrentPerson();
-    if (!pEmployee->m_id.isValid() || !pEmployee->m_employee.m_bIsEmployee)
-    {
-      QMessageBox::warning(this,
-                           tr("Aviso"),
-                           tr("Pincode informado não encontrado."),
-                           QMessageBox::Ok);
-      return false;
-    }
-  }
+    Person person = w.getCurrentPerson();
+    if (pEmployee != nullptr)
+      *pEmployee = person;
+    QString error;
+    if (!person.m_id.isValid() || !person.m_employee.m_bIsEmployee)
+      error = tr("Pincode informado não encontrado.");
+    else if (person.m_employee.hasPermissionToEdit(m_tableName))
+      error = tr("Funcionário não possui permissão.");
 
-  // TODO SOLUÇÃO TEMPORARIA
-  if (m_tableName == NOTE_SQL_TABLE_NAME)
-  {
-    if (pEmployee != nullptr && !pEmployee->m_employee.m_bNoteEdit)
+    if (!error.isEmpty())
     {
-      QMessageBox::warning(this,
-                           tr("Aviso"),
-                           tr("Funcionário não possui permissão."),
-                           QMessageBox::Ok);
+      QMessageBox::warning(this, tr("Erro"), error, QMessageBox::Ok);
       return false;
     }
   }
@@ -1198,12 +1183,7 @@ bool JDatabase::save(const JItemSQL& o, Person* pEmployee)
   if (bSuccess)
     refresh();
   else
-  {
-    QMessageBox::critical(this,
-                          tr("Erro"),
-                          tr("Erro '%1' ao salvar o item.").arg(error),
-                          QMessageBox::Ok);
-  }
+    QMessageBox::critical(this, tr("Erro"), tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
   return bSuccess;
 }
 

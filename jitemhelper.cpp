@@ -48,3 +48,21 @@ JItemSQL* JItemHelper::create(const QString& tableName, Id id)
     pt->m_id = id;
   return pt;
 }
+
+bool JItemHelper::authenticationToInsertUpdate(const QString& tableName)
+{
+  auto p = create(tableName);
+  bool b = p == nullptr ? false : p->SQL_authentication_insert_update();
+  if (p != nullptr)
+    delete p;
+  return b;
+}
+
+bool JItemHelper::authenticationToRemove(const QString& tableName)
+{
+  auto p = create(tableName);
+  bool b = p == nullptr ? false : p->SQL_authentication_remove();
+  if (p != nullptr)
+    delete p;
+  return b;
+}

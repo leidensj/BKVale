@@ -22,6 +22,8 @@ struct Employee
   bool m_bNoteRemove;
 
   QVariant getPincodeNull() const { return !m_pincode.isEmpty() ? m_pincode : QVariant(QVariant::String); }
+  bool hasPermissionToEdit(const QString& tableName) const;
+  bool hasPermissionToRemove(const QString& tableName) const;
 };
 
 struct Supplier

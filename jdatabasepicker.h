@@ -19,19 +19,13 @@ class JDatabasePicker : public QFrame
   Q_OBJECT
 
 public:
-  explicit JDatabasePicker(const QString& tableName,
-                           const QString& text,
-                           const QIcon& icon,
-                           bool bMultiPicker = false,
-                           QWidget* parent = nullptr);
+  explicit JDatabasePicker(const QString& tableName, bool bMultiPicker = false, QWidget* parent = nullptr);
 
   Id getId() const;
   const QVector<Id>& getIds() const;
-
-  const QString m_text;
-
   void setPlaceholderText(bool bSet);
   JDatabase* getDatabase() const;
+  QString getText() const;
 
 public slots:
   void clear();

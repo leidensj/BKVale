@@ -55,12 +55,8 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_imagePicker(nullptr)
   , m_table(nullptr)
 {
-  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
-                                         tr("Fornecedor"),
-                                         QIcon(":/icons/res/supplier.png"));
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
-                                      tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"));
+  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME);
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
 
@@ -114,8 +110,8 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   QFormLayout* viewFormLayout = new QFormLayout;
   viewFormLayout->addRow(tr("Título:"), m_edTitle);
-  viewFormLayout->addRow(m_supplierPicker->m_text + ":", m_supplierPicker);
-  viewFormLayout->addRow(m_imagePicker->m_text + ":", m_imagePicker);
+  viewFormLayout->addRow(m_supplierPicker->getText() + ":", m_supplierPicker);
+  viewFormLayout->addRow(m_imagePicker->getText() + ":", m_imagePicker);
   viewFormLayout->addRow(tr("Linhas:"), m_snLines);
   viewFormLayout->addRow(tr("Descrição:"), m_teDescription);
 

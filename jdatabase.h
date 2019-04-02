@@ -109,8 +109,6 @@ class JDatabaseSelector : public QDialog
 
 public:
   explicit JDatabaseSelector(const QString& tableName,
-                             const QString& title,
-                             const QIcon& icon,
                              bool bMultiSelector = false,
                              QWidget* parent = 0);
 

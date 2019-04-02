@@ -21,14 +21,8 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
   m_dtBegin->setCalendarPopup(true);
   m_dtEnd = new QDateEdit;
   m_dtEnd->setCalendarPopup(true);
-  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
-                                         tr("Fornecedor"),
-                                         QIcon(":/icons/res/supplier.png"),
-                                         true);
-  m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME,
-                                        tr("Produto"),
-                                        QIcon(":/icons/res/item.png"),
-                                        true);
+  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME, true);
+  m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
 
   m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
   m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);

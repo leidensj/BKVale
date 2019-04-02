@@ -40,6 +40,9 @@ struct Store : public JItemSQL
   Phone m_phone;
   QString m_name;
   QVector<StoreEmployee> m_vEmployee;
+
+  QString text() const { return "Loja"; }
+  QString icon() const { return ":/icons/res/store.png"; }
 };
 
 #endif // STORE_H

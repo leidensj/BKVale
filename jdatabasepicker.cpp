@@ -3,8 +3,7 @@
 #include "jimageview.h"
 #include "defines.h"
 #include "jdatabase.h"
-#include "store.h"
-#include "product.h"
+#include "jitemhelper.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QGroupBox>
@@ -13,12 +12,9 @@
 #include <QAction>
 
 JDatabasePicker::JDatabasePicker(const QString& tableName,
-                                 const QString& text,
-                                 const QIcon& icon,
                                  bool bMultiPicker,
                                  QWidget* parent)
  : QFrame(parent)
- , m_text(text)
  , m_bMultiPicker(bMultiPicker)
  , m_selector(nullptr)
  , m_edText(nullptr)
@@ -29,7 +25,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   QAction* action = m_edText->addAction(QIcon(":/icons/res/binoculars.png"), QLineEdit::LeadingPosition);
   QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);
 
-  m_selector = new JDatabaseSelector(tableName, tr("Selecionar ") + m_text, icon, bMultiPicker, this);
+  m_selector = new JDatabaseSelector(tableName, bMultiPicker, this);
 
   m_imageView = new JImageView(false, 24);
   m_imageView->hide();
@@ -71,33 +67,7 @@ void JDatabasePicker::setItems(const QVector<JItemSQL*>& v)
 
 bool JDatabasePicker::setItem(const JItemSQL& o)
 {
-  QString tableName = m_selector->getDatabase()->getTableName();
-  if (tableName == IMAGE_SQL_TABLE_NAME)
-  {
-    const Image& _o = dynamic_cast<const Image&>(o);
-    return setItem(_o.m_id, _o.m_name, _o.m_image);
-  }
-  else if (tableName == PERSON_SQL_TABLE_NAME)
-  {
-    const Person& _o = dynamic_cast<const Person&>(o);
-    return setItem(_o.m_id, _o.strAliasName(), _o.m_image.m_image);
-  }
-  else if (tableName == CATEGORY_SQL_TABLE_NAME)
-  {
-    const Category& _o = dynamic_cast<const Category&>(o);
-    return setItem(_o.m_id, _o.m_name, _o.m_image.m_image);
-  }
-  else if (tableName == PRODUCT_SQL_TABLE_NAME)
-  {
-    const Product& _o = dynamic_cast<const Product&>(o);
-    return setItem(_o.m_id, _o.m_name, _o.m_image.m_image);
-  }
-  else if (tableName == STORE_SQL_TABLE_NAME)
-  {
-    const Store& _o = dynamic_cast<const Store&>(o);
-    return setItem(_o.m_id, _o.m_name, _o.m_person.m_image.m_image);
-  }
-  return false;
+  return setItem(o.m_id, o.name(), o.image());
 }
 
 bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arImage)
@@ -174,7 +144,12 @@ const QVector<Id>& JDatabasePicker::getIds() const
   return m_ids;
 }
 
+QString JDatabasePicker::getText() const
+{
+  return JItemHelper::text(m_selector->getDatabase()->getTableName());
+}
+
 void JDatabasePicker::setPlaceholderText(bool bSet)
 {
-  m_edText->setPlaceholderText(bSet ? m_text : "");
+  m_edText->setPlaceholderText(bSet ? getText() : "");
 }

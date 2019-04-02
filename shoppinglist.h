@@ -70,6 +70,9 @@ struct ShoppingList : public JItemSQL
   bool m_weekDays[7];
   bool m_monthDays[31];
   QVector<ShoppingListItem> m_vItem;
+
+  QString text() const { return "Lista de Compras"; }
+  QString icon() const { return ":/icons/res/shopmgt.png"; }
 };
 
 

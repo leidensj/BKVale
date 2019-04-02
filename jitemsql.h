@@ -5,6 +5,7 @@
 #include <QSqlQuery>
 #include <QSqlDatabase>
 #include <QSqlError>
+#include <QByteArray>
 
 struct JItemSQL : public JItem
 {
@@ -21,6 +22,11 @@ struct JItemSQL : public JItem
 
   virtual bool SQL_authentication_insert_update() const { return false; }
   virtual bool SQL_authentication_remove() const { return false; }
+
+  virtual QString text() const { return ""; }
+  virtual QString icon() const { return ""; }
+  virtual QString name() const { return ""; }
+  virtual QByteArray image() const { return QByteArray(); }
 
   static bool SQL_isOpen(QString& error);
   static bool SQL_finish(QSqlDatabase db,

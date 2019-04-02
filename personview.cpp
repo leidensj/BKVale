@@ -82,9 +82,7 @@ PersonView::PersonView(bool bAccessEmployee,
   m_cbBirthDate->setChecked(false);
   m_cbBirthDate->setText(tr("Nascimento:"));
 
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
-                                      tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"));
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
   m_dtCreationDate = new QDateEdit;
   m_dtCreationDate->setCalendarPopup(true);
   m_dtCreationDate->setDisplayFormat("dd/MM/yyyy");

@@ -50,6 +50,9 @@ struct Address : public JItemSQL
   static EBRState st_getEBRState(const QString& abv);
   static BRState st_getBRState(EBRState s);
   BRState getBRState() const;
+
+  QString text() const { return "Telefone"; }
+  QString icon() const { return ":/icons/res/address.png"; }
 };
 
 #endif // ADDRESS_H

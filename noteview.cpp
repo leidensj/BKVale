@@ -211,9 +211,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line3);
   hlayout2->addWidget(m_btnDetails);
 
-  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
-                                         tr("Fornecedor"),
-                                         QIcon(":/icons/res/supplier.png"));
+  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();

@@ -1228,8 +1228,6 @@ double JDatabase::getSum(int column) const
 }
 
 JDatabaseSelector::JDatabaseSelector(const QString& tableName,
-                                     const QString& title,
-                                     const QIcon& icon,
                                      bool bMultiSelector,
                                      QWidget* parent)
   : QDialog(parent)
@@ -1244,8 +1242,13 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
   setLayout(vlayout0);
 
   resize(500, 400);
+
+  QString title = "Selecionar " + JItemHelper::text(tableName);
+  QString icon = JItemHelper::icon(tableName);
+
   setWindowTitle(title);
-  setWindowIcon(icon);
+  if (!icon.isEmpty())
+    setWindowIcon(QIcon(icon));
 
   QObject::connect(m_database, SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(itemsSelected(const QVector<JItemSQL*>&)));
 }

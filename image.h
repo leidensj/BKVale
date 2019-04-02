@@ -23,6 +23,11 @@ struct Image : public JItemSQL
 
   QString m_name;
   QByteArray m_image;
+
+  QString text() const { return "Imagem"; }
+  QString icon() const { return ":/icons/res/icon.png"; }
+  QString name() const { return m_name; }
+  QByteArray image() const { return m_image; }
 };
 
 #endif // IMAGE_H

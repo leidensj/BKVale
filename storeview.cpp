@@ -19,9 +19,7 @@ StoreView::StoreView(QWidget* parent)
   m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_edName->setPlaceholderText(tr("*"));
 
-  m_personPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME,
-                                       tr("Cadastro"),
-                                       QIcon(":/icons/res/person.png"));
+  m_personPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME);
   m_personPicker->getDatabase()->setFixedFilter(PERSON_FILTER_COMPANY);
 
   m_employeeTable = new StoreEmployeeTableWidget;

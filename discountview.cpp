@@ -343,9 +343,7 @@ void DiscountView::setProduct(const Product& product, bool bNewProduct)
 
 void DiscountView::searchProduct()
 {
-  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
-                        tr("Selecionar Produto"),
-                        QIcon(":/icons/res/item.png"));
+  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME);
   dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_SELL);
   dlg.exec();
   Product* p = static_cast<Product*>(dlg.getDatabase()->getCurrentItem());

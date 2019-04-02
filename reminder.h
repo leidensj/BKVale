@@ -38,6 +38,9 @@ struct Reminder : public JItemSQL
   Capitalization m_capitalization;
   bool m_bBarcodeHRI;
   QString m_barcode;
+
+  QString text() const { return "Lembrete"; }
+  QString icon() const { return ":/icons/res/postit.png"; }
 };
 
 #endif // REMINDER_H

@@ -65,6 +65,9 @@ struct Discount : public JItemSQL
   bool m_bExpires;
   QDate m_dtExp;
   QString m_description;
+
+  QString text() const { return "Desconto"; }
+  QString icon() const { return ":/icons/res/discount.png"; }
 };
 
 #endif // DISCOUNT_H

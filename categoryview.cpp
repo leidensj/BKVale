@@ -14,9 +14,7 @@ CategoryView::CategoryView(QWidget* parent)
   m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
 
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
-                                      tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"));
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
 
   QFormLayout* ltForm = new QFormLayout;
   ltForm->addRow(tr("Nome:"), m_edName);

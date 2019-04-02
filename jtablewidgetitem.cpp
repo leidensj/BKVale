@@ -397,9 +397,7 @@ const JItem& ProductTableWidgetItem::getItem() const
 
 void ProductTableWidgetItem::selectItem(const QString& fixedFilter)
 {
-  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME,
-                        QObject::tr("Selecionar Produto"),
-                        QIcon(":/icons/res/item.png"));
+  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME);
   dlg.getDatabase()->setFixedFilter(fixedFilter);
   if (dlg.exec())
   {
@@ -411,9 +409,7 @@ void ProductTableWidgetItem::selectItem(const QString& fixedFilter)
 
 void ProductTableWidgetItem::selectItemByCode(const QString& fixedFilter)
 {
-  JDatabaseSelector dlg(PRODUCT_CODE_ITEMS_SQL_TABLE_NAME,
-                        QObject::tr("Selecionar Produto"),
-                        QIcon(":/icons/res/item.png"));
+  JDatabaseSelector dlg(PRODUCT_CODE_ITEMS_SQL_TABLE_NAME);
   dlg.getDatabase()->setFixedFilter(fixedFilter);
   if (dlg.exec())
   {
@@ -458,9 +454,7 @@ const JItem& PersonTableWidgetItem::getItem() const
 
 void PersonTableWidgetItem::selectItem(const QString& fixedFilter)
 {
-  JDatabaseSelector dlg(PERSON_SQL_TABLE_NAME,
-                        QObject::tr("Selecionar Pessoa"),
-                        QIcon(":/icons/res/person.png"));
+  JDatabaseSelector dlg(PERSON_SQL_TABLE_NAME);
   dlg.getDatabase()->setFixedFilter(fixedFilter);
   if (dlg.exec())
   {

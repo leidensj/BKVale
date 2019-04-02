@@ -66,3 +66,27 @@ bool JItemHelper::authenticationToRemove(const QString& tableName)
     delete p;
   return b;
 }
+
+QString JItemHelper::text(const QString& tableName)
+{
+  auto p = JItemHelper::create(tableName);
+  QString text;
+  if (p != nullptr)
+  {
+    text = p->text();
+    delete p;
+  }
+  return text;
+}
+
+QString JItemHelper::icon(const QString& tableName)
+{
+  auto p = JItemHelper::create(tableName);
+  QString icon;
+  if (p != nullptr)
+  {
+    icon = p->icon();
+    delete p;
+  }
+  return icon;
+}

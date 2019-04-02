@@ -67,6 +67,11 @@ struct Person : public JItemSQL
   Employee m_employee;
   QVector<Phone> m_vPhone;
   QVector<Address> m_vAddress;
+
+  QString text() const { return "Pessoa"; }
+  QString icon() const { return ":/icons/res/person.png"; }
+  QString name() const { return strAliasName(); }
+  QByteArray image() const { return m_image.m_image; }
 };
 
 #endif

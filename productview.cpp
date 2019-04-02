@@ -41,12 +41,8 @@ ProductView::ProductView(QWidget* parent)
   m_cbSell->setIcon(QIcon(":/icons/res/sell.png"));
   m_cbSell->setText(tr("Venda"));
 
-  m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME,
-                                         tr("Categoria"),
-                                         QIcon(":/icons/res/category.png"));
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME,
-                                      tr("Imagem"),
-                                      QIcon(":/icons/res/icon.png"));
+  m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME);
+  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
 
   m_tbCode = new ProductCodeTableWidget;
   JTableButtons* btns = new JTableButtons(m_tbCode);

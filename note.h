@@ -74,6 +74,9 @@ struct Note : public JItemSQL
   QString m_observation;
   QVector<NoteItem> m_vNoteItem;
   double m_disccount;
+
+  QString text() const { return "Vale"; }
+  QString icon() const { return ":/icons/res/note.png"; }
 };
 
 #endif // COMMON_H

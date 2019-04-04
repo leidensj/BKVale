@@ -181,20 +181,20 @@ bool BaitaSQL::createTables(QString& error)
                         IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PERSON_SQL_TABLE_NAME " ("
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " FORM_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          PERSON_SQL_COL01 " INTEGER,"
-                          PERSON_SQL_COL02 " TEXT NOT NULL UNIQUE,"
-                          PERSON_SQL_COL03 " TEXT,"
-                          PERSON_SQL_COL04 " TEXT,"
-                          PERSON_SQL_COL05 " TEXT,"
-                          PERSON_SQL_COL06 " TEXT,"
-                          PERSON_SQL_COL07 " TEXT,"
-                          PERSON_SQL_COL08 " DATE,"
-                          PERSON_SQL_COL09 " DATE,"
-                          PERSON_SQL_COL10 " BOOLEAN,"
-                          PERSON_SQL_COL11 " BOOLEAN,"
-                          "FOREIGN KEY(" PERSON_SQL_COL01 ") REFERENCES "
+                          FORM_SQL_COL01 " INTEGER,"
+                          FORM_SQL_COL02 " TEXT NOT NULL UNIQUE,"
+                          FORM_SQL_COL03 " TEXT,"
+                          FORM_SQL_COL04 " TEXT,"
+                          FORM_SQL_COL05 " TEXT,"
+                          FORM_SQL_COL06 " TEXT,"
+                          FORM_SQL_COL07 " TEXT,"
+                          FORM_SQL_COL08 " DATE,"
+                          FORM_SQL_COL09 " DATE,"
+                          FORM_SQL_COL10 " BOOLEAN,"
+                          FORM_SQL_COL11 " BOOLEAN,"
+                          "FOREIGN KEY(" FORM_SQL_COL01 ") REFERENCES "
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
@@ -210,18 +210,18 @@ bool BaitaSQL::createTables(QString& error)
                         ADDRESS_SQL_COL08 " TEXT,"
                         ADDRESS_SQL_COL09 " TEXT,"
                         "FOREIGN KEY(" ADDRESS_SQL_COL01 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+                        FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
-  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PHONE_SQL_TABLE_NAME " ("
-                        SQL_COLID " SERIAL PRIMARY KEY,"
-                        PHONE_SQL_COL01 " INTEGER,"
-                        PHONE_SQL_COL02 " INTEGER DEFAULT " PHONE_DEFAULT_COUNTRY_CODE_VALUE_STR ","
-                        PHONE_SQL_COL03 " INTEGER DEFAULT " PHONE_DEFAULT_CODE_VALUE_STR ","
-                        PHONE_SQL_COL04 " TEXT,"
-                        PHONE_SQL_COL05 " TEXT,"
-                        "FOREIGN KEY(" PHONE_SQL_COL01 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PHONE_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          PHONE_SQL_COL01 " INTEGER,"
+                          PHONE_SQL_COL02 " INTEGER DEFAULT " PHONE_DEFAULT_COUNTRY_CODE_VALUE_STR ","
+                          PHONE_SQL_COL03 " INTEGER DEFAULT " PHONE_DEFAULT_CODE_VALUE_STR ","
+                          PHONE_SQL_COL04 " TEXT,"
+                          PHONE_SQL_COL05 " TEXT,"
+                          "FOREIGN KEY(" PHONE_SQL_COL01 ") REFERENCES "
+                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_SQL_TABLE_NAME " ("
@@ -231,45 +231,40 @@ bool BaitaSQL::createTables(QString& error)
                           STORE_SQL_COL03 " INTEGER,"
                           STORE_SQL_COL04 " TEXT,"
                           "FOREIGN KEY(" STORE_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                           "FOREIGN KEY(" STORE_SQL_COL02 ") REFERENCES "
                           ADDRESS_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                           "FOREIGN KEY(" STORE_SQL_COL03 ") REFERENCES "
                           PHONE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          STORE_EMPLOYEES_SQL_COL01 " INTEGER NOT NULL,"
-                          STORE_EMPLOYEES_SQL_COL02 " INTEGER NOT NULL,"
-                          "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL01 ") REFERENCES "
-                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL02 ") REFERENCES "
-                          EMPLOYEE_SQL_TABLE_NAME "(" EMPLOYEE_SQL_COL01 ") ON DELETE CASCADE)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
-                          STORE_EMPLOYEE_HOURS_SQL_COL01 " INTEGER NOT NULL,"
-                          STORE_EMPLOYEE_HOURS_SQL_COL02 " INTEGER,"
-                          STORE_EMPLOYEE_HOURS_SQL_COL03 " TIME,"
-                          STORE_EMPLOYEE_HOURS_SQL_COL04 " TIME,"
-                          "FOREIGN KEY(" STORE_EMPLOYEE_HOURS_SQL_COL01 ") REFERENCES "
-                          STORE_EMPLOYEES_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
-
-  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_SQL_TABLE_NAME " ("
-                          EMPLOYEE_SQL_COL01 " INTEGER PRIMARY KEY,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          EMPLOYEE_SQL_COL01 " INTEGER NOT NULL UNIQUE,"
                           EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
                           EMPLOYEE_SQL_COL03 " BOOLEAN,"
                           EMPLOYEE_SQL_COL04 " BOOLEAN,"
+                          EMPLOYEE_SQL_COL05 " INTEGER,"
                           "FOREIGN KEY(" EMPLOYEE_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" EMPLOYEE_SQL_COL05 ") REFERENCES "
+                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
+                          EMPLOYEE_HOURS_SQL_COL01 " INTEGER NOT NULL,"
+                          EMPLOYEE_HOURS_SQL_COL02 " INTEGER,"
+                          EMPLOYEE_HOURS_SQL_COL03 " TIME,"
+                          EMPLOYEE_HOURS_SQL_COL04 " TIME,"
+                          "FOREIGN KEY(" EMPLOYEE_HOURS_SQL_COL01 ") REFERENCES "
+                          EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SUPPLIER_SQL_TABLE_NAME " ("
-                          SUPPLIER_SQL_COL01 " INTEGER PRIMARY KEY,"
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          SUPPLIER_SQL_COL01 " INTEGER NOT NULL UNIQUE,"
                           "FOREIGN KEY(" SUPPLIER_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("
@@ -281,7 +276,7 @@ bool BaitaSQL::createTables(QString& error)
                         NOTE_SQL_COL05 " TEXT,"
                         NOTE_SQL_COL06 " REAL,"
                         "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
-                        PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                        SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
@@ -309,7 +304,7 @@ bool BaitaSQL::createTables(QString& error)
                           SHOPPING_LIST_SQL_COL06 " TEXT,"
                           SHOPPING_LIST_SQL_COL07 " INTEGER,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL01 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                          SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                           "FOREIGN KEY(" SHOPPING_LIST_SQL_COL02 ") REFERENCES "
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
@@ -331,7 +326,7 @@ bool BaitaSQL::createTables(QString& error)
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL02 ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL10 ") REFERENCES "
-                          PERSON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                          SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " RESERVATION_SQL_TABLE_NAME " ("
@@ -411,7 +406,7 @@ bool BaitaSQL::createTables(QString& error)
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
                     ":_password,"
-                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
+                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
       query.prepare(str);
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();
@@ -478,7 +473,7 @@ bool UserLoginSQL::login(const QString& strUser,
       m_user.m_bAccessUser = query.value(7).toBool();
       m_user.m_bAccessProduct = query.value(8).toBool();
       m_user.m_bAccessSettings = query.value(9).toBool();
-      m_user.m_bAccessPerson = query.value(10).toBool();
+      m_user.m_bAccessForm = query.value(10).toBool();
       m_user.m_bAccessCategory = query.value(11).toBool();
       m_user.m_bAccessImage = query.value(12).toBool();
       m_user.m_bAccessReservation = query.value(13).toBool();

@@ -80,7 +80,8 @@ private slots:
   void openCategoriesDialog();
   void openLoginDialog();
   void openImagesDialog();
-  void openPersonsDialog();
+  void openFormsDialog();
+  void openEmployeesDialog();
   void openShoppingListDialog();
   void openActiveUsersDialog();
   void openStoreDialog();

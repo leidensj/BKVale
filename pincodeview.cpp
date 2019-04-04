@@ -176,7 +176,7 @@ void PinCodeView::append(QChar c)
 void PinCodeView::search()
 {
   QString error;
-  if (!m_currentPerson.SQL_select_by_pincode(m_edPinCode->text(), error))
+  if (!m_employee.SQL_select_by_pincode(error))
   {
     QMessageBox::warning(this,
                          tr("Aviso"),
@@ -195,9 +195,9 @@ void PinCodeView::erase()
   m_edPinCode->clear();
 }
 
-Person PinCodeView::getCurrentPerson() const
+Employee PinCodeView::getEmployee() const
 {
-  return m_currentPerson;
+  return m_employee;
 }
 
 bool PinCodeView::eventFilter(QObject *target, QEvent *event)

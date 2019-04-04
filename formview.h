@@ -1,9 +1,9 @@
-#ifndef PERSONVIEW_H
-#define PERSONVIEW_H
+#ifndef FORMVIEW_H
+#define FORMVIEW_H
 
 #include <QFrame>
 #include <QVector>
-#include "person.h"
+#include "form.h"
 #include "jitemview.h"
 
 class QTabWidget;
@@ -20,15 +20,13 @@ class QGroupBox;
 class PhoneTableWidget;
 class AddressTableWidget;
 
-class PersonView : public JItemView
+class FormView : public JItemView
 {
   Q_OBJECT
 
 public:
-  explicit PersonView(bool bAccessEmployee,
-                      bool bAccessSupplier,
-                      QWidget* parent = 0);
-  ~PersonView();
+  explicit FormView(QWidget* parent = 0);
+  ~FormView();
   const JItemSQL& getItem() const;
 
 private slots:
@@ -39,7 +37,7 @@ public slots:
   void create();
 
 private:
-  mutable Person m_ref;
+  mutable Form m_ref;
   QRadioButton* m_rdoPerson;
   QRadioButton* m_rdoCompany;
   JLineEdit* m_edName;
@@ -56,7 +54,6 @@ private:
   QCheckBox* m_cbBirthDate;
   JDatabasePicker* m_imagePicker;
   QDateEdit* m_dtCreationDate;
-  JLineEdit* m_edPinCode;
 
   PhoneTableWidget* m_tblPhone;
   QPushButton* m_btnPhoneAdd;
@@ -66,16 +63,7 @@ private:
   QPushButton* m_btnAddressAdd;
   QPushButton* m_btnAddressRemove;
 
-  QCheckBox* m_cbNoteEdit;
-  QCheckBox* m_cbNoteRemove;
-
-  QCheckBox* m_cbEmployee;
-  QCheckBox* m_cbSupplier;
-
-  const bool m_bHasAccessToEmployees;
-  const bool m_bHasAccessToSuppliers;
-
   void setItem(const JItemSQL &o);
 };
 
-#endif // PERSONVIEW_H
+#endif // FORMVIEW_H

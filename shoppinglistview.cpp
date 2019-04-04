@@ -55,7 +55,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   , m_imagePicker(nullptr)
   , m_table(nullptr)
 {
-  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME);
+  m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
   m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
@@ -154,8 +154,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_table, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-
-  m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 }
 
 void ShoppingListView::updateControls()

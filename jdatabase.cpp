@@ -71,8 +71,8 @@ public:
                      NOTE_SQL_TABLE_NAME "." SQL_COLID ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
-                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL03 ","
-                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL02 ","
+                     FORM_SQL_TABLE_NAME "." FORM_SQL_COL03 ","
+                     FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
                      "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06 ")"
                      " FROM " NOTE_SQL_TABLE_NAME
                      " LEFT OUTER JOIN "
@@ -82,8 +82,8 @@ public:
                      " GROUP BY " NOTE_ITEMS_SQL_COL01 ") AS _TTOTAL"
                      " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." NOTE_ITEMS_SQL_COL01
                      " LEFT OUTER JOIN "
-                     PERSON_SQL_TABLE_NAME
-                     " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" PERSON_SQL_TABLE_NAME "." SQL_COLID);
+                     FORM_SQL_TABLE_NAME
+                     " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" FORM_SQL_TABLE_NAME "." SQL_COLID);
     return strQuery;
   }
 
@@ -207,10 +207,10 @@ public:
   }
 };
 
-class PersonTableModel : public JTableModel
+class FormTableModel : public JTableModel
 {
 public:
-  PersonTableModel(QObject *parent)
+  FormTableModel(QObject *parent)
     : JTableModel(parent)
   {
 
@@ -220,10 +220,10 @@ public:
   {
     QString strQuery("SELECT "
                      SQL_COLID ","
-                     PERSON_SQL_COL02 ","
-                     PERSON_SQL_COL03
+                     FORM_SQL_COL02 ","
+                     FORM_SQL_COL03
                      " FROM "
-                     PERSON_SQL_TABLE_NAME);
+                     FORM_SQL_TABLE_NAME);
     return strQuery;
   }
 
@@ -640,14 +640,15 @@ public:
   {
     QString strQuery("SELECT "
                      STORE_SQL_TABLE_NAME "." SQL_COLID ","
-                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL04 ","
-                     PERSON_SQL_TABLE_NAME "." PERSON_SQL_COL02
+                     FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
+                     FORM_SQL_TABLE_NAME "." FORM_SQL_COL03 ","
+                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL04
                      " FROM "
                      STORE_SQL_TABLE_NAME
                      " LEFT OUTER JOIN "
-                     PERSON_SQL_TABLE_NAME
+                     FORM_SQL_TABLE_NAME
                      " ON " STORE_SQL_TABLE_NAME "." STORE_SQL_COL01
-                     " = " PERSON_SQL_TABLE_NAME "." SQL_COLID);
+                     " = " FORM_SQL_TABLE_NAME "." SQL_COLID);
     return strQuery;
   }
 
@@ -655,13 +656,15 @@ public:
   {
     JTableModel::select("");
     setHeaderData(0, Qt::Horizontal, tr("ID"));
-    setHeaderData(1, Qt::Horizontal, tr("Nome"));
-    setHeaderData(2, Qt::Horizontal, tr("Empresa"));
+    setHeaderData(1, Qt::Horizontal, tr("Razão Social"));
+    setHeaderData(2, Qt::Horizontal, tr("Nome Fantasia"));
+    setHeaderData(3, Qt::Horizontal, tr("Descrição"));
     if (header != nullptr && header->count() == 3)
     {
       header->hideSection(0);
-      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
     }
   }
 };
@@ -783,8 +786,8 @@ JDatabase::JDatabase(const QString& tableName,
     model = new NoteTableModel(this);
   else if (tableName == REMINDER_SQL_TABLE_NAME)
     model = new ReminderTableModel(this);
-  else if (tableName == PERSON_SQL_TABLE_NAME)
-    model = new PersonTableModel(this);
+  else if (tableName == FORM_SQL_TABLE_NAME)
+    model = new FormTableModel(this);
   else if (tableName == USER_SQL_TABLE_NAME)
     model = new UserTableModel(this);
   else if (tableName == PRODUCT_SQL_TABLE_NAME)
@@ -1052,11 +1055,11 @@ void JDatabase::removeItems()
     if (!w.exec())
       return;
 
-    Person person = w.getCurrentPerson();
+    Employee e = w.getEmployee();
     QString error;
-    if (!person.m_id.isValid() || !person.m_employee.m_bIsEmployee)
+    if (!e.m_id.isValid())
       error = tr("Pincode informado não encontrado.");
-    else if (person.m_employee.hasPermissionToRemove(m_tableName))
+    else if (e.hasPermissionToRemove(m_tableName))
       error = tr("Funcionário não possui permissão.");
 
     if (!error.isEmpty())
@@ -1152,7 +1155,7 @@ JItemSQL* JDatabase::getCurrentItem() const
   return m_currentItems.size() != 0 ? m_currentItems.at(0) : nullptr;
 }
 
-bool JDatabase::save(const JItemSQL& o, Person* pEmployee)
+bool JDatabase::save(const JItemSQL& o, Employee* pEmployee)
 {
   if (JItemHelper::authenticationToInsertUpdate(m_tableName))
   {
@@ -1160,13 +1163,13 @@ bool JDatabase::save(const JItemSQL& o, Person* pEmployee)
     if (!w.exec())
       return false;
 
-    Person person = w.getCurrentPerson();
+    Employee e = w.getEmployee();
     if (pEmployee != nullptr)
-      *pEmployee = person;
+      *pEmployee = e;
     QString error;
-    if (!person.m_id.isValid() || !person.m_employee.m_bIsEmployee)
+    if (!e.m_id.isValid())
       error = tr("Pincode informado não encontrado.");
-    else if (person.m_employee.hasPermissionToEdit(m_tableName))
+    else if (e.hasPermissionToEdit(m_tableName))
       error = tr("Funcionário não possui permissão.");
 
     if (!error.isEmpty())

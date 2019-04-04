@@ -7,7 +7,7 @@
 #include "note.h"
 #include "reminder.h"
 #include "product.h"
-#include "person.h"
+#include "form.h"
 #include "shoppinglist.h"
 #include "reservation.h"
 #include "discount.h"

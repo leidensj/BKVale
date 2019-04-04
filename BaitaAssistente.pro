@@ -35,7 +35,6 @@ SOURCES += main.cpp\
     jimageview.cpp \
     imageview.cpp \
     productview.cpp \
-    personview.cpp \
     jdatabasepicker.cpp \
     pincodeview.cpp \
     shoppinglistview.cpp \
@@ -54,7 +53,6 @@ SOURCES += main.cpp\
     phonetablewidget.cpp \
     timecard.cpp \
     storeview.cpp \
-    storeemployeetablewidget.cpp \
     timeintervaldlg.cpp \
     jtimeedit.cpp \
     addresstablewidget.cpp \
@@ -65,7 +63,6 @@ SOURCES += main.cpp\
     image.cpp \
     discount.cpp \
     note.cpp \
-    person.cpp \
     phone.cpp \
     product.cpp \
     reminder.cpp \
@@ -75,7 +72,12 @@ SOURCES += main.cpp\
     jdatepicker.cpp \
     jplaintextedit.cpp \
     jitemhelper.cpp \
-    JItemSQL.cpp
+    JItemSQL.cpp \
+    form.cpp \
+    employee.cpp \
+    supplier.cpp \
+    formview.cpp \
+    employeeview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -104,9 +106,7 @@ HEADERS  += mainwindow.h \
     imageview.h \
     product.h \
     productview.h \
-    person.h \
     address.h \
-    personview.h \
     phone.h \
     defines.h \
     jitem.h \
@@ -134,7 +134,6 @@ HEADERS  += mainwindow.h \
     timecard.h \
     store.h \
     storeview.h \
-    storeemployeetablewidget.h \
     timeintervaldlg.h \
     jtimeedit.h \
     timeinterval.h \
@@ -144,7 +143,12 @@ HEADERS  += mainwindow.h \
     jdatepicker.h \
     jplaintextedit.h \
     jitemhelper.h \
-    jitemsql.h
+    jitemsql.h \
+    form.h \
+    employee.h \
+    supplier.h \
+    formview.h \
+    employeeview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

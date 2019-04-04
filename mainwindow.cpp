@@ -6,12 +6,13 @@
 #include "productview.h"
 #include "categoryview.h"
 #include "noteview.h"
+#include "employeeview.h"
 #include "reminderview.h"
 #include "calculatorwidget.h"
 #include "usermgtview.h"
 #include "imageview.h"
 #include "logindialog.h"
-#include "personview.h"
+#include "formview.h"
 #include "shoppinglistview.h"
 #include "reservationview.h"
 #include "discountview.h"
@@ -128,7 +129,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openImagesDialog()));
   connect(m_calculator, SIGNAL(lineSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
-  connect(ui->actionPersons, SIGNAL(triggered(bool)), this, SLOT(openPersonsDialog()));
+  connect(ui->actionForms, SIGNAL(triggered(bool)), this, SLOT(openFormsDialog()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(openShoppingListDialog()));
   connect(m_shop, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
@@ -273,10 +274,10 @@ void BaitaAssistant::print()
             return;
         }
       }
-      Person person;
-      note = m_note->save(person);
+      Employee e;
+      note = m_note->save(e);
       if (note.m_id.isValid())
-        print(NotePrinter::build(note, person.strAliasName()));
+        print(NotePrinter::build(note, e.m_form.strAliasName()));
     } break;
     case Functionality::Reminder:
     {
@@ -382,10 +383,12 @@ void BaitaAssistant::updateControls()
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
   ui->actionProducts->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProducts());
-  ui->actionPersons->setEnabled(bIsSQLOk && m_userLogin.hasAccessToPersons());
+  ui->actionForms->setEnabled(bIsSQLOk && m_userLogin.hasAccessToForms());
   ui->actionCategories->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCategories());
   ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
   ui->actionShoppingList->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShoppingLists());
+  ui->actionEmployees->setEnabled(bIsSQLOk && m_userLogin.hasAccessToEmployee());
+  ui->actionSuppliers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSupplier());
 
   ui->actionNotes->setEnabled(bIsSQLOk && m_userLogin.hasAccessToNote());
   ui->actionReminders->setEnabled(bIsSQLOk && m_userLogin.hasAccessToReminder());
@@ -503,18 +506,30 @@ void BaitaAssistant::openLoginDialog()
   }
 }
 
-void BaitaAssistant::openPersonsDialog()
+void BaitaAssistant::openFormsDialog()
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  PersonView* w = new PersonView(m_userLogin.hasAccessToEmployee(),
-                                 m_userLogin.hasAccessToSupplier(),
-                                 this);
+  FormView* w = new FormView(this);
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Pessoas"));
-  dlg.setWindowIcon(QIcon(":/icons/res/person.png"));
+  dlg.setWindowTitle(tr("Gerenciar Cadastros"));
+  dlg.setWindowIcon(QIcon(":/icons/res/resume.png"));
+  dlg.setModal(true);
+  dlg.exec();
+}
+
+void BaitaAssistant::openEmployeesDialog()
+{
+  QDialog dlg(this);
+  QHBoxLayout *layout = new QHBoxLayout;
+  dlg.setLayout(layout);
+  EmployeeView* w = new EmployeeView(this);
+  layout->addWidget(w);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Gerenciar Funcionários"));
+  dlg.setWindowIcon(QIcon(":/icons/res/employee.png"));
   dlg.setModal(true);
   dlg.exec();
 }

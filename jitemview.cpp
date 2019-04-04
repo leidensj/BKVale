@@ -1,5 +1,6 @@
 #include "jitemview.h"
 #include "jdatabase.h"
+#include "jitemhelper.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
@@ -43,34 +44,33 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   m_tab = new QTabWidget;
 
-  QVBoxLayout* viewlayout = new QVBoxLayout;
-  viewlayout->setContentsMargins(0, 0, 9, 0);
-  viewlayout->setAlignment(Qt::AlignTop);
-  viewlayout->addLayout(buttonlayout);
-  viewlayout->addWidget(m_tab);
+  QVBoxLayout* mainLayout = new QVBoxLayout;
+  mainLayout->setContentsMargins(0, 0, 9, 0);
+  mainLayout->setAlignment(Qt::AlignTop);
+  mainLayout->addLayout(buttonlayout);
+  mainLayout->addWidget(m_tab);
 
-  QFrame* viewFrame = new QFrame;
-  viewFrame->setLayout(viewlayout);
+  setLayout(mainLayout);
+
 
   m_database = new JDatabase(tableName);
-  m_database->layout()->setContentsMargins(9, 0, 0, 0);
-
-  QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(viewFrame);
-  splitter->addWidget(m_database);
-
-  QVBoxLayout* mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(splitter);
-  setLayout(mainLayout);
+  m_dlgDb = new QDialog(this);
+  QHBoxLayout *ltDlg = new QHBoxLayout;
+  m_dlgDb->setLayout(ltDlg);
+  ltDlg->addWidget(m_database);
+  m_dlgDb->setWindowFlags(Qt::Window);
+  m_dlgDb->setWindowTitle(JItemHelper::text(tableName));
+  m_dlgDb->setWindowIcon(QIcon(JItemHelper::icon(tableName)));
+  m_dlgDb->setModal(true);
 
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
   connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(selectItem(const JItemSQL&)));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), m_dlgDb, SLOT(accept()));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
-  connect(m_btnSearch, SIGNAL(clicked(bool)), m_database, SLOT(setVisible(bool)));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
 
   setMinimumWidth(600);
-  m_database->hide();
 }
 
 void JItemView::selectItem(const JItemSQL& o)

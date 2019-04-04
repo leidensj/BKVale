@@ -87,7 +87,7 @@
    </attribute>
    <addaction name="actionLogin"/>
    <addaction name="separator"/>
-   <addaction name="actionPersons"/>
+   <addaction name="actionForms"/>
    <addaction name="actionProducts"/>
    <addaction name="separator"/>
    <addaction name="actionPrint"/>
@@ -115,15 +115,29 @@
    </widget>
    <widget class="QMenu" name="menuCadastros">
     <property name="title">
-     <string>Cadastros</string>
+     <string>Itens</string>
     </property>
+    <widget class="QMenu" name="menuPessoas">
+     <property name="title">
+      <string>Pessoas</string>
+     </property>
+     <addaction name="actionForms"/>
+     <addaction name="actionEmployees"/>
+     <addaction name="actionSuppliers"/>
+    </widget>
+    <widget class="QMenu" name="menuType_Here">
+     <property name="title">
+      <string>Type Here</string>
+     </property>
+    </widget>
+    <addaction name="menuPessoas"/>
     <addaction name="actionProducts"/>
-    <addaction name="actionPersons"/>
     <addaction name="actionCategories"/>
     <addaction name="actionImages"/>
     <addaction name="actionShoppingList"/>
     <addaction name="actionUsers"/>
     <addaction name="actionStores"/>
+    <addaction name="menuType_Here"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
     <property name="title">
@@ -270,16 +284,16 @@
     <string>Gerenciar preços</string>
    </property>
   </action>
-  <action name="actionPersons">
+  <action name="actionForms">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/person.png</normaloff>:/icons/res/person.png</iconset>
+     <normaloff>:/icons/res/resume.png</normaloff>:/icons/res/resume.png</iconset>
    </property>
    <property name="text">
-    <string>Pessoas</string>
+    <string>Cadastros</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar pessoas</string>
+    <string>Gerenciar cadastros</string>
    </property>
   </action>
   <action name="actionShoppingList">
@@ -291,7 +305,7 @@
     <string>Listas de Compras</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar Listas de Compras</string>
+    <string>Gerenciar listas de compras</string>
    </property>
   </action>
   <action name="actionActiveUsers">
@@ -403,6 +417,30 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar Lojas</string>
+   </property>
+  </action>
+  <action name="actionEmployees">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/employee.png</normaloff>:/icons/res/employee.png</iconset>
+   </property>
+   <property name="text">
+    <string>Funcionários</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar funcionários</string>
+   </property>
+  </action>
+  <action name="actionSuppliers">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/supplier.png</normaloff>:/icons/res/supplier.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fornecedores</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar fornecedores</string>
    </property>
   </action>
  </widget>

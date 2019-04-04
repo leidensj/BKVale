@@ -6,7 +6,8 @@
 #include <jitem.h>
 #include <QVector>
 #include "product.h"
-#include "person.h"
+#include "supplier.h"
+#include "employee.h"
 #include "store.h"
 #include "phone.h"
 #include "address.h"
@@ -87,18 +88,6 @@ private:
   const bool m_bCheckable;
 };
 
-class TimeIntervalsTableWidgetItem : public QTableWidgetItem
-{
-public:
-  TimeIntervalsTableWidgetItem();
-  void setItems(const QVector<TimeInterval>& v);
-  const QVector<TimeInterval>& getItems() const;
-  void selectItem();
-
-private:
-  QVector<TimeInterval> m_timeIntervals;
-};
-
 class PhoneEditorTableWidgetItem : public QTableWidgetItem
 {
 public:
@@ -155,7 +144,7 @@ private:
   Product m_product;
 };
 
-class PersonTableWidgetItem : public JItemTableWidgetItem
+class SupplierTableWidgetItem : public JItemTableWidgetItem
 {
 public:
   void setItem(const JItem& o);
@@ -163,7 +152,18 @@ public:
   void selectItem(const QString& fixedFilter);
 
 private:
-  Person m_person;
+  Supplier m_ref;
+};
+
+class EmployeeTableWidgetItem : public JItemTableWidgetItem
+{
+public:
+  void setItem(const JItem& o);
+  const JItem& getItem() const;
+  void selectItem(const QString& fixedFilter);
+
+private:
+  Employee m_ref;
 };
 
 #endif // JTABLEWIDGETITEM_H

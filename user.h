@@ -32,7 +32,7 @@ struct User : public JItemSQL
   bool m_bAccessUser;
   bool m_bAccessProduct;
   bool m_bAccessSettings;
-  bool m_bAccessPerson;
+  bool m_bAccessForm;
   bool m_bAccessEmployee;
   bool m_bAccessSupplier;
   bool m_bAccessCategory;

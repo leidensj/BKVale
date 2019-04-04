@@ -18,7 +18,7 @@ void User::clear()
   m_bAccessUser = false;
   m_bAccessProduct = false;
   m_bAccessSettings = false;
-  m_bAccessPerson = false;
+  m_bAccessForm = false;
   m_bAccessEmployee = false;
   m_bAccessSupplier = false;
   m_bAccessCategory = false;
@@ -48,7 +48,7 @@ bool User::operator != (const JItem& other) const
       m_bAccessReminder != another.m_bAccessReminder ||
       m_bAccessCalculator != another.m_bAccessCalculator ||
       m_bAccessShop != another.m_bAccessCalculator ||
-      m_bAccessPerson != another.m_bAccessPerson ||
+      m_bAccessForm != another.m_bAccessForm ||
       m_bAccessEmployee != another.m_bAccessEmployee ||
       m_bAccessSupplier != another.m_bAccessSupplier ||
       m_bAccessUser != another.m_bAccessUser ||
@@ -120,7 +120,7 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_bAccessUser);
   query.bindValue(":_v08", m_bAccessProduct);
   query.bindValue(":_v09", m_bAccessSettings);
-  query.bindValue(":_v10", m_bAccessPerson);
+  query.bindValue(":_v10", m_bAccessForm);
   query.bindValue(":_v11", m_bAccessCategory);
   query.bindValue(":_v12", m_bAccessImage);
   query.bindValue(":_v13", m_bAccessReservation);
@@ -169,7 +169,7 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_bAccessUser);
   query.bindValue(":_v08", m_bAccessProduct);
   query.bindValue(":_v09", m_bAccessSettings);
-  query.bindValue(":_v10", m_bAccessPerson);
+  query.bindValue(":_v10", m_bAccessForm);
   query.bindValue(":_v11", m_bAccessCategory);
   query.bindValue(":_v12", m_bAccessImage);
   query.bindValue(":_v13", m_bAccessReservation);
@@ -218,7 +218,7 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       m_bAccessUser = query.value(6).toBool();
       m_bAccessProduct = query.value(7).toBool();
       m_bAccessSettings = query.value(8).toBool();
-      m_bAccessPerson = query.value(9).toBool();
+      m_bAccessForm = query.value(9).toBool();
       m_bAccessCategory = query.value(10).toBool();
       m_bAccessImage = query.value(11).toBool();
       m_bAccessReservation = query.value(12).toBool();

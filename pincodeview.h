@@ -2,7 +2,7 @@
 #define PINCODEVIEW_H
 
 #include <QDialog>
-#include "person.h"
+#include "employee.h"
 
 class QPushButton;
 class QLineEdit;
@@ -13,7 +13,7 @@ class PinCodeView : public QDialog
 
 public:
   explicit PinCodeView(QWidget* parent = nullptr);
-  Person getCurrentPerson() const;
+  Employee getEmployee() const;
 
 protected:
   bool eventFilter(QObject *target, QEvent *event);
@@ -36,7 +36,7 @@ private slots:
   void pressed9() { append('9'); }
 
 private:
-  Person m_currentPerson;
+  Employee m_employee;
   QLineEdit* m_edPinCode;
   QPushButton* m_btn0;
   QPushButton* m_btn1;

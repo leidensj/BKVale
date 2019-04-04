@@ -14,7 +14,7 @@ class JTableView;
 class JLineEdit;
 class QSortFilterProxyModel;
 class NoteFilterDlg;
-class Person;
+class Employee;
 
 class JTableView : public QTableView
 {
@@ -55,7 +55,7 @@ public:
   int getNumberOfEntries() const;
   double getSum(int column) const;
 
-  bool save(const JItemSQL& jItem, Person* pEmployee = nullptr);
+  bool save(const JItemSQL& jItem, Employee* pEmployee = nullptr);
 
 public slots:
   void refresh();

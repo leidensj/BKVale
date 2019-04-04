@@ -7,7 +7,7 @@
 class QPushButton;
 class JLineEdit;
 class JDatabasePicker;
-class StoreEmployeeTableWidget;
+class JPlainTextEdit;
 
 class StoreView : public JItemView
 {
@@ -20,18 +20,12 @@ public:
 public slots:
   void create();
 
-private slots:
-  void updateControls();
-
 private:
   mutable Store m_ref;
-  JLineEdit* m_edName;
-  JDatabasePicker* m_personPicker;
+  JPlainTextEdit* m_teDescription;
+  JDatabasePicker* m_formPicker;
   JDatabasePicker* m_addressPicker;
   JDatabasePicker* m_phonePicker;
-  StoreEmployeeTableWidget* m_employeeTable;
-  QPushButton* m_btnAddEmployee;
-  QPushButton* m_btnRemoveEmployee;
   void setItem(const JItemSQL& o);
 };
 

@@ -3,7 +3,6 @@
 #include "tinyexpr.h"
 #include "product.h"
 #include "packageeditor.h"
-#include "timeintervaldlg.h"
 #include "jspinbox.h"
 #include "jlineedit.h"
 #include <QComboBox>
@@ -437,63 +436,56 @@ void PackageTableWidgetItem::selectItem(const QString& productUnity)
     setItem(dlg.getPackage(), productUnity);
 }
 
-void PersonTableWidgetItem::setItem(const JItem& o)
+void SupplierTableWidgetItem::setItem(const JItem& o)
 {
-  m_person = dynamic_cast<const Person&>(o);
-  setText(m_person.strAliasName());
+  m_ref = dynamic_cast<const Supplier&>(o);
+  setText(m_ref.m_form.strAliasName());
 
   QPixmap pixmap(QSize(16, 16));
-  pixmap.loadFromData(m_person.m_image.m_image);
+  pixmap.loadFromData(m_ref.m_form.m_image.m_image);
   setIcon(QIcon(pixmap));
 }
 
-const JItem& PersonTableWidgetItem::getItem() const
+const JItem& SupplierTableWidgetItem::getItem() const
 {
-  return m_person;
+  return m_ref;
 }
 
-void PersonTableWidgetItem::selectItem(const QString& fixedFilter)
+void SupplierTableWidgetItem::selectItem(const QString& /*fixedFilter*/)
 {
-  JDatabaseSelector dlg(PERSON_SQL_TABLE_NAME);
-  dlg.getDatabase()->setFixedFilter(fixedFilter);
+  JDatabaseSelector dlg(SUPPLIER_SQL_TABLE_NAME);
   if (dlg.exec())
   {
-    Person* p = static_cast<Person*>(dlg.getDatabase()->getCurrentItem());
+    Supplier* p = static_cast<Supplier*>(dlg.getDatabase()->getCurrentItem());
     if (p != nullptr && p->m_id.isValid())
       setItem(*p);
   }
 }
 
-TimeIntervalsTableWidgetItem::TimeIntervalsTableWidgetItem()
+void EmployeeTableWidgetItem::setItem(const JItem& o)
 {
-  setTextColor(QColor(Qt::darkGray));
-  setFlags(Qt::NoItemFlags |
-           Qt::ItemIsSelectable |
-           Qt::ItemIsEnabled);
+  m_ref = dynamic_cast<const Employee&>(o);
+  setText(m_ref.m_form.strAliasName());
+
+  QPixmap pixmap(QSize(16, 16));
+  pixmap.loadFromData(m_ref.m_form.m_image.m_image);
+  setIcon(QIcon(pixmap));
 }
 
-void TimeIntervalsTableWidgetItem::selectItem()
+const JItem& EmployeeTableWidgetItem::getItem() const
 {
-  TimeIntervalDlg dlg;
-  dlg.setItems(m_timeIntervals);
+  return m_ref;
+}
+
+void EmployeeTableWidgetItem::selectItem(const QString& /*fixedFilter*/)
+{
+  JDatabaseSelector dlg(EMPLOYEE_SQL_TABLE_NAME);
   if (dlg.exec())
-    setItems(dlg.getItems());
-}
-
-void TimeIntervalsTableWidgetItem::setItems(const QVector<TimeInterval>& v)
-{
-  m_timeIntervals = v;
-  QString str;
-  for (int i = 0; i != v.size(); ++i)
-    str += v.at(i).m_tmBegin.toString("hh:mm") + "-" + v.at(i).m_tmEnd.toString("hh:mm") + " ";
-  if (v.size() > 0)
-    str.chop(1);
-  setText(str);
-}
-
-const QVector<TimeInterval>& TimeIntervalsTableWidgetItem::getItems() const
-{
-  return m_timeIntervals;
+  {
+    Employee* p = static_cast<Employee*>(dlg.getDatabase()->getCurrentItem());
+    if (p != nullptr && p->m_id.isValid())
+      setItem(*p);
+  }
 }
 
 PhoneEditorTableWidgetItem::PhoneEditorTableWidgetItem()

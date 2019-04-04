@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QStringList>
 #include "note.h"
+#include "employee.h"
 #include <QDialog>
 
 #define MAX_ITEMS 100
@@ -80,7 +81,7 @@ public slots:
   void create();
   void setNote(const Note& note);
   void updateControls();
-  Note save(Person& employee);
+  Note save(Employee& e);
 
 signals:
   void changedSignal();

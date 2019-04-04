@@ -1,7 +1,7 @@
 #include "noteview.h"
 #include "databaseutils.h"
 #include "notetablewidget.h"
-#include "person.h"
+#include "form.h"
 #include "jdatabasepicker.h"
 #include "jdatabase.h"
 #include "jlineedit.h"
@@ -211,7 +211,7 @@ NoteView::NoteView(QWidget *parent)
   hlayout2->addWidget(line3);
   hlayout2->addWidget(m_btnDetails);
 
-  m_supplierPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME);
+  m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
@@ -313,8 +313,6 @@ NoteView::NoteView(QWidget *parent)
   create();
   databaseFrame->hide();
   updateControls();
-
-  m_supplierPicker->getDatabase()->setFixedFilter(PERSON_FILTER_SUPPLIER);
 }
 
 NoteView::~NoteView()
@@ -403,10 +401,10 @@ void NoteView::addProduct()
 }
 
 // TODO, SALVAR QUEM EDITOU O ITEM
-Note NoteView::save(Person& employee)
+Note NoteView::save(Employee& e)
 {
   Note note = getNote();
-  bool bSuccess = m_database->save(note, &employee);
+  bool bSuccess = m_database->save(note, &e);
   if (bSuccess)
   {
     m_lastId = note.m_id;

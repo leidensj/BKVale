@@ -5,7 +5,7 @@
 #include <QString>
 #include <QVector>
 #include <QDate>
-#include "person.h"
+#include "supplier.h"
 #include "product.h"
 #include "defines.h"
 #include "jitemsql.h"
@@ -69,7 +69,7 @@ struct Note : public JItemSQL
 
   mutable qlonglong m_number;
   QDate m_date;
-  Person m_supplier;
+  Supplier m_supplier;
   bool m_bCash;
   QString m_observation;
   QVector<NoteItem> m_vNoteItem;

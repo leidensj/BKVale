@@ -3,9 +3,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QVector>
 #include "image.h"
-#include "defines.h"
 #include "jitemsql.h"
 
 struct Category : public JItemSQL

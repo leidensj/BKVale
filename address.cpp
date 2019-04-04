@@ -99,7 +99,7 @@ bool Address::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     if (query.next())
     {
-      query.value(0).toLongLong(); // PersonId não usamoe
+      query.value(0).toLongLong(); // FormId não usamoe
       m_cep = query.value(1).toString();
       m_neighborhood = query.value(2).toString();
       m_street = query.value(3).toString();

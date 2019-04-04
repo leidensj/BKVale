@@ -42,7 +42,7 @@ private:
   QCheckBox* m_accessShop;
   QCheckBox* m_accessUser;
   QCheckBox* m_accessProduct;
-  QCheckBox* m_accessPerson;
+  QCheckBox* m_accessForm;
   QCheckBox* m_accessEmployee;
   QCheckBox* m_accessSupplier;
   QCheckBox* m_accessCategory;

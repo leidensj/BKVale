@@ -92,9 +92,7 @@ namespace
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
                (note.m_supplier.m_id.isValid()
-               ? (note.m_supplier.m_alias.isEmpty()
-               ? note.m_supplier.m_name
-               : note.m_supplier.m_alias)
+               ? (note.m_supplier.m_form.strAliasName())
                : "Nao informado") +
                ESC_DOUBLE_FONT_OFF
                ESC_LF
@@ -149,7 +147,7 @@ namespace
                  ESC_LF
                  "Assinatura " +
                  (note.m_supplier.m_id.isValid()
-                  ? (note.m_supplier.strAliasName())
+                  ? (note.m_supplier.m_form.strAliasName())
                   : "fornecedor") +
                  ESC_LF;
     }
@@ -353,18 +351,18 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
            ESC_ALIGN_CENTER
            "Fornecedor: "
            ESC_EXPAND_ON +
-           lst.m_supplier.strAliasName() +
+           lst.m_supplier.m_form.strAliasName() +
            ESC_EXPAND_OFF
            ESC_ALIGN_LEFT
            ESC_LF;
 
-    for (int i = 0; i != lst.m_supplier.m_vPhone.size(); ++i)
+    for (int i = 0; i != lst.m_supplier.m_form.m_vPhone.size(); ++i)
     {
-      if (!lst.m_supplier.m_vPhone.at(i).m_number.isEmpty())
+      if (!lst.m_supplier.m_form.m_vPhone.at(i).m_number.isEmpty())
       {
-        if (!lst.m_supplier.m_vPhone.at(i).m_name.isEmpty())
-          str += lst.m_supplier.m_vPhone.at(i).m_name + " ";
-        str += lst.m_supplier.m_vPhone.at(i).strFormattedPhone() + ESC_LF;
+        if (!lst.m_supplier.m_form.m_vPhone.at(i).m_name.isEmpty())
+          str += lst.m_supplier.m_form.m_vPhone.at(i).m_name + " ";
+        str += lst.m_supplier.m_form.m_vPhone.at(i).strFormattedPhone() + ESC_LF;
       }
     }
   }
@@ -397,7 +395,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
       str += TABLE_FULL_LINE ESC_LF;
 
     if (bPrintSupplier)
-      str +=  ESC_ALIGN_CENTER "Fornecedor: " + lst.m_vItem.at(i).m_supplier.strAliasName() + ESC_LF ESC_ALIGN_LEFT;
+      str +=  ESC_ALIGN_CENTER "Fornecedor: " + lst.m_vItem.at(i).m_supplier.m_form.strAliasName() + ESC_LF ESC_ALIGN_LEFT;
 
     str += lst.m_vItem.at(i).m_product.m_name + ESC_LF;
 

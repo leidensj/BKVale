@@ -7,7 +7,7 @@
 #include <QVector>
 #include <QDate>
 #include <QRegExp>
-#include "person.h"
+#include "supplier.h"
 #include "product.h"
 #include "defines.h"
 #include "jitemsql.h"
@@ -41,7 +41,7 @@ struct ShoppingListItem : JItem
   bool m_bPrice;
   double m_price;
   Package m_package;
-  Person m_supplier;
+  Supplier m_supplier;
 };
 
 struct ShoppingList : public JItemSQL
@@ -64,7 +64,7 @@ struct ShoppingList : public JItemSQL
 
   QString m_title;
   QString m_description;
-  Person m_supplier;
+  Supplier m_supplier;
   Image m_image;
   int m_nLines;
   bool m_weekDays[7];

@@ -101,23 +101,23 @@ void TimeCard::saveAndAccept()
             "<tr><td align=\"center\" style=\"font-size:14pt;\">%6</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:14pt;\">%7</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:14pt;\">%8</td></tr>"
-          "</table>").arg(o.m_name,
+          "</table>").arg(o.m_form.strAliasName(),
                           idt.toString("dd/MM/yyyy"),
                           fdt.toString("dd/MM/yyyy"),
-                          o.m_person.m_name,
-                          o.m_person.m_vAddress.isEmpty() ? "" : o.m_person.m_vAddress.at(0).getFormattedAddress2(),
-                          o.m_person.m_vAddress.isEmpty() ? "" : "CEP: " + o.m_person.m_vAddress.at(0).m_cep,
-                          o.m_person.m_vAddress.isEmpty() ? "" : o.m_person.m_vAddress.at(0).getFormattedAddress3(),
-                          "CNPJ: " + o.m_person.m_CPF_CNPJ);
+                          o.m_form.m_name,
+                          o.m_form.m_vAddress.isEmpty() ? "" : o.m_form.m_vAddress.at(0).getFormattedAddress2(),
+                          o.m_form.m_vAddress.isEmpty() ? "" : "CEP: " + o.m_form.m_vAddress.at(0).m_cep,
+                          o.m_form.m_vAddress.isEmpty() ? "" : o.m_form.m_vAddress.at(0).getFormattedAddress3(),
+                          "CNPJ: " + o.m_form.m_CPF_CNPJ);
 
   QLocale br(QLocale::Portuguese, QLocale::Brazil);
 
-  for (int i = 0; i != o.m_vEmployee.size() + m_spnExtraPages->value(); ++i)
+  /*for (int i = 0; i != o.m_vEmployee.size() + m_spnExtraPages->value(); ++i)
   {
-    /* 1 - Nome funcionário
-     * 2 - Horário
-     * 3 - MÊS
-     * 4 - ANO */
+    // 1 - Nome funcionário
+    // 2 - Horário
+    // 3 - MÊS
+    // 4 - ANO
     QString title("REGISTRO PONTO");
     QString page(QString::number(i + 1));
     while (title.length() < (42 - page.length()))
@@ -140,7 +140,7 @@ void TimeCard::saveAndAccept()
           "<th colspan=\"2\">Hora</th>"
         "</tr>").arg(i >= o.m_vEmployee.size()
                      ? "_____________________________________"
-                     : o.m_vEmployee.at(i).m_employee.m_name,
+                     : o.m_vEmployee.at(i).m_employee.m_form.m_name,
                      i >= o.m_vEmployee.size()
                      ? "______________________________________"
                      : o.m_vEmployee.at(i).strHours(),
@@ -150,8 +150,8 @@ void TimeCard::saveAndAccept()
     const int daysInMonth = dt.daysInMonth();
     for (int i = 0; i != daysInMonth; ++i)
     {
-      /* 1 - Data dd
-       * 2 - Data dddd */
+      // - Data dd
+      // - Data dddd
       html += QString(
         "<tr>"
          "<td width=\"5%\">%1</td>"
@@ -203,7 +203,7 @@ void TimeCard::saveAndAccept()
       "</tr>"
       "</tr>"
       "</table>").arg(i == (o.m_vEmployee.size() + m_spnExtraPages->value() - 1) ? "" : "page-break-after:always;");
-  }
+  }*/
 
   html +=
     "</body>"
@@ -215,7 +215,7 @@ void TimeCard::saveAndAccept()
                                                   "/desktop/livro_" +
                                                   idt.toString("yyyy") + "_" +
                                                   idt.toString("MM") +
-                                                  (p != nullptr ? p->m_name.replace(" ", "") : "") +
+                                                  (p != nullptr ? p->m_form.strAliasName().replace(" ", "") : "") +
                                                   ".pdf",
                                                   tr("PDF (*.pdf)"));
 

@@ -27,7 +27,7 @@ public:
   bool hasAccessToUsers() const { return isValid() && m_user.m_bAccessUser; }
   bool hasAccessToProducts() const { return isValid() && m_user.m_bAccessProduct; }
   bool hasAccessToSettings() const { return isValid() && m_user.m_bAccessSettings; }
-  bool hasAccessToPersons() const { return isValid() && m_user.m_bAccessPerson; }
+  bool hasAccessToForms() const { return isValid() && m_user.m_bAccessForm; }
   bool hasAccessToEmployee() const { return isValid() && m_user.m_bAccessEmployee; }
   bool hasAccessToSupplier() const { return isValid() && m_user.m_bAccessSupplier; }
   bool hasAccessToCategories() const { return isValid() && m_user.m_bAccessCategory; }

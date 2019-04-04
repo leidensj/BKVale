@@ -6,20 +6,22 @@
 #include "settings.h"
 #include "category.h"
 #include "image.h"
-#include "person.h"
+#include "form.h"
 #include "phone.h"
 #include "address.h"
 #include "shoppinglist.h"
 #include "reservation.h"
 #include "discount.h"
 #include "store.h"
+#include "supplier.h"
+#include "employee.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
   if (tableName == IMAGE_SQL_TABLE_NAME)
     return new Image;
-  if (tableName == PERSON_SQL_TABLE_NAME)
-    return new Person;
+  if (tableName == FORM_SQL_TABLE_NAME)
+    return new Form;
   if (tableName == CATEGORY_SQL_TABLE_NAME)
     return new Category;
   if (tableName == STORE_SQL_TABLE_NAME)
@@ -38,6 +40,10 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new Reservation;
   if (tableName == DISCOUNT_SQL_TABLE_NAME)
     return new Discount;
+  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return new Employee;
+  if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return new Supplier;
   return nullptr;
 }
 

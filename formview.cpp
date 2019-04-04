@@ -1,4 +1,4 @@
-#include "personview.h"
+#include "formview.h"
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
 #include <QLayout>
@@ -12,16 +12,13 @@
 #include <QComboBox>
 #include <QMessageBox>
 #include "jdatabase.h"
-#include "databaseutils.h"
 #include <QAction>
 #include <QGroupBox>
 #include "phonetablewidget.h"
 #include "addresstablewidget.h"
 
-PersonView::PersonView(bool bAccessEmployee,
-                       bool bAccessSupplier,
-                       QWidget* parent)
-  : JItemView(PERSON_SQL_TABLE_NAME, parent)
+FormView::FormView(QWidget* parent)
+  : JItemView(FORM_SQL_TABLE_NAME, parent)
   , m_rdoPerson(nullptr)
   , m_rdoCompany(nullptr)
   , m_edName(nullptr)
@@ -38,19 +35,12 @@ PersonView::PersonView(bool bAccessEmployee,
   , m_cbBirthDate(nullptr)
   , m_imagePicker(nullptr)
   , m_dtCreationDate(nullptr)
-  , m_edPinCode(nullptr)
   , m_tblPhone(nullptr)
   , m_btnPhoneAdd(nullptr)
   , m_btnPhoneRemove(nullptr)
   , m_tblAddress(nullptr)
   , m_btnAddressAdd(nullptr)
   , m_btnAddressRemove(nullptr)
-  , m_cbNoteEdit(nullptr)
-  , m_cbNoteRemove(nullptr)
-  , m_cbEmployee(nullptr)
-  , m_cbSupplier(nullptr)
-  , m_bHasAccessToEmployees(bAccessEmployee)
-  , m_bHasAccessToSuppliers(bAccessSupplier)
 {
   m_rdoPerson = new QRadioButton;
   m_rdoPerson->setText(tr("Fisíca"));
@@ -88,23 +78,6 @@ PersonView::PersonView(bool bAccessEmployee,
   m_dtCreationDate->setDisplayFormat("dd/MM/yyyy");
   m_dtCreationDate->setDate(QDate::currentDate());
   m_dtCreationDate->setReadOnly(true);
-  m_edPinCode = new JLineEdit(JLineEdit::Input::Numeric,
-                              JLineEdit::st_defaultFlags2);
-  m_edPinCode->setEchoMode(QLineEdit::EchoMode::PasswordEchoOnEdit);
-  m_edPinCode->setAlignment(Qt::AlignCenter);
-  {
-    QFont f = m_edPinCode->font();
-    f.setBold(true);
-    m_edPinCode->setFont(f);
-  }
-
-  m_cbNoteEdit = new QCheckBox;
-  m_cbNoteEdit->setText(tr("Criar/Editar"));
-  m_cbNoteEdit->setIcon(QIcon(":/icons/res/file.png"));
-
-  m_cbNoteRemove = new QCheckBox;
-  m_cbNoteRemove->setText(tr("Remover"));
-  m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
   m_tblPhone = new PhoneTableWidget;
   m_btnPhoneAdd = new QPushButton(QIcon(":/icons/res/additem.png"), "");
@@ -126,16 +99,6 @@ PersonView::PersonView(bool bAccessEmployee,
   m_btnAddressRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
   m_btnAddressRemove->setToolTip(tr("Remover endereço"));
 
-  m_cbEmployee = new QCheckBox;
-  m_cbEmployee->setIcon(QIcon(":/icons/res/employee.png"));
-  m_cbEmployee->setEnabled(m_bHasAccessToEmployees);
-  m_cbEmployee->setText(tr("Funcionário"));
-
-  m_cbSupplier = new QCheckBox;
-  m_cbSupplier->setIcon(QIcon(":/icons/res/supplier.png"));
-  m_cbSupplier->setEnabled(m_bHasAccessToSuppliers);
-  m_cbSupplier->setText(tr("Fornecedor"));
-
   QFormLayout* formLayout = new QFormLayout;
   formLayout->addRow(tr("Tipo:"), m_rdoPerson);
   formLayout->addRow("", m_rdoCompany);
@@ -148,8 +111,6 @@ PersonView::PersonView(bool bAccessEmployee,
   formLayout->addRow(tr("Detalhes:"), m_edDetails);
   formLayout->addRow(m_cbBirthDate, m_dtBirthDate);
   formLayout->addRow(tr("Imagem:"), m_imagePicker);
-  formLayout->addRow(tr(""), m_cbEmployee);
-  formLayout->addRow(tr(""), m_cbSupplier);
 
   QVBoxLayout* ltPhoneBtn = new QVBoxLayout;
   ltPhoneBtn->setContentsMargins(0, 0, 0, 0);
@@ -171,17 +132,8 @@ PersonView::PersonView(bool bAccessEmployee,
   ltAddress->addWidget(m_tblAddress);
   ltAddress->addLayout(ltAddressBtn);
 
-  QFormLayout* employeeLayout = new QFormLayout;
-  employeeLayout->setAlignment(Qt::AlignTop);
-  employeeLayout->addRow(tr("Pincode:"), m_edPinCode);
-  employeeLayout->addRow(tr("Vales:"), m_cbNoteEdit);
-  employeeLayout->addRow("", m_cbNoteRemove);
-
   QFrame* informationFrame = new QFrame;
   informationFrame->setLayout(formLayout);
-
-  QFrame* employeeFrame = new QFrame;
-  employeeFrame->setLayout(employeeLayout);
 
   QFrame* phoneFrame = new QFrame;
   phoneFrame->setLayout(ltPhone);
@@ -192,12 +144,9 @@ PersonView::PersonView(bool bAccessEmployee,
   m_tab->addTab(informationFrame, QIcon(":/icons/res/details.png"), tr("Informações"));
   m_tab->addTab(phoneFrame, QIcon(":/icons/res/phone.png"), tr("Telefone"));
   m_tab->addTab(addressFrame, QIcon(":/icons/res/address.png"), tr("Endereço"));
-  m_tab->addTab(employeeFrame, QIcon(":/icons/res/employee.png"), tr("Funcionário"));
 
   connect(m_rdoCompany, SIGNAL(toggled(bool)), this, SLOT(switchUserType()));
   connect(m_rdoPerson, SIGNAL(toggled(bool)), this, SLOT(switchUserType()));
-  connect(m_cbEmployee, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
-  connect(m_cbSupplier, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_cbBirthDate, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_btnPhoneAdd, SIGNAL(clicked(bool)), m_tblPhone, SLOT(addItem()));
   connect(m_btnPhoneRemove, SIGNAL(clicked(bool)), m_tblPhone, SLOT(removeItem()));
@@ -210,12 +159,12 @@ PersonView::PersonView(bool bAccessEmployee,
   m_edName->setFocus();
 }
 
-PersonView::~PersonView()
+FormView::~FormView()
 {
 
 }
 
-const JItemSQL& PersonView::getItem() const
+const JItemSQL& FormView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
@@ -231,12 +180,6 @@ const JItemSQL& PersonView::getItem() const
   m_ref.m_dtCreation = m_dtCreationDate->date();
   m_ref.m_bCompany = m_rdoCompany->isChecked();
 
-  m_ref.m_supplier.m_bIsSupplier = m_cbSupplier->isChecked();
-  m_ref.m_employee.m_bIsEmployee = m_cbEmployee->isChecked();
-  m_ref.m_employee.m_pincode = m_cbEmployee->isChecked() ? m_edPinCode->text() : "";
-  m_ref.m_employee.m_bNoteEdit = m_cbEmployee->isChecked() && m_cbNoteEdit->isChecked();
-  m_ref.m_employee.m_bNoteRemove = m_cbEmployee->isChecked() && m_cbNoteRemove->isChecked();
-
   for (int i = 0; i != m_tblPhone->rowCount(); ++i)
     m_ref.m_vPhone.push_back(dynamic_cast<const Phone&>(m_tblPhone->getItem(i)));
 
@@ -246,9 +189,9 @@ const JItemSQL& PersonView::getItem() const
   return m_ref;
 }
 
-void PersonView::setItem(const JItemSQL &o)
+void FormView::setItem(const JItemSQL &o)
 {
-  auto _o = dynamic_cast<const Person&>(o);
+  auto _o = dynamic_cast<const Form&>(o);
   m_currentId = _o.m_id;
   m_imagePicker->setItem(_o.m_image);
   m_edName->setText(_o.m_name);
@@ -262,13 +205,7 @@ void PersonView::setItem(const JItemSQL &o)
   m_dtCreationDate->setDate(_o.m_dtCreation);
   m_rdoCompany->setChecked(_o.m_bCompany);
   m_rdoPerson->setChecked(!_o.m_bCompany);
-  m_cbSupplier->setChecked(_o.m_supplier.m_bIsSupplier);
-  m_cbEmployee->setChecked(_o.m_employee.m_bIsEmployee);
   switchUserType();
-
-  m_edPinCode->setText(_o.m_employee.m_pincode);
-  m_cbNoteEdit->setChecked(_o.m_employee.m_bNoteEdit);
-  m_cbNoteRemove->setChecked(_o.m_employee.m_bNoteRemove);
 
   m_tblPhone->removeAllItems();
   m_tblAddress->removeAllItems();
@@ -280,17 +217,16 @@ void PersonView::setItem(const JItemSQL &o)
     m_tblAddress->addItem(_o.m_vAddress.at(i));
 }
 
-void PersonView::create()
+void FormView::create()
 {
-  selectItem(Person());
+  selectItem(Form());
   m_tab->setCurrentIndex(0);
   updateControls();
   m_edName->setFocus();
 }
 
-void PersonView::updateControls()
+void FormView::updateControls()
 {
-  m_edPinCode->setEnabled(m_cbEmployee->isChecked());
   m_dtBirthDate->setEnabled(m_cbBirthDate->isChecked());
   if (m_cbBirthDate->isChecked() &&
       m_dtBirthDate->date() == m_dtBirthDate->minimumDate())
@@ -298,10 +234,9 @@ void PersonView::updateControls()
 
   m_btnPhoneRemove->setEnabled(m_tblPhone->isValidCurrentRow());
   m_btnAddressRemove->setEnabled(m_tblAddress->isValidCurrentRow());
-  m_tab->setTabEnabled(3, m_bHasAccessToEmployees && m_cbEmployee->isChecked());
 }
 
-void PersonView::switchUserType()
+void FormView::switchUserType()
 {
   if (m_rdoCompany->isChecked())
   {
@@ -309,10 +244,10 @@ void PersonView::switchUserType()
     m_lblAlias->setText(tr("Nome fantasia:"));
     m_lblCpfCnpj->setText(tr("CNPJ:"));
     m_lblRgIE->setText(tr("IE:"));
-    m_edCpfCnpj->clear();
     m_edCpfCnpj->setInputMask("99.999.999/9999-99;_");
-    m_edRgIE->clear();
+    m_edCpfCnpj->setText(m_ref.m_bCompany ? m_ref.m_CPF_CNPJ : "");
     m_edRgIE->setInputMask("");
+    m_edRgIE->setText(m_ref.m_bCompany ? m_ref.m_RG_IE : "");
   }
   else
   {
@@ -320,10 +255,10 @@ void PersonView::switchUserType()
     m_lblAlias->setText(tr("Apelido:"));
     m_lblCpfCnpj->setText(tr("CPF:"));
     m_lblRgIE->setText(tr("RG:"));
-    m_edCpfCnpj->clear();
     m_edCpfCnpj->setInputMask("999.999.999-99;_");
-    m_edRgIE->clear();
+    m_edCpfCnpj->setText(!m_ref.m_bCompany ? m_ref.m_CPF_CNPJ : "");
     m_edRgIE->setInputMask("9999999999;_");
+    m_edRgIE->setText(!m_ref.m_bCompany ? m_ref.m_RG_IE : "");
   }
   updateControls();
 }

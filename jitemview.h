@@ -10,6 +10,7 @@
 class QPushButton;
 class JDatabase;
 class QTabWidget;
+class QDialog;
 
 class JItemView : public QFrame
 {
@@ -39,6 +40,7 @@ private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   QPushButton* m_btnSearch;
+  QDialog* m_dlgDb;
   virtual void setItem(const JItemSQL& o) = 0;
 };
 

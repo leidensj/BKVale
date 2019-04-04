@@ -34,7 +34,7 @@ const JItem& ShoppingListTable::getItem(int row) const
     m_ref.m_bPrice = ((DoubleTableWidgetItem*)item(idx, (int)ShoppingListColumn::Price))->checkState() == Qt::Checked;
     m_ref.m_package = ((PackageTableWidgetItem*)item(idx, (int)ShoppingListColumn::Unity))->getItem();
     m_ref.m_product = dynamic_cast<const Product&>(((ProductTableWidgetItem*)item(idx, (int)ShoppingListColumn::Description))->getItem());
-    m_ref.m_supplier = dynamic_cast<const Person&>(((PersonTableWidgetItem*)item(idx, (int)ShoppingListColumn::Supplier))->getItem());
+    m_ref.m_supplier = dynamic_cast<const Supplier&>(((SupplierTableWidgetItem*)item(idx, (int)ShoppingListColumn::Supplier))->getItem());
   }
   return m_ref;
 }
@@ -52,7 +52,7 @@ void ShoppingListTable::addItem(const JItem& o)
   setItem(row, (int)ShoppingListColumn::Price, new DoubleTableWidgetItem(JItem::DataType::Money,
                                                                          DoubleTableWidgetItem::Color::None,
                                                                          true));
-  setItem(row, (int)ShoppingListColumn::Supplier, new PersonTableWidgetItem);
+  setItem(row, (int)ShoppingListColumn::Supplier, new SupplierTableWidgetItem);
 
   setCurrentCell(row, (int)ShoppingListColumn::Ammount);
 
@@ -63,7 +63,7 @@ void ShoppingListTable::addItem(const JItem& o)
   ((DoubleTableWidgetItem*)item(row, (int)ShoppingListColumn::Price))->setCheckState(_o.m_bPrice ? Qt::Checked : Qt::Unchecked);
   ((ProductTableWidgetItem*)item(row, (int)ShoppingListColumn::Description))->setItem(_o.m_product);
   ((PackageTableWidgetItem*)item(row, (int)ShoppingListColumn::Unity))->setItem(_o.m_package, _o.m_product.m_unity);
-  ((PersonTableWidgetItem*)item(row, (int)ShoppingListColumn::Supplier))->setItem(_o.m_supplier);
+  ((SupplierTableWidgetItem*)item(row, (int)ShoppingListColumn::Supplier))->setItem(_o.m_supplier);
   blockSignals(false);
 }
 
@@ -129,8 +129,8 @@ void ShoppingListTable::itemActivate(int row, int column)
   }
   else if (column == (int)ShoppingListColumn::Supplier)
   {
-    auto ptSupplier = (PersonTableWidgetItem*)item(row, column);
-    ptSupplier->selectItem(PERSON_FILTER_SUPPLIER);
+    auto ptSupplier = (SupplierTableWidgetItem*)item(row, column);
+    ptSupplier->selectItem("");
   }
 }
 
@@ -138,8 +138,8 @@ void ShoppingListTable::itemDelete(int row, int column)
 {
   if (column == (int)ShoppingListColumn::Supplier)
   {
-    auto ptSupplier = (PersonTableWidgetItem*)item(row, column);
-    ptSupplier->setItem(Person());
+    auto ptSupplier = (SupplierTableWidgetItem*)item(row, column);
+    ptSupplier->setItem(Supplier());
   }
 }
 

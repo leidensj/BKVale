@@ -1,99 +1,53 @@
 #include "storeview.h"
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
-#include "storeemployeetablewidget.h"
+#include "jplaintextedit.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
 
 StoreView::StoreView(QWidget* parent)
   : JItemView(STORE_SQL_TABLE_NAME, parent)
-  , m_edName(nullptr)
-  , m_personPicker(nullptr)
+  , m_teDescription(nullptr)
+  , m_formPicker(nullptr)
   , m_addressPicker(nullptr)
   , m_phonePicker(nullptr)
-  , m_employeeTable(nullptr)
-  , m_btnAddEmployee(nullptr)
-  , m_btnRemoveEmployee(nullptr)
 {
-  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
-  m_edName->setPlaceholderText(tr("*"));
+  m_teDescription = new JPlainTextEdit;
 
-  m_personPicker = new JDatabasePicker(PERSON_SQL_TABLE_NAME);
-  m_personPicker->getDatabase()->setFixedFilter(PERSON_FILTER_COMPANY);
+  m_formPicker = new JDatabasePicker(FORM_SQL_TABLE_NAME);
+  m_formPicker->getDatabase()->setFixedFilter(FORM_FILTER_COMPANY);
 
-  m_employeeTable = new StoreEmployeeTableWidget;
-
-  m_btnAddEmployee = new QPushButton;
-  m_btnAddEmployee->setFlat(true);
-  m_btnAddEmployee->setIcon(QIcon(":/icons/res/additem.png"));
-  m_btnAddEmployee->setIconSize(QSize(24, 24));
-
-  m_btnRemoveEmployee = new QPushButton;
-  m_btnRemoveEmployee->setFlat(true);
-  m_btnRemoveEmployee->setIcon(QIcon(":/icons/res/removeitem.png"));
-  m_btnRemoveEmployee->setIconSize(QSize(24, 24));
+  // TODO MOSTRAR APENAS TELEFONE DA PESSOA
+  m_addressPicker = new JDatabasePicker(ADDRESS_SQL_TABLE_NAME);
+  m_phonePicker = new JDatabasePicker(PHONE_SQL_TABLE_NAME);
 
   QFormLayout* tablayout = new QFormLayout;
   tablayout->setAlignment(Qt::AlignTop);
-  tablayout->addRow(tr("Nome:"), m_edName);
-  tablayout->addRow(tr("Cadastro:"), m_personPicker);
+  tablayout->addRow(tr("Cadastro:"), m_formPicker);
+  tablayout->addRow(tr("Endereço:"), m_addressPicker);
+  tablayout->addRow(tr("Telefone:"), m_phonePicker);
+  tablayout->addRow(tr("Descrição:"), m_teDescription);
 
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(tablayout);
 
-  QVBoxLayout* employeebuttonlayout = new QVBoxLayout;
-  employeebuttonlayout->setContentsMargins(0, 0, 0, 0);
-  employeebuttonlayout->setAlignment(Qt::AlignTop);
-  employeebuttonlayout->addWidget(m_btnAddEmployee);
-  employeebuttonlayout->addWidget(m_btnRemoveEmployee);
-
-  QHBoxLayout* employeelayout = new QHBoxLayout;
-  employeelayout->setAlignment(Qt::AlignTop);
-  employeelayout->addWidget(m_employeeTable);
-  employeelayout->addLayout(employeebuttonlayout);
-
-  QFrame* tabemployee = new QFrame;
-  tabemployee->setLayout(employeelayout);
-
-  m_tab->addTab(tabframe,
-                QIcon(":/icons/res/store.png"),
-                tr("Loja"));
-
-  m_tab->addTab(tabemployee,
-                QIcon(":/icons/res/employee.png"),
-                tr("Funcionários"));
-
-  QObject::connect(m_btnAddEmployee,
-                   SIGNAL(clicked(bool)),
-                   m_employeeTable,
-                   SLOT(addItem()));
-
-  QObject::connect(m_btnRemoveEmployee,
-                   SIGNAL(clicked(bool)),
-                   m_employeeTable,
-                   SLOT(removeItem()));
-
-  QObject::connect(m_employeeTable,
-                   SIGNAL(changedSignal()),
-                   this,
-                   SLOT(updateControls()));
+  m_tab->addTab(tabframe, QIcon(":/icons/res/store.png"), tr("Loja"));
 }
 
 void StoreView::create()
 {
   selectItem(Store());
-  m_edName->setFocus();
 }
 
 const JItemSQL& StoreView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
-  m_ref.m_person.m_id = m_personPicker->getId();
-  m_ref.m_name = m_edName->text();
-  for (int i = 0; i != m_employeeTable->rowCount(); ++i)
-    m_ref.m_vEmployee.push_back(dynamic_cast<const StoreEmployee&>(m_employeeTable->getItem(i)));
+  m_ref.m_form.m_id = m_formPicker->getId();
+  m_ref.m_address.m_id = m_addressPicker->getId();
+  m_ref.m_phone.m_id = m_phonePicker->getId();
+  m_ref.m_description = m_teDescription->toPlainText();
   return m_ref;
 }
 
@@ -101,14 +55,8 @@ void StoreView::setItem(const JItemSQL& o)
 {
   const Store& ref = static_cast<const Store&>(o);
   m_currentId = o.m_id;
-  m_edName->setText(ref.m_name);
-  m_personPicker->setItem(ref.m_person);
-  m_employeeTable->removeAllItems();
-  for (int i = 0; i != ref.m_vEmployee.size(); ++i)
-    m_employeeTable->addItem(ref.m_vEmployee.at(i));
-}
-
-void StoreView::updateControls()
-{
-  m_btnRemoveEmployee->setEnabled(m_employeeTable->isValidCurrentRow());
+  m_teDescription->setPlainText(ref.m_description);
+  m_formPicker->setItem(ref.m_form);
+  m_addressPicker->setItem(ref.m_address);
+  m_phonePicker->setItem(ref.m_phone);
 }

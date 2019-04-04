@@ -1,4 +1,5 @@
 #include "usermgtview.h"
+#include "jitemhelper.h"
 #include <QCheckBox>
 #include "jlineedit.h"
 #include <QLabel>
@@ -22,7 +23,7 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   , m_accessShop(nullptr)
   , m_accessUser(nullptr)
   , m_accessProduct(nullptr)
-  , m_accessPerson(nullptr)
+  , m_accessForm(nullptr)
   , m_accessEmployee(nullptr)
   , m_accessSupplier(nullptr)
   , m_accessCategory(nullptr)
@@ -77,36 +78,36 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   m_accessShoppingList->setText(tr("Listas de Compras"));
 
   m_accessUser = new QCheckBox;
-  m_accessUser->setIcon(QIcon(":/icons/res/user.png"));
-  m_accessUser->setText(tr("Usuários"));
+  m_accessUser->setIcon(QIcon(JItemHelper::icon(USER_SQL_TABLE_NAME)));
+  m_accessUser->setText(JItemHelper::text(USER_SQL_TABLE_NAME));
 
   m_accessProduct = new QCheckBox;
-  m_accessProduct->setIcon(QIcon(":/icons/res/item.png"));
-  m_accessProduct->setText(tr("Produtos"));
+  m_accessProduct->setIcon(QIcon(JItemHelper::icon(PRODUCT_SQL_TABLE_NAME)));
+  m_accessProduct->setText(JItemHelper::text(PRODUCT_SQL_TABLE_NAME));
 
-  m_accessPerson = new QCheckBox;
-  m_accessPerson->setIcon(QIcon(":/icons/res/person.png"));
-  m_accessPerson->setText(tr("Pessoas"));
+  m_accessForm = new QCheckBox;
+  m_accessForm->setIcon(QIcon(JItemHelper::icon(FORM_SQL_TABLE_NAME)));
+  m_accessForm->setText(JItemHelper::text(FORM_SQL_TABLE_NAME));
 
   m_accessEmployee = new QCheckBox;
-  m_accessEmployee->setIcon(QIcon(":/icons/res/employee.png"));
-  m_accessEmployee->setText(tr("Funcionários"));
+  m_accessEmployee->setIcon(QIcon(JItemHelper::icon(EMPLOYEE_SQL_TABLE_NAME)));
+  m_accessEmployee->setText(JItemHelper::text(EMPLOYEE_SQL_TABLE_NAME));
 
   m_accessSupplier = new QCheckBox;
-  m_accessSupplier->setIcon(QIcon(":/icons/res/supplier.png"));
-  m_accessSupplier->setText(tr("Fornecedores"));
+  m_accessSupplier->setIcon(QIcon(JItemHelper::icon(SUPPLIER_SQL_TABLE_NAME)));
+  m_accessSupplier->setText(JItemHelper::text(SUPPLIER_SQL_TABLE_NAME));
 
   m_accessCategory = new QCheckBox;
-  m_accessCategory->setIcon(QIcon(":/icons/res/category.png"));
-  m_accessCategory->setText(tr("Categorias"));
+  m_accessCategory->setIcon(QIcon(JItemHelper::icon(CATEGORY_SQL_TABLE_NAME)));
+  m_accessCategory->setText(JItemHelper::text(CATEGORY_SQL_TABLE_NAME));
 
   m_accessImage = new QCheckBox;
-  m_accessImage->setIcon(QIcon(":/icons/res/icon.png"));
-  m_accessImage->setText(tr("Imagens"));
+  m_accessImage->setIcon(QIcon(JItemHelper::icon(IMAGE_SQL_TABLE_NAME)));
+  m_accessImage->setText(JItemHelper::text(IMAGE_SQL_TABLE_NAME));
 
   m_accessReservation = new QCheckBox;
-  m_accessReservation->setIcon(QIcon(":/icons/res/reservation.png"));
-  m_accessReservation->setText(tr("Reservas"));
+  m_accessReservation->setIcon(QIcon(JItemHelper::icon(RESERVATION_SQL_TABLE_NAME)));
+  m_accessReservation->setText(JItemHelper::text(RESERVATION_SQL_TABLE_NAME));
 
   m_accessSettings = new QCheckBox;
   m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
@@ -131,7 +132,7 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   tabPermissionslayout->addWidget(m_accessReservation);
   tabPermissionslayout->addWidget(m_accessUser);
   tabPermissionslayout->addWidget(m_accessProduct);
-  tabPermissionslayout->addWidget(m_accessPerson);
+  tabPermissionslayout->addWidget(m_accessForm);
   tabPermissionslayout->addWidget(m_accessEmployee);
   tabPermissionslayout->addWidget(m_accessSupplier);
   tabPermissionslayout->addWidget(m_accessCategory);
@@ -179,7 +180,7 @@ const JItemSQL& UserMgtView::getItem() const
   m_ref.m_bAccessShop = m_accessShop->isChecked();
   m_ref.m_bAccessUser = m_accessUser->isChecked();
   m_ref.m_bAccessProduct = m_accessProduct->isChecked();
-  m_ref.m_bAccessPerson = m_accessPerson->isChecked();
+  m_ref.m_bAccessForm = m_accessForm->isChecked();
   m_ref.m_bAccessEmployee = m_accessEmployee->isChecked();
   m_ref.m_bAccessSupplier = m_accessSupplier->isChecked();
   m_ref.m_bAccessCategory = m_accessCategory->isChecked();
@@ -204,7 +205,7 @@ void UserMgtView::setItem(const JItemSQL& o)
   m_accessShop->setChecked(_o.m_bAccessShop);
   m_accessUser->setChecked(_o.m_bAccessUser);
   m_accessProduct->setChecked(_o.m_bAccessProduct);
-  m_accessPerson->setChecked(_o.m_bAccessPerson);
+  m_accessForm->setChecked(_o.m_bAccessForm);
   m_accessEmployee->setChecked(_o.m_bAccessEmployee);
   m_accessSupplier->setChecked(_o.m_bAccessSupplier);
   m_accessCategory->setChecked(_o.m_bAccessCategory);

@@ -130,6 +130,7 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
   connect(m_calculator, SIGNAL(lineSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
   connect(ui->actionForms, SIGNAL(triggered(bool)), this, SLOT(openFormsDialog()));
+  connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openEmployeesDialog()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(openShoppingListDialog()));
   connect(m_shop, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));

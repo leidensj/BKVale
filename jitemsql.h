@@ -7,6 +7,9 @@
 #include <QSqlError>
 #include <QByteArray>
 
+class JModel;
+class QObject;
+
 struct JItemSQL : public JItem
 {
   virtual ~JItemSQL();
@@ -15,6 +18,8 @@ struct JItemSQL : public JItem
   virtual bool SQL_update_proc(QSqlQuery& query) const  = 0;
   virtual bool SQL_select_proc(QSqlQuery& query, QString& error) = 0;
   virtual bool SQL_remove_proc(QSqlQuery& query) const = 0;
+  //TODO colocar virtual pura
+  virtual JModel* SQL_table_model(QObject* /*parent*/) const { return nullptr; }
 
   virtual bool SQL_insert_update(QString& error) const;
   virtual bool SQL_select(QString& error);

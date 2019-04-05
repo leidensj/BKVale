@@ -406,7 +406,7 @@ bool BaitaSQL::createTables(QString& error)
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
                     ":_password,"
-                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
+                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
       query.prepare(str);
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();

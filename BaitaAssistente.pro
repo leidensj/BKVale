@@ -53,7 +53,6 @@ SOURCES += main.cpp\
     phonetablewidget.cpp \
     timecard.cpp \
     storeview.cpp \
-    timeintervaldlg.cpp \
     jtimeedit.cpp \
     addresstablewidget.cpp \
     productcodetablewidget.cpp \
@@ -77,7 +76,8 @@ SOURCES += main.cpp\
     employee.cpp \
     supplier.cpp \
     formview.cpp \
-    employeeview.cpp
+    employeeview.cpp \
+    jmodel.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -134,7 +134,6 @@ HEADERS  += mainwindow.h \
     timecard.h \
     store.h \
     storeview.h \
-    timeintervaldlg.h \
     jtimeedit.h \
     timeinterval.h \
     addresstablewidget.h \
@@ -148,7 +147,8 @@ HEADERS  += mainwindow.h \
     employee.h \
     supplier.h \
     formview.h \
-    employeeview.h
+    employeeview.h \
+    jmodel.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

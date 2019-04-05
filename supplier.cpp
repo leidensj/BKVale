@@ -14,7 +14,7 @@ void Supplier::clear()
 bool Supplier::operator !=(const JItem& other) const
 {
   const Supplier& another = dynamic_cast<const Supplier&>(other);
-  bool b =  m_form.m_id != m_form.m_image.m_id;
+  bool b =  m_form.m_id != another.m_form.m_id;
   return b;
 }
 

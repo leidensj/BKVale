@@ -24,9 +24,9 @@ StoreView::StoreView(QWidget* parent)
 
   QFormLayout* tablayout = new QFormLayout;
   tablayout->setAlignment(Qt::AlignTop);
-  tablayout->addRow(tr("Cadastro:"), m_formPicker);
-  tablayout->addRow(tr("Endereço:"), m_addressPicker);
-  tablayout->addRow(tr("Telefone:"), m_phonePicker);
+  tablayout->addRow(m_formPicker->getText() + ":", m_formPicker);
+  tablayout->addRow(m_addressPicker->getText() + ":", m_addressPicker);
+  tablayout->addRow(m_phonePicker->getText() + ":", m_phonePicker);
   tablayout->addRow(tr("Descrição:"), m_teDescription);
 
   QFrame* tabframe = new QFrame;

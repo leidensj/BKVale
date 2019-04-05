@@ -125,11 +125,6 @@
      <addaction name="actionEmployees"/>
      <addaction name="actionSuppliers"/>
     </widget>
-    <widget class="QMenu" name="menuType_Here">
-     <property name="title">
-      <string>Type Here</string>
-     </property>
-    </widget>
     <addaction name="menuPessoas"/>
     <addaction name="actionProducts"/>
     <addaction name="actionCategories"/>
@@ -137,7 +132,6 @@
     <addaction name="actionShoppingList"/>
     <addaction name="actionUsers"/>
     <addaction name="actionStores"/>
-    <addaction name="menuType_Here"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
     <property name="title">

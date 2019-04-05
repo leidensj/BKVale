@@ -659,7 +659,7 @@ public:
     setHeaderData(1, Qt::Horizontal, tr("Razão Social"));
     setHeaderData(2, Qt::Horizontal, tr("Nome Fantasia"));
     setHeaderData(3, Qt::Horizontal, tr("Descrição"));
-    if (header != nullptr && header->count() == 3)
+    if (header != nullptr && header->count() == 4)
     {
       header->hideSection(0);
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);

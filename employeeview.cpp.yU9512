@@ -149,7 +149,7 @@ const JItemSQL& EmployeeView::getItem() const
   m_ref.clear();
   m_ref.m_id = m_currentId;
   m_ref.m_form.m_id = m_formPicker->getId();
-  m_ref.m_store.m_id = m_storePicker->getId();
+  m_ref.m_store.m_id = m_store
   m_ref.m_pincode = m_edPincode->text();
   m_ref.m_bNoteEdit = m_cbNoteEdit->isChecked();
   m_ref.m_bNoteRemove = m_cbNoteRemove->isChecked();
@@ -162,9 +162,7 @@ void EmployeeView::setItem(const JItemSQL& o)
   auto ref = static_cast<const Employee&>(o);
   m_currentId = o.m_id;
   m_formPicker->setItem(ref.m_form);
-  m_storePicker->setItem(ref.m_store);
   m_edPincode->setText(ref.m_pincode);
   m_cbNoteEdit->setChecked(ref.m_bNoteEdit);
   m_cbNoteRemove->setChecked(ref.m_bNoteRemove);
-  m_time->setItems(ref.m_hours);
 }

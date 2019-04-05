@@ -1,4 +1,63 @@
 #include "reservation.h"
+#include "jmodel.h"
+
+class ReservationModel : public JModel
+{
+public:
+  ReservationModel(QObject *parent)
+    : JModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     SQL_COLID ","
+                     RESERVATION_SQL_COL01 ","
+                     RESERVATION_SQL_COL04 ","
+                     RESERVATION_SQL_COL02 ","
+                     RESERVATION_SQL_COL03
+                     " FROM "
+                     RESERVATION_SQL_TABLE_NAME);
+    return strQuery;
+  }
+
+  void select(QHeaderView* header)
+  {
+    JModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Número"));
+    setHeaderData(2, Qt::Horizontal, tr("Data"));
+    setHeaderData(3, Qt::Horizontal, tr("Nome"));
+    setHeaderData(4, Qt::Horizontal, tr("Local"));
+    if (header != nullptr && header->count() == 5)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(4, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+
+  QVariant data(const QModelIndex &idx, int role = Qt::DisplayRole) const
+  {
+    if (!idx.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlQueryModel::data(idx, role);
+    if (role == Qt::DisplayRole)
+    {
+      if (idx.column() == 2)
+      {
+        QDateTime dt = QDateTime::fromString(value.toString(), Qt::ISODate);
+        value = dt.toString("yyyy/MM/dd HH:mm");
+      }
+    }
+    return value;
+  }
+};
 
 Reservation::Reservation()
 {
@@ -143,4 +202,9 @@ bool Reservation::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
+}
+
+JModel* Reservation::SQL_table_model(QObject* parent) const
+{
+  return new ReservationModel(parent);
 }

@@ -1,6 +1,39 @@
 #include "user.h"
+#include "jmodel.h"
 #include <QCryptographicHash>
 #include <QObject>
+
+class UserModel : public JModel
+{
+public:
+  UserModel(QObject *parent)
+    : JModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     SQL_COLID ","
+                     USER_SQL_COL01
+                     " FROM "
+                     USER_SQL_TABLE_NAME);
+    return strQuery;
+  }
+
+  void select(QHeaderView* header)
+  {
+    JModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    if (header != nullptr && header->count() == 2)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+};
 
 User::User()
 {
@@ -242,4 +275,9 @@ bool User::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
+}
+
+JModel* User::SQL_table_model(QObject* parent) const
+{
+  return new UserModel(parent);
 }

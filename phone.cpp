@@ -1,4 +1,46 @@
 #include "phone.h"
+#include "jmodel.h"
+
+class PhoneModel : public JModel
+{
+public:
+  PhoneModel(QObject *parent)
+    : JModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     SQL_COLID ","
+                     PHONE_SQL_COL02 ","
+                     PHONE_SQL_COL03 ","
+                     PHONE_SQL_COL04 ","
+                     PHONE_SQL_COL05
+                     " FROM "
+                     PHONE_SQL_TABLE_NAME);
+    return strQuery;
+  }
+
+  virtual void select(QHeaderView* header)
+  {
+    JModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("País"));
+    setHeaderData(1, Qt::Horizontal, tr("Código"));
+    setHeaderData(1, Qt::Horizontal, tr("Número"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    if (header != nullptr && header->count() == 5)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(4, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+};
 
 Phone::Phone()
 {
@@ -106,4 +148,9 @@ QString Phone::strFormattedPhoneWithName() const
     str += m_name + " ";
   str += strFormattedPhone();
   return str;
+}
+
+JModel* Phone::SQL_table_model(QObject* parent) const
+{
+  return new PhoneModel(parent);
 }

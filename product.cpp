@@ -1,4 +1,88 @@
 #include "product.h"
+#include "jmodel.h"
+
+class ProductModel : public JModel
+{
+public:
+  ProductModel(QObject *parent)
+    : JModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     PRODUCT_SQL_TABLE_NAME "." SQL_COLID ","
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01 ","
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL04 ","
+                     CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL02
+                     " FROM "
+                     PRODUCT_SQL_TABLE_NAME
+                     " LEFT OUTER JOIN "
+                     CATEGORY_SQL_TABLE_NAME
+                     " ON "
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL02
+                     " = "
+                     CATEGORY_SQL_TABLE_NAME "." SQL_COLID);
+    return strQuery;
+  }
+
+  void select(QHeaderView* header)
+  {
+    JModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    setHeaderData(2, Qt::Horizontal, tr("Unidade"));
+    setHeaderData(3, Qt::Horizontal, tr("Categoria"));
+    if (header != nullptr && header->count() == 4)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+};
+
+class ProductCodeModel : public JModel
+{
+public:
+  ProductCodeModel(QObject *parent)
+    : JModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." SQL_COLID ","
+                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL02 ","
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01
+                     " FROM "
+                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
+                     " LEFT OUTER JOIN "
+                     PRODUCT_SQL_TABLE_NAME
+                     " ON " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL01
+                     " = " PRODUCT_SQL_TABLE_NAME "." SQL_COLID);
+    return strQuery;
+  }
+
+  void select(QHeaderView* header)
+  {
+    JModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Código"));
+    setHeaderData(2, Qt::Horizontal, tr("Produto"));
+    if (header != nullptr && header->count() == 3)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+    }
+  }
+};
 
 Package::Package()
 {
@@ -42,13 +126,14 @@ ProductCode::ProductCode()
 void ProductCode::clear()
 {
   m_id.clear();
+  m_productId.clear();
   m_code.clear();
 }
 
 bool ProductCode::operator != (const JItem& other) const
 {
   const ProductCode& another = dynamic_cast<const ProductCode&>(other);
-  return m_code != another.m_code;
+  return m_code != another.m_code || m_productId != another.m_productId;
 }
 
 bool ProductCode::operator == (const JItem& other) const
@@ -61,9 +146,45 @@ bool ProductCode::isValid() const
   return !m_code.isEmpty();
 }
 
-QString ProductCode::strTableName() const
+QString ProductCode::SQL_tableName() const
 {
   return PRODUCT_CODE_ITEMS_SQL_TABLE_NAME;
+}
+
+bool ProductCode::SQL_insert_proc(QSqlQuery& query) const
+{
+  query.prepare("INSERT INTO " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
+                PRODUCT_CODE_ITEMS_SQL_COL01 ","
+                PRODUCT_CODE_ITEMS_SQL_COL02 ")"
+                " VALUES ("
+                "(:_v01),"
+                "(:_v02))");
+  query.bindValue(":_v01", m_productId.get());
+  query.bindValue(":_v02", m_code);
+  bool bSuccess = query.exec();
+  if (bSuccess)
+    m_id.set(query.lastInsertId().toLongLong());
+  return bSuccess;
+}
+
+bool ProductCode::SQL_update_proc(QSqlQuery& /*query*/) const
+{
+  return false;
+}
+
+bool ProductCode::SQL_select_proc(QSqlQuery& /*query*/, QString& /*error*/)
+{
+  return false;
+}
+
+bool ProductCode::SQL_remove_proc(QSqlQuery& /*query*/) const
+{
+  return false;
+}
+
+JModel* ProductCode::SQL_table_model(QObject* parent) const
+{
+  return new ProductCodeModel(parent);
 }
 
 Product::Product()
@@ -153,18 +274,9 @@ bool Product::SQL_insert_proc(QSqlQuery& query) const
     {
       for (int i = 0; i != m_vCode.size(); ++i)
       {
-        query.prepare("INSERT INTO " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
-                      PRODUCT_CODE_ITEMS_SQL_COL01 ","
-                      PRODUCT_CODE_ITEMS_SQL_COL02 ")"
-                      " VALUES ("
-                      "(:_v01),"
-                      "(:_v02))");
-        query.bindValue(":_v01", m_id.get());
-        query.bindValue(":_v02", m_vCode.at(i).m_code);
-        bSuccess = query.exec();
-        if (bSuccess)
-          m_vCode[i].m_id.set(query.lastInsertId().toLongLong());
-        else
+        m_vCode[i].m_productId = m_id;
+        bSuccess = m_vCode[i].SQL_insert_proc(query);
+        if (!bSuccess)
           break;
       }
     }
@@ -204,18 +316,9 @@ bool Product::SQL_update_proc(QSqlQuery& query) const
     {
       for (int i = 0; i != m_vCode.size(); ++i)
       {
-        query.prepare("INSERT INTO " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
-                      PRODUCT_CODE_ITEMS_SQL_COL01 ","
-                      PRODUCT_CODE_ITEMS_SQL_COL02 ")"
-                      " VALUES ("
-                      "(:_v01),"
-                      "(:_v02))");
-        query.bindValue(":_v01", m_id.get());
-        query.bindValue(":_v02", m_vCode.at(i).m_code);
-        bSuccess = query.exec();
-        if (bSuccess)
-          m_vCode[i].m_id.set(query.lastInsertId().toLongLong());
-        else
+        m_vCode[i].m_productId = m_id;
+        bSuccess = m_vCode[i].SQL_insert_proc(query);
+        if (!bSuccess)
           break;
       }
     }
@@ -330,3 +433,7 @@ bool Product::SQL_select_by_code(const ProductCode& code, QString& error)
   return SQL_finish(db, query, bSuccess, error);
 }
 
+JModel* Product::SQL_table_model(QObject* parent) const
+{
+  return new ProductModel(parent);
+}

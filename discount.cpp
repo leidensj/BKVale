@@ -1,4 +1,62 @@
 #include "discount.h"
+#include "jmodel.h"
+
+class DiscountModel : public JModel
+{
+public:
+  DiscountModel(QObject *parent)
+    : JModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    QString strQuery("SELECT "
+                     SQL_COLID ","
+                     DISCOUNT_SQL_COL01 ","
+                     DISCOUNT_SQL_COL04 ","
+                     DISCOUNT_SQL_COL08 ","
+                     DISCOUNT_SQL_COL07
+                     " FROM "
+                     DISCOUNT_SQL_TABLE_NAME);
+    return strQuery;
+  }
+
+  void select(QHeaderView* header)
+  {
+    JModel::select("");
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Código"));
+    setHeaderData(2, Qt::Horizontal, tr("Tipo"));
+    setHeaderData(3, Qt::Horizontal, tr("Descrição"));
+    setHeaderData(4, Qt::Horizontal, tr("Regatado"));
+    if (header != nullptr && header->count() == 5)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
+    }
+  }
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  {
+    if (!index.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlQueryModel::data(index, role);
+    if (role == Qt::DisplayRole)
+    {
+      if (index.column() == 2)
+        value = Discount::strType((Discount::Type)value.toInt());
+      else if (index.column() == 4)
+        value = value.toBool() ? tr("Sim") : "";
+    }
+    return value;
+  }
+};
 
 DiscountItem::DiscountItem()
 {
@@ -33,11 +91,6 @@ bool DiscountItem::operator ==(const JItem& other) const
 bool DiscountItem::isValid() const
 {
   return m_ammount >= 0;
-}
-
-QString DiscountItem::strTableName() const
-{
-  return DISCOUNT_ITEMS_SQL_TABLE_NAME;
 }
 
 Discount::Discount()
@@ -385,4 +438,9 @@ bool Discount::SQL_redeem(const QString& code, bool& redeemed, QString& error)
   }
 
   return SQL_finish(db, query, bSuccess, error);
+}
+
+JModel* Discount::SQL_table_model(QObject* parent) const
+{
+  return new DiscountModel(parent);
 }

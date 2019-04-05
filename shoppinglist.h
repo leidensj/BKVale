@@ -28,7 +28,6 @@ struct ShoppingListItem : JItem
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
-  QString strTableName() const;
 
   double subtotal() const;
   QString strSubtotal() const;
@@ -56,6 +55,7 @@ struct ShoppingList : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
+  JModel* SQL_table_model(QObject* parent) const;
 
   void setWeekDays(const QString& strWeekDays);
   void setMonthDays(const QString& strMonthDays);

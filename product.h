@@ -22,15 +22,22 @@ struct Package
   double m_ammount;
 };
 
-struct ProductCode : public JItem
+struct ProductCode : public JItemSQL
 {
   ProductCode();
   void clear();
   bool isValid() const;
   bool operator != (const JItem& other) const;
   bool operator == (const JItem& other) const;
-  QString strTableName() const;
 
+  QString SQL_tableName() const;
+  bool SQL_insert_proc(QSqlQuery& query) const;
+  bool SQL_update_proc(QSqlQuery& query) const;
+  bool SQL_select_proc(QSqlQuery& query, QString& error);
+  bool SQL_remove_proc(QSqlQuery& query) const;
+  JModel* SQL_table_model(QObject* parent) const;
+
+  mutable Id m_productId;
   QString m_code;
 };
 
@@ -47,6 +54,7 @@ struct Product : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
+  JModel* SQL_table_model(QObject* parent) const;
 
   bool SQL_select_by_code(const ProductCode& code, QString& error);
 

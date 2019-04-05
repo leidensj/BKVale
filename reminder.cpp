@@ -1,4 +1,84 @@
 #include "reminder.h"
+#include "jmodel.h"
+#include <QSqlRecord>
+
+class ReminderModel : public JModel
+{
+public:
+  ReminderModel(QObject *parent)
+    : JModel(parent)
+  {
+
+  }
+
+  QString getStrQuery()
+  {
+    return
+        "SELECT "
+        SQL_COLID ","
+        REMINDER_SQL_COL01 ","
+        REMINDER_SQL_COL02 ","
+        REMINDER_SQL_COL03
+        " FROM "
+        REMINDER_SQL_TABLE_NAME;
+  }
+
+  void select(QHeaderView* header)
+  {
+    JModel::select(getStrQuery());
+    setHeaderData(0, Qt::Horizontal, tr("ID"));
+    setHeaderData(1, Qt::Horizontal, tr("Título"));
+    setHeaderData(2, Qt::Horizontal, tr("Mensagem"));
+    setHeaderData(3, Qt::Horizontal, tr("Favorito"));
+    if (header != nullptr && header->count() == 4)
+    {
+      header->hideSection(0);
+      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+      header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
+    }
+  }
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+  {
+    if (!index.isValid())
+      return QModelIndex();
+
+    QVariant value = QSqlQueryModel::data(index, role);
+    if (role == Qt::DecorationRole)
+    {
+      if (index.column() == 3)
+      {
+        if (QSqlQueryModel::data(index, Qt::EditRole).toBool())
+          value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
+        else
+          value = "";
+      }
+    }
+    else if (role == Qt::DisplayRole)
+    {
+      if (index.column() == 3)
+        value = value.toBool() ? tr("Sim") : "";
+      else if (index.column() == 1)
+      {
+        auto cap = (Reminder::Capitalization)record(index.row()).value(4).toInt();
+        switch (cap)
+        {
+          case Reminder::Capitalization::AllUppercase:
+            value = value.toString().toUpper();
+            break;
+          case Reminder::Capitalization::AllLowercase:
+            value = value.toString().toLower();
+            break;
+          case Reminder::Capitalization::Normal:
+          default:
+            break;
+        }
+      }
+    }
+    return value;
+  }
+};
 
 Reminder::Reminder()
 {
@@ -141,4 +221,9 @@ bool Reminder::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
+}
+
+JModel* Reminder::SQL_table_model(QObject* parent) const
+{
+  return new ReminderModel(parent);
 }

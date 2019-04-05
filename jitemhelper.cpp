@@ -15,6 +15,7 @@
 #include "store.h"
 #include "supplier.h"
 #include "employee.h"
+#include "jmodel.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
@@ -95,4 +96,16 @@ QString JItemHelper::icon(const QString& tableName)
     delete p;
   }
   return icon;
+}
+
+JModel* JItemHelper::model(const QString& tableName, QObject* parent)
+{
+  JModel* m = nullptr;
+  auto p = JItemHelper::create(tableName);
+  if (p != nullptr)
+  {
+    m = p->SQL_table_model(parent);
+    delete p;
+  }
+  return m;
 }

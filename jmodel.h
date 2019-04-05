@@ -11,8 +11,8 @@ class JModel : public QSqlQueryModel
 public:
   JModel(QObject *parent);
   virtual QString getStrQuery() = 0;
-  virtual void select(const QString& query = "");
   virtual void select(QHeaderView* /*header*/) = 0;
+  virtual void select(const QString& query = "");
   virtual void selectFilter(const QString& filter);
 };
 

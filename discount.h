@@ -20,7 +20,6 @@ struct DiscountItem : JItem
   void clear();
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
-  QString strTableName() const;
   bool isValid() const;
   QString strAmmount() const;
 
@@ -51,6 +50,7 @@ struct Discount : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
   bool SQL_redeem(const QString& code, bool& redeemed, QString& error);
+  JModel* SQL_table_model(QObject* parent) const;
 
   static QString strType(Type type);
   QString strExpDate() const;

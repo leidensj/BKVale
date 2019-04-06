@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
   settings.load();
 
   QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
-  UserLoginSQL userLogin;
-  LoginDialog l(userLogin);
+  ActiveUser login;
+  LoginDialog l(login);
   if (l.exec() == QDialog::Accepted)
   {
-    BaitaAssistant w(userLogin);
+    BaitaAssistant w(login);
     w.show();
     return a.exec();
   }

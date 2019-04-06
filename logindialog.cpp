@@ -31,10 +31,10 @@ namespace
   }
 }
 
-LoginDialog::LoginDialog(UserLoginSQL& userLogin,
+LoginDialog::LoginDialog(ActiveUser& login,
                          QWidget* parent)
   : QDialog(parent)
-  , m_userLogin(userLogin)
+  , m_login(login)
   , m_user(nullptr)
   , m_password(nullptr)
   , m_hostName(nullptr)
@@ -190,20 +190,9 @@ LoginDialog::LoginDialog(UserLoginSQL& userLogin,
   setWindowFlags(Qt::WindowCloseButtonHint);
   layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-  QObject::connect(m_btnLogin,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(login()));
-
-  QObject::connect(m_btnDatabaseOpt,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(showDatabaseOpt()));
-
-  QObject::connect(m_password,
-                   SIGNAL(enterSignal()),
-                   this,
-                   SLOT(focusLogin()));
+  connect(m_btnLogin, SIGNAL(clicked(bool)), this, SLOT(login()));
+  connect(m_btnDatabaseOpt, SIGNAL(clicked(bool)), this, SLOT(showDatabaseOpt()));
+  connect(m_password, SIGNAL(enterSignal()), this, SLOT(focusLogin()));
 
   setWindowTitle(tr("Baita Assistente Login"));
   setWindowIcon(QIcon(":/icons/res/login.png"));
@@ -234,7 +223,7 @@ void LoginDialog::login()
   bool bSuccess = BaitaSQL::init(m_hostName->text(), m_port->value(), error);
   if (bSuccess)
   {
-    bSuccess = m_userLogin.login(m_user->text(), m_password->text(), error);
+    bSuccess = m_login.SQL_login(m_user->text(), m_password->text(), error);
     if (bSuccess)
     {
       Settings settings;

@@ -46,10 +46,10 @@ protected:
   }
 };
 
-BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
+BaitaAssistant::BaitaAssistant(const ActiveUser& login, QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::BaitaAssistant)
-  , m_userLogin(userLogin)
+  , m_login(login)
   , m_note(nullptr)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
@@ -153,8 +153,6 @@ BaitaAssistant::BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent)
 
 BaitaAssistant::~BaitaAssistant()
 {
-  QString error;
-  ActiveUserSQL::refresh(error);
   delete ui;
 }
 
@@ -368,7 +366,7 @@ void BaitaAssistant::updateStatusBar()
   // para adicionar um ícone:
   // "<img src=':/icons/res/16user.png'> " + ...
 
-  m_statusUserName->setText(tr("Usuário: ") + m_userLogin.strUser());
+  m_statusUserName->setText(tr("Usuário: ") + m_login.getUser().m_strUser);
   m_statusDatabasePath->setText(tr("Banco de dados: ") +
                                 (m_settings.m_databaseHostName.isEmpty() ? "localhost"
                                                                         : m_settings.m_databaseHostName) +
@@ -380,22 +378,22 @@ void BaitaAssistant::updateControls()
 {
   const bool bIsSQLOk = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid() &&
                         QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isOpen();
-  ui->actionSettings->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSettings());
+  ui->actionSettings->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessSettings);
   ui->actionLogin->setEnabled(bIsSQLOk);
-  ui->actionUsers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToUsers());
-  ui->actionProducts->setEnabled(bIsSQLOk && m_userLogin.hasAccessToProducts());
-  ui->actionForms->setEnabled(bIsSQLOk && m_userLogin.hasAccessToForms());
-  ui->actionCategories->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCategories());
-  ui->actionImages->setEnabled(bIsSQLOk && m_userLogin.hasAccessToImages());
-  ui->actionShoppingList->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShoppingLists());
-  ui->actionEmployees->setEnabled(bIsSQLOk && m_userLogin.hasAccessToEmployee());
-  ui->actionSuppliers->setEnabled(bIsSQLOk && m_userLogin.hasAccessToSupplier());
+  ui->actionUsers->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessUser);
+  ui->actionProducts->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessProduct);
+  ui->actionForms->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessForm);
+  ui->actionCategories->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessCategory);
+  ui->actionImages->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessImage);
+  ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessShoppingList);
+  ui->actionEmployees->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessEmployee);
+  ui->actionSuppliers->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessSupplier);
 
-  ui->actionNotes->setEnabled(bIsSQLOk && m_userLogin.hasAccessToNote());
-  ui->actionReminders->setEnabled(bIsSQLOk && m_userLogin.hasAccessToReminder());
-  ui->actionCalculator->setEnabled(bIsSQLOk && m_userLogin.hasAccessToCalculator());
-  ui->actionShop->setEnabled(bIsSQLOk && m_userLogin.hasAccessToShop());
-  ui->actionReservations->setEnabled(bIsSQLOk && m_userLogin.hasAccessToReservations());
+  ui->actionNotes->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessNote);
+  ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessReminder);
+  ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessCalculator);
+  ui->actionShop->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessShop);
+  ui->actionReservations->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessReservation);
 
   switch (getCurrentFunctionality())
   {
@@ -461,7 +459,7 @@ void BaitaAssistant::openUsersDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  UserMgtView* w = new UserMgtView(m_userLogin.getId(), this);
+  UserMgtView* w = new UserMgtView(m_login.getUser().m_id.get(), this);
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Gerenciar Usuários"));
@@ -490,7 +488,7 @@ void BaitaAssistant::openImagesDialog()
 void BaitaAssistant::openLoginDialog()
 {
   hide();
-  LoginDialog l(m_userLogin);
+  LoginDialog l(m_login);
   if (!l.exec())
   {
     QMessageBox::critical(this,

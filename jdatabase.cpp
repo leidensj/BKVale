@@ -19,48 +19,6 @@
 #include <QLabel>
 #include <QSortFilterProxyModel>
 
-// TODO FAZER ACTIVE USER
-/*class ActiveUserTableModel : public JTableModel
-{
-public:
-  ActiveUserTableModel(QObject *parent)
-    : JTableModel(parent)
-  {
-
-  }
-
-  QString getStrQuery()
-  {
-    return
-        "SELECT "
-        SQL_COLID ","
-        ACTIVE_USERS_SQL_COL01 ","
-        ACTIVE_USERS_SQL_COL02 ","
-        ACTIVE_USERS_SQL_COL03 ","
-        ACTIVE_USERS_SQL_COL04
-        " FROM "
-        ACTIVE_USERS_SQL_TABLE_NAME;
-  }
-
-  virtual void select(QHeaderView* header)
-  {
-    JTableModel::select(getStrQuery());
-    setHeaderData(0, Qt::Horizontal, tr("ID"));
-    setHeaderData(1, Qt::Horizontal, tr("PID"));
-    setHeaderData(2, Qt::Horizontal, tr("Nome"));
-    setHeaderData(3, Qt::Horizontal, tr("Máquina"));
-    setHeaderData(4, Qt::Horizontal, tr("Login"));
-    if (header != nullptr && header->count() == 5)
-    {
-      header->hideSection(0);
-      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
-    }
-  }
-};*/
-
 JTableView::JTableView(QWidget *parent)
   : QTableView(parent)
 {

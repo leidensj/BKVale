@@ -281,3 +281,30 @@ JModel* User::SQL_table_model(QObject* parent) const
 {
   return new UserModel(parent);
 }
+
+bool User::SQL_select_password_proc(QSqlQuery& query, QString& error)
+{
+  error.clear();
+  query.prepare("SELECT "
+                SQL_COLID
+                " FROM " USER_SQL_TABLE_NAME
+                " WHERE " USER_SQL_COL01 " = (:_v01) AND "
+                USER_SQL_COL02 " = (:_v02) LIMIT 1");
+  query.bindValue(":_v01", m_strUser);
+  query.bindValue(":_v02", strEncryptedPassword());
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      m_id.set(query.value(0).toLongLong());
+      bSuccess = SQL_select_proc(query, error);
+    }
+    else
+    {
+      error = "Usuário ou senha inválidos.";
+      bSuccess = false;
+    }
+  }
+  return bSuccess;
+}

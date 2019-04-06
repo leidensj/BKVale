@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include "settingsdlg.h"
 #include "databaseutils.h"
+#include "activeuser.h"
 
 namespace Ui {
 class BaitaAssistant;
@@ -37,7 +38,7 @@ class BaitaAssistant : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit BaitaAssistant(const UserLoginSQL& userLogin, QWidget *parent = 0);
+  explicit BaitaAssistant(const ActiveUser& login, QWidget *parent = 0);
   ~BaitaAssistant();
 
 protected:
@@ -45,7 +46,7 @@ protected:
 
 private:
   Ui::BaitaAssistant *ui;
-  UserLoginSQL m_userLogin;
+  ActiveUser m_login;
   NoteView* m_note;
   ReminderView* m_reminder;
   ConsumptionWidget* m_consumption;

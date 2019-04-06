@@ -77,7 +77,8 @@ SOURCES += main.cpp\
     supplier.cpp \
     formview.cpp \
     employeeview.cpp \
-    jmodel.cpp
+    jmodel.cpp \
+    activeuser.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -148,7 +149,8 @@ HEADERS  += mainwindow.h \
     supplier.h \
     formview.h \
     employeeview.h \
-    jmodel.h
+    jmodel.h \
+    activeuser.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

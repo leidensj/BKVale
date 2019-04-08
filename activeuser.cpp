@@ -32,7 +32,7 @@ public:
     JModel::select(getStrQuery());
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("PID"));
-    setHeaderData(2, Qt::Horizontal, tr("Nome"));
+    setHeaderData(2, Qt::Horizontal, tr("Usuário"));
     setHeaderData(3, Qt::Horizontal, tr("Máquina"));
     setHeaderData(4, Qt::Horizontal, tr("Login"));
     if (header != nullptr && header->count() == 5)
@@ -53,8 +53,11 @@ ActiveUser::ActiveUser()
 
 ActiveUser::~ActiveUser()
 {
-  QString error;
-  SQL_logout(error);
+  if (m_id.isValid())
+  {
+    QString error;
+    SQL_remove(error);
+  }
 }
 
 void ActiveUser::clear()

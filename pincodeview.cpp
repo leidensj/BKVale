@@ -176,6 +176,7 @@ void PinCodeView::append(QChar c)
 void PinCodeView::search()
 {
   QString error;
+  m_employee.m_pincode = m_edPinCode->text();
   if (!m_employee.SQL_select_by_pincode(error))
   {
     QMessageBox::warning(this,

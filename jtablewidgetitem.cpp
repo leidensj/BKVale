@@ -259,8 +259,8 @@ PhoneEditorDlg::PhoneEditorDlg(QWidget* parent)
   ltNumber->addWidget(m_edNumber);
 
   QVBoxLayout* ltPhone = new QVBoxLayout;
-  ltPhone->addWidget(m_edName);
   ltPhone->addLayout(ltNumber);
+  ltPhone->addWidget(m_edName);
   ltPhone->addWidget(m_btn);
 
   setLayout(ltPhone);
@@ -530,7 +530,7 @@ AddressEditorTableWidgetItem::AddressEditorTableWidgetItem()
 void AddressEditorTableWidgetItem::setItem(const Address& o)
 {
   m_o = o;
-  setText(o.getFormattedAddress());
+  setText(o.name());
 }
 
 const Address& AddressEditorTableWidgetItem::getItem() const

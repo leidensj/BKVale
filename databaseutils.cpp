@@ -358,7 +358,7 @@ bool BaitaSQL::createTables(QString& error)
                           ACTIVE_USERS_SQL_COL03 " TEXT,"
                           ACTIVE_USERS_SQL_COL04 " TIMESTAMP,"
                           "FOREIGN KEY(" ACTIVE_USERS_SQL_COL02 ") REFERENCES "
-                          USER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE);");
+                          USER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE NO ACTION);");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " DISCOUNT_SQL_TABLE_NAME " ("

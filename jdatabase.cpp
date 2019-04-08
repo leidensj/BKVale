@@ -131,6 +131,10 @@ JDatabase::JDatabase(const QString& tableName,
 
   JModel* model = JItemHelper::model(tableName, this);
   if (model == nullptr)
+  {
+    QMessageBox::critical(this, tr("Erro"), tr("Modelo não implementado"), QMessageBox::Ok);
+    exit(EXIT_FAILURE);
+  }
 
   m_proxyModel = new QSortFilterProxyModel(this);
   m_proxyModel->setSourceModel(model);

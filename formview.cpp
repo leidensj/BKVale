@@ -70,7 +70,6 @@ FormView::FormView(QWidget* parent)
   m_dtBirthDate->setSpecialValueText(tr("Não informada"));
   m_cbBirthDate = new QCheckBox;
   m_cbBirthDate->setChecked(false);
-  m_cbBirthDate->setText(tr("Nascimento:"));
 
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
   m_dtCreationDate = new QDateEdit;
@@ -99,18 +98,24 @@ FormView::FormView(QWidget* parent)
   m_btnAddressRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
   m_btnAddressRemove->setToolTip(tr("Remover endereço"));
 
-  QFormLayout* formLayout = new QFormLayout;
-  formLayout->addRow(tr("Tipo:"), m_rdoPerson);
-  formLayout->addRow("", m_rdoCompany);
-  formLayout->addRow(tr("Data de criação:"), m_dtCreationDate);
-  formLayout->addRow(m_lblName, m_edName);
-  formLayout->addRow(m_lblAlias, m_edAlias);
-  formLayout->addRow(tr("Email:"), m_edEmail);
-  formLayout->addRow(m_lblCpfCnpj, m_edCpfCnpj);
-  formLayout->addRow(m_lblRgIE, m_edRgIE);
-  formLayout->addRow(tr("Detalhes:"), m_edDetails);
-  formLayout->addRow(m_cbBirthDate, m_dtBirthDate);
-  formLayout->addRow(tr("Imagem:"), m_imagePicker);
+  QHBoxLayout* ltType = new QHBoxLayout;
+  ltType->addWidget(m_rdoPerson);
+  ltType->addWidget(m_rdoCompany);
+  ltType->addStretch();
+
+  QFormLayout* lt = new QFormLayout;
+  lt->addRow(tr("Data de criação:"), m_dtCreationDate);
+  lt->addRow(tr("Tipo:"), ltType);
+  lt->addRow(m_lblName, m_edName);
+  lt->addRow(m_lblAlias, m_edAlias);
+
+  QFormLayout* ltInfo = new QFormLayout;
+  ltInfo->addRow(tr("Email:"), m_edEmail);
+  ltInfo->addRow(m_lblCpfCnpj, m_edCpfCnpj);
+  ltInfo->addRow(m_lblRgIE, m_edRgIE);
+  ltInfo->addRow(tr("Detalhes:"), m_edDetails);
+  ltInfo->addRow(m_cbBirthDate, m_dtBirthDate);
+  ltInfo->addRow(tr("Imagem:"), m_imagePicker);
 
   QVBoxLayout* ltPhoneBtn = new QVBoxLayout;
   ltPhoneBtn->setContentsMargins(0, 0, 0, 0);
@@ -132,18 +137,22 @@ FormView::FormView(QWidget* parent)
   ltAddress->addWidget(m_tblAddress);
   ltAddress->addLayout(ltAddressBtn);
 
-  QFrame* informationFrame = new QFrame;
-  informationFrame->setLayout(formLayout);
+  QFrame* fr = new QFrame;
+  fr->setLayout(lt);
 
-  QFrame* phoneFrame = new QFrame;
-  phoneFrame->setLayout(ltPhone);
+  QFrame* frInfo = new QFrame;
+  frInfo->setLayout(ltInfo);
 
-  QFrame* addressFrame = new QFrame;
-  addressFrame->setLayout(ltAddress);
+  QFrame* frPhone = new QFrame;
+  frPhone->setLayout(ltPhone);
 
-  m_tab->addTab(informationFrame, QIcon(":/icons/res/details.png"), tr("Informações"));
-  m_tab->addTab(phoneFrame, QIcon(":/icons/res/phone.png"), tr("Telefone"));
-  m_tab->addTab(addressFrame, QIcon(":/icons/res/address.png"), tr("Endereço"));
+  QFrame* frAddress = new QFrame;
+  frAddress->setLayout(ltAddress);
+
+  m_tab->addTab(fr, QIcon(":/icons/res/resume.png"), tr("Perfil"));
+  m_tab->addTab(frInfo, QIcon(":/icons/res/details.png"), tr("Informações"));
+  m_tab->addTab(frPhone, QIcon(":/icons/res/phone.png"), tr("Telefone"));
+  m_tab->addTab(frAddress, QIcon(":/icons/res/address.png"), tr("Endereço"));
 
   connect(m_rdoCompany, SIGNAL(toggled(bool)), this, SLOT(switchUserType()));
   connect(m_rdoPerson, SIGNAL(toggled(bool)), this, SLOT(switchUserType()));
@@ -244,6 +253,7 @@ void FormView::switchUserType()
     m_lblAlias->setText(tr("Nome fantasia:"));
     m_lblCpfCnpj->setText(tr("CNPJ:"));
     m_lblRgIE->setText(tr("IE:"));
+    m_cbBirthDate->setText("Fundação:");
     m_edCpfCnpj->setInputMask("99.999.999/9999-99;_");
     m_edCpfCnpj->setText(m_ref.m_bCompany ? m_ref.m_CPF_CNPJ : "");
     m_edRgIE->setInputMask("");
@@ -255,6 +265,7 @@ void FormView::switchUserType()
     m_lblAlias->setText(tr("Apelido:"));
     m_lblCpfCnpj->setText(tr("CPF:"));
     m_lblRgIE->setText(tr("RG:"));
+    m_cbBirthDate->setText("Nascimento:");
     m_edCpfCnpj->setInputMask("999.999.999-99;_");
     m_edCpfCnpj->setText(!m_ref.m_bCompany ? m_ref.m_CPF_CNPJ : "");
     m_edRgIE->setInputMask("9999999999;_");

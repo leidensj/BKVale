@@ -35,10 +35,6 @@ struct Address : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
 
-  QString getFormattedAddress() const;
-  QString getFormattedAddress2() const;
-  QString getFormattedAddress3() const;
-
   QString m_cep;
   QString m_neighborhood;
   QString m_street;
@@ -52,8 +48,9 @@ struct Address : public JItemSQL
   static BRState st_getBRState(EBRState s);
   BRState getBRState() const;
 
-  QString text() const { return "Telefone"; }
+  QString text() const { return "Endereço"; }
   QString icon() const { return ":/icons/res/address.png"; }
+  QString name() const;
 };
 
 #endif // ADDRESS_H

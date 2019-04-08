@@ -88,6 +88,7 @@
    <addaction name="actionLogin"/>
    <addaction name="separator"/>
    <addaction name="actionForms"/>
+   <addaction name="actionSuppliers"/>
    <addaction name="actionProducts"/>
    <addaction name="separator"/>
    <addaction name="actionPrint"/>
@@ -115,7 +116,7 @@
    </widget>
    <widget class="QMenu" name="menuCadastros">
     <property name="title">
-     <string>Itens</string>
+     <string>Cadastros</string>
     </property>
     <widget class="QMenu" name="menuPessoas">
      <property name="title">
@@ -124,6 +125,7 @@
      <addaction name="actionForms"/>
      <addaction name="actionEmployees"/>
      <addaction name="actionSuppliers"/>
+     <addaction name="actionStores"/>
     </widget>
     <addaction name="menuPessoas"/>
     <addaction name="actionProducts"/>
@@ -131,7 +133,6 @@
     <addaction name="actionImages"/>
     <addaction name="actionShoppingList"/>
     <addaction name="actionUsers"/>
-    <addaction name="actionStores"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
     <property name="title">
@@ -284,10 +285,10 @@
      <normaloff>:/icons/res/resume.png</normaloff>:/icons/res/resume.png</iconset>
    </property>
    <property name="text">
-    <string>Cadastros</string>
+    <string>Perfis</string>
    </property>
    <property name="toolTip">
-    <string>Gerenciar cadastros</string>
+    <string>Gerenciar perfis</string>
    </property>
   </action>
   <action name="actionShoppingList">

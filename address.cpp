@@ -71,26 +71,6 @@ Address::Address()
   clear();
 }
 
-QString Address::getFormattedAddress() const
-{
-  return m_street + ", Nº " +
-      QString::number(m_number) + ". " +
-      m_city + " - " +
-      getBRState().m_abv + ".";
-}
-
-QString Address::getFormattedAddress2() const
-{
-  return m_street + ", Nº " +
-      QString::number(m_number) + ". " +
-      m_neighborhood;
-}
-
-QString Address::getFormattedAddress3() const
-{
-  return m_city + " / " + getBRState().m_abv + ".";
-}
-
 bool Address::operator !=(const JItem& other) const
 {
   const Address& another = dynamic_cast<const Address&>(other);
@@ -308,4 +288,22 @@ Address::BRState Address::st_getBRState(EBRState s)
 Address::BRState Address::getBRState() const
 {
   return st_getBRState(m_state);
+}
+
+QString Address::name() const
+{
+  QString str;
+  if (!m_street.isEmpty())
+    str += m_street;
+  if (!str.isEmpty())
+    str += " ";
+  if (m_number != 0)
+    str += "Nº " + QString::number(m_number);
+  if (!str.isEmpty())
+    str += " ";
+  if (!m_city.isEmpty())
+    str += m_city;
+  if (!str.isEmpty())
+    str += " " + getBRState().m_abv;
+  return str;
 }

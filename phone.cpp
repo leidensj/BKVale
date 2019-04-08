@@ -28,9 +28,9 @@ public:
     JModel::select("");
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("País"));
-    setHeaderData(1, Qt::Horizontal, tr("Código"));
-    setHeaderData(1, Qt::Horizontal, tr("Número"));
-    setHeaderData(1, Qt::Horizontal, tr("Nome"));
+    setHeaderData(2, Qt::Horizontal, tr("Código"));
+    setHeaderData(3, Qt::Horizontal, tr("Número"));
+    setHeaderData(4, Qt::Horizontal, tr("Nome"));
     if (header != nullptr && header->count() == 5)
     {
       header->hideSection(0);
@@ -132,6 +132,9 @@ bool Phone::SQL_remove_proc(QSqlQuery& /*query*/) const
 
 QString Phone::strFormattedPhone() const
 {
+  if (m_number.isEmpty())
+    return "";
+
   return
     "+" +
     QString::number(m_countryCode) +
@@ -143,6 +146,10 @@ QString Phone::strFormattedPhone() const
 
 QString Phone::strFormattedPhoneWithName() const
 {
+  QString fmt = strFormattedPhone();
+  if (fmt.isEmpty())
+    return "";
+
   QString str;
   if (!m_name.isEmpty())
     str += m_name + " ";

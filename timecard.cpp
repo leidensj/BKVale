@@ -105,9 +105,6 @@ void TimeCard::saveAndAccept()
                           idt.toString("dd/MM/yyyy"),
                           fdt.toString("dd/MM/yyyy"),
                           o.m_form.m_name,
-                          o.m_form.m_vAddress.isEmpty() ? "" : o.m_form.m_vAddress.at(0).getFormattedAddress2(),
-                          o.m_form.m_vAddress.isEmpty() ? "" : "CEP: " + o.m_form.m_vAddress.at(0).m_cep,
-                          o.m_form.m_vAddress.isEmpty() ? "" : o.m_form.m_vAddress.at(0).getFormattedAddress3(),
                           "CNPJ: " + o.m_form.m_CPF_CNPJ);
 
   QLocale br(QLocale::Portuguese, QLocale::Brazil);

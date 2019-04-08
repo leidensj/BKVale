@@ -15,7 +15,7 @@ public:
     QString strQuery("SELECT "
                      SUPPLIER_SQL_TABLE_NAME "." SQL_COLID ","
                      FORM_SQL_TABLE_NAME "." FORM_SQL_COL03 ","
-                     FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
+                     FORM_SQL_TABLE_NAME "." FORM_SQL_COL02
                      " FROM " SUPPLIER_SQL_TABLE_NAME
                      " LEFT OUTER JOIN "
                      FORM_SQL_TABLE_NAME
@@ -36,7 +36,7 @@ public:
       {
         header->hideSection(0);
         header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-        header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+        header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
       }
     }
   }

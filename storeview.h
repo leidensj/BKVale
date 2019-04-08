@@ -8,6 +8,7 @@ class QPushButton;
 class JLineEdit;
 class JDatabasePicker;
 class JPlainTextEdit;
+class QListWidget;
 
 class StoreView : public JItemView
 {
@@ -19,6 +20,7 @@ public:
 
 public slots:
   void create();
+  void updateControls();
 
 private:
   mutable Store m_ref;
@@ -26,6 +28,7 @@ private:
   JDatabasePicker* m_formPicker;
   JDatabasePicker* m_addressPicker;
   JDatabasePicker* m_phonePicker;
+  QListWidget* m_list;
   void setItem(const JItemSQL& o);
 };
 

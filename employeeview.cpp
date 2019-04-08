@@ -1,16 +1,12 @@
 #include "employeeview.h"
 #include "jlineedit.h"
 #include "jdatabasepicker.h"
-#include <QLayout>
 #include <QFormLayout>
-#include <QMessageBox>
 #include <QCheckBox>
 #include <QLabel>
 #include "jspinbox.h"
 #include "jtimeedit.h"
 #include <QPushButton>
-#include <QFormLayout>
-#include <QVector>
 #include "timeinterval.h"
 
 TimeIntervalWidget::TimeIntervalWidget(QWidget* parent)
@@ -117,8 +113,8 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
 
   QFormLayout* lt = new QFormLayout;
-  lt->addRow(m_formPicker->getText(), m_formPicker);
-  lt->addRow(m_storePicker->getText(), m_storePicker);
+  lt->addRow(m_formPicker->getText() + ":", m_formPicker);
+  lt->addRow(m_storePicker->getText() + ":", m_storePicker);
   lt->addRow(tr("Código PIN:"), m_edPincode);
   lt->addRow(tr("Vales:"), m_cbNoteEdit);
   lt->addRow("", m_cbNoteRemove);

@@ -28,7 +28,6 @@ SOURCES += main.cpp\
     logindialog.cpp \
     jlineedit.cpp \
     user.cpp \
-    usermgtview.cpp \
     notetablewidget.cpp \
     jdatabase.cpp \
     categoryview.cpp \
@@ -71,14 +70,16 @@ SOURCES += main.cpp\
     jdatepicker.cpp \
     jplaintextedit.cpp \
     jitemhelper.cpp \
-    JItemSQL.cpp \
     form.cpp \
     employee.cpp \
     supplier.cpp \
     formview.cpp \
     employeeview.cpp \
     jmodel.cpp \
-    activeuser.cpp
+    activeuser.cpp \
+    jitemsql.cpp \
+    supplierview.cpp \
+    userview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -97,7 +98,6 @@ HEADERS  += mainwindow.h \
     logindialog.h \
     jlineedit.h \
     user.h \
-    usermgtview.h \
     notetablewidget.h \
     jdatabase.h \
     category.h \
@@ -150,7 +150,9 @@ HEADERS  += mainwindow.h \
     formview.h \
     employeeview.h \
     jmodel.h \
-    activeuser.h
+    activeuser.h \
+    supplierview.h \
+    userview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

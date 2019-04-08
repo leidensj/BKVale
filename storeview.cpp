@@ -4,7 +4,7 @@
 #include "jplaintextedit.h"
 #include <QLayout>
 #include <QFormLayout>
-#include <QMessageBox>
+#include <qlistwidget.h>
 
 StoreView::StoreView(QWidget* parent)
   : JItemView(STORE_SQL_TABLE_NAME, parent)
@@ -29,15 +29,40 @@ StoreView::StoreView(QWidget* parent)
   tablayout->addRow(m_phonePicker->getText() + ":", m_phonePicker);
   tablayout->addRow(tr("Descrição:"), m_teDescription);
 
-  QFrame* tabframe = new QFrame;
-  tabframe->setLayout(tablayout);
+  m_list = new QListWidget;
+  QVBoxLayout* ltEmployee = new QVBoxLayout;
+  ltEmployee->addWidget(m_list);
 
-  m_tab->addTab(tabframe, QIcon(":/icons/res/store.png"), tr("Loja"));
+  QFrame* fr = new QFrame;
+  fr->setLayout(tablayout);
+
+  QFrame* frEmployee = new QFrame;
+  frEmployee->setLayout(ltEmployee);
+
+  m_tab->addTab(fr, QIcon(":/icons/res/store.png"), tr("Loja"));
+  m_tab->addTab(frEmployee, QIcon(":/icons/res/employee.png"), tr("Funcionários"));
+
+  connect(m_formPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  updateControls();
 }
 
 void StoreView::create()
 {
   selectItem(Store());
+  updateControls();
+}
+
+void StoreView::updateControls()
+{
+  m_phonePicker->setEnabled(m_formPicker->getId().isValid());
+  m_addressPicker->setEnabled(m_formPicker->getId().isValid());
+  if (m_formPicker->getId().isValid())
+  {
+    m_phonePicker->getDatabase()->setFixedFilter(PHONE_FORM_FILTER +
+                                                 m_formPicker->getId().str());
+    m_addressPicker->getDatabase()->setFixedFilter(ADDRESS_FORM_FILTER +
+                                                 m_formPicker->getId().str());
+  }
 }
 
 const JItemSQL& StoreView::getItem() const
@@ -59,4 +84,6 @@ void StoreView::setItem(const JItemSQL& o)
   m_formPicker->setItem(ref.m_form);
   m_addressPicker->setItem(ref.m_address);
   m_phonePicker->setItem(ref.m_phone);
+  m_list->clear();
+  m_list->addItems(ref.SQL_select_employees());
 }

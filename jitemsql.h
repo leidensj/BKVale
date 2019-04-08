@@ -27,9 +27,9 @@ struct JItemSQL : public JItem
   virtual bool SQL_authentication_insert_update() const { return false; }
   virtual bool SQL_authentication_remove() const { return false; }
 
-  virtual QString text() const { return ""; }
+  virtual QString text() const { return "Texto não implementado."; }
   virtual QString icon() const { return ""; }
-  virtual QString name() const { return ""; }
+  virtual QString name() const { return "Nome não implementado."; }
   virtual QByteArray image() const { return QByteArray(); }
 
   static bool SQL_isOpen(QString& error);

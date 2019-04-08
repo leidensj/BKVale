@@ -177,3 +177,34 @@ JModel* Store::SQL_table_model(QObject* parent) const
   return new StoreModel(parent);
 }
 
+QStringList Store::SQL_select_employees() const
+{
+  QString error;
+  QStringList lst;
+
+  if (SQL_isOpen(error))
+  {
+    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+    db.transaction();
+    QSqlQuery query(db);
+
+    query.prepare("SELECT "
+                  FORM_SQL_TABLE_NAME "." FORM_SQL_COL02
+                  " FROM "
+                  FORM_SQL_TABLE_NAME
+                  " LEFT OUTER JOIN "
+                  EMPLOYEE_SQL_TABLE_NAME
+                  " ON " FORM_SQL_TABLE_NAME "." SQL_COLID
+                  " = " EMPLOYEE_SQL_TABLE_NAME "." EMPLOYEE_SQL_COL01
+                  " WHERE " EMPLOYEE_SQL_TABLE_NAME "." EMPLOYEE_SQL_COL05
+                  " = (:_v00)");
+    query.bindValue(":_v00", m_id.get());
+
+    bool bSuccess = query.exec();
+    while (bSuccess && query.next())
+      lst.push_back(query.value(0).toString());
+    SQL_finish(db, query, bSuccess, error);
+  }
+
+  return lst;
+}

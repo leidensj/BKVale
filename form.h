@@ -27,7 +27,7 @@ struct Form : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
 
-  QString text() const { return "Cadastro"; }
+  QString text() const { return "Perfil"; }
   QString icon() const { return ":/icons/res/resume.png"; }
   QString name() const { return strAliasName(); }
   QByteArray image() const { return m_image.m_image; }

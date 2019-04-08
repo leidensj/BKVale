@@ -16,6 +16,7 @@
 #include "supplier.h"
 #include "employee.h"
 #include "jmodel.h"
+#include "activeuser.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
@@ -45,6 +46,12 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new Employee;
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return new Supplier;
+  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+    return new ActiveUser;
+  if (tableName == ADDRESS_SQL_TABLE_NAME)
+    return new Address;
+  if (tableName == PHONE_SQL_TABLE_NAME)
+    return new Phone;
   return nullptr;
 }
 

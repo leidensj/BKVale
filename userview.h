@@ -1,5 +1,5 @@
-#ifndef USERMGTVIEW_H
-#define USERMGTVIEW_H
+#ifndef USERVIEW_H
+#define USERVIEW_H
 
 #include <QFrame>
 #include "user.h"
@@ -9,12 +9,12 @@ class QCheckBox;
 class JLineEdit;
 class QLabel;
 
-class UserMgtView : public JItemView
+class UserView : public JItemView
 {
   Q_OBJECT
 
 public:
-  explicit UserMgtView(Id currentLoggedId, QWidget* parent = 0);
+  explicit UserView(Id currentLoggedId, QWidget* parent = 0);
   const JItemSQL& getItem() const;
 
   QString getPassword() const;
@@ -56,4 +56,4 @@ private slots:
   void viewPassword(bool b);
 };
 
-#endif // USERMGTVIEW_H
+#endif // USERVIEW_H

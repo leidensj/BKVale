@@ -75,19 +75,11 @@ private slots:
   void showInfo();
   void print();
   bool print(const QString& text);
+  void openJItemSQLDialog();
   void openSettingsDialog();
-  void openUsersDialog();
-  void openProductsDialog();
-  void openCategoriesDialog();
   void openLoginDialog();
-  void openImagesDialog();
-  void openFormsDialog();
-  void openEmployeesDialog();
-  void openShoppingListDialog();
   void openActiveUsersDialog();
-  void openStoreDialog();
   void activateWindow();
-
   void testTimeAccess();
 };
 

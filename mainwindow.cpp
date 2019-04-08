@@ -7,9 +7,10 @@
 #include "categoryview.h"
 #include "noteview.h"
 #include "employeeview.h"
+#include "supplierview.h"
 #include "reminderview.h"
 #include "calculatorwidget.h"
-#include "usermgtview.h"
+#include "userview.h"
 #include "imageview.h"
 #include "logindialog.h"
 #include "formview.h"
@@ -123,17 +124,9 @@ BaitaAssistant::BaitaAssistant(const ActiveUser& login, QWidget *parent)
   connect(ui->actionInfo, SIGNAL(triggered(bool)), this, SLOT(showInfo()));
   connect(m_note, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_reminder, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-  connect(ui->actionProducts, SIGNAL(triggered(bool)), this, SLOT(openProductsDialog()));
-  connect(ui->actionCategories, SIGNAL(triggered(bool)), this, SLOT(openCategoriesDialog()));
-  connect(ui->actionUsers, SIGNAL(triggered(bool)), this, SLOT(openUsersDialog()));
-  connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openImagesDialog()));
   connect(m_calculator, SIGNAL(lineSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
-  connect(ui->actionForms, SIGNAL(triggered(bool)), this, SLOT(openFormsDialog()));
-  connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openEmployeesDialog()));
-  connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(openShoppingListDialog()));
   connect(m_shop, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-  connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
   connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(close()));
   connect(ui->actionNotes, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
@@ -143,7 +136,18 @@ BaitaAssistant::BaitaAssistant(const ActiveUser& login, QWidget *parent)
   connect(ui->actionDiscount, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(m_discount, SIGNAL(redeemSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
-  connect(ui->actionStores, SIGNAL(triggered(bool)), this, SLOT(openStoreDialog()));
+
+  connect(ui->actionForms, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionStores, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionProducts, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionCategories, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionUsers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionSuppliers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+
+  connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
 
   activateWindow();
   m_settings.load();
@@ -426,63 +430,42 @@ void BaitaAssistant::showInfo()
 
 }
 
-void BaitaAssistant::openProductsDialog()
+void BaitaAssistant::openJItemSQLDialog()
 {
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  ProductView* w = new ProductView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Produtos"));
-  dlg.setWindowIcon(QIcon(":/icons/res/item.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
+  JItemView* view = nullptr;
+  QString title;
+  if (sender() == ui->actionCategories)
+    view = new CategoryView;
+  else if (sender() == ui->actionEmployees)
+    view = new EmployeeView;
+  else if (sender() == ui->actionForms)
+    view = new FormView;
+  else if (sender() == ui->actionImages)
+    view = new ImageView;
+  else if (sender() == ui->actionProducts)
+    view = new ProductView;
+  else if (sender() == ui->actionShoppingList)
+    view = new ShoppingListView;
+  else if (sender() == ui->actionStores)
+    view = new StoreView;
+  else if (sender() == ui->actionSuppliers)
+    view = new SupplierView;
+  else if (sender() == ui->actionUsers)
+    view = new UserView(m_login.getUser().m_id);
 
-void BaitaAssistant::openCategoriesDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  CategoryView* w = new CategoryView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Categorias"));
-  dlg.setWindowIcon(QIcon(":/icons/res/category.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
-
-void BaitaAssistant::openUsersDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  UserMgtView* w = new UserMgtView(m_login.getUser().m_id.get(), this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Usuários"));
-  dlg.setWindowIcon(QIcon(":/icons/res/user.png"));
-  dlg.setModal(true);
-  dlg.exec();
-
-  if (w->hasLoggedUserChanged())
-    openLoginDialog();
-}
-
-void BaitaAssistant::openImagesDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  ImageView* w = new ImageView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Imagens"));
-  dlg.setWindowIcon(QIcon(":/icons/res/icon.png"));
-  dlg.setModal(true);
-  dlg.exec();
+  if (view != nullptr)
+  {
+    auto pt = static_cast<QAction*>(sender());
+    QDialog dlg(this);
+    QHBoxLayout *layout = new QHBoxLayout;
+    dlg.setLayout(layout);
+    layout->addWidget(view);
+    dlg.setWindowFlags(Qt::Window);
+    dlg.setWindowTitle(pt->toolTip());
+    dlg.setWindowIcon(pt->icon());
+    dlg.setModal(true);
+    dlg.exec();
+  }
 }
 
 void BaitaAssistant::openLoginDialog()
@@ -505,47 +488,6 @@ void BaitaAssistant::openLoginDialog()
   }
 }
 
-void BaitaAssistant::openFormsDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  FormView* w = new FormView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Cadastros"));
-  dlg.setWindowIcon(QIcon(":/icons/res/resume.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
-
-void BaitaAssistant::openEmployeesDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  EmployeeView* w = new EmployeeView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Funcionários"));
-  dlg.setWindowIcon(QIcon(":/icons/res/employee.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
-
-void BaitaAssistant::openShoppingListDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  ShoppingListView* w = new ShoppingListView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Listas de Compras"));
-  dlg.setWindowIcon(QIcon(":/icons/res/shopmgt.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
 
 void BaitaAssistant::openActiveUsersDialog()
 {
@@ -557,20 +499,6 @@ void BaitaAssistant::openActiveUsersDialog()
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Usuários Ativos"));
   dlg.setWindowIcon(QIcon(":/icons/res/users.png"));
-  dlg.setModal(true);
-  dlg.exec();
-}
-
-void BaitaAssistant::openStoreDialog()
-{
-  QDialog dlg(this);
-  QHBoxLayout *layout = new QHBoxLayout;
-  dlg.setLayout(layout);
-  StoreView* w = new StoreView(this);
-  layout->addWidget(w);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Gerenciar Lojas"));
-  dlg.setWindowIcon(QIcon(":/icons/res/store.png"));
   dlg.setModal(true);
   dlg.exec();
 }

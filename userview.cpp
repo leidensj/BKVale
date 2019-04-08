@@ -1,4 +1,4 @@
-#include "usermgtview.h"
+#include "userview.h"
 #include "jitemhelper.h"
 #include <QCheckBox>
 #include "jlineedit.h"
@@ -8,7 +8,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 
-UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
+UserView::UserView(Id currentLoggedId, QWidget* parent)
   : JItemView(USER_SQL_TABLE_NAME, parent)
   , m_currentLoggedId(currentLoggedId)
   , m_bHasLoggedUserChanged(false)
@@ -168,7 +168,7 @@ UserMgtView::UserMgtView(Id currentLoggedId, QWidget* parent)
   create();
 }
 
-const JItemSQL& UserMgtView::getItem() const
+const JItemSQL& UserView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
@@ -191,7 +191,7 @@ const JItemSQL& UserMgtView::getItem() const
   return m_ref;
 }
 
-void UserMgtView::setItem(const JItemSQL& o)
+void UserView::setItem(const JItemSQL& o)
 {
   auto _o = dynamic_cast<const User&>(o);
   if (_o.m_id.isValid())
@@ -215,39 +215,39 @@ void UserMgtView::setItem(const JItemSQL& o)
   m_accessShoppingList->setChecked(_o.m_bAccessShoppingList);
 }
 
-void UserMgtView::create()
+void UserView::create()
 {
   selectItem(User());
   m_lblPasswordMsg->hide();
   m_user->setFocus();
 }
 
-QString UserMgtView::getPassword() const
+QString UserView::getPassword() const
 {
   return m_password->text();
 }
 
-void UserMgtView::viewPassword(bool b)
+void UserView::viewPassword(bool b)
 {
   m_password->setEchoMode( b ? QLineEdit::EchoMode::Normal
                              : QLineEdit::EchoMode::Password);
 }
 
-void UserMgtView::itemsRemoved(const QVector<Id>& ids)
+void UserView::itemsRemoved(const QVector<Id>& ids)
 {
   if (!m_bHasLoggedUserChanged)
     m_bHasLoggedUserChanged = ids.contains(m_bHasLoggedUserChanged);
   JItemView::itemsRemoved(ids);
 }
 
-void UserMgtView::save()
+void UserView::save()
 {
   if (!m_bHasLoggedUserChanged)
     m_bHasLoggedUserChanged = m_currentId == m_currentLoggedId;
   JItemView::save();
 }
 
-bool UserMgtView::hasLoggedUserChanged() const
+bool UserView::hasLoggedUserChanged() const
 {
   return m_bHasLoggedUserChanged;
 }

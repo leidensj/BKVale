@@ -29,10 +29,10 @@ public:
     JModel::select("");
     setHeaderData(0, Qt::Horizontal, tr("ID"));
     setHeaderData(1, Qt::Horizontal, tr("Rua"));
-    setHeaderData(1, Qt::Horizontal, tr("Nº"));
-    setHeaderData(1, Qt::Horizontal, tr("Bairro"));
-    setHeaderData(1, Qt::Horizontal, tr("Cidade"));
-    setHeaderData(1, Qt::Horizontal, tr("Estado"));
+    setHeaderData(2, Qt::Horizontal, tr("Nº"));
+    setHeaderData(3, Qt::Horizontal, tr("Bairro"));
+    setHeaderData(4, Qt::Horizontal, tr("Cidade"));
+    setHeaderData(5, Qt::Horizontal, tr("Estado"));
     if (header != nullptr && header->count() == 6)
     {
       header->hideSection(0);

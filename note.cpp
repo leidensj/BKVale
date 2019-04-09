@@ -27,8 +27,11 @@ public:
                      " GROUP BY " NOTE_ITEMS_SQL_COL01 ") AS _TTOTAL"
                      " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." NOTE_ITEMS_SQL_COL01
                      " LEFT OUTER JOIN "
+                     SUPPLIER_SQL_TABLE_NAME
+                     " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
+                     " LEFT OUTER JOIN "
                      FORM_SQL_TABLE_NAME
-                     " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" FORM_SQL_TABLE_NAME "." SQL_COLID);
+                     " ON " SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL01 " = " FORM_SQL_TABLE_NAME "." SQL_COLID);
     return strQuery;
   }
 
@@ -355,6 +358,9 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
 
 bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 {
+  Id id = m_id;
+  clear();
+  m_id = id;
   error.clear();
   query.prepare("SELECT "
                 NOTE_SQL_COL01 ","

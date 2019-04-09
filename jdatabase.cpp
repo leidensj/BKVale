@@ -342,7 +342,7 @@ void JDatabase::removeItems()
     QString error;
     if (!e.m_id.isValid())
       error = tr("Pincode informado não encontrado.");
-    else if (e.hasPermissionToRemove(m_tableName))
+    else if (!e.hasPermissionToRemove(m_tableName))
       error = tr("Funcionário não possui permissão.");
 
     if (!error.isEmpty())

@@ -159,5 +159,6 @@
         <file>res/timecard.png</file>
         <file>res/timespan.png</file>
         <file>res/clock.png</file>
+        <file>res/tipi.png</file>
     </qresource>
 </RCC>

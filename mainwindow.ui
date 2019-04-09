@@ -153,8 +153,15 @@
     </property>
     <addaction name="actionInfo"/>
    </widget>
+   <widget class="QMenu" name="menuFerramentas">
+    <property name="title">
+     <string>Ferramentas</string>
+    </property>
+    <addaction name="actionTimeCard"/>
+   </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
+   <addaction name="menuFerramentas"/>
    <addaction name="menuImpressora"/>
    <addaction name="menuConfigura_es"/>
    <addaction name="menuAjuda"/>
@@ -184,7 +191,6 @@
    <addaction name="actionShop"/>
    <addaction name="actionReservations"/>
    <addaction name="actionDiscount"/>
-   <addaction name="actionTimeCard"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">

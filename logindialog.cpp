@@ -46,9 +46,9 @@ LoginDialog::LoginDialog(ActiveUser& login,
   , m_btnLogin(nullptr)
 {
   QLabel* lblBaita = new QLabel();
-  lblBaita->setPixmap(QIcon(":/icons/res/baita.png").pixmap(QSize(64, 64)));
-  lblBaita->setMinimumSize(64, 64);
-  lblBaita->setMaximumSize(64, 64);
+  lblBaita->setPixmap(QIcon(":/icons/res/tipi.png").pixmap(QSize(160, 96)));
+  lblBaita->setMinimumSize(160, 96);
+  lblBaita->setMaximumSize(160, 96);
   lblBaita->setScaledContents(true);
   QLabel* lblUser = new QLabel();
   lblUser->setPixmap(QIcon(":/icons/res/user.png").pixmap(QSize(24, 24)));

@@ -9,7 +9,7 @@
 #include "activeuser.h"
 
 namespace Ui {
-class BaitaAssistant;
+class Tipi;
 }
 
 enum class Functionality : int
@@ -33,19 +33,19 @@ class ReservationView;
 class DiscountView;
 class JMdiSubWindow;
 
-class BaitaAssistant : public QMainWindow
+class Tipi : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit BaitaAssistant(const ActiveUser& login, QWidget *parent = 0);
-  ~BaitaAssistant();
+  explicit Tipi(const ActiveUser& login, QWidget *parent = 0);
+  ~Tipi();
 
 protected:
   void closeEvent(QCloseEvent* event);
 
 private:
-  Ui::BaitaAssistant *ui;
+  Ui::Tipi *ui;
   ActiveUser m_login;
   NoteView* m_note;
   ReminderView* m_reminder;

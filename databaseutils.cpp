@@ -150,7 +150,8 @@ bool BaitaSQL::createTables(QString& error)
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          USER_SQL_COL01 " TEXT NOT NULL UNIQUE,"
+                          USER_SQL_COL01 " TEXT NOT NULL UNIQUE CHECK ("
+                          USER_SQL_COL01 " <> ''),"
                           USER_SQL_COL02 " TEXT NOT NULL,"
                           USER_SQL_COL03 " BOOLEAN,"
                           USER_SQL_COL04 " BOOLEAN,"

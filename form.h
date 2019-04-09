@@ -29,7 +29,7 @@ struct Form : public JItemSQL
 
   QString text() const { return "Perfil"; }
   QString icon() const { return ":/icons/res/resume.png"; }
-  QString name() const { return strAliasName(); }
+  QString name() const { return m_name; }
   QByteArray image() const { return m_image.m_image; }
 
   Image m_image;

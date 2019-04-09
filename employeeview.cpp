@@ -16,7 +16,7 @@ TimeIntervalWidget::TimeIntervalWidget(QWidget* parent)
   setWindowIcon(QIcon(":/icons/res/timespan.png"));
   setMinimumWidth(300);
   m_spn = new JSpinBox;
-  m_spn->setMinimum(1);
+  m_spn->setMinimum(0);
   m_spn->setMaximum(10);
 
   QVBoxLayout* ltMain = new QVBoxLayout;

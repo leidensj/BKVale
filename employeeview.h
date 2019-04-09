@@ -12,6 +12,7 @@ class QCheckBox;
 class TimeIntervalWidget;
 class JTimeEdit;
 class JSpinBox;
+class QLabel;
 
 class TimeIntervalWidget : public QWidget
 {

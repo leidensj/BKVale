@@ -4,6 +4,7 @@
 #include <QDate>
 #include "jitem.h"
 #include "store.h"
+#include "employee.h"
 #include "jdatabasepicker.h"
 #include "jspinbox.h"
 #include <QDateEdit>
@@ -69,7 +70,6 @@ void TimeCard::updateControls()
 
 void TimeCard::saveAndAccept()
 {
-
   auto pt = static_cast<Store*>(m_storePicker->getDatabase()->getCurrentItem());
   Store o;
   if (pt != nullptr)
@@ -96,7 +96,7 @@ void TimeCard::saveAndAccept()
             "<tr><td align=\"center\" style=\"font-size:36pt;\">%2</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:36pt;\">A</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:36pt;\">%3</td></tr>"
-            "<tr><td align=\"center\" style=\"padding-top:80px;font-size:18pt;\">%4</td></tr>"
+            "<tr><td align=\"center\" style=\"padding-top:100px;font-size:18pt;\">%4</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:14pt;\">%5</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:14pt;\">%6</td></tr>"
             "<tr><td align=\"center\" style=\"font-size:14pt;\">%7</td></tr>"
@@ -105,11 +105,15 @@ void TimeCard::saveAndAccept()
                           idt.toString("dd/MM/yyyy"),
                           fdt.toString("dd/MM/yyyy"),
                           o.m_form.m_name,
-                          "CNPJ: " + o.m_form.m_CPF_CNPJ);
+                          "CNPJ: " + o.m_form.m_CPF_CNPJ,
+                          o.m_address.m_street + ", " + QString::number(o.m_address.m_number),
+                          "CEP: " + o.m_address.m_cep,
+                          o.m_address.m_city + " " + o.m_address.getBRState().m_abv);
 
   QLocale br(QLocale::Portuguese, QLocale::Brazil);
 
-  /*for (int i = 0; i != o.m_vEmployee.size() + m_spnExtraPages->value(); ++i)
+  QVector<Employee> v(Employee::SQL_select_from_store(o.m_id));
+  for (int i = 0; i != v.size() + m_spnExtraPages->value(); ++i)
   {
     // 1 - Nome funcionário
     // 2 - Horário
@@ -135,12 +139,12 @@ void TimeCard::saveAndAccept()
           "<th colspan=\"2\">Hora</th>"
           "<th>Assinatura</th>"
           "<th colspan=\"2\">Hora</th>"
-        "</tr>").arg(i >= o.m_vEmployee.size()
+        "</tr>").arg(i >= v.size()
                      ? "_____________________________________"
-                     : o.m_vEmployee.at(i).m_employee.m_form.m_name,
-                     i >= o.m_vEmployee.size()
+                     : v.at(i).m_form.m_name,
+                     i >= v.size()
                      ? "______________________________________"
-                     : o.m_vEmployee.at(i).strHours(),
+                     : v.at(i).strHours(),
                      br.toString(idt, "MMMM").toUpper(),
                      idt.toString("yyyy"));
     dt = idt;
@@ -199,20 +203,19 @@ void TimeCard::saveAndAccept()
       "<td width=\"50%\"></td>"
       "</tr>"
       "</tr>"
-      "</table>").arg(i == (o.m_vEmployee.size() + m_spnExtraPages->value() - 1) ? "" : "page-break-after:always;");
-  }*/
+      "</table>").arg(i == (v.size() + m_spnExtraPages->value() - 1) ? "" : "page-break-after:always;");
+  }
 
   html +=
     "</body>"
     "</html>";
 
-  Store* p = static_cast<Store*>(m_storePicker->getDatabase()->getCurrentItem());
   QString fileName = QFileDialog::getSaveFileName(this,
                                                   tr("Salvar livro ponto"),
                                                   "/desktop/livro_" +
                                                   idt.toString("yyyy") + "_" +
                                                   idt.toString("MM") +
-                                                  (p != nullptr ? p->m_form.strAliasName().replace(" ", "") : "") +
+                                                  o.m_form.strAliasName().replace(" ", "") +
                                                   ".pdf",
                                                   tr("PDF (*.pdf)"));
 

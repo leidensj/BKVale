@@ -194,7 +194,7 @@ LoginDialog::LoginDialog(ActiveUser& login,
   connect(m_btnDatabaseOpt, SIGNAL(clicked(bool)), this, SLOT(showDatabaseOpt()));
   connect(m_password, SIGNAL(enterSignal()), this, SLOT(focusLogin()));
 
-  setWindowTitle(tr("Baita Assistente Login"));
+  setWindowTitle(tr("Tipi Login"));
   setWindowIcon(QIcon(":/icons/res/login.png"));
   updateCapsLock();
   setModal(true);

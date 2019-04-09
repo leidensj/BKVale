@@ -47,9 +47,9 @@ protected:
   }
 };
 
-BaitaAssistant::BaitaAssistant(const ActiveUser& login, QWidget *parent)
+Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   : QMainWindow(parent)
-  , ui(new Ui::BaitaAssistant)
+  , ui(new Ui::Tipi)
   , m_login(login)
   , m_note(nullptr)
   , m_reminder(nullptr)
@@ -155,12 +155,12 @@ BaitaAssistant::BaitaAssistant(const ActiveUser& login, QWidget *parent)
   updateStatusBar();
 }
 
-BaitaAssistant::~BaitaAssistant()
+Tipi::~Tipi()
 {
   delete ui;
 }
 
-bool BaitaAssistant::connectPrinter()
+bool Tipi::connectPrinter()
 {
   if (m_printerSerial.isOpen())
     m_printerSerial.close();
@@ -223,7 +223,7 @@ bool BaitaAssistant::connectPrinter()
   return bSuccess;
 }
 
-void BaitaAssistant::disconnectPrinter()
+void Tipi::disconnectPrinter()
 {
   if (m_printerSerial.isOpen())
       m_printerSerial.close();
@@ -231,7 +231,7 @@ void BaitaAssistant::disconnectPrinter()
     m_printerTCP.close();
 }
 
-Functionality BaitaAssistant::getCurrentFunctionality() const
+Functionality Tipi::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = ui->mdi->activeSubWindow();
   if (activeWindow == m_noteWindow)
@@ -249,7 +249,7 @@ Functionality BaitaAssistant::getCurrentFunctionality() const
   return Functionality::None;
 }
 
-void BaitaAssistant::print()
+void Tipi::print()
 {
   switch (getCurrentFunctionality())
   {
@@ -332,7 +332,7 @@ void BaitaAssistant::print()
   }
 }
 
-bool BaitaAssistant::print(const QString& text)
+bool Tipi::print(const QString& text)
 {
   bool bSuccess = connectPrinter();
   if (bSuccess)
@@ -355,7 +355,7 @@ bool BaitaAssistant::print(const QString& text)
   return bSuccess;
 }
 
-void BaitaAssistant::openSettingsDialog()
+void Tipi::openSettingsDialog()
 {
   SettingsDlg dlg(m_settings);
   if (dlg.exec() == QDialog::Accepted)
@@ -365,7 +365,7 @@ void BaitaAssistant::openSettingsDialog()
   }
 }
 
-void BaitaAssistant::updateStatusBar()
+void Tipi::updateStatusBar()
 {
   // para adicionar um ícone:
   // "<img src=':/icons/res/16user.png'> " + ...
@@ -378,7 +378,7 @@ void BaitaAssistant::updateStatusBar()
                                 QString::number(m_settings.m_databasePort));
 }
 
-void BaitaAssistant::updateControls()
+void Tipi::updateControls()
 {
   const bool bIsSQLOk = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid() &&
                         QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isOpen();
@@ -425,12 +425,12 @@ void BaitaAssistant::updateControls()
   }
 }
 
-void BaitaAssistant::showInfo()
+void Tipi::showInfo()
 {
 
 }
 
-void BaitaAssistant::openJItemSQLDialog()
+void Tipi::openJItemSQLDialog()
 {
   JItemView* view = nullptr;
   QString title;
@@ -468,7 +468,7 @@ void BaitaAssistant::openJItemSQLDialog()
   }
 }
 
-void BaitaAssistant::openLoginDialog()
+void Tipi::openLoginDialog()
 {
   hide();
   LoginDialog l(m_login);
@@ -489,7 +489,7 @@ void BaitaAssistant::openLoginDialog()
 }
 
 
-void BaitaAssistant::openActiveUsersDialog()
+void Tipi::openActiveUsersDialog()
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
@@ -503,7 +503,7 @@ void BaitaAssistant::openActiveUsersDialog()
   dlg.exec();
 }
 
-void BaitaAssistant::closeEvent(QCloseEvent* event)
+void Tipi::closeEvent(QCloseEvent* event)
 {
   if (QMessageBox::question(this,
                             tr("Sair"),
@@ -515,7 +515,7 @@ void BaitaAssistant::closeEvent(QCloseEvent* event)
     event->ignore();
 }
 
-void BaitaAssistant::activateWindow()
+void Tipi::activateWindow()
 {
   m_noteWindow->hide();
   m_reminderWindow->hide();
@@ -556,7 +556,7 @@ void BaitaAssistant::activateWindow()
   updateControls();
 }
 
-void BaitaAssistant::testTimeAccess()
+void Tipi::testTimeAccess()
 {
   TimeCard c(this);
   c.exec();

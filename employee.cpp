@@ -330,3 +330,37 @@ QString Employee::strHours() const
     str.chop(1);
   return str;
 }
+
+QVector<Employee> Employee::SQL_select_from_store(Id storeId)
+{
+  QString error;
+  QVector<Employee> v;
+  if (!storeId.isValid())
+    return v;
+
+  if (SQL_isOpen(error))
+  {
+    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+    db.transaction();
+    QSqlQuery query(db);
+
+    query.prepare("SELECT "
+                  SQL_COLID
+                  " FROM "
+                  EMPLOYEE_SQL_TABLE_NAME
+                  " WHERE " EMPLOYEE_SQL_COL05 " = (:_v05)");
+    query.bindValue(":_v05", storeId.get());
+
+    bool bSuccess = query.exec();
+    while (bSuccess && query.next())
+    {
+      Employee e;
+      e.m_id = query.value(0).toLongLong();
+      e.SQL_select_proc(query, error);
+      v.push_back(e);
+    }
+    SQL_finish(db, query, bSuccess, error);
+  }
+
+  return v;
+}

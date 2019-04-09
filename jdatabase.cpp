@@ -452,7 +452,7 @@ bool JDatabase::save(const JItemSQL& o, Employee* pEmployee)
     QString error;
     if (!e.m_id.isValid())
       error = tr("Pincode informado não encontrado.");
-    else if (e.hasPermissionToEdit(m_tableName))
+    else if (!e.hasPermissionToEdit(m_tableName))
       error = tr("Funcionário não possui permissão.");
 
     if (!error.isEmpty())

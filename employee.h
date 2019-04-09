@@ -25,6 +25,8 @@ struct Employee : public JItemSQL
   bool SQL_select_by_pincode(QString& error);
   bool SQL_select_by_pincode_proc(QSqlQuery& query, QString& error);
 
+  static QVector<Employee> SQL_select_from_store(Id storeId);
+
   QString text() const { return "Funcionário"; }
   QString icon() const { return ":/icons/res/employee.png"; }
   QString name() const { return m_form.strAliasName(); }

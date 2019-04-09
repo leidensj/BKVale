@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   LoginDialog l(login);
   if (l.exec() == QDialog::Accepted)
   {
-    BaitaAssistant w(login);
+    Tipi w(login);
     w.show();
     return a.exec();
   }

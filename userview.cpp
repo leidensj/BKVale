@@ -1,7 +1,7 @@
 #include "userview.h"
 #include "jitemhelper.h"
-#include <QCheckBox>
 #include "jlineedit.h"
+#include "jitemhelper.h"
 #include <QLabel>
 #include <QLayout>
 #include <QRegExpValidator>
@@ -18,20 +18,6 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
   , m_password(nullptr)
   , m_viewPassword(nullptr)
   , m_list(nullptr)
-  , m_accessNote(nullptr)
-  , m_accessReminder(nullptr)
-  , m_accessCalculator(nullptr)
-  , m_accessShoppingList(nullptr)
-  , m_accessShop(nullptr)
-  , m_accessUser(nullptr)
-  , m_accessProduct(nullptr)
-  , m_accessForm(nullptr)
-  , m_accessEmployee(nullptr)
-  , m_accessSupplier(nullptr)
-  , m_accessCategory(nullptr)
-  , m_accessImage(nullptr)
-  , m_accessReservation(nullptr)
-  , m_accessSettings(nullptr)
 {
   QLabel* lblUser = new QLabel;
   lblUser->setPixmap(QIcon(":/icons/res/user.png").pixmap(QSize(24, 24)));
@@ -63,57 +49,37 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
   m_viewPassword->setIcon(QIcon(":/icons/res/view.png"));
   m_viewPassword->setCheckable(true);
 
-  m_accessNote = new QCheckBox;
-  m_accessNote->setIcon(QIcon(":/icons/res/note.png"));
-  m_accessNote->setText(tr("Vales"));
-  m_accessReminder = new QCheckBox;
-  m_accessReminder->setIcon(QIcon(":/icons/res/postit.png"));
-  m_accessReminder->setText(tr("Lembretes"));
-  m_accessCalculator = new QCheckBox;
-  m_accessCalculator->setIcon(QIcon(":/icons/res/calculator.png"));
-  m_accessCalculator->setText(tr("Calculadora"));
-  m_accessShop = new QCheckBox;
-  m_accessShop->setIcon(QIcon(":/icons/res/shop.png"));
-  m_accessShop->setText(tr("Compras"));
-  m_accessShoppingList = new QCheckBox;
-  m_accessShoppingList->setIcon(QIcon(":/icons/res/shopmgt.png"));
-  m_accessShoppingList->setText(tr("Listas de Compras"));
-
-  m_accessUser = new QCheckBox;
-  m_accessUser->setIcon(QIcon(JItemHelper::icon(USER_SQL_TABLE_NAME)));
-  m_accessUser->setText(JItemHelper::text(USER_SQL_TABLE_NAME));
-
-  m_accessProduct = new QCheckBox;
-  m_accessProduct->setIcon(QIcon(JItemHelper::icon(PRODUCT_SQL_TABLE_NAME)));
-  m_accessProduct->setText(JItemHelper::text(PRODUCT_SQL_TABLE_NAME));
-
-  m_accessForm = new QCheckBox;
-  m_accessForm->setIcon(QIcon(JItemHelper::icon(FORM_SQL_TABLE_NAME)));
-  m_accessForm->setText(JItemHelper::text(FORM_SQL_TABLE_NAME));
-
-  m_accessEmployee = new QCheckBox;
-  m_accessEmployee->setIcon(QIcon(JItemHelper::icon(EMPLOYEE_SQL_TABLE_NAME)));
-  m_accessEmployee->setText(JItemHelper::text(EMPLOYEE_SQL_TABLE_NAME));
-
-  m_accessSupplier = new QCheckBox;
-  m_accessSupplier->setIcon(QIcon(JItemHelper::icon(SUPPLIER_SQL_TABLE_NAME)));
-  m_accessSupplier->setText(JItemHelper::text(SUPPLIER_SQL_TABLE_NAME));
-
-  m_accessCategory = new QCheckBox;
-  m_accessCategory->setIcon(QIcon(JItemHelper::icon(CATEGORY_SQL_TABLE_NAME)));
-  m_accessCategory->setText(JItemHelper::text(CATEGORY_SQL_TABLE_NAME));
-
-  m_accessImage = new QCheckBox;
-  m_accessImage->setIcon(QIcon(JItemHelper::icon(IMAGE_SQL_TABLE_NAME)));
-  m_accessImage->setText(JItemHelper::text(IMAGE_SQL_TABLE_NAME));
-
-  m_accessReservation = new QCheckBox;
-  m_accessReservation->setIcon(QIcon(JItemHelper::icon(RESERVATION_SQL_TABLE_NAME)));
-  m_accessReservation->setText(JItemHelper::text(RESERVATION_SQL_TABLE_NAME));
-
-  m_accessSettings = new QCheckBox;
-  m_accessSettings->setIcon(QIcon(":/icons/res/settings.png"));
-  m_accessSettings->setText(tr("Configurações"));
+  m_list = new QListWidget;
+  for (int i = 0; i != (int)Idx::Settings; ++i)
+  {
+    QListWidgetItem* p = new QListWidgetItem;
+    QString strIcon;
+    QString strText;
+    switch (i)
+    {
+      case (int)Idx::Calculator:
+        strIcon = ":/icons/res/calculator.png";
+        strText = "Calculadora";
+        break;
+      case (int)Idx::Shop:
+        strIcon = ":/icons/res/shop.png";
+        strText = "Compras";
+        break;
+      case (int)Idx::Settings:
+        strIcon = ":/icons/res/settings.png";
+        strText = "Configurações";
+        break;
+      default:
+        strIcon = JItemHelper::icon(idxToTableName((Idx)i));
+        strText = JItemHelper::text(idxToTableName((Idx)i));
+        break;
+    }
+    p->setText(strText);
+    p->setIcon(QIcon(strIcon));
+    p->setFlags(p->flags() | Qt::ItemIsUserCheckable);
+    p->setCheckState(Qt::Checked);
+    m_list->addItem(p);
+  }
 
   QHBoxLayout* userlayout = new QHBoxLayout;
   userlayout->setContentsMargins(0, 0, 0, 0);
@@ -127,20 +93,7 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
   passwordlayout->addWidget(m_viewPassword);
 
   QVBoxLayout* tabPermissionslayout = new QVBoxLayout;
-  tabPermissionslayout->addWidget(m_accessNote);
-  tabPermissionslayout->addWidget(m_accessReminder);
-  tabPermissionslayout->addWidget(m_accessCalculator);
-  tabPermissionslayout->addWidget(m_accessShop);
-  tabPermissionslayout->addWidget(m_accessReservation);
-  tabPermissionslayout->addWidget(m_accessUser);
-  tabPermissionslayout->addWidget(m_accessProduct);
-  tabPermissionslayout->addWidget(m_accessForm);
-  tabPermissionslayout->addWidget(m_accessEmployee);
-  tabPermissionslayout->addWidget(m_accessSupplier);
-  tabPermissionslayout->addWidget(m_accessCategory);
-  tabPermissionslayout->addWidget(m_accessImage);
-  tabPermissionslayout->addWidget(m_accessShoppingList);
-  tabPermissionslayout->addWidget(m_accessSettings);
+  tabPermissionslayout->addWidget(m_list);
 
   QVBoxLayout* tabUserlayout = new QVBoxLayout;
   tabUserlayout->setAlignment(Qt::AlignTop);
@@ -176,20 +129,6 @@ const JItemSQL& UserView::getItem() const
   m_ref.m_id = m_currentId;
   m_ref.m_strUser = m_user->text();
   m_ref.m_password = m_password->text();
-  m_ref.m_bAccessNote = m_accessNote->isChecked();
-  m_ref.m_bAccessReminder = m_accessReminder->isChecked();
-  m_ref.m_bAccessCalculator = m_accessCalculator->isChecked();
-  m_ref.m_bAccessShop = m_accessShop->isChecked();
-  m_ref.m_bAccessUser = m_accessUser->isChecked();
-  m_ref.m_bAccessProduct = m_accessProduct->isChecked();
-  m_ref.m_bAccessForm = m_accessForm->isChecked();
-  m_ref.m_bAccessEmployee = m_accessEmployee->isChecked();
-  m_ref.m_bAccessSupplier = m_accessSupplier->isChecked();
-  m_ref.m_bAccessCategory = m_accessCategory->isChecked();
-  m_ref.m_bAccessImage = m_accessImage->isChecked();
-  m_ref.m_bAccessSettings = m_accessSettings->isChecked();
-  m_ref.m_bAccessReservation = m_accessReservation->isChecked();
-  m_ref.m_bAccessShoppingList = m_accessShoppingList->isChecked();
   return m_ref;
 }
 
@@ -201,20 +140,6 @@ void UserView::setItem(const JItemSQL& o)
   m_currentId = _o.m_id;
   m_user->setText(_o.m_strUser);
   m_password->setText("");
-  m_accessNote->setChecked(_o.m_bAccessNote);
-  m_accessReminder->setChecked(_o.m_bAccessReminder);
-  m_accessCalculator->setChecked(_o.m_bAccessCalculator);
-  m_accessShop->setChecked(_o.m_bAccessShop);
-  m_accessUser->setChecked(_o.m_bAccessUser);
-  m_accessProduct->setChecked(_o.m_bAccessProduct);
-  m_accessForm->setChecked(_o.m_bAccessForm);
-  m_accessEmployee->setChecked(_o.m_bAccessEmployee);
-  m_accessSupplier->setChecked(_o.m_bAccessSupplier);
-  m_accessCategory->setChecked(_o.m_bAccessCategory);
-  m_accessImage->setChecked(_o.m_bAccessImage);
-  m_accessSettings->setChecked(_o.m_bAccessSettings);
-  m_accessReservation->setChecked(_o.m_bAccessReservation);
-  m_accessShoppingList->setChecked(_o.m_bAccessShoppingList);
 }
 
 void UserView::create()
@@ -252,4 +177,39 @@ void UserView::save()
 bool UserView::hasLoggedUserChanged() const
 {
   return m_bHasLoggedUserChanged;
+}
+
+QString UserView::idxToTableName(Idx idx)
+{
+  switch (idx)
+  {
+    case Idx::User:
+      return USER_SQL_TABLE_NAME;
+    case Idx::Category:
+      return CATEGORY_SQL_TABLE_NAME;
+    case Idx::Product:
+      return PRODUCT_SQL_TABLE_NAME;
+    case Idx::Image:
+      return IMAGE_SQL_TABLE_NAME;
+    case Idx::Form:
+      return FORM_SQL_TABLE_NAME;
+    case Idx::Employee:
+      return EMPLOYEE_SQL_TABLE_NAME;
+    case Idx::Supplier:
+      return SUPPLIER_SQL_TABLE_NAME;
+    case Idx::Store:
+      return STORE_SQL_TABLE_NAME;
+    case Idx::Note:
+      return NOTE_SQL_TABLE_NAME;
+    case Idx::Reminder:
+      return REMINDER_SQL_TABLE_NAME;
+    case Idx::ShoppinList:
+      return SHOPPING_LIST_SQL_TABLE_NAME;
+    case Idx::Reservation:
+      return RESERVATION_SQL_TABLE_NAME;
+    case Idx::Discount:
+      return DISCOUNT_SQL_TABLE_NAME;
+    default:
+      return "";
+  }
 }

@@ -129,7 +129,7 @@ QString JItemHelper::icon(const QString& tableName)
   if (tableName == STORE_SQL_TABLE_NAME)
     return ":/icons/res/store.png";
   if (tableName == PRODUCT_SQL_TABLE_NAME)
-    return ":/icons/res/product.png";
+    return ":/icons/res/item.png";
   if (tableName == NOTE_SQL_TABLE_NAME)
     return ":/icons/res/note.png";
   if (tableName == USER_SQL_TABLE_NAME)

@@ -44,20 +44,22 @@ void User::clear()
 {
   m_id = INVALID_ID;
   m_strUser.clear();
-  m_bAccessNote = false;
-  m_bAccessReminder = false;
-  m_bAccessCalculator = false;
-  m_bAccessShop = false;
-  m_bAccessUser = false;
-  m_bAccessProduct = false;
-  m_bAccessSettings = false;
-  m_bAccessForm = false;
-  m_bAccessEmployee = false;
-  m_bAccessSupplier = false;
-  m_bAccessCategory = false;
-  m_bAccessImage = false;
-  m_bAccessReservation = false;
-  m_bAccessShoppingList = false;
+  m_bNote = false;
+  m_bReminder = false;
+  m_bCalculator = false;
+  m_bShop = false;
+  m_bUser = false;
+  m_bProduct = false;
+  m_bSettings = false;
+  m_bForm = false;
+  m_bEmployee = false;
+  m_bSupplier = false;
+  m_bCategory = false;
+  m_bImage = false;
+  m_bReservation = false;
+  m_bShoppingList = false;
+  m_bStore = false;
+  m_bDiscount = false;
   m_password.clear();
 }
 
@@ -77,20 +79,22 @@ bool User::operator != (const JItem& other) const
   const User& another = dynamic_cast<const User&>(other);
   return
       m_strUser != another.m_strUser ||
-      m_bAccessNote != another.m_bAccessNote ||
-      m_bAccessReminder != another.m_bAccessReminder ||
-      m_bAccessCalculator != another.m_bAccessCalculator ||
-      m_bAccessShop != another.m_bAccessCalculator ||
-      m_bAccessForm != another.m_bAccessForm ||
-      m_bAccessEmployee != another.m_bAccessEmployee ||
-      m_bAccessSupplier != another.m_bAccessSupplier ||
-      m_bAccessUser != another.m_bAccessUser ||
-      m_bAccessProduct != another.m_bAccessProduct ||
-      m_bAccessSettings != another.m_bAccessSettings ||
-      m_bAccessReservation != another.m_bAccessReservation ||
-      m_bAccessCategory != another.m_bAccessCategory ||
-      m_bAccessImage != another.m_bAccessImage ||
-      m_bAccessShoppingList != another.m_bAccessShoppingList;
+      m_bNote != another.m_bNote ||
+      m_bReminder != another.m_bReminder ||
+      m_bCalculator != another.m_bCalculator ||
+      m_bShop != another.m_bCalculator ||
+      m_bForm != another.m_bForm ||
+      m_bEmployee != another.m_bEmployee ||
+      m_bSupplier != another.m_bSupplier ||
+      m_bUser != another.m_bUser ||
+      m_bProduct != another.m_bProduct ||
+      m_bSettings != another.m_bSettings ||
+      m_bReservation != another.m_bReservation ||
+      m_bCategory != another.m_bCategory ||
+      m_bImage != another.m_bImage ||
+      m_bShoppingList != another.m_bShoppingList ||
+      m_bStore != another.m_bStore ||
+      m_bDiscount != another.m_bDiscount;
 }
 
 bool User::operator == (const JItem& other) const
@@ -126,7 +130,9 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16 ")"
+                USER_SQL_COL16 ","
+                USER_SQL_COL17 ","
+                USER_SQL_COL18 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -143,23 +149,27 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v13),"
                 "(:_v14),"
                 "(:_v15),"
-                "(:_v16))");
+                "(:_v16),"
+                "(:_v17),"
+                "(:_v18))");
   query.bindValue(":_v01", m_strUser);
   query.bindValue(":_v02", strEncryptedPassword());
-  query.bindValue(":_v03", m_bAccessNote);
-  query.bindValue(":_v04", m_bAccessReminder);
-  query.bindValue(":_v05", m_bAccessCalculator);
-  query.bindValue(":_v06", m_bAccessShop);
-  query.bindValue(":_v07", m_bAccessUser);
-  query.bindValue(":_v08", m_bAccessProduct);
-  query.bindValue(":_v09", m_bAccessSettings);
-  query.bindValue(":_v10", m_bAccessForm);
-  query.bindValue(":_v11", m_bAccessCategory);
-  query.bindValue(":_v12", m_bAccessImage);
-  query.bindValue(":_v13", m_bAccessReservation);
-  query.bindValue(":_v14", m_bAccessShoppingList);
-  query.bindValue(":_v15", m_bAccessEmployee);
-  query.bindValue(":_v16", m_bAccessSupplier);
+  query.bindValue(":_v03", m_bNote);
+  query.bindValue(":_v04", m_bReminder);
+  query.bindValue(":_v05", m_bCalculator);
+  query.bindValue(":_v06", m_bShop);
+  query.bindValue(":_v07", m_bUser);
+  query.bindValue(":_v08", m_bProduct);
+  query.bindValue(":_v09", m_bSettings);
+  query.bindValue(":_v10", m_bForm);
+  query.bindValue(":_v11", m_bCategory);
+  query.bindValue(":_v12", m_bImage);
+  query.bindValue(":_v13", m_bReservation);
+  query.bindValue(":_v14", m_bShoppingList);
+  query.bindValue(":_v15", m_bEmployee);
+  query.bindValue(":_v16", m_bSupplier);
+  query.bindValue(":_v17", m_bStore);
+  query.bindValue(":_v18", m_bDiscount);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -187,7 +197,9 @@ bool User::SQL_update_proc(QSqlQuery& query) const
               USER_SQL_COL13" = (:_v13),"
               USER_SQL_COL14" = (:_v14),"
               USER_SQL_COL15" = (:_v15),"
-              USER_SQL_COL16" = (:_v16)"
+              USER_SQL_COL16" = (:_v16),"
+              USER_SQL_COL17" = (:_v17),"
+              USER_SQL_COL18" = (:_v18)"
               " WHERE " SQL_COLID " = (:_v00)";
 
   query.prepare(strQuery);
@@ -195,20 +207,22 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v01", m_strUser);
   if (!m_password.isEmpty())
     query.bindValue(":_v02", strEncryptedPassword());
-  query.bindValue(":_v03", m_bAccessNote);
-  query.bindValue(":_v04", m_bAccessReminder);
-  query.bindValue(":_v05", m_bAccessCalculator);
-  query.bindValue(":_v06", m_bAccessShop);
-  query.bindValue(":_v07", m_bAccessUser);
-  query.bindValue(":_v08", m_bAccessProduct);
-  query.bindValue(":_v09", m_bAccessSettings);
-  query.bindValue(":_v10", m_bAccessForm);
-  query.bindValue(":_v11", m_bAccessCategory);
-  query.bindValue(":_v12", m_bAccessImage);
-  query.bindValue(":_v13", m_bAccessReservation);
-  query.bindValue(":_v14", m_bAccessShoppingList);
-  query.bindValue(":_v15", m_bAccessEmployee);
-  query.bindValue(":_v16", m_bAccessSupplier);
+  query.bindValue(":_v03", m_bNote);
+  query.bindValue(":_v04", m_bReminder);
+  query.bindValue(":_v05", m_bCalculator);
+  query.bindValue(":_v06", m_bShop);
+  query.bindValue(":_v07", m_bUser);
+  query.bindValue(":_v08", m_bProduct);
+  query.bindValue(":_v09", m_bSettings);
+  query.bindValue(":_v10", m_bForm);
+  query.bindValue(":_v11", m_bCategory);
+  query.bindValue(":_v12", m_bImage);
+  query.bindValue(":_v13", m_bReservation);
+  query.bindValue(":_v14", m_bShoppingList);
+  query.bindValue(":_v15", m_bEmployee);
+  query.bindValue(":_v16", m_bSupplier);
+  query.bindValue(":_v17", m_bStore);
+  query.bindValue(":_v18", m_bDiscount);
 
   return query.exec();
 }
@@ -232,7 +246,9 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
                 USER_SQL_COL13 ","
                 USER_SQL_COL14 ","
                 USER_SQL_COL15 ","
-                USER_SQL_COL16
+                USER_SQL_COL16 ","
+                USER_SQL_COL17 ","
+                USER_SQL_COL18
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -244,20 +260,22 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_strUser = query.value(0).toString();
       query.value(1).toString(); // password nao precisamos
-      m_bAccessNote = query.value(2).toBool();
-      m_bAccessReminder = query.value(3).toBool();
-      m_bAccessCalculator = query.value(4).toBool();
-      m_bAccessShop = query.value(5).toBool();
-      m_bAccessUser = query.value(6).toBool();
-      m_bAccessProduct = query.value(7).toBool();
-      m_bAccessSettings = query.value(8).toBool();
-      m_bAccessForm = query.value(9).toBool();
-      m_bAccessCategory = query.value(10).toBool();
-      m_bAccessImage = query.value(11).toBool();
-      m_bAccessReservation = query.value(12).toBool();
-      m_bAccessShoppingList = query.value(13).toBool();
-      m_bAccessEmployee = query.value(14).toBool();
-      m_bAccessSupplier = query.value(15).toBool();
+      m_bNote = query.value(2).toBool();
+      m_bReminder = query.value(3).toBool();
+      m_bCalculator = query.value(4).toBool();
+      m_bShop = query.value(5).toBool();
+      m_bUser = query.value(6).toBool();
+      m_bProduct = query.value(7).toBool();
+      m_bSettings = query.value(8).toBool();
+      m_bForm = query.value(9).toBool();
+      m_bCategory = query.value(10).toBool();
+      m_bImage = query.value(11).toBool();
+      m_bReservation = query.value(12).toBool();
+      m_bShoppingList = query.value(13).toBool();
+      m_bEmployee = query.value(14).toBool();
+      m_bSupplier = query.value(15).toBool();
+      m_bStore = query.value(16).toBool();
+      m_bDiscount = query.value(17).toBool();
     }
     else
     {

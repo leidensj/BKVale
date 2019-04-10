@@ -27,20 +27,22 @@ struct User : public JItemSQL
   static QString st_strEncryptedPassword(const QString& strPassword);
 
   QString m_strUser;
-  bool m_bAccessNote;
-  bool m_bAccessReminder;
-  bool m_bAccessCalculator;
-  bool m_bAccessShop;
-  bool m_bAccessUser;
-  bool m_bAccessProduct;
-  bool m_bAccessSettings;
-  bool m_bAccessForm;
-  bool m_bAccessEmployee;
-  bool m_bAccessSupplier;
-  bool m_bAccessCategory;
-  bool m_bAccessImage;
-  bool m_bAccessReservation;
-  bool m_bAccessShoppingList;
+  bool m_bNote;
+  bool m_bReminder;
+  bool m_bCalculator;
+  bool m_bShop;
+  bool m_bUser;
+  bool m_bProduct;
+  bool m_bSettings;
+  bool m_bForm;
+  bool m_bEmployee;
+  bool m_bSupplier;
+  bool m_bCategory;
+  bool m_bImage;
+  bool m_bReservation;
+  bool m_bShoppingList;
+  bool m_bStore;
+  bool m_bDiscount;
   QString m_password;
 };
 

@@ -42,7 +42,7 @@ private:
     Note,
     Calculator,
     Reminder,
-    ShoppinList,
+    ShoppingList,
     Shop,
     Reservation,
     Discount,

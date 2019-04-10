@@ -382,22 +382,22 @@ void Tipi::updateControls()
 {
   const bool bIsSQLOk = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid() &&
                         QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isOpen();
-  ui->actionSettings->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessSettings);
+  ui->actionSettings->setEnabled(bIsSQLOk && m_login.getUser().m_bSettings);
   ui->actionLogin->setEnabled(bIsSQLOk);
-  ui->actionUsers->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessUser);
-  ui->actionProducts->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessProduct);
-  ui->actionForms->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessForm);
-  ui->actionCategories->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessCategory);
-  ui->actionImages->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessImage);
-  ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessShoppingList);
-  ui->actionEmployees->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessEmployee);
-  ui->actionSuppliers->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessSupplier);
+  ui->actionUsers->setEnabled(bIsSQLOk && m_login.getUser().m_bUser);
+  ui->actionProducts->setEnabled(bIsSQLOk && m_login.getUser().m_bProduct);
+  ui->actionForms->setEnabled(bIsSQLOk && m_login.getUser().m_bForm);
+  ui->actionCategories->setEnabled(bIsSQLOk && m_login.getUser().m_bCategory);
+  ui->actionImages->setEnabled(bIsSQLOk && m_login.getUser().m_bImage);
+  ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShoppingList);
+  ui->actionEmployees->setEnabled(bIsSQLOk && m_login.getUser().m_bEmployee);
+  ui->actionSuppliers->setEnabled(bIsSQLOk && m_login.getUser().m_bSupplier);
 
-  ui->actionNotes->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessNote);
-  ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessReminder);
-  ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessCalculator);
-  ui->actionShop->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessShop);
-  ui->actionReservations->setEnabled(bIsSQLOk && m_login.getUser().m_bAccessReservation);
+  ui->actionNotes->setEnabled(bIsSQLOk && m_login.getUser().m_bNote);
+  ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bReminder);
+  ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bCalculator);
+  ui->actionShop->setEnabled(bIsSQLOk && m_login.getUser().m_bShop);
+  ui->actionReservations->setEnabled(bIsSQLOk && m_login.getUser().m_bReservation);
 
   switch (getCurrentFunctionality())
   {

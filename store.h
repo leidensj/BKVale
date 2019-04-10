@@ -25,8 +25,6 @@ struct Store : public JItemSQL
   Phone m_phone;
   QString m_description;
 
-  QString text() const { return "Loja"; }
-  QString icon() const { return ":/icons/res/store.png"; }
   QString name() const { return  m_form.m_name; }
   QByteArray image() const { return m_form.m_image.m_image; }
 };

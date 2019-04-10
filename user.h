@@ -42,9 +42,6 @@ struct User : public JItemSQL
   bool m_bAccessReservation;
   bool m_bAccessShoppingList;
   QString m_password;
-
-  QString text() const { return "Usuário"; }
-  QString icon() const { return ":/icons/res/user.png"; }
 };
 
 #endif // USER_H

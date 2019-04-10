@@ -28,8 +28,6 @@ struct Phone : public JItemSQL
   QString m_number;
   QString m_name;
 
-  QString text() const { return "Telefone"; }
-  QString icon() const { return ":/icons/res/phone.png"; }
   QString name() const { return strFormattedPhone(); }
 };
 

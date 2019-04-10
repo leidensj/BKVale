@@ -29,9 +29,6 @@ struct Reservation : public JItemSQL
   QString m_phone;
   int m_ammount;
   QString m_observation;
-
-  QString text() const { return "Reserva"; }
-  QString icon() const { return ":/icons/res/reservation.png"; }
 };
 
 #endif // RESERVATION_H

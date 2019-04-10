@@ -7,6 +7,7 @@
 #include <QRegExpValidator>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QListWidget>
 
 UserView::UserView(Id currentLoggedId, QWidget* parent)
   : JItemView(USER_SQL_TABLE_NAME, parent)
@@ -16,6 +17,7 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
   , m_lblPasswordMsg(nullptr)
   , m_password(nullptr)
   , m_viewPassword(nullptr)
+  , m_list(nullptr)
   , m_accessNote(nullptr)
   , m_accessReminder(nullptr)
   , m_accessCalculator(nullptr)

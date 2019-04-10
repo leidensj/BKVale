@@ -83,26 +83,76 @@ bool JItemHelper::authenticationToRemove(const QString& tableName)
 
 QString JItemHelper::text(const QString& tableName)
 {
-  auto p = JItemHelper::create(tableName);
-  QString text;
-  if (p != nullptr)
-  {
-    text = p->text();
-    delete p;
-  }
-  return text;
+  if (tableName == IMAGE_SQL_TABLE_NAME)
+    return "Imagem";
+  if (tableName == FORM_SQL_TABLE_NAME)
+    return "Perfil";
+  if (tableName == CATEGORY_SQL_TABLE_NAME)
+    return "Categoria";
+  if (tableName == STORE_SQL_TABLE_NAME)
+    return "Loja";
+  if (tableName == PRODUCT_SQL_TABLE_NAME)
+    return "Produto";
+  if (tableName == NOTE_SQL_TABLE_NAME)
+    return "Vale";
+  if (tableName == USER_SQL_TABLE_NAME)
+    return "Usuário";
+  if (tableName == REMINDER_SQL_TABLE_NAME)
+    return "Lembrete";
+  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    return "Lista de Compras";
+  if (tableName == RESERVATION_SQL_TABLE_NAME)
+    return "Reserva";
+  if (tableName == DISCOUNT_SQL_TABLE_NAME)
+    return "Desconto";
+  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return "Funcionário";
+  if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return "Fornecedor";
+  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+    return "Usuários Ativos";
+  if (tableName == ADDRESS_SQL_TABLE_NAME)
+    return "Endereço";
+  if (tableName == PHONE_SQL_TABLE_NAME)
+    return "Telefone";
+  return "ERRO: Tabela não encontrada.";
 }
 
 QString JItemHelper::icon(const QString& tableName)
 {
-  auto p = JItemHelper::create(tableName);
-  QString icon;
-  if (p != nullptr)
-  {
-    icon = p->icon();
-    delete p;
-  }
-  return icon;
+  if (tableName == IMAGE_SQL_TABLE_NAME)
+    return ":/icons/res/icon.png";;
+  if (tableName == FORM_SQL_TABLE_NAME)
+    return ":/icons/res/resume.png";
+  if (tableName == CATEGORY_SQL_TABLE_NAME)
+    return ":/icons/res/category.png";
+  if (tableName == STORE_SQL_TABLE_NAME)
+    return ":/icons/res/store.png";
+  if (tableName == PRODUCT_SQL_TABLE_NAME)
+    return ":/icons/res/product.png";
+  if (tableName == NOTE_SQL_TABLE_NAME)
+    return ":/icons/res/note.png";
+  if (tableName == USER_SQL_TABLE_NAME)
+    return ":/icons/res/user.png";
+  if (tableName == REMINDER_SQL_TABLE_NAME)
+    return ":/icons/res/postit.png";
+  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    return ":/icons/res/shopmgt.png";
+  if (tableName == RESERVATION_SQL_TABLE_NAME)
+    return ":/icons/res/reservation.png";
+  if (tableName == DISCOUNT_SQL_TABLE_NAME)
+    return ":/icons/res/discount.png";
+  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return ":/icons/res/employee.png";
+  if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return ":/icons/res/supplier.png";
+  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+    return ":/icons/res/supplier.png";
+  if (tableName == ADDRESS_SQL_TABLE_NAME)
+    return ":/icons/res/address.png";
+  if (tableName == PHONE_SQL_TABLE_NAME)
+    return ":/icons/res/phone.png";
+  return "";
 }
 
 JModel* JItemHelper::model(const QString& tableName, QObject* parent)

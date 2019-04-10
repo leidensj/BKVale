@@ -27,8 +27,6 @@ struct Employee : public JItemSQL
 
   static QVector<Employee> SQL_select_from_store(Id storeId);
 
-  QString text() const { return "Funcionário"; }
-  QString icon() const { return ":/icons/res/employee.png"; }
   QString name() const { return m_form.strAliasName(); }
   QByteArray image() const { return m_form.m_image.m_image; }
 

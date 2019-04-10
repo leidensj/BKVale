@@ -67,8 +67,6 @@ struct Product : public JItemSQL
   bool m_bSell;
   QVector<ProductCode> m_vCode;
 
-  QString text() const { return "Produto"; }
-  QString icon() const { return ":/icons/res/item.png"; }
   QString name() const { return m_name; }
   QByteArray image() const { return m_image.m_image; }
 };

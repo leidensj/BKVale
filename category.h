@@ -23,8 +23,6 @@ struct Category : public JItemSQL
   QString m_name;
   Image m_image;
 
-  QString text() const { return "Categoria"; }
-  QString icon() const { return ":/icons/res/category.png"; }
   QString name() const { return m_name; }
   QByteArray image() const { return m_image.m_image; }
 };

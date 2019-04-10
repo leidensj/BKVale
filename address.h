@@ -48,8 +48,6 @@ struct Address : public JItemSQL
   static BRState st_getBRState(EBRState s);
   BRState getBRState() const;
 
-  QString text() const { return "Endereço"; }
-  QString icon() const { return ":/icons/res/address.png"; }
   QString name() const;
 };
 

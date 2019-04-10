@@ -8,6 +8,7 @@
 class QCheckBox;
 class JLineEdit;
 class QLabel;
+class QListWidget;
 
 class UserView : public JItemView
 {
@@ -35,6 +36,7 @@ private:
   QLabel* m_lblPasswordMsg;
   JLineEdit* m_password;
   QPushButton* m_viewPassword;
+  QListWidget* m_list;
   QCheckBox* m_accessNote;
   QCheckBox* m_accessReminder;
   QCheckBox* m_accessCalculator;

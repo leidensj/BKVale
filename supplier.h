@@ -21,8 +21,6 @@ struct Supplier : public JItemSQL
 
   Form m_form;
 
-  QString text() const { return "Fornecedor"; }
-  QString icon() const { return ":/icons/res/supplier.png"; }
   QString name() const { return m_form.strAliasName(); }
   QByteArray image() const { return m_form.m_image.m_image; }
 };

@@ -79,6 +79,10 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_reservation = new ReservationView;
   m_discount = new DiscountView;
 
+  QImage img(":/icons/res/tipialpha.png");
+  img = img.scaled(QSize(144, 144));
+  ui->mdi->setBackground(img);
+
   m_noteWindow = new JMdiSubWindow(this);
   m_noteWindow->setWindowTitle(tr("Vales"));
   m_noteWindow->setWindowIcon(QIcon(":/icons/res/note.png"));

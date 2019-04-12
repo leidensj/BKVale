@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include "jplaintextedit.h"
 #include <QDialogButtonBox>
+#include "jitemhelper.h"
 
 NoteDetailsDlg::NoteDetailsDlg(QWidget* parent)
   : QDialog(parent)
@@ -52,8 +53,6 @@ QString NoteDetailsDlg::getDetails() const
   return m_teDetails->toPlainText();
 }
 
-#define DISCCOUNT_LAST_VALUE_PROP "lastValue"
-
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
   , m_btnCreate(nullptr)
@@ -73,6 +72,7 @@ NoteView::NoteView(QWidget *parent)
   , m_dlgDetails(nullptr)
   , m_lblEntries(nullptr)
   , m_lblSum(nullptr)
+  , m_dlgDb(nullptr)
 {
   m_btnCreate = new QPushButton();
   m_btnCreate->setFlat(true);
@@ -89,7 +89,6 @@ NoteView::NoteView(QWidget *parent)
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
   m_btnSearch->setToolTip(tr("Procurar vales (Ctrl+F)"));
-  m_btnSearch->setCheckable(true);
 
   m_btnOpenLast = new QPushButton();
   m_btnOpenLast->setFlat(true);
@@ -265,7 +264,6 @@ NoteView::NoteView(QWidget *parent)
   headerlayout->addWidget(frame);
 
   QVBoxLayout* viewLayout = new QVBoxLayout;
-  viewLayout->setContentsMargins(9, 0, 0, 0);
   viewLayout->addLayout(hlayout1);
   viewLayout->addLayout(headerlayout);
   viewLayout->addWidget(m_table);
@@ -275,28 +273,25 @@ NoteView::NoteView(QWidget *parent)
   viewFrame->setLayout(viewLayout);
 
   m_database = new JDatabase(NOTE_SQL_TABLE_NAME);
-  m_database->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  m_database->layout()->setContentsMargins(0, 0, 0, 0);
 
   QVBoxLayout* databaseLayout = new QVBoxLayout;
   databaseLayout->addWidget(m_database);
   databaseLayout->addWidget(m_lblEntries);
   databaseLayout->addWidget(m_lblSum);
 
-  QFrame* databaseFrame = new QFrame;
-  databaseFrame->setLayout(databaseLayout);
+  m_dlgDb = new QDialog(this);
+  m_dlgDb->setLayout(databaseLayout);
+  m_dlgDb->setWindowFlags(Qt::Window);
+  m_dlgDb->setWindowTitle(JItemHelper::text(NOTE_SQL_TABLE_NAME));
+  m_dlgDb->setWindowIcon(QIcon(JItemHelper::icon(NOTE_SQL_TABLE_NAME)));
+  m_dlgDb->setModal(true);
 
-  QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(viewFrame);
-  splitter->addWidget(databaseFrame);
-
-  QVBoxLayout* mainLayout = new QVBoxLayout();
-  mainLayout->addWidget(splitter);
-  setLayout(mainLayout);
+  setLayout(viewLayout);
 
   connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(itemSelected(const JItemSQL&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
   connect(m_database, SIGNAL(refreshSignal()), this, SLOT(updateControls()));
-  connect(m_btnSearch, SIGNAL(clicked(bool)), databaseFrame, SLOT(setVisible(bool)));
   connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
@@ -309,9 +304,10 @@ NoteView::NoteView(QWidget *parent)
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
+  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), m_dlgDb, SLOT(accept()));
 
   create();
-  databaseFrame->hide();
   updateControls();
 }
 

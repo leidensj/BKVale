@@ -32,7 +32,7 @@ private:
   QTime m_time;
 
 public:
-  User getUser() const { return m_user; }
+  const User& getUser() const { return m_user; }
 };
 
 #endif // ACTIVEUSER_H

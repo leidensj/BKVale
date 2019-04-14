@@ -65,7 +65,7 @@ JDatabase::JDatabase(const QString& tableName,
   m_btnRemove->setIconSize(QSize(24, 24));
   m_btnRemove->setToolTip(tr("Remover (Del)"));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
-  m_btnOpen->setShortcut(QKeySequence(Qt::Key_Delete));
+  m_btnRemove->setShortcut(QKeySequence(Qt::Key_Delete));
 
   m_btnFilter = new QPushButton();
   m_btnFilter->setFlat(true);

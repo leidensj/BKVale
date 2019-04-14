@@ -67,6 +67,7 @@ private:
   NoteDetailsDlg* m_dlgDetails;
   QLabel* m_lblEntries;
   QLabel* m_lblSum;
+  QDialog* m_dlgDb;
 
 private slots:
   void removeItem();

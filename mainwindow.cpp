@@ -79,6 +79,10 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_reservation = new ReservationView;
   m_discount = new DiscountView;
 
+  QImage img(":/icons/res/tipialpha.png");
+  img = img.scaled(QSize(144, 144));
+  ui->mdi->setBackground(img);
+
   m_noteWindow = new JMdiSubWindow(this);
   m_noteWindow->setWindowTitle(tr("Vales"));
   m_noteWindow->setWindowIcon(QIcon(":/icons/res/note.png"));
@@ -392,12 +396,15 @@ void Tipi::updateControls()
   ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShoppingList);
   ui->actionEmployees->setEnabled(bIsSQLOk && m_login.getUser().m_bEmployee);
   ui->actionSuppliers->setEnabled(bIsSQLOk && m_login.getUser().m_bSupplier);
+  ui->actionStores->setEnabled(bIsSQLOk && m_login.getUser().m_bStore);
+  ui->actionTimeCard->setEnabled(bIsSQLOk && m_login.getUser().m_bTimeCard);
 
   ui->actionNotes->setEnabled(bIsSQLOk && m_login.getUser().m_bNote);
   ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bReminder);
   ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bCalculator);
   ui->actionShop->setEnabled(bIsSQLOk && m_login.getUser().m_bShop);
   ui->actionReservations->setEnabled(bIsSQLOk && m_login.getUser().m_bReservation);
+  ui->actionDiscount->setEnabled(bIsSQLOk && m_login.getUser().m_bDiscount);
 
   switch (getCurrentFunctionality())
   {
@@ -433,7 +440,6 @@ void Tipi::showInfo()
 void Tipi::openJItemSQLDialog()
 {
   JItemView* view = nullptr;
-  QString title;
   if (sender() == ui->actionCategories)
     view = new CategoryView;
   else if (sender() == ui->actionEmployees)

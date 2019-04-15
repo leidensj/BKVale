@@ -281,10 +281,9 @@ void Tipi::print()
             return;
         }
       }
-      Employee e;
-      note = m_note->save(e);
+      note = m_note->save();
       if (note.m_id.isValid())
-        print(NotePrinter::build(note, e.m_form.strAliasName()));
+        print(NotePrinter::build(note));
     } break;
     case Functionality::Reminder:
     {

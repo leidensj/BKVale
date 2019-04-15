@@ -234,13 +234,12 @@ QString Printer::strCmdFullCut()
   return ESC_FULL_CUT;
 }
 
-QString NotePrinter::build(const Note& note,
-                           const QString& user)
+QString NotePrinter::build(const Note& note)
 {
   QString strNote1;
   noteAppendHeader(note, strNote1);
   noteAppendBody(note, strNote1);
-  noteAppendFooter(note, user, strNote1);
+  noteAppendFooter(note, note.m_employee.m_form.strAliasName(), strNote1);
   if (note.m_bCash)
   {
     return strNote1 + ESC_LF ESC_FULL_CUT;

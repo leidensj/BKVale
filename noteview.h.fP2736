@@ -23,7 +23,6 @@ class JExpLineEdit;
 class JPlainTextEdit;
 class JDatePicker;
 class QLabel;
-class JLineEdit;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -66,8 +65,8 @@ private:
   JExpLineEdit* m_edDisccount;
   QPushButton* m_btnDetails;
   NoteDetailsDlg* m_dlgDetails;
-  JLineEdit* m_edEntries;
-  JLineEdit* m_edSum;
+  JLineEdit* m_lblEntries;
+  QLabel* m_lblSum;
   QDialog* m_dlgDb;
 
 private slots:
@@ -83,7 +82,7 @@ public slots:
   void create();
   void setNote(const Note& note);
   void updateControls();
-  Note save();
+  Note save(Employee& e);
 
 signals:
   void changedSignal();

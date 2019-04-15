@@ -161,5 +161,6 @@
         <file>res/clock.png</file>
         <file>res/tipi.png</file>
         <file>res/tipialpha.png</file>
+        <file>res/statistics.png</file>
     </qresource>
 </RCC>

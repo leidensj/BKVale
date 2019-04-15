@@ -151,6 +151,7 @@ void Note::clear()
   m_vNoteItem.clear();
   m_observation.clear();
   m_disccount = 0.0;
+  m_employee.clear();
 }
 
 bool Note::isValid() const
@@ -242,20 +243,23 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
                   NOTE_SQL_COL03 ","
                   NOTE_SQL_COL04 ","
                   NOTE_SQL_COL05 ","
-                  NOTE_SQL_COL06
+                  NOTE_SQL_COL06 ","
+                  NOTE_SQL_COL07
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
                   "(:_v03),"
                   "(:_v04),"
                   "(:_v05),"
-                  "(:_v06))");
+                  "(:_v06),"
+                  "(:_v07))");
     query.bindValue(":_v01", m_number);
     query.bindValue(":_v02", m_date);
     query.bindValue(":_v03", m_supplier.m_id.getIdNull());
     query.bindValue(":_v04", m_bCash);
     query.bindValue(":_v05", m_observation);
     query.bindValue(":_v06", m_disccount);
+    query.bindValue(":_v07", m_employee.m_id.getIdNull());
     bSuccess = query.exec();
   }
 
@@ -304,7 +308,8 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
                 NOTE_SQL_COL03 " = (:_v03),"
                 NOTE_SQL_COL04 " = (:_v04),"
                 NOTE_SQL_COL05 " = (:_v05),"
-                NOTE_SQL_COL06 " = (:_v06) "
+                NOTE_SQL_COL06 " = (:_v06),"
+                NOTE_SQL_COL07 " = (:_v07) "
                 "WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v02", m_date);
@@ -312,6 +317,7 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v04", m_bCash);
   query.bindValue(":_v05", m_observation);
   query.bindValue(":_v06", m_disccount);
+  query.bindValue(":_v07", m_employee.m_id.getIdNull());
   bool bSuccess = query.exec();
 
   query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
@@ -368,7 +374,8 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
                 NOTE_SQL_COL03 ","
                 NOTE_SQL_COL04 ","
                 NOTE_SQL_COL05 ","
-                NOTE_SQL_COL06
+                NOTE_SQL_COL06 ","
+                NOTE_SQL_COL07
                 " FROM " NOTE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -384,6 +391,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
       m_bCash = query.value(3).toBool();
       m_observation = query.value(4).toString();
       m_disccount = query.value(5).toDouble();
+      m_employee.m_id.set(query.value(6).toDouble());
     }
     else
     {
@@ -428,6 +436,9 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
     if (m_supplier.m_id.isValid())
       bSuccess = m_supplier.SQL_select_proc(query, error);
   }
+
+  if (bSuccess && m_employee.m_id.isValid())
+    m_employee.SQL_select_proc(query, error);
 
   if (bSuccess)
   {
@@ -504,4 +515,9 @@ NoteItem Note::SQL_select_last_item(Id supplierId, Id productId)
 JModel* Note::SQL_table_model(QObject* parent) const
 {
   return new NoteModel(parent);
+}
+
+void Note::setEmployee(const JItemSQL& e) const
+{
+  m_employee = dynamic_cast<const Employee&>(e);
 }

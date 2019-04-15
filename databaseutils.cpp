@@ -278,8 +278,11 @@ bool BaitaSQL::createTables(QString& error)
                         NOTE_SQL_COL04 " BOOLEAN,"
                         NOTE_SQL_COL05 " TEXT,"
                         NOTE_SQL_COL06 " REAL,"
+                        NOTE_SQL_COL07 " INTEGER,"
                         "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
-                        SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                        SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                        "FOREIGN KEY(" NOTE_SQL_COL07 ") REFERENCES "
+                        EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("

@@ -17,6 +17,8 @@
 #include <QCheckBox>
 #include <QSplitter>
 #include <QMessageBox>
+#include <QTabWidget>
+#include <QFormLayout>
 #include "jplaintextedit.h"
 #include <QDialogButtonBox>
 #include "jitemhelper.h"
@@ -70,8 +72,8 @@ NoteView::NoteView(QWidget *parent)
   , m_edDisccount(nullptr)
   , m_btnDetails(nullptr)
   , m_dlgDetails(nullptr)
-  , m_lblEntries(nullptr)
-  , m_lblSum(nullptr)
+  , m_edEntries(nullptr)
+  , m_edSum(nullptr)
   , m_dlgDb(nullptr)
 {
   m_btnCreate = new QPushButton();
@@ -240,19 +242,6 @@ NoteView::NoteView(QWidget *parent)
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
-  m_lblEntries = new QLabel;
-  {
-    QFont f = m_lblEntries->font();
-    f.setPointSize(8);
-    m_lblEntries->setFont(f);
-  }
-  m_lblSum = new QLabel;
-  {
-    QFont f = m_lblSum->font();
-    f.setPointSize(8);
-    m_lblSum->setFont(f);
-  }
-
   QHBoxLayout* totalLayout = new QHBoxLayout;
   totalLayout->setContentsMargins(0, 0, 0, 0);
   totalLayout->addWidget(m_edDisccount);
@@ -273,15 +262,26 @@ NoteView::NoteView(QWidget *parent)
   viewFrame->setLayout(viewLayout);
 
   m_database = new JDatabase(NOTE_SQL_TABLE_NAME);
-  m_database->layout()->setContentsMargins(0, 0, 0, 0);
+  m_edEntries = new JLineEdit(JLineEdit::Input::All);
+  m_edEntries->setReadOnly(true);
+  m_edSum = new JLineEdit(JLineEdit::Input::All);
+  m_edSum->setReadOnly(true);
+  QFormLayout* ltDbInfo = new QFormLayout;
+  ltDbInfo->addRow(tr("Número de vales:"), m_edEntries);
+  ltDbInfo->addRow(tr("Soma dos vales:"), m_edSum);
 
-  QVBoxLayout* databaseLayout = new QVBoxLayout;
-  databaseLayout->addWidget(m_database);
-  databaseLayout->addWidget(m_lblEntries);
-  databaseLayout->addWidget(m_lblSum);
+  QFrame* frDbInfo = new QFrame;
+  frDbInfo->setLayout(ltDbInfo);
+
+  QTabWidget* tbdb = new QTabWidget;
+  tbdb->addTab(m_database, QIcon(JItemHelper::icon(NOTE_SQL_TABLE_NAME)), JItemHelper::text(NOTE_SQL_TABLE_NAME));
+  tbdb->addTab(frDbInfo, QIcon(":/icons/res/statistics.png"), tr("Estatísticas"));
+
+  QVBoxLayout* ltdb = new QVBoxLayout;
+  ltdb->addWidget(tbdb);
 
   m_dlgDb = new QDialog(this);
-  m_dlgDb->setLayout(databaseLayout);
+  m_dlgDb->setLayout(ltdb);
   m_dlgDb->setWindowFlags(Qt::Window);
   m_dlgDb->setWindowTitle(JItemHelper::text(NOTE_SQL_TABLE_NAME));
   m_dlgDb->setWindowIcon(QIcon(JItemHelper::icon(NOTE_SQL_TABLE_NAME)));
@@ -385,8 +385,8 @@ void NoteView::updateControls()
 
   m_edTotal->setText(total);
 
-  m_lblEntries->setText(tr("Número de entradas: %1").arg(JItem::st_strInt(m_database->getNumberOfEntries())));
-  m_lblSum->setText(tr("Total: %1").arg(JItem::st_strMoney(m_database->getSum(5))));
+  m_edEntries->setText(JItem::st_strInt(m_database->getNumberOfEntries()));
+  m_edSum->setText(JItem::st_strMoney(m_database->getSum(5)));
 
   emit changedSignal();
 }
@@ -396,16 +396,14 @@ void NoteView::addProduct()
   m_table->addItemAndLoadPrices(m_supplierPicker->getId(), sender() == m_btnAddCode);
 }
 
-// TODO, SALVAR QUEM EDITOU O ITEM
-Note NoteView::save(Employee& e)
+Note NoteView::save()
 {
   Note note = getNote();
-  bool bSuccess = m_database->save(note, &e);
+  bool bSuccess = m_database->save(note);
   if (bSuccess)
   {
     m_lastId = note.m_id;
     QString error;
-    //TODO quickfix
     note.SQL_select(error);
     create();
   }

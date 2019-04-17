@@ -7,10 +7,37 @@
 #include "settingsdlg.h"
 #include "databaseutils.h"
 #include "activeuser.h"
+#include <QMdiArea>
+#include <QPainter>
 
 namespace Ui {
 class Tipi;
 }
+
+class JMdiArea : public QMdiArea
+{
+public:
+    JMdiArea(QWidget *parent = nullptr)
+      : QMdiArea(parent)
+      , m_pixmap(":/icons/res/tipi.png")
+    {
+      setBackground(QBrush(Qt::white));
+      QFont f = font();
+      f.setPointSize(12);
+      setFont(f);
+    }
+protected:
+    void paintEvent(QPaintEvent *event)
+    {
+        QMdiArea::paintEvent(event);
+        QPainter painter(viewport());
+        int x = width()/2 - m_pixmap.width()/2;
+        int y = height()/2 - m_pixmap.height()/2;
+        painter.drawPixmap(x, y, m_pixmap);
+    }
+private:
+    QPixmap m_pixmap;
+};
 
 enum class Functionality : int
 {
@@ -47,6 +74,7 @@ protected:
 private:
   Ui::Tipi *ui;
   ActiveUser m_login;
+  JMdiArea* m_mdi;
   NoteView* m_note;
   ReminderView* m_reminder;
   ConsumptionWidget* m_consumption;

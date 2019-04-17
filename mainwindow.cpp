@@ -72,6 +72,9 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   QTime time = QTime::currentTime();
   qsrand((uint)time.msec());
 
+  m_mdi = new JMdiArea;
+  setCentralWidget(m_mdi);
+
   m_note = new NoteView;
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;
@@ -79,40 +82,36 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_reservation = new ReservationView;
   m_discount = new DiscountView;
 
-  QImage img(":/icons/res/tipialpha.png");
-  img = img.scaled(QSize(144, 144));
-  ui->mdi->setBackground(img);
-
   m_noteWindow = new JMdiSubWindow(this);
   m_noteWindow->setWindowTitle(tr("Vales"));
   m_noteWindow->setWindowIcon(QIcon(":/icons/res/note.png"));
   m_noteWindow->setWidget(m_note);
-  ui->mdi->addSubWindow(m_noteWindow);
+  m_mdi->addSubWindow(m_noteWindow);
   m_reminderWindow = new JMdiSubWindow(this);
   m_reminderWindow->setWindowTitle(tr("Lembretes"));
   m_reminderWindow->setWindowIcon(QIcon(":/icons/res/postit.png"));
   m_reminderWindow->setWidget(m_reminder);
-  ui->mdi->addSubWindow(m_reminderWindow);
+  m_mdi->addSubWindow(m_reminderWindow);
   m_calculatorWindow = new JMdiSubWindow(this);
   m_calculatorWindow->setWindowTitle(tr("Calculadora"));
   m_calculatorWindow->setWindowIcon(QIcon(":/icons/res/calculator.png"));
   m_calculatorWindow->setWidget(m_calculator);
-  ui->mdi->addSubWindow(m_calculatorWindow);
+  m_mdi->addSubWindow(m_calculatorWindow);
   m_shopWindow = new JMdiSubWindow(this);
   m_shopWindow->setWindowTitle(tr("Compras"));
   m_shopWindow->setWindowIcon(QIcon(":/icons/res/shop.png"));
   m_shopWindow->setWidget(m_shop);
-  ui->mdi->addSubWindow(m_shopWindow);
+  m_mdi->addSubWindow(m_shopWindow);
   m_reservationWindow = new JMdiSubWindow(this);
   m_reservationWindow->setWindowTitle(tr("Reservas"));
   m_reservationWindow->setWindowIcon(QIcon(":/icons/res/reservation.png"));
   m_reservationWindow->setWidget(m_reservation);
-  ui->mdi->addSubWindow(m_reservationWindow);
+  m_mdi->addSubWindow(m_reservationWindow);
   m_discountWindow = new JMdiSubWindow(this);
   m_discountWindow->setWindowTitle(tr("Descontos"));
   m_discountWindow->setWindowIcon(QIcon(":/icons/res/discount.png"));
   m_discountWindow->setWidget(m_discount);
-  ui->mdi->addSubWindow(m_discountWindow);
+  m_mdi->addSubWindow(m_discountWindow);
 
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
@@ -237,7 +236,7 @@ void Tipi::disconnectPrinter()
 
 Functionality Tipi::getCurrentFunctionality() const
 {
-  QMdiSubWindow* activeWindow = ui->mdi->activeSubWindow();
+  QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
   if (activeWindow == m_noteWindow)
     return Functionality::Note;
   else if (activeWindow == m_reminderWindow)
@@ -532,32 +531,32 @@ void Tipi::activateWindow()
   if (sender() == ui->actionNotes)
   {
     m_noteWindow->showMaximized();
-    ui->mdi->setActiveSubWindow(m_noteWindow);
+    m_mdi->setActiveSubWindow(m_noteWindow);
   }
   else if (sender() == ui->actionReminders)
   {
     m_reminderWindow->showMaximized();
-    ui->mdi->setActiveSubWindow(m_reminderWindow);
+    m_mdi->setActiveSubWindow(m_reminderWindow);
   }
   else if (sender() == ui->actionCalculator)
   {
     m_calculatorWindow->showMaximized();
-    ui->mdi->setActiveSubWindow(m_calculatorWindow);
+    m_mdi->setActiveSubWindow(m_calculatorWindow);
   }
   else if (sender() == ui->actionShop)
   {
     m_shopWindow->showMaximized();
-    ui->mdi->setActiveSubWindow(m_shopWindow);
+    m_mdi->setActiveSubWindow(m_shopWindow);
   }
   else if (sender() == ui->actionReservations)
   {
     m_reservationWindow->showMaximized();
-    ui->mdi->setActiveSubWindow(m_reservationWindow);
+    m_mdi->setActiveSubWindow(m_reservationWindow);
   }
   else if (sender() == ui->actionDiscount)
   {
     m_discountWindow->showMaximized();
-    ui->mdi->setActiveSubWindow(m_discountWindow);
+    m_mdi->setActiveSubWindow(m_discountWindow);
   }
   updateControls();
 }

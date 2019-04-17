@@ -9,6 +9,8 @@
 #include "product.h"
 #include "defines.h"
 #include "jitemsql.h"
+#include "employee.h"
+#include "payment.h"
 
 enum class NoteColumn : int
 {
@@ -56,8 +58,9 @@ struct Note : public JItemSQL
 
   bool SQL_authentication_insert_update() const { return true; }
   bool SQL_authentication_remove() const { return true; }
-
   static NoteItem SQL_select_last_item(Id supplierId, Id productId);
+
+  void setEmployee(const JItemSQL& e) const;
 
   QString strDate() const;
   QString strDayOfWeek() const;
@@ -71,10 +74,12 @@ struct Note : public JItemSQL
   mutable qlonglong m_number;
   QDate m_date;
   Supplier m_supplier;
-  bool m_bCash;
+  Payment::Method m_paymentMethod;
+  QVector<Payment> m_vPayment;
   QString m_observation;
   QVector<NoteItem> m_vNoteItem;
   double m_disccount;
+  mutable Employee m_employee;
 };
 
 #endif // COMMON_H

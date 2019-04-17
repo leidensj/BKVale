@@ -29,6 +29,7 @@ struct JItemSQL : public JItem
 
   virtual QString name() const { return "Nome não implementado."; }
   virtual QByteArray image() const { return QByteArray(); }
+  virtual void setEmployee(const JItemSQL& /*e*/) const { }
 
   static bool SQL_isOpen(QString& error);
   static bool SQL_finish(QSqlDatabase db,

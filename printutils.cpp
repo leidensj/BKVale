@@ -58,7 +58,7 @@ namespace
                ESC_VERT_TAB
                ESC_EXPAND_OFF;
 
-    strNote += note.m_bCash
+    strNote += note.m_paymentMethod == Payment::Method::Cash
                ? "PAGAMENTO A VISTA"
                : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";
 
@@ -139,7 +139,7 @@ namespace
                user +
                ESC_LF;
 
-    if (note.m_bCash)
+    if (note.m_paymentMethod == Payment::Method::Cash)
     {
       strNote += ESC_LF
                  ESC_LF
@@ -234,14 +234,13 @@ QString Printer::strCmdFullCut()
   return ESC_FULL_CUT;
 }
 
-QString NotePrinter::build(const Note& note,
-                           const QString& user)
+QString NotePrinter::build(const Note& note)
 {
   QString strNote1;
   noteAppendHeader(note, strNote1);
   noteAppendBody(note, strNote1);
-  noteAppendFooter(note, user, strNote1);
-  if (note.m_bCash)
+  noteAppendFooter(note, note.m_employee.m_form.strAliasName(), strNote1);
+  if (note.m_paymentMethod == Payment::Method::Cash)
   {
     return strNote1 + ESC_LF ESC_FULL_CUT;
   }

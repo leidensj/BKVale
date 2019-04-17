@@ -438,7 +438,7 @@ JItemSQL* JDatabase::getCurrentItem() const
   return m_currentItems.size() != 0 ? m_currentItems.at(0) : nullptr;
 }
 
-bool JDatabase::save(const JItemSQL& o, Employee* pEmployee)
+bool JDatabase::save(const JItemSQL& o)
 {
   if (JItemHelper::authenticationToInsertUpdate(m_tableName))
   {
@@ -447,8 +447,6 @@ bool JDatabase::save(const JItemSQL& o, Employee* pEmployee)
       return false;
 
     Employee e = w.getEmployee();
-    if (pEmployee != nullptr)
-      *pEmployee = e;
     QString error;
     if (!e.m_id.isValid())
       error = tr("Pincode informado não encontrado.");
@@ -460,6 +458,7 @@ bool JDatabase::save(const JItemSQL& o, Employee* pEmployee)
       QMessageBox::warning(this, tr("Erro"), error, QMessageBox::Ok);
       return false;
     }
+    o.setEmployee(e);
   }
 
   QString error;

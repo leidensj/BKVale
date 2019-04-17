@@ -32,8 +32,7 @@ namespace Printer
 
 namespace NotePrinter
 {
-  QString build(const Note& note,
-                const QString& user);
+  QString build(const Note& note);
 }
 
 namespace ReminderPrinter

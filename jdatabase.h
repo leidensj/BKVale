@@ -55,7 +55,7 @@ public:
   int getNumberOfEntries() const;
   double getSum(int column) const;
 
-  bool save(const JItemSQL& jItem, Employee* pEmployee = nullptr);
+  bool save(const JItemSQL& jItem);
 
 public slots:
   void refresh();

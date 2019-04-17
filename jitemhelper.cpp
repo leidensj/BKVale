@@ -121,7 +121,7 @@ QString JItemHelper::text(const QString& tableName)
 QString JItemHelper::icon(const QString& tableName)
 {
   if (tableName == IMAGE_SQL_TABLE_NAME)
-    return ":/icons/res/icon.png";;
+    return ":/icons/res/icon.png";
   if (tableName == FORM_SQL_TABLE_NAME)
     return ":/icons/res/resume.png";
   if (tableName == CATEGORY_SQL_TABLE_NAME)

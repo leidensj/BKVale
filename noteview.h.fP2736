@@ -1,5 +1,5 @@
-#ifndef NOTEVIEW_H
-#define NOTEVIEW_H
+#ifndef BKFRAME_H
+#define BKFRAME_H
 
 #include <QFrame>
 #include <QStringList>
@@ -23,9 +23,6 @@ class JExpLineEdit;
 class JPlainTextEdit;
 class JDatePicker;
 class QLabel;
-class JLineEdit;
-class QTableWidget;
-class QRadioButton;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -37,43 +34,6 @@ public:
   explicit NoteDetailsDlg(QWidget* parent = nullptr);
   void setDetails(const QString& str);
   QString getDetails() const;
-};
-
-class PaymentDlg : public QDialog
-{
-  Q_OBJECT
-
-  QTableWidget* m_table;
-  QRadioButton* m_rdoCredit;
-  QRadioButton* m_rdoCash;
-  QRadioButton* m_rdoBonus;
-  QPushButton* m_btnAdd;
-  QPushButton* m_btnRemove;
-
-  double m_noteTotal;
-  QDate m_noteDate;
-
-  enum class Column
-  {
-    Number,
-    Date,
-    Value
-  };
-
-public:
-  explicit PaymentDlg(QWidget* parent = nullptr);
-  QVector<Payment> getPayments() const;
-  void setPayment(const QVector<Payment>& v);
-  void setNoteTotal(double total);
-  void setNoteDate(const QDate& date);
-
-private slots:
-  void updateControls();
-  void addRow();
-  void removeRow();
-
-signals:
-  void isValidSignal(bool b);
 };
 
 class NoteView : public QFrame
@@ -100,13 +60,13 @@ private:
   JExpLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
-  QPushButton* m_btnPayment;
+  QCheckBox* m_cbCash;
   JDatabase* m_database;
   JExpLineEdit* m_edDisccount;
   QPushButton* m_btnDetails;
   NoteDetailsDlg* m_dlgDetails;
-  JLineEdit* m_edEntries;
-  JLineEdit* m_edSum;
+  JLineEdit* m_lblEntries;
+  QLabel* m_lblSum;
   QDialog* m_dlgDb;
 
 private slots:
@@ -117,16 +77,15 @@ private slots:
   void itemsRemoved(const QVector<Id>& ids);
   void addProduct();
   void openDetailsDialog();
-  void openPaymentDialog();
 
 public slots:
   void create();
   void setNote(const Note& note);
   void updateControls();
-  Note save();
+  Note save(Employee& e);
 
 signals:
   void changedSignal();
 };
 
-#endif // NOTEVIEW_H
+#endif // BKFRAME_H

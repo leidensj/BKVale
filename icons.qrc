@@ -162,5 +162,8 @@
         <file>res/tipi.png</file>
         <file>res/tipialpha.png</file>
         <file>res/statistics.png</file>
+        <file>res/credit.png</file>
+        <file>res/payment.png</file>
+        <file>res/bonus.png</file>
     </qresource>
 </RCC>

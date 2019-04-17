@@ -10,6 +10,7 @@
 #include "defines.h"
 #include "jitemsql.h"
 #include "employee.h"
+#include "payment.h"
 
 enum class NoteColumn : int
 {
@@ -73,7 +74,8 @@ struct Note : public JItemSQL
   mutable qlonglong m_number;
   QDate m_date;
   Supplier m_supplier;
-  bool m_bCash;
+  Payment::Method m_paymentMethod;
+  QVector<Payment> m_vPayment;
   QString m_observation;
   QVector<NoteItem> m_vNoteItem;
   double m_disccount;

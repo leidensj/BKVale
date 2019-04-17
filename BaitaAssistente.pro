@@ -79,7 +79,8 @@ SOURCES += main.cpp\
     activeuser.cpp \
     jitemsql.cpp \
     supplierview.cpp \
-    userview.cpp
+    userview.cpp \
+    payment.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -152,7 +153,8 @@ HEADERS  += mainwindow.h \
     jmodel.h \
     activeuser.h \
     supplierview.h \
-    userview.h
+    userview.h \
+    payment.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

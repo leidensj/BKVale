@@ -26,6 +26,7 @@ class QLabel;
 class JLineEdit;
 class QTableWidget;
 class QRadioButton;
+class JAddRemoveButtons;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -47,11 +48,12 @@ class PaymentDlg : public QDialog
   QRadioButton* m_rdoCredit;
   QRadioButton* m_rdoCash;
   QRadioButton* m_rdoBonus;
-  QPushButton* m_btnAdd;
-  QPushButton* m_btnRemove;
+  JAddRemoveButtons* m_btnAddRemove;
 
   double m_noteTotal;
   QDate m_noteDate;
+
+  double computeTotal() const;
 
   enum class Column
   {
@@ -64,6 +66,8 @@ public:
   explicit PaymentDlg(QWidget* parent = nullptr);
   QVector<Payment> getPayments() const;
   void setPayment(const QVector<Payment>& v);
+  Payment::Method getMethod() const;
+  void setMethod(Payment::Method m);
   void setNoteTotal(double total);
   void setNoteDate(const QDate& date);
 
@@ -105,6 +109,7 @@ private:
   JExpLineEdit* m_edDisccount;
   QPushButton* m_btnDetails;
   NoteDetailsDlg* m_dlgDetails;
+  PaymentDlg* m_dlgPayment;
   JLineEdit* m_edEntries;
   JLineEdit* m_edSum;
   QDialog* m_dlgDb;

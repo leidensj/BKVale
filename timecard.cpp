@@ -219,6 +219,9 @@ void TimeCard::saveAndAccept()
                                                   ".pdf",
                                                   tr("PDF (*.pdf)"));
 
+  if (fileName.isEmpty())
+    return;
+
   QProgressDialog progress(tr("Gerando livro ponto..."), QString(), 0, 3, this);
   progress.setWindowModality(Qt::WindowModal);
 

@@ -356,9 +356,16 @@ QVector<Employee> Employee::SQL_select_from_store(Id storeId)
     {
       Employee e;
       e.m_id = query.value(0).toLongLong();
-      e.SQL_select_proc(query, error);
       v.push_back(e);
     }
+
+    for (int i = 0; i != v.size(); ++i)
+    {
+      bSuccess = v[i].SQL_select_proc(query, error);
+      if (!bSuccess)
+        break;
+    }
+
     SQL_finish(db, query, bSuccess, error);
   }
 

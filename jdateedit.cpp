@@ -4,6 +4,7 @@
 JDateEdit::JDateEdit(QWidget* parent)
   : QDateEdit(parent)
 {
+  setDisplayFormat("dd/MM/yyyy");
 }
 
 void JDateEdit::keyPressEvent(QKeyEvent *event)

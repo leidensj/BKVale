@@ -80,7 +80,8 @@ SOURCES += main.cpp\
     jitemsql.cpp \
     supplierview.cpp \
     userview.cpp \
-    payment.cpp
+    payment.cpp \
+    jaddremovebuttons.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -154,7 +155,8 @@ HEADERS  += mainwindow.h \
     activeuser.h \
     supplierview.h \
     userview.h \
-    payment.h
+    payment.h \
+    jaddremovebuttons.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

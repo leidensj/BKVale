@@ -46,6 +46,7 @@ private:
     Shop,
     Reservation,
     Discount,
+    TimeCard,
     Settings
   };
 

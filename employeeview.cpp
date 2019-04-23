@@ -52,6 +52,7 @@ TimeIntervalWidget::TimeIntervalWidget(QWidget* parent)
 
 void TimeIntervalWidget::setItems(const QVector<TimeInterval>& v)
 {
+  m_spn->setValue(v.size() < 10 ? v.size() : 10);
   for (int i = 0; i != (v.size() < 10 ? v.size() : 10); ++i)
   {
     m_tmBegin[i]->setTime(v.at(i).m_tmBegin);

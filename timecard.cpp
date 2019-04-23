@@ -110,6 +110,9 @@ void TimeCard::saveAndAccept()
                           "CEP: " + o.m_address.m_cep,
                           o.m_address.m_city + " " + o.m_address.getBRState().m_abv);
 
+  // página em branco
+  html += "<p style=\"page-break-after: always;\">&nbsp;</p>";
+
   QLocale br(QLocale::Portuguese, QLocale::Brazil);
 
   QVector<Employee> v(Employee::SQL_select_from_store(o.m_id));

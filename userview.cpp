@@ -65,6 +65,10 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
         strIcon = ":/icons/res/shop.png";
         strText = "Compras";
         break;
+      case (int)Idx::TimeCard:
+        strIcon = ":/icons/res/timecard.png";
+        strText = "Livro Ponto";
+        break;
       case (int)Idx::Settings:
         strIcon = ":/icons/res/settings.png";
         strText = "Configurações";
@@ -137,6 +141,7 @@ const JItemSQL& UserView::getItem() const
   m_ref.m_bShoppingList = m_list->item((int)Idx::ShoppingList)->checkState() == Qt::Checked ? true : false;
   m_ref.m_bStore = m_list->item((int)Idx::Store)->checkState() == Qt::Checked ? true : false;
   m_ref.m_bDiscount = m_list->item((int)Idx::Discount)->checkState() == Qt::Checked ? true : false;
+  m_ref.m_bTimeCard = m_list->item((int)Idx::TimeCard)->checkState() == Qt::Checked ? true : false;
   return m_ref;
 }
 
@@ -164,6 +169,7 @@ void UserView::setItem(const JItemSQL& o)
   m_list->item((int)Idx::Reservation)->setCheckState(_o.m_bReservation ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Discount)->setCheckState(_o.m_bDiscount ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Settings)->setCheckState(_o.m_bSettings ? Qt::Checked : Qt::Unchecked);
+  m_list->item((int)Idx::TimeCard)->setCheckState(_o.m_bTimeCard ? Qt::Checked : Qt::Unchecked);
 }
 
 void UserView::create()

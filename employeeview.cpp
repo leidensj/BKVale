@@ -8,90 +8,9 @@
 #include "jtimeedit.h"
 #include <QPushButton>
 #include "timeinterval.h"
-
-TimeIntervalWidget::TimeIntervalWidget(QWidget* parent)
-  : QWidget(parent)
-{
-  setWindowTitle(tr("Intervalos de Tempo"));
-  setWindowIcon(QIcon(":/icons/res/timespan.png"));
-  setMinimumWidth(300);
-  m_spn = new JSpinBox;
-  m_spn->setMinimum(0);
-  m_spn->setMaximum(10);
-
-  QVBoxLayout* ltMain = new QVBoxLayout;
-  ltMain->addWidget(m_spn);
-
-  QHBoxLayout* ltHeader = new QHBoxLayout;
-  ltHeader->setContentsMargins(0, 0, 0, 0);
-  ltHeader->addWidget(new QLabel(tr("Início:")));
-  ltHeader->addWidget(new QLabel(tr("Fim:")));
-
-  ltMain->addLayout(ltHeader);
-
-  for (int i = 0; i != 10; ++i)
-  {
-    m_tmBegin[i] = new JTimeEdit;
-    m_tmEnd[i] = new JTimeEdit;
-    m_tmBegin[i]->setDisplayFormat("hh:mm");
-    m_tmEnd[i]->setDisplayFormat("hh:mm");
-    QHBoxLayout* lt = new QHBoxLayout;
-    lt->setContentsMargins(0, 0, 0, 0);
-    lt->addWidget(m_tmBegin[i]);
-    lt->addWidget(m_tmEnd[i]);
-    ltMain->addLayout(lt);
-  }
-
-  setLayout(ltMain);
-
-  connect(m_spn, SIGNAL(valueChanged(int)), this, SLOT(adjustControls()));
-
-  adjustControls();
-  validate();
-}
-
-void TimeIntervalWidget::setItems(const QVector<TimeInterval>& v)
-{
-  m_spn->setValue(v.size() < 10 ? v.size() : 10);
-  for (int i = 0; i != (v.size() < 10 ? v.size() : 10); ++i)
-  {
-    m_tmBegin[i]->setTime(v.at(i).m_tmBegin);
-    m_tmEnd[i]->setTime(v.at(i).m_tmEnd);
-  }
-}
-
-QVector<TimeInterval> TimeIntervalWidget::getItems() const
-{
-  QVector<TimeInterval> v;
-  for (int i = 0; i != m_spn->value(); ++i)
-  {
-    TimeInterval o;
-    o.m_tmBegin = m_tmBegin[i]->time();
-    o.m_tmEnd = m_tmEnd[i]->time();
-    v.push_back(o);
-  }
-  return v;
-}
-
-void TimeIntervalWidget::validate()
-{
-
-}
-
-void TimeIntervalWidget::adjustControls()
-{
-  for (int i = m_spn->value(); i != 10; ++i)
-  {
-    m_tmBegin[i]->hide();
-    m_tmEnd[i]->hide();
-  }
-  for (int i = 0; i != m_spn->value(); ++i)
-  {
-    m_tmBegin[i]->show();
-    m_tmEnd[i]->show();
-  }
-  setMaximumHeight(sizeHint().height());
-}
+#include <QTableWidget>
+#include <QHeaderView>
+#include "jaddremovebuttons.h"
 
 EmployeeView::EmployeeView(QWidget* parent)
   : JItemView(EMPLOYEE_SQL_TABLE_NAME, parent)
@@ -100,7 +19,8 @@ EmployeeView::EmployeeView(QWidget* parent)
   , m_edPincode(nullptr)
   , m_cbNoteEdit(nullptr)
   , m_cbNoteRemove(nullptr)
-  , m_time(nullptr)
+  , m_tbHours(nullptr)
+  , m_btnAddRemove(nullptr)
 {
   m_formPicker = new JDatabasePicker(FORM_SQL_TABLE_NAME);
   m_formPicker->getDatabase()->setFixedFilter(EMPLOYEE_UNIQUE_FORM_FILTER);
@@ -112,6 +32,16 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_cbNoteRemove = new QCheckBox;
   m_cbNoteRemove->setText(tr("Remover"));
   m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
+  m_tbHours = new QTableWidget();
+  m_tbHours->setColumnCount(2);
+  QStringList headers;
+  headers << "Início" << "Fim";
+  m_tbHours->setHorizontalHeaderLabels(headers);
+  m_tbHours->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+  m_tbHours->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+  m_tbHours->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_tbHours->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_btnAddRemove = new JAddRemoveButtons;
 
   QFormLayout* lt = new QFormLayout;
   lt->addRow(m_formPicker->getText() + ":", m_formPicker);
@@ -123,17 +53,22 @@ EmployeeView::EmployeeView(QWidget* parent)
   QFrame* fr = new QFrame;
   fr->setLayout(lt);
 
-  m_time = new TimeIntervalWidget;
-
   QVBoxLayout* ltHours = new QVBoxLayout;
-  ltHours->addWidget(m_time);
-  ltHours->addStretch();
+  ltHours->addWidget(m_btnAddRemove);
+  ltHours->addWidget(m_tbHours);
 
   QFrame* frHours = new QFrame;
   frHours->setLayout(ltHours);
 
   m_tab->addTab(fr, QIcon(":/icons/res/employee.png"), tr("Funcionário"));
   m_tab->addTab(frHours, QIcon(":/icons/res/clock.png"), tr("Horário"));
+
+  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addHour()));
+  connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeHour()));
+
+  connect(m_tbHours, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
+
+  updateControls();
 }
 
 void EmployeeView::create()
@@ -150,7 +85,13 @@ const JItemSQL& EmployeeView::getItem() const
   m_ref.m_pincode = m_edPincode->text();
   m_ref.m_bNoteEdit = m_cbNoteEdit->isChecked();
   m_ref.m_bNoteRemove = m_cbNoteRemove->isChecked();
-  m_ref.m_hours = m_time->getItems();
+  for (int i = 0; i != m_tbHours->rowCount(); ++i)
+  {
+    TimeInterval t;
+    t.m_tmBegin = dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 0))->time();
+    t.m_tmEnd = dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 1))->time();
+    m_ref.m_hours.push_back(t);
+  }
   return m_ref;
 }
 
@@ -163,5 +104,36 @@ void EmployeeView::setItem(const JItemSQL& o)
   m_edPincode->setText(ref.m_pincode);
   m_cbNoteEdit->setChecked(ref.m_bNoteEdit);
   m_cbNoteRemove->setChecked(ref.m_bNoteRemove);
-  m_time->setItems(ref.m_hours);
+  m_tbHours->setRowCount(0);
+  for (int i = 0; i != ref.m_hours.size(); ++i)
+  {
+    addHour();
+    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 0))->setTime(ref.m_hours.at(i).m_tmBegin);
+    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 1))->setTime(ref.m_hours.at(i).m_tmEnd);
+  }
+}
+
+void EmployeeView::addHour()
+{
+  JTimeEdit* begin = new JTimeEdit;
+  JTimeEdit* end = new JTimeEdit;
+  m_tbHours->insertRow(m_tbHours->rowCount());
+  int row = m_tbHours->rowCount() - 1;
+  m_tbHours->setCellWidget(row, 0, begin);
+  m_tbHours->setCellWidget(row, 1, end);
+  m_tbHours->setCurrentCell(row, 0, QItemSelectionModel::ClearAndSelect);
+  begin->setFocus();
+  updateControls();
+}
+
+void EmployeeView::removeHour()
+{
+  if (m_tbHours->currentRow() >= 0)
+    m_tbHours->removeRow(m_tbHours->currentRow());
+  updateControls();
+}
+
+void EmployeeView::updateControls()
+{
+  m_btnAddRemove->m_btnRemove->setEnabled(m_tbHours->currentRow() >= 0);
 }

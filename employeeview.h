@@ -9,28 +9,11 @@ class QPushButton;
 class JLineEdit;
 class JDatabasePicker;
 class QCheckBox;
-class TimeIntervalWidget;
+class QTableWidget;
 class JTimeEdit;
 class JSpinBox;
 class QLabel;
-
-class TimeIntervalWidget : public QWidget
-{
-  Q_OBJECT
-
-  JTimeEdit* m_tmBegin[10];
-  JTimeEdit* m_tmEnd[10];
-  JSpinBox* m_spn;
-
-public:
-  explicit TimeIntervalWidget(QWidget* parent = nullptr);
-  void setItems(const QVector<TimeInterval>& v);
-  QVector<TimeInterval> getItems() const;
-
-private slots:
-  void validate();
-  void adjustControls();
-};
+class JAddRemoveButtons;
 
 class EmployeeView : public JItemView
 {
@@ -43,6 +26,11 @@ public:
 public slots:
   void create();
 
+private slots:
+  void addHour();
+  void removeHour();
+  void updateControls();
+
 private:
   mutable Employee m_ref;
   JDatabasePicker* m_formPicker;
@@ -50,7 +38,8 @@ private:
   JLineEdit* m_edPincode;
   QCheckBox* m_cbNoteEdit;
   QCheckBox* m_cbNoteRemove;
-  TimeIntervalWidget* m_time;
+  QTableWidget* m_tbHours;
+  JAddRemoveButtons* m_btnAddRemove;
   void setItem(const JItemSQL& o);
 };
 

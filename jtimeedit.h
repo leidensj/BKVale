@@ -19,6 +19,8 @@ public:
 
 protected:
   void keyPressEvent(QKeyEvent *event);
+  void focusInEvent(QFocusEvent *event);
+  void mousePressEvent(QMouseEvent *event);
 
 private:
   int m_flags;
@@ -27,6 +29,8 @@ signals:
   void enterSignal();
   void keyDownSignal();
   void keyUpSignal();
+  void focusSignal();
+  void mousePressedSignal();
 };
 
 #endif // JTIMEEDIT_H

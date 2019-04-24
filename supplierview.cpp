@@ -1,21 +1,27 @@
 #include "supplierview.h"
-#include "jdatabasepicker.h"
+#include "formwidget.h"
 #include <QFormLayout>
+#include <QRadioButton>
 
 SupplierView::SupplierView(QWidget* parent)
   : JItemView(SUPPLIER_SQL_TABLE_NAME, parent)
-  , m_formPicker(nullptr)
+  , m_formInfo(nullptr)
+  , m_formDetails(nullptr)
+  , m_formPhone(nullptr)
+  , m_formAddress(nullptr)
 {
-  m_formPicker = new JDatabasePicker(FORM_SQL_TABLE_NAME);
-  m_formPicker->getDatabase()->setFixedFilter(SUPPLIER_UNIQUE_FORM_FILTER);
+  m_formInfo = new FormInfoWidget;
+  m_formDetails = new FormDetailsWidget;
+  m_formPhone = new FormPhoneWidget;
+  m_formAddress= new FormAddressWidget;
 
-  QFormLayout* lt = new QFormLayout;
-  lt->addRow(m_formPicker->getText() + ":", m_formPicker);
+  m_tab->addTab(m_formInfo, QIcon(":/icons/res/resume.png"), tr("Informações"));
+  m_tab->addTab(m_formDetails, QIcon(":/icons/res/details.png"), tr("Detalhes"));
+  m_tab->addTab(m_formPhone, QIcon(":/icons/res/phone.png"), tr("Telefone"));
+  m_tab->addTab(m_formAddress, QIcon(":/icons/res/address.png"), tr("Endereço"));
 
-  QFrame* fr = new QFrame;
-  fr->setLayout(lt);
-
-  m_tab->addTab(fr, QIcon(":/icons/res/supplier.png"), tr("Fornecedor"));
+  connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
+  m_formInfo->setCompany(true);
 }
 
 void SupplierView::create()
@@ -27,7 +33,10 @@ const JItemSQL& SupplierView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
-  m_ref.m_form.m_id = m_formPicker->getId();
+  m_formInfo->fillForm(m_ref.m_form);
+  m_formDetails->fillForm(m_ref.m_form);
+  m_formPhone->fillForm(m_ref.m_form);
+  m_formAddress->fillForm(m_ref.m_form);
   return m_ref;
 }
 
@@ -35,5 +44,8 @@ void SupplierView::setItem(const JItemSQL& o)
 {
   auto ref = static_cast<const Supplier&>(o);
   m_currentId = o.m_id;
-  m_formPicker->setItem(ref.m_form);
+  m_formInfo->fillForm(ref.m_form);
+  m_formDetails->fillForm(ref.m_form);
+  m_formPhone->fillForm(ref.m_form);
+  m_formAddress->fillForm(ref.m_form);
 }

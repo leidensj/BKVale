@@ -4,7 +4,10 @@
 #include "supplier.h"
 #include "jitemview.h"
 
-class JDatabasePicker;
+class FormInfoWidget;
+class FormDetailsWidget;
+class FormPhoneWidget;
+class FormAddressWidget;
 
 class SupplierView : public JItemView
 {
@@ -19,7 +22,10 @@ public slots:
 
 private:
   mutable Supplier m_ref;
-  JDatabasePicker* m_formPicker;
+  FormInfoWidget* m_formInfo;
+  FormDetailsWidget* m_formDetails;
+  FormPhoneWidget* m_formPhone;
+  FormAddressWidget* m_formAddress;
   void setItem(const JItemSQL& o);
 };
 

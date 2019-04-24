@@ -1,48 +1,40 @@
 #include "storeview.h"
 #include "jlineedit.h"
-#include "jdatabasepicker.h"
 #include "jplaintextedit.h"
+#include "formwidget.h"
 #include <QLayout>
 #include <QFormLayout>
-#include <qlistwidget.h>
+#include <QListWidget>
+#include <QRadioButton>
+#include <QLabel>
+#include <QDateEdit>
 
 StoreView::StoreView(QWidget* parent)
   : JItemView(STORE_SQL_TABLE_NAME, parent)
-  , m_teDescription(nullptr)
-  , m_formPicker(nullptr)
-  , m_addressPicker(nullptr)
-  , m_phonePicker(nullptr)
+  , m_formInfo(nullptr)
+  , m_formDetails(nullptr)
+  , m_formPhone(nullptr)
+  , m_formAddress(nullptr)
 {
-  m_teDescription = new JPlainTextEdit;
-
-  m_formPicker = new JDatabasePicker(FORM_SQL_TABLE_NAME);
-  m_formPicker->getDatabase()->setFixedFilter(FORM_FILTER_COMPANY);
-
-  // TODO MOSTRAR APENAS TELEFONE DA PESSOA
-  m_addressPicker = new JDatabasePicker(ADDRESS_SQL_TABLE_NAME);
-  m_phonePicker = new JDatabasePicker(PHONE_SQL_TABLE_NAME);
-
-  QFormLayout* tablayout = new QFormLayout;
-  tablayout->setAlignment(Qt::AlignTop);
-  tablayout->addRow(m_formPicker->getText() + ":", m_formPicker);
-  tablayout->addRow(m_addressPicker->getText() + ":", m_addressPicker);
-  tablayout->addRow(m_phonePicker->getText() + ":", m_phonePicker);
-  tablayout->addRow(tr("Descrição:"), m_teDescription);
-
+  m_formInfo = new FormInfoWidget;
+  m_formDetails = new FormDetailsWidget;
+  m_formPhone = new FormPhoneWidget;
+  m_formAddress= new FormAddressWidget;
   m_list = new QListWidget;
-  QVBoxLayout* ltEmployee = new QVBoxLayout;
-  ltEmployee->addWidget(m_list);
 
-  QFrame* fr = new QFrame;
-  fr->setLayout(tablayout);
+  m_tab->addTab(m_formInfo, QIcon(":/icons/res/resume.png"), tr("Informações"));
+  m_tab->addTab(m_formDetails, QIcon(":/icons/res/details.png"), tr("Detalhes"));
+  m_tab->addTab(m_formPhone, QIcon(":/icons/res/phone.png"), tr("Telefone"));
+  m_tab->addTab(m_formAddress, QIcon(":/icons/res/address.png"), tr("Endereço"));
+  m_tab->addTab(m_list, QIcon(":/icons/res/employee.png"), tr("Funcionários"));
 
-  QFrame* frEmployee = new QFrame;
-  frEmployee->setLayout(ltEmployee);
+  connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
 
-  m_tab->addTab(fr, QIcon(":/icons/res/store.png"), tr("Loja"));
-  m_tab->addTab(frEmployee, QIcon(":/icons/res/employee.png"), tr("Funcionários"));
-
-  connect(m_formPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  m_formInfo->m_lblCreationDate->hide();
+  m_formInfo->m_dtCreationDate->hide();
+  m_formInfo->m_lblType->hide();
+  m_formInfo->m_type->hide();
+  m_formInfo->setCompany(true);
   updateControls();
 }
 
@@ -54,25 +46,17 @@ void StoreView::create()
 
 void StoreView::updateControls()
 {
-  m_phonePicker->setEnabled(m_formPicker->getId().isValid());
-  m_addressPicker->setEnabled(m_formPicker->getId().isValid());
-  if (m_formPicker->getId().isValid())
-  {
-    m_phonePicker->getDatabase()->setFixedFilter(PHONE_FORM_FILTER +
-                                                 m_formPicker->getId().str());
-    m_addressPicker->getDatabase()->setFixedFilter(ADDRESS_FORM_FILTER +
-                                                 m_formPicker->getId().str());
-  }
+  //TODO
 }
 
 const JItemSQL& StoreView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
-  m_ref.m_form.m_id = m_formPicker->getId();
-  m_ref.m_address.m_id = m_addressPicker->getId();
-  m_ref.m_phone.m_id = m_phonePicker->getId();
-  m_ref.m_description = m_teDescription->toPlainText();
+  m_formInfo->fillForm(m_ref.m_form);
+  m_formDetails->fillForm(m_ref.m_form);
+  m_formPhone->fillForm(m_ref.m_form);
+  m_formAddress->fillForm(m_ref.m_form);
   return m_ref;
 }
 
@@ -80,10 +64,10 @@ void StoreView::setItem(const JItemSQL& o)
 {
   const Store& ref = static_cast<const Store&>(o);
   m_currentId = o.m_id;
-  m_teDescription->setPlainText(ref.m_description);
-  m_formPicker->setItem(ref.m_form);
-  m_addressPicker->setItem(ref.m_address);
-  m_phonePicker->setItem(ref.m_phone);
+  m_formInfo->setForm(ref.m_form);
+  m_formDetails->setForm(ref.m_form);
+  m_formPhone->setForm(ref.m_form);
+  m_formAddress->setForm(ref.m_form);
   m_list->clear();
   m_list->addItems(ref.SQL_select_employees());
 }

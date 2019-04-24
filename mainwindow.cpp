@@ -13,7 +13,6 @@
 #include "userview.h"
 #include "imageview.h"
 #include "logindialog.h"
-#include "formview.h"
 #include "shoppinglistview.h"
 #include "reservationview.h"
 #include "discountview.h"
@@ -140,7 +139,6 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   connect(m_discount, SIGNAL(redeemSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
 
-  connect(ui->actionForms, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionStores, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
@@ -388,7 +386,6 @@ void Tipi::updateControls()
   ui->actionLogin->setEnabled(bIsSQLOk);
   ui->actionUsers->setEnabled(bIsSQLOk && m_login.getUser().m_bUser);
   ui->actionProducts->setEnabled(bIsSQLOk && m_login.getUser().m_bProduct);
-  ui->actionForms->setEnabled(bIsSQLOk && m_login.getUser().m_bForm);
   ui->actionCategories->setEnabled(bIsSQLOk && m_login.getUser().m_bCategory);
   ui->actionImages->setEnabled(bIsSQLOk && m_login.getUser().m_bImage);
   ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShoppingList);
@@ -442,8 +439,6 @@ void Tipi::openJItemSQLDialog()
     view = new CategoryView;
   else if (sender() == ui->actionEmployees)
     view = new EmployeeView;
-  else if (sender() == ui->actionForms)
-    view = new FormView;
   else if (sender() == ui->actionImages)
     view = new ImageView;
   else if (sender() == ui->actionProducts)

@@ -66,7 +66,6 @@
    </attribute>
    <addaction name="actionLogin"/>
    <addaction name="separator"/>
-   <addaction name="actionForms"/>
    <addaction name="actionSuppliers"/>
    <addaction name="actionProducts"/>
    <addaction name="separator"/>
@@ -101,10 +100,8 @@
      <property name="title">
       <string>Pessoas</string>
      </property>
-     <addaction name="actionForms"/>
      <addaction name="actionEmployees"/>
      <addaction name="actionSuppliers"/>
-     <addaction name="actionStores"/>
     </widget>
     <addaction name="menuPessoas"/>
     <addaction name="actionProducts"/>
@@ -112,6 +109,7 @@
     <addaction name="actionImages"/>
     <addaction name="actionShoppingList"/>
     <addaction name="actionUsers"/>
+    <addaction name="actionStores"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
     <property name="title">
@@ -138,9 +136,17 @@
     </property>
     <addaction name="actionTimeCard"/>
    </widget>
+   <widget class="QMenu" name="menuProt_tipos">
+    <property name="title">
+     <string>Protótipos</string>
+    </property>
+    <addaction name="actionReservations"/>
+    <addaction name="actionDiscount"/>
+   </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
    <addaction name="menuFerramentas"/>
+   <addaction name="menuProt_tipos"/>
    <addaction name="menuImpressora"/>
    <addaction name="menuConfigura_es"/>
    <addaction name="menuAjuda"/>
@@ -168,8 +174,6 @@
    <addaction name="actionReminders"/>
    <addaction name="actionCalculator"/>
    <addaction name="actionShop"/>
-   <addaction name="actionReservations"/>
-   <addaction name="actionDiscount"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">
@@ -262,18 +266,6 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar preços</string>
-   </property>
-  </action>
-  <action name="actionForms">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/resume.png</normaloff>:/icons/res/resume.png</iconset>
-   </property>
-   <property name="text">
-    <string>Perfis</string>
-   </property>
-   <property name="toolTip">
-    <string>Gerenciar perfis</string>
    </property>
   </action>
   <action name="actionShoppingList">

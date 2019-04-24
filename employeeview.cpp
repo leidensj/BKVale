@@ -10,11 +10,16 @@
 #include "timeinterval.h"
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QRadioButton>
 #include "jaddremovebuttons.h"
+#include "formwidget.h"
 
 EmployeeView::EmployeeView(QWidget* parent)
   : JItemView(EMPLOYEE_SQL_TABLE_NAME, parent)
-  , m_formPicker(nullptr)
+  , m_formInfo(nullptr)
+  , m_formDetails(nullptr)
+  , m_formPhone(nullptr)
+  , m_formAddress(nullptr)
   , m_storePicker(nullptr)
   , m_edPincode(nullptr)
   , m_cbNoteEdit(nullptr)
@@ -22,8 +27,10 @@ EmployeeView::EmployeeView(QWidget* parent)
   , m_tbHours(nullptr)
   , m_btnAddRemove(nullptr)
 {
-  m_formPicker = new JDatabasePicker(FORM_SQL_TABLE_NAME);
-  m_formPicker->getDatabase()->setFixedFilter(EMPLOYEE_UNIQUE_FORM_FILTER);
+  m_formInfo = new FormInfoWidget;
+  m_formDetails = new FormDetailsWidget;
+  m_formPhone = new FormPhoneWidget;
+  m_formAddress= new FormAddressWidget;
   m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME);
   m_edPincode = new JLineEdit(JLineEdit::Input::Alphanumeric);
   m_cbNoteEdit = new QCheckBox;
@@ -44,7 +51,6 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_btnAddRemove = new JAddRemoveButtons;
 
   QFormLayout* lt = new QFormLayout;
-  lt->addRow(m_formPicker->getText() + ":", m_formPicker);
   lt->addRow(m_storePicker->getText() + ":", m_storePicker);
   lt->addRow(tr("Código PIN:"), m_edPincode);
   lt->addRow(tr("Vales:"), m_cbNoteEdit);
@@ -60,13 +66,23 @@ EmployeeView::EmployeeView(QWidget* parent)
   QFrame* frHours = new QFrame;
   frHours->setLayout(ltHours);
 
+  m_tab->addTab(m_formInfo, QIcon(":/icons/res/resume.png"), tr("Informações"));
   m_tab->addTab(fr, QIcon(":/icons/res/employee.png"), tr("Funcionário"));
   m_tab->addTab(frHours, QIcon(":/icons/res/clock.png"), tr("Horário"));
+  m_tab->addTab(m_formDetails, QIcon(":/icons/res/details.png"), tr("Detalhes"));
+  m_tab->addTab(m_formPhone, QIcon(":/icons/res/phone.png"), tr("Telefone"));
+  m_tab->addTab(m_formAddress, QIcon(":/icons/res/address.png"), tr("Endereço"));
 
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addHour()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeHour()));
-
   connect(m_tbHours, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
+  connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
+
+  m_formInfo->m_lblCreationDate->hide();
+  m_formInfo->m_dtCreationDate->hide();
+  m_formInfo->m_lblType->hide();
+  m_formInfo->m_type->hide();
+  m_formInfo->setCompany(false);
 
   updateControls();
 }
@@ -80,7 +96,10 @@ const JItemSQL& EmployeeView::getItem() const
 {
   m_ref.clear();
   m_ref.m_id = m_currentId;
-  m_ref.m_form.m_id = m_formPicker->getId();
+  m_formInfo->fillForm(m_ref.m_form);
+  m_formDetails->fillForm(m_ref.m_form);
+  m_formPhone->fillForm(m_ref.m_form);
+  m_formAddress->fillForm(m_ref.m_form);
   m_ref.m_store.m_id = m_storePicker->getId();
   m_ref.m_pincode = m_edPincode->text();
   m_ref.m_bNoteEdit = m_cbNoteEdit->isChecked();
@@ -99,7 +118,10 @@ void EmployeeView::setItem(const JItemSQL& o)
 {
   auto ref = static_cast<const Employee&>(o);
   m_currentId = o.m_id;
-  m_formPicker->setItem(ref.m_form);
+  m_formInfo->setForm(ref.m_form);
+  m_formDetails->setForm(ref.m_form);
+  m_formPhone->setForm(ref.m_form);
+  m_formAddress->setForm(ref.m_form);
   m_storePicker->setItem(ref.m_store);
   m_edPincode->setText(ref.m_pincode);
   m_cbNoteEdit->setChecked(ref.m_bNoteEdit);

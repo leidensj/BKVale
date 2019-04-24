@@ -78,26 +78,35 @@ QString Supplier::SQL_tableName() const
 
 bool Supplier::SQL_insert_proc(QSqlQuery& query) const
 {
-  query.prepare("INSERT INTO " SUPPLIER_SQL_TABLE_NAME " ("
-                SUPPLIER_SQL_COL01 ")"
-                " VALUES ("
-                "(:_v01))");
-
-  query.bindValue(":_v01", m_form.m_id.get());
-  bool bSuccess = query.exec();
+  bool bSuccess = m_form.SQL_insert_proc(query);
   if (bSuccess)
-    m_id.set(query.lastInsertId().toLongLong());
+  {
+    query.prepare("INSERT INTO " SUPPLIER_SQL_TABLE_NAME " ("
+                  SUPPLIER_SQL_COL01 ")"
+                  " VALUES ("
+                  "(:_v01))");
+
+    query.bindValue(":_v01", m_form.m_id.get());
+    bSuccess = query.exec();
+    if (bSuccess)
+      m_id.set(query.lastInsertId().toLongLong());
+  }
   return bSuccess;
 }
 
 bool Supplier::SQL_update_proc(QSqlQuery& query) const
 {
-  query.prepare("UPDATE " SUPPLIER_SQL_TABLE_NAME " SET "
-                SUPPLIER_SQL_COL01 " = (:_v01)"
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", m_id.get());
-  query.bindValue(":_v01", m_form.m_id.get());
-  return query.exec();
+  bool bSuccess = m_form.SQL_update_proc(query);
+  if (bSuccess)
+  {
+    query.prepare("UPDATE " SUPPLIER_SQL_TABLE_NAME " SET "
+                  SUPPLIER_SQL_COL01 " = (:_v01)"
+                  " WHERE " SQL_COLID " = (:_v00)");
+    query.bindValue(":_v00", m_id.get());
+    query.bindValue(":_v01", m_form.m_id.get());
+    bSuccess = query.exec();
+  }
+  return bSuccess;
 }
 
 bool Supplier::SQL_select_proc(QSqlQuery& query, QString& error)
@@ -130,9 +139,14 @@ bool Supplier::SQL_select_proc(QSqlQuery& query, QString& error)
 
 bool Supplier::SQL_remove_proc(QSqlQuery& query) const
 {
-  query.prepare("DELETE FROM " SUPPLIER_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", m_id.get());
-  return query.exec();
+  bool bSuccess = m_form.SQL_remove_proc(query);
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " SUPPLIER_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
+    query.bindValue(":_v00", m_id.get());
+    bSuccess = query.exec();
+  }
+  return bSuccess;
 }
 
 JModel* Supplier::SQL_table_model(QObject *parent) const

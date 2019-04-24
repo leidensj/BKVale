@@ -187,7 +187,7 @@ bool BaitaSQL::createTables(QString& error)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " FORM_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           FORM_SQL_COL01 " INTEGER,"
-                          FORM_SQL_COL02 " TEXT NOT NULL UNIQUE,"
+                          FORM_SQL_COL02 " TEXT NOT NULL,"
                           FORM_SQL_COL03 " TEXT,"
                           FORM_SQL_COL04 " TEXT,"
                           FORM_SQL_COL05 " TEXT,"

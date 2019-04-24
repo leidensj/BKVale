@@ -4,11 +4,11 @@
 #include "store.h"
 #include "jitemview.h"
 
-class QPushButton;
-class JLineEdit;
-class JDatabasePicker;
-class JPlainTextEdit;
 class QListWidget;
+class FormInfoWidget;
+class FormDetailsWidget;
+class FormPhoneWidget;
+class FormAddressWidget;
 
 class StoreView : public JItemView
 {
@@ -24,10 +24,10 @@ public slots:
 
 private:
   mutable Store m_ref;
-  JPlainTextEdit* m_teDescription;
-  JDatabasePicker* m_formPicker;
-  JDatabasePicker* m_addressPicker;
-  JDatabasePicker* m_phonePicker;
+  FormInfoWidget* m_formInfo;
+  FormDetailsWidget* m_formDetails;
+  FormPhoneWidget* m_formPhone;
+  FormAddressWidget* m_formAddress;
   QListWidget* m_list;
   void setItem(const JItemSQL& o);
 };

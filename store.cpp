@@ -82,44 +82,53 @@ QString Store::SQL_tableName() const
 
 bool Store::SQL_insert_proc(QSqlQuery& query) const
 {
-  query.prepare("INSERT INTO " STORE_SQL_TABLE_NAME " ("
-                STORE_SQL_COL01 ","
-                STORE_SQL_COL02 ","
-                STORE_SQL_COL03 ","
-                STORE_SQL_COL04 ")"
-                " VALUES ("
-                "(:_v01),"
-                "(:_v02),"
-                "(:_v03),"
-                "(:_v04))");
-
-  query.bindValue(":_v01", m_form.m_id.getIdNull());
-  query.bindValue(":_v02", m_address.m_id.getIdNull());
-  query.bindValue(":_v03", m_phone.m_id.getIdNull());
-  query.bindValue(":_v04", m_description);
-
-  bool bSuccess = query.exec();
+  bool bSuccess = m_form.SQL_insert_proc(query);
   if (bSuccess)
-    m_id.set(query.lastInsertId().toLongLong());
+  {
+    query.prepare("INSERT INTO " STORE_SQL_TABLE_NAME " ("
+                  STORE_SQL_COL01 ","
+                  STORE_SQL_COL02 ","
+                  STORE_SQL_COL03 ","
+                  STORE_SQL_COL04 ")"
+                  " VALUES ("
+                  "(:_v01),"
+                  "(:_v02),"
+                  "(:_v03),"
+                  "(:_v04))");
 
+    query.bindValue(":_v01", m_form.m_id.getIdNull());
+    query.bindValue(":_v02", m_address.m_id.getIdNull());
+    query.bindValue(":_v03", m_phone.m_id.getIdNull());
+    query.bindValue(":_v04", m_description);
+
+    bSuccess = query.exec();
+    if (bSuccess)
+      m_id.set(query.lastInsertId().toLongLong());
+  }
   return bSuccess;
 }
 
 bool Store::SQL_update_proc(QSqlQuery& query) const
 {
-  query.prepare("UPDATE " STORE_SQL_TABLE_NAME " SET "
-                STORE_SQL_COL01 " = (:_v01),"
-                STORE_SQL_COL02 " = (:_v02),"
-                STORE_SQL_COL03 " = (:_v03),"
-                STORE_SQL_COL04 " = (:_v04)"
-                " WHERE " SQL_COLID " = (:_v00)");
+  bool bSuccess = m_form.SQL_update_proc(query);
+  if (bSuccess)
+  {
+    query.prepare("UPDATE " STORE_SQL_TABLE_NAME " SET "
+                  STORE_SQL_COL01 " = (:_v01),"
+                  STORE_SQL_COL02 " = (:_v02),"
+                  STORE_SQL_COL03 " = (:_v03),"
+                  STORE_SQL_COL04 " = (:_v04)"
+                  " WHERE " SQL_COLID " = (:_v00)");
 
-  query.bindValue(":_v00", m_id.get());
-  query.bindValue(":_v01", m_form.m_id.getIdNull());
-  query.bindValue(":_v02", m_address.m_id.getIdNull());
-  query.bindValue(":_v03", m_phone.m_id.getIdNull());
-  query.bindValue(":_v04", m_description);
-  return query.exec();
+    query.bindValue(":_v00", m_id.get());
+    query.bindValue(":_v01", m_form.m_id.getIdNull());
+    query.bindValue(":_v02", m_address.m_id.getIdNull());
+    query.bindValue(":_v03", m_phone.m_id.getIdNull());
+    query.bindValue(":_v04", m_description);
+    bSuccess = query.exec();
+  }
+
+  return bSuccess;
 }
 
 bool Store::SQL_select_proc(QSqlQuery& query, QString& error)
@@ -166,10 +175,15 @@ bool Store::SQL_select_proc(QSqlQuery& query, QString& error)
 
 bool Store::SQL_remove_proc(QSqlQuery& query) const
 {
-  query.prepare("DELETE FROM " STORE_SQL_TABLE_NAME
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", m_id.get());
-  return query.exec();
+  bool bSuccess = m_form.SQL_remove_proc(query);
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " STORE_SQL_TABLE_NAME
+                  " WHERE " SQL_COLID " = (:_v00)");
+    query.bindValue(":_v00", m_id.get());
+    bSuccess = query.exec();
+  }
+  return bSuccess;
 }
 
 JModel* Store::SQL_table_model(QObject* parent) const

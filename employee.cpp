@@ -102,77 +102,30 @@ QString Employee::SQL_tableName() const
 
 bool Employee::SQL_insert_proc(QSqlQuery& query) const
 {
-  query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
-                EMPLOYEE_SQL_COL01 ","
-                EMPLOYEE_SQL_COL02 ","
-                EMPLOYEE_SQL_COL03 ","
-                EMPLOYEE_SQL_COL04 ","
-                EMPLOYEE_SQL_COL05
-                ") VALUES ("
-                "(:_v01),"
-                "(:_v02),"
-                "(:_v03),"
-                "(:_v04),"
-                "(:_v05))");
-  query.bindValue(":_v01", m_form.m_id.get());
-  query.bindValue(":_v02", getPincodeNull());
-  query.bindValue(":_v03", m_bNoteEdit);
-  query.bindValue(":_v04", m_bNoteRemove);
-  query.bindValue(":_v05", m_store.m_id.getIdNull());
-  bool bSuccess = query.exec();
+  bool bSuccess = m_form.SQL_insert_proc(query);
   if (bSuccess)
   {
-    m_id.set(query.lastInsertId().toLongLong());
-    for (int i = 0; i != m_hours.size(); ++i)
-    {
-      query.prepare("INSERT INTO " EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
-                    EMPLOYEE_HOURS_SQL_COL01 ","
-                    EMPLOYEE_HOURS_SQL_COL02 ","
-                    EMPLOYEE_HOURS_SQL_COL03 ","
-                    EMPLOYEE_HOURS_SQL_COL04
-                    ") VALUES ("
-                    "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
-                    "(:_v04))");
-      query.bindValue(":_v01", m_id.get());
-      query.bindValue(":_v02", m_hours.at(i).m_day);
-      query.bindValue(":_v03", m_hours.at(i).m_tmBegin);
-      query.bindValue(":_v04", m_hours.at(i).m_tmEnd);
-      bSuccess = query.exec();
-      if (!bSuccess)
-        break;
-    }
-  }
-  return bSuccess;
-}
-
-bool Employee::SQL_update_proc(QSqlQuery& query) const
-{
-
-  query.prepare("UPDATE " EMPLOYEE_SQL_TABLE_NAME " SET "
-                EMPLOYEE_SQL_COL01 " = (:_v01),"
-                EMPLOYEE_SQL_COL02 " = (:_v02),"
-                EMPLOYEE_SQL_COL03 " = (:_v03),"
-                EMPLOYEE_SQL_COL04 " = (:_v04),"
-                EMPLOYEE_SQL_COL05 " = (:_v05)"
-                " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", m_id.get());
-  query.bindValue(":_v01", m_form.m_id.get());
-  query.bindValue(":_v02", getPincodeNull());
-  query.bindValue(":_v03", m_bNoteEdit);
-  query.bindValue(":_v04", m_bNoteRemove);
-  query.bindValue(":_v05", m_store.m_id.getIdNull());
-
-  bool bSuccess = query.exec();
-  if (bSuccess)
-  {
-    query.prepare("DELETE FROM " EMPLOYEE_HOURS_SQL_TABLE_NAME
-                  " WHERE " EMPLOYEE_HOURS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", m_id.get());
+    query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
+                  EMPLOYEE_SQL_COL01 ","
+                  EMPLOYEE_SQL_COL02 ","
+                  EMPLOYEE_SQL_COL03 ","
+                  EMPLOYEE_SQL_COL04 ","
+                  EMPLOYEE_SQL_COL05
+                  ") VALUES ("
+                  "(:_v01),"
+                  "(:_v02),"
+                  "(:_v03),"
+                  "(:_v04),"
+                  "(:_v05))");
+    query.bindValue(":_v01", m_form.m_id.get());
+    query.bindValue(":_v02", getPincodeNull());
+    query.bindValue(":_v03", m_bNoteEdit);
+    query.bindValue(":_v04", m_bNoteRemove);
+    query.bindValue(":_v05", m_store.m_id.getIdNull());
     bSuccess = query.exec();
     if (bSuccess)
     {
+      m_id.set(query.lastInsertId().toLongLong());
       for (int i = 0; i != m_hours.size(); ++i)
       {
         query.prepare("INSERT INTO " EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
@@ -195,7 +148,60 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
       }
     }
   }
+  return bSuccess;
+}
 
+bool Employee::SQL_update_proc(QSqlQuery& query) const
+{
+  bool bSuccess = m_form.SQL_update_proc(query);
+  if (bSuccess)
+  {
+    query.prepare("UPDATE " EMPLOYEE_SQL_TABLE_NAME " SET "
+                  EMPLOYEE_SQL_COL01 " = (:_v01),"
+                  EMPLOYEE_SQL_COL02 " = (:_v02),"
+                  EMPLOYEE_SQL_COL03 " = (:_v03),"
+                  EMPLOYEE_SQL_COL04 " = (:_v04),"
+                  EMPLOYEE_SQL_COL05 " = (:_v05)"
+                  " WHERE " SQL_COLID " = (:_v00)");
+    query.bindValue(":_v00", m_id.get());
+    query.bindValue(":_v01", m_form.m_id.get());
+    query.bindValue(":_v02", getPincodeNull());
+    query.bindValue(":_v03", m_bNoteEdit);
+    query.bindValue(":_v04", m_bNoteRemove);
+    query.bindValue(":_v05", m_store.m_id.getIdNull());
+
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      query.prepare("DELETE FROM " EMPLOYEE_HOURS_SQL_TABLE_NAME
+                    " WHERE " EMPLOYEE_HOURS_SQL_COL01 " = (:_v01)");
+      query.bindValue(":_v01", m_id.get());
+      bSuccess = query.exec();
+      if (bSuccess)
+      {
+        for (int i = 0; i != m_hours.size(); ++i)
+        {
+          query.prepare("INSERT INTO " EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
+                        EMPLOYEE_HOURS_SQL_COL01 ","
+                        EMPLOYEE_HOURS_SQL_COL02 ","
+                        EMPLOYEE_HOURS_SQL_COL03 ","
+                        EMPLOYEE_HOURS_SQL_COL04
+                        ") VALUES ("
+                        "(:_v01),"
+                        "(:_v02),"
+                        "(:_v03),"
+                        "(:_v04))");
+          query.bindValue(":_v01", m_id.get());
+          query.bindValue(":_v02", m_hours.at(i).m_day);
+          query.bindValue(":_v03", m_hours.at(i).m_tmBegin);
+          query.bindValue(":_v04", m_hours.at(i).m_tmEnd);
+          bSuccess = query.exec();
+          if (!bSuccess)
+            break;
+        }
+      }
+    }
+  }
   return bSuccess;
 }
 
@@ -260,9 +266,15 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
 
 bool Employee::SQL_remove_proc(QSqlQuery& query) const
 {
-  query.prepare("DELETE FROM " EMPLOYEE_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
-  query.bindValue(":_v00", m_id.get());
-  return query.exec();
+  bool bSuccess = m_form.SQL_remove_proc(query);
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " EMPLOYEE_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
+    query.bindValue(":_v00", m_id.get());
+    bSuccess = query.exec();
+  }
+
+  return bSuccess;
 }
 
 JModel* Employee::SQL_table_model(QObject *parent) const

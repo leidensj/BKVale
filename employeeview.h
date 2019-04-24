@@ -14,6 +14,10 @@ class JTimeEdit;
 class JSpinBox;
 class QLabel;
 class JAddRemoveButtons;
+class FormInfoWidget;
+class FormDetailsWidget;
+class FormPhoneWidget;
+class FormAddressWidget;
 
 class EmployeeView : public JItemView
 {
@@ -33,7 +37,10 @@ private slots:
 
 private:
   mutable Employee m_ref;
-  JDatabasePicker* m_formPicker;
+  FormInfoWidget* m_formInfo;
+  FormDetailsWidget* m_formDetails;
+  FormPhoneWidget* m_formPhone;
+  FormAddressWidget* m_formAddress;
   JDatabasePicker* m_storePicker;
   JLineEdit* m_edPincode;
   QCheckBox* m_cbNoteEdit;

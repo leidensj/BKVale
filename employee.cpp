@@ -55,6 +55,7 @@ void Employee::clear()
   m_bNoteEdit = false;
   m_bNoteRemove = false;
   m_store.clear();
+  m_hours.clear();
 }
 
 bool Employee::hasPermissionToEdit(const QString& tableName) const

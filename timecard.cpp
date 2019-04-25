@@ -130,7 +130,7 @@ void TimeCard::saveAndAccept()
     html += QString(
       "<pre style=\"font-size:16pt;\" align=\"left\"><b>" + title + "</b></pre>"
       "<p>Nome: %1 Horário: %2</p>"
-      "<table border=\"1\" align=\"center\" width=\"100%\" style=\"border-style:groove;\">"
+      "<table align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
         "<tr><th colspan=\"2\">%3 %4</th>"
           "<th colspan=\"3\">ENTRADA</th>"
           "<th colspan=\"3\">SAIDA</th>"
@@ -174,7 +174,7 @@ void TimeCard::saveAndAccept()
     html += QString(
       "</table>"
       "<br>"
-      "<table border=\"1\" cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-style:groove;%1\">"
+      "<table cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;%1\">"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS NORMAIS</td>"
       "<td width=\"10%\">(H.N.)</td>"

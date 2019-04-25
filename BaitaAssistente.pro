@@ -73,7 +73,6 @@ SOURCES += main.cpp\
     form.cpp \
     employee.cpp \
     supplier.cpp \
-    formview.cpp \
     employeeview.cpp \
     jmodel.cpp \
     activeuser.cpp \
@@ -149,7 +148,6 @@ HEADERS  += mainwindow.h \
     form.h \
     employee.h \
     supplier.h \
-    formview.h \
     employeeview.h \
     jmodel.h \
     activeuser.h \

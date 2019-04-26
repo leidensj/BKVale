@@ -80,7 +80,8 @@ SOURCES += main.cpp\
     supplierview.cpp \
     userview.cpp \
     payment.cpp \
-    jaddremovebuttons.cpp
+    jaddremovebuttons.cpp \
+    formwidget.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -154,7 +155,8 @@ HEADERS  += mainwindow.h \
     supplierview.h \
     userview.h \
     payment.h \
-    jaddremovebuttons.h
+    jaddremovebuttons.h \
+    formwidget.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

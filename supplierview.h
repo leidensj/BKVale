@@ -16,6 +16,7 @@ class SupplierView : public JItemView
 public:
   explicit SupplierView(QWidget* parent = 0);
   const JItemSQL& getItem() const;
+  Id getId() const;
 
 public slots:
   void create();

@@ -10,7 +10,7 @@ public:
   ActiveUser();
   ~ActiveUser();
 
-  void clear();
+  void clear(bool bClearId = true);
   bool operator != (const JItem& other) const;
   bool operator == (const JItem& other) const;
   bool isValid() const;

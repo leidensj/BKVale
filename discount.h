@@ -7,7 +7,7 @@
 #include <QMetaType>
 #include <QDate>
 
-struct DiscountItem : JItem
+struct DiscountItem : public JItem
 {
   enum class Column
   {
@@ -17,7 +17,7 @@ struct DiscountItem : JItem
   };
 
   DiscountItem();
-  void clear();
+  void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
@@ -40,7 +40,7 @@ struct Discount : public JItemSQL
   };
 
   Discount();
-  void clear();
+  void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;

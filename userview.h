@@ -17,6 +17,7 @@ class UserView : public JItemView
 public:
   explicit UserView(Id currentLoggedId, QWidget* parent = 0);
   const JItemSQL& getItem() const;
+  Id getId() const;
 
   QString getPassword() const;
   bool hasLoggedUserChanged() const;

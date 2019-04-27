@@ -60,9 +60,10 @@ Payment::Payment()
   clear();
 }
 
-void Payment::clear()
+void Payment::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_value = 0.0;
   m_date = QDate::currentDate();
   m_noteId.clear();

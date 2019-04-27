@@ -85,9 +85,10 @@ Reminder::Reminder()
   clear();
 }
 
-void Reminder::clear()
+void Reminder::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_title.clear();
   m_message.clear();
   m_bFavorite = false;

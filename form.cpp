@@ -41,9 +41,10 @@ Form::Form()
   clear();
 }
 
-void Form::clear()
+void Form::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_image.clear();
   m_name.clear();
   m_alias.clear();

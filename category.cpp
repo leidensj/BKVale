@@ -38,9 +38,10 @@ Category::Category()
   clear();
 }
 
-void Category::clear()
+void Category::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_name.clear();
   m_image.clear();
 }

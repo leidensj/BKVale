@@ -60,8 +60,10 @@ ActiveUser::~ActiveUser()
   }
 }
 
-void ActiveUser::clear()
+void ActiveUser::clear(bool bClearId)
 {
+  if (bClearId)
+    m_id.clear();
   m_user.clear();
 }
 

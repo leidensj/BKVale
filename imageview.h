@@ -17,6 +17,7 @@ public:
   explicit ImageView(QWidget* parent = 0);
   void setImage(const JItemSQL& image);
   const JItemSQL& getItem() const;
+  Id getId() const;
 
 public slots:
   void create();

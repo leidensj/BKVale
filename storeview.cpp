@@ -51,8 +51,7 @@ void StoreView::updateControls()
 
 const JItemSQL& StoreView::getItem() const
 {
-  m_ref.clear();
-  m_ref.m_id = m_currentId;
+  m_ref.clear(false);
   m_formInfo->fillForm(m_ref.m_form);
   m_formDetails->fillForm(m_ref.m_form);
   m_formPhone->fillForm(m_ref.m_form);
@@ -62,12 +61,16 @@ const JItemSQL& StoreView::getItem() const
 
 void StoreView::setItem(const JItemSQL& o)
 {
-  const Store& ref = static_cast<const Store&>(o);
-  m_currentId = o.m_id;
-  m_formInfo->setForm(ref.m_form);
-  m_formDetails->setForm(ref.m_form);
-  m_formPhone->setForm(ref.m_form);
-  m_formAddress->setForm(ref.m_form);
+  m_ref = static_cast<const Store&>(o);
+  m_formInfo->setForm(m_ref.m_form);
+  m_formDetails->setForm(m_ref.m_form);
+  m_formPhone->setForm(m_ref.m_form);
+  m_formAddress->setForm(m_ref.m_form);
   m_list->clear();
-  m_list->addItems(ref.SQL_select_employees());
+  m_list->addItems(m_ref.SQL_select_employees());
+}
+
+Id StoreView::getId() const
+{
+  return m_ref.m_id;
 }

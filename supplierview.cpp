@@ -31,8 +31,7 @@ void SupplierView::create()
 
 const JItemSQL& SupplierView::getItem() const
 {
-  m_ref.clear();
-  m_ref.m_id = m_currentId;
+  m_ref.clear(false);
   m_formInfo->fillForm(m_ref.m_form);
   m_formDetails->fillForm(m_ref.m_form);
   m_formPhone->fillForm(m_ref.m_form);
@@ -42,10 +41,14 @@ const JItemSQL& SupplierView::getItem() const
 
 void SupplierView::setItem(const JItemSQL& o)
 {
-  auto ref = static_cast<const Supplier&>(o);
-  m_currentId = o.m_id;
-  m_formInfo->fillForm(ref.m_form);
-  m_formDetails->fillForm(ref.m_form);
-  m_formPhone->fillForm(ref.m_form);
-  m_formAddress->fillForm(ref.m_form);
+  m_ref = static_cast<const Supplier&>(o);
+  m_formInfo->fillForm(m_ref.m_form);
+  m_formDetails->fillForm(m_ref.m_form);
+  m_formPhone->fillForm(m_ref.m_form);
+  m_formAddress->fillForm(m_ref.m_form);
+}
+
+Id SupplierView::getId() const
+{
+  return m_ref.m_id;
 }

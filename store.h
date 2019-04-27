@@ -7,7 +7,7 @@
 struct Store : public JItemSQL
 {
   Store();
-  void clear();
+  void clear(bool bClearId = true);
   bool isValid() const;
   bool operator ==(const JItem& other) const;
   bool operator !=(const JItem& other) const;

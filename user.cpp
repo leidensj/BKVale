@@ -40,9 +40,10 @@ User::User()
   clear();
 }
 
-void User::clear()
+void User::clear(bool bClearId)
 {
-  m_id = INVALID_ID;
+  if (bClearId)
+    m_id.clear();
   m_strUser.clear();
   m_bNote = false;
   m_bReminder = false;

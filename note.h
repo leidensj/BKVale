@@ -21,10 +21,10 @@ enum class NoteColumn : int
   SubTotal
 };
 
-struct NoteItem : JItem
+struct NoteItem : public JItem
 {
   NoteItem();
-  void clear();
+  void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
@@ -44,7 +44,7 @@ struct NoteItem : JItem
 struct Note : public JItemSQL
 {
   Note();
-  void clear();
+  void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;

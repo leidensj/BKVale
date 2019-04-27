@@ -41,9 +41,10 @@ ShoppingListItem::ShoppingListItem()
   clear();
 }
 
-void ShoppingListItem::clear()
+void ShoppingListItem::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_product.clear();
   m_bAmmount = true;
   m_ammount = 0.0;
@@ -100,9 +101,10 @@ ShoppingList::ShoppingList()
   clear();
 }
 
-void ShoppingList::clear()
+void ShoppingList::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_title.clear();
   m_description.clear();
   m_supplier.clear();

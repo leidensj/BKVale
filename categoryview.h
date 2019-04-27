@@ -15,6 +15,7 @@ class CategoryView : public JItemView
 public:
   explicit CategoryView(QWidget* parent = 0);
   const JItemSQL& getItem() const;
+  Id getId() const;
 
 public slots:
   void create();

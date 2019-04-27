@@ -82,12 +82,11 @@ void JItemView::selectItem(const JItemSQL& o)
                     ? ":/icons/res/saveas.png"
                     : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(strIcon));
-  m_currentId = o.m_id;
 }
 
 void JItemView::itemsRemoved(const QVector<Id>& ids)
 {
-  if (ids.contains(m_currentId))
+  if (ids.contains(getId()))
     create();
 }
 

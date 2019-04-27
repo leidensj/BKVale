@@ -123,9 +123,10 @@ ProductCode::ProductCode()
   clear();
 }
 
-void ProductCode::clear()
+void ProductCode::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_productId.clear();
   m_code.clear();
 }
@@ -192,9 +193,10 @@ Product::Product()
   clear();
 }
 
-void Product::clear()
+void Product::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_category.clear();
   m_image.clear();
   m_name.clear();

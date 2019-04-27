@@ -54,9 +54,10 @@ public:
   }
 };
 
-void Address::clear()
+void Address::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_cep.clear();
   m_neighborhood.clear();
   m_street.clear();

@@ -17,6 +17,7 @@ class StoreView : public JItemView
 public:
   explicit StoreView(QWidget* parent = 0);
   const JItemSQL& getItem() const;
+  Id getId() const;
 
 public slots:
   void create();

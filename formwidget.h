@@ -23,7 +23,6 @@ public:
   explicit FormInfoWidget(QWidget* parent = 0);
   void setForm(const Form& o);
   void fillForm(Form& o) const;
-  void setCompany(bool b);
   QDateEdit* m_dtCreationDate;
   QWidget* m_type;
   QRadioButton* m_rdoPerson;
@@ -34,6 +33,9 @@ public:
   QLabel* m_lblCreationDate;
   QLabel* m_lblName;
   QLabel* m_lblAlias;
+
+public slots:
+  void setCompany(bool b);
 
 private slots:
   void switchUserType();
@@ -65,9 +67,11 @@ public:
   QCheckBox* m_cbBirthDate;
   JDatabasePicker* m_imagePicker;
 
+private slots:
+  void updateControls();
+
 public slots:
   void switchUserType(bool bCompany);
-  void updateControls();
 };
 
 class FormPhoneWidget : public QWidget

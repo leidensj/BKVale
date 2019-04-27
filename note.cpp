@@ -82,9 +82,10 @@ NoteItem::NoteItem()
   clear();
 }
 
-void NoteItem::clear()
+void NoteItem::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_product.clear();
   m_ammount = 0.0;
   m_price = 0.0;
@@ -141,9 +142,10 @@ Note::Note()
   clear();
 }
 
-void Note::clear()
+void Note::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_number = 0;
   m_supplier.clear();
   m_date = QDate::currentDate();

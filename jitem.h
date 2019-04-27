@@ -37,7 +37,7 @@ struct JItem
   mutable Id m_id;
   virtual ~JItem() { }
   virtual bool isValid() const = 0;
-  virtual void clear() = 0;
+  virtual void clear(bool bClearId) = 0;
   virtual bool operator ==(const JItem& other) const = 0;
   virtual bool operator !=(const JItem& other) const = 0;
 

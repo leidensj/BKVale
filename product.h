@@ -25,7 +25,7 @@ struct Package
 struct ProductCode : public JItemSQL
 {
   ProductCode();
-  void clear();
+  void clear(bool bClearId = true);
   bool isValid() const;
   bool operator != (const JItem& other) const;
   bool operator == (const JItem& other) const;
@@ -44,7 +44,7 @@ struct ProductCode : public JItemSQL
 struct Product : public JItemSQL
 {
   Product();
-  void clear();
+  void clear(bool bClearId = true);
   bool operator != (const JItem& other) const;
   bool operator == (const JItem& other) const;
   bool isValid() const;

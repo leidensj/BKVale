@@ -47,9 +47,10 @@ Supplier::Supplier()
   clear();
 }
 
-void Supplier::clear()
+void Supplier::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_form.clear();
 }
 

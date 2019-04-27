@@ -21,7 +21,7 @@ struct Reminder : public JItemSQL
   };
 
   Reminder();
-  void clear();
+  void clear(bool bClearId = true);
   bool operator != (const JItem& other) const;
   bool operator == (const JItem& other) const;
   bool isValid() const;

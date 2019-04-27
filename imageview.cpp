@@ -29,17 +29,15 @@ ImageView::ImageView(QWidget* parent)
 
 void ImageView::setItem(const JItemSQL& o)
 {
-  auto _o = dynamic_cast<const Image&>(o);
-  m_currentId = _o.m_id;
+  m_ref = dynamic_cast<const Image&>(o);
   m_imageView->clearImage();
-  m_edImageName->setText(_o.m_name);
-  m_imageView->setImage(_o.m_image);
+  m_edImageName->setText(m_ref.m_name);
+  m_imageView->setImage(m_ref.m_image);
 }
 
 const JItemSQL& ImageView::getItem() const
 {
-  m_ref.clear();
-  m_ref.m_id = m_currentId;
+  m_ref.clear(false);
   m_ref.m_name = m_edImageName->text();
   m_ref.m_image = m_imageView->getImage();
   return m_ref;
@@ -49,4 +47,9 @@ void ImageView::create()
 {
   selectItem(Image());
   m_edImageName->setFocus();
+}
+
+Id ImageView::getId() const
+{
+  return m_ref.m_id;
 }

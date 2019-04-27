@@ -21,10 +21,10 @@ enum class ShoppingListColumn : int
   Supplier
 };
 
-struct ShoppingListItem : JItem
+struct ShoppingListItem : public JItem
 {
   ShoppingListItem();
-  void clear();
+  void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;
@@ -46,7 +46,7 @@ struct ShoppingListItem : JItem
 struct ShoppingList : public JItemSQL
 {
   ShoppingList();
-  void clear();
+  void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
   bool isValid() const;

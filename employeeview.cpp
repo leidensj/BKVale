@@ -90,12 +90,13 @@ EmployeeView::EmployeeView(QWidget* parent)
 void EmployeeView::create()
 {
   selectItem(Employee());
+  m_tab->setCurrentIndex(0);
+  m_formInfo->m_edName->setFocus();
 }
 
 const JItemSQL& EmployeeView::getItem() const
 {
-  m_ref.clear();
-  m_ref.m_id = m_currentId;
+  m_ref.clear(false);
   m_formInfo->fillForm(m_ref.m_form);
   m_formDetails->fillForm(m_ref.m_form);
   m_formPhone->fillForm(m_ref.m_form);
@@ -116,22 +117,21 @@ const JItemSQL& EmployeeView::getItem() const
 
 void EmployeeView::setItem(const JItemSQL& o)
 {
-  auto ref = static_cast<const Employee&>(o);
-  m_currentId = o.m_id;
-  m_formInfo->setForm(ref.m_form);
-  m_formDetails->setForm(ref.m_form);
-  m_formPhone->setForm(ref.m_form);
-  m_formAddress->setForm(ref.m_form);
-  m_storePicker->setItem(ref.m_store);
-  m_edPincode->setText(ref.m_pincode);
-  m_cbNoteEdit->setChecked(ref.m_bNoteEdit);
-  m_cbNoteRemove->setChecked(ref.m_bNoteRemove);
+  m_ref = static_cast<const Employee&>(o);
+  m_formInfo->setForm(m_ref.m_form);
+  m_formDetails->setForm(m_ref.m_form);
+  m_formPhone->setForm(m_ref.m_form);
+  m_formAddress->setForm(m_ref.m_form);
+  m_storePicker->setItem(m_ref.m_store);
+  m_edPincode->setText(m_ref.m_pincode);
+  m_cbNoteEdit->setChecked(m_ref.m_bNoteEdit);
+  m_cbNoteRemove->setChecked(m_ref.m_bNoteRemove);
   m_tbHours->setRowCount(0);
-  for (int i = 0; i != ref.m_hours.size(); ++i)
+  for (int i = 0; i != m_ref.m_hours.size(); ++i)
   {
     addHour();
-    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 0))->setTime(ref.m_hours.at(i).m_tmBegin);
-    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 1))->setTime(ref.m_hours.at(i).m_tmEnd);
+    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 0))->setTime(m_ref.m_hours.at(i).m_tmBegin);
+    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 1))->setTime(m_ref.m_hours.at(i).m_tmEnd);
   }
 }
 
@@ -158,4 +158,9 @@ void EmployeeView::removeHour()
 void EmployeeView::updateControls()
 {
   m_btnAddRemove->m_btnRemove->setEnabled(m_tbHours->currentRow() >= 0);
+}
+
+Id EmployeeView::getId() const
+{
+  return m_ref.m_id;
 }

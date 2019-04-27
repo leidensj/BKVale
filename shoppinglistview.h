@@ -21,6 +21,7 @@ class ShoppingListView : public JItemView
 public:
   explicit ShoppingListView(QWidget* parent = nullptr);
   const JItemSQL& getItem() const;
+  Id getId() const;
 
 public slots:
   void create();

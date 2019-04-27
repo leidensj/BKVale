@@ -19,6 +19,7 @@ class JItemView : public QFrame
 public:
   explicit JItemView(const QString& tableName, QWidget* parent = 0);
   virtual const JItemSQL& getItem() const = 0;
+  virtual Id getId() const = 0;
 
 protected slots:
   virtual void itemsRemoved(const QVector<Id>& ids);
@@ -32,7 +33,6 @@ signals:
   void saveSignal();
 
 protected:
-  Id m_currentId;
   JDatabase* m_database;
   QTabWidget* m_tab;
 

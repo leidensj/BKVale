@@ -57,9 +57,10 @@ Image::Image()
   clear();
 }
 
-void Image::clear()
+void Image::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_name.clear();
   m_image.clear();
 }

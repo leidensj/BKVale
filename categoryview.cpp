@@ -36,8 +36,7 @@ void CategoryView::create()
 
 const JItemSQL& CategoryView::getItem() const
 {
-  m_ref.clear();
-  m_ref.m_id = m_currentId;
+  m_ref.clear(false);
   m_ref.m_image.m_id = m_imagePicker->getId();
   m_ref.m_name = m_edName->text();
   return m_ref;
@@ -45,8 +44,12 @@ const JItemSQL& CategoryView::getItem() const
 
 void CategoryView::setItem(const JItemSQL& o)
 {
-  auto ref = static_cast<const Category&>(o);
-  m_currentId = o.m_id;
-  m_edName->setText(ref.m_name);
-  m_imagePicker->setItem(ref.m_image);
+  m_ref = static_cast<const Category&>(o);
+  m_edName->setText(m_ref.m_name);
+  m_imagePicker->setItem(m_ref.m_image);
+}
+
+Id CategoryView::getId() const
+{
+  return m_ref.m_id;
 }

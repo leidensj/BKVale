@@ -64,8 +64,10 @@ Reservation::Reservation()
   clear();
 }
 
-void Reservation::clear()
+void Reservation::clear(bool bClearId)
 {
+  if (bClearId)
+    m_id.clear();
   m_number = 0;
   m_dateTime = QDateTime::currentDateTime().toString(Qt::DateFormat::ISODate);
   m_location.clear();

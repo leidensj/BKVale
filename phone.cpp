@@ -47,9 +47,10 @@ Phone::Phone()
   clear();
 }
 
-void Phone::clear()
+void Phone::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_countryCode = PHONE_DEFAULT_COUNTRY_CODE_VALUE;
   m_code = PHONE_DEFAULT_CODE_VALUE;
   m_number.clear();

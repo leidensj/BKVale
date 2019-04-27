@@ -21,6 +21,7 @@ public:
   explicit ProductView(QWidget* parent = 0);
   ~ProductView();
   const JItemSQL& getItem() const;
+  Id getId() const;
 
 public slots:
   void create();

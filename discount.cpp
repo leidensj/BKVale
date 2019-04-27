@@ -68,9 +68,10 @@ QString DiscountItem::strAmmount() const
   return JItem::st_strAmmount(m_ammount);
 }
 
-void DiscountItem::clear()
+void DiscountItem::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_product.clear();
   m_ammount = 0.0;
 }
@@ -130,9 +131,10 @@ QString Discount::getRandomCode(const int length)
   return randomString;
 }
 
-void Discount::clear()
+void Discount::clear(bool bClearId)
 {
-  m_id.clear();
+  if (bClearId)
+    m_id.clear();
   m_code.clear();
   m_type = Type::Value;
   m_value = 0.0;

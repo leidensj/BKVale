@@ -57,7 +57,6 @@ class PaymentDlg : public QDialog
 
   enum class Column
   {
-    Number,
     Date,
     Value
   };

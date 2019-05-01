@@ -6,7 +6,7 @@
 #include <QMessageBox>
 
 ShoppingListTable::ShoppingListTable(QWidget* parent)
-  : JTable((int) Flags::NoFlags, parent)
+  : JItemTable((int) Flags::NoFlags, parent)
 {
   setColumnCount(SHOPPING_LIST_NUMBER_OF_COLUMNS);
   QStringList headers;

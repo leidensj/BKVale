@@ -4,7 +4,7 @@
 #include "jitemtable.h"
 #include "address.h"
 
-class AddressTableWidget : public JTable
+class AddressTableWidget : public JItemTable
 {
   Q_OBJECT
 

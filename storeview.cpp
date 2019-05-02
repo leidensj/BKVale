@@ -67,7 +67,10 @@ void StoreView::setItem(const JItemSQL& o)
   m_formPhone->setForm(m_ref.m_form);
   m_formAddress->setForm(m_ref.m_form);
   m_list->clear();
-  m_list->addItems(m_ref.SQL_select_employees());
+  QStringList lst;
+  for (int i = 0; i != m_ref.m_vEmployee.size(); ++i)
+    lst << m_ref.m_vEmployee.at(i).m_form.m_name;
+  m_list->addItems(lst);
 }
 
 Id StoreView::getId() const

@@ -42,7 +42,6 @@ private:
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;
   FormAddressWidget* m_formAddress;
-  JDatabasePicker* m_storePicker;
   JLineEdit* m_edPincode;
   QCheckBox* m_cbNoteEdit;
   QCheckBox* m_cbNoteRemove;

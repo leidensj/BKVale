@@ -4,6 +4,7 @@
 #include "phonetablewidget.h"
 #include "addresstablewidget.h"
 #include "jaddremovebuttons.h"
+#include "jplaintextedit.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QTabWidget>
@@ -68,6 +69,15 @@ FormInfoWidget::FormInfoWidget(QWidget* parent)
   setLayout(lt);
 }
 
+void FormInfoWidget::addWidget(const QString& text, QWidget* w)
+{
+  if (w != nullptr)
+  {
+    auto l = dynamic_cast<QFormLayout*>(layout());
+    l->addRow(text, w);
+  }
+}
+
 void FormInfoWidget::setCompany(bool b)
 {
   m_rdoCompany->setChecked(b);
@@ -117,7 +127,7 @@ FormDetailsWidget::FormDetailsWidget(QWidget* parent)
   , m_edRgIE(nullptr)
   , m_lblRgIE(nullptr)
   , m_edEmail(nullptr)
-  , m_edDetails(nullptr)
+  , m_teDetails(nullptr)
   , m_dtBirthDate(nullptr)
   , m_cbBirthDate(nullptr)
   , m_imagePicker(nullptr)
@@ -127,7 +137,7 @@ FormDetailsWidget::FormDetailsWidget(QWidget* parent)
   m_lblCpfCnpj = new QLabel;
   m_lblRgIE = new QLabel;
   m_edEmail = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
-  m_edDetails = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_teDetails = new JPlainTextEdit;
   m_dtBirthDate = new QDateEdit;
   m_dtBirthDate->setCalendarPopup(true);
   m_dtBirthDate->setDisplayFormat("dd/MM/yyyy");
@@ -140,9 +150,9 @@ FormDetailsWidget::FormDetailsWidget(QWidget* parent)
   lt->addRow(m_lblCpfCnpj, m_edCpfCnpj);
   lt->addRow(m_lblRgIE, m_edRgIE);
   lt->addRow(tr("Email:"), m_edEmail);
-  lt->addRow(tr("Detalhes:"), m_edDetails);
-  lt->addRow(m_cbBirthDate, m_dtBirthDate);
   lt->addRow(tr("Imagem:"), m_imagePicker);
+  lt->addRow(m_cbBirthDate, m_dtBirthDate);
+  lt->addRow(tr("Detalhes:"), m_teDetails);
 
   connect(m_cbBirthDate, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   setLayout(lt);
@@ -159,7 +169,7 @@ void FormDetailsWidget::setForm(const Form& o)
   m_edEmail->setText(o.m_email);
   m_edCpfCnpj->setText(o.m_CPF_CNPJ);
   m_edRgIE->setText(o.m_RG_IE);
-  m_edDetails->setText(o.m_details);
+  m_teDetails->setPlainText(o.m_details);
   m_cbBirthDate->setChecked(o.m_bBirth);
   m_dtBirthDate->setDate(o.m_dtBirth);
   switchUserType(o.m_bCompany);
@@ -171,7 +181,7 @@ void FormDetailsWidget::fillForm(Form& o) const
   o.m_email = m_edEmail->text();
   o.m_CPF_CNPJ = m_edCpfCnpj->text();
   o.m_RG_IE = m_edRgIE->text();
-  o.m_details = m_edDetails->text();
+  o.m_details = m_teDetails->toPlainText();
   o.m_bBirth = m_cbBirthDate->isChecked();
   o.m_dtBirth = m_dtBirthDate->date();
 }

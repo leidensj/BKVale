@@ -3,7 +3,6 @@
 
 #include "form.h"
 #include "timeinterval.h"
-#include "store.h"
 #include <QVector>
 
 struct Employee : public JItemSQL
@@ -25,8 +24,6 @@ struct Employee : public JItemSQL
   bool SQL_select_by_pincode(QString& error);
   bool SQL_select_by_pincode_proc(QSqlQuery& query, QString& error);
 
-  static QVector<Employee> SQL_select_from_store(Id storeId);
-
   QString name() const { return m_form.strAliasName(); }
   QByteArray image() const { return m_form.m_image.m_image; }
 
@@ -34,7 +31,6 @@ struct Employee : public JItemSQL
   QString m_pincode;
   bool m_bNoteEdit;
   bool m_bNoteRemove;
-  Store m_store;
 
   QString strHours() const;
   QVector<TimeInterval> m_hours;

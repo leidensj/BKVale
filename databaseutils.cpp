@@ -247,11 +247,8 @@ bool BaitaSQL::createTables(QString& error)
                           EMPLOYEE_SQL_COL02 " TEXT UNIQUE,"
                           EMPLOYEE_SQL_COL03 " BOOLEAN,"
                           EMPLOYEE_SQL_COL04 " BOOLEAN,"
-                          EMPLOYEE_SQL_COL05 " INTEGER,"
                           "FOREIGN KEY(" EMPLOYEE_SQL_COL01 ") REFERENCES "
-                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" EMPLOYEE_SQL_COL05 ") REFERENCES "
-                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
@@ -268,6 +265,13 @@ bool BaitaSQL::createTables(QString& error)
                           SUPPLIER_SQL_COL01 " INTEGER NOT NULL UNIQUE,"
                           "FOREIGN KEY(" SUPPLIER_SQL_COL01 ") REFERENCES "
                           FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          STORE_EMPLOYEES_SQL_COL01 " INTEGER NOT NULL UNIQUE,"
+                          "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL01 ") REFERENCES "
+                          EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("

@@ -56,6 +56,7 @@ void Store::clear(bool bClearId)
   m_address.clear();
   m_phone.clear();
   m_description.clear();
+  m_vEmployee.clear();
 }
 
 bool Store:: operator != (const JItem& other) const
@@ -64,7 +65,8 @@ bool Store:: operator != (const JItem& other) const
   return m_form.m_id != another.m_form.m_id ||
          m_address.m_id != another.m_address.m_id ||
          m_phone.m_id != another.m_phone.m_id ||
-         m_description != another.m_description;
+         m_description != another.m_description ||
+         m_vEmployee != another.m_vEmployee;
 }
 
 bool Store:: operator == (const JItem& other) const
@@ -105,7 +107,18 @@ bool Store::SQL_insert_proc(QSqlQuery& query) const
 
     bSuccess = query.exec();
     if (bSuccess)
+    {
       m_id.set(query.lastInsertId().toLongLong());
+      for (int i = 0; i != m_vEmployee.size() && bSuccess; ++i)
+      {
+        query.prepare("INSERT INTO " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
+                      STORE_EMPLOYEES_SQL_COL01 ")"
+                      " VALUES ("
+                      "(:_v01))");
+        query.bindValue(":_v01", m_vEmployee.at(i).m_id.get());
+        bSuccess = query.exec();
+      }
+    }
   }
   return bSuccess;
 }
@@ -128,6 +141,22 @@ bool Store::SQL_update_proc(QSqlQuery& query) const
     query.bindValue(":_v03", m_phone.m_id.getIdNull());
     query.bindValue(":_v04", m_description);
     bSuccess = query.exec();
+    if (bSuccess)
+    {
+      query.prepare("DELETE FROM " STORE_EMPLOYEES_SQL_TABLE_NAME
+                    " WHERE " STORE_EMPLOYEES_SQL_COL01 " = (:_v01)");
+      query.bindValue(":_v01", m_id.get());
+      bSuccess = query.exec();
+      for (int i = 0; i != m_vEmployee.size() && bSuccess; ++i)
+      {
+        query.prepare("INSERT INTO " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
+                      STORE_EMPLOYEES_SQL_COL01 ")"
+                      " VALUES ("
+                      "(:_v01))");
+        query.bindValue(":_v01", m_vEmployee.at(i).m_id.get());
+        bSuccess = query.exec();
+      }
+    }
   }
 
   return bSuccess;
@@ -163,6 +192,24 @@ bool Store::SQL_select_proc(QSqlQuery& query, QString& error)
     }
   }
 
+  if (bSuccess)
+  {
+    query.prepare("SELECT "
+                  SQL_COLID
+                  " FROM " STORE_EMPLOYEES_SQL_TABLE_NAME
+                  " WHERE " STORE_EMPLOYEES_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    while (bSuccess && query.next())
+    {
+      Employee e;
+      e.m_id.set(query.value(0).toLongLong());
+      m_vEmployee.push_back(e);
+    }
+  }
+
+  for (int i = 0; i != m_vEmployee.size() && bSuccess; ++i)
+    bSuccess = m_vEmployee[i].SQL_select_proc(query, error);
+
   if (bSuccess && m_form.m_id.isValid())
     bSuccess = m_form.SQL_select_proc(query, error);
 
@@ -191,36 +238,4 @@ bool Store::SQL_remove_proc(QSqlQuery& query) const
 JModel* Store::SQL_table_model(QObject* parent) const
 {
   return new StoreModel(parent);
-}
-
-QStringList Store::SQL_select_employees() const
-{
-  QString error;
-  QStringList lst;
-
-  if (SQL_isOpen(error))
-  {
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    db.transaction();
-    QSqlQuery query(db);
-
-    query.prepare("SELECT "
-                  FORM_SQL_TABLE_NAME "." FORM_SQL_COL02
-                  " FROM "
-                  FORM_SQL_TABLE_NAME
-                  " LEFT OUTER JOIN "
-                  EMPLOYEE_SQL_TABLE_NAME
-                  " ON " FORM_SQL_TABLE_NAME "." SQL_COLID
-                  " = " EMPLOYEE_SQL_TABLE_NAME "." EMPLOYEE_SQL_COL01
-                  " WHERE " EMPLOYEE_SQL_TABLE_NAME "." EMPLOYEE_SQL_COL05
-                  " = (:_v00)");
-    query.bindValue(":_v00", m_id.get());
-
-    bool bSuccess = query.exec();
-    while (bSuccess && query.next())
-      lst.push_back(query.value(0).toString());
-    SQL_finish(db, query, bSuccess, error);
-  }
-
-  return lst;
 }

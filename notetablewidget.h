@@ -4,7 +4,7 @@
 #include "jitemtable.h"
 #include "note.h"
 
-class NoteTableWidget : public JTable
+class NoteTableWidget : public JItemTable
 {
   Q_OBJECT
 

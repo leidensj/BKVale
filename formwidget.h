@@ -14,6 +14,7 @@ class QPushButton;
 class PhoneTableWidget;
 class AddressTableWidget;
 class JAddRemoveButtons;
+class JPlainTextEdit;
 
 class FormInfoWidget : public QWidget
 {
@@ -36,6 +37,7 @@ public:
 
 public slots:
   void setCompany(bool b);
+  void addWidget(const QString& text, QWidget* w);
 
 private slots:
   void switchUserType();
@@ -62,7 +64,7 @@ public:
   JLineEdit* m_edRgIE;
   QLabel* m_lblRgIE;
   JLineEdit* m_edEmail;
-  JLineEdit* m_edDetails;
+  JPlainTextEdit* m_teDetails;
   QDateEdit* m_dtBirthDate;
   QCheckBox* m_cbBirthDate;
   JDatabasePicker* m_imagePicker;

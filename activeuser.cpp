@@ -194,14 +194,18 @@ bool ActiveUser::SQL_login(const QString& strUser, const QString& strPassword, Q
                     ACTIVE_USERS_SQL_TABLE_NAME " WHERE "
                     ACTIVE_USERS_SQL_COL02 " = (:v02) LIMIT 1");
       query.bindValue(":v02", m_user.m_id.get());
-      if (query.next())
+      bSuccess = query.exec();
+      if (bSuccess)
       {
-        bSuccess = false;
-        error = "Usuário " + m_user.m_strUser  + " já logado na máquina " + query.value(0).toString();
-      }
-      else
-      {
-        bSuccess = SQL_insert_proc(query);
+        if (query.next())
+        {
+          bSuccess = false;
+          error = "Usuário " + m_user.m_strUser  + " já logado na máquina " + query.value(0).toString();
+        }
+        else
+        {
+          bSuccess = SQL_insert_proc(query);
+        }
       }
     }
   }

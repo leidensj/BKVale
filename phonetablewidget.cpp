@@ -5,7 +5,7 @@
 #include "jtablewidgetitem.h"
 
 PhoneTableWidget::PhoneTableWidget(QWidget* parent)
-: JTable((int)Flags::NoFlags, parent)
+  : JItemTable((int)Flags::NoFlags, parent)
 {
   setColumnCount(1);
   QStringList headers;

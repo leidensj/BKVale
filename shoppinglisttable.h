@@ -5,7 +5,7 @@
 #include "shoppinglist.h"
 #include "jitemtable.h"
 
-class ShoppingListTable : public JTable
+class ShoppingListTable : public JItemTable
 {
   Q_OBJECT
 

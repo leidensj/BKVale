@@ -115,8 +115,7 @@ void TimeCard::saveAndAccept()
 
   QLocale br(QLocale::Portuguese, QLocale::Brazil);
 
-  QVector<Employee> v(Employee::SQL_select_from_store(o.m_id));
-  for (int i = 0; i != v.size() + m_spnExtraPages->value(); ++i)
+  for (int i = 0; i != o.m_vEmployee.size() + m_spnExtraPages->value(); ++i)
   {
     // 1 - Nome funcionário
     // 2 - Horário
@@ -142,12 +141,12 @@ void TimeCard::saveAndAccept()
           "<th colspan=\"2\">Hora</th>"
           "<th>Assinatura</th>"
           "<th colspan=\"2\">Hora</th>"
-        "</tr>").arg(i >= v.size()
+        "</tr>").arg(i >= o.m_vEmployee.size()
                      ? "_____________________________________"
-                     : v.at(i).m_form.m_name,
-                     i >= v.size()
+                     : o.m_vEmployee.at(i).m_form.m_name,
+                     i >= o.m_vEmployee.size()
                      ? "______________________________________"
-                     : v.at(i).strHours(),
+                     : o.m_vEmployee.at(i).strHours(),
                      br.toString(idt, "MMMM").toUpper(),
                      idt.toString("yyyy"));
     dt = idt;
@@ -206,7 +205,7 @@ void TimeCard::saveAndAccept()
       "<td width=\"50%\"></td>"
       "</tr>"
       "</tr>"
-      "</table>").arg(i == (v.size() + m_spnExtraPages->value() - 1) ? "" : "page-break-after:always;");
+      "</table>").arg(i == (o.m_vEmployee.size() + m_spnExtraPages->value() - 1) ? "" : "page-break-after:always;");
   }
 
   html +=

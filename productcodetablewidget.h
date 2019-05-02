@@ -4,7 +4,7 @@
 #include "jitemtable.h"
 #include "product.h"
 
-class ProductCodeTableWidget : public JTable
+class ProductCodeTableWidget : public JItemTable
 {
   Q_OBJECT
 

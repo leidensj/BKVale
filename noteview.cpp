@@ -18,7 +18,6 @@
 #include <QSplitter>
 #include <QMessageBox>
 #include <QTabWidget>
-#include <QTableWidget>
 #include <QRadioButton>
 #include <QFormLayout>
 #include "jplaintextedit.h"
@@ -26,6 +25,7 @@
 #include "jitemhelper.h"
 #include "jaddremovebuttons.h"
 #include "jdoublespinbox.h"
+#include "jitemtable.h"
 
 NoteDetailsDlg::NoteDetailsDlg(QWidget* parent)
   : QDialog(parent)
@@ -64,12 +64,11 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   , m_noteTotal(0.0)
   , m_noteDate(QDate::currentDate())
 {
-  m_table = new QTableWidget;
-  m_table->setColumnCount(3);
+  m_table = new JTable;
+  m_table->setColumnCount(2);
   QStringList headers;
-  headers << "Número" << "Data" << "Valor";
+  headers << "Data" << "Valor";
   m_table->setHorizontalHeaderLabels(headers);
-  m_table->horizontalHeader()->setSectionResizeMode((int)Column::Number, QHeaderView::ResizeMode::ResizeToContents);
   m_table->horizontalHeader()->setSectionResizeMode((int)Column::Date, QHeaderView::ResizeMode::ResizeToContents);
   m_table->horizontalHeader()->setSectionResizeMode((int)Column::Value, QHeaderView::ResizeMode::Stretch);
 
@@ -176,8 +175,6 @@ void PaymentDlg::setNoteDate(const QDate& date)
 
 void PaymentDlg::addRow()
 {
-  QTableWidgetItem* it = new QTableWidgetItem;
-  it->setFlags(it->flags() & ~Qt::ItemIsEditable);
   JDoubleSpinBox* spn = new JDoubleSpinBox;
   spn->setMinimum(0.0);
   spn->setMaximum(999999999.00);
@@ -187,14 +184,8 @@ void PaymentDlg::addRow()
   dt->setDate(m_noteDate.addMonths(1 + m_table->rowCount()));
   m_table->insertRow(m_table->rowCount());
   int row = m_table->rowCount() - 1;
-  m_table->setItem(row, (int)Column::Number, it);
   m_table->setCellWidget(row, (int)Column::Date, dt);
   m_table->setCellWidget(row, (int)Column::Value, spn);
-  for (int i = 0; i != m_table->rowCount(); ++i)
-  {
-    auto it = m_table->item(i, (int)Column::Number);
-    it->setText(QString::number(i + 1) + "/" + QString::number(m_table->rowCount()));
-  }
   updateControls();
 }
 

@@ -55,7 +55,6 @@ void Employee::clear(bool bClearId)
   m_pincode.clear();
   m_bNoteEdit = false;
   m_bNoteRemove = false;
-  m_store.clear();
   m_hours.clear();
 }
 
@@ -82,7 +81,7 @@ bool Employee::operator !=(const JItem& other) const
             m_pincode != another.m_pincode ||
             m_bNoteEdit != another.m_bNoteEdit ||
             m_bNoteRemove != another.m_bNoteRemove ||
-            m_store != another.m_store;
+            m_hours != another.m_hours;
   return b;
 }
 
@@ -111,19 +110,16 @@ bool Employee::SQL_insert_proc(QSqlQuery& query) const
                   EMPLOYEE_SQL_COL01 ","
                   EMPLOYEE_SQL_COL02 ","
                   EMPLOYEE_SQL_COL03 ","
-                  EMPLOYEE_SQL_COL04 ","
-                  EMPLOYEE_SQL_COL05
+                  EMPLOYEE_SQL_COL04
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
                   "(:_v03),"
-                  "(:_v04),"
-                  "(:_v05))");
+                  "(:_v04))");
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
     query.bindValue(":_v03", m_bNoteEdit);
     query.bindValue(":_v04", m_bNoteRemove);
-    query.bindValue(":_v05", m_store.m_id.getIdNull());
     bSuccess = query.exec();
     if (bSuccess)
     {
@@ -162,15 +158,13 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
                   EMPLOYEE_SQL_COL01 " = (:_v01),"
                   EMPLOYEE_SQL_COL02 " = (:_v02),"
                   EMPLOYEE_SQL_COL03 " = (:_v03),"
-                  EMPLOYEE_SQL_COL04 " = (:_v04),"
-                  EMPLOYEE_SQL_COL05 " = (:_v05)"
+                  EMPLOYEE_SQL_COL04 " = (:_v04)"
                   " WHERE " SQL_COLID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
     query.bindValue(":_v03", m_bNoteEdit);
     query.bindValue(":_v04", m_bNoteRemove);
-    query.bindValue(":_v05", m_store.m_id.getIdNull());
 
     bSuccess = query.exec();
     if (bSuccess)
@@ -214,8 +208,7 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
                 EMPLOYEE_SQL_COL01 ","
                 EMPLOYEE_SQL_COL02 ","
                 EMPLOYEE_SQL_COL03 ","
-                EMPLOYEE_SQL_COL04 ","
-                EMPLOYEE_SQL_COL05
+                EMPLOYEE_SQL_COL04
                 " FROM " EMPLOYEE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -228,7 +221,6 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
       m_pincode = query.value(1).toString();
       m_bNoteEdit = query.value(2).toBool();
       m_bNoteRemove = query.value(3).toBool();
-      m_store.m_id.set(query.value(4).toLongLong());
     }
     else
     {
@@ -259,9 +251,6 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess)
     bSuccess = m_form.SQL_select_proc(query, error);
-
-  if (bSuccess && m_store.m_id.isValid())
-    bSuccess = m_store.SQL_select_proc(query, error);
 
   return bSuccess;
 }
@@ -343,45 +332,4 @@ QString Employee::strHours() const
   if (m_hours.size() > 0)
     str.chop(1);
   return str;
-}
-
-QVector<Employee> Employee::SQL_select_from_store(Id storeId)
-{
-  QString error;
-  QVector<Employee> v;
-  if (!storeId.isValid())
-    return v;
-
-  if (SQL_isOpen(error))
-  {
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    db.transaction();
-    QSqlQuery query(db);
-
-    query.prepare("SELECT "
-                  SQL_COLID
-                  " FROM "
-                  EMPLOYEE_SQL_TABLE_NAME
-                  " WHERE " EMPLOYEE_SQL_COL05 " = (:_v05)");
-    query.bindValue(":_v05", storeId.get());
-
-    bool bSuccess = query.exec();
-    while (bSuccess && query.next())
-    {
-      Employee e;
-      e.m_id = query.value(0).toLongLong();
-      v.push_back(e);
-    }
-
-    for (int i = 0; i != v.size(); ++i)
-    {
-      bSuccess = v[i].SQL_select_proc(query, error);
-      if (!bSuccess)
-        break;
-    }
-
-    SQL_finish(db, query, bSuccess, error);
-  }
-
-  return v;
 }

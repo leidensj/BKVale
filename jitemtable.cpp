@@ -31,9 +31,8 @@ JTable::JTable(int flags, QWidget* parent)
   verticalHeader()->setSectionsMovable(true);
   verticalHeader()->setHighlightSections(false);
 
-  QObject::connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(update(int, int)));
   QObject::connect(this, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(emitChangedSignal()));
-  QObject::connect(this, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(itemActivate(int,int)));
+  QObject::connect(this, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(emitActivateSignal(int, int)));
 }
 
 void JTable::removeItem()
@@ -69,8 +68,7 @@ void JTable::keyPressEvent(QKeyEvent *event)
                        event->count());
     QTableWidget::keyPressEvent(&modEvent);
   }
-  else if (event->key() == Qt::Key_Escape ||
-           event->key() == Qt::Key_Backspace)
+  else if (event->key() == Qt::Key_Delete)
   {
     if (currentIndex().isValid())
       emit deleteSignal(currentIndex().row(), currentIndex().column());
@@ -94,6 +92,17 @@ void JTable::emitChangedSignal()
   emit changedSignal();
 }
 
+
+void JTable::emitDeleteSignal(int row, int column)
+{
+  emit deleteSignal(row, column);
+}
+
+void JTable::emitActivateSignal(int row, int column)
+{
+  emit activateSignal(row, column);
+}
+
 bool JTable::isValidRow(int row) const
 {
   return row >= 0 && row < rowCount();
@@ -104,7 +113,13 @@ bool JTable::isValidCurrentRow() const
   return isValidRow(currentRow());
 }
 
-void JTable::setHeaderIcon(int pos, const QIcon& icon)
+JItemTable::JItemTable(int flags, QWidget* parent)
+  : JTable(flags, parent)
+{
+  QObject::connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(update(int, int)));
+}
+
+void JItemTable::setHeaderIcon(int pos, const QIcon& icon)
 {
   model()->setHeaderData(pos,
                          Qt::Horizontal,
@@ -112,7 +127,7 @@ void JTable::setHeaderIcon(int pos, const QIcon& icon)
                          Qt::DecorationRole);
 }
 
-void JTable::setHeaderIconSearchable(int pos)
+void JItemTable::setHeaderIconSearchable(int pos)
 {
   setHeaderIcon(pos, QIcon(":/icons/res/binoculars.png"));
 }

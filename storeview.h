@@ -4,11 +4,13 @@
 #include "store.h"
 #include "jitemview.h"
 
-class QListWidget;
+class JTable;
 class FormInfoWidget;
 class FormDetailsWidget;
 class FormPhoneWidget;
 class FormAddressWidget;
+class JAddRemoveButtons;
+class QTableWidgetItem;
 
 class StoreView : public JItemView
 {
@@ -22,6 +24,8 @@ public:
 public slots:
   void create();
   void updateControls();
+  void addEmployee();
+  void addEmployee(const Employee& e);
 
 private:
   mutable Store m_ref;
@@ -29,7 +33,8 @@ private:
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;
   FormAddressWidget* m_formAddress;
-  QListWidget* m_list;
+  JTable* m_tbEmployee;
+  JAddRemoveButtons* m_btnAddRemove;
   void setItem(const JItemSQL& o);
 };
 

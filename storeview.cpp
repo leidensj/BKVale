@@ -31,6 +31,7 @@ StoreView::StoreView(QWidget* parent)
   QStringList headers;
   headers << tr("Funcionário");
   m_tbEmployee->setHorizontalHeaderLabels(headers);
+  m_tbEmployee->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 
   QVBoxLayout* ltTable = new QVBoxLayout;
   ltTable->addWidget(m_btnAddRemove);
@@ -96,7 +97,18 @@ Id StoreView::getId() const
 
 void StoreView::addEmployee()
 {
+  QString filter;
+  if (m_tbEmployee->rowCount() != 0)
+  {
+    filter = EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN (";
+    for (int i = 0; i != m_tbEmployee->rowCount(); ++i)
+      filter += m_tbEmployee->item(i, 0)->data(Qt::UserRole).toString() + ",";
+    filter.chop(1);
+    filter += ")";
+  }
+
   JDatabaseSelector dlg(EMPLOYEE_SQL_TABLE_NAME);
+  dlg.getDatabase()->setFixedFilter(filter);
   dlg.exec();
   auto pt = dynamic_cast<Employee*>(dlg.getDatabase()->getCurrentItem());
   if (pt != nullptr)
@@ -105,7 +117,9 @@ void StoreView::addEmployee()
 
 void StoreView::addEmployee(const Employee& e)
 {
-  QTableWidgetItem* it = new QTableWidgetItem(e.m_form.m_name);
-  it->setData(Qt::UserRole, e.m_id.get());
-  m_tbEmployee->setItem(m_tbEmployee->rowCount(), 0, it);
+  m_tbEmployee->insertRow(m_tbEmployee->rowCount());
+  auto pt = new QTableWidgetItem(e.m_form.m_name);
+  pt->setFlags(pt ->flags() & ~Qt::ItemFlag::ItemIsEditable);
+  pt->setData(Qt::UserRole, e.m_id.get());
+  m_tbEmployee->setItem(m_tbEmployee->rowCount() - 1, 0, pt);
 }

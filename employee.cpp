@@ -51,7 +51,7 @@ void Employee::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
-  m_form.clear();
+  m_form.clear(bClearId);
   m_pincode.clear();
   m_bNoteEdit = false;
   m_bNoteRemove = false;

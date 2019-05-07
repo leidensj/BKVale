@@ -52,7 +52,7 @@ void Store::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
-  m_form.clear();
+  m_form.clear(bClearId);
   m_address.clear();
   m_phone.clear();
   m_description.clear();
@@ -112,10 +112,13 @@ bool Store::SQL_insert_proc(QSqlQuery& query) const
       for (int i = 0; i != m_vEmployee.size() && bSuccess; ++i)
       {
         query.prepare("INSERT INTO " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
-                      STORE_EMPLOYEES_SQL_COL01 ")"
+                      STORE_EMPLOYEES_SQL_COL01 ","
+                      STORE_EMPLOYEES_SQL_COL02 ")"
                       " VALUES ("
-                      "(:_v01))");
+                      "(:_v01),"
+                      "(:_v02))");
         query.bindValue(":_v01", m_vEmployee.at(i).m_id.get());
+        query.bindValue(":_v02", m_id.get());
         bSuccess = query.exec();
       }
     }
@@ -144,16 +147,19 @@ bool Store::SQL_update_proc(QSqlQuery& query) const
     if (bSuccess)
     {
       query.prepare("DELETE FROM " STORE_EMPLOYEES_SQL_TABLE_NAME
-                    " WHERE " STORE_EMPLOYEES_SQL_COL01 " = (:_v01)");
-      query.bindValue(":_v01", m_id.get());
+                    " WHERE " STORE_EMPLOYEES_SQL_COL02 " = (:_v02)");
+      query.bindValue(":_v02", m_id.get());
       bSuccess = query.exec();
       for (int i = 0; i != m_vEmployee.size() && bSuccess; ++i)
       {
         query.prepare("INSERT INTO " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
-                      STORE_EMPLOYEES_SQL_COL01 ")"
+                      STORE_EMPLOYEES_SQL_COL01 ","
+                      STORE_EMPLOYEES_SQL_COL02 ")"
                       " VALUES ("
-                      "(:_v01))");
+                      "(:_v01),"
+                      "(:_v02))");
         query.bindValue(":_v01", m_vEmployee.at(i).m_id.get());
+        query.bindValue(":_v02", m_id.get());
         bSuccess = query.exec();
       }
     }
@@ -195,10 +201,11 @@ bool Store::SQL_select_proc(QSqlQuery& query, QString& error)
   if (bSuccess)
   {
     query.prepare("SELECT "
-                  SQL_COLID
+                  STORE_EMPLOYEES_SQL_COL01
                   " FROM " STORE_EMPLOYEES_SQL_TABLE_NAME
-                  " WHERE " STORE_EMPLOYEES_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", m_id.get());
+                  " WHERE " STORE_EMPLOYEES_SQL_COL02 " = (:_v02)");
+    query.bindValue(":_v02", m_id.get());
+    bSuccess = query.exec();
     while (bSuccess && query.next())
     {
       Employee e;

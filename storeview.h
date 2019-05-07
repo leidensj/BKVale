@@ -10,7 +10,6 @@ class FormDetailsWidget;
 class FormPhoneWidget;
 class FormAddressWidget;
 class JAddRemoveButtons;
-class QTableWidgetItem;
 
 class StoreView : public JItemView
 {

@@ -105,10 +105,10 @@ void TimeCard::saveAndAccept()
                           idt.toString("dd/MM/yyyy"),
                           fdt.toString("dd/MM/yyyy"),
                           o.m_form.m_name,
-                          "CNPJ: " + o.m_form.m_CPF_CNPJ,
-                          o.m_address.m_street + ", " + QString::number(o.m_address.m_number),
-                          "CEP: " + o.m_address.m_cep,
-                          o.m_address.m_city + " " + o.m_address.getBRState().m_abv);
+                          o.m_form.m_CPF_CNPJ.isEmpty() ? "" : "CNPJ: " + o.m_form.m_CPF_CNPJ,
+                          o.m_address.m_street.isEmpty() ? "" : o.m_address.m_street + ", " + QString::number(o.m_address.m_number),
+                          o.m_address.m_cep.isEmpty() ? "" : "CEP: " + o.m_address.m_cep,
+                          o.m_address.m_city.isEmpty() ? "" :o.m_address.m_city + " " + o.m_address.getBRState().m_abv);
 
   // página em branco
   html += "<p style=\"page-break-after: always;\">&nbsp;</p>";
@@ -129,7 +129,7 @@ void TimeCard::saveAndAccept()
     html += QString(
       "<pre style=\"font-size:16pt;\" align=\"left\"><b>" + title + "</b></pre>"
       "<p>Nome: %1 Horário: %2</p>"
-      "<table align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+      "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
         "<tr><th colspan=\"2\">%3 %4</th>"
           "<th colspan=\"3\">ENTRADA</th>"
           "<th colspan=\"3\">SAIDA</th>"
@@ -173,7 +173,7 @@ void TimeCard::saveAndAccept()
     html += QString(
       "</table>"
       "<br>"
-      "<table cellpadding=\"2\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;%1\">"
+      "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;%1\">"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS NORMAIS</td>"
       "<td width=\"10%\">(H.N.)</td>"

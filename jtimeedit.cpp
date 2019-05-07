@@ -5,7 +5,6 @@ JTimeEdit::JTimeEdit(int flags, QWidget* parent)
  : QTimeEdit(parent)
  , m_flags(flags)
 {
-  setDisplayFormat("HH:mm:ss");
 }
 
 void JTimeEdit::keyPressEvent(QKeyEvent *event)

@@ -10,6 +10,7 @@ class JLineEdit;
 class JDatabasePicker;
 class QCheckBox;
 class QTableWidget;
+class QTreeWidgetItem;
 class JTimeEdit;
 class JSpinBox;
 class QLabel;
@@ -18,6 +19,8 @@ class FormInfoWidget;
 class FormDetailsWidget;
 class FormPhoneWidget;
 class FormAddressWidget;
+class JTable;
+class QTreeWidget;
 
 class EmployeeView : public JItemView
 {
@@ -43,9 +46,10 @@ private:
   FormPhoneWidget* m_formPhone;
   FormAddressWidget* m_formAddress;
   JLineEdit* m_edPincode;
-  QCheckBox* m_cbNoteEdit;
-  QCheckBox* m_cbNoteRemove;
-  QTableWidget* m_tbHours;
+  QTreeWidget* m_trPermissions;
+  QTreeWidgetItem* m_triNoteEdit;
+  QTreeWidgetItem* m_triNoteRemove;
+  JTable* m_tbHours;
   JAddRemoveButtons* m_btnAddRemove;
   void setItem(const JItemSQL& o);
 };

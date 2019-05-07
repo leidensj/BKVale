@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QDateEdit>
 
+
 StoreView::StoreView(QWidget* parent)
   : JItemView(STORE_SQL_TABLE_NAME, parent)
   , m_formInfo(nullptr)
@@ -66,7 +67,7 @@ void StoreView::create()
 
 void StoreView::updateControls()
 {
-  //TODO
+  m_btnAddRemove->m_btnRemove->setEnabled(m_tbEmployee->isValidCurrentRow());
 }
 
 const JItemSQL& StoreView::getItem() const
@@ -93,6 +94,7 @@ void StoreView::setItem(const JItemSQL& o)
   m_formDetails->setForm(m_ref.m_form);
   m_formPhone->setForm(m_ref.m_form);
   m_formAddress->setForm(m_ref.m_form);
+  m_tbEmployee->removeAllItems();
   for (int i = 0; i != m_ref.m_vEmployee.size(); ++i)
     addEmployee(m_ref.m_vEmployee.at(i));
 }

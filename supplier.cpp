@@ -51,7 +51,7 @@ void Supplier::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
-  m_form.clear();
+  m_form.clear(bClearId);
 }
 
 bool Supplier::operator !=(const JItem& other) const

@@ -270,8 +270,11 @@ bool BaitaSQL::createTables(QString& error)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " STORE_EMPLOYEES_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           STORE_EMPLOYEES_SQL_COL01 " INTEGER NOT NULL UNIQUE,"
+                          STORE_EMPLOYEES_SQL_COL02 " INTEGER NOT NULL,"
                           "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL01 ") REFERENCES "
-                          EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+                          EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" STORE_EMPLOYEES_SQL_COL02 ") REFERENCES "
+                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("

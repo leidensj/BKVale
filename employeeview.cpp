@@ -8,9 +8,10 @@
 #include "jtimeedit.h"
 #include <QPushButton>
 #include "timeinterval.h"
-#include <QTableWidget>
+#include "jitemtable.h"
 #include <QHeaderView>
 #include <QRadioButton>
+#include <QTreeWidget>
 #include "jaddremovebuttons.h"
 #include "formwidget.h"
 
@@ -21,8 +22,9 @@ EmployeeView::EmployeeView(QWidget* parent)
   , m_formPhone(nullptr)
   , m_formAddress(nullptr)
   , m_edPincode(nullptr)
-  , m_cbNoteEdit(nullptr)
-  , m_cbNoteRemove(nullptr)
+  , m_trPermissions(nullptr)
+  , m_triNoteEdit(nullptr)
+  , m_triNoteRemove(nullptr)
   , m_tbHours(nullptr)
   , m_btnAddRemove(nullptr)
 {
@@ -31,13 +33,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formPhone = new FormPhoneWidget;
   m_formAddress= new FormAddressWidget;
   m_edPincode = new JLineEdit(JLineEdit::Input::Alphanumeric);
-  m_cbNoteEdit = new QCheckBox;
-  m_cbNoteEdit->setText(tr("Criar e editar"));
-  m_cbNoteEdit->setIcon(QIcon(":/icons/res/file.png"));
-  m_cbNoteRemove = new QCheckBox;
-  m_cbNoteRemove->setText(tr("Remover"));
-  m_cbNoteRemove->setIcon(QIcon(":/icons/res/remove.png"));
-  m_tbHours = new QTableWidget();
+  m_tbHours = new JTable;
   m_tbHours->setColumnCount(2);
   QStringList headers;
   headers << "Início" << "Fim";
@@ -48,14 +44,26 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_tbHours->setSelectionMode(QAbstractItemView::SingleSelection);
   m_btnAddRemove = new JAddRemoveButtons;
 
+  m_trPermissions = new QTreeWidget;
+  m_trPermissions->setColumnCount(1);
+  m_trPermissions->header()->setVisible(false);
+  auto root = new QTreeWidgetItem;
+  root->setText(0, tr("Vales"));
+  root->setIcon(0, QIcon(":/icons/res/note.png"));
+  m_trPermissions->insertTopLevelItem(0, root);
+  m_triNoteEdit = new QTreeWidgetItem;
+  m_triNoteRemove = new QTreeWidgetItem;
+  m_triNoteEdit->setText(0, tr("Criar/editar"));
+  m_triNoteEdit->setIcon(0, QIcon(":/icons/res/file.png"));
+  m_triNoteEdit->setCheckState(0, Qt::Unchecked);
+  m_triNoteRemove->setText(0, tr("Remover"));
+  m_triNoteRemove->setIcon(0, QIcon(":/icons/res/remove.png"));
+  m_triNoteRemove->setCheckState(0, Qt::Unchecked);
+  root->addChild(m_triNoteEdit);
+  root->addChild(m_triNoteRemove);
+  root->setExpanded(true);
+
   m_formInfo->addWidget(tr("Código PIN:"), m_edPincode);
-
-  QFormLayout* ltPermissions = new QFormLayout;
-  ltPermissions->addRow(tr("Vales:"), m_cbNoteEdit);
-  ltPermissions->addRow("", m_cbNoteRemove);
-
-  QFrame* frPermissions = new QFrame;
-  frPermissions->setLayout(ltPermissions);
 
   QVBoxLayout* ltHours = new QVBoxLayout;
   ltHours->addWidget(m_btnAddRemove);
@@ -66,7 +74,7 @@ EmployeeView::EmployeeView(QWidget* parent)
 
   m_tab->addTab(m_formInfo, QIcon(":/icons/res/resume.png"), tr("Informações"));
   m_tab->addTab(m_formDetails, QIcon(":/icons/res/details.png"), tr("Detalhes"));
-  m_tab->addTab(frPermissions, QIcon(":/icons/res/usershield.png"), tr("Permissões"));
+  m_tab->addTab(m_trPermissions, QIcon(":/icons/res/usershield.png"), tr("Permissões"));
   m_tab->addTab(frHours, QIcon(":/icons/res/clock.png"), tr("Horário"));
   m_tab->addTab(m_formPhone, QIcon(":/icons/res/phone.png"), tr("Telefone"));
   m_tab->addTab(m_formAddress, QIcon(":/icons/res/address.png"), tr("Endereço"));
@@ -100,8 +108,8 @@ const JItemSQL& EmployeeView::getItem() const
   m_formPhone->fillForm(m_ref.m_form);
   m_formAddress->fillForm(m_ref.m_form);
   m_ref.m_pincode = m_edPincode->text();
-  m_ref.m_bNoteEdit = m_cbNoteEdit->isChecked();
-  m_ref.m_bNoteRemove = m_cbNoteRemove->isChecked();
+  m_ref.m_bNoteEdit = m_triNoteEdit->checkState(0) == Qt::Checked;
+  m_ref.m_bNoteRemove = m_triNoteRemove->checkState(0) == Qt::Checked;
   for (int i = 0; i != m_tbHours->rowCount(); ++i)
   {
     TimeInterval t;
@@ -120,8 +128,8 @@ void EmployeeView::setItem(const JItemSQL& o)
   m_formPhone->setForm(m_ref.m_form);
   m_formAddress->setForm(m_ref.m_form);
   m_edPincode->setText(m_ref.m_pincode);
-  m_cbNoteEdit->setChecked(m_ref.m_bNoteEdit);
-  m_cbNoteRemove->setChecked(m_ref.m_bNoteRemove);
+  m_triNoteEdit->setCheckState(0, m_ref.m_bNoteEdit ? Qt::Checked : Qt::Unchecked);
+  m_triNoteRemove->setCheckState(0, m_ref.m_bNoteRemove ? Qt::Checked : Qt::Unchecked);
   m_tbHours->setRowCount(0);
   for (int i = 0; i != m_ref.m_hours.size(); ++i)
   {
@@ -133,14 +141,15 @@ void EmployeeView::setItem(const JItemSQL& o)
 
 void EmployeeView::addHour()
 {
-  JTimeEdit* begin = new JTimeEdit;
-  JTimeEdit* end = new JTimeEdit;
+  auto begin = new QTableWidgetItem("00:00");
+  auto end = new QTableWidgetItem("00:00");
+  begin->setToolTip(tr("Hora e minutos hh:mm"));
+  end->setToolTip(tr("Hora e minutos hh:mm"));
   m_tbHours->insertRow(m_tbHours->rowCount());
   int row = m_tbHours->rowCount() - 1;
-  m_tbHours->setCellWidget(row, 0, begin);
-  m_tbHours->setCellWidget(row, 1, end);
-  m_tbHours->setCurrentCell(row, 0, QItemSelectionModel::ClearAndSelect);
-  begin->setFocus();
+  m_tbHours->setItem(row, 0, begin);
+  m_tbHours->setItem(row, 1, end);
+  m_tbHours->setCurrentItem(begin);
   updateControls();
 }
 
@@ -154,6 +163,15 @@ void EmployeeView::removeHour()
 void EmployeeView::updateControls()
 {
   m_btnAddRemove->m_btnRemove->setEnabled(m_tbHours->currentRow() >= 0);
+  for (int i = 0; i != m_tbHours->rowCount(); ++i)
+  {
+    QTime begin = QTime::fromString(m_tbHours->item(i, 0)->text());
+    QTime end = QTime::fromString(m_tbHours->item(i, 1)->text());
+    QString str = begin.toString("HH:mm");
+    m_tbHours->item(i, 0)->setText(str.isEmpty() ? "00:00" : str);
+    str = end.toString("HH:mm");
+    m_tbHours->item(i, 1)->setText(str.isEmpty() ? "00:00" : str);
+  }
 }
 
 Id EmployeeView::getId() const

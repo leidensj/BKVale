@@ -72,10 +72,17 @@ void StoreView::updateControls()
 const JItemSQL& StoreView::getItem() const
 {
   m_ref.clear(false);
+  m_ref.m_vEmployee.clear();
   m_formInfo->fillForm(m_ref.m_form);
   m_formDetails->fillForm(m_ref.m_form);
   m_formPhone->fillForm(m_ref.m_form);
   m_formAddress->fillForm(m_ref.m_form);
+  for (int i = 0; i != m_tbEmployee->rowCount(); ++i)
+  {
+    Employee e;
+    e.m_id.set(m_tbEmployee->item(i, 0)->data(Qt::UserRole).toLongLong());
+    m_ref.m_vEmployee.push_back(e);
+  }
   return m_ref;
 }
 
@@ -97,10 +104,12 @@ Id StoreView::getId() const
 
 void StoreView::addEmployee()
 {
-  QString filter;
+  QString filter = EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN ("
+                   "SELECT " STORE_EMPLOYEES_SQL_TABLE_NAME "." STORE_EMPLOYEES_SQL_COL01
+                   " FROM " STORE_EMPLOYEES_SQL_TABLE_NAME ")";
   if (m_tbEmployee->rowCount() != 0)
   {
-    filter = EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN (";
+    filter += " AND " EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN (";
     for (int i = 0; i != m_tbEmployee->rowCount(); ++i)
       filter += m_tbEmployee->item(i, 0)->data(Qt::UserRole).toString() + ",";
     filter.chop(1);

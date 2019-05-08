@@ -20,7 +20,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnCreate->setIconSize(QSize(24, 24));
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-  m_btnCreate->setToolTip(tr("Novo"));
+  m_btnCreate->setToolTip(tr("Novo (Ctrl+N)"));
 
   m_btnSave = new QPushButton;
   m_btnSave->setFlat(true);
@@ -28,7 +28,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnSave->setIconSize(QSize(24, 24));
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
-  m_btnSave->setToolTip(tr("Salvar"));
+  m_btnSave->setToolTip(tr("Salvar (Ctrl+S)"));
 
   m_btnSearch = new QPushButton;
   m_btnSearch->setFlat(true);
@@ -36,7 +36,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
-  m_btnSearch->setToolTip(tr("Procurar"));
+  m_btnSearch->setToolTip(tr("Procurar (Ctrl+F)"));
 
   QHBoxLayout* buttonlayout = new QHBoxLayout;
   buttonlayout->setContentsMargins(0, 0, 0, 0);

@@ -55,6 +55,37 @@ public:
   }
 };
 
+
+PaymentPart::PaymentPart()
+{
+  clear();
+}
+
+void PaymentPart::clear(bool bClearId)
+{
+  if (bClearId)
+    m_id.clear();
+  m_value = 0.0;
+  m_date = QDate::currentDate();
+}
+
+bool PaymentPart::operator != (const JItem& other) const
+{
+  const PaymentPart& another = dynamic_cast<const PaymentPart&>(other);
+  return m_value != another.m_value ||
+         m_date != another.m_date;
+}
+
+bool PaymentPart::operator == (const JItem& other) const
+{
+  return !(*this != other);
+}
+
+bool PaymentPart::isValid() const
+{
+  return true;
+}
+
 Payment::Payment()
 {
   clear();
@@ -64,16 +95,18 @@ void Payment::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
-  m_value = 0.0;
-  m_date = QDate::currentDate();
+  m_cash = 0.0;
+  m_bonus = 0.0;
+  m_vCredit.clear();
   m_noteId.clear();
 }
 
 bool Payment::operator != (const JItem& other) const
 {
   const Payment& another = dynamic_cast<const Payment&>(other);
-  return m_value != another.m_value ||
-         m_date != another.m_date;
+  return m_cash != another.m_cash ||
+         m_bonus != another.m_bonus ||
+         m_vCredit != another.m_vCredit;
 }
 
 bool Payment::operator == (const JItem& other) const
@@ -102,14 +135,33 @@ bool Payment::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v02),"
                 "(:_v03))");
 
-  query.bindValue(":_v01", m_value);
-  query.bindValue(":_v02", m_date);
-  query.bindValue(":_v03", m_noteId.get());
+  query.bindValue(":_v01", m_noteId.get());
+  query.bindValue(":_v02", m_cash);
+  query.bindValue(":_v03", m_bonus);
 
   bool bSuccess = query.exec();
   if (bSuccess)
+  {
     m_id.set(query.lastInsertId().toLongLong());
+    for (int i = 0; i != m_vCredit.size() && bSuccess; ++i)
+    {
+      query.prepare("INSERT INTO " PAYMENT_PARTS_SQL_TABLE_NAME " ("
+                    PAYMENT_PARTS_SQL_COL01 ","
+                    PAYMENT_PARTS_SQL_COL02 ","
+                    PAYMENT_PARTS_SQL_COL03 ")"
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03))");
 
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vCredit.at(i).m_date);
+      query.bindValue(":_v03",  m_vCredit.at(i).m_value);
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_vCredit[i].m_id.set(query.lastInsertId().toLongLong());
+    }
+  }
   return bSuccess;
 }
 
@@ -121,16 +173,43 @@ bool Payment::SQL_update_proc(QSqlQuery& query) const
                 PAYMENT_SQL_COL03 " = (:_v03)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
-  query.bindValue(":_v01", m_value);
-  query.bindValue(":_v02", m_date);
-  query.bindValue(":_v03", m_noteId.get());
+  query.bindValue(":_v01", m_noteId.get());
+  query.bindValue(":_v02", m_cash);
+  query.bindValue(":_v03", m_bonus);
 
-  return query.exec();
+
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " PAYMENT_PARTS_SQL_TABLE_NAME
+                  " WHERE " PAYMENT_PARTS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
+    for (int i = 0; i != m_vCredit.size() && bSuccess; ++i)
+    {
+      query.prepare("INSERT INTO " PAYMENT_PARTS_SQL_TABLE_NAME " ("
+                    PAYMENT_PARTS_SQL_COL01 ","
+                    PAYMENT_PARTS_SQL_COL02 ","
+                    PAYMENT_PARTS_SQL_COL03 ")"
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03))");
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vCredit.at(i).m_date);
+      query.bindValue(":_v03",  m_vCredit.at(i).m_value);
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_vCredit[i].m_id.set(query.lastInsertId().toLongLong());
+    }
+  }
+
+  return bSuccess;
 }
 
 bool Payment::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
+  clear(false);
 
   query.prepare("SELECT "
                 PAYMENT_SQL_COL01 ","
@@ -145,14 +224,37 @@ bool Payment::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     if (query.next())
     {
-      m_value = query.value(0).toDouble();
-      m_date = query.value(1).toDate();
-      m_noteId.set(query.value(3).toLongLong());
+      m_noteId.set(query.value(1).toLongLong());
+      m_cash = query.value(2).toDouble();
+      m_bonus = query.value(3).toDate();
     }
     else
     {
       error = "Pagamento não encontrado.";
       bSuccess = false;
+    }
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("SELECT "
+                  SQL_COLID ","
+                  PAYMENT_PARTS_SQL_COL02 ","
+                  PAYMENT_PARTS_SQL_COL03
+                  " FROM " PAYMENT_PARTS_SQL_TABLE_NAME
+                  " WHERE " PAYMENT_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      while (query.next())
+      {
+        PaymentPart o;
+        o.m_id.set(query.value(0).toLongLong());
+        o.m_date = query.value(1).toDate();
+        o.m_value = query.value(2).toDouble();
+        m_vCredit.push_back(o);
+      }
     }
   }
 
@@ -170,4 +272,30 @@ bool Payment::SQL_remove_proc(QSqlQuery& query) const
 JModel* Payment::SQL_table_model(QObject* parent) const
 {
   return new PaymentModel(parent);
+}
+
+double Payment::total() const
+{
+  double t = m_cash + m_bonus;
+  for (int i = 0; i != m_vCredit.size(); ++i)
+    t += m_vCredit.at(i).m_value;
+  return t;
+}
+
+bool Payment::isAllCash(double total) const
+{
+  return m_cash == total;
+}
+
+bool Payment::isAllBonus(double total) const
+{
+  return m_bonus == total;
+}
+
+bool Payment::isAllCredit(double total) const
+{
+  double sum = 0.0;
+  for (int i = 0; i != m_vCredit.size(); ++i)
+    sum += m_vCredit.at(i).m_value;
+  return sum == total;
 }

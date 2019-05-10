@@ -146,11 +146,10 @@ void Note::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
+  m_payment.clear();
   m_number = 0;
   m_supplier.clear();
   m_date = QDate::currentDate();
-  m_paymentMethod = Payment::Method::Credit;
-  m_vPayment.clear();
   m_vNoteItem.clear();
   m_observation.clear();
   m_disccount = 0.0;
@@ -169,8 +168,7 @@ bool Note::operator !=(const JItem& other) const
       m_number != another.m_number ||
       m_date != another.m_date ||
       m_supplier.m_id != another.m_supplier.m_id ||
-      m_paymentMethod != another.m_paymentMethod ||
-      m_vPayment != another.m_vPayment ||
+      m_payment != another.m_payment ||
       m_vNoteItem != another.m_vNoteItem ||
       m_disccount != another.m_disccount;
 }
@@ -304,17 +302,7 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
   }
 
   if (bSuccess)
-  {
-    for (int i = 0; i != m_vPayment.size(); ++i)
-    {
-      m_vPayment.at(i).m_noteId = m_id;
-      bSuccess = m_vPayment.at(i).SQL_insert_proc(query);
-      if (bSuccess)
-        m_vPayment.at(i).m_id.set(query.lastInsertId().toLongLong());
-      else
-        break;
-    }
-  }
+    bSuccess = m_payment.SQL_insert_proc(query);
 
   return bSuccess;
 }
@@ -344,7 +332,7 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
 
   if (bSuccess)
   {
-    for (int i = 0; i != m_vNoteItem.size(); ++i)
+    for (int i = 0; i != m_vNoteItem.size() && bSuccess; ++i)
     {
       query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
                     NOTE_ITEMS_SQL_COL01 ","
@@ -372,33 +360,18 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
       bSuccess = query.exec();
       if (bSuccess)
         m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
-      else
-        break;
     }
   }
 
-  query.prepare("DELETE FROM " PAYMENT_SQL_TABLE_NAME " WHERE " PAYMENT_SQL_COL03 " = (:_v03)");
-  query.bindValue(":_v03", m_id.get());
-  bSuccess = query.exec();
   if (bSuccess)
-  {
-    for (int i = 0; i != m_vPayment.size(); ++i)
-    {
-      m_vPayment.at(i).m_noteId = m_id;
-      bSuccess = m_vPayment.at(i).SQL_insert_proc(query);
-      if (!bSuccess)
-        break;
-    }
-  }
+    bSuccess = m_payment.SQL_update_proc(query);
 
   return bSuccess;
 }
 
 bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 {
-  Id id = m_id;
-  clear();
-  m_id = id;
+  clear(false);
   error.clear();
   query.prepare("SELECT "
                 NOTE_SQL_COL01 ","
@@ -485,21 +458,8 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess)
   {
-    if (bSuccess)
-    {
-      query.prepare("SELECT "
-                    SQL_COLID
-                    " FROM " PAYMENT_SQL_TABLE_NAME
-                    " WHERE " PAYMENT_SQL_COL03 " = (:_v03)");
-      query.bindValue(":_v03", m_id.get());
-      bSuccess = query.exec();
-      while (query.next() && bSuccess)
-      {
-        Payment o;
-        bSuccess = o.SQL_select_proc(query, error);
-        m_vPayment.push_back(o);
-      }
-    }
+    m_payment.m_noteId = m_id;
+    bSuccess = m_payment.SQL_select_proc(query, error);
   }
 
   return bSuccess;

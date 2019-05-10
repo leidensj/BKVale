@@ -74,8 +74,7 @@ struct Note : public JItemSQL
   mutable qlonglong m_number;
   QDate m_date;
   Supplier m_supplier;
-  Payment::Method m_paymentMethod;
-  QVector<Payment> m_vPayment;
+  Payment m_payment;
   QString m_observation;
   QVector<NoteItem> m_vNoteItem;
   double m_disccount;

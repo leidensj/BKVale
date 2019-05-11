@@ -258,7 +258,7 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
     query.bindValue(":_v01", m_number);
     query.bindValue(":_v02", m_date);
     query.bindValue(":_v03", m_supplier.m_id.getIdNull());
-    query.bindValue(":_v04", (int)m_paymentMethod);
+    //query.bindValue(":_v04", (int)m_paymentMethod);
     query.bindValue(":_v05", m_observation);
     query.bindValue(":_v06", m_disccount);
     query.bindValue(":_v07", m_employee.m_id.getIdNull());
@@ -320,7 +320,7 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v02", m_date);
   query.bindValue(":_v03", m_supplier.m_id.getIdNull());
-  query.bindValue(":_v04", (int)m_paymentMethod);
+  //query.bindValue(":_v04", (int)m_paymentMethod);
   query.bindValue(":_v05", m_observation);
   query.bindValue(":_v06", m_disccount);
   query.bindValue(":_v07", m_employee.m_id.getIdNull());
@@ -393,7 +393,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
       m_number = query.value(0).toLongLong();
       m_date = query.value(1).toDate();
       m_supplier.m_id.set(query.value(2).toLongLong());
-      m_paymentMethod = (Payment::Method)query.value(3).toInt();
+      //m_paymentMethod = (Payment::Method)query.value(3).toInt();
       m_observation = query.value(4).toString();
       m_disccount = query.value(5).toDouble();
       m_employee.m_id.set(query.value(6).toDouble());

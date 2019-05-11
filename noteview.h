@@ -25,8 +25,8 @@ class JDatePicker;
 class QLabel;
 class JLineEdit;
 class QTableWidget;
-class QRadioButton;
 class JAddRemoveButtons;
+class JTable;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -44,16 +44,16 @@ class PaymentDlg : public QDialog
 {
   Q_OBJECT
 
-  QTableWidget* m_table;
-  QRadioButton* m_rdoCredit;
-  QRadioButton* m_rdoCash;
-  QRadioButton* m_rdoBonus;
+  QPushButton* m_btnCash;
+  QPushButton* m_btnBonus;
+  QPushButton* m_btnCredit;
+  JExpLineEdit* m_edCash;
+  JExpLineEdit* m_edBonus;
+  JTable* m_tbCredit;
   JAddRemoveButtons* m_btnAddRemove;
 
   double m_noteTotal;
   QDate m_noteDate;
-
-  double computeTotal() const;
 
   enum class Column
   {
@@ -63,17 +63,21 @@ class PaymentDlg : public QDialog
 
 public:
   explicit PaymentDlg(QWidget* parent = nullptr);
-  QVector<Payment> getPayments() const;
-  void setPayment(const QVector<Payment>& v);
-  Payment::Method getMethod() const;
-  void setMethod(Payment::Method m);
+  Payment getPayment() const;
+  void setPayment(const Payment& o);
   void setNoteTotal(double total);
   void setNoteDate(const QDate& date);
 
 private slots:
   void updateControls();
+  void fillCash();
+  void fillBonus();
+  void fillCredit();
   void addRow();
   void removeRow();
+
+private:
+  Payment m_payment;
 
 signals:
   void isValidSignal(bool b);

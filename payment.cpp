@@ -177,7 +177,7 @@ bool Payment::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v02", m_cash);
   query.bindValue(":_v03", m_bonus);
 
-
+  bool bSuccess = query.exec();
   if (bSuccess)
   {
     query.prepare("DELETE FROM " PAYMENT_PARTS_SQL_TABLE_NAME
@@ -226,7 +226,7 @@ bool Payment::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_noteId.set(query.value(1).toLongLong());
       m_cash = query.value(2).toDouble();
-      m_bonus = query.value(3).toDate();
+      m_bonus = query.value(3).toDouble();
     }
     else
     {

@@ -58,9 +58,10 @@ namespace
                ESC_VERT_TAB
                ESC_EXPAND_OFF;
 
-    strNote += note.m_paymentMethod == Payment::Method::Cash
+    // TODO
+    /*strNote += note.m_paymentMethod == Payment::Method::Cash
                ? "PAGAMENTO A VISTA"
-               : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";
+               : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";*/
 
     strNote += ESC_LF
                ESC_VERT_TAB
@@ -139,7 +140,8 @@ namespace
                user +
                ESC_LF;
 
-    if (note.m_paymentMethod == Payment::Method::Cash)
+    // TODO
+    /*if (note.m_paymentMethod == Payment::Method::Cash)
     {
       strNote += ESC_LF
                  ESC_LF
@@ -150,7 +152,7 @@ namespace
                   ? (note.m_supplier.m_form.strAliasName())
                   : "fornecedor") +
                  ESC_LF;
-    }
+    }*/
   }
 
   void noteAppendBody(const Note& note,
@@ -240,7 +242,8 @@ QString NotePrinter::build(const Note& note)
   noteAppendHeader(note, strNote1);
   noteAppendBody(note, strNote1);
   noteAppendFooter(note, note.m_employee.m_form.strAliasName(), strNote1);
-  if (note.m_paymentMethod == Payment::Method::Cash)
+  // TODO
+  /*if (note.m_paymentMethod == Payment::Method::Cash)
   {
     return strNote1 + ESC_LF ESC_FULL_CUT;
   }
@@ -250,7 +253,8 @@ QString NotePrinter::build(const Note& note)
     strNote1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
     strNote2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
     return strNote1 + strNote2;
-  }
+  }*/
+  return strNote1;
 }
 
 QString ReminderPrinter::build(const Reminder& r)

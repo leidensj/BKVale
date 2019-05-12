@@ -2,7 +2,7 @@
 #define REMINDERVIEW_H
 
 #include <QFrame>
-#include "reminder.h"
+#include "items/reminder.h"
 #include <QDialog>
 
 class JLineEdit;

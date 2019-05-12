@@ -2,7 +2,7 @@
 #define PACKAGEEDITOR_H
 
 #include <QDialog>
-#include "product.h"
+#include "items/product.h"
 
 class JLineEdit;
 class JDoubleSpinBox;

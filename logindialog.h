@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <databaseutils.h>
-#include "activeuser.h"
+#include "items/activeuser.h"
 
 class JLineEdit;
 class QLabel;

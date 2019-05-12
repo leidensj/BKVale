@@ -1,6 +1,6 @@
 #include "logindialog.h"
 #include "jlineedit.h"
-#include "user.h"
+#include "items/user.h"
 #include "databaseutils.h"
 #include <QLayout>
 #include <QIcon>

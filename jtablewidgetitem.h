@@ -5,12 +5,12 @@
 #include <QDialog>
 #include <jitem.h>
 #include <QVector>
-#include "product.h"
-#include "supplier.h"
-#include "employee.h"
-#include "store.h"
-#include "phone.h"
-#include "address.h"
+#include "items/product.h"
+#include "items/supplier.h"
+#include "items/employee.h"
+#include "items/store.h"
+#include "items/phone.h"
+#include "items/address.h"
 
 class JSpinBox;
 class JLineEdit;
@@ -64,28 +64,6 @@ private:
   JLineEdit* m_edComplement;
   JLineEdit* m_edReference;
   QDialogButtonBox* m_btn;
-};
-
-class DoubleTableWidgetItem : public QTableWidgetItem
-{
-public:
-  enum class Color
-  {
-    None,
-    Background,
-    Foreground
-  };
-
-  DoubleTableWidgetItem(JItem::DataType type, Color color, bool bCheckable = false);
-  bool evaluate(const QString& exp);
-  void evaluate();
-  void setValue(double val);
-  double getValue();
-
-private:
-  const JItem::DataType m_type;
-  const Color m_color;
-  const bool m_bCheckable;
 };
 
 class PhoneEditorTableWidgetItem : public QTableWidgetItem

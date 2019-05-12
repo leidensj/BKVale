@@ -2,7 +2,7 @@
 #define USERVIEW_H
 
 #include <QFrame>
-#include "user.h"
+#include "items/user.h"
 #include "jitemview.h"
 
 class QCheckBox;

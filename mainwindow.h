@@ -6,7 +6,7 @@
 #include <QTcpSocket>
 #include "settingsdlg.h"
 #include "databaseutils.h"
-#include "activeuser.h"
+#include "items/activeuser.h"
 #include <QMdiArea>
 #include <QPainter>
 

@@ -2,7 +2,7 @@
 #define PINCODEVIEW_H
 
 #include <QDialog>
-#include "employee.h"
+#include "items/employee.h"
 
 class QPushButton;
 class QLineEdit;

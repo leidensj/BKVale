@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include <QVector>
-#include "shoppinglist.h"
+#include "items/shoppinglist.h"
 #include "jitemview.h"
 
 class JDatabasePicker;

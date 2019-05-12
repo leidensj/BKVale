@@ -2,7 +2,7 @@
 #define DISCOUNTVIEW_H
 
 #include <QFrame>
-#include "discount.h"
+#include "items/discount.h"
 
 class QPushButton;
 class JLineEdit;

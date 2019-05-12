@@ -2,7 +2,7 @@
 #define DISCOUNTTABLEWIDGET_H
 
 #include <QTableWidget>
-#include "discount.h"
+#include "items/discount.h"
 
 class QKeyEvent;
 

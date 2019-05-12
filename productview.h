@@ -2,8 +2,8 @@
 #define PRODUCTVIEW_H
 
 #include <QFrame>
-#include "product.h"
-#include "category.h"
+#include "items/product.h"
+#include "items/category.h"
 #include "jitemview.h"
 
 class QLabel;

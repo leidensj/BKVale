@@ -1,6 +1,6 @@
 #include "jitemview.h"
 #include "jdatabase.h"
-#include "jitemhelper.h"
+#include "items/jitemhelper.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>

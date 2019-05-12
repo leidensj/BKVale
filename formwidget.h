@@ -2,7 +2,7 @@
 #define FORMWIDGET_H
 
 #include <QWidget>
-#include "form.h"
+#include "items/form.h"
 
 class QLabel;
 class QRadioButton;

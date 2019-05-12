@@ -1,7 +1,7 @@
 #ifndef STOREVIEW_H
 #define STOREVIEW_H
 
-#include "store.h"
+#include "items/store.h"
 #include "jitemview.h"
 
 class JTable;

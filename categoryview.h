@@ -1,7 +1,7 @@
 #ifndef CATEGORYVIEW_H
 #define CATEGORYVIEW_H
 
-#include "category.h"
+#include "items/category.h"
 #include "jitemview.h"
 
 class QPushButton;

@@ -1,9 +1,9 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
 #include "defines.h"
-#include "notefilterdlg.h"
+#include "note/notefilterdlg.h"
 #include "pincodeview.h"
-#include "jitemhelper.h"
+#include "items/jitemhelper.h"
 #include "jmodel.h"
 #include <QDate>
 #include <QLayout>

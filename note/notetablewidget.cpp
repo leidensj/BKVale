@@ -1,4 +1,4 @@
-#include "notetablewidget.h"
+#include "note/notetablewidget.h"
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -22,16 +22,16 @@ NoteTableWidget::NoteTableWidget(QWidget* parent)
 
 double NoteTableWidget::computePrice(int row) const
 {
-  const double ammount = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Ammount))->getValue();
-  const double subTotal = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal))->getValue();
+  const double ammount = ((DoubleItem*)item(row, (int)NoteColumn::Ammount))->getValue();
+  const double subTotal = ((DoubleItem*)item(row, (int)NoteColumn::SubTotal))->getValue();
   const double price = ammount ? subTotal / ammount : 0.0;
   return price;
 }
 
 double NoteTableWidget::computeSubTotal(int row) const
 {
-  const double ammount = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Ammount))->getValue();
-  const double price = ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Price))->getValue();
+  const double ammount = ((DoubleItem*)item(row, (int)NoteColumn::Ammount))->getValue();
+  const double price = ((DoubleItem*)item(row, (int)NoteColumn::Price))->getValue();
   const double subTotal = ammount * price;
   return subTotal;
 }
@@ -40,7 +40,7 @@ double NoteTableWidget::computeTotal() const
 {
   double total = 0.0;
   for (int row = 0; row != rowCount(); ++row)
-    total += ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal))->getValue();
+    total += ((DoubleItem*)item(row, (int)NoteColumn::SubTotal))->getValue();
   return total;
 }
 
@@ -50,8 +50,8 @@ const JItem& NoteTableWidget::getItem(int row) const
   if (isValidRow(row))
   {
     int idx = verticalHeader()->logicalIndex(row);
-    m_ref.m_ammount = ((DoubleTableWidgetItem*)item(idx, (int)NoteColumn::Ammount))->getValue();
-    m_ref.m_price = ((DoubleTableWidgetItem*)item(idx, (int)NoteColumn::Price))->getValue();
+    m_ref.m_ammount = ((DoubleItem*)item(idx, (int)NoteColumn::Ammount))->getValue();
+    m_ref.m_price = ((DoubleItem*)item(idx, (int)NoteColumn::Price))->getValue();
     m_ref.m_package = ((PackageTableWidgetItem*)item(idx, (int)NoteColumn::Unity))->getItem();
     m_ref.m_product = dynamic_cast<const Product&>(((ProductTableWidgetItem*)item(idx, (int)NoteColumn::Description))->getItem());
   }
@@ -73,7 +73,7 @@ void NoteTableWidget::addItemAndLoadPrices(Id supplierId, bool bCode)
     NoteItem noteItem;
     if (supplierId.isValid())
       noteItem = Note::SQL_select_last_item(supplierId, product.m_id);
-    auto ptPriceCell = dynamic_cast<DoubleTableWidgetItem*>(item(row, (int)NoteColumn::Price));
+    auto ptPriceCell = dynamic_cast<DoubleItem*>(item(row, (int)NoteColumn::Price));
     ptPriceCell->setValue(noteItem.m_price);
     auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)NoteColumn::Unity));
     ptPackageCell->setItem(noteItem.m_package, product.m_unity);
@@ -92,19 +92,16 @@ void NoteTableWidget::addItem(const JItem& o)
 
   insertRow(rowCount());
   int row = rowCount() - 1;
-  setItem(row, (int)NoteColumn::Ammount, new DoubleTableWidgetItem(JItem::DataType::Ammount,
-                                                                   DoubleTableWidgetItem::Color::Background));
+  setItem(row, (int)NoteColumn::Ammount, new DoubleItem(JItem::DataType::Ammount, DoubleItem::Color::Background));
   setItem(row, (int)NoteColumn::Unity, new PackageTableWidgetItem);
   setItem(row, (int)NoteColumn::Description, new ProductTableWidgetItem);
-  setItem(row, (int)NoteColumn::Price, new DoubleTableWidgetItem(JItem::DataType::Money,
-                                                                 DoubleTableWidgetItem::Color::Background));
-  setItem(row, (int)NoteColumn::SubTotal, new DoubleTableWidgetItem(JItem::DataType::Money,
-                                                                    DoubleTableWidgetItem::Color::Foreground));
+  setItem(row, (int)NoteColumn::Price, new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Background));
+  setItem(row, (int)NoteColumn::SubTotal, new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Foreground));
   setCurrentCell(row, (int)NoteColumn::Ammount);
 
-  ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Ammount))->setValue(_o.m_ammount);
-  ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::Price))->setValue(_o.m_price);
-  ((DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal))->setValue(_o.subtotal());
+  ((DoubleItem*)item(row, (int)NoteColumn::Ammount))->setValue(_o.m_ammount);
+  ((DoubleItem*)item(row, (int)NoteColumn::Price))->setValue(_o.m_price);
+  ((DoubleItem*)item(row, (int)NoteColumn::SubTotal))->setValue(_o.subtotal());
   ((ProductTableWidgetItem*)item(row, (int)NoteColumn::Description))->setItem(_o.m_product);
   ((PackageTableWidgetItem*)item(row, (int)NoteColumn::Unity))->setItem(_o.m_package, _o.m_product.m_unity);
 
@@ -120,23 +117,23 @@ void NoteTableWidget::update(int row, int column)
   {
     case NoteColumn::Ammount:
     {
-      auto ptAmmount = (DoubleTableWidgetItem*)item(row, column);
+      auto ptAmmount = (DoubleItem*)item(row, column);
       ptAmmount->evaluate();
-      auto ptSubtotal = (DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal);
+      auto ptSubtotal = (DoubleItem*)item(row, (int)NoteColumn::SubTotal);
       ptSubtotal->setValue(computeSubTotal(row));
     } break;
     case NoteColumn::Price:
     {
-      auto ptPrice = (DoubleTableWidgetItem*)item(row, column);
+      auto ptPrice = (DoubleItem*)item(row, column);
       ptPrice->evaluate();
-      auto ptSubtotal = (DoubleTableWidgetItem*)item(row, (int)NoteColumn::SubTotal);
+      auto ptSubtotal = (DoubleItem*)item(row, (int)NoteColumn::SubTotal);
       ptSubtotal->setValue(computeSubTotal(row));
     } break;
     case NoteColumn::SubTotal:
     {
-      auto ptSubtotal = (DoubleTableWidgetItem*)item(row, column);
+      auto ptSubtotal = (DoubleItem*)item(row, column);
       ptSubtotal->evaluate();
-      auto ptPrice = (DoubleTableWidgetItem*)item(row, (int)NoteColumn::Price);
+      auto ptPrice = (DoubleItem*)item(row, (int)NoteColumn::Price);
       ptPrice->setValue(computePrice(row));
       //Re-compute subtotal
       ptSubtotal->setValue(computeSubTotal(row));

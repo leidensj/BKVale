@@ -3,8 +3,8 @@
 
 #include <QFrame>
 #include <QStringList>
-#include "note.h"
-#include "employee.h"
+#include "items/note.h"
+#include "items/employee.h"
 #include <QDialog>
 
 #define MAX_ITEMS 100
@@ -27,6 +27,7 @@ class JLineEdit;
 class QTableWidget;
 class JAddRemoveButtons;
 class JTable;
+class QTableWidgetItem;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -50,6 +51,8 @@ class PaymentDlg : public QDialog
   JExpLineEdit* m_edCash;
   JExpLineEdit* m_edBonus;
   JTable* m_tbCredit;
+  QLabel* m_lblNoteTotal;
+  QLabel* m_lblPaymentTotal;
   JAddRemoveButtons* m_btnAddRemove;
 
   double m_noteTotal;
@@ -75,6 +78,7 @@ private slots:
   void fillCredit();
   void addRow();
   void removeRow();
+  void updateTable(QTableWidgetItem* p);
 
 private:
   Payment m_payment;

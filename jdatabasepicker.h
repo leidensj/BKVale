@@ -3,7 +3,6 @@
 
 #include <QFrame>
 #include <QString>
-#include <category.h>
 #include <QVector>
 #include <QSqlDatabase>
 #include "jitemsql.h"

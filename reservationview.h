@@ -2,7 +2,7 @@
 #define RESERVATIONVIEW_H
 
 #include <QFrame>
-#include "reservation.h"
+#include "items/reservation.h"
 
 class QPushButton;
 class JLineEdit;

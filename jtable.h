@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QDate>
 #include "jitem.h"
 
 class QKeyEvent;
@@ -81,6 +82,48 @@ private:
   int m_max;
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
+};
+
+class DoubleItem : public QTableWidgetItem
+{
+public:
+  enum class Color
+  {
+    None,
+    Background,
+    Foreground
+  };
+
+  DoubleItem(JItem::DataType type, Color color, bool bCheckable = false);
+  void setValue(double val);
+  double getValue() const;
+  void evaluate();
+
+private:
+  bool evaluate(const QString& exp);
+  const JItem::DataType m_type;
+  const Color m_color;
+  const bool m_bCheckable;
+};
+
+class DateItem : public QTableWidgetItem
+{
+public:
+  enum class Color
+  {
+    None,
+    DateBeforeDefault
+  };
+
+  DateItem(const QDate& defaultDate, Color color = Color::None);
+  void setDate(const QDate& dt);
+  QDate getDate() const;
+  void evaluate();
+
+private:
+  bool evaluate(const QString& exp);
+  QDate m_defaultDate;
+  Color m_color;
 };
 
 #endif // JITEMTABLE_H

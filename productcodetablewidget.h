@@ -1,8 +1,8 @@
 #ifndef PRODUCTCODETABLEWIDGET_H
 #define PRODUCTCODETABLEWIDGET_H
 
-#include "jitemtable.h"
-#include "product.h"
+#include "jtable.h"
+#include "items/product.h"
 
 class ProductCodeTableWidget : public JItemTable
 {

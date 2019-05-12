@@ -1,7 +1,6 @@
 #include "userview.h"
-#include "jitemhelper.h"
+#include "items/jitemhelper.h"
 #include "jlineedit.h"
-#include "jitemhelper.h"
 #include <QLabel>
 #include <QLayout>
 #include <QRegExpValidator>

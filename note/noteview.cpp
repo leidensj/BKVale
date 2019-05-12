@@ -1,30 +1,27 @@
 #include "noteview.h"
 #include "databaseutils.h"
-#include "notetablewidget.h"
-#include "form.h"
+#include "note/notetablewidget.h"
 #include "jdatabasepicker.h"
 #include "jdatabase.h"
 #include "jlineedit.h"
-#include "jdateedit.h"
 #include "packageeditor.h"
 #include "jdatepicker.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
-#include <QKeyEvent>
 #include <QLayout>
 #include <QSpinBox>
 #include <QCheckBox>
-#include <QSplitter>
 #include <QMessageBox>
 #include <QTabWidget>
 #include <QFormLayout>
 #include "jplaintextedit.h"
 #include <QDialogButtonBox>
-#include "jitemhelper.h"
+#include "items/jitemhelper.h"
 #include "jaddremovebuttons.h"
 #include "jdoublespinbox.h"
-#include "jitemtable.h"
+#include "jtable.h"
+#include "jtablewidgetitem.h"
 
 NoteDetailsDlg::NoteDetailsDlg(QWidget* parent)
   : QDialog(parent)
@@ -60,8 +57,6 @@ QString NoteDetailsDlg::getDetails() const
 
 PaymentDlg::PaymentDlg(QWidget* parent)
   : QDialog(parent)
-  , m_noteTotal(0.0)
-  , m_noteDate(QDate::currentDate())
   , m_btnCash(nullptr)
   , m_btnBonus(nullptr)
   , m_btnCredit(nullptr)
@@ -69,6 +64,8 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   , m_edBonus(nullptr)
   , m_tbCredit(nullptr)
   , m_btnAddRemove(nullptr)
+  , m_noteTotal(0.0)
+  , m_noteDate(QDate::currentDate())
 {
   m_btnCash = new QPushButton;
   m_btnCash->setFlat(true);
@@ -90,6 +87,9 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   m_btnCredit->setStyleSheet("Text-align:left");
   m_btnCredit->setText(tr("Crédito:"));
 
+  m_lblNoteTotal = new QLabel;
+  m_lblPaymentTotal = new QLabel;
+
   m_btnAddRemove = new JAddRemoveButtons;
 
   QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -104,11 +104,17 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   m_tbCredit->horizontalHeader()->setSectionResizeMode((int)Column::Date, QHeaderView::ResizeMode::ResizeToContents);
   m_tbCredit->horizontalHeader()->setSectionResizeMode((int)Column::Value, QHeaderView::ResizeMode::Stretch);
 
-  QFormLayout* lt = new QFormLayout;
-  lt->addRow(m_btnCash, m_edCash);
-  lt->addRow(m_btnBonus, m_edBonus);
-  lt->addRow(m_btnCredit, m_btnAddRemove);
-  lt->addRow(tr(""), m_tbCredit);
+  QFormLayout* ltf = new QFormLayout;
+  ltf->addRow(m_btnCash, m_edCash);
+  ltf->addRow(m_btnBonus, m_edBonus);
+  ltf->addRow(m_btnCredit, m_btnAddRemove);
+
+  QVBoxLayout* lt = new QVBoxLayout;
+  lt->addLayout(ltf);
+  lt->addWidget(m_tbCredit);
+  lt->addWidget(m_lblNoteTotal);
+  lt->addWidget(m_lblPaymentTotal);
+  lt->addWidget(btn);
 
   setWindowTitle(tr("Pagamento"));
   setWindowIcon(QIcon(":/icons/res/payment.png"));
@@ -118,6 +124,10 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   connect(m_btnCredit, SIGNAL(clicked(bool)), this, SLOT(fillCredit()));
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeRow()));
+  connect(m_tbCredit, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_tbCredit, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateTable(QTableWidgetItem*)));
+  connect(m_edCash, SIGNAL(textEdited(const QString&)), this, SLOT(updateControls()));
+  connect(m_edBonus, SIGNAL(textEdited(const QString&)), this, SLOT(updateControls()));
   connect(this, SIGNAL(isValidSignal(bool)), btn->button(QDialogButtonBox::Ok), SLOT(setEnabled(bool)));
 
   setLayout(lt);
@@ -127,19 +137,32 @@ PaymentDlg::PaymentDlg(QWidget* parent)
 void PaymentDlg::updateControls()
 {
   m_btnAddRemove->m_btnRemove->setEnabled(m_tbCredit->isValidCurrentRow());
-
-  bool bValid = false;
-  for (int i = 0; i != m_tbCredit->rowCount(); ++i)
-  {
-    QDate dt = QDate::fromString(m_tbCredit->item(i, (int)Column::Date)->text());
-    bValid = dt >= m_noteDate;
-    if (!bValid)
-      break;
-  }
+  bool bValid = true;
   Payment o = getPayment();
   if (m_noteTotal != o.total())
     bValid = false;
+  for (int i = 0; i != o.m_vCredit.size() && bValid; ++i)
+    bValid = m_noteDate < o.m_vCredit.at(i).m_date;
+  m_lblNoteTotal->setText(tr("Total do vale: ") + JItem::st_strMoney(m_noteTotal));
+  m_lblPaymentTotal->setText(("Total do pagamento: ") + JItem::st_strMoney(o.total()));
   emit isValidSignal(bValid);
+}
+
+void PaymentDlg::updateTable(QTableWidgetItem* p)
+{
+  switch(p->column())
+  {
+    case (int)Column::Date:
+    {
+      dynamic_cast<DateItem*>(p)->evaluate();
+      break;
+    }
+    case (int)Column::Value:
+    {
+      dynamic_cast<DoubleItem*>(p)->evaluate();
+      break;
+    }
+  }
 }
 
 void PaymentDlg::fillCash()
@@ -175,8 +198,8 @@ Payment PaymentDlg::getPayment() const
   for (int i = 0; i != m_tbCredit->rowCount(); ++i)
   {
     PaymentPart _o;
-    _o.m_date = QDate::fromString(m_tbCredit->item(i, (int)Column::Date)->text());
-    _o.m_value = m_tbCredit->item(i, (int)Column::Value)->text().toDouble();
+    _o.m_date = dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->getDate();
+    _o.m_value = dynamic_cast<DoubleItem*>(m_tbCredit->item(i, (int)Column::Value))->getValue();
     o.m_vCredit.push_back(_o);
   }
   return o;
@@ -190,8 +213,8 @@ void PaymentDlg::setPayment(const Payment& o)
   for (int i = 0; i != o.m_vCredit.size(); ++i)
   {
     addRow();
-    m_tbCredit->item(i, (int)Column::Date)->setText(o.m_vCredit.at(i).m_date.toString("dd/mm/yyyy"));
-    m_tbCredit->item(i, (int)Column::Value)->setText(JItem::st_strMoney(o.m_vCredit.at(i).m_value));
+    dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->setDate(o.m_vCredit.at(i).m_date);
+    dynamic_cast<DoubleItem*>(m_tbCredit->item(i, (int)Column::Value))->setValue(o.m_vCredit.at(i).m_value);
   }
   updateControls();
 }
@@ -211,14 +234,19 @@ void PaymentDlg::addRow()
   m_tbCredit->insertRow(m_tbCredit->rowCount());
   int row = m_tbCredit->rowCount() - 1;
 
-  Payment o = getPayment();
-  double val = m_noteTotal > o.total() ? m_noteTotal - o.total() : 0.0;
-  auto itValue = new QTableWidgetItem(JItem::st_strMoney(val));
-  auto itDate = new QTableWidgetItem(m_noteDate.addMonths(1 + m_tbCredit->rowCount()).toString("dd/mm/yyyy"));
+  auto itValue = new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Foreground);
+  auto itDate = new DateItem(m_noteDate, DateItem::Color::DateBeforeDefault);
 
   m_tbCredit->setItem(row, (int)Column::Date, itDate);
   m_tbCredit->setItem(row, (int)Column::Value, itValue);
+
+  Payment o = getPayment();
+  double val = m_noteTotal > o.total() ? m_noteTotal - o.total() : 0.0;
+  itValue->setValue(val);
+  itDate->setDate(m_noteDate.addMonths(itDate->row() + 1));
   updateControls();
+  m_tbCredit->setCurrentItem(itDate);
+  m_tbCredit->setFocus();
 }
 
 void PaymentDlg::removeRow()
@@ -227,7 +255,6 @@ void PaymentDlg::removeRow()
     m_tbCredit->removeRow(m_tbCredit->currentRow());
   updateControls();
 }
-
 
 NoteView::NoteView(QWidget *parent)
   : QFrame(parent)
@@ -350,9 +377,9 @@ NoteView::NoteView(QWidget *parent)
 
   m_btnPayment = new QPushButton;
   m_btnPayment->setFlat(true);
-  m_btnPayment->setToolTip(tr("Pagamento parcelado"));
+  m_btnPayment->setToolTip(tr("Pagamento"));
   m_btnPayment->setIconSize(QSize(24,24));
-  m_btnPayment->setIcon(QIcon(":/icons/res/credit.png"));
+  m_btnPayment->setIcon(QIcon(":/icons/res/payment.png"));
 
   m_dlgDetails = new NoteDetailsDlg(this);
   m_dlgPayment = new PaymentDlg(this);
@@ -475,7 +502,7 @@ NoteView::NoteView(QWidget *parent)
   connect(m_dtPicker, SIGNAL(dateChangedSignal()), this, SLOT(updateControls()));
   connect(m_btnPayment, SIGNAL(clicked(bool)), this, SLOT(openPaymentDialog()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
-  connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
+  connect(m_edDisccount, SIGNAL(textEdited(const QString&)), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));

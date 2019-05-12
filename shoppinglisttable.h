@@ -2,8 +2,8 @@
 #define SHOPPINGLISTTABLE_H
 
 #include <QTableWidget>
-#include "shoppinglist.h"
-#include "jitemtable.h"
+#include "items/shoppinglist.h"
+#include "jtable.h"
 
 class ShoppingListTable : public JItemTable
 {

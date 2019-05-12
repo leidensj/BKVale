@@ -3,8 +3,8 @@
 #include <QPrinter>
 #include <QDate>
 #include "jitem.h"
-#include "store.h"
-#include "employee.h"
+#include "items/store.h"
+#include "items/employee.h"
 #include "jdatabasepicker.h"
 #include "jspinbox.h"
 #include <QDateEdit>
@@ -129,7 +129,7 @@ void TimeCard::saveAndAccept()
     html += QString(
       "<pre style=\"font-size:16pt;\" align=\"left\"><b>" + title + "</b></pre>"
       "<p>Nome: %1 Horário: %2</p>"
-      "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+      "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">"
         "<tr><th colspan=\"2\">%3 %4</th>"
           "<th colspan=\"3\">ENTRADA</th>"
           "<th colspan=\"3\">SAIDA</th>"
@@ -173,7 +173,7 @@ void TimeCard::saveAndAccept()
     html += QString(
       "</table>"
       "<br>"
-      "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;%1\">"
+      "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;%1\">"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS NORMAIS</td>"
       "<td width=\"10%\">(H.N.)</td>"

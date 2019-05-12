@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include <QByteArray>
-#include "image.h"
+#include "items/image.h"
 
 class QPushButton;
 class QLabel;

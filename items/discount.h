@@ -2,7 +2,7 @@
 #define DISCOUNT_H
 
 #include "jitemsql.h"
-#include "product.h"
+#include "items/product.h"
 #include <QVector>
 #include <QMetaType>
 #include <QDate>

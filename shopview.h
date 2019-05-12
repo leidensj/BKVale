@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include <QDialog>
-#include "shoppinglist.h"
+#include "items/shoppinglist.h"
 
 class JDatabase;
 class QDateEdit;

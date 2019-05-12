@@ -1,6 +1,6 @@
 #include "databaseutils.h"
 #include "defines.h"
-#include "user.h"
+#include "items/user.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>

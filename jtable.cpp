@@ -1,8 +1,9 @@
-#include "jitemtable.h"
+#include "jtable.h"
 #include <QTableWidget>
 #include <QKeyEvent>
 #include <QLayout>
 #include <QPushButton>
+#include "tinyexpr.h"
 
 JTable::JTable(int flags, QWidget* parent)
  : QTableWidget(parent)
@@ -186,4 +187,119 @@ void JTableButtons::updateControls()
     m_btnAdd->setEnabled(m_max > 0 ? m_table->rowCount() < m_max : true);
     m_btnRemove->setEnabled(m_table->isValidCurrentRow());
   }
+}
+
+DoubleItem::DoubleItem(JItem::DataType type, Color color, bool bCheckable)
+  : m_type(type)
+  , m_color(color)
+  , m_bCheckable(bCheckable)
+{
+  if (m_bCheckable)
+    setFlags(Qt::NoItemFlags |
+             Qt::ItemIsSelectable |
+             Qt::ItemIsEnabled |
+             Qt::ItemIsEditable |
+             Qt::ItemIsUserCheckable);
+}
+
+void DoubleItem::setValue(double val)
+{
+  setData(Qt::UserRole, val);
+  setText(JItem::st_str(val, m_type));
+
+  if (m_bCheckable)
+  {
+    if (checkState() == Qt::Unchecked)
+      setFlags(flags() & ~Qt::ItemIsEditable);
+    else
+      setFlags(flags() | Qt::ItemIsEditable);
+  }
+
+  switch (m_color)
+  {
+    case Color::Background:
+      setBackgroundColor(val == 0.0 ? QColor(255, 200, 200) : QColor(Qt::white));
+      break;
+    case Color::Foreground:
+      setTextColor(QColor(val >= 0 ? Qt::red : Qt::darkGreen));
+      break;
+    case Color::None:
+    default:
+      break;
+  }
+}
+
+double DoubleItem::getValue() const
+{
+  return data(Qt::UserRole).toDouble();
+}
+
+bool DoubleItem::evaluate(const QString& exp)
+{
+  auto stdExp = exp.toStdString();
+  int error = 0;
+  double val = te_interp(stdExp.c_str(), &error);
+  if (!error)
+    setValue(val);
+  return !error;
+}
+
+void DoubleItem::evaluate()
+{
+  if (!evaluate(text()))
+    setValue(getValue());
+}
+
+DateItem::DateItem(const QDate& defaultDate, Color color)
+  : m_defaultDate(defaultDate)
+  , m_color(color)
+{
+}
+
+void DateItem::setDate(const QDate& dt)
+{
+  setData(Qt::UserRole, dt);
+  setText(dt.toString("dd/MM/yyyy"));
+
+  switch (m_color)
+  {
+    case Color::DateBeforeDefault:
+      setBackgroundColor(dt < m_defaultDate ? QColor(255, 200, 200) : QColor(Qt::white));
+      setToolTip(dt < m_defaultDate ? "A data é anterior à informada" : "");
+      break;
+    case Color::None:
+    default:
+      break;
+  }
+}
+
+QDate DateItem::getDate()const
+{
+  return data(Qt::UserRole).toDate();
+}
+
+bool DateItem::evaluate(const QString& exp)
+{
+  QDate dt = QDate::fromString(exp, "dd/MM/yyyy");
+  if (!dt.isValid())
+  {
+    dt = QDate::fromString(exp, "dd/MM/yy");
+    if (!dt.isValid())
+    {
+      dt = QDate::fromString(exp, "ddMMyyyy");
+      if (!dt.isValid())
+        dt = QDate::fromString(exp, "ddMMyy").addYears(2000);
+    }
+  }
+
+  if (dt.isValid())
+    setDate(dt);
+
+  return dt.isValid();
+}
+
+void DateItem::evaluate()
+{
+  if (!evaluate(text()))
+    setDate(getDate());
 }

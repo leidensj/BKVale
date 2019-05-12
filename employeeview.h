@@ -1,7 +1,7 @@
 #ifndef EMPLOYEEVIEW_H
 #define EMPLOYEEVIEW_H
 
-#include "employee.h"
+#include "items/employee.h"
 #include "jitemview.h"
 #include <QVector>
 

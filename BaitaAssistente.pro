@@ -24,11 +24,8 @@ SOURCES += main.cpp\
     qcustomplot.cpp \
     consumptionchart.cpp \
     calculatorwidget.cpp \
-    noteview.cpp \
     logindialog.cpp \
     jlineedit.cpp \
-    user.cpp \
-    notetablewidget.cpp \
     jdatabase.cpp \
     categoryview.cpp \
     jimageview.cpp \
@@ -43,12 +40,10 @@ SOURCES += main.cpp\
     reservationview.cpp \
     jspinbox.cpp \
     packageeditor.cpp \
-    notefilterdlg.cpp \
     discounttablewidget.cpp \
     discountview.cpp \
     jtablewidgetitem.cpp \
     jitemview.cpp \
-    jitemtable.cpp \
     phonetablewidget.cpp \
     timecard.cpp \
     storeview.cpp \
@@ -56,86 +51,75 @@ SOURCES += main.cpp\
     addresstablewidget.cpp \
     productcodetablewidget.cpp \
     jdateedit.cpp \
-    address.cpp \
-    category.cpp \
-    image.cpp \
-    discount.cpp \
-    note.cpp \
-    phone.cpp \
-    product.cpp \
-    reminder.cpp \
-    reservation.cpp \
-    shoppinglist.cpp \
-    store.cpp \
     jdatepicker.cpp \
     jplaintextedit.cpp \
-    jitemhelper.cpp \
-    form.cpp \
-    employee.cpp \
-    supplier.cpp \
     employeeview.cpp \
     jmodel.cpp \
-    activeuser.cpp \
     jitemsql.cpp \
     supplierview.cpp \
     userview.cpp \
-    payment.cpp \
     jaddremovebuttons.cpp \
-    formwidget.cpp
+    formwidget.cpp \
+    jtable.cpp \
+    note/notefilterdlg.cpp \
+    note/notetablewidget.cpp \
+    note/noteview.cpp \
+    items/activeuser.cpp \
+    items/address.cpp \
+    items/category.cpp \
+    items/discount.cpp \
+    items/employee.cpp \
+    items/form.cpp \
+    items/image.cpp \
+    items/note.cpp \
+    items/payment.cpp \
+    items/phone.cpp \
+    items/product.cpp \
+    items/reminder.cpp \
+    items/reservation.cpp \
+    items/shoppinglist.cpp \
+    items/store.cpp \
+    items/supplier.cpp \
+    items/user.cpp \
+    items/jitemhelper.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
     settingsdlg.h \
     printutils.h \
     databaseutils.h \
-    note.h \
     settings.h \
-    reminder.h \
     reminderview.h \
     qcustomplot.h \
     consumptionchart.h \
     calculatorwidget.h \
     calculator.h \
-    noteview.h \
     logindialog.h \
     jlineedit.h \
-    user.h \
-    notetablewidget.h \
     jdatabase.h \
-    category.h \
     categoryview.h \
     jimageview.h \
-    image.h \
     imageview.h \
-    product.h \
     productview.h \
-    address.h \
-    phone.h \
     defines.h \
     jitem.h \
     jdatabasepicker.h \
     pincodeview.h \
-    shoppinglist.h \
     shoppinglistview.h \
     shoppinglisttable.h \
     jdoublespinbox.h \
     shopview.h \
-    reservation.h \
     reservationview.h \
     jspinbox.h \
     packageeditor.h \
     escpos.h \
-    notefilterdlg.h \
     filterdlg.h \
-    discount.h \
     discounttablewidget.h \
     discountview.h \
     jtablewidgetitem.h \
     jitemview.h \
-    jitemtable.h \
     phonetablewidget.h \
     timecard.h \
-    store.h \
     storeview.h \
     jtimeedit.h \
     timeinterval.h \
@@ -144,19 +128,35 @@ HEADERS  += mainwindow.h \
     jdateedit.h \
     jdatepicker.h \
     jplaintextedit.h \
-    jitemhelper.h \
     jitemsql.h \
-    form.h \
-    employee.h \
-    supplier.h \
     employeeview.h \
     jmodel.h \
-    activeuser.h \
     supplierview.h \
     userview.h \
-    payment.h \
     jaddremovebuttons.h \
-    formwidget.h
+    formwidget.h \
+    jtable.h \
+    note/noteview.h \
+    note/notefilterdlg.h \
+    note/notetablewidget.h \
+    items/address.h \
+    items/activeuser.h \
+    items/category.h \
+    items/discount.h \
+    items/employee.h \
+    items/form.h \
+    items/image.h \
+    items/note.h \
+    items/payment.h \
+    items/phone.h \
+    items/product.h \
+    items/reminder.h \
+    items/reservation.h \
+    items/store.h \
+    items/shoppinglist.h \
+    items/supplier.h \
+    items/user.h \
+    items/jitemhelper.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

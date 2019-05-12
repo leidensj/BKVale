@@ -4,13 +4,13 @@
 #include <QtSerialPort>
 #include <QTcpSocket>
 #include <QByteArray>
-#include "note.h"
-#include "reminder.h"
-#include "product.h"
-#include "form.h"
-#include "shoppinglist.h"
-#include "reservation.h"
-#include "discount.h"
+#include "items/note.h"
+#include "items/reminder.h"
+#include "items/product.h"
+#include "items/form.h"
+#include "items/shoppinglist.h"
+#include "items/reservation.h"
+#include "items/discount.h"
 
 namespace Printer
 {

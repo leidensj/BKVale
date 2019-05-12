@@ -8,7 +8,7 @@
 #include "jtimeedit.h"
 #include <QPushButton>
 #include "timeinterval.h"
-#include "jitemtable.h"
+#include "jtable.h"
 #include <QHeaderView>
 #include <QRadioButton>
 #include <QTreeWidget>

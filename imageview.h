@@ -2,7 +2,7 @@
 #define IMAGEVIEW_H
 
 #include <QFrame>
-#include "image.h"
+#include "items/image.h"
 #include "jitemview.h"
 
 class QPushButton;

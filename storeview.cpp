@@ -2,7 +2,7 @@
 #include "jlineedit.h"
 #include "jplaintextedit.h"
 #include "formwidget.h"
-#include "jitemtable.h"
+#include "jtable.h"
 #include "jaddremovebuttons.h"
 #include "jdatabase.h"
 #include <QLayout>

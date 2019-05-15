@@ -282,13 +282,12 @@ bool BaitaSQL::createTables(QString& error)
                         NOTE_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
                         NOTE_SQL_COL02 " DATE NOT NULL,"
                         NOTE_SQL_COL03 " INTEGER,"
-                        NOTE_SQL_COL04 " BOOLEAN,"
-                        NOTE_SQL_COL05 " TEXT,"
-                        NOTE_SQL_COL06 " REAL,"
-                        NOTE_SQL_COL07 " INTEGER,"
+                        NOTE_SQL_COL04 " TEXT,"
+                        NOTE_SQL_COL05 " REAL,"
+                        NOTE_SQL_COL06 " INTEGER,"
                         "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
                         SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
-                        "FOREIGN KEY(" NOTE_SQL_COL07 ") REFERENCES "
+                        "FOREIGN KEY(" NOTE_SQL_COL06 ") REFERENCES "
                         EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
@@ -305,6 +304,24 @@ bool BaitaSQL::createTables(QString& error)
                           NOTE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" NOTE_ITEMS_SQL_COL02 ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PAYMENT_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          PAYMENT_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
+                          PAYMENT_SQL_COL02 " REAL,"
+                          PAYMENT_SQL_COL03 " REAL,"
+                          "FOREIGN KEY(" PAYMENT_SQL_COL01 ") REFERENCES "
+                          NOTE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PAYMENT_PARTS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          PAYMENT_PARTS_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
+                          PAYMENT_PARTS_SQL_COL02 " DATE,"
+                          PAYMENT_PARTS_SQL_COL03 " REAL,"
+                          "FOREIGN KEY(" PAYMENT_PARTS_SQL_COL01 ") REFERENCES "
+                          PAYMENT_SQL_COL01 "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_SQL_TABLE_NAME " ("

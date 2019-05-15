@@ -84,7 +84,16 @@ private:
   QPushButton* m_btnRemove;
 };
 
-class DoubleItem : public QTableWidgetItem
+class ExpItem : public QTableWidgetItem
+{
+public:
+  virtual void evaluate() = 0;
+
+private:
+  virtual bool evaluate(const QString& exp) = 0;
+};
+
+class DoubleItem : public ExpItem
 {
 public:
   enum class Color
@@ -106,7 +115,7 @@ private:
   const bool m_bCheckable;
 };
 
-class DateItem : public QTableWidgetItem
+class DateItem : public ExpItem
 {
 public:
   enum class Color
@@ -126,7 +135,7 @@ private:
   Color m_color;
 };
 
-class TimeItem : public QTableWidgetItem
+class TimeItem : public ExpItem
 {
 public:
   TimeItem(const QTime& defaultTime);

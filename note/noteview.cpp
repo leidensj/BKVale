@@ -126,8 +126,8 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeRow()));
   connect(m_tbCredit, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_tbCredit, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateTable(QTableWidgetItem*)));
-  connect(m_edCash, SIGNAL(textEdited(const QString&)), this, SLOT(updateControls()));
-  connect(m_edBonus, SIGNAL(textEdited(const QString&)), this, SLOT(updateControls()));
+  connect(m_edCash, SIGNAL(editingFinished()), this, SLOT(updateControls()));
+  connect(m_edBonus, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(this, SIGNAL(isValidSignal(bool)), btn->button(QDialogButtonBox::Ok), SLOT(setEnabled(bool)));
 
   setLayout(lt);
@@ -150,19 +150,7 @@ void PaymentDlg::updateControls()
 
 void PaymentDlg::updateTable(QTableWidgetItem* p)
 {
-  switch(p->column())
-  {
-    case (int)Column::Date:
-    {
-      dynamic_cast<DateItem*>(p)->evaluate();
-      break;
-    }
-    case (int)Column::Value:
-    {
-      dynamic_cast<DoubleItem*>(p)->evaluate();
-      break;
-    }
-  }
+  dynamic_cast<ExpItem*>(p)->evaluate();
 }
 
 void PaymentDlg::fillCash()
@@ -254,6 +242,19 @@ void PaymentDlg::removeRow()
   if (m_tbCredit->currentRow() >= 0)
     m_tbCredit->removeRow(m_tbCredit->currentRow());
   updateControls();
+}
+
+void PaymentDlg::adjust()
+{
+  Payment o = getPayment();
+  if (o.isAllCredit(m_noteTotal))
+    fillCredit();
+  else if (o.isAllCash(m_noteTotal))
+    fillCash();
+  else if (o.isAllBonus(m_noteTotal))
+    fillBonus();
+  else
+    fillCredit();
 }
 
 NoteView::NoteView(QWidget *parent)
@@ -597,21 +598,37 @@ void NoteView::addProduct()
   m_table->addItemAndLoadPrices(m_supplierPicker->getId(), sender() == m_btnAddCode);
 }
 
-Note NoteView::save()
+bool NoteView::save(Id& id)
 {
-  Note note = getNote();
-  bool bSuccess = m_database->save(note);
+  id.clear();
+  Note o = getNote();
+
+  if (!o.isPaymentOk())
+  { // TODO por enquanto corrigimos o pagamento
+    m_dlgPayment->setNoteTotal(o.total());
+    m_dlgPayment->setNoteDate(o.m_date);
+    m_dlgPayment->adjust();
+    o.m_payment = m_dlgPayment->getPayment();
+  }
+
+  if (!o.isPaymentOk())
+  {
+    QMessageBox::critical(this,
+                          tr("Pagamento inconsistente"),
+                          tr("O valor do pagamento é diferente do valor da nota."),
+                          QMessageBox::Ok);
+    return false;
+  }
+
+  bool bSuccess = m_database->save(o);
   if (bSuccess)
   {
-    m_lastId = note.m_id;
-    QString error;
-    note.SQL_select(error);
+    m_lastId = o.m_id;
+    id = o.m_id;
     create();
   }
-  else
-    note.clear();
   updateControls();
-  return note;
+  return bSuccess;
 }
 
 void NoteView::lastItemSelected()
@@ -648,9 +665,6 @@ void NoteView::openPaymentDialog()
   m_dlgPayment->setNoteDate(o.m_date);
   m_dlgPayment->setNoteTotal(o.total());
   if (!m_dlgPayment->exec())
-  {
-    Note o = getNote();
     m_dlgPayment->setPayment(o.m_payment);
-  }
   updateControls();
 }

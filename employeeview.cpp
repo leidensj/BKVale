@@ -164,7 +164,7 @@ void EmployeeView::removeHour()
 
 void EmployeeView::updateHoursTable(QTableWidgetItem* p)
 {
-  dynamic_cast<TimeItem*>(p)->evaluate();
+  dynamic_cast<ExpItem*>(p)->evaluate();
 }
 
 void EmployeeView::updateControls()

@@ -43,7 +43,7 @@ struct NoteItem : public JItem
 
 struct Note : public JItemSQL
 {
-  Note();
+  Note(Id = Id());
   void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;
@@ -70,6 +70,7 @@ struct Note : public JItemSQL
   double subTotal() const;
   QString strTotal() const;
   QString strSubTotal() const;
+  bool isPaymentOk() const;
 
   mutable qlonglong m_number;
   QDate m_date;

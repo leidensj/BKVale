@@ -278,9 +278,17 @@ void Tipi::print()
             return;
         }
       }
-      note = m_note->save();
-      if (note.m_id.isValid())
-        print(NotePrinter::build(note));
+      Id id;
+      if (m_note->save(id))
+      {
+        Note o(id);
+        QString error;
+        if (o.SQL_select(error))
+          print(NotePrinter::build(note));
+        else
+          QMessageBox::critical(this, ("Erro ao selecionar item"), error, QMessageBox::Ok);
+      }
+
     } break;
     case Functionality::Reminder:
     {

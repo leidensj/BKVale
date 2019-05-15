@@ -70,6 +70,7 @@ public:
   void setPayment(const Payment& o);
   void setNoteTotal(double total);
   void setNoteDate(const QDate& date);
+  void adjust();
 
 private slots:
   void updateControls();
@@ -135,7 +136,7 @@ public slots:
   void create();
   void setNote(const Note& note);
   void updateControls();
-  Note save();
+  bool save(Id& id);
 
 signals:
   void changedSignal();

@@ -21,6 +21,7 @@ class FormPhoneWidget;
 class FormAddressWidget;
 class JTable;
 class QTreeWidget;
+class QTableWidgetItem;
 
 class EmployeeView : public JItemView
 {
@@ -38,6 +39,7 @@ private slots:
   void addHour();
   void removeHour();
   void updateControls();
+  void updateHoursTable(QTableWidgetItem* p);
 
 private:
   mutable Employee m_ref;

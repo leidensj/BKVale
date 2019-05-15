@@ -254,6 +254,7 @@ DateItem::DateItem(const QDate& defaultDate, Color color)
   : m_defaultDate(defaultDate)
   , m_color(color)
 {
+  setDate(m_defaultDate);
 }
 
 void DateItem::setDate(const QDate& dt)
@@ -265,7 +266,7 @@ void DateItem::setDate(const QDate& dt)
   {
     case Color::DateBeforeDefault:
       setBackgroundColor(dt < m_defaultDate ? QColor(255, 200, 200) : QColor(Qt::white));
-      setToolTip(dt < m_defaultDate ? "A data é anterior à informada" : "");
+      setToolTip(dt < m_defaultDate ? "A data é anterior a " + m_defaultDate.toString("dd/MM/yyyy") : "");
       break;
     case Color::None:
     default:
@@ -288,7 +289,15 @@ bool DateItem::evaluate(const QString& exp)
     {
       dt = QDate::fromString(exp, "ddMMyyyy");
       if (!dt.isValid())
-        dt = QDate::fromString(exp, "ddMMyy").addYears(2000);
+      {
+        dt = QDate::fromString(exp, "ddMM");
+        dt.setDate(QDate::currentDate().year(), dt.month(), dt.day());
+        if (!dt.isValid())
+        {
+          dt = QDate::fromString(exp, "dd");
+          dt.setDate(QDate::currentDate().year(), QDate::currentDate().month(), dt.day());
+        }
+      }
     }
   }
 
@@ -302,4 +311,39 @@ void DateItem::evaluate()
 {
   if (!evaluate(text()))
     setDate(getDate());
+}
+
+TimeItem::TimeItem(const QTime& defaultTime)
+  : m_defaultTime(defaultTime)
+{
+  setTime(m_defaultTime);
+}
+
+void TimeItem::setTime(const QTime& t)
+{
+  setData(Qt::UserRole, t);
+  setText(t.toString("HH:mm"));
+}
+
+QTime TimeItem::getTime()const
+{
+  return data(Qt::UserRole).toTime();
+}
+
+bool TimeItem::evaluate(const QString& exp)
+{
+  QTime t = QTime::fromString(exp, "HH:mm");
+  if (!t.isValid())
+    t = QTime::fromString(exp, "HHmm");
+
+  if (t.isValid())
+    setTime(t);
+
+  return t.isValid();
+}
+
+void TimeItem::evaluate()
+{
+  if (!evaluate(text()))
+    setTime(getTime());
 }

@@ -126,4 +126,17 @@ private:
   Color m_color;
 };
 
+class TimeItem : public QTableWidgetItem
+{
+public:
+  TimeItem(const QTime& defaultTime);
+  void setTime(const QTime& t);
+  QTime getTime() const;
+  void evaluate();
+
+private:
+  bool evaluate(const QString& exp);
+  QTime m_defaultTime;
+};
+
 #endif // JITEMTABLE_H

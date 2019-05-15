@@ -83,6 +83,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeHour()));
   connect(m_tbHours, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
+  connect(m_tbHours, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateHoursTable(QTableWidgetItem*)));
 
   m_formInfo->m_lblCreationDate->hide();
   m_formInfo->m_dtCreationDate->hide();
@@ -113,8 +114,8 @@ const JItemSQL& EmployeeView::getItem() const
   for (int i = 0; i != m_tbHours->rowCount(); ++i)
   {
     TimeInterval t;
-    t.m_tmBegin = dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 0))->time();
-    t.m_tmEnd = dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 1))->time();
+    t.m_tmBegin = dynamic_cast<TimeItem*>(m_tbHours->item(i, 0))->getTime();
+    t.m_tmEnd = dynamic_cast<TimeItem*>(m_tbHours->item(i, 1))->getTime();
     m_ref.m_hours.push_back(t);
   }
   return m_ref;
@@ -134,15 +135,15 @@ void EmployeeView::setItem(const JItemSQL& o)
   for (int i = 0; i != m_ref.m_hours.size(); ++i)
   {
     addHour();
-    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 0))->setTime(m_ref.m_hours.at(i).m_tmBegin);
-    dynamic_cast<JTimeEdit*>(m_tbHours->cellWidget(i, 1))->setTime(m_ref.m_hours.at(i).m_tmEnd);
+    dynamic_cast<TimeItem*>(m_tbHours->item(i, 0))->setTime(m_ref.m_hours.at(i).m_tmBegin);
+    dynamic_cast<TimeItem*>(m_tbHours->item(i, 1))->setTime(m_ref.m_hours.at(i).m_tmEnd);
   }
 }
 
 void EmployeeView::addHour()
 {
-  auto begin = new QTableWidgetItem("00:00");
-  auto end = new QTableWidgetItem("00:00");
+  auto begin = new TimeItem(QTime::fromString("00:00", "HH:mm"));
+  auto end = new TimeItem(QTime::fromString("00:00", "HH:mm"));
   begin->setToolTip(tr("Hora e minutos hh:mm"));
   end->setToolTip(tr("Hora e minutos hh:mm"));
   m_tbHours->insertRow(m_tbHours->rowCount());
@@ -151,6 +152,7 @@ void EmployeeView::addHour()
   m_tbHours->setItem(row, 1, end);
   m_tbHours->setCurrentItem(begin);
   updateControls();
+  m_tbHours->setFocus();
 }
 
 void EmployeeView::removeHour()
@@ -160,18 +162,14 @@ void EmployeeView::removeHour()
   updateControls();
 }
 
+void EmployeeView::updateHoursTable(QTableWidgetItem* p)
+{
+  dynamic_cast<TimeItem*>(p)->evaluate();
+}
+
 void EmployeeView::updateControls()
 {
   m_btnAddRemove->m_btnRemove->setEnabled(m_tbHours->currentRow() >= 0);
-  for (int i = 0; i != m_tbHours->rowCount(); ++i)
-  {
-    QTime begin = QTime::fromString(m_tbHours->item(i, 0)->text());
-    QTime end = QTime::fromString(m_tbHours->item(i, 1)->text());
-    QString str = begin.toString("HH:mm");
-    m_tbHours->item(i, 0)->setText(str.isEmpty() ? "00:00" : str);
-    str = end.toString("HH:mm");
-    m_tbHours->item(i, 1)->setText(str.isEmpty() ? "00:00" : str);
-  }
 }
 
 Id EmployeeView::getId() const

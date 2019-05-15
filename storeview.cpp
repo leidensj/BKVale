@@ -50,7 +50,7 @@ StoreView::StoreView(QWidget* parent)
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addEmployee()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), m_tbEmployee, SLOT(removeItem()));
-
+  connect(m_tbEmployee, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
   m_formInfo->m_lblCreationDate->hide();
   m_formInfo->m_dtCreationDate->hide();
   m_formInfo->m_lblType->hide();

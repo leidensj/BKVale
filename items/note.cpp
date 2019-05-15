@@ -305,7 +305,10 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
   }
 
   if (bSuccess)
+  {
+    m_payment.m_noteId = m_id;
     bSuccess = m_payment.SQL_insert_proc(query);
+  }
 
   return bSuccess;
 }
@@ -458,7 +461,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
   if (bSuccess)
   {
     m_payment.m_noteId = m_id;
-    bSuccess = m_payment.SQL_select_proc(query, error);
+    bSuccess = m_payment.SQL_select_proc_by_noteid(query, error);
   }
 
   return bSuccess;

@@ -115,8 +115,6 @@ void JExpLineEdit::evaluate()
     m_currentValue = val;
     setTextBlockingSignals(JItem::st_str(val, m_dataType));
   }
-  else
-    m_currentValue = m_defaultValue;
 
   if (m_currentValue == m_defaultValue)
     setTextBlockingSignals("");

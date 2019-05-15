@@ -224,9 +224,9 @@ bool Payment::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     if (query.next())
     {
-      m_noteId.set(query.value(1).toLongLong());
-      m_cash = query.value(2).toDouble();
-      m_bonus = query.value(3).toDouble();
+      m_noteId.set(query.value(0).toLongLong());
+      m_cash = query.value(1).toDouble();
+      m_bonus = query.value(2).toDouble();
     }
     else
     {
@@ -258,6 +258,33 @@ bool Payment::SQL_select_proc(QSqlQuery& query, QString& error)
     }
   }
 
+  return bSuccess;
+}
+
+bool Payment::SQL_select_proc_by_noteid(QSqlQuery& query, QString& error)
+{
+  query.prepare("SELECT "
+                SQL_COLID
+                " FROM " PAYMENT_SQL_TABLE_NAME
+                " WHERE " PAYMENT_SQL_COL01 " = (:_v01)");
+  query.bindValue(":_v01", m_noteId.get());
+
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      m_id.set(query.value(0).toLongLong());
+    }
+    else
+    {
+      error = "Pagamento não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  if (bSuccess)
+    bSuccess = SQL_select_proc(query, error);
   return bSuccess;
 }
 

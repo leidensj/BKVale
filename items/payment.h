@@ -38,6 +38,8 @@ struct Payment : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
 
+  bool SQL_select_proc_by_noteid(QSqlQuery& query, QString& error);
+
   double total() const;
   bool isAllCash(double total) const;
   bool isAllBonus(double total) const;

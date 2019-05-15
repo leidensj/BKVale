@@ -321,7 +321,7 @@ bool BaitaSQL::createTables(QString& error)
                           PAYMENT_PARTS_SQL_COL02 " DATE,"
                           PAYMENT_PARTS_SQL_COL03 " REAL,"
                           "FOREIGN KEY(" PAYMENT_PARTS_SQL_COL01 ") REFERENCES "
-                          PAYMENT_SQL_COL01 "(" SQL_COLID ") ON DELETE CASCADE)");
+                          PAYMENT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_SQL_TABLE_NAME " ("

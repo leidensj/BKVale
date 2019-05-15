@@ -503,7 +503,7 @@ NoteView::NoteView(QWidget *parent)
   connect(m_dtPicker, SIGNAL(dateChangedSignal()), this, SLOT(updateControls()));
   connect(m_btnPayment, SIGNAL(clicked(bool)), this, SLOT(openPaymentDialog()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
-  connect(m_edDisccount, SIGNAL(textEdited(const QString&)), this, SLOT(updateControls()));
+  connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));

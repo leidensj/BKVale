@@ -87,6 +87,12 @@ void TimeCard::saveAndAccept()
    * 5 - Endereço
    * 6 - CEP
    * 7 - Cidade / UF */
+
+  // TODO: solução temporaria
+  Address address;
+  if (!o.m_form.m_vAddress.isEmpty())
+    address = o.m_form.m_vAddress.at(0);
+
   html = QString(
       "<html>"
         "<body>"
@@ -106,9 +112,9 @@ void TimeCard::saveAndAccept()
                           fdt.toString("dd/MM/yyyy"),
                           o.m_form.m_name,
                           o.m_form.m_CPF_CNPJ.isEmpty() ? "" : "CNPJ: " + o.m_form.m_CPF_CNPJ,
-                          o.m_address.m_street.isEmpty() ? "" : o.m_address.m_street + ", " + QString::number(o.m_address.m_number),
-                          o.m_address.m_cep.isEmpty() ? "" : "CEP: " + o.m_address.m_cep,
-                          o.m_address.m_city.isEmpty() ? "" :o.m_address.m_city + " " + o.m_address.getBRState().m_abv);
+                          address.m_street.isEmpty() ? "" : address.m_street + ", " + QString::number(address.m_number),
+                          address.m_cep.isEmpty() ? "" : "CEP: " + address.m_cep,
+                          address.m_city.isEmpty() ? "" : address.m_city + " " + address.getBRState().m_abv);
 
   // página em branco
   html += "<p style=\"page-break-after: always;\">&nbsp;</p>";

@@ -94,11 +94,13 @@ Payment::Payment()
 void Payment::clear(bool bClearId)
 {
   if (bClearId)
+  {
     m_id.clear();
+    m_noteId.clear();
+  }
   m_cash = 0.0;
   m_bonus = 0.0;
   m_vCredit.clear();
-  m_noteId.clear();
 }
 
 bool Payment::operator != (const JItem& other) const
@@ -242,7 +244,7 @@ bool Payment::SQL_select_proc(QSqlQuery& query, QString& error)
                   PAYMENT_PARTS_SQL_COL02 ","
                   PAYMENT_PARTS_SQL_COL03
                   " FROM " PAYMENT_PARTS_SQL_TABLE_NAME
-                  " WHERE " PAYMENT_SQL_COL01 " = (:_v01)");
+                  " WHERE " PAYMENT_PARTS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     if (bSuccess)

@@ -18,7 +18,7 @@ public:
                      NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
                      FORM_SQL_TABLE_NAME "." FORM_SQL_COL03 ","
                      FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
-                     "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL06 ")"
+                     "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL05 ")"
                      " FROM " NOTE_SQL_TABLE_NAME
                      " LEFT OUTER JOIN "
                      "(SELECT " NOTE_ITEMS_SQL_COL01 ","
@@ -147,7 +147,7 @@ void Note::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
-  m_payment.clear();
+  m_payment.clear(bClearId);
   m_number = 0;
   m_supplier.clear();
   m_date = QDate::currentDate();
@@ -368,7 +368,12 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
   }
 
   if (bSuccess)
-    bSuccess = m_payment.SQL_update_proc(query);
+  {
+    if (m_payment.m_id.isValid())
+      m_payment.SQL_update_proc(query);
+    else
+      m_payment.SQL_insert_proc(query);
+  }
 
   return bSuccess;
 }
@@ -460,8 +465,9 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess)
   {
+    QString error2;
     m_payment.m_noteId = m_id;
-    bSuccess = m_payment.SQL_select_proc_by_noteid(query, error);
+    m_payment.SQL_select_proc_by_noteid(query, error2);
   }
 
   return bSuccess;

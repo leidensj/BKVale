@@ -234,7 +234,7 @@ bool BaitaSQL::createTables(QString& error)
                           STORE_SQL_COL03 " INTEGER,"
                           STORE_SQL_COL04 " TEXT,"
                           "FOREIGN KEY(" STORE_SQL_COL01 ") REFERENCES "
-                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                          FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" STORE_SQL_COL02 ") REFERENCES "
                           ADDRESS_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                           "FOREIGN KEY(" STORE_SQL_COL03 ") REFERENCES "

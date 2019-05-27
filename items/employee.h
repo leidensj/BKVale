@@ -23,6 +23,7 @@ struct Employee : public JItemSQL
 
   bool SQL_select_by_pincode(QString& error);
   bool SQL_select_by_pincode_proc(QSqlQuery& query, QString& error);
+  bool SQL_select_formid_proc(QSqlQuery& query) const;
 
   QString name() const { return m_form.strAliasName(); }
   QByteArray image() const { return m_form.m_image.m_image; }

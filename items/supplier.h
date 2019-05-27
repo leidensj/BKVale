@@ -19,6 +19,8 @@ struct Supplier : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject *parent) const;
 
+  bool SQL_select_formid_proc(QSqlQuery& query) const;
+
   Form m_form;
 
   QString name() const { return m_form.strAliasName(); }

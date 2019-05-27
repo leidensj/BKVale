@@ -140,17 +140,26 @@ bool Supplier::SQL_select_proc(QSqlQuery& query, QString& error)
 
 bool Supplier::SQL_remove_proc(QSqlQuery& query) const
 {
-  bool bSuccess = m_form.SQL_remove_proc(query);
+  bool bSuccess = SQL_select_formid_proc(query);
   if (bSuccess)
-  {
-    query.prepare("DELETE FROM " SUPPLIER_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
-    query.bindValue(":_v00", m_id.get());
-    bSuccess = query.exec();
-  }
+    bSuccess = m_form.SQL_remove_proc(query);
   return bSuccess;
 }
 
 JModel* Supplier::SQL_table_model(QObject *parent) const
 {
   return new SupplierModel(parent);
+}
+
+bool Supplier::SQL_select_formid_proc(QSqlQuery& query) const
+{
+  query.prepare("SELECT "
+                SUPPLIER_SQL_COL01
+                " FROM " SUPPLIER_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", m_id.get());
+  bool bSuccess = query.exec();
+  if (bSuccess && query.next())
+    m_form.m_id.set(query.value(0).toLongLong());
+  return bSuccess;
 }

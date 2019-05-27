@@ -257,14 +257,9 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
 
 bool Employee::SQL_remove_proc(QSqlQuery& query) const
 {
-  bool bSuccess = m_form.SQL_remove_proc(query);
+  bool bSuccess = SQL_select_formid_proc(query);
   if (bSuccess)
-  {
-    query.prepare("DELETE FROM " EMPLOYEE_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
-    query.bindValue(":_v00", m_id.get());
-    bSuccess = query.exec();
-  }
-
+    bSuccess = m_form.SQL_remove_proc(query);
   return bSuccess;
 }
 
@@ -321,6 +316,19 @@ bool Employee::SQL_select_by_pincode_proc(QSqlQuery& query, QString& error)
     }
   }
 
+  return bSuccess;
+}
+
+bool Employee::SQL_select_formid_proc(QSqlQuery& query) const
+{
+  query.prepare("SELECT "
+                EMPLOYEE_SQL_COL01
+                " FROM " EMPLOYEE_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", m_id.get());
+  bool bSuccess = query.exec();
+  if (bSuccess && query.next())
+    m_form.m_id.set(query.value(0).toLongLong());
   return bSuccess;
 }
 

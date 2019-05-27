@@ -231,18 +231,29 @@ bool Store::SQL_select_proc(QSqlQuery& query, QString& error)
 
 bool Store::SQL_remove_proc(QSqlQuery& query) const
 {
-  bool bSuccess = m_form.SQL_remove_proc(query);
+  bool bSuccess = SQL_select_formid_proc(query);
   if (bSuccess)
-  {
-    query.prepare("DELETE FROM " STORE_SQL_TABLE_NAME
-                  " WHERE " SQL_COLID " = (:_v00)");
-    query.bindValue(":_v00", m_id.get());
-    bSuccess = query.exec();
-  }
+    bSuccess = m_form.SQL_remove_proc(query);
   return bSuccess;
 }
 
 JModel* Store::SQL_table_model(QObject* parent) const
 {
   return new StoreModel(parent);
+}
+
+bool Store::SQL_select_formid_proc(QSqlQuery& query)
+{
+  error.clear();
+
+  query.prepare("SELECT "
+                STORE_SQL_COL01
+                " FROM " STORE_SQL_TABLE_NAME
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", m_id.get());
+
+  bool bSuccess = query.exec();
+  if (bSuccess && query.next())
+    m_form.m_id = query.value(0).toLongLong();
+  return bSuccess;
 }

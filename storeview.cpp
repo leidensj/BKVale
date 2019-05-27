@@ -11,7 +11,6 @@
 #include <QLabel>
 #include <QDateEdit>
 
-
 StoreView::StoreView(QWidget* parent)
   : JItemView(STORE_SQL_TABLE_NAME, parent)
   , m_formInfo(nullptr)
@@ -81,7 +80,8 @@ const JItemSQL& StoreView::getItem() const
   for (int i = 0; i != m_tbEmployee->rowCount(); ++i)
   {
     Employee e;
-    e.m_id.set(m_tbEmployee->item(i, 0)->data(Qt::UserRole).toLongLong());
+    int row = m_tbEmployee->verticalHeader()->logicalIndex(i);
+    e.m_id.set(m_tbEmployee->item(row, 0)->data(Qt::UserRole).toLongLong());
     m_ref.m_vEmployee.push_back(e);
   }
   return m_ref;

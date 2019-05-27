@@ -99,7 +99,7 @@ public:
   void addNoteItem(const NoteItem& noteItem);
 
 private:
-  Id m_currentId;
+  Note m_currentNote;
   Id m_lastId;
   QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;

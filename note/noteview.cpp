@@ -155,21 +155,24 @@ void PaymentDlg::updateTable(QTableWidgetItem* p)
 
 void PaymentDlg::fillCash()
 {
-  Payment o;
+  Payment o = m_payment;
+  o.clear(false);
   o.m_cash = m_noteTotal;
   setPayment(o);
 }
 
 void PaymentDlg::fillBonus()
 {
-  Payment o;
+  Payment o = m_payment;
+  o.clear(false);
   o.m_bonus = m_noteTotal;
   setPayment(o);
 }
 
 void PaymentDlg::fillCredit()
 {
-  Payment o;
+  Payment o = m_payment;
+  o.clear(false);
   PaymentPart _o;
   _o.m_date = m_noteDate.addMonths(1);
   _o.m_value = m_noteTotal;
@@ -195,6 +198,7 @@ Payment PaymentDlg::getPayment() const
 
 void PaymentDlg::setPayment(const Payment& o)
 {
+  m_payment = o;
   m_tbCredit->setRowCount(0);
   m_edCash->setText(o.m_cash);
   m_edBonus->setText(o.m_bonus);
@@ -528,8 +532,8 @@ void NoteView::removeItem()
 
 Note NoteView::getNote() const
 {
-  Note note;
-  note.m_id = m_currentId;
+  Note note = m_currentNote;
+  note.clear(false);
   note.m_date = m_dtPicker->getDate();
   note.m_supplier.m_id = m_supplierPicker->getId();
   note.m_payment = m_dlgPayment->getPayment();
@@ -542,7 +546,7 @@ Note NoteView::getNote() const
 
 void NoteView::setNote(const Note& note)
 {
-  m_currentId = note.m_id;
+  m_currentNote = note;
   m_table->removeAllItems();
   m_supplierPicker->clear();
   m_dtPicker->setDate(note.m_date);
@@ -572,7 +576,7 @@ void NoteView::supplierChanged()
       m_table->setCurrentCell(0, 0);
       m_table->setFocus();
     }
-    else if (!m_currentId.isValid())
+    else if (!m_currentNote.m_id.isValid())
       m_btnAdd->click();
   }
   updateControls();
@@ -648,7 +652,7 @@ void NoteView::itemsRemoved(const QVector<Id>& ids)
 {
   if (ids.contains(m_lastId))
     m_lastId.clear();
-  if (ids.contains(m_currentId))
+  if (ids.contains(m_currentNote.m_id))
     create();
 }
 
@@ -664,6 +668,7 @@ void NoteView::openPaymentDialog()
   Note o = getNote();
   m_dlgPayment->setNoteDate(o.m_date);
   m_dlgPayment->setNoteTotal(o.total());
+  m_dlgPayment->setPayment(m_currentNote.m_payment);
   if (!m_dlgPayment->exec())
     m_dlgPayment->setPayment(o.m_payment);
   updateControls();

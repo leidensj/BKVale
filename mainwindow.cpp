@@ -256,26 +256,28 @@ void Tipi::print()
   {
     case Functionality::Note:
     {
-      Note note = m_note->getNote();
-      if (note.m_date != QDate::currentDate() && !note.m_id.isValid())
       {
-        int ret = QMessageBox::question(
-                    this,
-                    tr("Data"),
-                    tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
-                    QMessageBox::Apply | QMessageBox::Ignore | QMessageBox::Cancel,
-                    QMessageBox::Apply);
-        switch (ret)
+        Note note = m_note->getNote();
+        if (note.m_date != QDate::currentDate() && !note.m_id.isValid())
         {
-          case QMessageBox::Apply:
-            note.m_date = QDate::currentDate();
-            m_note->setNote(note);
-            break;
-          case QMessageBox::Ignore:
-            break;
-          case QMessageBox::Cancel:
-          default:
-            return;
+          int ret = QMessageBox::question(
+                      this,
+                      tr("Data"),
+                      tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
+                      QMessageBox::Apply | QMessageBox::Ignore | QMessageBox::Cancel,
+                      QMessageBox::Apply);
+          switch (ret)
+          {
+            case QMessageBox::Apply:
+              note.m_date = QDate::currentDate();
+              m_note->setNote(note);
+              break;
+            case QMessageBox::Ignore:
+              break;
+            case QMessageBox::Cancel:
+            default:
+              return;
+          }
         }
       }
       Id id;
@@ -284,7 +286,7 @@ void Tipi::print()
         Note o(id);
         QString error;
         if (o.SQL_select(error))
-          print(NotePrinter::build(note));
+          print(NotePrinter::build(o));
         else
           QMessageBox::critical(this, ("Erro ao selecionar item"), error, QMessageBox::Ok);
       }

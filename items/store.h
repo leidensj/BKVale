@@ -18,6 +18,8 @@ struct Store : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
 
+  bool SQL_select_formid_proc(QSqlQuery& query) const;
+
   Form m_form;
   Address m_address;
   Phone m_phone;

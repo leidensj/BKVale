@@ -242,10 +242,8 @@ JModel* Store::SQL_table_model(QObject* parent) const
   return new StoreModel(parent);
 }
 
-bool Store::SQL_select_formid_proc(QSqlQuery& query)
+bool Store::SQL_select_formid_proc(QSqlQuery& query) const
 {
-  error.clear();
-
   query.prepare("SELECT "
                 STORE_SQL_COL01
                 " FROM " STORE_SQL_TABLE_NAME

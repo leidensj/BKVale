@@ -313,12 +313,12 @@ double Payment::total() const
 
 bool Payment::isAllCash(double total) const
 {
-  return m_cash == total;
+  return st_areEqual(m_cash, total, DataType::Money);
 }
 
 bool Payment::isAllBonus(double total) const
 {
-  return m_bonus == total;
+  return st_areEqual(m_bonus, total, DataType::Money);
 }
 
 bool Payment::isAllCredit(double total) const
@@ -326,5 +326,5 @@ bool Payment::isAllCredit(double total) const
   double sum = 0.0;
   for (int i = 0; i != m_vCredit.size(); ++i)
     sum += m_vCredit.at(i).m_value;
-  return sum == total;
+  return st_areEqual(sum, total, DataType::Money);
 }

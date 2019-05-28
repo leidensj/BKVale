@@ -139,7 +139,7 @@ void PaymentDlg::updateControls()
   m_btnAddRemove->m_btnRemove->setEnabled(m_tbCredit->isValidCurrentRow());
   bool bValid = true;
   Payment o = getPayment();
-  if (m_noteTotal != o.total())
+  if (!JItem::st_areEqual(m_noteTotal,o.total(), JItem::DataType::Money))
     bValid = false;
   for (int i = 0; i != o.m_vCredit.size() && bValid; ++i)
     bValid = m_noteDate < o.m_vCredit.at(i).m_date;
@@ -668,7 +668,6 @@ void NoteView::openPaymentDialog()
   Note o = getNote();
   m_dlgPayment->setNoteDate(o.m_date);
   m_dlgPayment->setNoteTotal(o.total());
-  m_dlgPayment->setPayment(m_currentNote.m_payment);
   if (!m_dlgPayment->exec())
     m_dlgPayment->setPayment(o.m_payment);
   updateControls();

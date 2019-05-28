@@ -117,7 +117,9 @@ bool JTable::isValidCurrentRow() const
 JItemTable::JItemTable(int flags, QWidget* parent)
   : JTable(flags, parent)
 {
-  QObject::connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(update(int, int)));
+  connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(update(int, int)));
+  connect(this, SIGNAL(activateSignal(int,int)), this, SLOT(itemActivate(int, int)));
+  connect(this, SIGNAL(deleteSignal(int,int)), this, SLOT(itemDelete(int, int)));
 }
 
 void JItemTable::setHeaderIcon(int pos, const QIcon& icon)

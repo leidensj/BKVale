@@ -227,7 +227,7 @@ QString Note::strSubTotal() const
 
 bool Note::isPaymentOk() const
 {
-  return total() == m_payment.total();
+  return st_areEqual(total(), m_payment.total(), DataType::Money);
 }
 
 QString Note::SQL_tableName() const

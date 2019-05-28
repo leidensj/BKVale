@@ -46,6 +46,16 @@ struct JItem
   static QString st_strFmt(double value) { return QString::number(value, 'f').remove(QRegExp("\\.?0*$")); }
   static QString st_strInt(double value) { return QString::number((int)value); }
   static QString st_strPercentage(double value) { return QString::number(value, 'f', 2) + "%"; }
+  static bool st_areEqual(double v1, double v2, DataType type)
+  {
+    switch (type)
+    {
+      case DataType::Money:
+        return (v1 < v2 + 0.01 && v1 > v2 - 0.01);
+      default:
+        return false;
+    }
+  }
 
   static QString st_str(double value, DataType type)
   {

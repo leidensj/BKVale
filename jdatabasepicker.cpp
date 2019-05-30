@@ -28,7 +28,6 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   m_selector = new JDatabaseSelector(tableName, bMultiPicker, this);
 
   m_imageView = new JImageView(false, 24);
-  m_imageView->hide();
 
   QHBoxLayout* hlayout0 = new QHBoxLayout;
   hlayout0->setContentsMargins(0, 0, 0, 0);
@@ -42,6 +41,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
   connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(setItems(const QVector<JItemSQL*>&)));
+  clear();
 }
 
 JDatabase* JDatabasePicker::getDatabase() const
@@ -130,6 +130,8 @@ void JDatabasePicker::clear()
   m_edText->clear();
   m_ids.clear();
   m_names.clear();
+  m_imageView->clearImage();
+  m_imageView->hasImage() ? m_imageView->show() : m_imageView->hide();
   if (bChanged)
     emit changedSignal();
 }

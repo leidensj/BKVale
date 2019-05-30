@@ -72,7 +72,6 @@ SOURCES += main.cpp\
     items/form.cpp \
     items/image.cpp \
     items/note.cpp \
-    items/payment.cpp \
     items/phone.cpp \
     items/product.cpp \
     items/reminder.cpp \
@@ -147,7 +146,6 @@ HEADERS  += mainwindow.h \
     items/form.h \
     items/image.h \
     items/note.h \
-    items/payment.h \
     items/phone.h \
     items/product.h \
     items/reminder.h \

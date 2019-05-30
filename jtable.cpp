@@ -45,8 +45,11 @@ void JTable::removeItem()
 
 void JTable::removeAllItems()
 {
-  setRowCount(0);
-  emitChangedSignal();
+  if (hasItems())
+  {
+    setRowCount(0);
+    emitChangedSignal();
+  }
 }
 
 bool JTable::hasItems() const

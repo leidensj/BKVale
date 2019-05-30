@@ -137,6 +137,36 @@ QString NoteItem::strPrice() const
   return st_strMoney(m_price);
 }
 
+PaymentItem::PaymentItem()
+{
+  clear();
+}
+
+void PaymentItem::clear(bool bClearId)
+{
+  if (bClearId)
+    m_id.clear();
+  m_value = 0.0;
+  m_date = QDate::currentDate();
+}
+
+bool PaymentItem::operator != (const JItem& other) const
+{
+  const PaymentItem& another = dynamic_cast<const PaymentItem&>(other);
+  return m_value != another.m_value ||
+         m_date != another.m_date;
+}
+
+bool PaymentItem::operator == (const JItem& other) const
+{
+  return !(*this != other);
+}
+
+bool PaymentItem::isValid() const
+{
+  return true;
+}
+
 Note::Note(Id id)
 {
   clear();
@@ -147,7 +177,8 @@ void Note::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
-  m_payment.clear(bClearId);
+  m_paymentMethod = PaymentMethod::Credit;
+  m_vPaymentItem.clear();
   m_number = 0;
   m_supplier.clear();
   m_date = QDate::currentDate();
@@ -169,7 +200,8 @@ bool Note::operator !=(const JItem& other) const
       m_number != another.m_number ||
       m_date != another.m_date ||
       m_supplier.m_id != another.m_supplier.m_id ||
-      m_payment != another.m_payment ||
+      m_paymentMethod != another.m_paymentMethod ||
+      m_vPaymentItem != another.m_vPaymentItem ||
       m_vNoteItem != another.m_vNoteItem ||
       m_disccount != another.m_disccount;
 }
@@ -225,9 +257,33 @@ QString Note::strSubTotal() const
   return st_strMoney(subTotal());
 }
 
-bool Note::isPaymentOk() const
+bool Note::isPaymentValid() const
 {
-  return st_areEqual(total(), m_payment.total(), DataType::Money);
+  bool bValid = true;
+  for (int i = 0; i != m_vPaymentItem.size() && bValid; ++i)
+    bValid = m_vPaymentItem.at(i).m_date >= m_date;
+  return bValid && st_areEqual(total(), paymentTotal(), DataType::Money);
+}
+
+double Note::paymentTotal() const
+{
+  double t = 0.0;
+  for (int i = 0; i != m_vPaymentItem.size(); ++i)
+    t += m_vPaymentItem.at(i).m_value;
+  return t;
+}
+
+void Note::adjustPayment()
+{
+  if (!isPaymentValid())
+  {
+    m_vPaymentItem.clear();
+    m_paymentMethod = PaymentMethod::Credit;
+    PaymentItem o;
+    o.m_value = total();
+    o.m_date = m_date.addMonths(1);
+    m_vPaymentItem.push_back(o);
+  }
 }
 
 QString Note::SQL_tableName() const
@@ -251,27 +307,30 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
                   NOTE_SQL_COL03 ","
                   NOTE_SQL_COL04 ","
                   NOTE_SQL_COL05 ","
-                  NOTE_SQL_COL06
+                  NOTE_SQL_COL06 ","
+                  NOTE_SQL_COL07
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
                   "(:_v03),"
                   "(:_v04),"
                   "(:_v05),"
-                  "(:_v06))");
+                  "(:_v06),"
+                  "(:_v07))");
     query.bindValue(":_v01", m_number);
     query.bindValue(":_v02", m_date);
     query.bindValue(":_v03", m_supplier.m_id.getIdNull());
     query.bindValue(":_v04", m_observation);
     query.bindValue(":_v05", m_disccount);
     query.bindValue(":_v06", m_employee.m_id.getIdNull());
+    query.bindValue(":_v07", (int)m_paymentMethod);
     bSuccess = query.exec();
   }
 
   if (bSuccess)
   {
     m_id.set(query.lastInsertId().toLongLong());
-    for (int i = 0; i != m_vNoteItem.size(); ++i)
+    for (int i = 0; i != m_vNoteItem.size() && bSuccess; ++i)
     {
       query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
                     NOTE_ITEMS_SQL_COL01 ","
@@ -299,15 +358,28 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
       bSuccess = query.exec();
       if (bSuccess)
         m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
-      else
-        break;
     }
   }
 
   if (bSuccess)
   {
-    m_payment.m_noteId = m_id;
-    bSuccess = m_payment.SQL_insert_proc(query);
+    for (int i = 0; i != m_vPaymentItem.size() && bSuccess; ++i)
+    {
+      query.prepare("INSERT INTO " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME " ("
+                    NOTE_PAYMENT_ITEMS_SQL_COL01 ","
+                    NOTE_PAYMENT_ITEMS_SQL_COL02 ","
+                    NOTE_PAYMENT_ITEMS_SQL_COL03
+                    ") VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03))");
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vPaymentItem.at(i).m_date);
+      query.bindValue(":_v03", m_vPaymentItem.at(i).m_value);
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_vPaymentItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+    }
   }
 
   return bSuccess;
@@ -320,7 +392,8 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
                 NOTE_SQL_COL03 " = (:_v03),"
                 NOTE_SQL_COL04 " = (:_v04),"
                 NOTE_SQL_COL05 " = (:_v05),"
-                NOTE_SQL_COL06 " = (:_v06) "
+                NOTE_SQL_COL06 " = (:_v06),"
+                NOTE_SQL_COL07 " = (:_v07) "
                 "WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v02", m_date);
@@ -328,6 +401,7 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v04", m_observation);
   query.bindValue(":_v05", m_disccount);
   query.bindValue(":_v06", m_employee.m_id.getIdNull());
+  query.bindValue(":_v07", (int)m_paymentMethod);
   bool bSuccess = query.exec();
 
   query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
@@ -369,10 +443,23 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
 
   if (bSuccess)
   {
-    if (m_payment.m_id.isValid())
-      m_payment.SQL_update_proc(query);
-    else
-      m_payment.SQL_insert_proc(query);
+    for (int i = 0; i != m_vPaymentItem.size() && bSuccess; ++i)
+    {
+      query.prepare("INSERT INTO " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME " ("
+                    NOTE_PAYMENT_ITEMS_SQL_COL01 ","
+                    NOTE_PAYMENT_ITEMS_SQL_COL02 ","
+                    NOTE_PAYMENT_ITEMS_SQL_COL03
+                    ") VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03))");
+      query.bindValue(":_v01", m_id.get());
+      query.bindValue(":_v02", m_vPaymentItem.at(i).m_date);
+      query.bindValue(":_v03", m_vPaymentItem.at(i).m_value);
+      bSuccess = query.exec();
+      if (bSuccess)
+        m_vPaymentItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+    }
   }
 
   return bSuccess;
@@ -388,7 +475,8 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
                 NOTE_SQL_COL03 ","
                 NOTE_SQL_COL04 ","
                 NOTE_SQL_COL05 ","
-                NOTE_SQL_COL06
+                NOTE_SQL_COL06 ","
+                NOTE_SQL_COL07
                 " FROM " NOTE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -404,6 +492,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
       m_observation = query.value(3).toString();
       m_disccount = query.value(4).toDouble();
       m_employee.m_id.set(query.value(5).toDouble());
+      m_paymentMethod = (PaymentMethod)query.value(6).toInt();
     }
     else
     {
@@ -465,9 +554,25 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess)
   {
-    QString error2;
-    m_payment.m_noteId = m_id;
-    m_payment.SQL_select_proc_by_noteid(query, error2);
+    query.prepare("SELECT "
+                  SQL_COLID ","
+                  NOTE_PAYMENT_ITEMS_SQL_COL02 ","
+                  NOTE_PAYMENT_ITEMS_SQL_COL03
+                  " FROM " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME
+                  " WHERE " NOTE_PAYMENT_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      while (query.next())
+      {
+        PaymentItem o;
+        o.m_id.set(query.value(0).toLongLong());
+        o.m_date = query.value(1).toDate();
+        o.m_value = query.value(2).toDouble();
+        m_vPaymentItem.push_back(o);
+      }
+    }
   }
 
   return bSuccess;

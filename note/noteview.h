@@ -28,6 +28,7 @@ class QTableWidget;
 class JAddRemoveButtons;
 class JTable;
 class QTableWidgetItem;
+class QRadioButton;
 
 class NoteDetailsDlg : public QDialog
 {
@@ -45,11 +46,9 @@ class PaymentDlg : public QDialog
 {
   Q_OBJECT
 
-  QPushButton* m_btnCash;
-  QPushButton* m_btnBonus;
-  QPushButton* m_btnCredit;
-  JExpLineEdit* m_edCash;
-  JExpLineEdit* m_edBonus;
+  QRadioButton* m_rdoCash;
+  QRadioButton* m_rdoBonus;
+  QRadioButton* m_rdoCredit;
   JTable* m_tbCredit;
   QLabel* m_lblNoteTotal;
   QLabel* m_lblPaymentTotal;
@@ -66,23 +65,23 @@ class PaymentDlg : public QDialog
 
 public:
   explicit PaymentDlg(QWidget* parent = nullptr);
-  Payment getPayment() const;
-  void setPayment(const Payment& o);
-  void setNoteTotal(double total);
-  void setNoteDate(const QDate& date);
-  void adjust();
+  void fillNote(Note& o) const;
+  void setNote(const Note& o);
 
 private slots:
-  void updateControls();
-  void fillCash();
-  void fillBonus();
   void fillCredit();
+  void updateControls();
   void addRow();
   void removeRow();
   void updateTable(QTableWidgetItem* p);
 
 private:
-  Payment m_payment;
+  Note::PaymentMethod getPaymentMethod() const;
+  QVector<PaymentItem> getPaymentItems() const;
+  void setPaymentMethod(Note::PaymentMethod o);
+  void setPaymentItems(const QVector<PaymentItem>& v);
+  double computeTotal() const;
+  bool isDatesValid() const;
 
 signals:
   void isValidSignal(bool b);

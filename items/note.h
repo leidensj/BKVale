@@ -10,7 +10,6 @@
 #include "defines.h"
 #include "jitemsql.h"
 #include "employee.h"
-#include "payment.h"
 
 enum class NoteColumn : int
 {
@@ -41,8 +40,27 @@ struct NoteItem : public JItem
   Package m_package;
 };
 
+struct PaymentItem : public JItem
+{
+  double m_value;
+  QDate m_date;
+
+  PaymentItem();
+  void clear(bool bClearId = true);
+  bool operator != (const JItem& other) const;
+  bool operator == (const JItem& other) const;
+  bool isValid() const;
+};
+
 struct Note : public JItemSQL
 {
+  enum class PaymentMethod
+  {
+    Credit,
+    Cash,
+    Bonus
+  };
+
   Note(Id = Id());
   void clear(bool bClearId = true);
   bool isValid() const;
@@ -70,12 +88,16 @@ struct Note : public JItemSQL
   double subTotal() const;
   QString strTotal() const;
   QString strSubTotal() const;
-  bool isPaymentOk() const;
+  bool isPaymentValid() const;
+  double paymentTotal() const;
+
+  void adjustPayment();
 
   mutable qlonglong m_number;
   QDate m_date;
   Supplier m_supplier;
-  Payment m_payment;
+  PaymentMethod m_paymentMethod;
+  QVector<PaymentItem> m_vPaymentItem;
   QString m_observation;
   QVector<NoteItem> m_vNoteItem;
   double m_disccount;

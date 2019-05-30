@@ -124,7 +124,7 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   connect(m_btnCredit, SIGNAL(clicked(bool)), this, SLOT(fillCredit()));
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeRow()));
-  connect(m_tbCredit, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_tbCredit, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_tbCredit, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateTable(QTableWidgetItem*)));
   connect(m_edCash, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edBonus, SIGNAL(editingFinished()), this, SLOT(updateControls()));
@@ -502,7 +502,7 @@ NoteView::NoteView(QWidget *parent)
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
-  connect(m_table, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
   connect(m_dtPicker, SIGNAL(dateChangedSignal()), this, SLOT(updateControls()));
   connect(m_btnPayment, SIGNAL(clicked(bool)), this, SLOT(openPaymentDialog()));

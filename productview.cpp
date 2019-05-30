@@ -3,6 +3,7 @@
 #include "jdatabasepicker.h"
 #include "jdoublespinbox.h"
 #include "productcodetablewidget.h"
+#include "jaddremovebuttons.h"
 #include <QLayout>
 #include <QCheckBox>
 #include <QFormLayout>
@@ -18,6 +19,7 @@ ProductView::ProductView(QWidget* parent)
   , m_categoryPicker(nullptr)
   , m_imagePicker(nullptr)
   , m_tbCode(nullptr)
+  , m_btns(nullptr)
 {
   m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
                            JLineEdit::st_defaultFlags1);
@@ -45,11 +47,11 @@ ProductView::ProductView(QWidget* parent)
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
 
   m_tbCode = new ProductCodeTableWidget;
-  JTableButtons* btns = new JTableButtons(m_tbCode);
+  m_btns = new JAddRemoveButtons;
 
-  QHBoxLayout* ltCode = new QHBoxLayout;
+  QVBoxLayout* ltCode = new QVBoxLayout;
+  ltCode->addWidget(m_btns);
   ltCode->addWidget(m_tbCode);
-  ltCode->addWidget(btns);
 
   QFormLayout* formlayout = new QFormLayout;
   formlayout->addRow(tr("Nome:"), m_edName);
@@ -66,13 +68,12 @@ ProductView::ProductView(QWidget* parent)
   QFrame* tabCodeFrame = new QFrame;
   tabCodeFrame->setLayout(ltCode);
 
-  m_tab->addTab(tabInfoFrame,
-                QIcon(":/icons/res/item.png"),
-                tr("Produto"));
+  m_tab->addTab(tabInfoFrame, QIcon(":/icons/res/item.png"), tr("Produto"));
+  m_tab->addTab(tabCodeFrame, QIcon(":/icons/res/barcode.png"), tr("Códigos"));
+  connect(m_tbCode, SIGNAL(changedSignal(bool)), m_btns, SLOT(enableRemoveButton(bool)));
+  connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_tbCode, SLOT(addItem()));
+  connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_tbCode, SLOT(removeItem()));
 
-  m_tab->addTab(tabCodeFrame,
-                QIcon(":/icons/res/barcode.png"),
-                tr("Códigos"));
 }
 
 ProductView::~ProductView()

@@ -12,7 +12,7 @@ class JLineEdit;
 class ShoppingListTable;
 class QPlainTextEdit;
 class JSpinBox;
-class JTableButtons;
+class JAddRemoveButtons;
 
 class ShoppingListView : public JItemView
 {
@@ -31,7 +31,6 @@ private slots:
 
 private:
   mutable ShoppingList m_ref;
-  JTableButtons* m_tableButtons;
 
   JLineEdit* m_edTitle;
   JSpinBox* m_snLines;
@@ -40,6 +39,7 @@ private:
   JDatabasePicker* m_imagePicker;
 
   ShoppingListTable* m_table;
+  JAddRemoveButtons* m_btns;
 
   QPushButton* m_vbtnMonth[31];
   QPushButton* m_vbtnWeek[7];

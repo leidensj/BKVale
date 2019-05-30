@@ -41,7 +41,7 @@ protected:
   void keyPressEvent(QKeyEvent *event);
 
 signals:
-  void changedSignal();
+  void changedSignal(bool bIsRowSelected);
   void deleteSignal(int row, int column);
   void activateSignal(int row, int column);
 };
@@ -65,23 +65,6 @@ protected slots:
 protected:
   void setHeaderIcon(int pos, const QIcon& icon);
   void setHeaderIconSearchable(int pos);
-};
-
-class JTableButtons : public QWidget
-{
-  Q_OBJECT
-
-public:
-  explicit JTableButtons(JTable* table, int maxNumberofItems = 100, int orientation = Qt::Vertical, QWidget* parent = nullptr);
-
-private slots:
-  void updateControls();
-
-private:
-  JTable* m_table;
-  int m_max;
-  QPushButton* m_btnAdd;
-  QPushButton* m_btnRemove;
 };
 
 class ExpItem : public QTableWidgetItem

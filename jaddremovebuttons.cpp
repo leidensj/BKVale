@@ -31,4 +31,10 @@ JAddRemoveButtons::JAddRemoveButtons(QWidget* parent)
   m_lt->addWidget(m_btnAdd);
   m_lt->addWidget(m_btnRemove);
   setLayout(m_lt);
+  enableRemoveButton(false);
+}
+
+void JAddRemoveButtons::enableRemoveButton(bool bEnable)
+{
+  m_btnRemove->setEnabled(bEnable);
 }

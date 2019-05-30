@@ -12,6 +12,7 @@ class JDoubleSpinBox;
 class QCheckBox;
 class JDatabasePicker;
 class ProductCodeTableWidget;
+class JAddRemoveButtons;
 
 class ProductView : public JItemView
 {
@@ -36,6 +37,7 @@ private:
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
   ProductCodeTableWidget* m_tbCode;
+  JAddRemoveButtons* m_btns;
   void setItem(const JItemSQL& o);
 };
 

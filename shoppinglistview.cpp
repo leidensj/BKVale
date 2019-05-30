@@ -6,6 +6,7 @@
 #include "packageeditor.h"
 #include "jlineedit.h"
 #include "jspinbox.h"
+#include "jaddremovebuttons.h"
 #include <QSplitter>
 #include <QPlainTextEdit>
 #include <QTabWidget>
@@ -47,13 +48,13 @@ QPushButton* weekButtonFactory(int n)
 
 ShoppingListView::ShoppingListView(QWidget* parent)
   : JItemView(SHOPPING_LIST_SQL_TABLE_NAME, parent)
-  , m_tableButtons(nullptr)
   , m_edTitle(nullptr)
   , m_snLines(nullptr)
   , m_teDescription(nullptr)
   , m_supplierPicker(nullptr)
   , m_imagePicker(nullptr)
   , m_table(nullptr)
+  , m_btns(nullptr)
 {
   m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
@@ -127,33 +128,31 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   calendarLayout->addLayout(monthLayout4);
   calendarLayout->addLayout(monthLayout5);
 
+  m_btns = new JAddRemoveButtons;
   m_table = new ShoppingListTable;
-  m_tableButtons = new JTableButtons(m_table, SHOPPING_LIST_MAX_NUMBER_OF_ITEMS);
-  QHBoxLayout* listLayout = new QHBoxLayout;
-  listLayout->addWidget(m_table);
-  listLayout->addWidget(m_tableButtons);
+
+  QVBoxLayout* ltTable = new QVBoxLayout;
+  ltTable->addWidget(m_btns);
+  ltTable->addWidget(m_table);
 
   QFrame* tabView = new QFrame;
   tabView->setLayout(viewFormLayout);
 
-  QFrame* tabList = new QFrame;
-  tabList->setLayout(listLayout);
+  QFrame* tabTable = new QFrame;
+  tabTable->setLayout(ltTable);
 
   QFrame* tabCalendar = new QFrame;
   tabCalendar->setLayout(calendarLayout);
 
-  m_tab->addTab(tabView,
-                QIcon(":/icons/res/shopmgt.png"),
-                tr("Lista de Compras"));
-  m_tab->addTab(tabList,
-                QIcon(":/icons/res/item.png"),
-                tr("Produtos"));
-  m_tab->addTab(tabCalendar,
-                QIcon(":/icons/res/calendar.png"),
-                tr("Calendário"));
+  m_tab->addTab(tabView, QIcon(":/icons/res/shopmgt.png"), tr("Lista de Compras"));
+  m_tab->addTab(tabTable, QIcon(":/icons/res/item.png"), tr("Produtos"));
+  m_tab->addTab(tabCalendar, QIcon(":/icons/res/calendar.png"), tr("Calendário"));
 
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-  connect(m_table, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
+  connect(m_table, SIGNAL(changedSignal(bool)), m_btns, SLOT(enableRemoveButton(bool)));
+  connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_table, SLOT(addItem()));
+  connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_table, SLOT(removeItem()));
 }
 
 void ShoppingListView::updateControls()

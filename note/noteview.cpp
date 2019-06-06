@@ -494,7 +494,7 @@ NoteView::NoteView(QWidget *parent)
 
   connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(itemSelected(const JItemSQL&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
-  connect(m_database, SIGNAL(refreshSignal()), this, SLOT(updateControls()));
+  connect(m_database, SIGNAL(refreshSignal()), this, SLOT(updateStatistics()));
   connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
@@ -583,15 +583,15 @@ void NoteView::updateControls()
 {
   m_btnRemove->setEnabled(m_table->currentRow() >= 0);
   m_btnOpenLast->setEnabled(m_lastId.isValid());
-
   double total = m_table->computeTotal() + m_edDisccount->getValue();
-
   m_edTotal->setText(total);
+  emit changedSignal();
+}
 
+void NoteView::updateStatistics()
+{
   m_edEntries->setText(JItem::st_strInt(m_database->getNumberOfEntries()));
   m_edSum->setText(JItem::st_strMoney(m_database->getSum(5)));
-
-  emit changedSignal();
 }
 
 void NoteView::addProduct()

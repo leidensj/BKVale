@@ -130,11 +130,12 @@ private slots:
   void addProduct();
   void openDetailsDialog();
   void openPaymentDialog();
+  void updateControls();
+  void updateStatistics();
 
 public slots:
   void create();
   void setNote(const Note& note);
-  void updateControls();
   bool save(Id& id);
 
 signals:

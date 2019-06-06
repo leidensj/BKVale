@@ -259,18 +259,26 @@ QString Note::strSubTotal() const
 
 bool Note::isPaymentValid() const
 {
-  bool bValid = true;
-  for (int i = 0; i != m_vPaymentItem.size() && bValid; ++i)
-    bValid = m_vPaymentItem.at(i).m_date >= m_date;
-  return bValid && st_areEqual(total(), paymentTotal(), DataType::Money);
+  if (m_paymentMethod == PaymentMethod::Credit)
+  {
+    bool bValid = true;
+    for (int i = 0; i != m_vPaymentItem.size() && bValid; ++i)
+      bValid = m_vPaymentItem.at(i).m_date >= m_date;
+    return bValid && st_areEqual(total(), paymentTotal(), DataType::Money);
+  }
+  return true;
 }
 
 double Note::paymentTotal() const
 {
-  double t = 0.0;
-  for (int i = 0; i != m_vPaymentItem.size(); ++i)
-    t += m_vPaymentItem.at(i).m_value;
-  return t;
+  if (m_paymentMethod == PaymentMethod::Credit)
+  {
+    double t = 0.0;
+    for (int i = 0; i != m_vPaymentItem.size(); ++i)
+      t += m_vPaymentItem.at(i).m_value;
+    return t;
+  }
+  return total();
 }
 
 void Note::adjustPayment()

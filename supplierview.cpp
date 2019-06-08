@@ -42,10 +42,10 @@ const JItemSQL& SupplierView::getItem() const
 void SupplierView::setItem(const JItemSQL& o)
 {
   m_ref = static_cast<const Supplier&>(o);
-  m_formInfo->fillForm(m_ref.m_form);
-  m_formDetails->fillForm(m_ref.m_form);
-  m_formPhone->fillForm(m_ref.m_form);
-  m_formAddress->fillForm(m_ref.m_form);
+  m_formInfo->setForm(m_ref.m_form);
+  m_formDetails->setForm(m_ref.m_form);
+  m_formPhone->setForm(m_ref.m_form);
+  m_formAddress->setForm(m_ref.m_form);
 }
 
 Id SupplierView::getId() const

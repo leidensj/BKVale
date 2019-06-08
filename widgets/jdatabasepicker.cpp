@@ -3,7 +3,7 @@
 #include "jimageview.h"
 #include "defines.h"
 #include "jdatabase.h"
-#include "items/jitemhelper.h"
+#include "items/jitemex.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QGroupBox>
@@ -148,7 +148,7 @@ const QVector<Id>& JDatabasePicker::getIds() const
 
 QString JDatabasePicker::getText() const
 {
-  return JItemHelper::text(m_selector->getDatabase()->getTableName());
+  return JItemEx::text(m_selector->getDatabase()->getTableName());
 }
 
 void JDatabasePicker::setPlaceholderText(bool bSet)

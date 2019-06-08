@@ -1,7 +1,7 @@
 #ifndef ADDRESSTABLEWIDGET_H
 #define ADDRESSTABLEWIDGET_H
 
-#include "jtable.h"
+#include "widgets/jtable.h"
 #include "items/address.h"
 
 class AddressTableWidget : public JItemTable

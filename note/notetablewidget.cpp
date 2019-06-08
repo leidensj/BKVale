@@ -1,8 +1,8 @@
-#include "note/notetablewidget.h"
+#include "notetablewidget.h"
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
-#include "jtablewidgetitem.h"
+#include "widgets/jtablewidgetitem.h"
 
 NoteTableWidget::NoteTableWidget(QWidget* parent)
   : JItemTable((int)Flags::BigFont, parent)

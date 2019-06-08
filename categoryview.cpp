@@ -1,6 +1,6 @@
 #include "categoryview.h"
-#include "jlineedit.h"
-#include "jdatabasepicker.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jdatabasepicker.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>

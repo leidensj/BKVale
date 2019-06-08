@@ -1,6 +1,6 @@
 #include "imageview.h"
-#include "jlineedit.h"
-#include "jimageview.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jimageview.h"
 #include <QLayout>
 
 ImageView::ImageView(QWidget* parent)

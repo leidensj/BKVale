@@ -4,8 +4,8 @@
 #include <QGroupBox>
 #include <QIcon>
 #include <QDialogButtonBox>
-#include "jlineedit.h"
-#include "jdoublespinbox.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jdoublespinbox.h"
 
 PackageEditor::PackageEditor(const Package& package,
                              const QString& productUnity,

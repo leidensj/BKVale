@@ -1,7 +1,7 @@
 #ifndef PHONETABLEWIDGET_H
 #define PHONETABLEWIDGET_H
 
-#include "jtable.h"
+#include "widgets/jtable.h"
 #include "items/phone.h"
 
 class PhoneTableWidget : public JItemTable

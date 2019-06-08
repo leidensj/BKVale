@@ -3,7 +3,7 @@
 
 #include <QTableWidgetItem>
 #include <QDialog>
-#include <jitem.h>
+#include "items/jitem.h"
 #include <QVector>
 #include "items/product.h"
 #include "items/supplier.h"

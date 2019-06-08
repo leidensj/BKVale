@@ -5,7 +5,7 @@
 #include <QString>
 #include <QVector>
 #include <QSqlDatabase>
-#include "jitemsql.h"
+#include "items/jitemsql.h"
 
 class QPushButton;
 class JLineEdit;

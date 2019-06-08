@@ -1,6 +1,6 @@
 #include "shoppinglisttable.h"
 #include "tinyexpr.h"
-#include "jtablewidgetitem.h"
+#include "widgets/jtablewidgetitem.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QMessageBox>

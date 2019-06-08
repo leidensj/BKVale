@@ -2,7 +2,7 @@
 #define STOREVIEW_H
 
 #include "items/store.h"
-#include "jitemview.h"
+#include "widgets/jitemview.h"
 
 class JTable;
 class FormInfoWidget;

@@ -2,9 +2,9 @@
 #define JVIEW_H
 
 #include <QFrame>
-#include "jitemsql.h"
+#include "items/jitemsql.h"
 #include <QPushButton>
-#include "jdatabase.h"
+#include "widgets/jdatabase.h"
 #include <QTabWidget>
 
 class QPushButton;

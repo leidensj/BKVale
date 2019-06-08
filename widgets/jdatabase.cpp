@@ -3,8 +3,8 @@
 #include "defines.h"
 #include "note/notefilterdlg.h"
 #include "pincodeview.h"
-#include "items/jitemhelper.h"
-#include "jmodel.h"
+#include "items/jitemex.h"
+#include "items/jmodel.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
@@ -129,7 +129,7 @@ JDatabase::JDatabase(const QString& tableName,
   vlayout1->addWidget(m_table);
   setLayout(vlayout1);
 
-  JModel* model = JItemHelper::model(tableName, this);
+  JModel* model = JItemEx::model(tableName, this);
   if (model == nullptr)
   {
     QMessageBox::critical(this, tr("Erro"), tr("Modelo não implementado"), QMessageBox::Ok);
@@ -257,7 +257,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
   {
     QString error;
     bool bSuccess = false;
-    auto p = JItemHelper::create(m_tableName, ids.at(i));
+    auto p = JItemEx::create(m_tableName, ids.at(i));
     if (p != nullptr)
     {
       bSuccess = p->SQL_select(error);
@@ -332,7 +332,7 @@ void JDatabase::removeItems()
     return;
   }
 
-  if (JItemHelper::authenticationToRemove(m_tableName))
+  if (JItemEx::authenticationToRemove(m_tableName))
   {
     PinCodeView w(this);
     if (!w.exec())
@@ -355,7 +355,7 @@ void JDatabase::removeItems()
   for (int i = 0; i != ids.size(); ++i)
   {
     Id id = ids.at(i);
-    auto p = JItemHelper::create(m_tableName, id);
+    auto p = JItemEx::create(m_tableName, id);
     if (p != nullptr)
     {
       QString error;
@@ -388,6 +388,7 @@ void JDatabase::filterSearchChanged()
   }
 
   enableControls();
+  emit refreshSignal();
 }
 
 void JDatabase::filterSearchEnter()
@@ -440,7 +441,7 @@ JItemSQL* JDatabase::getCurrentItem() const
 
 bool JDatabase::save(const JItemSQL& o)
 {
-  if (JItemHelper::authenticationToInsertUpdate(m_tableName))
+  if (JItemEx::authenticationToInsertUpdate(m_tableName))
   {
     PinCodeView w(this);
     if (!w.exec())
@@ -528,8 +529,8 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
 
   resize(500, 400);
 
-  QString title = "Selecionar " + JItemHelper::text(tableName);
-  QString icon = JItemHelper::icon(tableName);
+  QString title = "Selecionar " + JItemEx::text(tableName);
+  QString icon = JItemEx::icon(tableName);
 
   setWindowTitle(title);
   if (!icon.isEmpty())

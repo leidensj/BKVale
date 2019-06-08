@@ -1,6 +1,6 @@
 #include "jitemview.h"
 #include "jdatabase.h"
-#include "items/jitemhelper.h"
+#include "items/jitemex.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
@@ -61,8 +61,8 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_dlgDb->setLayout(ltDlg);
   ltDlg->addWidget(m_database);
   m_dlgDb->setWindowFlags(Qt::Window);
-  m_dlgDb->setWindowTitle(JItemHelper::text(tableName));
-  m_dlgDb->setWindowIcon(QIcon(JItemHelper::icon(tableName)));
+  m_dlgDb->setWindowTitle(JItemEx::text(tableName));
+  m_dlgDb->setWindowIcon(QIcon(JItemEx::icon(tableName)));
   m_dlgDb->setModal(true);
 
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));

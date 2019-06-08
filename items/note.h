@@ -73,9 +73,6 @@ struct Note : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
-
-  bool SQL_authentication_insert_update() const { return true; }
-  bool SQL_authentication_remove() const { return true; }
   static NoteItem SQL_select_last_item(Id supplierId, Id productId);
 
   void setEmployee(const JItemSQL& e) const;

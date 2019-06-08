@@ -1,11 +1,16 @@
 #include "noteview.h"
 #include "databaseutils.h"
 #include "note/notetablewidget.h"
-#include "jdatabasepicker.h"
-#include "jdatabase.h"
-#include "jlineedit.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jdatabase.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jaddremovebuttons.h"
+#include "widgets/jdoublespinbox.h"
+#include "widgets/jtable.h"
+#include "widgets/jtablewidgetitem.h"
+#include "widgets/jdatepicker.h"
 #include "packageeditor.h"
-#include "jdatepicker.h"
+#include "widgets/jplaintextedit.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -15,14 +20,9 @@
 #include <QMessageBox>
 #include <QTabWidget>
 #include <QFormLayout>
-#include "jplaintextedit.h"
 #include <QDialogButtonBox>
 #include <QRadioButton>
-#include "items/jitemhelper.h"
-#include "jaddremovebuttons.h"
-#include "jdoublespinbox.h"
-#include "jtable.h"
-#include "jtablewidgetitem.h"
+#include "items/jitemex.h"
 
 NoteDetailsDlg::NoteDetailsDlg(QWidget* parent)
   : QDialog(parent)
@@ -477,7 +477,7 @@ NoteView::NoteView(QWidget *parent)
   frDbInfo->setLayout(ltDbInfo);
 
   QTabWidget* tbdb = new QTabWidget;
-  tbdb->addTab(m_database, QIcon(JItemHelper::icon(NOTE_SQL_TABLE_NAME)), JItemHelper::text(NOTE_SQL_TABLE_NAME));
+  tbdb->addTab(m_database, QIcon(JItemEx::icon(NOTE_SQL_TABLE_NAME)), JItemEx::text(NOTE_SQL_TABLE_NAME));
   tbdb->addTab(frDbInfo, QIcon(":/icons/res/statistics.png"), tr("Estatísticas"));
 
   QVBoxLayout* ltdb = new QVBoxLayout;
@@ -486,15 +486,14 @@ NoteView::NoteView(QWidget *parent)
   m_dlgDb = new QDialog(this);
   m_dlgDb->setLayout(ltdb);
   m_dlgDb->setWindowFlags(Qt::Window);
-  m_dlgDb->setWindowTitle(JItemHelper::text(NOTE_SQL_TABLE_NAME));
-  m_dlgDb->setWindowIcon(QIcon(JItemHelper::icon(NOTE_SQL_TABLE_NAME)));
+  m_dlgDb->setWindowTitle(JItemEx::text(NOTE_SQL_TABLE_NAME));
+  m_dlgDb->setWindowIcon(QIcon(JItemEx::icon(NOTE_SQL_TABLE_NAME)));
   m_dlgDb->setModal(true);
 
   setLayout(viewLayout);
 
   connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(itemSelected(const JItemSQL&)));
   connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
-  connect(m_database, SIGNAL(refreshSignal()), this, SLOT(updateStatistics()));
   connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
   connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
@@ -509,9 +508,11 @@ NoteView::NoteView(QWidget *parent)
   connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
   connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), m_dlgDb, SLOT(accept()));
+  connect(tbdb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
 
   create();
   updateControls();
+  updateStatistics();
 }
 
 NoteView::~NoteView()

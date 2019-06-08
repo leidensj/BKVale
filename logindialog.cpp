@@ -1,5 +1,6 @@
 #include "logindialog.h"
-#include "jlineedit.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jspinbox.h"
 #include "items/user.h"
 #include "databaseutils.h"
 #include <QLayout>
@@ -10,7 +11,6 @@
 #include <QPushButton>
 #include <QPropertyAnimation>
 #include "settings.h"
-#include "jspinbox.h"
 #include <QApplication>
 
 #ifdef Q_OS_WIN32

@@ -4,7 +4,7 @@
 #include <QFrame>
 #include "items/product.h"
 #include "items/category.h"
-#include "jitemview.h"
+#include "widgets/jitemview.h"
 
 class QLabel;
 class JLineEdit;

@@ -1,5 +1,5 @@
 #include "shopview.h"
-#include "jdatabase.h"
+#include "widgets/jdatabase.h"
 #include "defines.h"
 #include "printutils.h"
 #include "escpos.h"

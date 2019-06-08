@@ -3,7 +3,7 @@
 
 #include <QTableWidget>
 #include "items/shoppinglist.h"
-#include "jtable.h"
+#include "widgets/jtable.h"
 
 class ShoppingListTable : public JItemTable
 {

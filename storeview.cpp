@@ -1,10 +1,10 @@
 #include "storeview.h"
-#include "jlineedit.h"
-#include "jplaintextedit.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jplaintextedit.h"
+#include "widgets/jtable.h"
+#include "widgets/jaddremovebuttons.h"
+#include "widgets/jdatabase.h"
 #include "formwidget.h"
-#include "jtable.h"
-#include "jaddremovebuttons.h"
-#include "jdatabase.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QRadioButton>

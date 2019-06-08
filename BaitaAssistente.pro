@@ -25,42 +25,26 @@ SOURCES += main.cpp\
     consumptionchart.cpp \
     calculatorwidget.cpp \
     logindialog.cpp \
-    jlineedit.cpp \
-    jdatabase.cpp \
     categoryview.cpp \
-    jimageview.cpp \
     imageview.cpp \
     productview.cpp \
-    jdatabasepicker.cpp \
     pincodeview.cpp \
     shoppinglistview.cpp \
     shoppinglisttable.cpp \
-    jdoublespinbox.cpp \
     shopview.cpp \
     reservationview.cpp \
-    jspinbox.cpp \
     packageeditor.cpp \
     discounttablewidget.cpp \
     discountview.cpp \
-    jtablewidgetitem.cpp \
-    jitemview.cpp \
     phonetablewidget.cpp \
     timecard.cpp \
     storeview.cpp \
-    jtimeedit.cpp \
     addresstablewidget.cpp \
     productcodetablewidget.cpp \
-    jdateedit.cpp \
-    jdatepicker.cpp \
-    jplaintextedit.cpp \
     employeeview.cpp \
-    jmodel.cpp \
-    jitemsql.cpp \
     supplierview.cpp \
     userview.cpp \
-    jaddremovebuttons.cpp \
     formwidget.cpp \
-    jtable.cpp \
     note/notefilterdlg.cpp \
     note/notetablewidget.cpp \
     note/noteview.cpp \
@@ -80,7 +64,23 @@ SOURCES += main.cpp\
     items/store.cpp \
     items/supplier.cpp \
     items/user.cpp \
-    items/jitemhelper.cpp
+    items/jitemex.cpp \
+    widgets/jaddremovebuttons.cpp \
+    widgets/jdatabase.cpp \
+    widgets/jdatabasepicker.cpp \
+    widgets/jdateedit.cpp \
+    widgets/jdatepicker.cpp \
+    widgets/jdoublespinbox.cpp \
+    widgets/jimageview.cpp \
+    widgets/jitemview.cpp \
+    widgets/jlineedit.cpp \
+    widgets/jplaintextedit.cpp \
+    widgets/jspinbox.cpp \
+    widgets/jtable.cpp \
+    widgets/jtablewidgetitem.cpp \
+    widgets/jtimeedit.cpp \
+    items/jitemsql.cpp \
+    items/jmodel.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -94,47 +94,28 @@ HEADERS  += mainwindow.h \
     calculatorwidget.h \
     calculator.h \
     logindialog.h \
-    jlineedit.h \
-    jdatabase.h \
     categoryview.h \
-    jimageview.h \
-    imageview.h \
     productview.h \
     defines.h \
-    jitem.h \
-    jdatabasepicker.h \
     pincodeview.h \
     shoppinglistview.h \
     shoppinglisttable.h \
-    jdoublespinbox.h \
     shopview.h \
     reservationview.h \
-    jspinbox.h \
     packageeditor.h \
     escpos.h \
     filterdlg.h \
     discounttablewidget.h \
     discountview.h \
-    jtablewidgetitem.h \
-    jitemview.h \
     phonetablewidget.h \
     timecard.h \
     storeview.h \
-    jtimeedit.h \
     timeinterval.h \
     addresstablewidget.h \
     productcodetablewidget.h \
-    jdateedit.h \
-    jdatepicker.h \
-    jplaintextedit.h \
-    jitemsql.h \
     employeeview.h \
-    jmodel.h \
     supplierview.h \
     userview.h \
-    jaddremovebuttons.h \
-    formwidget.h \
-    jtable.h \
     note/noteview.h \
     note/notefilterdlg.h \
     note/notetablewidget.h \
@@ -154,7 +135,28 @@ HEADERS  += mainwindow.h \
     items/shoppinglist.h \
     items/supplier.h \
     items/user.h \
-    items/jitemhelper.h
+    items/jitemex.h \
+    widgets/jitemview.h \
+    widgets/imageview.h \
+    widgets/jaddremovebuttons.h \
+    widgets/jdatabasepicker.h \
+    widgets/jimageview.h \
+    widgets/jdatepicker.h \
+    widgets/jdoublespinbox.h \
+    widgets/jdateedit.h \
+    widgets/formwidget.h \
+    widgets/jdatabase.h \
+    widgets/jplaintextedit.h \
+    widgets/jspinbox.h \
+    widgets/jtablewidgetitem.h \
+    widgets/jtimeedit.h \
+    items/jitem.h \
+    items/jitemsql.h \
+    widgets/jtable.h \
+    widgets/jlineedit.h \
+    items/jmodel.h \
+    formwidget.h \
+    imageview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

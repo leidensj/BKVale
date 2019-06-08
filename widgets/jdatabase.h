@@ -6,7 +6,7 @@
 #include <QModelIndex>
 #include <QVector>
 #include <QTableView>
-#include "jitemsql.h"
+#include "items/jitemsql.h"
 
 class QPushButton;
 class QCheckBox;

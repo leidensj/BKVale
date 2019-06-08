@@ -5,7 +5,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QDate>
-#include "jitem.h"
+#include "items/jitem.h"
 
 class QKeyEvent;
 class QPushButton;

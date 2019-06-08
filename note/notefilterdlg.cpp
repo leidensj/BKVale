@@ -1,9 +1,10 @@
 #include "notefilterdlg.h"
-#include "jdatabasepicker.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jdatabase.h"
 #include <QDateEdit>
 #include <QCheckBox>
 #include <QLayout>
-#include "jdatabase.h"
+
 
 /* PRODUCT FILTER */
 /*WHERE _NOTES._ID = ANY (SELECT _NOTEID FROM _NOTE_ITEMS WHERE _PRODUCTID IN(...))*/

@@ -5,7 +5,7 @@
 #include <QKeyEvent>
 #include <QValidator>
 #include <QRegExpValidator>
-#include "jitem.h"
+#include "items/jitem.h"
 
 class JRegExpValidator: public QRegExpValidator
 {

@@ -1,18 +1,18 @@
 #include "employeeview.h"
-#include "jlineedit.h"
-#include "jdatabasepicker.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jspinbox.h"
+#include "widgets/jtimeedit.h"
+#include "widgets/jaddremovebuttons.h"
+#include "widgets/jtable.h"
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QLabel>
-#include "jspinbox.h"
-#include "jtimeedit.h"
 #include <QPushButton>
 #include "timeinterval.h"
-#include "jtable.h"
 #include <QHeaderView>
 #include <QRadioButton>
 #include <QTreeWidget>
-#include "jaddremovebuttons.h"
 #include "formwidget.h"
 
 EmployeeView::EmployeeView(QWidget* parent)

@@ -1,7 +1,7 @@
 #ifndef NOTETABLEWIDGET_H
 #define NOTETABLEWIDGET_H
 
-#include "jtable.h"
+#include "widgets/jtable.h"
 #include "items/note.h"
 
 class NoteTableWidget : public JItemTable

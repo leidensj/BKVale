@@ -1,4 +1,4 @@
-#include "jitemhelper.h"
+#include "jitemex.h"
 #include "user.h"
 #include "note.h"
 #include "product.h"
@@ -18,7 +18,7 @@
 #include "jmodel.h"
 #include "activeuser.h"
 
-JItemSQL* JItemHelper::create(const QString& tableName)
+JItemSQL* JItemEx::create(const QString& tableName)
 {
   if (tableName == IMAGE_SQL_TABLE_NAME)
     return new Image;
@@ -30,6 +30,8 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new Store;
   if (tableName == PRODUCT_SQL_TABLE_NAME)
     return new Product;
+  if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    return new ProductCode;
   if (tableName == NOTE_SQL_TABLE_NAME)
     return new Note;
   if (tableName == USER_SQL_TABLE_NAME)
@@ -55,7 +57,7 @@ JItemSQL* JItemHelper::create(const QString& tableName)
   return nullptr;
 }
 
-JItemSQL* JItemHelper::create(const QString& tableName, Id id)
+JItemSQL* JItemEx::create(const QString& tableName, Id id)
 {
   auto pt = create(tableName);
   if (pt != nullptr)
@@ -63,25 +65,21 @@ JItemSQL* JItemHelper::create(const QString& tableName, Id id)
   return pt;
 }
 
-bool JItemHelper::authenticationToInsertUpdate(const QString& tableName)
+bool JItemEx::authenticationToInsertUpdate(const QString& tableName)
 {
-  auto p = create(tableName);
-  bool b = p == nullptr ? false : p->SQL_authentication_insert_update();
-  if (p != nullptr)
-    delete p;
-  return b;
+  if (tableName == NOTE_SQL_TABLE_NAME)
+    return true;
+  return false;
 }
 
-bool JItemHelper::authenticationToRemove(const QString& tableName)
+bool JItemEx::authenticationToRemove(const QString& tableName)
 {
-  auto p = create(tableName);
-  bool b = p == nullptr ? false : p->SQL_authentication_remove();
-  if (p != nullptr)
-    delete p;
-  return b;
+  if (tableName == NOTE_SQL_TABLE_NAME)
+    return true;
+  return false;
 }
 
-QString JItemHelper::text(const QString& tableName)
+QString JItemEx::text(const QString& tableName)
 {
   if (tableName == IMAGE_SQL_TABLE_NAME)
     return "Imagem";
@@ -93,6 +91,8 @@ QString JItemHelper::text(const QString& tableName)
     return "Loja";
   if (tableName == PRODUCT_SQL_TABLE_NAME)
     return "Produto";
+  if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    return "Código";
   if (tableName == NOTE_SQL_TABLE_NAME)
     return "Vale";
   if (tableName == USER_SQL_TABLE_NAME)
@@ -118,7 +118,7 @@ QString JItemHelper::text(const QString& tableName)
   return "ERRO: Tabela não encontrada.";
 }
 
-QString JItemHelper::icon(const QString& tableName)
+QString JItemEx::icon(const QString& tableName)
 {
   if (tableName == IMAGE_SQL_TABLE_NAME)
     return ":/icons/res/icon.png";
@@ -130,6 +130,8 @@ QString JItemHelper::icon(const QString& tableName)
     return ":/icons/res/store.png";
   if (tableName == PRODUCT_SQL_TABLE_NAME)
     return ":/icons/res/item.png";
+  if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    return ":/icons/res/barcode.png";
   if (tableName == NOTE_SQL_TABLE_NAME)
     return ":/icons/res/note.png";
   if (tableName == USER_SQL_TABLE_NAME)
@@ -155,10 +157,10 @@ QString JItemHelper::icon(const QString& tableName)
   return "";
 }
 
-JModel* JItemHelper::model(const QString& tableName, QObject* parent)
+JModel* JItemEx::model(const QString& tableName, QObject* parent)
 {
   JModel* m = nullptr;
-  auto p = JItemHelper::create(tableName);
+  auto p = JItemEx::create(tableName);
   if (p != nullptr)
   {
     m = p->SQL_table_model(parent);

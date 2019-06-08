@@ -1,10 +1,10 @@
 #include "formwidget.h"
-#include "jlineedit.h"
-#include "jdatabasepicker.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jaddremovebuttons.h"
+#include "widgets/jplaintextedit.h"
 #include "phonetablewidget.h"
 #include "addresstablewidget.h"
-#include "jaddremovebuttons.h"
-#include "jplaintextedit.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QTabWidget>
@@ -232,7 +232,7 @@ FormPhoneWidget::FormPhoneWidget(QWidget* parent)
 
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), m_tbPhone, SLOT(addItem()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), m_tbPhone, SLOT(removeItem()));
-  connect(m_tbPhone, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_tbPhone, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   setLayout(lt);
 }
 
@@ -268,7 +268,7 @@ FormAddressWidget::FormAddressWidget(QWidget* parent)
 
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), m_tbAddress, SLOT(addItem()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), m_tbAddress, SLOT(removeItem()));
-  connect(m_tbAddress, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_tbAddress, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   setLayout(lt);
 }
 

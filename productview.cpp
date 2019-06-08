@@ -1,9 +1,9 @@
 #include "productview.h"
-#include "jlineedit.h"
-#include "jdatabasepicker.h"
-#include "jdoublespinbox.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jdoublespinbox.h"
+#include "widgets/jaddremovebuttons.h"
 #include "productcodetablewidget.h"
-#include "jaddremovebuttons.h"
 #include <QLayout>
 #include <QCheckBox>
 #include <QFormLayout>

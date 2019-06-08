@@ -1,8 +1,8 @@
 #include "reservationview.h"
-#include "jlineedit.h"
-#include "jdatabasepicker.h"
-#include "jdatabase.h"
-#include "jspinbox.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jdatabase.h"
+#include "widgets/jspinbox.h"
 #include <QDateTimeEdit>
 #include <QPushButton>
 #include <QLayout>

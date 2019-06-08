@@ -2,7 +2,7 @@
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
-#include "jtablewidgetitem.h"
+#include "widgets/jtablewidgetitem.h"
 
 AddressTableWidget::AddressTableWidget(QWidget* parent)
   : JItemTable((int)Flags::NoFlags , parent)

@@ -4,7 +4,7 @@
 #include <QFrame>
 #include <QVector>
 #include "items/shoppinglist.h"
-#include "jitemview.h"
+#include "widgets/jitemview.h"
 
 class JDatabasePicker;
 class QCheckBox;

@@ -1,12 +1,12 @@
 #include "shoppinglistview.h"
 #include <QCheckBox>
 #include <QLayout>
-#include "jdatabasepicker.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jspinbox.h"
+#include "widgets/jaddremovebuttons.h"
 #include "shoppinglisttable.h"
 #include "packageeditor.h"
-#include "jlineedit.h"
-#include "jspinbox.h"
-#include "jaddremovebuttons.h"
 #include <QSplitter>
 #include <QPlainTextEdit>
 #include <QTabWidget>

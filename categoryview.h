@@ -2,7 +2,7 @@
 #define CATEGORYVIEW_H
 
 #include "items/category.h"
-#include "jitemview.h"
+#include "widgets/jitemview.h"
 
 class QPushButton;
 class JLineEdit;

@@ -17,7 +17,7 @@
 #include "reservationview.h"
 #include "discountview.h"
 #include "shopview.h"
-#include "jdatabase.h"
+#include "widgets/jdatabase.h"
 #include "timecard.h"
 #include "storeview.h"
 #include <QMessageBox>

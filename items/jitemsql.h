@@ -24,9 +24,6 @@ struct JItemSQL : public JItem
   virtual bool SQL_select(QString& error);
   virtual bool SQL_remove(QString& error) const;
 
-  virtual bool SQL_authentication_insert_update() const { return false; }
-  virtual bool SQL_authentication_remove() const { return false; }
-
   virtual QString name() const { return "Nome não implementado."; }
   virtual QByteArray image() const { return QByteArray(); }
   virtual void setEmployee(const JItemSQL& /*e*/) const { }

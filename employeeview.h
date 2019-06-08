@@ -2,7 +2,7 @@
 #define EMPLOYEEVIEW_H
 
 #include "items/employee.h"
-#include "jitemview.h"
+#include "widgets/jitemview.h"
 #include <QVector>
 
 class QPushButton;

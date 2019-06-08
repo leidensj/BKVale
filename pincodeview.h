@@ -36,6 +36,7 @@ private slots:
   void pressed9() { append('9'); }
 
 private:
+  bool m_bError;
   Employee m_employee;
   QLineEdit* m_edPinCode;
   QPushButton* m_btn0;

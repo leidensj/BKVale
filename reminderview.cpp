@@ -1,7 +1,7 @@
 #include "reminderview.h"
-#include "jlineedit.h"
-#include "jdatabase.h"
-#include "jspinbox.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jdatabase.h"
+#include "widgets/jspinbox.h"
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QRadioButton>

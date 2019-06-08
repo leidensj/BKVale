@@ -9,6 +9,20 @@
 
 PinCodeView::PinCodeView(QWidget* parent)
   : QDialog(parent)
+  , m_bError(false)
+  , m_edPinCode(nullptr)
+  , m_btn0(nullptr)
+  , m_btn1(nullptr)
+  , m_btn2(nullptr)
+  , m_btn3(nullptr)
+  , m_btn4(nullptr)
+  , m_btn5(nullptr)
+  , m_btn6(nullptr)
+  , m_btn7(nullptr)
+  , m_btn8(nullptr)
+  , m_btn9(nullptr)
+  , m_btnEnter(nullptr)
+  , m_btnClr(nullptr)
 {
   setWindowIcon(QIcon(":/icons/res/employee.png"));
   setWindowTitle(tr("Selecionar Funcionário"));
@@ -170,6 +184,8 @@ PinCodeView::PinCodeView(QWidget* parent)
 
 void PinCodeView::append(QChar c)
 {
+  if (m_bError)
+    erase();
   m_edPinCode->setText(m_edPinCode->text().append(c));
 }
 
@@ -179,11 +195,15 @@ void PinCodeView::search()
   m_employee.m_pincode = m_edPinCode->text();
   if (!m_employee.SQL_select_by_pincode(error))
   {
-    QMessageBox::warning(this,
-                         tr("Aviso"),
-                         error,
-                         QMessageBox::Ok);
-    m_edPinCode->clear();
+    QPalette palette = m_edPinCode->palette();
+    palette.setColor(QPalette::Base, QColor(255, 200, 200));
+    m_edPinCode->setPalette(palette);
+    m_edPinCode->setEchoMode(QLineEdit::EchoMode::Normal);
+    QFont f = m_edPinCode->font();
+    f.setPointSize(12);
+    m_edPinCode->setFont(f);
+    m_edPinCode->setText(error);
+    m_bError = true;
   }
   else
   {
@@ -194,6 +214,17 @@ void PinCodeView::search()
 void PinCodeView::erase()
 {
   m_edPinCode->clear();
+  if (m_bError)
+  {
+    QPalette palette = m_edPinCode->palette();
+    palette.setColor(QPalette::Base, Qt::white);
+    m_edPinCode->setPalette(palette);
+    m_edPinCode->setEchoMode(QLineEdit::EchoMode::Password);
+    QFont f = m_edPinCode->font();
+    f.setPointSize(24);
+    m_edPinCode->setFont(f);
+    m_bError = false;
+  }
 }
 
 Employee PinCodeView::getEmployee() const

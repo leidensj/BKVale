@@ -1,6 +1,6 @@
 #include "userview.h"
-#include "items/jitemhelper.h"
-#include "jlineedit.h"
+#include "items/jitemex.h"
+#include "widgets/jlineedit.h"
 #include <QLabel>
 #include <QLayout>
 #include <QRegExpValidator>
@@ -73,8 +73,8 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
         strText = "Configurações";
         break;
       default:
-        strIcon = JItemHelper::icon(idxToTableName((Idx)i));
-        strText = JItemHelper::text(idxToTableName((Idx)i));
+        strIcon = JItemEx::icon(idxToTableName((Idx)i));
+        strText = JItemEx::text(idxToTableName((Idx)i));
         break;
     }
     p->setText(strText);

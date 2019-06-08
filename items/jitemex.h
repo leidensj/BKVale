@@ -1,11 +1,11 @@
-#ifndef JITEMHELPER_H
-#define JITEMHELPER_H
+#ifndef JItemEx_H
+#define JItemEx_H
 
 #include "jitemsql.h"
 
 class QObject;
 
-namespace JItemHelper
+namespace JItemEx
 {
 JItemSQL* create(const QString& tableName);
 JItemSQL* create(const QString& tableName, Id id);
@@ -15,4 +15,4 @@ QString text(const QString& tableName);
 QString icon(const QString& tableName);
 JModel* model(const QString& tableName, QObject* parent);
 }
-#endif // JITEMHELPER_H
+#endif // JItemEx_H

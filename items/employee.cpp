@@ -289,7 +289,7 @@ bool Employee::SQL_select_by_pincode_proc(QSqlQuery& query, QString& error)
   bool bSuccess = true;
   if (m_pincode.isEmpty())
   {
-    error = "Código PIN nulo.";
+    error = "Código nulo.";
     bSuccess = false;
   }
 
@@ -310,7 +310,7 @@ bool Employee::SQL_select_by_pincode_proc(QSqlQuery& query, QString& error)
       }
       else
       {
-        error = "Código PIN informado não encontrado.";
+        error = "Código não encontrado.";
         bSuccess = false;
       }
     }

@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include "items/image.h"
-#include "jitemview.h"
+#include "widgets/jitemview.h"
 
 class QPushButton;
 class JLineEdit;

@@ -2,7 +2,7 @@
 #define SUPPLIERVIEW_H
 
 #include "items/supplier.h"
-#include "jitemview.h"
+#include "widgets/jitemview.h"
 
 class FormInfoWidget;
 class FormDetailsWidget;

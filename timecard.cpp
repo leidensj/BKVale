@@ -2,11 +2,12 @@
 #include <QTextDocument>
 #include <QPrinter>
 #include <QDate>
-#include "jitem.h"
+#include "items/jitem.h"
 #include "items/store.h"
 #include "items/employee.h"
-#include "jdatabasepicker.h"
-#include "jspinbox.h"
+#include "widgets/jdatabasepicker.h"
+#include "widgets/jspinbox.h"
+#include "widgets/jdatabase.h"
 #include <QDateEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -14,7 +15,6 @@
 #include <QFileDialog>
 #include <QLocale>
 #include <QPushButton>
-#include "jdatabase.h"
 #include <QDesktopServices>
 #include <QCheckBox>
 #include <QProgressDialog>

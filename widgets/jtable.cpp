@@ -144,11 +144,10 @@ DoubleItem::DoubleItem(JItem::DataType type, Color color, bool bCheckable)
   , m_bCheckable(bCheckable)
 {
   if (m_bCheckable)
-    setFlags(Qt::NoItemFlags |
-             Qt::ItemIsSelectable |
-             Qt::ItemIsEnabled |
-             Qt::ItemIsEditable |
-             Qt::ItemIsUserCheckable);
+  {
+    setFlags(flags() | Qt::ItemIsUserCheckable);
+    setCheckState(Qt::Checked);
+  }
 }
 
 void DoubleItem::setValue(double val)

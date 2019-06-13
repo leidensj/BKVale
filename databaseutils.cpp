@@ -340,14 +340,12 @@ bool BaitaSQL::createTables(QString& error)
                           SHOPPING_LIST_ITEMS_SQL_COL05 " BOOLEAN,"
                           SHOPPING_LIST_ITEMS_SQL_COL06 " TEXT,"
                           SHOPPING_LIST_ITEMS_SQL_COL07 " REAL,"
-                          SHOPPING_LIST_ITEMS_SQL_COL08 " BOOLEAN,"
-                          SHOPPING_LIST_ITEMS_SQL_COL09 " BOOLEAN,"
-                          SHOPPING_LIST_ITEMS_SQL_COL10 " INTEGER,"
+                          SHOPPING_LIST_ITEMS_SQL_COL08 " INTEGER,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL01 ") REFERENCES "
                           SHOPPING_LIST_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL02 ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL10 ") REFERENCES "
+                          "FOREIGN KEY(" SHOPPING_LIST_ITEMS_SQL_COL08 ") REFERENCES "
                           SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)

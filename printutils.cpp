@@ -399,13 +399,13 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
 
     str += lst.m_vItem.at(i).m_product.m_name + ESC_LF;
 
-    if (lst.m_vItem.at(i).m_bPrice)
+    if (lst.m_vItem.at(i).m_price != 0.0)
       str += "Preco sugerido: " + lst.m_vItem.at(i).strPrice() + ESC_LF;
 
     if (bPrintCount)
     {
       str += ESC_DOUBLE_FONT_ON "[     ][     ]";
-      if (lst.m_vItem.at(i).m_bAmmount)
+      if (lst.m_vItem.at(i).m_ammount != 0.0)
         str += "[" + JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
                lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity) + "]";
       str += ESC_DOUBLE_FONT_OFF ESC_LF;

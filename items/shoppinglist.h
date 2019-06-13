@@ -35,9 +35,7 @@ struct ShoppingListItem : public JItem
   QString strPrice() const;
 
   Product m_product;
-  bool m_bAmmount;
   double m_ammount;
-  bool m_bPrice;
   double m_price;
   Package m_package;
   Supplier m_supplier;

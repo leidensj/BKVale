@@ -46,9 +46,7 @@ void ShoppingListItem::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_product.clear();
-  m_bAmmount = true;
   m_ammount = 0.0;
-  m_bPrice = true;
   m_price = 0.0;
   m_package.clear();
   m_supplier.clear();
@@ -61,8 +59,6 @@ bool ShoppingListItem::operator !=(const JItem& other) const
          m_ammount != another.m_ammount ||
          m_price != another.m_price ||
          m_package != another.m_package ||
-         m_bAmmount != another.m_bAmmount ||
-         m_bPrice != another.m_bPrice ||
          m_supplier.m_id != another.m_id;
 }
 
@@ -253,9 +249,7 @@ bool ShoppingList::SQL_insert_proc(QSqlQuery& query) const
                     SHOPPING_LIST_ITEMS_SQL_COL05 ","
                     SHOPPING_LIST_ITEMS_SQL_COL06 ","
                     SHOPPING_LIST_ITEMS_SQL_COL07 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL08 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL09 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL10
+                    SHOPPING_LIST_ITEMS_SQL_COL08
                     ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
@@ -264,9 +258,7 @@ bool ShoppingList::SQL_insert_proc(QSqlQuery& query) const
                     "(:_v05),"
                     "(:_v06),"
                     "(:_v07),"
-                    "(:_v08),"
-                    "(:_v09),"
-                    "(:_v10))");
+                    "(:_v08))");
 
       query.bindValue(":_v01", m_id.get());
       query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
@@ -275,9 +267,7 @@ bool ShoppingList::SQL_insert_proc(QSqlQuery& query) const
       query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
       query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
       query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
-      query.bindValue(":_v08", m_vItem.at(i).m_bAmmount);
-      query.bindValue(":_v09", m_vItem.at(i).m_bPrice);
-      query.bindValue(":_v10", m_vItem.at(i).m_supplier.m_id.getIdNull());
+      query.bindValue(":_v08", m_vItem.at(i).m_supplier.m_id.getIdNull());
       bSuccess = query.exec();
       if (bSuccess)
         m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
@@ -327,9 +317,7 @@ bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
                     SHOPPING_LIST_ITEMS_SQL_COL05 ","
                     SHOPPING_LIST_ITEMS_SQL_COL06 ","
                     SHOPPING_LIST_ITEMS_SQL_COL07 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL08 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL09 ","
-                    SHOPPING_LIST_ITEMS_SQL_COL10
+                    SHOPPING_LIST_ITEMS_SQL_COL08
                     ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
@@ -340,7 +328,7 @@ bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
                     "(:_v07),"
                     "(:_v08),"
                     "(:_v09),"
-                    "(:_v10))");
+                    "(:_v08))");
       query.bindValue(":_v01", m_id.get());
       query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
       query.bindValue(":_v03", m_vItem.at(i).m_ammount);
@@ -348,9 +336,7 @@ bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
       query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
       query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
       query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
-      query.bindValue(":_v08", m_vItem.at(i).m_bAmmount);
-      query.bindValue(":_v09", m_vItem.at(i).m_bPrice);
-      query.bindValue(":_v10", m_vItem.at(i).m_supplier.m_id.getIdNull());
+      query.bindValue(":_v08", m_vItem.at(i).m_supplier.m_id.getIdNull());
       bSuccess = query.exec();
       if (bSuccess)
         m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
@@ -407,9 +393,7 @@ bool ShoppingList::SQL_select_proc(QSqlQuery& query, QString& error)
                   SHOPPING_LIST_ITEMS_SQL_COL05 ","
                   SHOPPING_LIST_ITEMS_SQL_COL06 ","
                   SHOPPING_LIST_ITEMS_SQL_COL07 ","
-                  SHOPPING_LIST_ITEMS_SQL_COL08 ","
-                  SHOPPING_LIST_ITEMS_SQL_COL09 ","
-                  SHOPPING_LIST_ITEMS_SQL_COL10
+                  SHOPPING_LIST_ITEMS_SQL_COL08
                   " FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME
                   " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
@@ -426,9 +410,7 @@ bool ShoppingList::SQL_select_proc(QSqlQuery& query, QString& error)
         item.m_package.m_bIsPackage = query.value(4).toBool();
         item.m_package.m_unity = query.value(5).toString();
         item.m_package.m_ammount = query.value(6).toDouble();
-        item.m_bAmmount= query.value(7).toDouble();
-        item.m_bPrice = query.value(8).toDouble();
-        item.m_supplier.m_id.set(query.value(9).toDouble());
+        item.m_supplier.m_id.set(query.value(7).toDouble());
         m_vItem.push_back(item);
       }
     }

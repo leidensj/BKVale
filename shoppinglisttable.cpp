@@ -29,9 +29,7 @@ const JItem& ShoppingListTable::getItem(int row) const
   {
     int idx = verticalHeader()->logicalIndex(row);
     m_ref.m_ammount = ((DoubleItem*)item(idx, (int)ShoppingListColumn::Ammount))->getValue();
-    m_ref.m_bAmmount = ((DoubleItem*)item(idx, (int)ShoppingListColumn::Ammount))->checkState() == Qt::Checked;
     m_ref.m_price = ((DoubleItem*)item(idx, (int)ShoppingListColumn::Price))->getValue();
-    m_ref.m_bPrice = ((DoubleItem*)item(idx, (int)ShoppingListColumn::Price))->checkState() == Qt::Checked;
     m_ref.m_package = ((PackageTableWidgetItem*)item(idx, (int)ShoppingListColumn::Unity))->getItem();
     m_ref.m_product = dynamic_cast<const Product&>(((ProductTableWidgetItem*)item(idx, (int)ShoppingListColumn::Description))->getItem());
     m_ref.m_supplier = dynamic_cast<const Supplier&>(((SupplierTableWidgetItem*)item(idx, (int)ShoppingListColumn::Supplier))->getItem());
@@ -46,21 +44,15 @@ void ShoppingListTable::addItem(const JItem& o)
   int row = rowCount() - 1;
   setItem(row, (int)ShoppingListColumn::Unity, new PackageTableWidgetItem);
   setItem(row, (int)ShoppingListColumn::Description, new ProductTableWidgetItem);
-  setItem(row, (int)ShoppingListColumn::Ammount, new DoubleItem(JItem::DataType::Ammount,
-                                                                           DoubleItem::Color::None,
-                                                                           true));
-  setItem(row, (int)ShoppingListColumn::Price, new DoubleItem(JItem::DataType::Money,
-                                                                         DoubleItem::Color::None,
-                                                                         true));
+  setItem(row, (int)ShoppingListColumn::Ammount, new DoubleItem(JItem::DataType::Ammount, DoubleItem::Color::Background));
+  setItem(row, (int)ShoppingListColumn::Price, new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Background));
   setItem(row, (int)ShoppingListColumn::Supplier, new SupplierTableWidgetItem);
 
   setCurrentCell(row, (int)ShoppingListColumn::Ammount);
 
   const ShoppingListItem& _o = dynamic_cast<const ShoppingListItem&>(o);
   ((DoubleItem*)item(row, (int)ShoppingListColumn::Ammount))->setValue(_o.m_ammount);
-  ((DoubleItem*)item(row, (int)ShoppingListColumn::Ammount))->setCheckState(_o.m_bAmmount ? Qt::Checked : Qt::Unchecked);
   ((DoubleItem*)item(row, (int)ShoppingListColumn::Price))->setValue(_o.m_price);
-  ((DoubleItem*)item(row, (int)ShoppingListColumn::Price))->setCheckState(_o.m_bPrice ? Qt::Checked : Qt::Unchecked);
   ((ProductTableWidgetItem*)item(row, (int)ShoppingListColumn::Description))->setItem(_o.m_product);
   ((PackageTableWidgetItem*)item(row, (int)ShoppingListColumn::Unity))->setItem(_o.m_package, _o.m_product.m_unity);
   ((SupplierTableWidgetItem*)item(row, (int)ShoppingListColumn::Supplier))->setItem(_o.m_supplier);

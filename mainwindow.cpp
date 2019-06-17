@@ -133,14 +133,14 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   connect(ui->actionNotes, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
-  connect(ui->actionShop, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReservations, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionDiscount, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(m_discount, SIGNAL(redeemSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
 
   connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
-  connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionShoppingListMgt, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionStores, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionProducts, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCategories, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
@@ -398,7 +398,7 @@ void Tipi::updateControls()
   ui->actionProducts->setEnabled(bIsSQLOk && m_login.getUser().m_bProduct);
   ui->actionCategories->setEnabled(bIsSQLOk && m_login.getUser().m_bCategory);
   ui->actionImages->setEnabled(bIsSQLOk && m_login.getUser().m_bImage);
-  ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShoppingList);
+  ui->actionShoppingListMgt->setEnabled(bIsSQLOk && m_login.getUser().m_bShoppingList);
   ui->actionEmployees->setEnabled(bIsSQLOk && m_login.getUser().m_bEmployee);
   ui->actionSuppliers->setEnabled(bIsSQLOk && m_login.getUser().m_bSupplier);
   ui->actionStores->setEnabled(bIsSQLOk && m_login.getUser().m_bStore);
@@ -407,7 +407,7 @@ void Tipi::updateControls()
   ui->actionNotes->setEnabled(bIsSQLOk && m_login.getUser().m_bNote);
   ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bReminder);
   ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bCalculator);
-  ui->actionShop->setEnabled(bIsSQLOk && m_login.getUser().m_bShop);
+  ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShop);
   ui->actionReservations->setEnabled(bIsSQLOk && m_login.getUser().m_bReservation);
   ui->actionDiscount->setEnabled(bIsSQLOk && m_login.getUser().m_bDiscount);
 
@@ -453,7 +453,7 @@ void Tipi::openJItemSQLDialog()
     view = new ImageView;
   else if (sender() == ui->actionProducts)
     view = new ProductView;
-  else if (sender() == ui->actionShoppingList)
+  else if (sender() == ui->actionShoppingListMgt)
     view = new ShoppingListView;
   else if (sender() == ui->actionStores)
     view = new StoreView;
@@ -470,7 +470,7 @@ void Tipi::openJItemSQLDialog()
     dlg.setLayout(layout);
     layout->addWidget(view);
     dlg.setWindowFlags(Qt::Window);
-    dlg.setWindowTitle(pt->toolTip());
+    dlg.setWindowTitle(tr("Gerenciar ") + pt->text());
     dlg.setWindowIcon(pt->icon());
     dlg.setModal(true);
     dlg.exec();
@@ -547,7 +547,7 @@ void Tipi::activateWindow()
     m_calculatorWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_calculatorWindow);
   }
-  else if (sender() == ui->actionShop)
+  else if (sender() == ui->actionShoppingList)
   {
     m_shopWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_shopWindow);

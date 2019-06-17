@@ -144,7 +144,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   QFrame* tabCalendar = new QFrame;
   tabCalendar->setLayout(calendarLayout);
 
-  m_tab->addTab(tabView, QIcon(":/icons/res/shopmgt.png"), tr("Lista de Compras"));
+  m_tab->addTab(tabView, QIcon(":/icons/res/details.png"), tr("Informações"));
   m_tab->addTab(tabTable, QIcon(":/icons/res/item.png"), tr("Produtos"));
   m_tab->addTab(tabCalendar, QIcon(":/icons/res/calendar.png"), tr("Calendário"));
 

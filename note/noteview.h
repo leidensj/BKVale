@@ -67,6 +67,8 @@ public:
   explicit PaymentDlg(QWidget* parent = nullptr);
   void fillNote(Note& o) const;
   void setNote(const Note& o);
+  QIcon getIcon() const;
+  QString getText() const;
 
 private slots:
   void fillCredit();

@@ -20,6 +20,7 @@ ShoppingListTable::ShoppingListTable(QWidget* parent)
 
   setHeaderIconSearchable((int)ShoppingListColumn::Description);
   setHeaderIconSearchable((int)ShoppingListColumn::Supplier);
+  setHeaderIcon((int)ShoppingListColumn::Unity, QIcon(":/icons/res/item.png"));
 }
 
 const JItem& ShoppingListTable::getItem(int row) const
@@ -83,6 +84,7 @@ void ShoppingListTable::addItem()
       break;
     }
   }
+  setFocus();
 }
 
 void ShoppingListTable::update(int row, int column)

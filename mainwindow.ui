@@ -107,8 +107,8 @@
     <addaction name="actionProducts"/>
     <addaction name="actionCategories"/>
     <addaction name="actionImages"/>
-    <addaction name="actionShoppingList"/>
     <addaction name="actionUsers"/>
+    <addaction name="actionShoppingListMgt"/>
     <addaction name="actionStores"/>
    </widget>
    <widget class="QMenu" name="menuImpressora">
@@ -173,7 +173,7 @@
    <addaction name="actionNotes"/>
    <addaction name="actionReminders"/>
    <addaction name="actionCalculator"/>
-   <addaction name="actionShop"/>
+   <addaction name="actionShoppingList"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">
@@ -268,18 +268,6 @@
     <string>Gerenciar preços</string>
    </property>
   </action>
-  <action name="actionShoppingList">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/shopmgt.png</normaloff>:/icons/res/shopmgt.png</iconset>
-   </property>
-   <property name="text">
-    <string>Listas de Compras</string>
-   </property>
-   <property name="toolTip">
-    <string>Gerenciar listas de compras</string>
-   </property>
-  </action>
   <action name="actionActiveUsers">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -340,13 +328,16 @@
     <string>Calculadora</string>
    </property>
   </action>
-  <action name="actionShop">
+  <action name="actionShoppingList">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/shop.png</normaloff>:/icons/res/shop.png</iconset>
+     <normaloff>:/icons/res/shoppinglist.png</normaloff>:/icons/res/shoppinglist.png</iconset>
    </property>
    <property name="text">
-    <string>Compras</string>
+    <string>Listas de Compras</string>
+   </property>
+   <property name="toolTip">
+    <string>Ver e imprimir listas de compras</string>
    </property>
   </action>
   <action name="actionReservations">
@@ -413,6 +404,18 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar fornecedores</string>
+   </property>
+  </action>
+  <action name="actionShoppingListMgt">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/shoppinglistmgt.png</normaloff>:/icons/res/shoppinglistmgt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Listas de Compras</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar quais produtos comprar e que quantidades</string>
    </property>
   </action>
  </widget>

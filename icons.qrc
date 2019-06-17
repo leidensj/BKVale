@@ -165,5 +165,7 @@
         <file>res/credit.png</file>
         <file>res/payment.png</file>
         <file>res/bonus.png</file>
+        <file>res/shoppinglist.png</file>
+        <file>res/shoppinglistmgt.png</file>
     </qresource>
 </RCC>

@@ -68,15 +68,15 @@ PaymentDlg::PaymentDlg(QWidget* parent)
 {
   m_rdoCredit = new QRadioButton;
   m_rdoCredit->setIcon(QIcon(":/icons/res/credit.png"));
-  m_rdoCredit->setText(tr("Crédito:"));
+  m_rdoCredit->setText(tr("Crédito"));
 
   m_rdoCash = new QRadioButton;
   m_rdoCash->setIcon(QIcon(":/icons/res/cash.png"));
-  m_rdoCash->setText(tr("A vista:"));
+  m_rdoCash->setText(tr("A vista"));
 
   m_rdoBonus = new QRadioButton;
   m_rdoBonus->setIcon(QIcon(":/icons/res/bonus.png"));
-  m_rdoBonus->setText(tr("Bonificação:"));
+  m_rdoBonus->setText(tr("Bonificação"));
 
   m_lblNoteTotal = new QLabel;
   m_lblPaymentTotal = new QLabel;
@@ -108,7 +108,6 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   lt->addWidget(btn);
 
   setWindowTitle(tr("Pagamento"));
-  setWindowIcon(QIcon(":/icons/res/payment.png"));
 
   connect(m_rdoCash, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoBonus, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
@@ -124,6 +123,24 @@ PaymentDlg::PaymentDlg(QWidget* parent)
 
   setLayout(lt);
   updateControls();
+}
+
+QIcon PaymentDlg::getIcon() const
+{
+  if (m_rdoBonus->isChecked())
+    return QIcon(":/icons/res/bonus.png");
+  if (m_rdoCash->isChecked())
+    return QIcon(":/icons/res/cash.png");
+  return QIcon(":/icons/res/credit.png");
+}
+
+QString PaymentDlg::getText() const
+{
+  if (m_rdoBonus->isChecked())
+    return tr("Bonificação");
+  if (m_rdoCash->isChecked())
+    return tr("A vista");
+  return tr("Crédito");
 }
 
 bool PaymentDlg::isDatesValid() const
@@ -153,6 +170,7 @@ void PaymentDlg::updateControls()
   m_lblNoteTotal->setText(tr("Total do vale: ") + JItem::st_strMoney(m_noteTotal));
   m_lblPaymentTotal->setText(("Total do pagamento: ") + JItem::st_strMoney(total));
   m_lblPaymentTotal->setVisible(m_rdoCredit->isChecked());
+  setWindowIcon(getIcon());
   emit isValidSignal(bValid);
 }
 
@@ -586,6 +604,8 @@ void NoteView::updateControls()
   m_btnOpenLast->setEnabled(m_lastId.isValid());
   double total = m_table->computeTotal() + m_edDisccount->getValue();
   m_edTotal->setText(total);
+  m_btnPayment->setIcon(m_dlgPayment->getIcon());
+  m_btnPayment->setToolTip(m_dlgPayment->getText());
   emit changedSignal();
 }
 

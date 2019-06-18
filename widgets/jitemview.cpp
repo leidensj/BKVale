@@ -13,6 +13,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_btnSearch(nullptr)
+  , m_ltButton(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -38,19 +39,19 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
   m_btnSearch->setToolTip(tr("Procurar (Ctrl+F)"));
 
-  QHBoxLayout* buttonlayout = new QHBoxLayout;
-  buttonlayout->setContentsMargins(0, 0, 0, 0);
-  buttonlayout->addWidget(m_btnCreate);
-  buttonlayout->addWidget(m_btnSave);
-  buttonlayout->addWidget(m_btnSearch);
-  buttonlayout->setAlignment(Qt::AlignLeft);
+  m_ltButton = new QHBoxLayout;
+  m_ltButton->setContentsMargins(0, 0, 0, 0);
+  m_ltButton->addWidget(m_btnCreate);
+  m_ltButton->addWidget(m_btnSave);
+  m_ltButton->addWidget(m_btnSearch);
+  m_ltButton->setAlignment(Qt::AlignLeft);
 
   m_tab = new QTabWidget;
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->setContentsMargins(0, 0, 9, 0);
   mainLayout->setAlignment(Qt::AlignTop);
-  mainLayout->addLayout(buttonlayout);
+  mainLayout->addLayout(m_ltButton);
   mainLayout->addWidget(m_tab);
 
   setLayout(mainLayout);

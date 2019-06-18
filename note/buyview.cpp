@@ -1,4 +1,4 @@
-#include "noteview.h"
+#include "buyview.h"
 #include "databaseutils.h"
 #include "note/notetablewidget.h"
 #include "widgets/jdatabasepicker.h"
@@ -276,11 +276,9 @@ void PaymentDlg::removeRow()
   updateControls();
 }
 
-NoteView::NoteView(QWidget *parent)
-  : QFrame(parent)
-  , m_btnCreate(nullptr)
+BuyView::BuyView(QWidget *parent)
+  : JItemView(NOTE_SQL_TABLE_NAME, parent)
   , m_btnOpenLast(nullptr)
-  , m_btnSearch(nullptr)
   , m_btnAddCode(nullptr)
   , m_btnAdd(nullptr)
   , m_btnRemove(nullptr)
@@ -289,40 +287,24 @@ NoteView::NoteView(QWidget *parent)
   , m_edTotal(nullptr)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
-  , m_btnPayment(nullptr)
   , m_edDisccount(nullptr)
-  , m_btnDetails(nullptr)
   , m_dlgDetails(nullptr)
   , m_dlgPayment(nullptr)
   , m_edEntries(nullptr)
   , m_edSum(nullptr)
   , m_dlgDb(nullptr)
 {
-  m_btnCreate = new QPushButton();
-  m_btnCreate->setFlat(true);
-  m_btnCreate->setText("");
-  m_btnCreate->setIconSize(QSize(24, 24));
-  m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
-  m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-  m_btnCreate->setToolTip(tr("Novo vale (Ctrl+N)"));
+  m_btnSave->setEnabled(false);
+  m_btnSave->hide();
 
-  m_btnSearch = new QPushButton();
-  m_btnSearch->setFlat(true);
-  m_btnSearch->setText("");
-  m_btnSearch->setIconSize(QSize(24, 24));
-  m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
-  m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
-  m_btnSearch->setToolTip(tr("Procurar vales (Ctrl+F)"));
-
-  m_btnOpenLast = new QPushButton();
+  m_btnOpenLast = new QPushButton;
   m_btnOpenLast->setFlat(true);
   m_btnOpenLast->setText("");
   m_btnOpenLast->setIconSize(QSize(24, 24));
   m_btnOpenLast->setIcon(QIcon(":/icons/res/openlast.png"));
   m_btnOpenLast->setToolTip(tr("Abrir último vale"));
 
-  QFrame* vFrame0 = new QFrame;
-  vFrame0->setFrameShape(QFrame::VLine);
+  m_ltButton->addWidget(m_btnOpenLast);
 
   m_btnAddCode = new QPushButton();
   m_btnAddCode->setFlat(true);
@@ -347,17 +329,6 @@ NoteView::NoteView(QWidget *parent)
   m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
   m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
   m_btnRemove->setToolTip(tr("Remover item (Alt+-)"));
-
-  QHBoxLayout* hlayout1 = new QHBoxLayout();
-  hlayout1->setContentsMargins(0, 0, 0, 0);
-  hlayout1->setAlignment(Qt::AlignLeft);
-  hlayout1->addWidget(m_btnCreate);
-  hlayout1->addWidget(m_btnSearch);
-  hlayout1->addWidget(m_btnOpenLast);
-  hlayout1->addWidget(vFrame0);
-  hlayout1->addWidget(m_btnAddCode);
-  hlayout1->addWidget(m_btnAdd);
-  hlayout1->addWidget(m_btnRemove);
 
   QLabel* lblNumber = new QLabel();
   lblNumber->setText(tr("Número:"));
@@ -395,21 +366,8 @@ NoteView::NoteView(QWidget *parent)
     lblDate->setFont(font);
   }
 
-  m_btnPayment = new QPushButton;
-  m_btnPayment->setFlat(true);
-  m_btnPayment->setToolTip(tr("Pagamento"));
-  m_btnPayment->setIconSize(QSize(24,24));
-  m_btnPayment->setIcon(QIcon(":/icons/res/payment.png"));
-
   m_dlgDetails = new NoteDetailsDlg(this);
   m_dlgPayment = new PaymentDlg(this);
-
-  m_btnDetails = new QPushButton;
-  m_btnDetails->setFlat(true);
-  m_btnDetails->setText("");
-  m_btnDetails->setIconSize(QSize(24, 24));
-  m_btnDetails->setIcon(QIcon(":/icons/res/details.png"));
-  m_btnDetails->setToolTip(tr("Observações"));
 
   QFrame* line1 = new QFrame;
   line1->setFrameShape(QFrame::VLine);
@@ -417,34 +375,31 @@ NoteView::NoteView(QWidget *parent)
   QFrame* line2 = new QFrame;
   line2->setFrameShape(QFrame::VLine);
 
-  QFrame* line3 = new QFrame;
-  line3->setFrameShape(QFrame::VLine);
-
-  QHBoxLayout* hlayout2 = new QHBoxLayout();
-  hlayout2->setContentsMargins(0, 0, 0, 0);
-  hlayout2->setAlignment(Qt::AlignLeft);
-  hlayout2->addWidget(lblNumber);
-  hlayout2->addWidget(m_snNumber);
-  hlayout2->addWidget(line1);
-  hlayout2->addWidget(lblDate);
-  hlayout2->addWidget(m_dtPicker);
-  hlayout2->addWidget(line2);
-  hlayout2->addWidget(m_btnPayment);
-  hlayout2->addWidget(line3);
-  hlayout2->addWidget(m_btnDetails);
+  QHBoxLayout* ltCmd = new QHBoxLayout();
+  ltCmd->setContentsMargins(0, 0, 0, 0);
+  ltCmd->setAlignment(Qt::AlignLeft);
+  ltCmd->addWidget(lblNumber);
+  ltCmd->addWidget(m_snNumber);
+  ltCmd->addWidget(line1);
+  ltCmd->addWidget(lblDate);
+  ltCmd->addWidget(m_dtPicker);
+  ltCmd->addWidget(line2);
+  ltCmd->addWidget(m_btnAddCode);
+  ltCmd->addWidget(m_btnAdd);
+  ltCmd->addWidget(m_btnRemove);
 
   m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
 
-  QVBoxLayout* vlayout1 = new QVBoxLayout();
-  vlayout1->addLayout(hlayout2);
-  vlayout1->addWidget(m_supplierPicker);
+  QVBoxLayout* ltBuy = new QVBoxLayout();
+  ltInfo->addLayout(ltCmd);
+  ltInfo->addWidget(m_supplierPicker);
 
-  QFrame* frame = new QFrame();
-  frame->setFrameShape(QFrame::Shape::StyledPanel);
-  frame->setFrameShadow(QFrame::Shadow::Plain);
-  frame->setLayout(vlayout1);
-  frame->setFixedHeight(frame->sizeHint().height());
+  QFrame* frInfo = new QFrame();
+  frInfo->setFrameShape(QFrame::Shape::StyledPanel);
+  frInfo->setFrameShadow(QFrame::Shadow::Plain);
+  frInfo->setLayout(ltInfo);
+  frInfo->setFixedHeight(frInfo->sizeHint().height());
 
   m_table = new NoteTableWidget;
 
@@ -463,24 +418,25 @@ NoteView::NoteView(QWidget *parent)
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
-  QHBoxLayout* totalLayout = new QHBoxLayout;
-  totalLayout->setContentsMargins(0, 0, 0, 0);
-  totalLayout->addWidget(m_edDisccount);
-  totalLayout->addStretch();
-  totalLayout->addWidget(m_edTotal);
+  QHBoxLayout* ltTotal = new QHBoxLayout;
+  ltTotal->setContentsMargins(0, 0, 0, 0);
+  ltTotal->addWidget(m_edDisccount);
+  ltTotal->addStretch();
+  ltTotal->addWidget(m_edTotal);
 
-  QHBoxLayout* headerlayout = new QHBoxLayout;
-  headerlayout->setContentsMargins(0, 0, 0, 0);
-  headerlayout->addWidget(frame);
+  QVBoxLayout* ltBuy = new QVBoxLayout;
+  ltBuy->addWidget(frInfo);
+  ltBuy->addWidget(m_table);
+  ltBuy->addLayout(ltTotal);
 
-  QVBoxLayout* viewLayout = new QVBoxLayout;
-  viewLayout->addLayout(hlayout1);
-  viewLayout->addLayout(headerlayout);
-  viewLayout->addWidget(m_table);
-  viewLayout->addLayout(totalLayout);
+  QFrame* frBuy = new QFrame;
+  frBuy->setLayout(ltBuy);
 
-  QFrame* viewFrame = new QFrame;
-  viewFrame->setLayout(viewLayout);
+  m_tab->addTab(frBuy,
+                QIcon(":/icons/res/details.png"),
+                tr("Informações"));
+
+  m_dlgDb->
 
   m_database = new JDatabase(NOTE_SQL_TABLE_NAME);
   m_edEntries = new JLineEdit(JLineEdit::Input::All);

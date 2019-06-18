@@ -11,6 +11,7 @@ class QPushButton;
 class JDatabase;
 class QTabWidget;
 class QDialog;
+class QHBoxLayout;
 
 class JItemView : public QFrame
 {
@@ -35,6 +36,8 @@ signals:
 protected:
   JDatabase* m_database;
   QTabWidget* m_tab;
+  QTabWidget* m_tabDb;
+  QHBoxLayout* m_ltButton;
 
 private:
   QPushButton* m_btnCreate;

@@ -47,7 +47,6 @@ SOURCES += main.cpp\
     formwidget.cpp \
     note/notefilterdlg.cpp \
     note/notetablewidget.cpp \
-    note/noteview.cpp \
     items/activeuser.cpp \
     items/address.cpp \
     items/category.cpp \
@@ -80,7 +79,8 @@ SOURCES += main.cpp\
     widgets/jtablewidgetitem.cpp \
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
-    items/jmodel.cpp
+    items/jmodel.cpp \
+    note/buyview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -116,7 +116,6 @@ HEADERS  += mainwindow.h \
     employeeview.h \
     supplierview.h \
     userview.h \
-    note/noteview.h \
     note/notefilterdlg.h \
     note/notetablewidget.h \
     items/address.h \
@@ -156,7 +155,8 @@ HEADERS  += mainwindow.h \
     widgets/jlineedit.h \
     items/jmodel.h \
     formwidget.h \
-    imageview.h
+    imageview.h \
+    note/buyview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

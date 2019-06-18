@@ -5,6 +5,7 @@
 #include <QStringList>
 #include "items/note.h"
 #include "items/employee.h"
+#include "widgets/jitemview.h"
 #include <QDialog>
 
 #define MAX_ITEMS 100
@@ -89,22 +90,27 @@ signals:
   void isValidSignal(bool b);
 };
 
-class NoteView : public QFrame
+class BuyView : public JItemView
 {
   Q_OBJECT
 
 public:
-  explicit NoteView(QWidget *parent = 0);
-  ~NoteView();
-  Note getNote() const;
+  explicit BuyView(QWidget *parent = 0);
+  ~BuyView();
+
+  const JItemSQL& getItem() const;
+  Id getId() const;
+
   void addNoteItem(const NoteItem& noteItem);
+
+protected slots:
+  void create();
+  void itemsRemoved(const QVector<Id>& ids);
 
 private:
   Note m_currentNote;
   Id m_lastId;
-  QPushButton* m_btnCreate;
   QPushButton* m_btnOpenLast;
-  QPushButton* m_btnSearch;
   QPushButton* m_btnAddCode;
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
@@ -113,32 +119,23 @@ private:
   JExpLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
-  QPushButton* m_btnPayment;
-  JDatabase* m_database;
   JExpLineEdit* m_edDisccount;
-  QPushButton* m_btnDetails;
   NoteDetailsDlg* m_dlgDetails;
   PaymentDlg* m_dlgPayment;
   JLineEdit* m_edEntries;
   JLineEdit* m_edSum;
-  QDialog* m_dlgDb;
+  void setItem(const JItemSQL& o);
 
 private slots:
+  void itemSelected(const JItemSQL& jItem);
   void removeItem();
   void supplierChanged();
   void lastItemSelected();
-  void itemSelected(const JItemSQL& jItem);
-  void itemsRemoved(const QVector<Id>& ids);
   void addProduct();
   void openDetailsDialog();
   void openPaymentDialog();
   void updateControls();
   void updateStatistics();
-
-public slots:
-  void create();
-  void setNote(const Note& note);
-  bool save(Id& id);
 
 signals:
   void changedSignal();

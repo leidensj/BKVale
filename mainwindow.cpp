@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "note/buyview.h"
+#include "note/purchaseview.h"
 #include "printutils.h"
 #include "pincodeview.h"
 #include "productview.h"
 #include "categoryview.h"
-#include "note/buyview.h"
+#include "note/purchaseview.h"
 #include "employeeview.h"
 #include "supplierview.h"
 #include "reminderview.h"
@@ -50,7 +50,7 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::Tipi)
   , m_login(login)
-  , m_note(nullptr)
+  , m_purchase(nullptr)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
@@ -59,7 +59,7 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   , m_discount(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
-  , m_noteWindow(nullptr)
+  , m_purchaseWindow(nullptr)
   , m_reminderWindow(nullptr)
   , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
@@ -74,18 +74,18 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_mdi = new JMdiArea;
   setCentralWidget(m_mdi);
 
-  m_note = new NoteView;
+  m_purchase = new PurchaseView;
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;
   m_shop = new ShopView;
   m_reservation = new ReservationView;
   m_discount = new DiscountView;
 
-  m_noteWindow = new JMdiSubWindow(this);
-  m_noteWindow->setWindowTitle(tr("Vales"));
-  m_noteWindow->setWindowIcon(QIcon(":/icons/res/note.png"));
-  m_noteWindow->setWidget(m_note);
-  m_mdi->addSubWindow(m_noteWindow);
+  m_purchaseWindow = new JMdiSubWindow(this);
+  m_purchaseWindow->setWindowTitle(tr("Vales"));
+  m_purchaseWindow->setWindowIcon(QIcon(":/icons/res/note.png"));
+  m_purchaseWindow->setWidget(m_purchase);
+  m_mdi->addSubWindow(m_purchaseWindow);
   m_reminderWindow = new JMdiSubWindow(this);
   m_reminderWindow->setWindowTitle(tr("Lembretes"));
   m_reminderWindow->setWindowIcon(QIcon(":/icons/res/postit.png"));
@@ -124,7 +124,7 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   connect(ui->actionPrint, SIGNAL(triggered(bool)), this, SLOT(print()));
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(ui->actionInfo, SIGNAL(triggered(bool)), this, SLOT(showInfo()));
-  connect(m_note, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_reminder, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_calculator, SIGNAL(lineSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
@@ -235,7 +235,7 @@ void Tipi::disconnectPrinter()
 Functionality Tipi::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
-  if (activeWindow == m_noteWindow)
+  if (activeWindow == m_purchaseWindow)
     return Functionality::Note;
   else if (activeWindow == m_reminderWindow)
     return Functionality::Reminder;
@@ -257,8 +257,7 @@ void Tipi::print()
     case Functionality::Note:
     {
       {
-        Note note = m_note->getNote();
-        if (note.m_date != QDate::currentDate() && !note.m_id.isValid())
+        if (m_purchase->getDate() != QDate::currentDate() && !m_purchase->getItem().m_id.isValid())
         {
           int ret = QMessageBox::question(
                       this,
@@ -269,8 +268,7 @@ void Tipi::print()
           switch (ret)
           {
             case QMessageBox::Apply:
-              note.m_date = QDate::currentDate();
-              m_note->setNote(note);
+              m_purchase->setDate(QDate::currentDate());
               break;
             case QMessageBox::Ignore:
               break;
@@ -281,7 +279,7 @@ void Tipi::print()
         }
       }
       Id id;
-      if (m_note->save(id))
+      if (m_purchase->save(id))
       {
         Note o(id);
         QString error;
@@ -414,7 +412,7 @@ void Tipi::updateControls()
   switch (getCurrentFunctionality())
   {
     case Functionality::Note:
-      ui->actionPrint->setEnabled(m_note->getNote().isValid());
+      ui->actionPrint->setEnabled(m_purchase->getItem().isValid());
       break;
     case Functionality::Reminder:
       ui->actionPrint->setEnabled(m_reminder->getReminder().isValid());
@@ -526,7 +524,7 @@ void Tipi::closeEvent(QCloseEvent* event)
 
 void Tipi::activateWindow()
 {
-  m_noteWindow->hide();
+  m_purchaseWindow->hide();
   m_reminderWindow->hide();
   m_calculatorWindow->hide();
   m_shopWindow->hide();
@@ -534,8 +532,8 @@ void Tipi::activateWindow()
   m_discountWindow->hide();
   if (sender() == ui->actionNotes)
   {
-    m_noteWindow->showMaximized();
-    m_mdi->setActiveSubWindow(m_noteWindow);
+    m_purchaseWindow->showMaximized();
+    m_mdi->setActiveSubWindow(m_purchaseWindow);
   }
   else if (sender() == ui->actionReminders)
   {

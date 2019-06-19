@@ -15,11 +15,14 @@ class SupplierView : public JItemView
 
 public:
   explicit SupplierView(QWidget* parent = 0);
-  const JItemSQL& getItem() const;
-  Id getId() const;
 
 public slots:
   void create();
+  const JItemSQL& getItem() const;
+  Id getId() const;
+
+protected slots:
+  void setItem(const JItemSQL& o);
 
 private:
   mutable Supplier m_ref;
@@ -27,7 +30,6 @@ private:
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;
   FormAddressWidget* m_formAddress;
-  void setItem(const JItemSQL& o);
 };
 
 #endif // EMPLOYEEVIEW_H

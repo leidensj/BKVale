@@ -16,18 +16,20 @@ class UserView : public JItemView
 
 public:
   explicit UserView(Id currentLoggedId, QWidget* parent = 0);
-  const JItemSQL& getItem() const;
-  Id getId() const;
+
 
   QString getPassword() const;
   bool hasLoggedUserChanged() const;
 
 public slots:
   void create();
+  const JItemSQL& getItem() const;
+  Id getId() const;
 
 protected slots:
   void itemsRemoved(const QVector<Id>& ids);
   void save();
+  void setItem(const JItemSQL& o);
 
 private:
   enum class Idx : int
@@ -61,8 +63,6 @@ private:
   JLineEdit* m_password;
   QPushButton* m_viewPassword;
   QListWidget* m_list;
-
-  void setItem(const JItemSQL& o);
 
 private slots:
   void viewPassword(bool b);

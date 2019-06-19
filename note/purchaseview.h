@@ -31,18 +31,6 @@ class JTable;
 class QTableWidgetItem;
 class QRadioButton;
 
-class NoteDetailsDlg : public QDialog
-{
-  Q_OBJECT
-
-  JPlainTextEdit* m_teDetails;
-
-public:
-  explicit NoteDetailsDlg(QWidget* parent = nullptr);
-  void setDetails(const QString& str);
-  QString getDetails() const;
-};
-
 class PaymentDlg : public QDialog
 {
   Q_OBJECT
@@ -90,50 +78,50 @@ signals:
   void isValidSignal(bool b);
 };
 
-class BuyView : public JItemView
+class PurchaseView : public JItemView
 {
   Q_OBJECT
 
 public:
-  explicit BuyView(QWidget *parent = 0);
-  ~BuyView();
+  explicit PurchaseView(QWidget *parent = 0);
+  ~PurchaseView();
+  void addNoteItem(const NoteItem& noteItem);
+  bool save(Id& id);
+  void setDate(const QDate& dt);
+  QDate getDate() const;
 
+public slots:
+  void selectItem(const JItemSQL& o);
+  void create();
   const JItemSQL& getItem() const;
   Id getId() const;
 
-  void addNoteItem(const NoteItem& noteItem);
-
 protected slots:
-  void create();
   void itemsRemoved(const QVector<Id>& ids);
+  void setItem(const JItemSQL& o);
 
 private:
-  Note m_currentNote;
+  mutable Note m_ref;
   Id m_lastId;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnAddCode;
-  QPushButton* m_btnAdd;
-  QPushButton* m_btnRemove;
+  JAddRemoveButtons* m_btnAddRemove;
   QSpinBox* m_snNumber;
   JDatePicker* m_dtPicker;
   JExpLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
   JExpLineEdit* m_edDisccount;
-  NoteDetailsDlg* m_dlgDetails;
   PaymentDlg* m_dlgPayment;
   JLineEdit* m_edEntries;
   JLineEdit* m_edSum;
-  void setItem(const JItemSQL& o);
+  JPlainTextEdit* m_teObservation;
 
 private slots:
-  void itemSelected(const JItemSQL& jItem);
-  void removeItem();
+  void removeProduct();
   void supplierChanged();
   void lastItemSelected();
   void addProduct();
-  void openDetailsDialog();
-  void openPaymentDialog();
   void updateControls();
   void updateStatistics();
 

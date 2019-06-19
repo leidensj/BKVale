@@ -29,11 +29,14 @@ class EmployeeView : public JItemView
 
 public:
   explicit EmployeeView(QWidget* parent = 0);
-  const JItemSQL& getItem() const;
-  Id getId() const;
 
 public slots:
   void create();
+  const JItemSQL& getItem() const;
+  Id getId() const;
+
+protected slots:
+  void setItem(const JItemSQL& o);
 
 private slots:
   void addHour();
@@ -53,7 +56,6 @@ private:
   QTreeWidgetItem* m_triNoteRemove;
   JTable* m_tbHours;
   JAddRemoveButtons* m_btnAddRemove;
-  void setItem(const JItemSQL& o);
 };
 
 #endif // EMPLOYEEVIEW_H

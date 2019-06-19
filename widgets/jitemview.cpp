@@ -9,11 +9,14 @@
 
 JItemView::JItemView(const QString& tableName, QWidget* parent)
   : QFrame(parent)
+  , m_database(nullptr)
   , m_tab(nullptr)
+  , m_tabDb(nullptr)
+  , m_ltButton(nullptr)
   , m_btnCreate(nullptr)
   , m_btnSave(nullptr)
   , m_btnSearch(nullptr)
-  , m_ltButton(nullptr)
+  , m_dlgDb(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -37,7 +40,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
-  m_btnSearch->setToolTip(tr("Procurar (Ctrl+F)"));
+  m_btnSearch->setToolTip(tr("Pesquisar (Ctrl+F)"));
 
   m_ltButton = new QHBoxLayout;
   m_ltButton->setContentsMargins(0, 0, 0, 0);
@@ -58,9 +61,19 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   m_database = new JDatabase(tableName);
   m_dlgDb = new QDialog(this);
+
+  QVBoxLayout* ltDb = new QVBoxLayout;
+  ltDb->setContentsMargins(0, 0, 0, 0);
+  ltDb->addWidget(m_database);
+  QFrame* frDb = new QFrame;
+  frDb->setLayout(ltDb);
+
+  m_tabDb = new QTabWidget;
+  m_tabDb->addTab(frDb, QIcon(":/icons/res/search.png"), tr("Pesquisar"));
+
   QHBoxLayout *ltDlg = new QHBoxLayout;
+  ltDlg->addWidget(m_tabDb);
   m_dlgDb->setLayout(ltDlg);
-  ltDlg->addWidget(m_database);
   m_dlgDb->setWindowFlags(Qt::Window);
   m_dlgDb->setWindowTitle(JItemEx::text(tableName));
   m_dlgDb->setWindowIcon(QIcon(JItemEx::icon(tableName)));
@@ -83,6 +96,8 @@ void JItemView::selectItem(const JItemSQL& o)
                     ? ":/icons/res/saveas.png"
                     : ":/icons/res/save.png";
   m_btnSave->setIcon(QIcon(strIcon));
+  if (m_tab->count() > 0)
+    m_tab->setCurrentIndex(0);
 }
 
 void JItemView::itemsRemoved(const QVector<Id>& ids)

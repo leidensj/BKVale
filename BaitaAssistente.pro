@@ -80,7 +80,7 @@ SOURCES += main.cpp\
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
     items/jmodel.cpp \
-    note/buyview.cpp
+    note/purchaseview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -156,7 +156,7 @@ HEADERS  += mainwindow.h \
     items/jmodel.h \
     formwidget.h \
     imageview.h \
-    note/buyview.h
+    note/purchaseview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

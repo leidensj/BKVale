@@ -167,5 +167,6 @@
         <file>res/bonus.png</file>
         <file>res/shoppinglist.png</file>
         <file>res/shoppinglistmgt.png</file>
+        <file>res/pencil.png</file>
     </qresource>
 </RCC>

@@ -17,14 +17,17 @@ class StoreView : public JItemView
 
 public:
   explicit StoreView(QWidget* parent = 0);
-  const JItemSQL& getItem() const;
-  Id getId() const;
 
 public slots:
   void create();
+  const JItemSQL& getItem() const;
+  Id getId() const;
   void updateControls();
   void addEmployee();
   void addEmployee(const Employee& e);
+
+protected slots:
+  void setItem(const JItemSQL& o);
 
 private:
   mutable Store m_ref;
@@ -34,7 +37,6 @@ private:
   FormAddressWidget* m_formAddress;
   JTable* m_tbEmployee;
   JAddRemoveButtons* m_btnAddRemove;
-  void setItem(const JItemSQL& o);
 };
 
 #endif // STOREVIEW_H

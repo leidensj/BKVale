@@ -70,7 +70,7 @@ ProductView::ProductView(QWidget* parent)
 
   m_tab->addTab(tabInfoFrame, QIcon(":/icons/res/item.png"), tr("Produto"));
   m_tab->addTab(tabCodeFrame, QIcon(":/icons/res/barcode.png"), tr("Códigos"));
-  connect(m_tbCode, SIGNAL(changedSignal(bool)), m_btns, SLOT(enableRemoveButton(bool)));
+  connect(m_tbCode, SIGNAL(changedSignal(bool)), m_btns->m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_tbCode, SLOT(addItem()));
   connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_tbCode, SLOT(removeItem()));
 

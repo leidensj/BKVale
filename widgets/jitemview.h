@@ -19,16 +19,17 @@ class JItemView : public QFrame
 
 public:
   explicit JItemView(const QString& tableName, QWidget* parent = 0);
-  virtual const JItemSQL& getItem() const = 0;
-  virtual Id getId() const = 0;
-
-protected slots:
-  virtual void itemsRemoved(const QVector<Id>& ids);
-  virtual void save();
 
 public slots:
-  virtual void selectItem(const JItemSQL& o);
+  virtual const JItemSQL& getItem() const = 0;
+  virtual Id getId() const = 0;
   virtual void create() = 0;
+  virtual void selectItem(const JItemSQL& o);
+
+protected slots:
+  virtual void setItem(const JItemSQL& o) = 0;
+  virtual void itemsRemoved(const QVector<Id>& ids);
+  virtual void save();
 
 signals:
   void saveSignal();
@@ -38,13 +39,12 @@ protected:
   QTabWidget* m_tab;
   QTabWidget* m_tabDb;
   QHBoxLayout* m_ltButton;
-
-private:
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   QPushButton* m_btnSearch;
+
+private:
   QDialog* m_dlgDb;
-  virtual void setItem(const JItemSQL& o) = 0;
 };
 
 #endif // JVIEW_H

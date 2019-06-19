@@ -51,7 +51,7 @@ enum class Functionality : int
 };
 
 class QLabel;
-class NoteView;
+class PurchaseView;
 class ReminderView;
 class ConsumptionWidget;
 class CalculatorWidget;
@@ -75,7 +75,7 @@ private:
   Ui::Tipi *ui;
   ActiveUser m_login;
   JMdiArea* m_mdi;
-  NoteView* m_note;
+  PurchaseView* m_purchase;
   ReminderView* m_reminder;
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
@@ -87,7 +87,7 @@ private:
   Settings m_settings;
   QLabel* m_statusDatabasePath;
   QLabel* m_statusUserName;
-  JMdiSubWindow* m_noteWindow;
+  JMdiSubWindow* m_purchaseWindow;
   JMdiSubWindow* m_reminderWindow;
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;

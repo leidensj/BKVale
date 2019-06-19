@@ -150,7 +150,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
-  connect(m_table, SIGNAL(changedSignal(bool)), m_btns, SLOT(enableRemoveButton(bool)));
+  connect(m_table, SIGNAL(changedSignal(bool)), m_btns->m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_table, SLOT(addItem()));
   connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_table, SLOT(removeItem()));
 }

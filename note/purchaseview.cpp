@@ -1,4 +1,4 @@
-#include "buyview.h"
+#include "purchaseview.h"
 #include "databaseutils.h"
 #include "note/notetablewidget.h"
 #include "widgets/jdatabasepicker.h"
@@ -23,38 +23,6 @@
 #include <QDialogButtonBox>
 #include <QRadioButton>
 #include "items/jitemex.h"
-
-NoteDetailsDlg::NoteDetailsDlg(QWidget* parent)
-  : QDialog(parent)
-  , m_teDetails(nullptr)
-{
-  m_teDetails = new JPlainTextEdit;
-  m_teDetails->setPlaceholderText(tr("Shift+Enter para inserir uma quebra de linha"));
-  QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-  connect(m_teDetails, SIGNAL(enterSignal()), this, SLOT(accept()));
-  connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
-
-  QVBoxLayout* lt = new QVBoxLayout;
-  lt->addWidget(m_teDetails);
-  lt->addWidget(btn);
-
-  setWindowTitle(tr("Observações"));
-  setWindowIcon(QIcon(":/icons/res/details.png"));
-
-  setLayout(lt);
-  m_teDetails->setFocus();
-}
-
-void NoteDetailsDlg::setDetails(const QString& str)
-{
-  m_teDetails->setPlainText(str);
-}
-
-QString NoteDetailsDlg::getDetails() const
-{
-  return m_teDetails->toPlainText();
-}
 
 PaymentDlg::PaymentDlg(QWidget* parent)
   : QDialog(parent)
@@ -116,7 +84,7 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   connect(m_rdoCredit, SIGNAL(clicked(bool)), this, SLOT(fillCredit()));
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeRow()));
-  connect(m_tbCredit, SIGNAL(changedSignal(bool)), m_btnAddRemove, SLOT(enableRemoveButton(bool)));
+  connect(m_tbCredit, SIGNAL(changedSignal(bool)), m_btnAddRemove->m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_tbCredit, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_tbCredit, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateTable(QTableWidgetItem*)));
   connect(this, SIGNAL(isValidSignal(bool)), btn->button(QDialogButtonBox::Ok), SLOT(setEnabled(bool)));
@@ -276,23 +244,21 @@ void PaymentDlg::removeRow()
   updateControls();
 }
 
-BuyView::BuyView(QWidget *parent)
+PurchaseView::PurchaseView(QWidget *parent)
   : JItemView(NOTE_SQL_TABLE_NAME, parent)
   , m_btnOpenLast(nullptr)
   , m_btnAddCode(nullptr)
-  , m_btnAdd(nullptr)
-  , m_btnRemove(nullptr)
+  , m_btnAddRemove(nullptr)
   , m_snNumber(nullptr)
   , m_dtPicker(nullptr)
   , m_edTotal(nullptr)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
   , m_edDisccount(nullptr)
-  , m_dlgDetails(nullptr)
   , m_dlgPayment(nullptr)
   , m_edEntries(nullptr)
   , m_edSum(nullptr)
-  , m_dlgDb(nullptr)
+  , m_teObservation(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -306,7 +272,7 @@ BuyView::BuyView(QWidget *parent)
 
   m_ltButton->addWidget(m_btnOpenLast);
 
-  m_btnAddCode = new QPushButton();
+  m_btnAddCode = new QPushButton;
   m_btnAddCode->setFlat(true);
   m_btnAddCode->setText("");
   m_btnAddCode->setIconSize(QSize(24, 24));
@@ -314,21 +280,8 @@ BuyView::BuyView(QWidget *parent)
   m_btnAddCode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
   m_btnAddCode->setToolTip(tr("Adicionar item (Alt+*)"));
 
-  m_btnAdd = new QPushButton();
-  m_btnAdd->setFlat(true);
-  m_btnAdd->setText("");
-  m_btnAdd->setIconSize(QSize(24, 24));
-  m_btnAdd->setIcon(QIcon(":/icons/res/additem.png"));
-  m_btnAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
-  m_btnAdd->setToolTip(tr("Adicionar item (Alt++)"));
-
-  m_btnRemove = new QPushButton();
-  m_btnRemove->setFlat(true);
-  m_btnRemove->setText("");
-  m_btnRemove->setIconSize(QSize(24, 24));
-  m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
-  m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
-  m_btnRemove->setToolTip(tr("Remover item (Alt+-)"));
+  m_btnAddRemove = new JAddRemoveButtons;
+  m_btnAddRemove->m_lt->addWidget(m_btnAddCode);
 
   QLabel* lblNumber = new QLabel();
   lblNumber->setText(tr("Número:"));
@@ -366,7 +319,6 @@ BuyView::BuyView(QWidget *parent)
     lblDate->setFont(font);
   }
 
-  m_dlgDetails = new NoteDetailsDlg(this);
   m_dlgPayment = new PaymentDlg(this);
 
   QFrame* line1 = new QFrame;
@@ -384,22 +336,20 @@ BuyView::BuyView(QWidget *parent)
   ltCmd->addWidget(lblDate);
   ltCmd->addWidget(m_dtPicker);
   ltCmd->addWidget(line2);
-  ltCmd->addWidget(m_btnAddCode);
-  ltCmd->addWidget(m_btnAdd);
-  ltCmd->addWidget(m_btnRemove);
+  ltCmd->addWidget(m_btnAddRemove);
 
   m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
 
-  QVBoxLayout* ltBuy = new QVBoxLayout();
-  ltInfo->addLayout(ltCmd);
-  ltInfo->addWidget(m_supplierPicker);
+  QVBoxLayout* ltHeader = new QVBoxLayout;
+  ltHeader->addLayout(ltCmd);
+  ltHeader->addWidget(m_supplierPicker);
 
-  QFrame* frInfo = new QFrame();
-  frInfo->setFrameShape(QFrame::Shape::StyledPanel);
-  frInfo->setFrameShadow(QFrame::Shadow::Plain);
-  frInfo->setLayout(ltInfo);
-  frInfo->setFixedHeight(frInfo->sizeHint().height());
+  QFrame* frHeader = new QFrame();
+  frHeader->setFrameShape(QFrame::Shape::StyledPanel);
+  frHeader->setFrameShadow(QFrame::Shadow::Plain);
+  frHeader->setLayout(ltHeader);
+  frHeader->setFixedHeight(frHeader->sizeHint().height());
 
   m_table = new NoteTableWidget;
 
@@ -424,21 +374,24 @@ BuyView::BuyView(QWidget *parent)
   ltTotal->addStretch();
   ltTotal->addWidget(m_edTotal);
 
-  QVBoxLayout* ltBuy = new QVBoxLayout;
-  ltBuy->addWidget(frInfo);
-  ltBuy->addWidget(m_table);
-  ltBuy->addLayout(ltTotal);
+  QVBoxLayout* ltInfo = new QVBoxLayout;
+  ltInfo->addWidget(frHeader);
+  ltInfo->addWidget(m_table);
+  ltInfo->addLayout(ltTotal);
 
-  QFrame* frBuy = new QFrame;
-  frBuy->setLayout(ltBuy);
+  QFrame* frInfo = new QFrame;
+  frInfo->setLayout(ltInfo);
 
-  m_tab->addTab(frBuy,
-                QIcon(":/icons/res/details.png"),
-                tr("Informações"));
+  m_teObservation = new JPlainTextEdit;
+  m_teObservation->setPlaceholderText(tr("Shift+Enter para inserir uma quebra de linha"));
+  QVBoxLayout* ltObservation = new QVBoxLayout;
+  ltObservation->addWidget(m_teObservation);
+  QFrame* frObservation = new QFrame;
+  frObservation->setLayout(ltObservation);
 
-  m_dlgDb->
+  m_tab->addTab(frInfo, QIcon(":/icons/res/details.png"), tr("Informações"));
+  m_tab->addTab(frObservation, QIcon(":/icons/res/pencil.png"), tr("Observações"));
 
-  m_database = new JDatabase(NOTE_SQL_TABLE_NAME);
   m_edEntries = new JLineEdit(JLineEdit::Input::All);
   m_edEntries->setReadOnly(true);
   m_edSum = new JLineEdit(JLineEdit::Input::All);
@@ -449,52 +402,33 @@ BuyView::BuyView(QWidget *parent)
 
   QFrame* frDbInfo = new QFrame;
   frDbInfo->setLayout(ltDbInfo);
+  m_tabDb->addTab(frDbInfo, QIcon(":/icons/res/statistics.png"), tr("Estatísticas"));
 
-  QTabWidget* tbdb = new QTabWidget;
-  tbdb->addTab(m_database, QIcon(JItemEx::icon(NOTE_SQL_TABLE_NAME)), JItemEx::text(NOTE_SQL_TABLE_NAME));
-  tbdb->addTab(frDbInfo, QIcon(":/icons/res/statistics.png"), tr("Estatísticas"));
-
-  QVBoxLayout* ltdb = new QVBoxLayout;
-  ltdb->addWidget(tbdb);
-
-  m_dlgDb = new QDialog(this);
-  m_dlgDb->setLayout(ltdb);
-  m_dlgDb->setWindowFlags(Qt::Window);
-  m_dlgDb->setWindowTitle(JItemEx::text(NOTE_SQL_TABLE_NAME));
-  m_dlgDb->setWindowIcon(QIcon(JItemEx::icon(NOTE_SQL_TABLE_NAME)));
-  m_dlgDb->setModal(true);
-
-  setLayout(viewLayout);
-
-  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(itemSelected(const JItemSQL&)));
-  connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
-  connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
+  setContentsMargins(9, 9, 9, 9);
+  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
+  connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeProduct()));
+  connect(m_table, SIGNAL(changedSignal(bool)), m_btnAddRemove->m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
-  connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
   connect(m_dtPicker, SIGNAL(dateChangedSignal()), this, SLOT(updateControls()));
-  connect(m_btnPayment, SIGNAL(clicked(bool)), this, SLOT(openPaymentDialog()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
-  connect(m_btnDetails, SIGNAL(clicked(bool)), this, SLOT(openDetailsDialog()));
-  connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
-  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), m_dlgDb, SLOT(accept()));
-  connect(tbdb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
+  connect(m_tabDb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
 
   create();
   updateControls();
   updateStatistics();
 }
 
-NoteView::~NoteView()
+PurchaseView::~PurchaseView()
 {
 
 }
 
-void NoteView::removeItem()
+void PurchaseView::removeProduct()
 {
   m_table->removeItem();
   if (!m_table->hasItems())
@@ -502,44 +436,42 @@ void NoteView::removeItem()
   updateControls();
 }
 
-Note NoteView::getNote() const
+const JItemSQL& PurchaseView::getItem() const
 {
-  Note note = m_currentNote;
-  note.clear(false);
-  note.m_date = m_dtPicker->getDate();
-  note.m_supplier.m_id = m_supplierPicker->getId();
-  m_dlgPayment->fillNote(note);
-  note.m_observation = m_dlgDetails->getDetails();
-  note.m_disccount = m_edDisccount->getValue();
+  m_ref.clear(false);
+  m_ref.m_date = m_dtPicker->getDate();
+  m_ref.m_supplier.m_id = m_supplierPicker->getId();
+  m_dlgPayment->fillNote(m_ref);
+  m_ref.m_observation = m_teObservation->toPlainText();
+  m_ref.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
-    note.m_vNoteItem.push_back(dynamic_cast<const NoteItem&>(m_table->getItem(i)));
-  return note;
+    m_ref.m_vNoteItem.push_back(dynamic_cast<const NoteItem&>(m_table->getItem(i)));
+  return m_ref;
 }
 
-void NoteView::setNote(const Note& note)
+void PurchaseView::setItem(const JItemSQL& o)
 {
-  m_currentNote = note;
+  m_ref = dynamic_cast<const Note&>(o);
   m_table->removeAllItems();
   m_supplierPicker->clear();
-  m_dtPicker->setDate(note.m_date);
-  m_snNumber->setValue(note.m_number);
-  for (int i = 0; i != note.m_vNoteItem.size(); ++i)
-    m_table->addItem(note.m_vNoteItem.at(i));
-  m_supplierPicker->setItem(note.m_supplier);
-  m_dlgDetails->setDetails(note.m_observation);
-  m_dlgPayment->setNote(note);
-  m_edDisccount->setText(note.m_disccount);
+  m_dtPicker->setDate(m_ref.m_date);
+  m_snNumber->setValue(m_ref.m_number);
+  for (int i = 0; i != m_ref.m_vNoteItem.size(); ++i)
+    m_table->addItem(m_ref.m_vNoteItem.at(i));
+  m_supplierPicker->setItem(m_ref.m_supplier);
+  m_teObservation->setPlainText(m_ref.m_observation);
+  m_dlgPayment->setNote(m_ref);
+  m_edDisccount->setText(m_ref.m_disccount);
   updateControls();
 }
 
-void NoteView::create()
+void PurchaseView::create()
 {
-  Note note;
-  setNote(note);
+  setItem(Note());
   updateControls();
 }
 
-void NoteView::supplierChanged()
+void PurchaseView::supplierChanged()
 {
   if (m_supplierPicker->getId().isValid())
   {
@@ -548,38 +480,38 @@ void NoteView::supplierChanged()
       m_table->setCurrentCell(0, 0);
       m_table->setFocus();
     }
-    else if (!m_currentNote.m_id.isValid())
-      m_btnAdd->click();
+    else if (!m_ref.m_id.isValid())
+      m_btnAddRemove->m_btnAdd->click();
   }
   updateControls();
 }
 
-void NoteView::updateControls()
+void PurchaseView::updateControls()
 {
-  m_btnRemove->setEnabled(m_table->currentRow() >= 0);
   m_btnOpenLast->setEnabled(m_lastId.isValid());
   double total = m_table->computeTotal() + m_edDisccount->getValue();
   m_edTotal->setText(total);
-  m_btnPayment->setIcon(m_dlgPayment->getIcon());
-  m_btnPayment->setToolTip(m_dlgPayment->getText());
+  //TODO
+  //m_btnPayment->setIcon(m_dlgPayment->getIcon());
+  //m_btnPayment->setToolTip(m_dlgPayment->getText());
   emit changedSignal();
 }
 
-void NoteView::updateStatistics()
+void PurchaseView::updateStatistics()
 {
   m_edEntries->setText(JItem::st_strInt(m_database->getNumberOfEntries()));
   m_edSum->setText(JItem::st_strMoney(m_database->getSum(5)));
 }
 
-void NoteView::addProduct()
+void PurchaseView::addProduct()
 {
   m_table->addItemAndLoadPrices(m_supplierPicker->getId(), sender() == m_btnAddCode);
 }
 
-bool NoteView::save(Id& id)
+bool PurchaseView::save(Id& id)
 {
   id.clear();
-  Note o = getNote();
+  Note o = dynamic_cast<const Note&>(getItem());
 
   // TODO por enquanto corrigimos o pagamento
   o.adjustPayment();
@@ -604,39 +536,36 @@ bool NoteView::save(Id& id)
   return bSuccess;
 }
 
-void NoteView::lastItemSelected()
+void PurchaseView::lastItemSelected()
 {
   if (m_lastId.isValid())
   m_database->selectItem(m_lastId);
 }
 
-void NoteView::itemSelected(const JItemSQL& jItem)
+void PurchaseView::selectItem(const JItemSQL& o)
 {
-  const Note& note = dynamic_cast<const Note&>(jItem);
-  m_lastId = note.m_id;
-  setNote(note);
+  JItemView::selectItem(o);
+  m_lastId = o.m_id;
 }
 
-void NoteView::itemsRemoved(const QVector<Id>& ids)
+void PurchaseView::itemsRemoved(const QVector<Id>& ids)
 {
+  JItemView::itemsRemoved(ids);
   if (ids.contains(m_lastId))
     m_lastId.clear();
-  if (ids.contains(m_currentNote.m_id))
-    create();
 }
 
-void NoteView::openDetailsDialog()
+void PurchaseView::setDate(const QDate& dt)
 {
-  QString str = m_dlgDetails->getDetails();
-  if (!m_dlgDetails->exec())
-    m_dlgDetails->setDetails(str);
+  m_dtPicker->setDate(dt);
 }
 
-void NoteView::openPaymentDialog()
+QDate PurchaseView::getDate() const
 {
-  Note o = getNote();
-  m_dlgPayment->setNote(o);
-  if (!m_dlgPayment->exec())
-    m_dlgPayment->setNote(o);
-  updateControls();
+  return m_dtPicker->getDate();
+}
+
+Id PurchaseView::getId() const
+{
+  return m_ref.m_id;
 }

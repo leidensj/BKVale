@@ -6,7 +6,6 @@
 #include "items/note.h"
 #include "items/employee.h"
 #include "widgets/jitemview.h"
-#include <QDialog>
 
 #define MAX_ITEMS 100
 
@@ -31,7 +30,7 @@ class JTable;
 class QTableWidgetItem;
 class QRadioButton;
 
-class PaymentDlg : public QDialog
+class PaymentWidget : public QWidget
 {
   Q_OBJECT
 
@@ -53,7 +52,7 @@ class PaymentDlg : public QDialog
   };
 
 public:
-  explicit PaymentDlg(QWidget* parent = nullptr);
+  explicit PaymentWidget(QWidget* parent = nullptr);
   void fillNote(Note& o) const;
   void setNote(const Note& o);
   QIcon getIcon() const;
@@ -65,6 +64,7 @@ private slots:
   void addRow();
   void removeRow();
   void updateTable(QTableWidgetItem* p);
+  void emitMethodChangedSignal();
 
 private:
   Note::PaymentMethod getPaymentMethod() const;
@@ -76,6 +76,7 @@ private:
 
 signals:
   void isValidSignal(bool b);
+  void methodChangedSignal();
 };
 
 class PurchaseView : public JItemView
@@ -112,7 +113,7 @@ private:
   JDatabasePicker* m_supplierPicker;
   NoteTableWidget* m_table;
   JExpLineEdit* m_edDisccount;
-  PaymentDlg* m_dlgPayment;
+  PaymentWidget* m_wPayment;
   JLineEdit* m_edEntries;
   JLineEdit* m_edSum;
   JPlainTextEdit* m_teObservation;

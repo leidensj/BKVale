@@ -20,12 +20,11 @@
 #include <QMessageBox>
 #include <QTabWidget>
 #include <QFormLayout>
-#include <QDialogButtonBox>
 #include <QRadioButton>
 #include "items/jitemex.h"
 
-PaymentDlg::PaymentDlg(QWidget* parent)
-  : QDialog(parent)
+PaymentWidget::PaymentWidget(QWidget* parent)
+  : QWidget(parent)
   , m_rdoCash(nullptr)
   , m_rdoBonus(nullptr)
   , m_rdoCredit(nullptr)
@@ -36,7 +35,7 @@ PaymentDlg::PaymentDlg(QWidget* parent)
 {
   m_rdoCredit = new QRadioButton;
   m_rdoCredit->setIcon(QIcon(":/icons/res/credit.png"));
-  m_rdoCredit->setText(tr("Crédito"));
+  m_rdoCredit->setText(tr("A prazo"));
 
   m_rdoCash = new QRadioButton;
   m_rdoCash->setIcon(QIcon(":/icons/res/cash.png"));
@@ -49,10 +48,6 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   m_lblNoteTotal = new QLabel;
   m_lblPaymentTotal = new QLabel;
 
-  QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-  connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
-
   m_btnAddRemove = new JAddRemoveButtons;
   m_tbCredit = new JTable;
   m_tbCredit->setColumnCount(2);
@@ -63,6 +58,7 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   m_tbCredit->horizontalHeader()->setSectionResizeMode((int)Column::Value, QHeaderView::ResizeMode::Stretch);
 
   QHBoxLayout* ltButtons = new QHBoxLayout;
+  ltButtons->setAlignment(Qt::AlignLeft);
   ltButtons->addWidget(m_rdoCredit);
   ltButtons->addWidget(m_rdoCash);
   ltButtons->addWidget(m_rdoBonus);
@@ -73,12 +69,12 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   lt->addWidget(m_tbCredit);
   lt->addWidget(m_lblNoteTotal);
   lt->addWidget(m_lblPaymentTotal);
-  lt->addWidget(btn);
-
-  setWindowTitle(tr("Pagamento"));
 
   connect(m_rdoCash, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoBonus, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+  connect(m_rdoCash, SIGNAL(clicked(bool)), this, SLOT(emitMethodChangedSignal()));
+  connect(m_rdoBonus, SIGNAL(clicked(bool)), this, SLOT(emitMethodChangedSignal()));
+  connect(m_rdoCredit, SIGNAL(clicked(bool)), this, SLOT(emitMethodChangedSignal()));
   connect(m_rdoCash, SIGNAL(clicked(bool)), m_tbCredit, SLOT(removeAllItems()));
   connect(m_rdoBonus, SIGNAL(clicked(bool)), m_tbCredit, SLOT(removeAllItems()));
   connect(m_rdoCredit, SIGNAL(clicked(bool)), this, SLOT(fillCredit()));
@@ -87,13 +83,12 @@ PaymentDlg::PaymentDlg(QWidget* parent)
   connect(m_tbCredit, SIGNAL(changedSignal(bool)), m_btnAddRemove->m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_tbCredit, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_tbCredit, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateTable(QTableWidgetItem*)));
-  connect(this, SIGNAL(isValidSignal(bool)), btn->button(QDialogButtonBox::Ok), SLOT(setEnabled(bool)));
 
   setLayout(lt);
   updateControls();
 }
 
-QIcon PaymentDlg::getIcon() const
+QIcon PaymentWidget::getIcon() const
 {
   if (m_rdoBonus->isChecked())
     return QIcon(":/icons/res/bonus.png");
@@ -102,16 +97,16 @@ QIcon PaymentDlg::getIcon() const
   return QIcon(":/icons/res/credit.png");
 }
 
-QString PaymentDlg::getText() const
+QString PaymentWidget::getText() const
 {
   if (m_rdoBonus->isChecked())
-    return tr("Bonificação");
+    return tr("A prazo");
   if (m_rdoCash->isChecked())
     return tr("A vista");
   return tr("Crédito");
 }
 
-bool PaymentDlg::isDatesValid() const
+bool PaymentWidget::isDatesValid() const
 {
   bool bValid = true;
   if (m_rdoCredit->isChecked())
@@ -120,7 +115,7 @@ bool PaymentDlg::isDatesValid() const
   return bValid;
 }
 
-double PaymentDlg::computeTotal() const
+double PaymentWidget::computeTotal() const
 {
   double total = 0.0;
   if (m_rdoCredit->isChecked())
@@ -129,7 +124,7 @@ double PaymentDlg::computeTotal() const
   return total;
 }
 
-void PaymentDlg::updateControls()
+void PaymentWidget::updateControls()
 {
   m_tbCredit->setEnabled(m_rdoCredit->isChecked());
   m_btnAddRemove->setEnabled(m_rdoCredit->isChecked());
@@ -142,19 +137,19 @@ void PaymentDlg::updateControls()
   emit isValidSignal(bValid);
 }
 
-void PaymentDlg::updateTable(QTableWidgetItem* p)
+void PaymentWidget::updateTable(QTableWidgetItem* p)
 {
   dynamic_cast<ExpItem*>(p)->evaluate();
 }
 
-void PaymentDlg::fillCredit()
+void PaymentWidget::fillCredit()
 {
   m_tbCredit->removeAllItems();
   addRow();
   updateControls();
 }
 
-Note::PaymentMethod PaymentDlg::getPaymentMethod() const
+Note::PaymentMethod PaymentWidget::getPaymentMethod() const
 {
   if (m_rdoBonus->isChecked())
     return Note::PaymentMethod::Bonus;
@@ -163,7 +158,7 @@ Note::PaymentMethod PaymentDlg::getPaymentMethod() const
   return Note::PaymentMethod::Credit;
 }
 
-QVector<PaymentItem> PaymentDlg::getPaymentItems() const
+QVector<PaymentItem> PaymentWidget::getPaymentItems() const
 {
   QVector<PaymentItem> v;
   if (m_rdoCredit->isChecked())
@@ -179,7 +174,7 @@ QVector<PaymentItem> PaymentDlg::getPaymentItems() const
   return v;
 }
 
-void PaymentDlg::fillNote(Note& o) const
+void PaymentWidget::fillNote(Note& o) const
 {
   o.m_paymentMethod = getPaymentMethod();
   o.m_vPaymentItem.clear();
@@ -187,7 +182,7 @@ void PaymentDlg::fillNote(Note& o) const
     o.m_vPaymentItem = getPaymentItems();
 }
 
-void PaymentDlg::setPaymentMethod(Note::PaymentMethod o)
+void PaymentWidget::setPaymentMethod(Note::PaymentMethod o)
 {
   if (o == Note::PaymentMethod::Bonus)
     m_rdoBonus->setChecked(true);
@@ -197,7 +192,7 @@ void PaymentDlg::setPaymentMethod(Note::PaymentMethod o)
     m_rdoCredit->setChecked(true);
 }
 
-void PaymentDlg::setPaymentItems(const QVector<PaymentItem>& v)
+void PaymentWidget::setPaymentItems(const QVector<PaymentItem>& v)
 {
   m_tbCredit->removeAllItems();
   for (int i = 0; i != v.size(); ++i)
@@ -208,7 +203,7 @@ void PaymentDlg::setPaymentItems(const QVector<PaymentItem>& v)
   }
 }
 
-void PaymentDlg::setNote(const Note& o)
+void PaymentWidget::setNote(const Note& o)
 {
   m_noteDate = o.m_date;
   m_noteTotal = o.total();
@@ -217,7 +212,7 @@ void PaymentDlg::setNote(const Note& o)
   updateControls();
 }
 
-void PaymentDlg::addRow()
+void PaymentWidget::addRow()
 {
   m_tbCredit->insertRow(m_tbCredit->rowCount());
   int row = m_tbCredit->rowCount() - 1;
@@ -237,11 +232,16 @@ void PaymentDlg::addRow()
   m_tbCredit->setFocus();
 }
 
-void PaymentDlg::removeRow()
+void PaymentWidget::removeRow()
 {
   if (m_tbCredit->currentRow() >= 0)
     m_tbCredit->removeRow(m_tbCredit->currentRow());
   updateControls();
+}
+
+void PaymentWidget::emitMethodChangedSignal()
+{
+  emit methodChangedSignal();
 }
 
 PurchaseView::PurchaseView(QWidget *parent)
@@ -255,7 +255,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_supplierPicker(nullptr)
   , m_table(nullptr)
   , m_edDisccount(nullptr)
-  , m_dlgPayment(nullptr)
+  , m_wPayment(nullptr)
   , m_edEntries(nullptr)
   , m_edSum(nullptr)
   , m_teObservation(nullptr)
@@ -278,7 +278,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_btnAddCode->setIconSize(QSize(24, 24));
   m_btnAddCode->setIcon(QIcon(":/icons/res/barcodescan.png"));
   m_btnAddCode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
-  m_btnAddCode->setToolTip(tr("Adicionar item (Alt+*)"));
+  m_btnAddCode->setToolTip(tr("Adicionar pelo código(Alt+*)"));
 
   m_btnAddRemove = new JAddRemoveButtons;
   m_btnAddRemove->m_lt->addWidget(m_btnAddCode);
@@ -318,8 +318,6 @@ PurchaseView::PurchaseView(QWidget *parent)
     font.setPointSize(12);
     lblDate->setFont(font);
   }
-
-  m_dlgPayment = new PaymentDlg(this);
 
   QFrame* line1 = new QFrame;
   line1->setFrameShape(QFrame::VLine);
@@ -389,7 +387,10 @@ PurchaseView::PurchaseView(QWidget *parent)
   QFrame* frObservation = new QFrame;
   frObservation->setLayout(ltObservation);
 
+  m_wPayment = new PaymentWidget(this);
+
   m_tab->addTab(frInfo, QIcon(":/icons/res/details.png"), tr("Informações"));
+  m_tab->addTab(m_wPayment, m_wPayment->getIcon(), tr("Pagamento"));
   m_tab->addTab(frObservation, QIcon(":/icons/res/pencil.png"), tr("Observações"));
 
   m_edEntries = new JLineEdit(JLineEdit::Input::All);
@@ -417,6 +418,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_tabDb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
+  connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
 
   create();
   updateControls();
@@ -441,7 +443,7 @@ const JItemSQL& PurchaseView::getItem() const
   m_ref.clear(false);
   m_ref.m_date = m_dtPicker->getDate();
   m_ref.m_supplier.m_id = m_supplierPicker->getId();
-  m_dlgPayment->fillNote(m_ref);
+  m_wPayment->fillNote(m_ref);
   m_ref.m_observation = m_teObservation->toPlainText();
   m_ref.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
@@ -460,7 +462,7 @@ void PurchaseView::setItem(const JItemSQL& o)
     m_table->addItem(m_ref.m_vNoteItem.at(i));
   m_supplierPicker->setItem(m_ref.m_supplier);
   m_teObservation->setPlainText(m_ref.m_observation);
-  m_dlgPayment->setNote(m_ref);
+  m_wPayment->setNote(m_ref);
   m_edDisccount->setText(m_ref.m_disccount);
   updateControls();
 }
@@ -491,9 +493,7 @@ void PurchaseView::updateControls()
   m_btnOpenLast->setEnabled(m_lastId.isValid());
   double total = m_table->computeTotal() + m_edDisccount->getValue();
   m_edTotal->setText(total);
-  //TODO
-  //m_btnPayment->setIcon(m_dlgPayment->getIcon());
-  //m_btnPayment->setToolTip(m_dlgPayment->getText());
+  m_tab->setTabIcon(1, m_wPayment->getIcon());
   emit changedSignal();
 }
 

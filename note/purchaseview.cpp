@@ -174,12 +174,16 @@ QVector<PaymentItem> PaymentWidget::getPaymentItems() const
   return v;
 }
 
-void PaymentWidget::fillNote(Note& o) const
+void PaymentWidget::setNoteDate(const QDate& dt)
 {
-  o.m_paymentMethod = getPaymentMethod();
-  o.m_vPaymentItem.clear();
-  if (getPaymentMethod() == Note::PaymentMethod::Credit)
-    o.m_vPaymentItem = getPaymentItems();
+  m_noteDate = dt;
+  updateControls();
+}
+
+void PaymentWidget::setNoteTotal(double value)
+{
+  m_noteTotal = value;
+  updateControls();
 }
 
 void PaymentWidget::setPaymentMethod(Note::PaymentMethod o)
@@ -201,15 +205,6 @@ void PaymentWidget::setPaymentItems(const QVector<PaymentItem>& v)
     dynamic_cast<DoubleItem*>(m_tbCredit->item(i, (int)Column::Value))->setValue(v.at(i).m_value);
     dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->setDate(v.at(i).m_date);
   }
-}
-
-void PaymentWidget::setNote(const Note& o)
-{
-  m_noteDate = o.m_date;
-  m_noteTotal = o.total();
-  setPaymentMethod(o.m_paymentMethod);
-  setPaymentItems(o.m_vPaymentItem);
-  updateControls();
 }
 
 void PaymentWidget::addRow()
@@ -413,12 +408,13 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
-  connect(m_dtPicker, SIGNAL(dateChangedSignal()), this, SLOT(updateControls()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_tabDb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
+  connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setNoteTotal(double)));
+  connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setNoteDate(const QDate&)));
 
   create();
   updateControls();
@@ -443,7 +439,8 @@ const JItemSQL& PurchaseView::getItem() const
   m_ref.clear(false);
   m_ref.m_date = m_dtPicker->getDate();
   m_ref.m_supplier.m_id = m_supplierPicker->getId();
-  m_wPayment->fillNote(m_ref);
+  m_ref.m_paymentMethod = m_wPayment->getPaymentMethod();
+  m_ref.m_vPaymentItem = m_wPayment->getPaymentItems();
   m_ref.m_observation = m_teObservation->toPlainText();
   m_ref.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
@@ -462,7 +459,8 @@ void PurchaseView::setItem(const JItemSQL& o)
     m_table->addItem(m_ref.m_vNoteItem.at(i));
   m_supplierPicker->setItem(m_ref.m_supplier);
   m_teObservation->setPlainText(m_ref.m_observation);
-  m_wPayment->setNote(m_ref);
+  m_wPayment->setPaymentMethod(m_ref.m_paymentMethod);
+  m_wPayment->setPaymentItems(m_ref.m_vPaymentItem);
   m_edDisccount->setText(m_ref.m_disccount);
   updateControls();
 }

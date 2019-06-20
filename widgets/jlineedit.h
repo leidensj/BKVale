@@ -82,6 +82,9 @@ public:
 private slots:
   void evaluate();
 
+signals:
+  void valueChanged(double);
+
 private:
   const JItem::DataType m_dataType;
   const double m_defaultValue;

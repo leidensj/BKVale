@@ -412,7 +412,8 @@ void Tipi::updateControls()
   switch (getCurrentFunctionality())
   {
     case Functionality::Note:
-      ui->actionPrint->setEnabled(m_purchase->getItem().isValid());
+      //TODO
+      //ui->actionPrint->setEnabled(m_purchase->getItem().isValid());
       break;
     case Functionality::Reminder:
       ui->actionPrint->setEnabled(m_reminder->getReminder().isValid());

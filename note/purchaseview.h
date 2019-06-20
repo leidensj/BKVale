@@ -53,10 +53,16 @@ class PaymentWidget : public QWidget
 
 public:
   explicit PaymentWidget(QWidget* parent = nullptr);
-  void fillNote(Note& o) const;
-  void setNote(const Note& o);
+  Note::PaymentMethod getPaymentMethod() const;
+  QVector<PaymentItem> getPaymentItems() const;
+  void setPaymentMethod(Note::PaymentMethod o);
+  void setPaymentItems(const QVector<PaymentItem>& v);
   QIcon getIcon() const;
   QString getText() const;
+
+public slots:
+  void setNoteDate(const QDate& dt);
+  void setNoteTotal(double value);
 
 private slots:
   void fillCredit();
@@ -67,10 +73,6 @@ private slots:
   void emitMethodChangedSignal();
 
 private:
-  Note::PaymentMethod getPaymentMethod() const;
-  QVector<PaymentItem> getPaymentItems() const;
-  void setPaymentMethod(Note::PaymentMethod o);
-  void setPaymentItems(const QVector<PaymentItem>& v);
   double computeTotal() const;
   bool isDatesValid() const;
 

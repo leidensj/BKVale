@@ -21,14 +21,14 @@ public slots:
   void setToday();
 
 private slots:
-  void emitDateChangedSignal();
+  void emitDateChangedSignal(const QDate& dt);
 
 private:
   JDateEdit* m_dt;
   QPushButton* m_btn;
 
 signals:
-  void dateChangedSignal();
+  void dateChangedSignal(const QDate& dt);
 };
 
 #endif // JDATEPICKER_H

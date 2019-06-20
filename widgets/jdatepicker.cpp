@@ -26,7 +26,7 @@ JDatePicker::JDatePicker(QWidget* parent)
   lt->addWidget(m_btn);
 
   connect(m_btn, SIGNAL(clicked(bool)), this, SLOT(setToday()));
-  connect(m_dt, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitDateChangedSignal()));
+  connect(m_dt, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitDateChangedSignal(const QDate&)));
   connect(m_dt, SIGNAL(dateChanged(const QDate&)), this, SLOT(checkDate()));
 
   QTimer *timer = new QTimer(this);
@@ -70,7 +70,7 @@ void JDatePicker::setDate(const QDate& dt)
   m_dt->setDate(dt);
 }
 
-void JDatePicker::emitDateChangedSignal()
+void JDatePicker::emitDateChangedSignal(const QDate& dt)
 {
-  emit dateChangedSignal();
+  emit dateChangedSignal(dt);
 }

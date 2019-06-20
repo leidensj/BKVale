@@ -412,9 +412,12 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v07", (int)m_paymentMethod);
   bool bSuccess = query.exec();
 
-  query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", m_id.get());
-  bSuccess = query.exec();
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
+  }
 
   if (bSuccess)
   {
@@ -447,6 +450,13 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
       if (bSuccess)
         m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
     }
+  }
+
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_PAYMENT_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
   }
 
   if (bSuccess)

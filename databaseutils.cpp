@@ -309,7 +309,7 @@ bool BaitaSQL::createTables(QString& error)
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          NOTE_PAYMENT_ITEMS_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
+                          NOTE_PAYMENT_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
                           NOTE_PAYMENT_ITEMS_SQL_COL02 " DATE,"
                           NOTE_PAYMENT_ITEMS_SQL_COL03 " REAL,"
                           "FOREIGN KEY(" NOTE_PAYMENT_ITEMS_SQL_COL01 ") REFERENCES "

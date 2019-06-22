@@ -18,14 +18,12 @@ public:
 
 public slots:
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
 
 protected slots:
   void setItem(const JItemSQL& o);
 
 private:
-  mutable Supplier m_ref;
   FormInfoWidget* m_formInfo;
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;

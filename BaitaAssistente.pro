@@ -136,14 +136,12 @@ HEADERS  += mainwindow.h \
     items/user.h \
     items/jitemex.h \
     widgets/jitemview.h \
-    widgets/imageview.h \
     widgets/jaddremovebuttons.h \
     widgets/jdatabasepicker.h \
     widgets/jimageview.h \
     widgets/jdatepicker.h \
     widgets/jdoublespinbox.h \
     widgets/jdateedit.h \
-    widgets/formwidget.h \
     widgets/jdatabase.h \
     widgets/jplaintextedit.h \
     widgets/jspinbox.h \

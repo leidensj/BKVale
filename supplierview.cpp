@@ -29,26 +29,22 @@ void SupplierView::create()
   selectItem(Supplier());
 }
 
-const JItemSQL& SupplierView::getItem() const
+void SupplierView::getItem(JItemSQL& o) const
 {
-  m_ref.clear(false);
-  m_formInfo->fillForm(m_ref.m_form);
-  m_formDetails->fillForm(m_ref.m_form);
-  m_formPhone->fillForm(m_ref.m_form);
-  m_formAddress->fillForm(m_ref.m_form);
-  return m_ref;
+  Supplier& _o = dynamic_cast<Supplier&>(o);
+  _o.clear(true);
+  _o.m_id = m_id;
+  m_formInfo->fillForm(_o.m_form);
+  m_formDetails->fillForm(_o.m_form);
+  m_formPhone->fillForm(_o.m_form);
+  m_formAddress->fillForm(_o.m_form);
 }
 
 void SupplierView::setItem(const JItemSQL& o)
 {
-  m_ref = static_cast<const Supplier&>(o);
-  m_formInfo->setForm(m_ref.m_form);
-  m_formDetails->setForm(m_ref.m_form);
-  m_formPhone->setForm(m_ref.m_form);
-  m_formAddress->setForm(m_ref.m_form);
-}
-
-Id SupplierView::getId() const
-{
-  return m_ref.m_id;
+  const Supplier& _o= static_cast<const Supplier&>(o);
+  m_formInfo->setForm(_o.m_form);
+  m_formDetails->setForm(_o.m_form);
+  m_formPhone->setForm(_o.m_form);
+  m_formAddress->setForm(_o.m_form);
 }

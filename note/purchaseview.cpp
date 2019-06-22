@@ -434,34 +434,35 @@ void PurchaseView::removeProduct()
   updateControls();
 }
 
-const JItemSQL& PurchaseView::getItem() const
+void PurchaseView::getItem(JItemSQL& o) const
 {
-  m_ref.clear(false);
-  m_ref.m_date = m_dtPicker->getDate();
-  m_ref.m_supplier.m_id = m_supplierPicker->getId();
-  m_ref.m_paymentMethod = m_wPayment->getPaymentMethod();
-  m_ref.m_vPaymentItem = m_wPayment->getPaymentItems();
-  m_ref.m_observation = m_teObservation->toPlainText();
-  m_ref.m_disccount = m_edDisccount->getValue();
+  Note& _o = dynamic_cast<Note&>(o);
+  _o.clear(true);
+  _o.m_id = m_id;
+  _o.m_date = m_dtPicker->getDate();
+  _o.m_supplier.m_id = m_supplierPicker->getId();
+  _o.m_paymentMethod = m_wPayment->getPaymentMethod();
+  _o.m_vPaymentItem = m_wPayment->getPaymentItems();
+  _o.m_observation = m_teObservation->toPlainText();
+  _o.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
-    m_ref.m_vNoteItem.push_back(dynamic_cast<const NoteItem&>(m_table->getItem(i)));
-  return m_ref;
+    _o.m_vNoteItem.push_back(dynamic_cast<const NoteItem&>(m_table->getItem(i)));
 }
 
 void PurchaseView::setItem(const JItemSQL& o)
 {
-  m_ref = dynamic_cast<const Note&>(o);
+  const Note& _o = dynamic_cast<const Note&>(o);
   m_table->removeAllItems();
   m_supplierPicker->clear();
-  m_dtPicker->setDate(m_ref.m_date);
-  m_snNumber->setValue(m_ref.m_number);
-  for (int i = 0; i != m_ref.m_vNoteItem.size(); ++i)
-    m_table->addItem(m_ref.m_vNoteItem.at(i));
-  m_supplierPicker->setItem(m_ref.m_supplier);
-  m_teObservation->setPlainText(m_ref.m_observation);
-  m_wPayment->setPaymentMethod(m_ref.m_paymentMethod);
-  m_wPayment->setPaymentItems(m_ref.m_vPaymentItem);
-  m_edDisccount->setText(m_ref.m_disccount);
+  m_dtPicker->setDate(_o.m_date);
+  m_snNumber->setValue(_o.m_number);
+  for (int i = 0; i != _o.m_vNoteItem.size(); ++i)
+    m_table->addItem(_o.m_vNoteItem.at(i));
+  m_supplierPicker->setItem(_o.m_supplier);
+  m_teObservation->setPlainText(_o.m_observation);
+  m_wPayment->setPaymentMethod(_o.m_paymentMethod);
+  m_wPayment->setPaymentItems(_o.m_vPaymentItem);
+  m_edDisccount->setText(_o.m_disccount);
   updateControls();
 }
 
@@ -480,7 +481,7 @@ void PurchaseView::supplierChanged()
       m_table->setCurrentCell(0, 0);
       m_table->setFocus();
     }
-    else if (!m_ref.m_id.isValid())
+    else if (!m_id.isValid())
       m_btnAddRemove->m_btnAdd->click();
   }
   updateControls();
@@ -509,7 +510,8 @@ void PurchaseView::addProduct()
 bool PurchaseView::save(Id& id)
 {
   id.clear();
-  Note o = dynamic_cast<const Note&>(getItem());
+  Note o;
+  getItem(o);
 
   // TODO por enquanto corrigimos o pagamento
   o.adjustPayment();
@@ -561,9 +563,4 @@ void PurchaseView::setDate(const QDate& dt)
 QDate PurchaseView::getDate() const
 {
   return m_dtPicker->getDate();
-}
-
-Id PurchaseView::getId() const
-{
-  return m_ref.m_id;
 }

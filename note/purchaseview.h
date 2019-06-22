@@ -96,15 +96,13 @@ public:
 public slots:
   void selectItem(const JItemSQL& o);
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
 
 protected slots:
   void itemsRemoved(const QVector<Id>& ids);
   void setItem(const JItemSQL& o);
 
 private:
-  mutable Note m_ref;
   Id m_lastId;
   QPushButton* m_btnOpenLast;
   QPushButton* m_btnAddCode;

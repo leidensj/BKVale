@@ -101,42 +101,43 @@ void EmployeeView::create()
   m_formInfo->m_edName->setFocus();
 }
 
-const JItemSQL& EmployeeView::getItem() const
+void EmployeeView::getItem(JItemSQL& o) const
 {
-  m_ref.clear(false);
-  m_formInfo->fillForm(m_ref.m_form);
-  m_formDetails->fillForm(m_ref.m_form);
-  m_formPhone->fillForm(m_ref.m_form);
-  m_formAddress->fillForm(m_ref.m_form);
-  m_ref.m_pincode = m_edPincode->text();
-  m_ref.m_bNoteEdit = m_triNoteEdit->checkState(0) == Qt::Checked;
-  m_ref.m_bNoteRemove = m_triNoteRemove->checkState(0) == Qt::Checked;
+  Employee& _o = dynamic_cast<Employee&>(o);
+  _o.clear(true);
+  _o.m_id = m_id;
+  m_formInfo->fillForm(_o.m_form);
+  m_formDetails->fillForm(_o.m_form);
+  m_formPhone->fillForm(_o.m_form);
+  m_formAddress->fillForm(_o.m_form);
+  _o.m_pincode = m_edPincode->text();
+  _o.m_bNoteEdit = m_triNoteEdit->checkState(0) == Qt::Checked;
+  _o.m_bNoteRemove = m_triNoteRemove->checkState(0) == Qt::Checked;
   for (int i = 0; i != m_tbHours->rowCount(); ++i)
   {
     TimeInterval t;
     t.m_tmBegin = dynamic_cast<TimeItem*>(m_tbHours->item(i, 0))->getTime();
     t.m_tmEnd = dynamic_cast<TimeItem*>(m_tbHours->item(i, 1))->getTime();
-    m_ref.m_hours.push_back(t);
+    _o.m_hours.push_back(t);
   }
-  return m_ref;
 }
 
 void EmployeeView::setItem(const JItemSQL& o)
 {
-  m_ref = static_cast<const Employee&>(o);
-  m_formInfo->setForm(m_ref.m_form);
-  m_formDetails->setForm(m_ref.m_form);
-  m_formPhone->setForm(m_ref.m_form);
-  m_formAddress->setForm(m_ref.m_form);
-  m_edPincode->setText(m_ref.m_pincode);
-  m_triNoteEdit->setCheckState(0, m_ref.m_bNoteEdit ? Qt::Checked : Qt::Unchecked);
-  m_triNoteRemove->setCheckState(0, m_ref.m_bNoteRemove ? Qt::Checked : Qt::Unchecked);
+  const Employee& _o = dynamic_cast<const Employee&>(o);
+  m_formInfo->setForm(_o.m_form);
+  m_formDetails->setForm(_o.m_form);
+  m_formPhone->setForm(_o.m_form);
+  m_formAddress->setForm(_o.m_form);
+  m_edPincode->setText(_o.m_pincode);
+  m_triNoteEdit->setCheckState(0, _o.m_bNoteEdit ? Qt::Checked : Qt::Unchecked);
+  m_triNoteRemove->setCheckState(0, _o.m_bNoteRemove ? Qt::Checked : Qt::Unchecked);
   m_tbHours->setRowCount(0);
-  for (int i = 0; i != m_ref.m_hours.size(); ++i)
+  for (int i = 0; i != _o.m_hours.size(); ++i)
   {
     addHour();
-    dynamic_cast<TimeItem*>(m_tbHours->item(i, 0))->setTime(m_ref.m_hours.at(i).m_tmBegin);
-    dynamic_cast<TimeItem*>(m_tbHours->item(i, 1))->setTime(m_ref.m_hours.at(i).m_tmEnd);
+    dynamic_cast<TimeItem*>(m_tbHours->item(i, 0))->setTime(_o.m_hours.at(i).m_tmBegin);
+    dynamic_cast<TimeItem*>(m_tbHours->item(i, 1))->setTime(_o.m_hours.at(i).m_tmEnd);
   }
 }
 
@@ -170,9 +171,4 @@ void EmployeeView::updateHoursTable(QTableWidgetItem* p)
 void EmployeeView::updateControls()
 {
   m_btnAddRemove->m_btnRemove->setEnabled(m_tbHours->currentRow() >= 0);
-}
-
-Id EmployeeView::getId() const
-{
-  return m_ref.m_id;
 }

@@ -34,22 +34,18 @@ void CategoryView::create()
   m_edName->setFocus();
 }
 
-const JItemSQL& CategoryView::getItem() const
+void CategoryView::getItem(JItemSQL& o) const
 {
-  m_ref.clear(false);
-  m_ref.m_image.m_id = m_imagePicker->getId();
-  m_ref.m_name = m_edName->text();
-  return m_ref;
+  Category& _o = dynamic_cast<Category&>(o);
+  _o.clear(true);
+  _o.m_id = m_id;
+  _o.m_image.m_id = m_imagePicker->getId();
+  _o.m_name = m_edName->text();
 }
 
 void CategoryView::setItem(const JItemSQL& o)
 {
-  m_ref = static_cast<const Category&>(o);
-  m_edName->setText(m_ref.m_name);
-  m_imagePicker->setItem(m_ref.m_image);
-}
-
-Id CategoryView::getId() const
-{
-  return m_ref.m_id;
+  const Category& _o = static_cast<const Category&>(o);
+  m_edName->setText(_o.m_name);
+  m_imagePicker->setItem(_o.m_image);
 }

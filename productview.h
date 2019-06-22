@@ -24,14 +24,12 @@ public:
 
 public slots:
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
 
 protected slots:
   void setItem(const JItemSQL& o);
 
 private:
-  mutable Product m_ref;
   JLineEdit* m_edName;
   JLineEdit* m_edUnity;
   JLineEdit* m_edDetails;

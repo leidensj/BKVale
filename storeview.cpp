@@ -69,39 +69,35 @@ void StoreView::updateControls()
   m_btnAddRemove->m_btnRemove->setEnabled(m_tbEmployee->isValidCurrentRow());
 }
 
-const JItemSQL& StoreView::getItem() const
+void StoreView::getItem(JItemSQL& o) const
 {
-  m_ref.clear(false);
-  m_ref.m_vEmployee.clear();
-  m_formInfo->fillForm(m_ref.m_form);
-  m_formDetails->fillForm(m_ref.m_form);
-  m_formPhone->fillForm(m_ref.m_form);
-  m_formAddress->fillForm(m_ref.m_form);
+  Store& _o = dynamic_cast<Store&>(o);
+  _o.clear(true);
+  _o.m_id = m_id;
+  _o.m_vEmployee.clear();
+  m_formInfo->fillForm(_o.m_form);
+  m_formDetails->fillForm(_o.m_form);
+  m_formPhone->fillForm(_o.m_form);
+  m_formAddress->fillForm(_o.m_form);
   for (int i = 0; i != m_tbEmployee->rowCount(); ++i)
   {
     Employee e;
     int row = m_tbEmployee->verticalHeader()->logicalIndex(i);
     e.m_id.set(m_tbEmployee->item(row, 0)->data(Qt::UserRole).toLongLong());
-    m_ref.m_vEmployee.push_back(e);
+    _o.m_vEmployee.push_back(e);
   }
-  return m_ref;
 }
 
 void StoreView::setItem(const JItemSQL& o)
 {
-  m_ref = static_cast<const Store&>(o);
-  m_formInfo->setForm(m_ref.m_form);
-  m_formDetails->setForm(m_ref.m_form);
-  m_formPhone->setForm(m_ref.m_form);
-  m_formAddress->setForm(m_ref.m_form);
+  const Store& _o = static_cast<const Store&>(o);
+  m_formInfo->setForm(_o.m_form);
+  m_formDetails->setForm(_o.m_form);
+  m_formPhone->setForm(_o.m_form);
+  m_formAddress->setForm(_o.m_form);
   m_tbEmployee->removeAllItems();
-  for (int i = 0; i != m_ref.m_vEmployee.size(); ++i)
-    addEmployee(m_ref.m_vEmployee.at(i));
-}
-
-Id StoreView::getId() const
-{
-  return m_ref.m_id;
+  for (int i = 0; i != _o.m_vEmployee.size(); ++i)
+    addEmployee(_o.m_vEmployee.at(i));
 }
 
 void StoreView::addEmployee()

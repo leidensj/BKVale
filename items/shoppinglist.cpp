@@ -301,9 +301,12 @@ bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_nLines);
   bool bSuccess = query.exec();
 
-  query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
-  query.bindValue(":_v01", m_id.get());
-  bSuccess = query.exec();
+  if (bSuccess)
+  {
+    query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_COL01 " = (:_v01)");
+    query.bindValue(":_v01", m_id.get());
+    bSuccess = query.exec();
+  }
 
   if (bSuccess)
   {
@@ -326,8 +329,6 @@ bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
                     "(:_v05),"
                     "(:_v06),"
                     "(:_v07),"
-                    "(:_v08),"
-                    "(:_v09),"
                     "(:_v08))");
       query.bindValue(":_v01", m_id.get());
       query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());

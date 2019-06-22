@@ -20,8 +20,7 @@ public:
 
 public slots:
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
   void updateControls();
   void addEmployee();
   void addEmployee(const Employee& e);
@@ -30,7 +29,6 @@ protected slots:
   void setItem(const JItemSQL& o);
 
 private:
-  mutable Store m_ref;
   FormInfoWidget* m_formInfo;
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;

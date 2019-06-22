@@ -17,14 +17,12 @@ public:
 
 public slots:
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
 
 protected slots:
   void setItem(const JItemSQL& o);
 
 private:
-  mutable Category m_ref;
   JLineEdit* m_edName;
   JDatabasePicker* m_imagePicker;
 };

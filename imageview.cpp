@@ -8,10 +8,8 @@ ImageView::ImageView(QWidget* parent)
   , m_edImageName(nullptr)
   , m_imageView(nullptr)
 {
-  m_edImageName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                JLineEdit::st_defaultFlags1);
+  m_edImageName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_edImageName->setPlaceholderText(tr("Nome"));
-
   m_imageView = new JImageView(true);
 
   QVBoxLayout* tablayout = new QVBoxLayout;
@@ -22,34 +20,28 @@ ImageView::ImageView(QWidget* parent)
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(tablayout);
 
-  m_tab->addTab(tabframe,
-                QIcon(":/icons/res/icon.png"),
-                tr("Imagem"));
+  m_tab->addTab(tabframe, QIcon(":/icons/res/icon.png"), tr("Imagem"));
 }
 
 void ImageView::setItem(const JItemSQL& o)
 {
-  m_ref = dynamic_cast<const Image&>(o);
+  const Image& _o = dynamic_cast<const Image&>(o);
   m_imageView->clearImage();
-  m_edImageName->setText(m_ref.m_name);
-  m_imageView->setImage(m_ref.m_image);
+  m_edImageName->setText(_o.m_name);
+  m_imageView->setImage(_o.m_image);
 }
 
-const JItemSQL& ImageView::getItem() const
+void ImageView::getItem(JItemSQL& o) const
 {
-  m_ref.clear(false);
-  m_ref.m_name = m_edImageName->text();
-  m_ref.m_image = m_imageView->getImage();
-  return m_ref;
+  Image& _o = dynamic_cast<Image&>(o);
+  _o.clear(true);
+  _o.m_id = m_id;
+  _o.m_name = m_edImageName->text();
+  _o.m_image = m_imageView->getImage();
 }
 
 void ImageView::create()
 {
   selectItem(Image());
   m_edImageName->setFocus();
-}
-
-Id ImageView::getId() const
-{
-  return m_ref.m_id;
 }

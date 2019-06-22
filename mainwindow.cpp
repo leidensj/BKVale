@@ -256,39 +256,37 @@ void Tipi::print()
   {
     case Functionality::Note:
     {
+      Note o;
+      m_purchase->getItem(o);
+      if (o.m_date != QDate::currentDate() && !o.m_id.isValid())
       {
-        if (m_purchase->getDate() != QDate::currentDate() && !m_purchase->getItem().m_id.isValid())
+        int ret = QMessageBox::question(
+                    this,
+                    tr("Data"),
+                    tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
+                    QMessageBox::Apply | QMessageBox::Ignore | QMessageBox::Cancel,
+                    QMessageBox::Apply);
+        switch (ret)
         {
-          int ret = QMessageBox::question(
-                      this,
-                      tr("Data"),
-                      tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
-                      QMessageBox::Apply | QMessageBox::Ignore | QMessageBox::Cancel,
-                      QMessageBox::Apply);
-          switch (ret)
-          {
-            case QMessageBox::Apply:
-              m_purchase->setDate(QDate::currentDate());
-              break;
-            case QMessageBox::Ignore:
-              break;
-            case QMessageBox::Cancel:
-            default:
-              return;
-          }
+          case QMessageBox::Apply:
+            m_purchase->setDate(QDate::currentDate());
+            break;
+          case QMessageBox::Ignore:
+            break;
+          case QMessageBox::Cancel:
+          default:
+            return;
         }
       }
-      Id id;
-      if (m_purchase->save(id))
+      o.clear(true);
+      if (m_purchase->save(o.m_id))
       {
-        Note o(id);
         QString error;
         if (o.SQL_select(error))
           print(NotePrinter::build(o));
         else
           QMessageBox::critical(this, ("Erro ao selecionar item"), error, QMessageBox::Ok);
       }
-
     } break;
     case Functionality::Reminder:
     {
@@ -414,6 +412,7 @@ void Tipi::updateControls()
     case Functionality::Note:
       //TODO
       //ui->actionPrint->setEnabled(m_purchase->getItem().isValid());
+      ui->actionPrint->setEnabled(true);
       break;
     case Functionality::Reminder:
       ui->actionPrint->setEnabled(m_reminder->getReminder().isValid());

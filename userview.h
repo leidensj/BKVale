@@ -23,8 +23,7 @@ public:
 
 public slots:
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
 
 protected slots:
   void itemsRemoved(const QVector<Id>& ids);
@@ -55,7 +54,6 @@ private:
 
   static QString idxToTableName(Idx idx);
 
-  mutable User m_ref;
   Id m_currentLoggedId;
   bool m_bHasLoggedUserChanged;
   JLineEdit* m_user;

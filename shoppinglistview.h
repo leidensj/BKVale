@@ -21,11 +21,9 @@ class ShoppingListView : public JItemView
 public:
   explicit ShoppingListView(QWidget* parent = nullptr);
 
-
 public slots:
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
 
 protected slots:
   void setItem(const JItemSQL& o);
@@ -34,8 +32,6 @@ private slots:
   void updateControls();
 
 private:
-  mutable ShoppingList m_ref;
-
   JLineEdit* m_edTitle;
   JSpinBox* m_snLines;
   QPlainTextEdit* m_teDescription;

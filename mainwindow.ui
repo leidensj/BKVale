@@ -161,8 +161,14 @@
    <property name="orientation">
     <enum>Qt::Vertical</enum>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>
@@ -307,7 +313,10 @@
      <normaloff>:/icons/res/note.png</normaloff>:/icons/res/note.png</iconset>
    </property>
    <property name="text">
-    <string>Vales</string>
+    <string>Compras</string>
+   </property>
+   <property name="toolTip">
+    <string>Entrada de mercadorias e despesas</string>
    </property>
   </action>
   <action name="actionReminders">
@@ -318,6 +327,9 @@
    <property name="text">
     <string>Lembretes</string>
    </property>
+   <property name="toolTip">
+    <string>Lembretes que podem ser salvos e impressos</string>
+   </property>
   </action>
   <action name="actionCalculator">
    <property name="icon">
@@ -326,6 +338,9 @@
    </property>
    <property name="text">
     <string>Calculadora</string>
+   </property>
+   <property name="toolTip">
+    <string>Calculadora com função de impressão</string>
    </property>
   </action>
   <action name="actionShoppingList">

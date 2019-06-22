@@ -81,34 +81,35 @@ ProductView::~ProductView()
 
 }
 
-const JItemSQL& ProductView::getItem() const
+void ProductView::getItem(JItemSQL& o) const
 {
-  m_ref.clear(false);
-  m_ref.m_name = m_edName->text();
-  m_ref.m_unity = m_edUnity->text();
-  m_ref.m_details = m_edDetails->text();
-  m_ref.m_bBuy = m_cbBuy->isChecked();
-  m_ref.m_bSell = m_cbSell->isChecked();
-  m_ref.m_category.m_id = m_categoryPicker->getId();
-  m_ref.m_image.m_id = m_imagePicker->getId();
+  Product& _o = dynamic_cast<Product&>(o);
+  _o.clear(true);
+  _o.m_id = m_id;
+  _o.m_name = m_edName->text();
+  _o.m_unity = m_edUnity->text();
+  _o.m_details = m_edDetails->text();
+  _o.m_bBuy = m_cbBuy->isChecked();
+  _o.m_bSell = m_cbSell->isChecked();
+  _o.m_category.m_id = m_categoryPicker->getId();
+  _o.m_image.m_id = m_imagePicker->getId();
   for (int i = 0; i != m_tbCode->rowCount(); ++i)
-    m_ref.m_vCode.push_back(dynamic_cast<const ProductCode&>(m_tbCode->getItem(i)));
-  return m_ref;
+    _o.m_vCode.push_back(dynamic_cast<const ProductCode&>(m_tbCode->getItem(i)));
 }
 
 void ProductView::setItem(const JItemSQL &o)
 {
-  m_ref = dynamic_cast<const Product&>(o);
-  m_edName->setText(m_ref.m_name);
-  m_edUnity->setText(m_ref.m_unity);
-  m_edDetails->setText(m_ref.m_details);
-  m_cbBuy->setChecked(m_ref.m_bBuy);
-  m_cbSell->setChecked(m_ref.m_bSell);
-  m_categoryPicker->setItem(m_ref.m_category);
-  m_imagePicker->setItem(m_ref.m_image);
+  const Product& _o = dynamic_cast<const Product&>(o);
+  m_edName->setText(_o.m_name);
+  m_edUnity->setText(_o.m_unity);
+  m_edDetails->setText(_o.m_details);
+  m_cbBuy->setChecked(_o.m_bBuy);
+  m_cbSell->setChecked(_o.m_bSell);
+  m_categoryPicker->setItem(_o.m_category);
+  m_imagePicker->setItem(_o.m_image);
   m_tbCode->removeAllItems();
-  for (int i = 0; i != m_ref.m_vCode.size(); ++i)
-    m_tbCode->addItem(m_ref.m_vCode.at(i));
+  for (int i = 0; i != _o.m_vCode.size(); ++i)
+    m_tbCode->addItem(_o.m_vCode.at(i));
 }
 
 void ProductView::create()
@@ -116,9 +117,4 @@ void ProductView::create()
   selectItem(Product());
   m_tab->setCurrentIndex(0);
   m_edName->setFocus();
-}
-
-Id ProductView::getId() const
-{
-  return m_ref.m_id;
 }

@@ -91,6 +91,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
 void JItemView::selectItem(const JItemSQL& o)
 {
+  m_id = o.m_id;
   setItem(o);
   QString strIcon = o.m_id.isValid()
                     ? ":/icons/res/saveas.png"
@@ -108,6 +109,17 @@ void JItemView::itemsRemoved(const QVector<Id>& ids)
 
 void JItemView::save()
 {
-  if (m_database->save(getItem()))
-    create();
+  JItemSQL* p = JItemEx::create(m_database->getTableName());
+  if (p != nullptr)
+  {
+    getItem(*p);
+    if (m_database->save(*p))
+      create();
+    delete p;
+  }
+}
+
+Id JItemView::getId() const
+{
+  return m_id;
 }

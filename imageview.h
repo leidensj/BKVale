@@ -18,14 +18,12 @@ public:
 
 public slots:
   void create();
-  const JItemSQL& getItem() const;
-  Id getId() const;
+  void getItem(JItemSQL& o) const;
 
 protected slots:
   void setItem(const JItemSQL& o);
 
 private:
-  mutable Image m_ref;
   JLineEdit* m_edImageName;
   JImageView* m_imageView;
 };

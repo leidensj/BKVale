@@ -310,7 +310,7 @@
   <action name="actionNotes">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/note.png</normaloff>:/icons/res/note.png</iconset>
+     <normaloff>:/icons/res/purchase.png</normaloff>:/icons/res/purchase.png</iconset>
    </property>
    <property name="text">
     <string>Compras</string>

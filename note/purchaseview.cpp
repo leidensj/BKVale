@@ -405,7 +405,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeProduct()));
   connect(m_table, SIGNAL(changedSignal(bool)), m_btnAddRemove->m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
-  connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
@@ -415,7 +414,9 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
   connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setNoteTotal(double)));
   connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setNoteDate(const QDate&)));
+  connect(this, SIGNAL(itemSelectedSignal()), SLOT(updateControls()));
 
+  setFocusWidgetOnCreate(m_supplierPicker);
   create();
   updateControls();
   updateStatistics();
@@ -463,12 +464,6 @@ void PurchaseView::setItem(const JItemSQL& o)
   m_wPayment->setPaymentMethod(_o.m_paymentMethod);
   m_wPayment->setPaymentItems(_o.m_vPaymentItem);
   m_edDisccount->setText(_o.m_disccount);
-  updateControls();
-}
-
-void PurchaseView::create()
-{
-  setItem(Note());
   updateControls();
 }
 

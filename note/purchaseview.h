@@ -95,7 +95,6 @@ public:
 
 public slots:
   void selectItem(const JItemSQL& o);
-  void create();
   void getItem(JItemSQL& o) const;
 
 protected slots:

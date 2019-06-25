@@ -17,6 +17,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   , m_btnSave(nullptr)
   , m_btnSearch(nullptr)
   , m_dlgDb(nullptr)
+  , m_wFocus(nullptr)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
@@ -99,6 +100,10 @@ void JItemView::selectItem(const JItemSQL& o)
   m_btnSave->setIcon(QIcon(strIcon));
   if (m_tab->count() > 0)
     m_tab->setCurrentIndex(0);
+  if (m_wFocus != nullptr)
+    m_wFocus->setFocus();
+  emit itemSelectedSignal();
+
 }
 
 void JItemView::itemsRemoved(const QVector<Id>& ids)
@@ -107,19 +112,47 @@ void JItemView::itemsRemoved(const QVector<Id>& ids)
     create();
 }
 
-void JItemView::save()
+bool JItemView::save(Id& id)
 {
+  id.clear();
   JItemSQL* p = JItemEx::create(m_database->getTableName());
+  bool bSuccess = false;
   if (p != nullptr)
   {
     getItem(*p);
-    if (m_database->save(*p))
+    bSuccess = m_database->save(*p);
+    if (bSuccess)
+    {
       create();
+      id = p->m_id;
+    }
     delete p;
   }
+  return bSuccess;
+}
+
+void JItemView::save()
+{
+  Id id;
+  save(id);
 }
 
 Id JItemView::getId() const
 {
   return m_id;
+}
+
+void JItemView::setFocusWidgetOnCreate(QWidget* w)
+{
+  m_wFocus = w;
+}
+
+void JItemView::create()
+{
+  JItemSQL* p = JItemEx::create(m_database->getTableName());
+  if (p != nullptr)
+  {
+    selectItem(*p);
+    delete p;
+  }
 }

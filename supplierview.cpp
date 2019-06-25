@@ -22,11 +22,10 @@ SupplierView::SupplierView(QWidget* parent)
 
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
   m_formInfo->setCompany(true);
-}
 
-void SupplierView::create()
-{
-  selectItem(Supplier());
+  // TODO WHY JLINEEDIT* TO QWIDGET NOT WORKING
+  setFocusWidgetOnCreate((QWidget*)m_formInfo->m_edName);
+  create();
 }
 
 void SupplierView::getItem(JItemSQL& o) const

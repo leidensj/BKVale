@@ -31,7 +31,6 @@ public:
   explicit EmployeeView(QWidget* parent = 0);
 
 public slots:
-  void create();
   void getItem(JItemSQL& o) const;
 
 protected slots:

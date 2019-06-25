@@ -293,8 +293,9 @@ void Tipi::print()
       ReminderPrintDialog dlg(this);
       if (dlg.exec())
       {
-        Reminder r = m_reminder->getReminder();
-        QString str = ReminderPrinter::build(r);
+        Reminder o;
+        m_reminder->getItem(o);
+        QString str = ReminderPrinter::build(o);
         bool bSuccess = false;
         for (int i = 0; i != dlg.getCopies(); ++i)
         {
@@ -304,8 +305,10 @@ void Tipi::print()
         }
 
         if (bSuccess && dlg.getSave())
-          bSuccess = m_reminder->save();
-
+        {
+          Id id;
+          bSuccess = m_reminder->save(id);
+        }
         if (bSuccess)
           m_reminder->create();
       }
@@ -410,13 +413,17 @@ void Tipi::updateControls()
   switch (getCurrentFunctionality())
   {
     case Functionality::Note:
-      //TODO
-      //ui->actionPrint->setEnabled(m_purchase->getItem().isValid());
-      ui->actionPrint->setEnabled(true);
-      break;
+    {
+      Note o;
+      m_purchase->getItem(o);
+      ui->actionPrint->setEnabled(o.isValid());
+    }  break;
     case Functionality::Reminder:
-      ui->actionPrint->setEnabled(m_reminder->getReminder().isValid());
-      break;
+    {
+      Reminder o;
+      m_reminder->getItem(o);
+      ui->actionPrint->setEnabled(o.isValid());
+    } break;
       case Functionality::Calculator:
       ui->actionPrint->setEnabled(true);
       break;

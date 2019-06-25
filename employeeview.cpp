@@ -84,6 +84,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   connect(m_tbHours, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
   connect(m_tbHours, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateHoursTable(QTableWidgetItem*)));
+  connect(this, SIGNAL(itemSelectedSignal()), this, SLOT(updateControls()));
 
   m_formInfo->m_lblCreationDate->hide();
   m_formInfo->m_dtCreationDate->hide();
@@ -91,14 +92,8 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formInfo->m_type->hide();
   m_formInfo->setCompany(false);
 
-  updateControls();
-}
-
-void EmployeeView::create()
-{
-  selectItem(Employee());
-  m_tab->setCurrentIndex(0);
-  m_formInfo->m_edName->setFocus();
+  setFocusWidgetOnCreate(m_formInfo->m_edName);
+  create();
 }
 
 void EmployeeView::getItem(JItemSQL& o) const

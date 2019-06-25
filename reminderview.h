@@ -3,42 +3,36 @@
 
 #include <QFrame>
 #include "items/reminder.h"
+#include "widgets/jitemview.h"
 #include <QDialog>
 
 class JLineEdit;
 class QPlainTextEdit;
 class QCheckBox;
 class QRadioButton;
-class QPushButton;
-class QDockWidget;
-class JDatabase;
 class JSpinBox;
 
-class ReminderView : public QFrame
+class ReminderView : public JItemView
 {
   Q_OBJECT
 
 public:
   explicit ReminderView(QWidget *parent = 0);
-  Reminder getReminder() const;
-  void setReminder(const Reminder& reminder);
-  bool save();
+
+public slots:
+  void getItem(JItemSQL& o) const;
+
+protected slots:
+  void setItem(const JItemSQL& o);
 
 private slots:
   void emitChangedSignal();
   void setCapitalization(int state);
-  void search();
-  void itemSelected(const JItemSQL& jItem);
-  void itemsRemoved(const QVector<Id>& ids);
-
-public slots:
-  void create();
 
 signals:
   void changedSignal();
 
 private:
-  Id m_currentId;
   JLineEdit* m_edTitle;
   QPlainTextEdit* m_teMessage;
   JLineEdit* m_edBarcode;
@@ -47,10 +41,6 @@ private:
   QRadioButton* m_rdSize2;
   QCheckBox* m_cbFavorite;
   QCheckBox* m_cbBarcodeHRI;
-  QPushButton* m_btnCreate;
-  QPushButton* m_btnSearch;
-  JDatabase* m_database;
-  QDockWidget* m_dock;
 };
 
 class ReminderPrintDialog : public QDialog

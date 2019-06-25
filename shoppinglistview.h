@@ -22,7 +22,6 @@ public:
   explicit ShoppingListView(QWidget* parent = nullptr);
 
 public slots:
-  void create();
   void getItem(JItemSQL& o) const;
 
 protected slots:

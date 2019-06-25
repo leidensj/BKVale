@@ -22,7 +22,6 @@ public:
   bool hasLoggedUserChanged() const;
 
 public slots:
-  void create();
   void getItem(JItemSQL& o) const;
 
 protected slots:

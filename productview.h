@@ -23,7 +23,6 @@ public:
   ~ProductView();
 
 public slots:
-  void create();
   void getItem(JItemSQL& o) const;
 
 protected slots:

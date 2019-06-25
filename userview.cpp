@@ -115,6 +115,7 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
 
   connect(m_viewPassword, SIGNAL(toggled(bool)), this, SLOT(viewPassword(bool)));
 
+  setFocusWidgetOnCreate(m_user);
   create();
 }
 
@@ -168,13 +169,6 @@ void UserView::setItem(const JItemSQL& o)
   m_list->item((int)Idx::Discount)->setCheckState(_o.m_bDiscount ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Settings)->setCheckState(_o.m_bSettings ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::TimeCard)->setCheckState(_o.m_bTimeCard ? Qt::Checked : Qt::Unchecked);
-}
-
-void UserView::create()
-{
-  selectItem(User());
-  m_lblPasswordMsg->hide();
-  m_user->setFocus();
 }
 
 QString UserView::getPassword() const

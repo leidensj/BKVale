@@ -50,18 +50,16 @@ StoreView::StoreView(QWidget* parent)
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addEmployee()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), m_tbEmployee, SLOT(removeItem()));
   connect(m_tbEmployee, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
+  connect(this, SIGNAL(itemSelectedSignal()), this, SLOT(updateControls()));
+
   m_formInfo->m_lblCreationDate->hide();
   m_formInfo->m_dtCreationDate->hide();
   m_formInfo->m_lblType->hide();
   m_formInfo->m_type->hide();
   m_formInfo->setCompany(true);
-  updateControls();
-}
 
-void StoreView::create()
-{
-  selectItem(Store());
-  updateControls();
+  setFocusWidgetOnCreate(m_formInfo->m_edName);
+  create();
 }
 
 void StoreView::updateControls()

@@ -74,6 +74,8 @@ ProductView::ProductView(QWidget* parent)
   connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_tbCode, SLOT(addItem()));
   connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_tbCode, SLOT(removeItem()));
 
+  setFocusWidgetOnCreate(m_edName);
+  create();
 }
 
 ProductView::~ProductView()
@@ -110,11 +112,4 @@ void ProductView::setItem(const JItemSQL &o)
   m_tbCode->removeAllItems();
   for (int i = 0; i != _o.m_vCode.size(); ++i)
     m_tbCode->addItem(_o.m_vCode.at(i));
-}
-
-void ProductView::create()
-{
-  selectItem(Product());
-  m_tab->setCurrentIndex(0);
-  m_edName->setFocus();
 }

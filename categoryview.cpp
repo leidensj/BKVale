@@ -23,15 +23,8 @@ CategoryView::CategoryView(QWidget* parent)
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(ltForm);
 
-  m_tab->addTab(tabframe,
-                QIcon(":/icons/res/category.png"),
-                tr("Categoria"));
-}
-
-void CategoryView::create()
-{
-  selectItem(Category());
-  m_edName->setFocus();
+  m_tab->addTab(tabframe, QIcon(":/icons/res/category.png"), tr("Categoria"));
+  setFocusWidgetOnCreate(m_edName);
 }
 
 void CategoryView::getItem(JItemSQL& o) const

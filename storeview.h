@@ -19,7 +19,6 @@ public:
   explicit StoreView(QWidget* parent = 0);
 
 public slots:
-  void create();
   void getItem(JItemSQL& o) const;
   void updateControls();
   void addEmployee();

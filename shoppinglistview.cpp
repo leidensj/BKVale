@@ -153,19 +153,15 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   connect(m_table, SIGNAL(changedSignal(bool)), m_btns->m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_table, SLOT(addItem()));
   connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_table, SLOT(removeItem()));
+  connect(this, SIGNAL(itemSelectedSignal()), this, SLOT(updateControls()));
+
+  setFocusWidgetOnCreate(m_edTitle);
+  create();
 }
 
 void ShoppingListView::updateControls()
 {
   m_table->showSupplierColumn(!m_supplierPicker->getId().isValid());
-}
-
-void ShoppingListView::create()
-{
-  selectItem(ShoppingList());
-  m_tab->setCurrentIndex(0);
-  m_edTitle->setFocus();
-  updateControls();
 }
 
 void ShoppingListView::setItem(const JItemSQL& o)

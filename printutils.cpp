@@ -226,7 +226,7 @@ bool Printer::printString(QIODevice* printer,
 
 QString Printer::strCmdInit()
 {
-  return ESC_CLEAR ESC_INIT ESC_CODEPAGE850 ESC_CLEAR;
+  return ESC_INIT ESC_CODEPAGE850;
 }
 
 QString Printer::strCmdFullCut()

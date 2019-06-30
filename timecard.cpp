@@ -164,7 +164,7 @@ void TimeCard::saveAndAccept()
       html += QString(
         "<tr>"
          "<td width=\"5%\">%1</td>"
-           "<td width=\"15%\">%2</td>"
+           "<td width=\"15%\" bgcolor=\"%3\">%2</td>"
            "<td width=\"30%\"></td>"
            "<td width=\"5%\"></td>"
            "<td width=\"5%\"></td>"
@@ -172,7 +172,8 @@ void TimeCard::saveAndAccept()
            "<td width=\"5%\"></td>"
            "<td width=\"5%\"></td>"
          "</tr>").arg(dt.toString("dd"),
-                      br.toString(dt, "dddd"));
+                      br.toString(dt, "dddd"),
+                      dt.dayOfWeek() == 7 ? "gray" : "white");
       dt = dt.addDays(1);
     }
 

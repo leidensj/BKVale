@@ -133,7 +133,7 @@ QString JItemEx::icon(const QString& tableName)
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return ":/icons/res/barcode.png";
   if (tableName == NOTE_SQL_TABLE_NAME)
-    return ":/icons/res/note.png";
+    return ":/icons/res/purchase.png";
   if (tableName == USER_SQL_TABLE_NAME)
     return ":/icons/res/user.png";
   if (tableName == REMINDER_SQL_TABLE_NAME)

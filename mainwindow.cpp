@@ -291,27 +291,32 @@ void Tipi::print()
     case Functionality::Reminder:
     {
       ReminderPrintDialog dlg(this);
-      if (dlg.exec())
+      if (!dlg.exec())
+        break;
+
+      bool bSuccess = true;
+      Reminder o;
+      m_reminder->getItem(o);
+      if (dlg.getSave())
       {
-        Reminder o;
-        m_reminder->getItem(o);
+        Id id;
+        bSuccess = m_reminder->save(id);
+      }
+
+      if (bSuccess)
+      {
         QString str = ReminderPrinter::build(o);
-        bool bSuccess = false;
         for (int i = 0; i != dlg.getCopies(); ++i)
         {
           bSuccess = print(str);
           if (!bSuccess)
             break;
         }
-
-        if (bSuccess && dlg.getSave())
-        {
-          Id id;
-          bSuccess = m_reminder->save(id);
-        }
-        if (bSuccess)
-          m_reminder->create();
       }
+
+      if (bSuccess)
+        m_reminder->create();
+
     } break;
     case Functionality::Calculator:
     {

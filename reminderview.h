@@ -11,6 +11,9 @@ class QPlainTextEdit;
 class QCheckBox;
 class QRadioButton;
 class JSpinBox;
+class JDatePicker;
+class QComboBox;
+class JTimeEdit;
 
 class ReminderView : public JItemView
 {
@@ -27,7 +30,7 @@ protected slots:
 
 private slots:
   void emitChangedSignal();
-  void setCapitalization(int state);
+  void updateControls();
 
 signals:
   void changedSignal();
@@ -41,6 +44,11 @@ private:
   QRadioButton* m_rdSize2;
   QCheckBox* m_cbFavorite;
   QCheckBox* m_cbBarcodeHRI;
+  QComboBox* m_subject;
+  JDatePicker* m_date;
+  QCheckBox* m_cbDate;
+  JTimeEdit* m_time;
+  QCheckBox* m_cbTime;
 };
 
 class ReminderPrintDialog : public QDialog

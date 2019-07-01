@@ -2,6 +2,8 @@
 #include "widgets/jlineedit.h"
 #include "widgets/jdatabase.h"
 #include "widgets/jspinbox.h"
+#include "widgets/jdatepicker.h"
+#include "widgets/jtimeedit.h"
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QRadioButton>
@@ -13,6 +15,7 @@
 #include <QLabel>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QComboBox>
 
 ReminderView::ReminderView(QWidget *parent)
   : JItemView(REMINDER_SQL_TABLE_NAME, parent)
@@ -24,6 +27,11 @@ ReminderView::ReminderView(QWidget *parent)
   , m_rdSize2(nullptr)
   , m_cbFavorite(nullptr)
   , m_cbBarcodeHRI(nullptr)
+  , m_subject(nullptr)
+  , m_date(nullptr)
+  , m_cbDate(nullptr)
+  , m_time(nullptr)
+  , m_cbTime(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -37,24 +45,38 @@ ReminderView::ReminderView(QWidget *parent)
   m_cbCapitalization->setIcon(QIcon(":/icons/res/uppercase.png"));
   m_cbCapitalization->setTristate(true);
   m_cbCapitalization->setCheckState(Qt::CheckState::Checked);
+  m_cbCapitalization->setToolTip(tr("Maiúsculas e minúsculas"));
   m_rdSize1 = new QRadioButton();
   m_rdSize1->setText("");
   m_rdSize1->setIconSize(QSize(16, 16));
   m_rdSize1->setIcon(QIcon(":/icons/res/text.png"));
   m_rdSize1->setChecked(true);
+  m_rdSize1->setToolTip(tr("Fonte normal"));
   m_rdSize2 = new QRadioButton();
   m_rdSize2->setIconSize(QSize(24, 24));
   m_rdSize2->setIcon(QIcon(":/icons/res/text.png"));
+  m_rdSize2->setToolTip(tr("Fonte grande"));
   m_cbFavorite = new QCheckBox;
-  m_cbFavorite->setText(tr("Favorito"));
+  m_cbFavorite->setIconSize(QSize(24, 24));
   m_cbFavorite->setIcon(QIcon(":/icons/res/favorite.png"));
   m_cbFavorite->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F));
+  m_cbFavorite->setToolTip(tr("Marcar como favorito"));
   m_edBarcode = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
   m_edBarcode->setPlaceholderText(tr("Código de barras"));
   m_edBarcode->setMaxLength(REMINDER_MAX_BARCODE_CODE93_LENGTH);
   m_edBarcode->setClearButtonEnabled(true);
   m_cbBarcodeHRI = new QCheckBox;
   m_cbBarcodeHRI->setText(tr("Incluir HRI"));
+  m_subject = new QComboBox;
+  JLineEdit* edType = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  edType->setPlaceholderText(tr("Assunto"));
+  m_subject->setEditable(true);
+  m_subject->setLineEdit(edType);
+  m_subject->setSizePolicy(QSizePolicy::QSizePolicy::Expanding, QSizePolicy::Preferred);
+  m_cbDate = new QCheckBox;
+  m_date = new JDatePicker;
+  m_cbTime = new QCheckBox;
+  m_time = new JTimeEdit;
 
   QLabel* lblBarcode = new QLabel();
   lblBarcode->setPixmap(QIcon(":/icons/res/barcode.png").pixmap(QSize(24, 24)));
@@ -65,18 +87,18 @@ ReminderView::ReminderView(QWidget *parent)
   QFrame* vFrame1 = new QFrame;
   vFrame1->setFrameShape(QFrame::VLine);
 
-  QFrame* vFrame2 = new QFrame;
-  vFrame2->setFrameShape(QFrame::VLine);
-
   QHBoxLayout* ltHeader = new QHBoxLayout;
   ltHeader->setContentsMargins(0, 0, 0, 0);
-  ltHeader->setAlignment(Qt::AlignLeft);
   ltHeader->addWidget(m_cbCapitalization);
-  ltHeader->addWidget(vFrame1);
   ltHeader->addWidget(m_rdSize1);
   ltHeader->addWidget(m_rdSize2);
-  ltHeader->addWidget(vFrame2);
   ltHeader->addWidget(m_cbFavorite);
+  ltHeader->addWidget(m_cbDate);
+  ltHeader->addWidget(m_date);
+  ltHeader->addWidget(m_cbTime);
+  ltHeader->addWidget(m_time);
+  ltHeader->addWidget(vFrame1);
+  ltHeader->addWidget(m_subject);
 
   QHBoxLayout* ltFooter = new QHBoxLayout;
   ltFooter->setContentsMargins(0, 0, 0, 0);
@@ -100,9 +122,11 @@ ReminderView::ReminderView(QWidget *parent)
   connect(m_edTitle, SIGNAL(textEdited(const QString&)), this, SLOT(emitChangedSignal()));
   connect(m_teMessage, SIGNAL(textChanged()), this, SLOT(emitChangedSignal()));
   connect(m_edBarcode, SIGNAL(textChanged(const QString&)), this, SLOT(emitChangedSignal()));
-  connect(m_cbCapitalization, SIGNAL(stateChanged(int)), this, SLOT(setCapitalization(int)));
+  connect(m_cbCapitalization, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
+  connect(m_cbDate, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
+  connect(m_cbTime, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
 
-  setCapitalization(m_cbCapitalization->checkState());
+  updateControls();
   setFocusWidgetOnCreate(m_edTitle);
   create();
 }
@@ -131,10 +155,18 @@ void ReminderView::getItem(JItemSQL& o) const
   }
   _o.m_bBarcodeHRI = m_cbBarcodeHRI->isChecked();
   _o.m_barcode = m_edBarcode->text();
+  _o.m_date = m_date->getDate();
+  _o.m_bDate = m_cbDate->isChecked();
+  _o.m_time = m_time->time();
+  _o.m_bTime = m_cbTime->isChecked();
+  _o.m_subject = m_subject->currentText();
 }
 
 void ReminderView::setItem(const JItemSQL& o)
 {
+  m_subject->clear();
+  m_subject->addItems(Reminder::SQL_select_subjects());
+
   const Reminder& _o = dynamic_cast<const Reminder&>(o);
   m_id = _o.m_id;
   m_edTitle->setText(_o.m_title);
@@ -157,6 +189,12 @@ void ReminderView::setItem(const JItemSQL& o)
   }
   m_cbBarcodeHRI->setChecked(_o.m_bBarcodeHRI);
   m_edBarcode->setText(_o.m_barcode);
+  m_date->setDate(_o.m_date);
+  m_cbDate->setChecked(_o.m_bDate);
+  m_time->setTime(_o.m_time);
+  m_cbTime->setChecked(_o.m_bTime);
+  m_subject->setCurrentText(_o.m_subject);
+  updateControls();
 }
 
 void ReminderView::emitChangedSignal()
@@ -164,10 +202,13 @@ void ReminderView::emitChangedSignal()
   emit changedSignal();
 }
 
-void ReminderView::setCapitalization(int state)
+void ReminderView::updateControls()
 {
+  m_date->setEnabled(m_cbDate->isChecked());
+  m_time->setEnabled(m_cbTime->isChecked());
+
   QFont::Capitalization cap = QFont::AllUppercase;
-  switch ((Qt::CheckState)state)
+  switch (m_cbCapitalization->checkState())
   {
     case Qt::CheckState::Unchecked:
       cap = QFont::MixedCase;

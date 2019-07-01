@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QObject>
+#include <QDate>
+#include <QTime>
 #include "jitemsql.h"
 
 struct Reminder : public JItemSQL
@@ -32,6 +34,8 @@ struct Reminder : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
 
+  static QStringList SQL_select_subjects();
+
   QString m_title;
   QString m_message;
   bool m_bFavorite;
@@ -39,6 +43,11 @@ struct Reminder : public JItemSQL
   Capitalization m_capitalization;
   bool m_bBarcodeHRI;
   QString m_barcode;
+  QDate m_date;
+  bool m_bDate;
+  QTime m_time;
+  bool m_bTime;
+  QString m_subject;
 };
 
 #endif // REMINDER_H

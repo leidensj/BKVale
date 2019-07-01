@@ -145,7 +145,12 @@ bool BaitaSQL::createTables(QString& error)
                           REMINDER_SQL_COL04 " INTEGER,"
                           REMINDER_SQL_COL05 " INTEGER,"
                           REMINDER_SQL_COL06 " BOOLEAN,"
-                          REMINDER_SQL_COL07 " TEXT)");
+                          REMINDER_SQL_COL07 " TEXT,"
+                          REMINDER_SQL_COL08 " DATE,"
+                          REMINDER_SQL_COL09 " BOOLEAN,"
+                          REMINDER_SQL_COL10 " TIME,"
+                          REMINDER_SQL_COL11 " BOOLEAN,"
+                          REMINDER_SQL_COL12 " TEXT)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_SQL_TABLE_NAME " ("

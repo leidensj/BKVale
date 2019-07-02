@@ -123,6 +123,7 @@ void Reminder::clear(bool bClearId)
   m_date = QDate::currentDate();
   m_bDate = false;
   m_time = QTime::currentTime();
+  m_time = m_time.addSecs((-1)*m_time.second());
   m_bTime = false;
   m_subject.clear();
 }

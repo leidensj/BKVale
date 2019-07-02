@@ -9,7 +9,6 @@
 class JLineEdit;
 class QPlainTextEdit;
 class QCheckBox;
-class QRadioButton;
 class JSpinBox;
 class JDatePicker;
 class QComboBox;
@@ -40,8 +39,7 @@ private:
   QPlainTextEdit* m_teMessage;
   JLineEdit* m_edBarcode;
   QCheckBox* m_cbCapitalization;
-  QRadioButton* m_rdSize1;
-  QRadioButton* m_rdSize2;
+  QCheckBox* m_cbSize;
   QCheckBox* m_cbFavorite;
   QCheckBox* m_cbBarcodeHRI;
   QComboBox* m_subject;

@@ -6,7 +6,6 @@
 #include "widgets/jtimeedit.h"
 #include <QPlainTextEdit>
 #include <QCheckBox>
-#include <QRadioButton>
 #include <QLayout>
 #include <QPushButton>
 #include <QDockWidget>
@@ -23,8 +22,7 @@ ReminderView::ReminderView(QWidget *parent)
   , m_teMessage(nullptr)
   , m_edBarcode(nullptr)
   , m_cbCapitalization(nullptr)
-  , m_rdSize1(nullptr)
-  , m_rdSize2(nullptr)
+  , m_cbSize(nullptr)
   , m_cbFavorite(nullptr)
   , m_cbBarcodeHRI(nullptr)
   , m_subject(nullptr)
@@ -46,16 +44,11 @@ ReminderView::ReminderView(QWidget *parent)
   m_cbCapitalization->setTristate(true);
   m_cbCapitalization->setCheckState(Qt::CheckState::Checked);
   m_cbCapitalization->setToolTip(tr("Maiúsculas e minúsculas"));
-  m_rdSize1 = new QRadioButton();
-  m_rdSize1->setText("");
-  m_rdSize1->setIconSize(QSize(16, 16));
-  m_rdSize1->setIcon(QIcon(":/icons/res/text.png"));
-  m_rdSize1->setChecked(true);
-  m_rdSize1->setToolTip(tr("Fonte normal"));
-  m_rdSize2 = new QRadioButton();
-  m_rdSize2->setIconSize(QSize(24, 24));
-  m_rdSize2->setIcon(QIcon(":/icons/res/text.png"));
-  m_rdSize2->setToolTip(tr("Fonte grande"));
+  m_cbSize = new QCheckBox;
+  m_cbSize->setIconSize(QSize(24, 24));
+  m_cbSize->setIcon(QIcon(":/icons/res/text.png"));
+  m_cbSize->setToolTip(tr("Fonte grande"));
+  m_cbSize->setChecked(true);
   m_cbFavorite = new QCheckBox;
   m_cbFavorite->setIconSize(QSize(24, 24));
   m_cbFavorite->setIcon(QIcon(":/icons/res/favorite.png"));
@@ -68,11 +61,11 @@ ReminderView::ReminderView(QWidget *parent)
   m_cbBarcodeHRI = new QCheckBox;
   m_cbBarcodeHRI->setText(tr("Incluir HRI"));
   m_subject = new QComboBox;
-  JLineEdit* edType = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  JLineEdit* edType = new JLineEdit(JLineEdit::Input::ASCII, JLineEdit::st_defaultFlags2);
   edType->setPlaceholderText(tr("Assunto"));
   m_subject->setEditable(true);
   m_subject->setLineEdit(edType);
-  m_subject->setSizePolicy(QSizePolicy::QSizePolicy::Expanding, QSizePolicy::Preferred);
+  m_subject->setSizePolicy(QSizePolicy::QSizePolicy::Expanding, QSizePolicy::Fixed);
   m_cbDate = new QCheckBox;
   m_date = new JDatePicker;
   m_cbTime = new QCheckBox;
@@ -90,8 +83,7 @@ ReminderView::ReminderView(QWidget *parent)
   QHBoxLayout* ltHeader = new QHBoxLayout;
   ltHeader->setContentsMargins(0, 0, 0, 0);
   ltHeader->addWidget(m_cbCapitalization);
-  ltHeader->addWidget(m_rdSize1);
-  ltHeader->addWidget(m_rdSize2);
+  ltHeader->addWidget(m_cbSize);
   ltHeader->addWidget(m_cbFavorite);
   ltHeader->addWidget(m_cbDate);
   ltHeader->addWidget(m_date);
@@ -139,7 +131,7 @@ void ReminderView::getItem(JItemSQL& o) const
   _o.m_title = m_edTitle->text();
   _o.m_message = m_teMessage->toPlainText();
   _o.m_bFavorite = m_cbFavorite->isChecked();
-  _o.m_size = m_rdSize1->isChecked() ? Reminder::Size::Normal : Reminder::Size::Large;
+  _o.m_size = m_cbSize->isChecked() ? Reminder::Size::Large : Reminder::Size::Normal;
   switch(m_cbCapitalization->checkState())
   {
     case Qt::CheckState::Unchecked:
@@ -172,8 +164,7 @@ void ReminderView::setItem(const JItemSQL& o)
   m_edTitle->setText(_o.m_title);
   m_teMessage->setPlainText(_o.m_message);
   m_cbFavorite->setChecked(_o.m_bFavorite);
-  m_rdSize2->setChecked(_o.m_size == Reminder::Size::Large);
-  m_rdSize1->setChecked(_o.m_size == Reminder::Size::Normal);
+  m_cbSize->setChecked(_o.m_size == Reminder::Size::Large);
   switch(_o.m_capitalization)
   {
     case Reminder::Capitalization::AllLowercase:
@@ -229,6 +220,10 @@ void ReminderView::updateControls()
   QFont f2 = m_teMessage->font();
   f2.setCapitalization(cap);
   m_teMessage->setFont(f2);
+
+  QFont f3 = m_subject->lineEdit()->font();
+  f3.setCapitalization(cap);
+  m_subject->lineEdit()->setFont(f3);
 }
 
 ReminderPrintDialog::ReminderPrintDialog(QWidget* parent)

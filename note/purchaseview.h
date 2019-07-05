@@ -20,7 +20,7 @@ class QDockWidget;
 class JDatabase;
 class QIODevice;
 class JExpLineEdit;
-class JPlainTextEdit;
+class QPlainTextEdit;
 class JDatePicker;
 class QLabel;
 class JLineEdit;
@@ -115,7 +115,7 @@ private:
   PaymentWidget* m_wPayment;
   JLineEdit* m_edEntries;
   JLineEdit* m_edSum;
-  JPlainTextEdit* m_teObservation;
+  QPlainTextEdit* m_teObservation;
 
 private slots:
   void removeProduct();

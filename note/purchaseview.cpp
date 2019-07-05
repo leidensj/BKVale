@@ -10,7 +10,7 @@
 #include "widgets/jtablewidgetitem.h"
 #include "widgets/jdatepicker.h"
 #include "packageeditor.h"
-#include "widgets/jplaintextedit.h"
+#include <QPlainTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
@@ -375,8 +375,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   QFrame* frInfo = new QFrame;
   frInfo->setLayout(ltInfo);
 
-  m_teObservation = new JPlainTextEdit;
-  m_teObservation->setPlaceholderText(tr("Shift+Enter para inserir uma quebra de linha"));
+  m_teObservation = new QPlainTextEdit;
   QVBoxLayout* ltObservation = new QVBoxLayout;
   ltObservation->addWidget(m_teObservation);
   QFrame* frObservation = new QFrame;

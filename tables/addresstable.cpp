@@ -1,10 +1,10 @@
-#include "addresstablewidget.h"
+#include "addresstable.h"
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 #include "widgets/jtablewidgetitem.h"
 
-AddressTableWidget::AddressTableWidget(QWidget* parent)
+AddressTable::AddressTable(QWidget* parent)
   : JItemTable((int)Flags::NoFlags , parent)
 {
   setColumnCount(1);
@@ -15,7 +15,7 @@ AddressTableWidget::AddressTableWidget(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)Column::Address, QHeaderView::Stretch);
 }
 
-const JItem& AddressTableWidget::getItem(int row) const
+const JItem& AddressTable::getItem(int row) const
 {
   m_ref.clear();
   if (isValidRow(row))
@@ -26,7 +26,7 @@ const JItem& AddressTableWidget::getItem(int row) const
   return m_ref;
 }
 
-void AddressTableWidget::addItem()
+void AddressTable::addItem()
 {
   addItem(Address());
   int row = rowCount() - 1;
@@ -36,7 +36,7 @@ void AddressTableWidget::addItem()
   setFocus();
 }
 
-void AddressTableWidget::addItem(const JItem& o)
+void AddressTable::addItem(const JItem& o)
 {
   const Address& _o = dynamic_cast<const Address&>(o);
 
@@ -53,14 +53,14 @@ void AddressTableWidget::addItem(const JItem& o)
   blockSignals(false);
 }
 
-void AddressTableWidget::update(int /*row*/, int /*column*/)
+void AddressTable::update(int /*row*/, int /*column*/)
 {
   blockSignals(true);
   blockSignals(false);
   emitChangedSignal();
 }
 
-void AddressTableWidget::itemActivate(int row, int column)
+void AddressTable::itemActivate(int row, int column)
 {
   if (column == (int)Column::Address)
   {
@@ -69,7 +69,7 @@ void AddressTableWidget::itemActivate(int row, int column)
   }
 }
 
-void AddressTableWidget::itemDelete(int row, int column)
+void AddressTable::itemDelete(int row, int column)
 {
   if (column == (int)Column::Address)
   {

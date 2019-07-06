@@ -27,7 +27,7 @@ struct User : public JItemSQL
   static QString st_strEncryptedPassword(const QString& strPassword);
 
   QString m_strUser;
-  bool m_bNote;
+  bool m_bPurchase;
   bool m_bReminder;
   bool m_bCalculator;
   bool m_bShop;
@@ -39,7 +39,6 @@ struct User : public JItemSQL
   bool m_bSupplier;
   bool m_bCategory;
   bool m_bImage;
-  bool m_bReservation;
   bool m_bShoppingList;
   bool m_bStore;
   bool m_bDiscount;

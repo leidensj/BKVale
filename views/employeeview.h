@@ -49,8 +49,8 @@ private:
   FormAddressWidget* m_formAddress;
   JLineEdit* m_edPincode;
   QTreeWidget* m_trPermissions;
-  QTreeWidgetItem* m_triNoteEdit;
-  QTreeWidgetItem* m_triNoteRemove;
+  QTreeWidgetItem* m_triPurchaseEdit;
+  QTreeWidgetItem* m_triPurchaseRemove;
   JTable* m_tbHours;
   JAddRemoveButtons* m_btnAddRemove;
 };

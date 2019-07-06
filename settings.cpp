@@ -4,7 +4,6 @@
 
 #define COMPANY_NAME "LEICO"
 #define APP_NAME     "BaitaAssistente"
-#define DATABASE_NAME    "BaitaAssistente.db"
 
 #define DATABASE_HOST_NAME     "databaseHostName"
 #define DATABASE_PORT          "databasePort"
@@ -12,8 +11,6 @@
 #define SERIAL_PORT            "serial/port"
 #define ETHERNET_IP            "ethernet/ip"
 #define ETHERNET_PORT          "ethernet/port"
-#define NOTES_DEFAULT_NUMBER   "notes/defaultnumber"
-#define NOTES_PINCODE_REQUIRED "notes/pincoderequired"
 
 #define DEFAULT_DATABASE_PORT 5432
 
@@ -30,8 +27,6 @@ void Settings::clear()
   m_serialPort.clear();
   m_ethernetIP.clear();
   m_ethernetPort = 9100;
-  m_notesDefaultNumber = 1000;
-  m_notesPincodeRequired = true;
 }
 
 void Settings::save() const
@@ -43,8 +38,6 @@ void Settings::save() const
   settings.setValue(SERIAL_PORT, m_serialPort);
   settings.setValue(ETHERNET_IP, m_ethernetIP);
   settings.setValue(ETHERNET_PORT, m_ethernetPort);
-  settings.setValue(NOTES_DEFAULT_NUMBER, m_notesDefaultNumber);
-  settings.setValue(NOTES_PINCODE_REQUIRED, m_bIsPrinterEthernet);
 }
 
 void Settings::load()
@@ -56,5 +49,4 @@ void Settings::load()
   m_serialPort = settings.value(SERIAL_PORT).toString();
   m_ethernetIP = settings.value(ETHERNET_IP).toString();
   m_ethernetPort = settings.value(ETHERNET_PORT, 9100).toInt();
-  m_notesDefaultNumber = settings.value(NOTES_DEFAULT_NUMBER, 1000).toInt();
 }

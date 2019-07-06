@@ -1,5 +1,5 @@
-#ifndef NOTEFILTERDLG_H
-#define NOTEFILTERDLG_H
+#ifndef PURCHASEFILTERDLG_H
+#define PURCHASEFILTERDLG_H
 
 #include "filterdlg.h"
 
@@ -7,12 +7,12 @@ class JDatabasePicker;
 class QDateEdit;
 class QCheckBox;
 
-class NoteFilterDlg : public FilterDlg
+class PurchaseFilterDlg : public FilterDlg
 {
   Q_OBJECT
 
 public:
-  explicit NoteFilterDlg(QWidget* parent = nullptr);
+  explicit PurchaseFilterDlg(QWidget* parent = nullptr);
   virtual QString getFilter() const;
   virtual void clearFilter();
 
@@ -27,4 +27,4 @@ private:
   JDatabasePicker* m_productPicker;
 };
 
-#endif // NOTEFILTERDLG_H
+#endif // PURCHASEFILTERDLG_H

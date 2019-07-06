@@ -1,20 +1,20 @@
-#ifndef ADDRESSTABLEWIDGET_H
-#define ADDRESSTABLEWIDGET_H
+#ifndef PHONETABLE_H
+#define PHONETABLE_H
 
 #include "widgets/jtable.h"
-#include "items/address.h"
+#include "items/phone.h"
 
-class AddressTableWidget : public JItemTable
+class PhoneTable : public JItemTable
 {
   Q_OBJECT
 
   enum class Column
   {
-    Address
+    Phone
   };
 
 public:
-  explicit AddressTableWidget(QWidget* parent = nullptr);
+  explicit PhoneTable(QWidget* parent = nullptr);
   const JItem& getItem(int row) const;
 
 public slots:
@@ -22,7 +22,7 @@ public slots:
   void addItem();
 
 private:
-  mutable Address m_ref;
+  mutable Phone m_ref;
 
 protected slots:
   void update(int row, int column);
@@ -30,4 +30,4 @@ protected slots:
   void itemDelete(int row, int column);
 };
 
-#endif // ADDRESSTABLEWIDGET_H
+#endif // PHONETABLE_H

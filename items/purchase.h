@@ -1,5 +1,5 @@
-#ifndef NOTE_H
-#define NOTE_H
+#ifndef PURCHASE_H
+#define PURCHASE_H
 
 #include <QObject>
 #include <QString>
@@ -11,23 +11,13 @@
 #include "jitemsql.h"
 #include "employee.h"
 
-enum class NoteColumn : int
+struct PurchaseItem : public JItem
 {
-  Ammount,
-  Unity,
-  Description,
-  Price,
-  SubTotal
-};
-
-struct NoteItem : public JItem
-{
-  NoteItem();
+  PurchaseItem();
   void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
-  QString strTableName() const;
 
   double subtotal() const;
   QString strSubtotal() const;
@@ -52,7 +42,7 @@ struct PaymentItem : public JItem
   bool isValid() const;
 };
 
-struct Note : public JItemSQL
+struct Purchase : public JItemSQL
 {
   enum class PaymentMethod
   {
@@ -61,7 +51,7 @@ struct Note : public JItemSQL
     Bonus
   };
 
-  Note(Id = Id());
+  Purchase(Id = Id());
   void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;
@@ -73,7 +63,7 @@ struct Note : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
-  static NoteItem SQL_select_last_item(Id supplierId, Id productId);
+  static PurchaseItem SQL_select_last_item(Id supplierId, Id productId);
 
   void setEmployee(const JItemSQL& e) const;
 
@@ -96,9 +86,9 @@ struct Note : public JItemSQL
   PaymentMethod m_paymentMethod;
   QVector<PaymentItem> m_vPaymentItem;
   QString m_observation;
-  QVector<NoteItem> m_vNoteItem;
+  QVector<PurchaseItem> m_vItem;
   double m_disccount;
   mutable Employee m_employee;
 };
 
-#endif // COMMON_H
+#endif // PURCHASE_H

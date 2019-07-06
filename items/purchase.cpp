@@ -1,10 +1,10 @@
-#include "note.h"
+#include "purchase.h"
 #include "jmodel.h"
 
-class NoteModel : public JModel
+class PurchaseModel : public JModel
 {
 public:
-  NoteModel(QObject *parent)
+  PurchaseModel(QObject *parent)
     : JModel(parent)
   {
 
@@ -77,12 +77,12 @@ public:
   }
 };
 
-NoteItem::NoteItem()
+PurchaseItem::PurchaseItem()
 {
   clear();
 }
 
-void NoteItem::clear(bool bClearId)
+void PurchaseItem::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
@@ -92,14 +92,14 @@ void NoteItem::clear(bool bClearId)
   m_package.clear();
 }
 
-bool NoteItem::isValid() const
+bool PurchaseItem::isValid() const
 {
   return true;
 }
 
-bool NoteItem::operator !=(const JItem& other) const
+bool PurchaseItem::operator !=(const JItem& other) const
 {
-  const NoteItem& another = dynamic_cast<const NoteItem&>(other);
+  const PurchaseItem& another = dynamic_cast<const PurchaseItem&>(other);
   return
       m_product.m_id != another.m_product.m_id ||
       m_ammount != another.m_ammount ||
@@ -107,32 +107,27 @@ bool NoteItem::operator !=(const JItem& other) const
       m_package != another.m_package;
 }
 
-bool NoteItem::operator ==(const JItem& other) const
+bool PurchaseItem::operator ==(const JItem& other) const
 {
   return !(*this != other);
 }
 
-QString NoteItem::strTableName() const
-{
-  return NOTE_ITEMS_SQL_TABLE_NAME;
-}
-
-double NoteItem::subtotal() const
+double PurchaseItem::subtotal() const
 {
   return m_ammount * m_price;
 }
 
-QString NoteItem::strSubtotal() const
+QString PurchaseItem::strSubtotal() const
 {
   return st_strMoney(subtotal());
 }
 
-QString NoteItem::strAmmount() const
+QString PurchaseItem::strAmmount() const
 {
   return st_strAmmount(m_ammount);
 }
 
-QString NoteItem::strPrice() const
+QString PurchaseItem::strPrice() const
 {
   return st_strMoney(m_price);
 }
@@ -167,13 +162,13 @@ bool PaymentItem::isValid() const
   return true;
 }
 
-Note::Note(Id id)
+Purchase::Purchase(Id id)
 {
   clear();
   m_id = id;
 }
 
-void Note::clear(bool bClearId)
+void Purchase::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
@@ -182,82 +177,82 @@ void Note::clear(bool bClearId)
   m_number = 0;
   m_supplier.clear();
   m_date = QDate::currentDate();
-  m_vNoteItem.clear();
+  m_vItem.clear();
   m_observation.clear();
   m_disccount = 0.0;
   m_employee.clear();
 }
 
-bool Note::isValid() const
+bool Purchase::isValid() const
 {
   return true;
 }
 
-bool Note::operator !=(const JItem& other) const
+bool Purchase::operator !=(const JItem& other) const
 {
-  const Note& another = dynamic_cast<const Note&>(other);
+  const Purchase& another = dynamic_cast<const Purchase&>(other);
   return
       m_number != another.m_number ||
       m_date != another.m_date ||
       m_supplier.m_id != another.m_supplier.m_id ||
       m_paymentMethod != another.m_paymentMethod ||
       m_vPaymentItem != another.m_vPaymentItem ||
-      m_vNoteItem != another.m_vNoteItem ||
+      m_vItem != another.m_vItem ||
       m_disccount != another.m_disccount;
 }
 
-bool Note::operator ==(const JItem& other) const
+bool Purchase::operator ==(const JItem& other) const
 {
   return !(*this != other);
 }
 
-QString Note::strDate() const
+QString Purchase::strDate() const
 {
   return m_date.toString("dd/MM/yyyy");
 }
 
-QString Note::strDayOfWeek() const
+QString Purchase::strDayOfWeek() const
 {
   return m_date.toString("dddd");
 }
 
-QString Note::strNumber() const
+QString Purchase::strNumber() const
 {
   return st_strInt(m_number);
 }
 
-QString Note::strDisccount() const
+QString Purchase::strDisccount() const
 {
   return st_strMoney(m_disccount);
 }
 
-double Note::total() const
+double Purchase::total() const
 {
   double total = 0.0;
-  for (int i = 0; i != m_vNoteItem.size(); ++i)
-    total += m_vNoteItem.at(i).subtotal();
+  for (int i = 0; i != m_vItem.size(); ++i)
+    total += m_vItem.at(i).subtotal();
   return total + m_disccount;
 }
 
-double Note::subTotal() const
+double Purchase::subTotal() const
 {
   double subTotal = 0.0;
-  for (int i = 0; i != m_vNoteItem.size(); ++i)
-    subTotal += m_vNoteItem.at(i).subtotal();
+  for (int i = 0; i != m_vItem.size(); ++i)
+    subTotal += m_vItem.at(i).subtotal();
   return subTotal;
 }
 
-QString Note::strTotal() const
+QString Purchase::strTotal() const
 {
   return st_strMoney(total());
 }
 
-QString Note::strSubTotal() const
+QString Purchase::strSubTotal() const
 {
   return st_strMoney(subTotal());
 }
 
-bool Note::isPaymentValid() const
+bool Purchase::isPaymentValid() const
 {
   if (m_paymentMethod == PaymentMethod::Credit)
   {
@@ -269,7 +264,7 @@ bool Note::isPaymentValid() const
   return true;
 }
 
-double Note::paymentTotal() const
+double Purchase::paymentTotal() const
 {
   if (m_paymentMethod == PaymentMethod::Credit)
   {
@@ -281,7 +276,7 @@ double Note::paymentTotal() const
   return total();
 }
 
-void Note::adjustPayment()
+void Purchase::adjustPayment()
 {
   if (!isPaymentValid())
   {
@@ -294,12 +289,12 @@ void Note::adjustPayment()
   }
 }
 
-QString Note::SQL_tableName() const
+QString Purchase::SQL_tableName() const
 {
   return NOTE_SQL_TABLE_NAME;
 }
 
-bool Note::SQL_insert_proc(QSqlQuery& query) const
+bool Purchase::SQL_insert_proc(QSqlQuery& query) const
 {
   bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
   if (bSuccess)
@@ -338,7 +333,7 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
   if (bSuccess)
   {
     m_id.set(query.lastInsertId().toLongLong());
-    for (int i = 0; i != m_vNoteItem.size() && bSuccess; ++i)
+    for (int i = 0; i != m_vItem.size() && bSuccess; ++i)
     {
       query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
                     NOTE_ITEMS_SQL_COL01 ","
@@ -357,15 +352,15 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
                     "(:_v06),"
                     "(:_v07))");
       query.bindValue(":_v01", m_id.get());
-      query.bindValue(":_v02", m_vNoteItem.at(i).m_product.m_id.get());
-      query.bindValue(":_v03", m_vNoteItem.at(i).m_ammount);
-      query.bindValue(":_v04", m_vNoteItem.at(i).m_price);
-      query.bindValue(":_v05", m_vNoteItem.at(i).m_package.m_bIsPackage);
-      query.bindValue(":_v06", m_vNoteItem.at(i).m_package.m_unity);
-      query.bindValue(":_v07", m_vNoteItem.at(i).m_package.m_ammount);
+      query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
+      query.bindValue(":_v03", m_vItem.at(i).m_ammount);
+      query.bindValue(":_v04", m_vItem.at(i).m_price);
+      query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
-        m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+        m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
     }
   }
 
@@ -393,7 +388,7 @@ bool Note::SQL_insert_proc(QSqlQuery& query) const
   return bSuccess;
 }
 
-bool Note::SQL_update_proc(QSqlQuery& query) const
+bool Purchase::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " NOTE_SQL_TABLE_NAME " SET "
                 NOTE_SQL_COL02 " = (:_v02),"
@@ -421,7 +416,7 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
 
   if (bSuccess)
   {
-    for (int i = 0; i != m_vNoteItem.size() && bSuccess; ++i)
+    for (int i = 0; i != m_vItem.size() && bSuccess; ++i)
     {
       query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
                     NOTE_ITEMS_SQL_COL01 ","
@@ -440,15 +435,15 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
                     "(:_v06),"
                     "(:_v07))");
       query.bindValue(":_v01", m_id.get());
-      query.bindValue(":_v02", m_vNoteItem.at(i).m_product.m_id.get());
-      query.bindValue(":_v03", m_vNoteItem.at(i).m_ammount);
-      query.bindValue(":_v04", m_vNoteItem.at(i).m_price);
-      query.bindValue(":_v05", m_vNoteItem.at(i).m_package.m_bIsPackage);
-      query.bindValue(":_v06", m_vNoteItem.at(i).m_package.m_unity);
-      query.bindValue(":_v07", m_vNoteItem.at(i).m_package.m_ammount);
+      query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
+      query.bindValue(":_v03", m_vItem.at(i).m_ammount);
+      query.bindValue(":_v04", m_vItem.at(i).m_price);
+      query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
+      query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
+      query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
       bSuccess = query.exec();
       if (bSuccess)
-        m_vNoteItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+        m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
     }
   }
 
@@ -483,7 +478,7 @@ bool Note::SQL_update_proc(QSqlQuery& query) const
   return bSuccess;
 }
 
-bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
+bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   clear(false);
   error.clear();
@@ -537,7 +532,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       while (query.next())
       {
-        NoteItem o;
+        PurchaseItem o;
         o.m_id.set(query.value(0).toLongLong());
         o.m_product.m_id.set(query.value(1).toLongLong());
         o.m_ammount = query.value(2).toDouble();
@@ -545,7 +540,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
         o.m_package.m_bIsPackage = query.value(4).toBool();
         o.m_package.m_unity = query.value(5).toString();
         o.m_package.m_ammount = query.value(6).toDouble();
-        m_vNoteItem.push_back(o);
+        m_vItem.push_back(o);
       }
     }
   }
@@ -561,10 +556,10 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess)
   {
-    for (int i = 0; i != m_vNoteItem.size(); ++i)
+    for (int i = 0; i != m_vItem.size(); ++i)
     {
-      if (m_vNoteItem.at(i).m_product.m_id.isValid())
-        bSuccess = m_vNoteItem[i].m_product.SQL_select_proc(query, error);
+      if (m_vItem.at(i).m_product.m_id.isValid())
+        bSuccess = m_vItem[i].m_product.SQL_select_proc(query, error);
       if (!bSuccess)
         break;
     }
@@ -596,7 +591,7 @@ bool Note::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool Note::SQL_remove_proc(QSqlQuery& query) const
+bool Purchase::SQL_remove_proc(QSqlQuery& query) const
 {
   query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
@@ -604,9 +599,9 @@ bool Note::SQL_remove_proc(QSqlQuery& query) const
   return query.exec();
 }
 
-NoteItem Note::SQL_select_last_item(Id supplierId, Id productId)
+PurchaseItem Purchase::SQL_select_last_item(Id supplierId, Id productId)
 {
-  NoteItem o;
+  PurchaseItem o;
   QString error;
   if (!SQL_isOpen(error))
     return o;
@@ -654,12 +649,12 @@ NoteItem Note::SQL_select_last_item(Id supplierId, Id productId)
   return o;
 }
 
-JModel* Note::SQL_table_model(QObject* parent) const
+JModel* Purchase::SQL_table_model(QObject* parent) const
 {
-  return new NoteModel(parent);
+  return new PurchaseModel(parent);
 }
 
-void Note::setEmployee(const JItemSQL& e) const
+void Purchase::setEmployee(const JItemSQL& e) const
 {
   m_employee = dynamic_cast<const Employee&>(e);
 }

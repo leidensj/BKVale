@@ -42,10 +42,9 @@ namespace
                       '\xF0', '\xF1', '\xF2', '\xF3', '\xF4', '\xF5', '\xF6', '\xF7',
                       '\xF8', '\xF9', '\xFA', '\xFB', '\xFC', '\xFD', '\xFE', '\xFF' };
 
-  void noteAppendHeader(const Note& note,
-                        QString& strNote)
+  void purchaseAppendHeader(const Purchase& o, QString& text)
   {
-    strNote += ESC_EXPAND_ON
+    text += ESC_EXPAND_ON
                ESC_ALIGN_CENTER
                "BAITAKAO"
                ESC_LF
@@ -58,70 +57,67 @@ namespace
                ESC_VERT_TAB
                ESC_EXPAND_OFF;
 
-    strNote += note.m_paymentMethod == Note::PaymentMethod::Cash
-               ? "PAGAMENTO A VISTA"
-               : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";
+    text += o.m_paymentMethod == Purchase::PaymentMethod::Cash
+            ? "PAGAMENTO A VISTA"
+            : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";
 
-    strNote += ESC_LF
+    text += ESC_LF
                ESC_VERT_TAB
                ESC_DOUBLE_FONT_ON +
-               note.strNumber() + " "
+               o.strNumber() + " "
                ESC_DOUBLE_FONT_OFF
                ESC_LF;
 
 
-    if (0 < note.strNumber().length() && note.strNumber().length() < 256)
+    if (0 < o.strNumber().length() && o.strNumber().length() < 256)
     {
-      strNote += ESC_BARCODE_HRI_OFF
+      text += ESC_BARCODE_HRI_OFF
                  ESC_BARCODE_HEIGHT +
                  QString(decToHex[120]) +
                  ESC_BARCODE_CODE93 +
-                 QString(decToHex[note.strNumber().length()]) +
-                 note.strNumber() +
+                 QString(decToHex[o.strNumber().length()]) +
+                 o.strNumber() +
                  ESC_LF;
     }
 
-    strNote += ESC_ALIGN_LEFT
+    text += ESC_ALIGN_LEFT
                "Data       "
                ESC_DOUBLE_FONT_ON +
-               note.strDate() +
+               o.strDate() +
                ESC_DOUBLE_FONT_OFF
                " " +
-               note.strDayOfWeek() +
+               o.strDayOfWeek() +
                ESC_LF
                "Fornecedor "
                ESC_DOUBLE_FONT_ON +
-               (note.m_supplier.m_id.isValid()
-               ? (note.m_supplier.m_form.strAliasName())
+               (o.m_supplier.m_id.isValid()
+               ? (o.m_supplier.m_form.strAliasName())
                : "Nao informado") +
                ESC_DOUBLE_FONT_OFF
                ESC_LF
                ESC_VERT_TAB;
   }
 
-  void noteAppendFooter(const Note& note,
-                        const QString& user,
-                        QString& strNote)
+  void purchaseAppendFooter(const Purchase& o, QString& text)
   {
-    if (note.m_disccount != 0)
+    if (o.m_disccount != 0)
     {
-      strNote += ESC_EXPAND_ON ESC_LF;
-      strNote +=   "Subtotal:  " + note.strSubTotal() + ESC_LF;
-      if (note.m_disccount > 0)
-        strNote += "Acrescimo: " + note.strDisccount();
-      else if(note.m_disccount < 0)
-        strNote += "Desconto:  " + note.strDisccount() ;
-      strNote += ESC_EXPAND_OFF ESC_LF;
+      text += ESC_EXPAND_ON ESC_LF;
+      text +=   "Subtotal:  " + o.strSubTotal() + ESC_LF;
+      if (o.m_disccount > 0)
+        text += "Acrescimo: " + o.strDisccount();
+      else if(o.m_disccount < 0)
+        text += "Desconto:  " + o.strDisccount() ;
+      text += ESC_EXPAND_OFF ESC_LF;
     }
 
-    if (!note.m_observation.isEmpty())
-      strNote += ESC_LF ESC_EXPAND_ON "Observacoes: " ESC_EXPAND_OFF +
-                 note.m_observation + ESC_LF;
-    strNote += ESC_LF
+    if (!o.m_observation.isEmpty())
+      text += ESC_LF ESC_EXPAND_ON "Observacoes: " ESC_EXPAND_OFF + o.m_observation + ESC_LF;
+    text += ESC_LF
                ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON
                "TOTAL " +
-               note.strTotal() +
+               o.strTotal() +
                ESC_DOUBLE_FONT_OFF
                ESC_LF
                "Emissao: " +
@@ -136,41 +132,37 @@ namespace
                "________________________________"
                ESC_LF
                "Assinatura " +
-               user +
+               o.m_employee.m_form.strAliasName() +
                ESC_LF;
 
-    if (note.m_paymentMethod == Note::PaymentMethod::Cash)
+    if (o.m_paymentMethod == Purchase::PaymentMethod::Cash)
     {
-      strNote += ESC_LF
-                 ESC_LF
-                 "________________________________"
-                 ESC_LF
-                 "Assinatura " +
-                 (note.m_supplier.m_id.isValid()
-                  ? (note.m_supplier.m_form.strAliasName())
-                  : "fornecedor") +
-                 ESC_LF;
+      text += ESC_LF ESC_LF "________________________________" ESC_LF
+              "Assinatura " +
+              (o.m_supplier.m_id.isValid()
+               ? (o.m_supplier.m_form.strAliasName())
+               : "fornecedor") +
+              ESC_LF;
     }
   }
 
-  void noteAppendBody(const Note& note,
-                      QString& strNote)
+  void purchaseAppendBody(const Purchase& o, QString& text)
   {
-    strNote += ESC_ALIGN_LEFT;
-    for (int i = 0; i != note.m_vNoteItem.size(); ++i)
+    text += ESC_ALIGN_LEFT;
+    for (int i = 0; i != o.m_vItem.size(); ++i)
     {
       QString item;
       {
-        QString itemPt1 = note.m_vNoteItem.at(i).strAmmount();
-        itemPt1 += note.m_vNoteItem.at(i).m_package.strUnity(note.m_vNoteItem.at(i).m_product.m_unity);
-        itemPt1 += " x " + note.m_vNoteItem.at(i).strPrice();
-        QString itemPt2 = note.m_vNoteItem.at(i).strSubtotal();
+        QString itemPt1 = o.m_vItem.at(i).strAmmount();
+        itemPt1 += o.m_vItem.at(i).m_package.strUnity(o.m_vItem.at(i).m_product.m_unity);
+        itemPt1 += " x " + o.m_vItem.at(i).strPrice();
+        QString itemPt2 = o.m_vItem.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += ".";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      strNote += note.m_vNoteItem.at(i).m_product.m_name + ESC_LF + item + ESC_LF;
+      text += o.m_vItem.at(i).m_product.m_name + ESC_LF + item + ESC_LF;
     }
   }
 }
@@ -234,24 +226,24 @@ QString Printer::strCmdFullCut()
   return ESC_FULL_CUT;
 }
 
-QString NotePrinter::build(const Note& note)
+QString PurchasePrinter::build(const Purchase& o)
 {
-  QString strNote1;
-  noteAppendHeader(note, strNote1);
-  noteAppendBody(note, strNote1);
-  noteAppendFooter(note, note.m_employee.m_form.strAliasName(), strNote1);
-  if (note.m_paymentMethod == Note::PaymentMethod::Cash)
+  QString text1;
+  purchaseAppendHeader(o, text1);
+  purchaseAppendBody(o, text1);
+  purchaseAppendFooter(o, text1);
+  if (o.m_paymentMethod == Purchase::PaymentMethod::Cash)
   {
-    return strNote1 + ESC_LF ESC_FULL_CUT;
+    return text1 + ESC_LF ESC_FULL_CUT;
   }
   else
   {
-    QString strNote2(strNote1);
-    strNote1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
-    strNote2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
-    return strNote1 + strNote2;
+    QString text2(text1);
+    text1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
+    text2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
+    return text1 + text2;
   }
-  return strNote1;
+  return text1;
 }
 
 QString ReminderPrinter::build(const Reminder& r)
@@ -421,56 +413,6 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
   }
 
   str += ESC_LF
-         ESC_VERT_TAB
-         ESC_FULL_CUT;
-
-  return str;
-}
-
-QString ReservationPrinter::build(const Reservation& res)
-{
-  QString str;
-  str += ESC_EXPAND_ON
-         ESC_ALIGN_CENTER
-         "RESERVA"
-         ESC_EXPAND_OFF
-         ESC_LF
-         ESC_DOUBLE_FONT_ON +
-         QString::number(res.m_number) +
-         ESC_DOUBLE_FONT_OFF
-         ESC_LF
-         ESC_EXPAND_ON
-         "DATA E HORA"
-         ESC_EXPAND_OFF
-         ESC_LF
-         ESC_DOUBLE_FONT_ON +
-         QDateTime::fromString(res.m_dateTime, Qt::ISODate).toString("dd/MM/yyyy HH:mm") +
-         ESC_DOUBLE_FONT_OFF
-         ESC_LF
-         ESC_VERT_TAB
-         ESC_ALIGN_LEFT
-         "Nome: "
-         ESC_EXPAND_ON +
-         res.m_name +
-         ESC_EXPAND_OFF
-         ESC_LF
-         "Local: "
-         ESC_EXPAND_ON +
-         res.m_location +
-         ESC_EXPAND_OFF
-         ESC_LF
-         "Telefone: " +
-         res.m_phone +
-         ESC_LF
-         "Quantidade: "
-         ESC_EXPAND_ON +
-         QString::number(res.m_ammount) +
-         " pessoas" +
-         ESC_EXPAND_OFF
-         ESC_LF
-         "Observacoes: " +
-         res.m_observation +
-         ESC_LF
          ESC_VERT_TAB
          ESC_FULL_CUT;
 

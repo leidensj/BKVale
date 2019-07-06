@@ -1,6 +1,6 @@
 #include "purchaseview.h"
 #include "databaseutils.h"
-#include "note/notetablewidget.h"
+#include "tables/purchasetable.h"
 #include "widgets/jdatabasepicker.h"
 #include "widgets/jdatabase.h"
 #include "widgets/jlineedit.h"
@@ -30,8 +30,8 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   , m_rdoCredit(nullptr)
   , m_tbCredit(nullptr)
   , m_btnAddRemove(nullptr)
-  , m_noteTotal(0.0)
-  , m_noteDate(QDate::currentDate())
+  , m_purchaseTotal(0.0)
+  , m_purchaseDate(QDate::currentDate())
 {
   m_rdoCredit = new QRadioButton;
   m_rdoCredit->setIcon(QIcon(":/icons/res/credit.png"));
@@ -45,7 +45,7 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   m_rdoBonus->setIcon(QIcon(":/icons/res/bonus.png"));
   m_rdoBonus->setText(tr("Bonificação"));
 
-  m_lblNoteTotal = new QLabel;
+  m_lblPurchaseTotal = new QLabel;
   m_lblPaymentTotal = new QLabel;
 
   m_btnAddRemove = new JAddRemoveButtons;
@@ -67,7 +67,7 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   lt->addLayout(ltButtons);
   lt->addWidget(m_btnAddRemove);
   lt->addWidget(m_tbCredit);
-  lt->addWidget(m_lblNoteTotal);
+  lt->addWidget(m_lblPurchaseTotal);
   lt->addWidget(m_lblPaymentTotal);
 
   connect(m_rdoCash, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
@@ -111,7 +111,7 @@ bool PaymentWidget::isDatesValid() const
   bool bValid = true;
   if (m_rdoCredit->isChecked())
     for (int i = 0; i != m_tbCredit->rowCount() && bValid; ++i)
-      bValid = dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->getDate() >= m_noteDate;
+      bValid = dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->getDate() >= m_purchaseDate;
   return bValid;
 }
 
@@ -129,8 +129,8 @@ void PaymentWidget::updateControls()
   m_tbCredit->setEnabled(m_rdoCredit->isChecked());
   m_btnAddRemove->setEnabled(m_rdoCredit->isChecked());
   double total = computeTotal();
-  bool bValid = isDatesValid() && JItem::st_areEqual(m_noteTotal, total, JItem::DataType::Money);;
-  m_lblNoteTotal->setText(tr("Total do vale: ") + JItem::st_strMoney(m_noteTotal));
+  bool bValid = isDatesValid() && JItem::st_areEqual(m_purchaseTotal, total, JItem::DataType::Money);;
+  m_lblPurchaseTotal->setText(tr("Total do vale: ") + JItem::st_strMoney(m_purchaseTotal));
   m_lblPaymentTotal->setText(("Total do pagamento: ") + JItem::st_strMoney(total));
   m_lblPaymentTotal->setVisible(m_rdoCredit->isChecked());
   setWindowIcon(getIcon());
@@ -149,13 +149,13 @@ void PaymentWidget::fillCredit()
   updateControls();
 }
 
-Note::PaymentMethod PaymentWidget::getPaymentMethod() const
+Purchase::PaymentMethod PaymentWidget::getPaymentMethod() const
 {
   if (m_rdoBonus->isChecked())
-    return Note::PaymentMethod::Bonus;
+    return Purchase::PaymentMethod::Bonus;
   if (m_rdoCash->isChecked())
-    return Note::PaymentMethod::Cash;
-  return Note::PaymentMethod::Credit;
+    return Purchase::PaymentMethod::Cash;
+  return Purchase::PaymentMethod::Credit;
 }
 
 QVector<PaymentItem> PaymentWidget::getPaymentItems() const
@@ -174,23 +174,23 @@ QVector<PaymentItem> PaymentWidget::getPaymentItems() const
   return v;
 }
 
-void PaymentWidget::setNoteDate(const QDate& dt)
+void PaymentWidget::setPurchaseDate(const QDate& dt)
 {
-  m_noteDate = dt;
+  m_purchaseDate = dt;
   updateControls();
 }
 
-void PaymentWidget::setNoteTotal(double value)
+void PaymentWidget::setPurchaseTotal(double value)
 {
-  m_noteTotal = value;
+  m_purchaseTotal = value;
   updateControls();
 }
 
-void PaymentWidget::setPaymentMethod(Note::PaymentMethod o)
+void PaymentWidget::setPaymentMethod(Purchase::PaymentMethod o)
 {
-  if (o == Note::PaymentMethod::Bonus)
+  if (o == Purchase::PaymentMethod::Bonus)
     m_rdoBonus->setChecked(true);
-  else if (o == Note::PaymentMethod::Cash)
+  else if (o == Purchase::PaymentMethod::Cash)
     m_rdoCash->setChecked(true);
   else
     m_rdoCredit->setChecked(true);
@@ -213,15 +213,15 @@ void PaymentWidget::addRow()
   int row = m_tbCredit->rowCount() - 1;
 
   auto itValue = new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Foreground);
-  auto itDate = new DateItem(m_noteDate, DateItem::Color::DateBeforeDefault);
+  auto itDate = new DateItem(m_purchaseDate, DateItem::Color::DateBeforeDefault);
 
   m_tbCredit->setItem(row, (int)Column::Date, itDate);
   m_tbCredit->setItem(row, (int)Column::Value, itValue);
 
   double total = computeTotal();
-  double val = m_noteTotal > total ? m_noteTotal - total : 0.0;
+  double val = m_purchaseTotal > total ? m_purchaseTotal - total : 0.0;
   itValue->setValue(val);
-  itDate->setDate(m_noteDate.addMonths(itDate->row() + 1));
+  itDate->setDate(m_purchaseDate.addMonths(itDate->row() + 1));
   updateControls();
   m_tbCredit->setCurrentItem(itDate);
   m_tbCredit->setFocus();
@@ -344,7 +344,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   frHeader->setLayout(ltHeader);
   frHeader->setFixedHeight(frHeader->sizeHint().height());
 
-  m_table = new NoteTableWidget;
+  m_table = new PurchaseTable;
 
   m_edTotal = new JExpLineEdit(JItem::DataType::Money);
   m_edTotal->setReadOnly(true);
@@ -411,8 +411,8 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_tabDb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
-  connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setNoteTotal(double)));
-  connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setNoteDate(const QDate&)));
+  connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setPurchaseTotal(double)));
+  connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setPurchaseDate(const QDate&)));
   connect(this, SIGNAL(itemSelectedSignal()), SLOT(updateControls()));
 
   setFocusWidgetOnCreate(m_supplierPicker);
@@ -436,7 +436,7 @@ void PurchaseView::removeProduct()
 
 void PurchaseView::getItem(JItemSQL& o) const
 {
-  Note& _o = dynamic_cast<Note&>(o);
+  Purchase& _o = dynamic_cast<Purchase&>(o);
   _o.clear(true);
   _o.m_id = m_id;
   _o.m_date = m_dtPicker->getDate();
@@ -446,18 +446,18 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
-    _o.m_vNoteItem.push_back(dynamic_cast<const NoteItem&>(m_table->getItem(i)));
+    _o.m_vItem.push_back(dynamic_cast<const PurchaseItem&>(m_table->getItem(i)));
 }
 
 void PurchaseView::setItem(const JItemSQL& o)
 {
-  const Note& _o = dynamic_cast<const Note&>(o);
+  const Purchase& _o = dynamic_cast<const Purchase&>(o);
   m_table->removeAllItems();
   m_supplierPicker->clear();
   m_dtPicker->setDate(_o.m_date);
   m_snNumber->setValue(_o.m_number);
-  for (int i = 0; i != _o.m_vNoteItem.size(); ++i)
-    m_table->addItem(_o.m_vNoteItem.at(i));
+  for (int i = 0; i != _o.m_vItem.size(); ++i)
+    m_table->addItem(_o.m_vItem.at(i));
   m_supplierPicker->setItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);
   m_wPayment->setPaymentMethod(_o.m_paymentMethod);
@@ -504,7 +504,7 @@ void PurchaseView::addProduct()
 bool PurchaseView::save(Id& id)
 {
   id.clear();
-  Note o;
+  Purchase o;
   getItem(o);
 
   // TODO por enquanto corrigimos o pagamento

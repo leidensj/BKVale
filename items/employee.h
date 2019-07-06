@@ -30,8 +30,8 @@ struct Employee : public JItemSQL
 
   Form m_form;
   QString m_pincode;
-  bool m_bNoteEdit;
-  bool m_bNoteRemove;
+  bool m_bPurchaseEdit;
+  bool m_bPurchaseRemove;
 
   QString strHours() const;
   QVector<TimeInterval> m_hours;

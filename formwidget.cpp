@@ -3,8 +3,8 @@
 #include "widgets/jdatabasepicker.h"
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jplaintextedit.h"
-#include "phonetablewidget.h"
-#include "addresstablewidget.h"
+#include "tables/phonetable.h"
+#include "tables/addresstable.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QTabWidget>
@@ -223,7 +223,7 @@ FormPhoneWidget::FormPhoneWidget(QWidget* parent)
   , m_btnAddRemove(nullptr)
   , m_tbPhone(nullptr)
 {
-  m_tbPhone = new PhoneTableWidget;
+  m_tbPhone = new PhoneTable;
   m_btnAddRemove = new JAddRemoveButtons;
 
   QVBoxLayout* lt = new QVBoxLayout;
@@ -259,7 +259,7 @@ FormAddressWidget::FormAddressWidget(QWidget* parent)
   , m_btnAddRemove(nullptr)
   , m_tbAddress(nullptr)
 {
-  m_tbAddress = new AddressTableWidget;
+  m_tbAddress = new AddressTable;
   m_btnAddRemove = new JAddRemoveButtons;
 
   QVBoxLayout* lt = new QVBoxLayout;

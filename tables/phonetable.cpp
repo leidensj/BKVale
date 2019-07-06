@@ -1,10 +1,10 @@
-#include "phonetablewidget.h"
+#include "phonetable.h"
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 #include "widgets/jtablewidgetitem.h"
 
-PhoneTableWidget::PhoneTableWidget(QWidget* parent)
+PhoneTable::PhoneTable(QWidget* parent)
   : JItemTable((int)Flags::NoFlags, parent)
 {
   setColumnCount(1);
@@ -15,7 +15,7 @@ PhoneTableWidget::PhoneTableWidget(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)Column::Phone, QHeaderView::Stretch);
 }
 
-const JItem& PhoneTableWidget::getItem(int row) const
+const JItem& PhoneTable::getItem(int row) const
 {
   m_ref.clear();
   if (isValidRow(row))
@@ -26,7 +26,7 @@ const JItem& PhoneTableWidget::getItem(int row) const
   return m_ref;
 }
 
-void PhoneTableWidget::addItem()
+void PhoneTable::addItem()
 {
   addItem(Phone());
   int row = rowCount() - 1;
@@ -36,7 +36,7 @@ void PhoneTableWidget::addItem()
   setFocus();
 }
 
-void PhoneTableWidget::addItem(const JItem& o)
+void PhoneTable::addItem(const JItem& o)
 {
   const Phone& _o = dynamic_cast<const Phone&>(o);
 
@@ -53,14 +53,14 @@ void PhoneTableWidget::addItem(const JItem& o)
   blockSignals(false);
 }
 
-void PhoneTableWidget::update(int /*row*/, int /*column*/)
+void PhoneTable::update(int /*row*/, int /*column*/)
 {
   blockSignals(true);
   blockSignals(false);
   emitChangedSignal();
 }
 
-void PhoneTableWidget::itemActivate(int row, int column)
+void PhoneTable::itemActivate(int row, int column)
 {
   if (column == (int)Column::Phone)
   {
@@ -69,7 +69,7 @@ void PhoneTableWidget::itemActivate(int row, int column)
   }
 }
 
-void PhoneTableWidget::itemDelete(int row, int column)
+void PhoneTable::itemDelete(int row, int column)
 {
   if (column == (int)Column::Phone)
   {

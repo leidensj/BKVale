@@ -140,7 +140,6 @@
     <property name="title">
      <string>Protótipos</string>
     </property>
-    <addaction name="actionReservations"/>
     <addaction name="actionDiscount"/>
    </widget>
    <addaction name="menuSistema"/>
@@ -176,7 +175,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNotes"/>
+   <addaction name="actionPurchases"/>
    <addaction name="actionReminders"/>
    <addaction name="actionCalculator"/>
    <addaction name="actionShoppingList"/>
@@ -307,7 +306,7 @@
     <string>Gerenciar usuários</string>
    </property>
   </action>
-  <action name="actionNotes">
+  <action name="actionPurchases">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/purchase.png</normaloff>:/icons/res/purchase.png</iconset>
@@ -353,15 +352,6 @@
    </property>
    <property name="toolTip">
     <string>Ver e imprimir listas de compras</string>
-   </property>
-  </action>
-  <action name="actionReservations">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/reservation.png</normaloff>:/icons/res/reservation.png</iconset>
-   </property>
-   <property name="text">
-    <string>Reservas</string>
    </property>
   </action>
   <action name="actionDiscount">

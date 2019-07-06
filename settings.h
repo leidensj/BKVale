@@ -12,8 +12,6 @@ struct Settings
   QString m_serialPort;
   QString m_ethernetIP;
   int m_ethernetPort;
-  int m_notesDefaultNumber;
-  bool m_notesPincodeRequired;
 
   void clear();
   void save() const;

@@ -20,33 +20,15 @@ SOURCES += main.cpp\
     printutils.cpp \
     databaseutils.cpp \
     settings.cpp \
-    reminderview.cpp \
     qcustomplot.cpp \
     consumptionchart.cpp \
     calculatorwidget.cpp \
     logindialog.cpp \
-    categoryview.cpp \
-    imageview.cpp \
-    productview.cpp \
     pincodeview.cpp \
-    shoppinglistview.cpp \
-    shoppinglisttable.cpp \
-    shopview.cpp \
-    reservationview.cpp \
     packageeditor.cpp \
-    discounttablewidget.cpp \
     discountview.cpp \
-    phonetablewidget.cpp \
     timecard.cpp \
-    storeview.cpp \
-    addresstablewidget.cpp \
-    productcodetablewidget.cpp \
-    employeeview.cpp \
-    supplierview.cpp \
-    userview.cpp \
     formwidget.cpp \
-    note/notefilterdlg.cpp \
-    note/notetablewidget.cpp \
     items/activeuser.cpp \
     items/address.cpp \
     items/category.cpp \
@@ -54,11 +36,9 @@ SOURCES += main.cpp\
     items/employee.cpp \
     items/form.cpp \
     items/image.cpp \
-    items/note.cpp \
     items/phone.cpp \
     items/product.cpp \
     items/reminder.cpp \
-    items/reservation.cpp \
     items/shoppinglist.cpp \
     items/store.cpp \
     items/supplier.cpp \
@@ -80,7 +60,25 @@ SOURCES += main.cpp\
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
     items/jmodel.cpp \
-    note/purchaseview.cpp
+    items/purchase.cpp \
+    purchase/purchasefilterdlg.cpp \
+    tables/purchasetable.cpp \
+    tables/shoppinglisttable.cpp \
+    tables/addresstable.cpp \
+    tables/discounttable.cpp \
+    tables/phonetable.cpp \
+    tables/productcodetable.cpp \
+    views/purchaseview.cpp \
+    views/categoryview.cpp \
+    views/employeeview.cpp \
+    views/imageview.cpp \
+    views/reminderview.cpp \
+    views/storeview.cpp \
+    views/supplierview.cpp \
+    views/shoppinglistview.cpp \
+    views/productview.cpp \
+    views/userview.cpp \
+    shopview.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -88,36 +86,20 @@ HEADERS  += mainwindow.h \
     printutils.h \
     databaseutils.h \
     settings.h \
-    reminderview.h \
     qcustomplot.h \
     consumptionchart.h \
     calculatorwidget.h \
     calculator.h \
     logindialog.h \
-    categoryview.h \
-    productview.h \
     defines.h \
     pincodeview.h \
-    shoppinglistview.h \
-    shoppinglisttable.h \
     shopview.h \
-    reservationview.h \
     packageeditor.h \
     escpos.h \
     filterdlg.h \
-    discounttablewidget.h \
     discountview.h \
-    phonetablewidget.h \
     timecard.h \
-    storeview.h \
     timeinterval.h \
-    addresstablewidget.h \
-    productcodetablewidget.h \
-    employeeview.h \
-    supplierview.h \
-    userview.h \
-    note/notefilterdlg.h \
-    note/notetablewidget.h \
     items/address.h \
     items/activeuser.h \
     items/category.h \
@@ -125,11 +107,9 @@ HEADERS  += mainwindow.h \
     items/employee.h \
     items/form.h \
     items/image.h \
-    items/note.h \
     items/phone.h \
     items/product.h \
     items/reminder.h \
-    items/reservation.h \
     items/store.h \
     items/shoppinglist.h \
     items/supplier.h \
@@ -153,8 +133,24 @@ HEADERS  += mainwindow.h \
     widgets/jlineedit.h \
     items/jmodel.h \
     formwidget.h \
-    imageview.h \
-    note/purchaseview.h
+    items/purchase.h \
+    purchase/purchasefilterdlg.h \
+    tables/shoppinglisttable.h \
+    tables/purchasetable.h \
+    tables/addresstable.h \
+    tables/discounttable.h \
+    tables/phonetable.h \
+    tables/productcodetable.h \
+    views/purchaseview.h \
+    views/categoryview.h \
+    views/employeeview.h \
+    views/imageview.h \
+    views/productview.h \
+    views/reminderview.h \
+    views/supplierview.h \
+    views/storeview.h \
+    views/shoppinglistview.h \
+    views/userview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

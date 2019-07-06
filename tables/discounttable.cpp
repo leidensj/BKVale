@@ -1,9 +1,9 @@
-#include "discounttablewidget.h"
+#include "discounttable.h"
 #include "tinyexpr.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 
-DiscountTableWidget::DiscountTableWidget(QWidget* parent)
+DiscountTable::DiscountTable(QWidget* parent)
   : QTableWidget(parent)
 {
   setColumnCount(3);
@@ -47,7 +47,7 @@ DiscountTableWidget::DiscountTableWidget(QWidget* parent)
                    SLOT(emitEditSignal(int, int)));
 }
 
-void DiscountTableWidget::keyPressEvent(QKeyEvent *event)
+void DiscountTable::keyPressEvent(QKeyEvent *event)
 {
   if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
   {
@@ -77,7 +77,7 @@ void DiscountTableWidget::keyPressEvent(QKeyEvent *event)
   }
 }
 
-double DiscountTableWidget::evaluate(int row, int column) const
+double DiscountTable::evaluate(int row, int column) const
 {
   auto pt = item(row, column);
   if (pt == nullptr)
@@ -90,7 +90,7 @@ double DiscountTableWidget::evaluate(int row, int column) const
   return pt->data(Qt::UserRole).toDouble();
 }
 
-QString DiscountTableWidget::text(int row, int column) const
+QString DiscountTable::text(int row, int column) const
 {
   QString str;
   auto p = item(row, (int)column);
@@ -99,14 +99,14 @@ QString DiscountTableWidget::text(int row, int column) const
   return str;
 }
 
-void DiscountTableWidget::setText(int row, int column, const QString& str)
+void DiscountTable::setText(int row, int column, const QString& str)
 {
   auto p = item(row, column);
   if (p != nullptr)
     p->setText(str);
 }
 
-QVector<DiscountItem> DiscountTableWidget::getDiscountItems() const
+QVector<DiscountItem> DiscountTable::getDiscountItems() const
 {
   QVector<DiscountItem> v;
   for (int i = 0; i != rowCount(); ++i)
@@ -118,7 +118,7 @@ QVector<DiscountItem> DiscountTableWidget::getDiscountItems() const
   return v;
 }
 
-void DiscountTableWidget::addDiscountItem(const DiscountItem& o)
+void DiscountTable::addDiscountItem(const DiscountItem& o)
 {
   blockSignals(true);
   insertRow(rowCount());
@@ -131,7 +131,7 @@ void DiscountTableWidget::addDiscountItem(const DiscountItem& o)
   blockSignals(false);
 }
 
-void DiscountTableWidget::setProduct(const Product& product)
+void DiscountTable::setProduct(const Product& product)
 {
   if (currentRow() >= 0)
   {
@@ -163,7 +163,7 @@ void DiscountTableWidget::setProduct(const Product& product)
   }
 }
 
-void DiscountTableWidget::setDiscountItem(const DiscountItem& o)
+void DiscountTable::setDiscountItem(const DiscountItem& o)
 {
   if (currentRow() >= 0)
   {
@@ -180,14 +180,14 @@ void DiscountTableWidget::setDiscountItem(const DiscountItem& o)
   }
 }
 
-void DiscountTableWidget::setDiscountItems(const QVector<DiscountItem>& v)
+void DiscountTable::setDiscountItems(const QVector<DiscountItem>& v)
 {
   removeAllItems();
   for (int i = 0; i != v.size(); ++i)
     addDiscountItem(v.at(i));
 }
 
-void DiscountTableWidget::update(int row, int column)
+void DiscountTable::update(int row, int column)
 {
   blockSignals(true);
   switch ((DiscountItem::Column)column)
@@ -212,12 +212,12 @@ void DiscountTableWidget::update(int row, int column)
   emitChangedSignal();
 }
 
-void DiscountTableWidget::emitChangedSignal()
+void DiscountTable::emitChangedSignal()
 {
   emit changedSignal();
 }
 
-void DiscountTableWidget::emitEditSignal(int row, int column)
+void DiscountTable::emitEditSignal(int row, int column)
 {
   if (column == (int)DiscountItem::Column::Name && row >= 0)
   {

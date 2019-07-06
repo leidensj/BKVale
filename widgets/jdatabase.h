@@ -13,7 +13,7 @@ class QCheckBox;
 class JTableView;
 class JLineEdit;
 class QSortFilterProxyModel;
-class NoteFilterDlg;
+class PurchaseFilterDlg;
 class Employee;
 
 class JTableView : public QTableView
@@ -80,7 +80,7 @@ private:
   QString m_fixedFilter;
   QVector<JItemSQL*> m_currentItems;
   QSortFilterProxyModel* m_proxyModel;
-  NoteFilterDlg* m_noteFilter;
+  PurchaseFilterDlg* m_purchaseFilter;
 
   void clearCurrentItems();
 

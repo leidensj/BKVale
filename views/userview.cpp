@@ -126,7 +126,7 @@ void UserView::getItem(JItemSQL& o) const
   _o.m_id = m_id;
   _o.m_strUser = m_user->text();
   _o.m_password = m_password->text();
-  _o.m_bNote = m_list->item((int)Idx::Note)->checkState() == Qt::Checked ? true : false;
+  _o.m_bPurchase = m_list->item((int)Idx::Purchase)->checkState() == Qt::Checked ? true : false;
   _o.m_bReminder = m_list->item((int)Idx::Reminder)->checkState() == Qt::Checked ? true : false;
   _o.m_bCalculator = m_list->item((int)Idx::Calculator)->checkState() == Qt::Checked ? true : false;
   _o.m_bShop = m_list->item((int)Idx::Shop)->checkState() == Qt::Checked ? true : false;
@@ -138,7 +138,6 @@ void UserView::getItem(JItemSQL& o) const
   _o.m_bSupplier = m_list->item((int)Idx::Supplier)->checkState() == Qt::Checked ? true : false;
   _o.m_bCategory = m_list->item((int)Idx::Category)->checkState() == Qt::Checked ? true : false;
   _o.m_bImage = m_list->item((int)Idx::Image)->checkState() == Qt::Checked ? true : false;
-  _o.m_bReservation = m_list->item((int)Idx::Reservation)->checkState() == Qt::Checked ? true : false;
   _o.m_bShoppingList = m_list->item((int)Idx::ShoppingList)->checkState() == Qt::Checked ? true : false;
   _o.m_bStore = m_list->item((int)Idx::Store)->checkState() == Qt::Checked ? true : false;
   _o.m_bDiscount = m_list->item((int)Idx::Discount)->checkState() == Qt::Checked ? true : false;
@@ -160,12 +159,11 @@ void UserView::setItem(const JItemSQL& o)
   m_list->item((int)Idx::Employee)->setCheckState(_o.m_bEmployee ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Supplier)->setCheckState(_o.m_bSupplier ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Store)->setCheckState(_o.m_bStore ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Note)->setCheckState(_o.m_bNote ? Qt::Checked : Qt::Unchecked);
+  m_list->item((int)Idx::Purchase)->setCheckState(_o.m_bPurchase ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Calculator)->setCheckState(_o.m_bCalculator ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Reminder)->setCheckState(_o.m_bReminder ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::ShoppingList)->setCheckState(_o.m_bShoppingList ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Shop)->setCheckState(_o.m_bShop ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Reservation)->setCheckState(_o.m_bReservation ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Discount)->setCheckState(_o.m_bDiscount ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Settings)->setCheckState(_o.m_bSettings ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::TimeCard)->setCheckState(_o.m_bTimeCard ? Qt::Checked : Qt::Unchecked);
@@ -221,14 +219,12 @@ QString UserView::idxToTableName(Idx idx)
       return SUPPLIER_SQL_TABLE_NAME;
     case Idx::Store:
       return STORE_SQL_TABLE_NAME;
-    case Idx::Note:
+    case Idx::Purchase:
       return NOTE_SQL_TABLE_NAME;
     case Idx::Reminder:
       return REMINDER_SQL_TABLE_NAME;
     case Idx::ShoppingList:
       return SHOPPING_LIST_SQL_TABLE_NAME;
-    case Idx::Reservation:
-      return RESERVATION_SQL_TABLE_NAME;
     case Idx::Discount:
       return DISCOUNT_SQL_TABLE_NAME;
     default:

@@ -1,7 +1,7 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
 #include "defines.h"
-#include "note/notefilterdlg.h"
+#include "purchase/purchasefilterdlg.h"
 #include "pincodeview.h"
 #include "items/jitemex.h"
 #include "items/jmodel.h"
@@ -49,7 +49,7 @@ JDatabase::JDatabase(const QString& tableName,
   , m_cbContains(nullptr)
   , m_table(nullptr)
   , m_proxyModel(nullptr)
-  , m_noteFilter(nullptr)
+  , m_purchaseFilter(nullptr)
 {
   m_btnOpen = new QPushButton();
   m_btnOpen->setFlat(true);
@@ -482,19 +482,19 @@ void JDatabase::showFilter()
 {
   if (m_tableName == NOTE_SQL_TABLE_NAME)
   {
-    if (m_noteFilter == nullptr)
-      m_noteFilter = new NoteFilterDlg(this);
-    m_noteFilter->exec();
-    m_filter = m_noteFilter->getFilter();
+    if (m_purchaseFilter == nullptr)
+      m_purchaseFilter = new PurchaseFilterDlg(this);
+    m_purchaseFilter->exec();
+    m_filter = m_purchaseFilter->getFilter();
     refresh();
   }
 }
 
 void JDatabase::clearFilter()
 {
-  if (m_tableName == NOTE_SQL_TABLE_NAME && m_noteFilter != nullptr)
+  if (m_tableName == NOTE_SQL_TABLE_NAME && m_purchaseFilter != nullptr)
   {
-    m_noteFilter->clearFilter();
+    m_purchaseFilter->clearFilter();
     m_filter = "";
     refresh();
   }

@@ -354,17 +354,6 @@ bool BaitaSQL::createTables(QString& error)
                           SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " RESERVATION_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          RESERVATION_SQL_COL01 " INTEGER,"
-                          RESERVATION_SQL_COL02 " TEXT,"
-                          RESERVATION_SQL_COL03 " TEXT,"
-                          RESERVATION_SQL_COL04 " DATE,"
-                          RESERVATION_SQL_COL05 " INTEGER,"
-                          RESERVATION_SQL_COL06 " TEXT,"
-                          RESERVATION_SQL_COL07 " TEXT)");
-
-  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           PRODUCT_CODE_ITEMS_SQL_COL01 " INTEGER NOT NULL,"

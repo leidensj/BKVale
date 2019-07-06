@@ -9,7 +9,7 @@ class JLineEdit;
 class JDatabasePicker;
 class JDatabase;
 class QRadioButton;
-class DiscountTableWidget;
+class DiscountTable;
 class JDoubleSpinBox;
 class JSpinBox;
 class QDateEdit;
@@ -61,7 +61,7 @@ private:
   JDoubleSpinBox* m_spnPercentage;
   QPushButton* m_btnAdd;
   QPushButton* m_btnRemove;
-  DiscountTableWidget* m_table;
+  DiscountTable* m_table;
   JDatabase* m_database;
   QLabel* m_lblRedeemed;
   QPlainTextEdit* m_teDescription;

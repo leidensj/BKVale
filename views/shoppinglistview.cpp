@@ -5,7 +5,7 @@
 #include "widgets/jlineedit.h"
 #include "widgets/jspinbox.h"
 #include "widgets/jaddremovebuttons.h"
-#include "shoppinglisttable.h"
+#include "tables/shoppinglisttable.h"
 #include "packageeditor.h"
 #include <QSplitter>
 #include <QPlainTextEdit>

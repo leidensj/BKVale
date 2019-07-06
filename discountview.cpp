@@ -3,7 +3,7 @@
 #include "widgets/jdoublespinbox.h"
 #include "widgets/jdatabase.h"
 #include "widgets/jspinbox.h"
-#include "discounttablewidget.h"
+#include "tables/discounttable.h"
 #include "databaseutils.h"
 #include "printutils.h"
 #include <QGroupBox>
@@ -112,7 +112,7 @@ DiscountView::DiscountView(QWidget* parent)
   m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
   m_btnRemove->setToolTip(tr("Remover item (Alt+-)"));
 
-  m_table = new DiscountTableWidget;
+  m_table = new DiscountTable;
 
   m_lblRedeemed = new QLabel;
   m_lblRedeemed->setText(tr("Desconto já resgatado."));

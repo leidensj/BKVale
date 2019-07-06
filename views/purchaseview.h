@@ -1,9 +1,9 @@
-#ifndef NOTEVIEW_H
-#define NOTEVIEW_H
+#ifndef PURCHASEVIEW_H
+#define PURCHASEVIEW_H
 
 #include <QFrame>
 #include <QStringList>
-#include "items/note.h"
+#include "items/purchase.h"
 #include "items/employee.h"
 #include "widgets/jitemview.h"
 
@@ -14,7 +14,7 @@ class QLineEdit;
 class QSpinBox;
 class QPushButton;
 class QCheckBox;
-class NoteTableWidget;
+class PurchaseTable;
 class JDatabasePicker;
 class QDockWidget;
 class JDatabase;
@@ -38,12 +38,12 @@ class PaymentWidget : public QWidget
   QRadioButton* m_rdoBonus;
   QRadioButton* m_rdoCredit;
   JTable* m_tbCredit;
-  QLabel* m_lblNoteTotal;
+  QLabel* m_lblPurchaseTotal;
   QLabel* m_lblPaymentTotal;
   JAddRemoveButtons* m_btnAddRemove;
 
-  double m_noteTotal;
-  QDate m_noteDate;
+  double m_purchaseTotal;
+  QDate m_purchaseDate;
 
   enum class Column
   {
@@ -53,16 +53,16 @@ class PaymentWidget : public QWidget
 
 public:
   explicit PaymentWidget(QWidget* parent = nullptr);
-  Note::PaymentMethod getPaymentMethod() const;
+  Purchase::PaymentMethod getPaymentMethod() const;
   QVector<PaymentItem> getPaymentItems() const;
-  void setPaymentMethod(Note::PaymentMethod o);
+  void setPaymentMethod(Purchase::PaymentMethod o);
   void setPaymentItems(const QVector<PaymentItem>& v);
   QIcon getIcon() const;
   QString getText() const;
 
 public slots:
-  void setNoteDate(const QDate& dt);
-  void setNoteTotal(double value);
+  void setPurchaseDate(const QDate& dt);
+  void setPurchaseTotal(double value);
 
 private slots:
   void fillCredit();
@@ -88,7 +88,7 @@ class PurchaseView : public JItemView
 public:
   explicit PurchaseView(QWidget *parent = 0);
   ~PurchaseView();
-  void addNoteItem(const NoteItem& noteItem);
+  void addPurchaseItem(const PurchaseItem& o);
   bool save(Id& id);
   void setDate(const QDate& dt);
   QDate getDate() const;
@@ -110,7 +110,7 @@ private:
   JDatePicker* m_dtPicker;
   JExpLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;
-  NoteTableWidget* m_table;
+  PurchaseTable* m_table;
   JExpLineEdit* m_edDisccount;
   PaymentWidget* m_wPayment;
   JLineEdit* m_edEntries;
@@ -129,4 +129,4 @@ signals:
   void changedSignal();
 };
 
-#endif // NOTEVIEW_H
+#endif // PURCHASEVIEW_H

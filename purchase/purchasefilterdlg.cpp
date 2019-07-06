@@ -1,4 +1,4 @@
-#include "notefilterdlg.h"
+#include "purchasefilterdlg.h"
 #include "widgets/jdatabasepicker.h"
 #include "widgets/jdatabase.h"
 #include <QDateEdit>
@@ -9,7 +9,7 @@
 /* PRODUCT FILTER */
 /*WHERE _NOTES._ID = ANY (SELECT _NOTEID FROM _NOTE_ITEMS WHERE _PRODUCTID IN(...))*/
 
-NoteFilterDlg::NoteFilterDlg(QWidget* parent)
+PurchaseFilterDlg::PurchaseFilterDlg(QWidget* parent)
   : FilterDlg(parent)
   , m_cbDate(nullptr)
   , m_dtBegin(nullptr)
@@ -54,7 +54,7 @@ NoteFilterDlg::NoteFilterDlg(QWidget* parent)
   clearFilter();
 }
 
-QString NoteFilterDlg::getFilter() const
+QString PurchaseFilterDlg::getFilter() const
 {
   QString strFilter;
   if (m_cbDate->isChecked())
@@ -94,7 +94,7 @@ QString NoteFilterDlg::getFilter() const
   return strFilter;
 }
 
-void NoteFilterDlg::clearFilter()
+void PurchaseFilterDlg::clearFilter()
 {
   m_cbDate->setChecked(false);
   m_dtBegin->setDate(QDate::currentDate());
@@ -104,7 +104,7 @@ void NoteFilterDlg::clearFilter()
   updateControls();
 }
 
-void NoteFilterDlg::updateControls()
+void PurchaseFilterDlg::updateControls()
 {
   m_dtBegin->setEnabled(m_cbDate->isChecked());
   m_dtEnd->setEnabled(m_cbDate->isChecked());

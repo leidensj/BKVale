@@ -53,15 +53,15 @@ void Employee::clear(bool bClearId)
     m_id.clear();
   m_form.clear(bClearId);
   m_pincode.clear();
-  m_bNoteEdit = false;
-  m_bNoteRemove = false;
+  m_bPurchaseEdit = false;
+  m_bPurchaseRemove = false;
   m_hours.clear();
 }
 
 bool Employee::hasPermissionToEdit(const QString& tableName) const
 {
   if (tableName == NOTE_SQL_TABLE_NAME)
-    return m_bNoteEdit;
+    return m_bPurchaseEdit;
   else
     return false;
 }
@@ -69,7 +69,7 @@ bool Employee::hasPermissionToEdit(const QString& tableName) const
 bool Employee::hasPermissionToRemove(const QString& tableName) const
 {
   if (tableName == NOTE_SQL_TABLE_NAME)
-    return m_bNoteRemove;
+    return m_bPurchaseRemove;
   else
     return false;
 }
@@ -79,8 +79,8 @@ bool Employee::operator !=(const JItem& other) const
   const Employee& another = dynamic_cast<const Employee&>(other);
   bool b =  m_form.m_id != another.m_form.m_id ||
             m_pincode != another.m_pincode ||
-            m_bNoteEdit != another.m_bNoteEdit ||
-            m_bNoteRemove != another.m_bNoteRemove ||
+            m_bPurchaseEdit != another.m_bPurchaseEdit ||
+            m_bPurchaseRemove != another.m_bPurchaseRemove ||
             m_hours != another.m_hours;
   return b;
 }
@@ -118,8 +118,8 @@ bool Employee::SQL_insert_proc(QSqlQuery& query) const
                   "(:_v04))");
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
-    query.bindValue(":_v03", m_bNoteEdit);
-    query.bindValue(":_v04", m_bNoteRemove);
+    query.bindValue(":_v03", m_bPurchaseEdit);
+    query.bindValue(":_v04", m_bPurchaseRemove);
     bSuccess = query.exec();
     if (bSuccess)
     {
@@ -163,8 +163,8 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
-    query.bindValue(":_v03", m_bNoteEdit);
-    query.bindValue(":_v04", m_bNoteRemove);
+    query.bindValue(":_v03", m_bPurchaseEdit);
+    query.bindValue(":_v04", m_bPurchaseRemove);
 
     bSuccess = query.exec();
     if (bSuccess)
@@ -219,8 +219,8 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_form.m_id.set(query.value(0).toLongLong());
       m_pincode = query.value(1).toString();
-      m_bNoteEdit = query.value(2).toBool();
-      m_bNoteRemove = query.value(3).toBool();
+      m_bPurchaseEdit = query.value(2).toBool();
+      m_bPurchaseRemove = query.value(3).toBool();
     }
     else
     {

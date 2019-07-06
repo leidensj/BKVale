@@ -5,6 +5,7 @@
 #include "widgets/jtimeedit.h"
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jtable.h"
+#include "items/jitemex.h"
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QLabel>
@@ -23,8 +24,8 @@ EmployeeView::EmployeeView(QWidget* parent)
   , m_formAddress(nullptr)
   , m_edPincode(nullptr)
   , m_trPermissions(nullptr)
-  , m_triNoteEdit(nullptr)
-  , m_triNoteRemove(nullptr)
+  , m_triPurchaseEdit(nullptr)
+  , m_triPurchaseRemove(nullptr)
   , m_tbHours(nullptr)
   , m_btnAddRemove(nullptr)
 {
@@ -48,19 +49,19 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_trPermissions->setColumnCount(1);
   m_trPermissions->header()->setVisible(false);
   auto root = new QTreeWidgetItem;
-  root->setText(0, tr("Vales"));
-  root->setIcon(0, QIcon(":/icons/res/note.png"));
+  root->setText(0, JItemEx::text(NOTE_SQL_TABLE_NAME));
+  root->setIcon(0, QIcon(JItemEx::icon(NOTE_SQL_TABLE_NAME)));
   m_trPermissions->insertTopLevelItem(0, root);
-  m_triNoteEdit = new QTreeWidgetItem;
-  m_triNoteRemove = new QTreeWidgetItem;
-  m_triNoteEdit->setText(0, tr("Criar/editar"));
-  m_triNoteEdit->setIcon(0, QIcon(":/icons/res/file.png"));
-  m_triNoteEdit->setCheckState(0, Qt::Unchecked);
-  m_triNoteRemove->setText(0, tr("Remover"));
-  m_triNoteRemove->setIcon(0, QIcon(":/icons/res/remove.png"));
-  m_triNoteRemove->setCheckState(0, Qt::Unchecked);
-  root->addChild(m_triNoteEdit);
-  root->addChild(m_triNoteRemove);
+  m_triPurchaseEdit = new QTreeWidgetItem;
+  m_triPurchaseRemove = new QTreeWidgetItem;
+  m_triPurchaseEdit->setText(0, tr("Criar/editar"));
+  m_triPurchaseEdit->setIcon(0, QIcon(":/icons/res/file.png"));
+  m_triPurchaseEdit->setCheckState(0, Qt::Unchecked);
+  m_triPurchaseRemove->setText(0, tr("Remover"));
+  m_triPurchaseRemove->setIcon(0, QIcon(":/icons/res/remove.png"));
+  m_triPurchaseRemove->setCheckState(0, Qt::Unchecked);
+  root->addChild(m_triPurchaseEdit);
+  root->addChild(m_triPurchaseRemove);
   root->setExpanded(true);
 
   m_formInfo->addWidget(tr("Código PIN:"), m_edPincode);
@@ -106,8 +107,8 @@ void EmployeeView::getItem(JItemSQL& o) const
   m_formPhone->fillForm(_o.m_form);
   m_formAddress->fillForm(_o.m_form);
   _o.m_pincode = m_edPincode->text();
-  _o.m_bNoteEdit = m_triNoteEdit->checkState(0) == Qt::Checked;
-  _o.m_bNoteRemove = m_triNoteRemove->checkState(0) == Qt::Checked;
+  _o.m_bPurchaseEdit = m_triPurchaseEdit->checkState(0) == Qt::Checked;
+  _o.m_bPurchaseRemove = m_triPurchaseRemove->checkState(0) == Qt::Checked;
   for (int i = 0; i != m_tbHours->rowCount(); ++i)
   {
     TimeInterval t;
@@ -125,8 +126,8 @@ void EmployeeView::setItem(const JItemSQL& o)
   m_formPhone->setForm(_o.m_form);
   m_formAddress->setForm(_o.m_form);
   m_edPincode->setText(_o.m_pincode);
-  m_triNoteEdit->setCheckState(0, _o.m_bNoteEdit ? Qt::Checked : Qt::Unchecked);
-  m_triNoteRemove->setCheckState(0, _o.m_bNoteRemove ? Qt::Checked : Qt::Unchecked);
+  m_triPurchaseEdit->setCheckState(0, _o.m_bPurchaseEdit ? Qt::Checked : Qt::Unchecked);
+  m_triPurchaseRemove->setCheckState(0, _o.m_bPurchaseRemove ? Qt::Checked : Qt::Unchecked);
   m_tbHours->setRowCount(0);
   for (int i = 0; i != _o.m_hours.size(); ++i)
   {

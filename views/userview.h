@@ -40,12 +40,11 @@ private:
     Employee,
     Supplier,
     Store,
-    Note,
+    Purchase,
     Calculator,
     Reminder,
     ShoppingList,
     Shop,
-    Reservation,
     Discount,
     TimeCard,
     Settings

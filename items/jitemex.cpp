@@ -1,6 +1,6 @@
 #include "jitemex.h"
 #include "user.h"
-#include "note.h"
+#include "purchase.h"
 #include "product.h"
 #include "reminder.h"
 #include "settings.h"
@@ -10,7 +10,6 @@
 #include "phone.h"
 #include "address.h"
 #include "shoppinglist.h"
-#include "reservation.h"
 #include "discount.h"
 #include "store.h"
 #include "supplier.h"
@@ -33,15 +32,13 @@ JItemSQL* JItemEx::create(const QString& tableName)
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return new ProductCode;
   if (tableName == NOTE_SQL_TABLE_NAME)
-    return new Note;
+    return new Purchase;
   if (tableName == USER_SQL_TABLE_NAME)
     return new User;
   if (tableName == REMINDER_SQL_TABLE_NAME)
     return new Reminder;
   if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     return new ShoppingList;
-  if (tableName == RESERVATION_SQL_TABLE_NAME)
-    return new Reservation;
   if (tableName == DISCOUNT_SQL_TABLE_NAME)
     return new Discount;
   if (tableName == EMPLOYEE_SQL_TABLE_NAME)
@@ -94,15 +91,13 @@ QString JItemEx::text(const QString& tableName)
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return "Código";
   if (tableName == NOTE_SQL_TABLE_NAME)
-    return "Vale";
+    return "Compra";
   if (tableName == USER_SQL_TABLE_NAME)
     return "Usuário";
   if (tableName == REMINDER_SQL_TABLE_NAME)
     return "Lembrete";
   if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     return "Lista de Compras";
-  if (tableName == RESERVATION_SQL_TABLE_NAME)
-    return "Reserva";
   if (tableName == DISCOUNT_SQL_TABLE_NAME)
     return "Desconto";
   if (tableName == EMPLOYEE_SQL_TABLE_NAME)
@@ -140,8 +135,6 @@ QString JItemEx::icon(const QString& tableName)
     return ":/icons/res/postit.png";
   if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     return ":/icons/res/shopmgt.png";
-  if (tableName == RESERVATION_SQL_TABLE_NAME)
-    return ":/icons/res/reservation.png";
   if (tableName == DISCOUNT_SQL_TABLE_NAME)
     return ":/icons/res/discount.png";
   if (tableName == EMPLOYEE_SQL_TABLE_NAME)

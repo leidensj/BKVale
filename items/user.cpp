@@ -45,7 +45,7 @@ void User::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_strUser.clear();
-  m_bNote = false;
+  m_bPurchase = false;
   m_bReminder = false;
   m_bCalculator = false;
   m_bShop = false;
@@ -57,7 +57,6 @@ void User::clear(bool bClearId)
   m_bSupplier = false;
   m_bCategory = false;
   m_bImage = false;
-  m_bReservation = false;
   m_bShoppingList = false;
   m_bStore = false;
   m_bDiscount = false;
@@ -81,7 +80,7 @@ bool User::operator != (const JItem& other) const
   const User& another = dynamic_cast<const User&>(other);
   return
       m_strUser != another.m_strUser ||
-      m_bNote != another.m_bNote ||
+      m_bPurchase != another.m_bPurchase ||
       m_bReminder != another.m_bReminder ||
       m_bCalculator != another.m_bCalculator ||
       m_bShop != another.m_bCalculator ||
@@ -91,7 +90,6 @@ bool User::operator != (const JItem& other) const
       m_bUser != another.m_bUser ||
       m_bProduct != another.m_bProduct ||
       m_bSettings != another.m_bSettings ||
-      m_bReservation != another.m_bReservation ||
       m_bCategory != another.m_bCategory ||
       m_bImage != another.m_bImage ||
       m_bShoppingList != another.m_bShoppingList ||
@@ -159,7 +157,7 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v19))");
   query.bindValue(":_v01", m_strUser);
   query.bindValue(":_v02", strEncryptedPassword());
-  query.bindValue(":_v03", m_bNote);
+  query.bindValue(":_v03", m_bPurchase);
   query.bindValue(":_v04", m_bReminder);
   query.bindValue(":_v05", m_bCalculator);
   query.bindValue(":_v06", m_bShop);
@@ -169,7 +167,6 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v10", m_bForm);
   query.bindValue(":_v11", m_bCategory);
   query.bindValue(":_v12", m_bImage);
-  query.bindValue(":_v13", m_bReservation);
   query.bindValue(":_v14", m_bShoppingList);
   query.bindValue(":_v15", m_bEmployee);
   query.bindValue(":_v16", m_bSupplier);
@@ -214,7 +211,7 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v01", m_strUser);
   if (!m_password.isEmpty())
     query.bindValue(":_v02", strEncryptedPassword());
-  query.bindValue(":_v03", m_bNote);
+  query.bindValue(":_v03", m_bPurchase);
   query.bindValue(":_v04", m_bReminder);
   query.bindValue(":_v05", m_bCalculator);
   query.bindValue(":_v06", m_bShop);
@@ -224,7 +221,6 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v10", m_bForm);
   query.bindValue(":_v11", m_bCategory);
   query.bindValue(":_v12", m_bImage);
-  query.bindValue(":_v13", m_bReservation);
   query.bindValue(":_v14", m_bShoppingList);
   query.bindValue(":_v15", m_bEmployee);
   query.bindValue(":_v16", m_bSupplier);
@@ -269,7 +265,7 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_strUser = query.value(0).toString();
       query.value(1).toString(); // password nao precisamos
-      m_bNote = query.value(2).toBool();
+      m_bPurchase = query.value(2).toBool();
       m_bReminder = query.value(3).toBool();
       m_bCalculator = query.value(4).toBool();
       m_bShop = query.value(5).toBool();
@@ -279,7 +275,6 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       m_bForm = query.value(9).toBool();
       m_bCategory = query.value(10).toBool();
       m_bImage = query.value(11).toBool();
-      m_bReservation = query.value(12).toBool();
       m_bShoppingList = query.value(13).toBool();
       m_bEmployee = query.value(14).toBool();
       m_bSupplier = query.value(15).toBool();

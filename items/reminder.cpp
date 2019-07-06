@@ -21,7 +21,10 @@ public:
         REMINDER_SQL_COL12 ","
         REMINDER_SQL_COL08 ","
         REMINDER_SQL_COL10 ","
-        REMINDER_SQL_COL03
+        REMINDER_SQL_COL03 ","
+        REMINDER_SQL_COL09 ","
+        REMINDER_SQL_COL11 ","
+        REMINDER_SQL_COL04
         " FROM "
         REMINDER_SQL_TABLE_NAME;
   }
@@ -36,7 +39,10 @@ public:
     setHeaderData(4, Qt::Horizontal, tr("Data"));
     setHeaderData(5, Qt::Horizontal, tr("Hora"));
     setHeaderData(6, Qt::Horizontal, tr("Favorito"));
-    if (header != nullptr && header->count() == 7)
+    setHeaderData(7, Qt::Horizontal, tr("Data Informada"));
+    setHeaderData(8, Qt::Horizontal, tr("Hora Informada"));
+    setHeaderData(9, Qt::Horizontal, tr("Maiúsuclas"));
+    if (header != nullptr && header->count() == 10)
     {
       header->hideSection(0);
       header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
@@ -45,6 +51,9 @@ public:
       header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
       header->setSectionResizeMode(5, QHeaderView::ResizeMode::ResizeToContents);
       header->setSectionResizeMode(6, QHeaderView::ResizeMode::ResizeToContents);
+      header->hideSection(7);
+      header->hideSection(8);
+      header->hideSection(9);
     }
   }
 
@@ -70,17 +79,17 @@ public:
         value = value.toBool() ? tr("Sim") : "";
       else if (idx.column() == 4)
       {
-        bool bDate = record(idx.row()).value(9).toBool();
+        bool bDate = record(idx.row()).value(7).toBool();
         value = bDate ? value.toDate().toString("yyyy/MM/dd") : "";
       }
       else if (idx.column() == 5)
       {
-        bool bTime = record(idx.row()).value(11).toBool();
+        bool bTime = record(idx.row()).value(8).toBool();
         value = bTime ? value.toTime().toString("HH:mm:ss") : "";
       }
-      else if (idx.column() == 1)
+      else if (idx.column() == 1 || idx.column() == 2)
       {
-        auto cap = (Reminder::Capitalization)record(idx.row()).value(4).toInt();
+        auto cap = (Reminder::Capitalization)record(idx.row()).value(9).toInt();
         switch (cap)
         {
           case Reminder::Capitalization::AllUppercase:

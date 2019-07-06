@@ -11,7 +11,7 @@ class JLineEdit;
 class JDoubleSpinBox;
 class QCheckBox;
 class JDatabasePicker;
-class ProductCodeTableWidget;
+class ProductCodeTable;
 class JAddRemoveButtons;
 
 class ProductView : public JItemView
@@ -36,7 +36,7 @@ private:
   QCheckBox* m_cbSell;
   JDatabasePicker* m_categoryPicker;
   JDatabasePicker* m_imagePicker;
-  ProductCodeTableWidget* m_tbCode;
+  ProductCodeTable* m_tbCode;
   JAddRemoveButtons* m_btns;
 };
 

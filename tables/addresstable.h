@@ -1,20 +1,20 @@
-#ifndef PRODUCTCODETABLEWIDGET_H
-#define PRODUCTCODETABLEWIDGET_H
+#ifndef ADDRESSTABLE_H
+#define ADDRESSTABLE_H
 
 #include "widgets/jtable.h"
-#include "items/product.h"
+#include "items/address.h"
 
-class ProductCodeTableWidget : public JItemTable
+class AddressTable : public JItemTable
 {
   Q_OBJECT
 
   enum class Column
   {
-    Code
+    Address
   };
 
 public:
-  explicit ProductCodeTableWidget(QWidget* parent = nullptr);
+  explicit AddressTable(QWidget* parent = nullptr);
   const JItem& getItem(int row) const;
 
 public slots:
@@ -22,7 +22,7 @@ public slots:
   void addItem();
 
 private:
-  mutable ProductCode m_ref;
+  mutable Address m_ref;
 
 protected slots:
   void update(int row, int column);
@@ -30,4 +30,4 @@ protected slots:
   void itemDelete(int row, int column);
 };
 
-#endif // PRODUCTCODETABLEWIDGET_H
+#endif // ADDRESSTABLE_H

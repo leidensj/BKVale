@@ -4,12 +4,11 @@
 #include <QtSerialPort>
 #include <QTcpSocket>
 #include <QByteArray>
-#include "items/note.h"
+#include "items/purchase.h"
 #include "items/reminder.h"
 #include "items/product.h"
 #include "items/form.h"
 #include "items/shoppinglist.h"
-#include "items/reservation.h"
 #include "items/discount.h"
 
 namespace Printer
@@ -30,9 +29,9 @@ namespace Printer
   QByteArray imageToPrintVersion(const QByteArray& arImage);
 }
 
-namespace NotePrinter
+namespace PurchasePrinter
 {
-  QString build(const Note& note);
+  QString build(const Purchase& o);
 }
 
 namespace ReminderPrinter
@@ -43,11 +42,6 @@ namespace ReminderPrinter
 namespace ShoppingListPrinter
 {
   QString build(const ShoppingList& lst, bool bPrintCount);
-}
-
-namespace ReservationPrinter
-{
-  QString build(const Reservation& lst);
 }
 
 namespace DiscountPrinter

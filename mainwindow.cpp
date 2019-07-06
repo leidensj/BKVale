@@ -1,25 +1,24 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "note/purchaseview.h"
 #include "printutils.h"
 #include "pincodeview.h"
-#include "productview.h"
-#include "categoryview.h"
-#include "note/purchaseview.h"
-#include "employeeview.h"
-#include "supplierview.h"
-#include "reminderview.h"
+#include "views/productview.h"
+#include "views/categoryview.h"
+#include "views/purchaseview.h"
+#include "views/employeeview.h"
+#include "views/supplierview.h"
+#include "views/reminderview.h"
+#include "views/shoppinglistview.h"
+#include "views/storeview.h"
 #include "calculatorwidget.h"
-#include "userview.h"
-#include "imageview.h"
+#include "views/userview.h"
+#include "views/imageview.h"
 #include "logindialog.h"
-#include "shoppinglistview.h"
-#include "reservationview.h"
 #include "discountview.h"
 #include "shopview.h"
 #include "widgets/jdatabase.h"
 #include "timecard.h"
-#include "storeview.h"
+
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -55,7 +54,6 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
   , m_shop(nullptr)
-  , m_reservation(nullptr)
   , m_discount(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
@@ -63,7 +61,6 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   , m_reminderWindow(nullptr)
   , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
-  , m_reservationWindow(nullptr)
   , m_discountWindow(nullptr)
 {
   ui->setupUi(this);
@@ -78,12 +75,11 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;
   m_shop = new ShopView;
-  m_reservation = new ReservationView;
   m_discount = new DiscountView;
 
   m_purchaseWindow = new JMdiSubWindow(this);
-  m_purchaseWindow->setWindowTitle(ui->actionNotes->text());
-  m_purchaseWindow->setWindowIcon(ui->actionNotes->icon());
+  m_purchaseWindow->setWindowTitle(ui->actionPurchases->text());
+  m_purchaseWindow->setWindowIcon(ui->actionPurchases->icon());
   m_purchaseWindow->setWidget(m_purchase);
   m_mdi->addSubWindow(m_purchaseWindow);
   m_reminderWindow = new JMdiSubWindow(this);
@@ -101,11 +97,6 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_shopWindow->setWindowIcon(ui->actionShoppingList->icon());
   m_shopWindow->setWidget(m_shop);
   m_mdi->addSubWindow(m_shopWindow);
-  m_reservationWindow = new JMdiSubWindow(this);
-  m_reservationWindow->setWindowTitle(ui->actionReservations->text());
-  m_reservationWindow->setWindowIcon(ui->actionReservations->icon());
-  m_reservationWindow->setWidget(m_reservation);
-  m_mdi->addSubWindow(m_reservationWindow);
   m_discountWindow = new JMdiSubWindow(this);
   m_discountWindow->setWindowTitle(ui->actionDiscount->text());
   m_discountWindow->setWindowIcon(ui->actionDiscount->icon());
@@ -130,11 +121,10 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
   connect(m_shop, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(close()));
-  connect(ui->actionNotes, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionPurchases, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
-  connect(ui->actionReservations, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionDiscount, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(m_discount, SIGNAL(redeemSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
@@ -236,15 +226,13 @@ Functionality Tipi::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
   if (activeWindow == m_purchaseWindow)
-    return Functionality::Note;
+    return Functionality::Purchase;
   else if (activeWindow == m_reminderWindow)
     return Functionality::Reminder;
   else if (activeWindow == m_calculatorWindow)
     return Functionality::Calculator;
   else if (activeWindow == m_shopWindow)
     return Functionality::Shop;
-  else if (activeWindow == m_reservationWindow)
-    return Functionality::Reservation;
   else if (activeWindow == m_discountWindow)
     return Functionality::Discount;
   return Functionality::None;
@@ -254,9 +242,9 @@ void Tipi::print()
 {
   switch (getCurrentFunctionality())
   {
-    case Functionality::Note:
+    case Functionality::Purchase:
     {
-      Note o;
+      Purchase o;
       m_purchase->getItem(o);
       if (o.m_date != QDate::currentDate() && !o.m_id.isValid())
       {
@@ -283,7 +271,7 @@ void Tipi::print()
       {
         QString error;
         if (o.SQL_select(error))
-          print(NotePrinter::build(o));
+          print(PurchasePrinter::build(o));
         else
           QMessageBox::critical(this, ("Erro ao selecionar item"), error, QMessageBox::Ok);
       }
@@ -327,12 +315,6 @@ void Tipi::print()
       ShopPrintDialog dlg;
       if (dlg.exec())
         print(ShoppingListPrinter::build(m_shop->getShoppingList(), dlg.getCount()));
-    } break;
-    case Functionality::Reservation:
-    {
-      Reservation res = m_reservation->save();
-      if (res.m_id.isValid())
-        print(ReservationPrinter::build(res));
     } break;
     case Functionality::Discount:
     {
@@ -408,18 +390,17 @@ void Tipi::updateControls()
   ui->actionStores->setEnabled(bIsSQLOk && m_login.getUser().m_bStore);
   ui->actionTimeCard->setEnabled(bIsSQLOk && m_login.getUser().m_bTimeCard);
 
-  ui->actionNotes->setEnabled(bIsSQLOk && m_login.getUser().m_bNote);
+  ui->actionPurchases->setEnabled(bIsSQLOk && m_login.getUser().m_bPurchase);
   ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bReminder);
   ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bCalculator);
   ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShop);
-  ui->actionReservations->setEnabled(bIsSQLOk && m_login.getUser().m_bReservation);
   ui->actionDiscount->setEnabled(bIsSQLOk && m_login.getUser().m_bDiscount);
 
   switch (getCurrentFunctionality())
   {
-    case Functionality::Note:
+    case Functionality::Purchase:
     {
-      Note o;
+      Purchase o;
       m_purchase->getItem(o);
       ui->actionPrint->setEnabled(o.isValid());
     }  break;
@@ -434,9 +415,6 @@ void Tipi::updateControls()
       break;
     case Functionality::Shop:
       ui->actionPrint->setEnabled(m_shop->getShoppingList().m_id.isValid());
-      break;
-    case Functionality::Reservation:
-      ui->actionPrint->setEnabled(m_reservation->getReservation().isValid());
       break;
     case Functionality::Discount:
       ui->actionPrint->setEnabled(m_discount->getDiscount().isValid() &&
@@ -540,9 +518,8 @@ void Tipi::activateWindow()
   m_reminderWindow->hide();
   m_calculatorWindow->hide();
   m_shopWindow->hide();
-  m_reservationWindow->hide();
   m_discountWindow->hide();
-  if (sender() == ui->actionNotes)
+  if (sender() == ui->actionPurchases)
   {
     m_purchaseWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_purchaseWindow);
@@ -561,11 +538,6 @@ void Tipi::activateWindow()
   {
     m_shopWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_shopWindow);
-  }
-  else if (sender() == ui->actionReservations)
-  {
-    m_reservationWindow->showMaximized();
-    m_mdi->setActiveSubWindow(m_reservationWindow);
   }
   else if (sender() == ui->actionDiscount)
   {

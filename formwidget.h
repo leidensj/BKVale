@@ -11,8 +11,8 @@ class QDateEdit;
 class JDatabasePicker;
 class QCheckBox;
 class QPushButton;
-class PhoneTableWidget;
-class AddressTableWidget;
+class PhoneTable;
+class AddressTable;
 class JAddRemoveButtons;
 class JPlainTextEdit;
 
@@ -86,7 +86,7 @@ public:
   void fillForm(Form& o) const;
 
   JAddRemoveButtons* m_btnAddRemove;
-  PhoneTableWidget* m_tbPhone;
+  PhoneTable* m_tbPhone;
 
 private slots:
   void updateControls();
@@ -102,7 +102,7 @@ public:
   void fillForm(Form& o) const;
 
   JAddRemoveButtons* m_btnAddRemove;
-  AddressTableWidget* m_tbAddress;
+  AddressTable* m_tbAddress;
 
 private slots:
   void updateControls();

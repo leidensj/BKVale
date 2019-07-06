@@ -1,17 +1,17 @@
-#ifndef DISCOUNTTABLEWIDGET_H
-#define DISCOUNTTABLEWIDGET_H
+#ifndef DISCOUNTTABLE_H
+#define DISCOUNTTABLE_H
 
 #include <QTableWidget>
 #include "items/discount.h"
 
 class QKeyEvent;
 
-class DiscountTableWidget : public QTableWidget
+class DiscountTable : public QTableWidget
 {
   Q_OBJECT
 
 public:
-  explicit DiscountTableWidget(QWidget* parent = 0);
+  explicit DiscountTable(QWidget* parent = 0);
   QVector<DiscountItem> getDiscountItems() const;
   void setDiscountItems(const QVector<DiscountItem>& v);
   void setProduct(const Product& o);
@@ -41,4 +41,4 @@ signals:
   void productSignal(const Product& product);
 };
 
-#endif // DISCOUNTTABLEWIDGET_H
+#endif // DISCOUNTTABLE_H

@@ -3,7 +3,7 @@
 #include "widgets/jdatabasepicker.h"
 #include "widgets/jdoublespinbox.h"
 #include "widgets/jaddremovebuttons.h"
-#include "productcodetablewidget.h"
+#include "tables/productcodetable.h"
 #include <QLayout>
 #include <QCheckBox>
 #include <QFormLayout>
@@ -46,7 +46,7 @@ ProductView::ProductView(QWidget* parent)
   m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
 
-  m_tbCode = new ProductCodeTableWidget;
+  m_tbCode = new ProductCodeTable;
   m_btns = new JAddRemoveButtons;
 
   QVBoxLayout* ltCode = new QVBoxLayout;

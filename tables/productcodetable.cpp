@@ -1,10 +1,10 @@
-#include "productcodetablewidget.h"
+#include "productcodetable.h"
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 #include "widgets/jtablewidgetitem.h"
 
-ProductCodeTableWidget::ProductCodeTableWidget(QWidget* parent)
+ProductCodeTable::ProductCodeTable(QWidget* parent)
   : JItemTable((int)Flags::NoFlags, parent)
 {
   setColumnCount(1);
@@ -15,7 +15,7 @@ ProductCodeTableWidget::ProductCodeTableWidget(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)Column::Code, QHeaderView::Stretch);
 }
 
-const JItem& ProductCodeTableWidget::getItem(int row) const
+const JItem& ProductCodeTable::getItem(int row) const
 {
   m_ref.clear();
   if (isValidRow(row))
@@ -26,13 +26,13 @@ const JItem& ProductCodeTableWidget::getItem(int row) const
   return m_ref;
 }
 
-void ProductCodeTableWidget::addItem()
+void ProductCodeTable::addItem()
 {
   addItem(ProductCode());
   setFocus();
 }
 
-void ProductCodeTableWidget::addItem(const JItem& o)
+void ProductCodeTable::addItem(const JItem& o)
 {
   const ProductCode& _o = dynamic_cast<const ProductCode&>(o);
 
@@ -46,19 +46,19 @@ void ProductCodeTableWidget::addItem(const JItem& o)
   blockSignals(false);
 }
 
-void ProductCodeTableWidget::update(int /*row*/, int /*column*/)
+void ProductCodeTable::update(int /*row*/, int /*column*/)
 {
   blockSignals(true);
   blockSignals(false);
   emitChangedSignal();
 }
 
-void ProductCodeTableWidget::itemActivate(int /*row*/, int /*column*/)
+void ProductCodeTable::itemActivate(int /*row*/, int /*column*/)
 {
 
 }
 
-void ProductCodeTableWidget::itemDelete(int /*row*/, int /*column*/)
+void ProductCodeTable::itemDelete(int /*row*/, int /*column*/)
 {
 
 }

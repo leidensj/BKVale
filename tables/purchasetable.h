@@ -1,15 +1,27 @@
-#ifndef NOTETABLEWIDGET_H
-#define NOTETABLEWIDGET_H
+#ifndef PURCHASETABLE_H
+#define PURCHASETABLE_H
 
 #include "widgets/jtable.h"
-#include "items/note.h"
+#include "items/purchase.h"
 
-class NoteTableWidget : public JItemTable
+#define PURCHASE_TABLE_NUMBER_OF_COLUMNS 5
+
+class PurchaseTable : public JItemTable
 {
   Q_OBJECT
 
 public:
-  explicit NoteTableWidget(QWidget* parent = nullptr);
+
+  enum class Column : int
+  {
+    Ammount,
+    Unity,
+    Description,
+    Price,
+    SubTotal
+  };
+
+  explicit PurchaseTable(QWidget* parent = nullptr);
   const JItem& getItem(int row) const;
 
 public slots:
@@ -18,7 +30,7 @@ public slots:
   double computeTotal() const;
 
 private:
-  mutable NoteItem m_ref;
+  mutable PurchaseItem m_ref;
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
 
@@ -28,4 +40,4 @@ protected slots:
   void itemDelete(int row, int column);
 };
 
-#endif // NOTETABLEWIDGET_H
+#endif // PURCHASETABLE_H

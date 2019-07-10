@@ -128,6 +128,7 @@ void JDatabasePicker::clear()
 {
   bool bChanged = !m_edText->text().isEmpty();
   m_edText->clear();
+  m_edText->setToolTip("");
   m_ids.clear();
   m_names.clear();
   m_imageView->clearImage();

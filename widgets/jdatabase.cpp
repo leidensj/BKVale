@@ -1,7 +1,6 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
 #include "defines.h"
-#include "purchase/purchasefilterdlg.h"
 #include "pincodeview.h"
 #include "items/jitemex.h"
 #include "items/jmodel.h"
@@ -43,13 +42,10 @@ JDatabase::JDatabase(const QString& tableName,
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
-  , m_btnFilter(nullptr)
-  , m_btnFilterClear(nullptr)
-  , m_edFilterSearch(nullptr)
+  , m_edSearch(nullptr)
   , m_cbContains(nullptr)
   , m_table(nullptr)
   , m_proxyModel(nullptr)
-  , m_purchaseFilter(nullptr)
 {
   m_btnOpen = new QPushButton();
   m_btnOpen->setFlat(true);
@@ -67,20 +63,6 @@ JDatabase::JDatabase(const QString& tableName,
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
   m_btnRemove->setShortcut(QKeySequence(Qt::Key_Delete));
 
-  m_btnFilter = new QPushButton();
-  m_btnFilter->setFlat(true);
-  m_btnFilter->setText("");
-  m_btnFilter->setIconSize(QSize(24, 24));
-  m_btnFilter->setToolTip(tr("Filtro"));
-  m_btnFilter->setIcon(QIcon(":/icons/res/filter.png"));
-
-  m_btnFilterClear = new QPushButton();
-  m_btnFilterClear->setFlat(true);
-  m_btnFilterClear->setText("");
-  m_btnFilterClear->setIconSize(QSize(24, 24));
-  m_btnFilterClear->setToolTip(tr("Limpar filtro"));
-  m_btnFilterClear->setIcon(QIcon(":/icons/res/filterclear.png"));
-
   m_btnRefresh = new QPushButton();
   m_btnRefresh->setFlat(true);
   m_btnRefresh->setText("");
@@ -94,12 +76,10 @@ JDatabase::JDatabase(const QString& tableName,
   hlayout0->setAlignment(Qt::AlignLeft);
   hlayout0->addWidget(m_btnOpen);
   hlayout0->addWidget(m_btnRemove);
-  hlayout0->addWidget(m_btnFilter);
-  hlayout0->addWidget(m_btnFilterClear);
 
-  m_edFilterSearch = new JLineEdit(JLineEdit::Input::All, (int)JLineEdit::Flags::ToUpper);
-  m_edFilterSearch->setToolTip(tr("Procurar (Ctrl+F)"));
-  m_edFilterSearch->setClearButtonEnabled(true);
+  m_edSearch = new JLineEdit(JLineEdit::Input::All, (int)JLineEdit::Flags::ToUpper);
+  m_edSearch->setToolTip(tr("Procurar (Ctrl+F)"));
+  m_edSearch->setClearButtonEnabled(true);
 
   m_cbContains = new QCheckBox;
   m_cbContains->setText(tr("Contendo"));
@@ -110,7 +90,7 @@ JDatabase::JDatabase(const QString& tableName,
   QHBoxLayout* hlayout1 = new QHBoxLayout();
   hlayout1->setContentsMargins(0, 0, 0, 0);
   hlayout1->addWidget(m_btnRefresh);
-  hlayout1->addWidget(m_edFilterSearch);
+  hlayout1->addWidget(m_edSearch);
   hlayout1->addWidget(m_cbContains);
 
   m_table = new JTableView();
@@ -147,13 +127,11 @@ JDatabase::JDatabase(const QString& tableName,
   connect(m_table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(enableControls()));
   connect(m_table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(emitCurrentRowChangedSignal()));
   connect(m_btnRefresh, SIGNAL(clicked(bool)), this, SLOT(refresh()));
-  connect(m_edFilterSearch, SIGNAL(textEdited(const QString&)), this, SLOT(filterSearchChanged()));
-  connect(m_edFilterSearch, SIGNAL(enterSignal()), this, SLOT(filterSearchEnter()));
-  connect(m_edFilterSearch, SIGNAL(keyDownSignal()), this, SLOT(filterSearchEnter()));
+  connect(m_edSearch, SIGNAL(textEdited(const QString&)), this, SLOT(searchChanged()));
+  connect(m_edSearch, SIGNAL(enterSignal()), this, SLOT(searchEnter()));
+  connect(m_edSearch, SIGNAL(keyDownSignal()), this, SLOT(searchEnter()));
   connect(m_cbContains, SIGNAL(clicked(bool)), this, SLOT(containsPressed()));
-  connect(m_table->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(filterSearchChanged()));
-  connect(m_btnFilter, SIGNAL(clicked(bool)), this, SLOT(showFilter()));
-  connect(m_btnFilterClear, SIGNAL(clicked(bool)), this, SLOT(clearFilter()));
+  connect(m_table->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(searchChanged()));
 
   if (m_mode != Mode::ReadOnly)
   {
@@ -163,34 +141,27 @@ JDatabase::JDatabase(const QString& tableName,
     connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(selectItems()));
   }
 
-  new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(focusFilterSearch()));
+  new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(focusSearch()));
 
   if (m_table->horizontalHeader()->count() > 1)
     m_table->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
-  if (m_tableName != NOTE_SQL_TABLE_NAME)
-  {
-    m_btnFilter->hide();
-    m_btnFilterClear->hide();
-  }
-
   if (m_mode == Mode::SingleSelector || m_mode == Mode::MultiSelector)
   {
     m_btnOpen->hide();
-    m_btnFilter->hide();
     m_btnRemove->setEnabled(false);
     m_btnRemove->hide();
-    m_edFilterSearch->setFocus();
+    m_edSearch->setFocus();
   }
   else if (m_mode == Mode::ReadOnly)
   {
     m_btnOpen->hide();
     m_btnRemove->setEnabled(false);
     m_btnRemove->hide();
-    m_edFilterSearch->setFocus();
+    m_edSearch->setFocus();
   }
 
-  filterSearchChanged();
+  searchChanged();
 }
 
 JDatabase::~JDatabase()
@@ -285,27 +256,27 @@ void JDatabase::selectItems(const QVector<Id> ids)
 void JDatabase::refresh()
 {
   JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
-  if (m_fixedFilter.isEmpty() && m_filter.isEmpty())
+  if (m_fixedFilter.isEmpty() && m_dynamicFilter.isEmpty())
     model->select();
   else
   {
     QString str;
     if (!m_fixedFilter.isEmpty())
     {
-      if (!m_filter.isEmpty())
-        str = m_fixedFilter + " AND " + m_filter;
+      if (!m_dynamicFilter.isEmpty())
+        str = m_fixedFilter + " AND " + m_dynamicFilter;
       else
         str = m_fixedFilter;
     }
     else
-      str = m_filter;
+      str = m_dynamicFilter;
     model->selectFilter(str);
   }
 
   m_proxyModel->invalidate();
   enableControls();
   if (m_mode != Mode::Full)
-    m_edFilterSearch->setFocus();
+    m_edSearch->setFocus();
 
   emit refreshSignal();
 }
@@ -368,30 +339,30 @@ void JDatabase::removeItems()
   refresh();
 }
 
-void JDatabase::filterSearchChanged()
+void JDatabase::searchChanged()
 {
   int column = m_table->horizontalHeader()->sortIndicatorSection();
   m_proxyModel->setFilterKeyColumn(column);
-  QString filter = m_edFilterSearch->text();
-  if (!m_cbContains->isChecked() && !filter.isEmpty())
-    filter.prepend("\\b");
-  QRegExp regExp(filter, Qt::CaseInsensitive, QRegExp::RegExp);
+  QString search = m_edSearch->text();
+  if (!m_cbContains->isChecked() && !search.isEmpty())
+    search.prepend("\\b");
+  QRegExp regExp(search, Qt::CaseInsensitive, QRegExp::RegExp);
   m_proxyModel->setFilterRegExp(regExp);
 
-  if (filter.isEmpty())
+  if (search.isEmpty())
   {
     QString columnName;
     if (column > 0)
       columnName = m_proxyModel->headerData(column, Qt::Horizontal).toString().toLower();
     columnName = tr("Procurar por: ") + columnName;
-    m_edFilterSearch->setPlaceholderText(columnName);
+    m_edSearch->setPlaceholderText(columnName);
   }
 
   enableControls();
   emit refreshSignal();
 }
 
-void JDatabase::filterSearchEnter()
+void JDatabase::searchEnter()
 {
   m_table->setFocus();
   if (m_proxyModel->rowCount() != 0)
@@ -400,32 +371,38 @@ void JDatabase::filterSearchEnter()
   }
   else
   {
-    m_edFilterSearch->setFocus();
-    m_edFilterSearch->selectAll();
+    m_edSearch->setFocus();
+    m_edSearch->selectAll();
   }
 }
 
-void JDatabase::clearFilterSearch()
+void JDatabase::clearSearch()
 {
-  m_edFilterSearch->clear();
-  filterSearchChanged();
+  m_edSearch->clear();
+  searchChanged();
 }
 
 void JDatabase::containsPressed()
 {
-  filterSearchChanged();
-  m_edFilterSearch->setFocus();
+  searchChanged();
+  m_edSearch->setFocus();
 }
 
-void JDatabase::focusFilterSearch()
+void JDatabase::focusSearch()
 {
-  m_edFilterSearch->selectAll();
-  m_edFilterSearch->setFocus();
+  m_edSearch->selectAll();
+  m_edSearch->setFocus();
 }
 
 void JDatabase::setFixedFilter(const QString& fixedFilter)
 {
   m_fixedFilter = fixedFilter;
+  refresh();
+}
+
+void JDatabase::setDynamicFilter(const QString& dynamicFilter)
+{
+  m_dynamicFilter = dynamicFilter;
   refresh();
 }
 
@@ -476,28 +453,6 @@ bool JDatabase::save(const JItemSQL& o)
 void JDatabase::emitCurrentRowChangedSignal()
 {
   emit currentRowChangedSignal(m_table->currentIndex().row());
-}
-
-void JDatabase::showFilter()
-{
-  if (m_tableName == NOTE_SQL_TABLE_NAME)
-  {
-    if (m_purchaseFilter == nullptr)
-      m_purchaseFilter = new PurchaseFilterDlg(this);
-    m_purchaseFilter->exec();
-    m_filter = m_purchaseFilter->getFilter();
-    refresh();
-  }
-}
-
-void JDatabase::clearFilter()
-{
-  if (m_tableName == NOTE_SQL_TABLE_NAME && m_purchaseFilter != nullptr)
-  {
-    m_purchaseFilter->clearFilter();
-    m_filter = "";
-    refresh();
-  }
 }
 
 int JDatabase::getNumberOfEntries() const
@@ -551,7 +506,7 @@ JDatabase* JDatabaseSelector::getDatabase() const
 
 void JDatabaseSelector::closeEvent(QCloseEvent * e)
 {
-  m_database->clearFilterSearch();
+  m_database->clearSearch();
   m_database->refresh();
   QDialog::closeEvent(e);
 }

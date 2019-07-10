@@ -9,6 +9,7 @@
 #include "widgets/jtable.h"
 #include "widgets/jtablewidgetitem.h"
 #include "widgets/jdatepicker.h"
+#include "filters/purchasefilter.h"
 #include "packageeditor.h"
 #include <QPlainTextEdit>
 #include <QLineEdit>
@@ -130,7 +131,7 @@ void PaymentWidget::updateControls()
   m_btnAddRemove->setEnabled(m_rdoCredit->isChecked());
   double total = computeTotal();
   bool bValid = isDatesValid() && JItem::st_areEqual(m_purchaseTotal, total, JItem::DataType::Money);;
-  m_lblPurchaseTotal->setText(tr("Total do vale: ") + JItem::st_strMoney(m_purchaseTotal));
+  m_lblPurchaseTotal->setText(tr("Total da compra: ") + JItem::st_strMoney(m_purchaseTotal));
   m_lblPaymentTotal->setText(("Total do pagamento: ") + JItem::st_strMoney(total));
   m_lblPaymentTotal->setVisible(m_rdoCredit->isChecked());
   setWindowIcon(getIcon());
@@ -254,6 +255,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_edEntries(nullptr)
   , m_edSum(nullptr)
   , m_teObservation(nullptr)
+  , m_filter(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -263,7 +265,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_btnOpenLast->setText("");
   m_btnOpenLast->setIconSize(QSize(24, 24));
   m_btnOpenLast->setIcon(QIcon(":/icons/res/openlast.png"));
-  m_btnOpenLast->setToolTip(tr("Abrir último vale"));
+  m_btnOpenLast->setToolTip(tr("Abrir último item"));
 
   m_ltButton->addWidget(m_btnOpenLast);
 
@@ -387,16 +389,19 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_tab->addTab(m_wPayment, m_wPayment->getIcon(), tr("Pagamento"));
   m_tab->addTab(frObservation, QIcon(":/icons/res/pencil.png"), tr("Observações"));
 
+  m_filter = new PurchaseFilter;
+
   m_edEntries = new JLineEdit(JLineEdit::Input::All);
   m_edEntries->setReadOnly(true);
   m_edSum = new JLineEdit(JLineEdit::Input::All);
   m_edSum->setReadOnly(true);
   QFormLayout* ltDbInfo = new QFormLayout;
-  ltDbInfo->addRow(tr("Número de vales:"), m_edEntries);
-  ltDbInfo->addRow(tr("Soma dos vales:"), m_edSum);
-
+  ltDbInfo->addRow(tr("Número de compras:"), m_edEntries);
+  ltDbInfo->addRow(tr("Soma das compras:"), m_edSum);
   QFrame* frDbInfo = new QFrame;
   frDbInfo->setLayout(ltDbInfo);
+
+  m_tabDb->addTab(m_filter, QIcon(":/icons/res/filter.png"), tr("Filtro"));
   m_tabDb->addTab(frDbInfo, QIcon(":/icons/res/statistics.png"), tr("Estatísticas"));
 
   setContentsMargins(9, 9, 9, 9);
@@ -409,6 +414,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
+  connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_database, SLOT(setDynamicFilter(const QString&)));
   connect(m_tabDb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
   connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setPurchaseTotal(double)));
@@ -533,13 +539,13 @@ bool PurchaseView::save(Id& id)
 void PurchaseView::lastItemSelected()
 {
   if (m_lastId.isValid())
-  m_database->selectItem(m_lastId);
+    m_database->selectItem(m_lastId);
 }
 
 void PurchaseView::selectItem(const JItemSQL& o)
 {
+  m_lastId = m_id;
   JItemView::selectItem(o);
-  m_lastId = o.m_id;
 }
 
 void PurchaseView::itemsRemoved(const QVector<Id>& ids)

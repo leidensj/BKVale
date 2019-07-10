@@ -1,60 +1,57 @@
-#include "purchasefilterdlg.h"
+#include "purchasefilter.h"
 #include "widgets/jdatabasepicker.h"
 #include "widgets/jdatabase.h"
-#include <QDateEdit>
-#include <QCheckBox>
-#include <QLayout>
-
+#include "widgets/jdateedit.h"
+#include "items/jitemex.h"
+#include <QGroupBox>
+#include <QFormLayout>
 
 /* PRODUCT FILTER */
 /*WHERE _NOTES._ID = ANY (SELECT _NOTEID FROM _NOTE_ITEMS WHERE _PRODUCTID IN(...))*/
 
-PurchaseFilterDlg::PurchaseFilterDlg(QWidget* parent)
-  : FilterDlg(parent)
+PurchaseFilter::PurchaseFilter(QWidget* parent)
+  : JFilter(parent)
   , m_cbDate(nullptr)
   , m_dtBegin(nullptr)
   , m_dtEnd(nullptr)
   , m_supplierPicker(nullptr)
   , m_productPicker(nullptr)
 {
-  m_cbDate = new QCheckBox;
-  m_dtBegin = new QDateEdit;
+  m_cbDate = new QGroupBox;
+  m_cbDate->setFlat(true);
+  m_cbDate->setCheckable(true);
+  m_cbDate->setTitle(tr("Data"));
+  m_dtBegin = new JDateEdit;
   m_dtBegin->setCalendarPopup(true);
-  m_dtEnd = new QDateEdit;
+  m_dtEnd = new JDateEdit;
   m_dtEnd->setCalendarPopup(true);
   m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME, true);
   m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
-
   m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);
 
-  QHBoxLayout* dateLayout = new QHBoxLayout;
-  dateLayout->setContentsMargins(0, 0, 0, 0);
-  dateLayout->setAlignment(Qt::AlignLeft);
-  dateLayout->addWidget(m_cbDate);
-  dateLayout->addWidget(m_dtBegin);
-  dateLayout->addWidget(m_dtEnd);
+  QFormLayout* ltfr = new QFormLayout;
+  ltfr->setContentsMargins(0, 0, 0, 0);
+  ltfr->addRow(tr("Data inicial:"), m_dtBegin);
+  ltfr->addRow(tr("Data final:"), m_dtEnd);
+  ltfr->addRow(JItemEx::text(SUPPLIER_SQL_TABLE_NAME) + ":", m_supplierPicker);
+  ltfr->addRow(JItemEx::text(PRODUCT_SQL_TABLE_NAME) + ":", m_productPicker);
 
-  QVBoxLayout* mainLayout = new QVBoxLayout;
-  mainLayout->setAlignment(Qt::AlignTop);
-  mainLayout->addLayout(dateLayout);
-  mainLayout->addWidget(m_supplierPicker);
-  mainLayout->addWidget(m_productPicker);
-  setLayout(mainLayout);
+  QVBoxLayout* ltv = new QVBoxLayout;
+  ltv->setAlignment(Qt::AlignTop);
+  ltv->addWidget(m_cbDate);
+  ltv->addLayout(ltfr);
+  m_fr->setLayout(ltv);
 
-  QObject::connect(m_cbDate,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(updateControls()));
-
-  setWindowFlags(Qt::Window);
-  setWindowTitle(tr("Filtrar Notas"));
-  setWindowIcon(QIcon(":/icons/res/filter.png"));
-  setModal(true);
-
-  clearFilter();
+  connect(m_cbDate, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+  connect(m_cbDate, SIGNAL(toggled(bool)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_dtBegin, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_dtEnd, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
+  connect(m_productPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
+  clear();
 }
 
-QString PurchaseFilterDlg::getFilter() const
+QString PurchaseFilter::getFilter() const
 {
   QString strFilter;
   if (m_cbDate->isChecked())
@@ -94,7 +91,7 @@ QString PurchaseFilterDlg::getFilter() const
   return strFilter;
 }
 
-void PurchaseFilterDlg::clearFilter()
+void PurchaseFilter::clear()
 {
   m_cbDate->setChecked(false);
   m_dtBegin->setDate(QDate::currentDate());
@@ -104,7 +101,7 @@ void PurchaseFilterDlg::clearFilter()
   updateControls();
 }
 
-void PurchaseFilterDlg::updateControls()
+void PurchaseFilter::updateControls()
 {
   m_dtBegin->setEnabled(m_cbDate->isChecked());
   m_dtEnd->setEnabled(m_cbDate->isChecked());

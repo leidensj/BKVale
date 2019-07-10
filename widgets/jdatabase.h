@@ -13,7 +13,6 @@ class QCheckBox;
 class JTableView;
 class JLineEdit;
 class QSortFilterProxyModel;
-class PurchaseFilterDlg;
 class Employee;
 
 class JTableView : public QTableView
@@ -63,37 +62,33 @@ public slots:
   void selectItem(Id id);
   void selectItems(const QVector<Id> ids);
   void setFixedFilter(const QString& fixedFilter);
-  void clearFilterSearch();
+  void setDynamicFilter(const QString& dynamicFilter);
+  void clearSearch();
 
 private:
   const Mode m_mode;
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
-  QPushButton* m_btnFilter;
-  QPushButton* m_btnFilterClear;
-  JLineEdit* m_edFilterSearch;
+  JLineEdit* m_edSearch;
   QCheckBox* m_cbContains;
   JTableView* m_table;
   QString m_tableName;
-  QString m_filter;
+  QString m_dynamicFilter;
   QString m_fixedFilter;
   QVector<JItemSQL*> m_currentItems;
   QSortFilterProxyModel* m_proxyModel;
-  PurchaseFilterDlg* m_purchaseFilter;
 
   void clearCurrentItems();
 
 private slots:
-  void filterSearchChanged();
-  void filterSearchEnter();
+  void searchChanged();
+  void searchEnter();
   void containsPressed();
   void enableControls();
   void removeItems();
-  void focusFilterSearch();
+  void focusSearch();
   void emitCurrentRowChangedSignal();
-  void showFilter();
-  void clearFilter();
 
 signals:
   void itemSelectedSignal(const JItemSQL& item);

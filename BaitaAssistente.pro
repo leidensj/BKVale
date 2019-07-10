@@ -61,7 +61,6 @@ SOURCES += main.cpp\
     items/jitemsql.cpp \
     items/jmodel.cpp \
     items/purchase.cpp \
-    purchase/purchasefilterdlg.cpp \
     tables/purchasetable.cpp \
     tables/shoppinglisttable.cpp \
     tables/addresstable.cpp \
@@ -78,7 +77,9 @@ SOURCES += main.cpp\
     views/shoppinglistview.cpp \
     views/productview.cpp \
     views/userview.cpp \
-    shopview.cpp
+    shopview.cpp \
+    widgets/jfilter.cpp \
+    filters/purchasefilter.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -96,7 +97,6 @@ HEADERS  += mainwindow.h \
     shopview.h \
     packageeditor.h \
     escpos.h \
-    filterdlg.h \
     discountview.h \
     timecard.h \
     timeinterval.h \
@@ -134,7 +134,6 @@ HEADERS  += mainwindow.h \
     items/jmodel.h \
     formwidget.h \
     items/purchase.h \
-    purchase/purchasefilterdlg.h \
     tables/shoppinglisttable.h \
     tables/purchasetable.h \
     tables/addresstable.h \
@@ -150,7 +149,9 @@ HEADERS  += mainwindow.h \
     views/supplierview.h \
     views/storeview.h \
     views/shoppinglistview.h \
-    views/userview.h
+    views/userview.h \
+    widgets/jfilter.h \
+    filters/purchasefilter.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

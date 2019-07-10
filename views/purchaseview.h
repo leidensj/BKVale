@@ -29,6 +29,7 @@ class JAddRemoveButtons;
 class JTable;
 class QTableWidgetItem;
 class QRadioButton;
+class PurchaseFilter;
 
 class PaymentWidget : public QWidget
 {
@@ -116,6 +117,7 @@ private:
   JLineEdit* m_edEntries;
   JLineEdit* m_edSum;
   QPlainTextEdit* m_teObservation;
+  PurchaseFilter* m_filter;
 
 private slots:
   void removeProduct();

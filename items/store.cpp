@@ -53,6 +53,7 @@ void Store::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_form.clear(bClearId);
+  m_form.m_bCompany = true;
   m_address.clear();
   m_phone.clear();
   m_description.clear();

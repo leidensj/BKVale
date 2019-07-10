@@ -202,7 +202,7 @@ void FormDetailsWidget::switchUserType(bool bCompany)
   {
     m_lblCpfCnpj->setText(tr("CPF:"));
     m_lblRgIE->setText(tr("RG:"));
-    m_cbBirthDate->setText("Nascimento:");
+    m_cbBirthDate->setText("Aniversário:");
     m_edCpfCnpj->setInputMask("999.999.999-99;_");
     m_edCpfCnpj->setText(!m_bPreviousWasCompany ? m_strPreviousCpfCnpj : "");
     m_edRgIE->setInputMask("9999999999;_");

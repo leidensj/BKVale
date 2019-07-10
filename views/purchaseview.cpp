@@ -528,7 +528,6 @@ bool PurchaseView::save(Id& id)
   bool bSuccess = m_database->save(o);
   if (bSuccess)
   {
-    m_lastId = o.m_id;
     id = o.m_id;
     create();
   }
@@ -544,7 +543,8 @@ void PurchaseView::lastItemSelected()
 
 void PurchaseView::selectItem(const JItemSQL& o)
 {
-  m_lastId = m_id;
+  if (!m_lastId.isValid() || m_id.isValid())
+    m_lastId = m_id;
   JItemView::selectItem(o);
 }
 

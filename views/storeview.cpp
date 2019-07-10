@@ -56,7 +56,6 @@ StoreView::StoreView(QWidget* parent)
   m_formInfo->m_dtCreationDate->hide();
   m_formInfo->m_lblType->hide();
   m_formInfo->m_type->hide();
-  m_formInfo->setCompany(true);
 
   setFocusWidgetOnCreate(m_formInfo->m_edName);
   create();

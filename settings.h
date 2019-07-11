@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include <QString>
+#include <QSerialPort>
 
 struct Settings
 {
@@ -12,6 +13,11 @@ struct Settings
   QString m_serialPort;
   QString m_ethernetIP;
   int m_ethernetPort;
+  QSerialPort::BaudRate m_serialBaudRate;
+  QSerialPort::DataBits m_serialDataBits;
+  QSerialPort::FlowControl m_serialFlowControl;
+  QSerialPort::Parity m_serialParity;
+  QSerialPort::StopBits m_serialStopBits;
 
   void clear();
   void save() const;

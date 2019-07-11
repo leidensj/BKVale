@@ -14,8 +14,7 @@ class SettingsDlg : public QDialog
   Q_OBJECT
 
 public:
-  explicit SettingsDlg(const Settings& settings,
-                       QWidget *parent = 0);
+  explicit SettingsDlg(const Settings& settings, QWidget *parent = 0);
   ~SettingsDlg();
   const Settings& getSettings() const { return m_settings; }
 

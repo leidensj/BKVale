@@ -218,7 +218,7 @@ bool Printer::printString(QIODevice* printer,
 
 QString Printer::strCmdInit()
 {
-  return ESC_INIT ESC_CODEPAGE850;
+  return ESC_INIT;
 }
 
 QString Printer::strCmdFullCut()
@@ -248,22 +248,25 @@ QString PurchasePrinter::build(const Purchase& o)
 
 QString ReminderPrinter::build(const Reminder& r)
 {
-  QString str, title, msg;
+  QString str, title, subject, msg;
 
   switch (r.m_capitalization)
   {
     case Reminder::Capitalization::Normal:
       title = r.m_title;
       msg = r.m_message;
+      subject = r.m_subject;
       break;
     case Reminder::Capitalization::AllLowercase:
       title = r.m_title.toLower();
       msg = r.m_message.toLower();
+      subject = r.m_subject.toLower();
       break;
     case Reminder::Capitalization::AllUppercase:
     default:
       title = r.m_title.toUpper();
       msg = r.m_message.toUpper();
+      subject = r.m_subject.toUpper();
       break;
   }
 
@@ -273,6 +276,38 @@ QString ReminderPrinter::build(const Reminder& r)
            ESC_DOUBLE_FONT_ON +
            title +
            ESC_DOUBLE_FONT_OFF
+           ESC_LF;
+    if (!msg.isEmpty() || !subject.isEmpty() || r.m_bDate || r.m_bTime)
+    {
+      str += "________________________________________________"
+             ESC_LF;
+    }
+    str += ESC_ALIGN_LEFT;
+  }
+
+  if (!subject.isEmpty())
+  {
+    str += ESC_ALIGN_CENTER
+           ESC_EXPAND_ON +
+           subject +
+           ESC_EXPAND_OFF
+           ESC_LF;
+    if (!msg.isEmpty() || r.m_bDate || r.m_bTime )
+    {
+      str += "________________________________________________"
+             ESC_LF;
+    }
+    str += ESC_ALIGN_LEFT;
+  }
+
+  if (r.m_bDate || r.m_bTime)
+  {
+    QString date = r.m_bDate ? r.m_date.toString("dd/MM/yyyy") : "";
+    QString time = r.m_bTime ? r.m_time.toString("HH:mm:ss") : "";
+    str += ESC_ALIGN_CENTER
+           ESC_STRESS_ON +
+           date + " " + time +
+           ESC_STRESS_OFF
            ESC_LF;
     if (!msg.isEmpty())
     {
@@ -284,6 +319,7 @@ QString ReminderPrinter::build(const Reminder& r)
 
   if (!msg.isEmpty())
   {
+    str += ESC_ALIGN_LEFT;
     if (r.m_size == Reminder::Size::Large)
       str += ESC_EXPAND_ON;
     str += msg;

@@ -194,7 +194,6 @@ bool Tipi::connectPrinter()
     m_printerSerial.setParity(m_settings.m_serialParity);
     m_printerSerial.setStopBits(m_settings.m_serialStopBits);
     bSuccess = m_printerSerial.open(QIODevice::ReadWrite);
-    m_printerSerial.clear();
     if (bSuccess)
       bSuccess = Printer::printString(&m_printerSerial,
                                       m_settings.m_bIsPrinterEthernet,

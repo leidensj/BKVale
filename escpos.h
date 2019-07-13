@@ -12,7 +12,8 @@
 #define ESC_STRESS_OFF      "\x1b\x46"
 #define ESC_LF              "\n"
 #define ESC_VERT_TAB        "\x1b\x4a\x40"
-#define ESC_INIT            "\x1b\x40" //ESC @
+//ESC @
+#define ESC_INIT            "\x1b\x40"
 #define ESC_DOUBLE_FONT_ON  "\x1b\x64\x31\x1b\x57\x31"
 #define ESC_DOUBLE_FONT_OFF "\x1b\x64\x30\x1b\x57\x30"
 #define ESC_STX             "\x02"
@@ -23,11 +24,19 @@
 #define ESC_EXPAND_ON       "\x1b\x57\x31"
 #define ESC_EXPAND_OFF      "\x1b\x57\x30"
 
-#define ESC_BARCODE_HRI_OFF "\x1d\x48\x00" //GS H
-#define ESC_BARCODE_HRI_ON  "\x1d\x48\x01" //GS H
-#define ESC_BARCODE_HEIGHT  "\x1d\x68" //GS h
-#define ESC_BARCODE_CODE39  "\x1d\x6b\x45" //GS k
-#define ESC_BARCODE_CODE93  "\x1d\x6b\x48" //GS k
+//GS H
+#define ESC_BARCODE_HRI_OFF "\x1d\x48\x00"
+//GS H
+#define ESC_BARCODE_HRI_ON  "\x1d\x48\x01"
+ //GS h
+#define ESC_BARCODE_HEIGHT  "\x1d\x68"
+//GS k
+#define ESC_BARCODE_CODE39  "\x1d\x6b\x45"
+//GS k
+#define ESC_BARCODE_CODE93  "\x1d\x6b\x48"
+
+//Reset
+#define ESC_RESET "\x1d\xf8\x46"
 
 #define TABLE_WIDTH           48
 #define TABLE_MAX_VALUE       10000

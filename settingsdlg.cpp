@@ -29,8 +29,8 @@ SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
   ui->cbDataBits->setCurrentIndex(ui->cbDataBits->findData(QSerialPort::Data8));
 
   ui->cbFlowControl->addItem("NoFlowControl", QSerialPort::NoFlowControl);
-  ui->cbFlowControl->addItem("HardwareControl", QSerialPort::HardwareControl);
-  ui->cbFlowControl->addItem("SoftwareControl", QSerialPort::SoftwareControl);
+  ui->cbFlowControl->addItem("HardwareControl (RTS/CTS)", QSerialPort::HardwareControl);
+  ui->cbFlowControl->addItem("SoftwareControl (XON/XOFF)", QSerialPort::SoftwareControl);
   ui->cbFlowControl->setCurrentIndex(ui->cbFlowControl->findData(QSerialPort::NoFlowControl));
 
   ui->cbParity->addItem("NoParity", QSerialPort::NoParity);

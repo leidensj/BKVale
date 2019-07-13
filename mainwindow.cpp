@@ -188,6 +188,11 @@ bool Tipi::connectPrinter()
   else
   {
     m_printerSerial.setPortName(m_settings.m_serialPort);
+    m_printerSerial.setBaudRate(m_settings.m_serialBaudRate);
+    m_printerSerial.setDataBits(m_settings.m_serialDataBits);
+    m_printerSerial.setFlowControl(m_settings.m_serialFlowControl);
+    m_printerSerial.setParity(m_settings.m_serialParity);
+    m_printerSerial.setStopBits(m_settings.m_serialStopBits);
     bSuccess = m_printerSerial.open(QIODevice::ReadWrite);
     m_printerSerial.clear();
     if (bSuccess)

@@ -43,6 +43,7 @@ private slots:
   void updateHoursTable(QTableWidgetItem* p);
 
 private:
+  Id m_formId;
   FormInfoWidget* m_formInfo;
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;

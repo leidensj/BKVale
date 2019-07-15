@@ -66,6 +66,12 @@ EmployeeView::EmployeeView(QWidget* parent)
 
   m_formInfo->addWidget(tr("Código PIN:"), m_edPincode);
 
+  QVBoxLayout* ltPermissions = new QVBoxLayout;
+  ltPermissions->addWidget(m_trPermissions);
+
+  QFrame* frPermissions = new QFrame;
+  frPermissions->setLayout(ltPermissions);
+
   QVBoxLayout* ltHours = new QVBoxLayout;
   ltHours->addWidget(m_btnAddRemove);
   ltHours->addWidget(m_tbHours);
@@ -75,7 +81,7 @@ EmployeeView::EmployeeView(QWidget* parent)
 
   m_tab->addTab(m_formInfo, QIcon(":/icons/res/resume.png"), tr("Informações"));
   m_tab->addTab(m_formDetails, QIcon(":/icons/res/details.png"), tr("Detalhes"));
-  m_tab->addTab(m_trPermissions, QIcon(":/icons/res/usershield.png"), tr("Permissões"));
+  m_tab->addTab(frPermissions, QIcon(":/icons/res/usershield.png"), tr("Permissões"));
   m_tab->addTab(frHours, QIcon(":/icons/res/clock.png"), tr("Horário"));
   m_tab->addTab(m_formPhone, QIcon(":/icons/res/phone.png"), tr("Telefone"));
   m_tab->addTab(m_formAddress, QIcon(":/icons/res/address.png"), tr("Endereço"));
@@ -102,6 +108,7 @@ void EmployeeView::getItem(JItemSQL& o) const
   Employee& _o = dynamic_cast<Employee&>(o);
   _o.clear(true);
   _o.m_id = m_id;
+  _o.m_form.m_id = m_formId;
   m_formInfo->fillForm(_o.m_form);
   m_formDetails->fillForm(_o.m_form);
   m_formPhone->fillForm(_o.m_form);
@@ -121,6 +128,7 @@ void EmployeeView::getItem(JItemSQL& o) const
 void EmployeeView::setItem(const JItemSQL& o)
 {
   const Employee& _o = dynamic_cast<const Employee&>(o);
+  m_formId = _o.m_form.m_id;
   m_formInfo->setForm(_o.m_form);
   m_formDetails->setForm(_o.m_form);
   m_formPhone->setForm(_o.m_form);

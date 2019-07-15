@@ -71,6 +71,7 @@ void StoreView::getItem(JItemSQL& o) const
   Store& _o = dynamic_cast<Store&>(o);
   _o.clear(true);
   _o.m_id = m_id;
+  _o.m_form.m_id = m_formId;
   _o.m_vEmployee.clear();
   m_formInfo->fillForm(_o.m_form);
   m_formDetails->fillForm(_o.m_form);
@@ -88,6 +89,7 @@ void StoreView::getItem(JItemSQL& o) const
 void StoreView::setItem(const JItemSQL& o)
 {
   const Store& _o = static_cast<const Store&>(o);
+  m_formId = _o.m_form.m_id;
   m_formInfo->setForm(_o.m_form);
   m_formDetails->setForm(_o.m_form);
   m_formPhone->setForm(_o.m_form);

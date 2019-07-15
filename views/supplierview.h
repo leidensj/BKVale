@@ -23,6 +23,7 @@ protected slots:
   void setItem(const JItemSQL& o);
 
 private:
+  Id m_formId;
   FormInfoWidget* m_formInfo;
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;

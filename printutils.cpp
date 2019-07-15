@@ -425,10 +425,10 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
     if (bPrintSupplier)
       str +=  ESC_ALIGN_CENTER "Fornecedor: " + lst.m_vItem.at(i).m_supplier.m_form.strAliasName() + ESC_LF ESC_ALIGN_LEFT;
 
-    str += lst.m_vItem.at(i).m_product.m_name + ESC_LF;
+    str += ESC_STRESS_ON + lst.m_vItem.at(i).m_product.m_name + ESC_STRESS_OFF ESC_LF;
 
     if (lst.m_vItem.at(i).m_price != 0.0)
-      str += "Preco sugerido: " + lst.m_vItem.at(i).strPrice() + ESC_LF;
+      str += "Preco: " + lst.m_vItem.at(i).strPrice() + ESC_LF;
 
     if (bPrintCount)
     {

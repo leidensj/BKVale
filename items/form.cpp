@@ -265,12 +265,12 @@ bool Form::SQL_update_proc(QSqlQuery& query) const
                     PHONE_SQL_COL03 ","
                     PHONE_SQL_COL04 ","
                     PHONE_SQL_COL05 ")"
-                                    " VALUES ("
-                                    "(:_v01),"
-                                    "(:_v02),"
-                                    "(:_v03),"
-                                    "(:_v04),"
-                                    "(:_v05))");
+                    " VALUES ("
+                    "(:_v01),"
+                    "(:_v02),"
+                    "(:_v03),"
+                    "(:_v04),"
+                    "(:_v05))");
       query.bindValue(":_v01", m_id.get());
       query.bindValue(":_v02", m_vPhone.at(i).m_countryCode);
       query.bindValue(":_v03", m_vPhone.at(i).m_code);

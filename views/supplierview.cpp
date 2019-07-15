@@ -33,6 +33,7 @@ void SupplierView::getItem(JItemSQL& o) const
   Supplier& _o = dynamic_cast<Supplier&>(o);
   _o.clear(true);
   _o.m_id = m_id;
+  _o.m_form.m_id = m_formId;
   m_formInfo->fillForm(_o.m_form);
   m_formDetails->fillForm(_o.m_form);
   m_formPhone->fillForm(_o.m_form);
@@ -42,6 +43,7 @@ void SupplierView::getItem(JItemSQL& o) const
 void SupplierView::setItem(const JItemSQL& o)
 {
   const Supplier& _o= static_cast<const Supplier&>(o);
+  m_formId = _o.m_form.m_id;
   m_formInfo->setForm(_o.m_form);
   m_formDetails->setForm(_o.m_form);
   m_formPhone->setForm(_o.m_form);

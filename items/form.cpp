@@ -1,40 +1,4 @@
 #include "form.h"
-#include "jmodel.h"
-
-class FormModel : public JModel
-{
-public:
-  FormModel(QObject *parent)
-    : JModel(parent)
-  {
-
-  }
-
-  QString getStrQuery()
-  {
-    QString strQuery("SELECT "
-                     SQL_COLID ","
-                     FORM_SQL_COL02 ","
-                     FORM_SQL_COL03
-                     " FROM "
-                     FORM_SQL_TABLE_NAME);
-    return strQuery;
-  }
-
-  void select(QHeaderView* header)
-  {
-    JModel::select("");
-    setHeaderData(0, Qt::Horizontal, tr("ID"));
-    setHeaderData(1, Qt::Horizontal, tr("Nome"));
-    setHeaderData(2, Qt::Horizontal, tr("Apelido"));
-    if (header != nullptr && header->count() == 3)
-    {
-      header->hideSection(0);
-      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
-    }
-  }
-};
 
 Form::Form()
 {
@@ -424,9 +388,4 @@ bool Form::SQL_remove_proc(QSqlQuery& query) const
   query.prepare("DELETE FROM " FORM_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
-}
-
-JModel* Form::SQL_table_model(QObject* parent) const
-{
-  return new FormModel(parent);
 }

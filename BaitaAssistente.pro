@@ -59,7 +59,6 @@ SOURCES += main.cpp\
     widgets/jtablewidgetitem.cpp \
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
-    items/jmodel.cpp \
     items/purchase.cpp \
     tables/purchasetable.cpp \
     tables/shoppinglisttable.cpp \
@@ -83,7 +82,20 @@ SOURCES += main.cpp\
     items/purchaseelement.cpp \
     models/addressmodel.cpp \
     models/categorymodel.cpp \
-    models/employeemodel.cpp
+    models/employeemodel.cpp \
+    models/imagemodel.cpp \
+    models/phonemodel.cpp \
+    models/productmodel.cpp \
+    models/purchasemodel.cpp \
+    models/remindermodel.cpp \
+    models/shoppinglistmodel.cpp \
+    models/storemodel.cpp \
+    models/suppliermodel.cpp \
+    models/usermodel.cpp \
+    models/activeusermodel.cpp \
+    models/jmodel.cpp \
+    models/productcodemodel.cpp \
+    models/discountmodel.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -135,7 +147,6 @@ HEADERS  += mainwindow.h \
     items/jitemsql.h \
     widgets/jtable.h \
     widgets/jlineedit.h \
-    items/jmodel.h \
     formwidget.h \
     items/purchase.h \
     tables/shoppinglisttable.h \
@@ -160,7 +171,20 @@ HEADERS  += mainwindow.h \
     items/purchaseelement.h \
     models/addressmodel.h \
     models/categorymodel.h \
-    models/employeemodel.h
+    models/employeemodel.h \
+    models/imagemodel.h \
+    models/phonemodel.h \
+    models/productmodel.h \
+    models/purchasemodel.h \
+    models/remindermodel.h \
+    models/shoppinglistmodel.h \
+    models/storemodel.h \
+    models/suppliermodel.h \
+    models/usermodel.h \
+    models/activeusermodel.h \
+    models/jmodel.h \
+    models/productcodemodel.h \
+    models/discountmodel.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

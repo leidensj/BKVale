@@ -1,58 +1,4 @@
 #include "address.h"
-#include "jmodel.h"
-
-class AddressModel : public JModel
-{
-public:
-  AddressModel(QObject *parent)
-    : JModel(parent)
-  {
-
-  }
-
-  QString getStrQuery()
-  {
-    QString strQuery("SELECT "
-                     SQL_COLID ","
-                     ADDRESS_SQL_COL04 ","
-                     ADDRESS_SQL_COL05 ","
-                     ADDRESS_SQL_COL03 ","
-                     ADDRESS_SQL_COL06 ","
-                     ADDRESS_SQL_COL07
-                     " FROM "
-                     ADDRESS_SQL_TABLE_NAME);
-    return strQuery;
-  }
-
-  virtual void select(QHeaderView* header)
-  {
-    JModel::select("");
-    setHeaderData(0, Qt::Horizontal, tr("ID"));
-    setHeaderData(1, Qt::Horizontal, tr("Rua"));
-    setHeaderData(2, Qt::Horizontal, tr("Nº"));
-    setHeaderData(3, Qt::Horizontal, tr("Bairro"));
-    setHeaderData(4, Qt::Horizontal, tr("Cidade"));
-    setHeaderData(5, Qt::Horizontal, tr("Estado"));
-    if (header != nullptr && header->count() == 6)
-    {
-      header->hideSection(0);
-      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(5, QHeaderView::ResizeMode::ResizeToContents);
-    }
-  }
-
-  QVariant data(const QModelIndex &idx, int role) const
-  {
-    QVariant value = QSqlQueryModel::data(idx, role);
-    if (role == Qt::DisplayRole)
-      if (idx.column() == 5)
-        value = Address::st_getBRState((Address::EBRState)value.toInt()).m_abv;
-    return value;
-  }
-};
 
 void Address::clear(bool bClearId)
 {
@@ -157,11 +103,6 @@ bool Address::SQL_select_proc(QSqlQuery& query, QString& error)
 bool Address::SQL_remove_proc(QSqlQuery& /*query*/) const
 {
   return false;
-}
-
-JModel* Address::SQL_table_model(QObject* parent) const
-{
-  return new AddressModel(parent);
 }
 
 Address::EBRState Address::st_getEBRState(const QString& abv)

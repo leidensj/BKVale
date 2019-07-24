@@ -19,7 +19,6 @@ public:
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
-  JModel* SQL_table_model(QObject* parent) const;
 
   bool SQL_login(const QString& strUser, const QString& strPassword, QString& error);
   bool SQL_logout(QString& error);

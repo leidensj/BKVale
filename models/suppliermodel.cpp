@@ -1,26 +1,26 @@
-#include "employeemodel.h"
+#include "suppliermodel.h"
 
-EmployeeModel::EmployeeModel(QObject *parent)
+SupplierModel::SupplierModel(QObject *parent)
   : JModel(parent)
 {
 
 }
 
-QString EmployeeModel::getStrQuery()
+QString SupplierModel::getStrQuery()
 {
   QString strQuery("SELECT "
-                   EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID ","
+                   SUPPLIER_SQL_TABLE_NAME "." SQL_COLID ","
                    FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
                    FORM_SQL_TABLE_NAME "." FORM_SQL_COL03
-                   " FROM " EMPLOYEE_SQL_TABLE_NAME
+                   " FROM " SUPPLIER_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
                    FORM_SQL_TABLE_NAME
-                   " ON " EMPLOYEE_SQL_TABLE_NAME "." EMPLOYEE_SQL_COL01 " = "
+                   " ON " SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL01 " = "
                    FORM_SQL_TABLE_NAME "." SQL_COLID);
   return strQuery;
 }
 
-void EmployeeModel::select(QHeaderView* header)
+void SupplierModel::select(QHeaderView* header)
 {
   JModel::select(getStrQuery());
   setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -36,4 +36,3 @@ void EmployeeModel::select(QHeaderView* header)
     }
   }
 }
-

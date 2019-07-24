@@ -32,7 +32,6 @@ struct Reminder : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
-  JModel* SQL_table_model(QObject* parent) const;
 
   static QStringList SQL_select_subjects();
 

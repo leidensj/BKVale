@@ -3,7 +3,7 @@
 #include "defines.h"
 #include "pincodeview.h"
 #include "items/jitemex.h"
-#include "items/jmodel.h"
+#include "models/jmodel.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>

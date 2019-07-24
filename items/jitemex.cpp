@@ -14,8 +14,24 @@
 #include "store.h"
 #include "supplier.h"
 #include "employee.h"
-#include "jmodel.h"
 #include "activeuser.h"
+
+#include "models/activeusermodel.h"
+#include "models/addressmodel.h"
+#include "models/categorymodel.h"
+#include "models/discountmodel.h"
+#include "models/employeemodel.h"
+#include "models/imagemodel.h"
+#include "models/phonemodel.h"
+#include "models/productcodemodel.h"
+#include "models/productmodel.h"
+#include "models/purchasemodel.h"
+#include "models/remindermodel.h"
+#include "models/shoppinglistmodel.h"
+#include "models/storemodel.h"
+#include "models/suppliermodel.h"
+#include "models/usermodel.h"
+
 
 JItemSQL* JItemEx::create(const QString& tableName)
 {
@@ -152,12 +168,35 @@ QString JItemEx::icon(const QString& tableName)
 
 JModel* JItemEx::model(const QString& tableName, QObject* parent)
 {
-  JModel* m = nullptr;
-  auto p = JItemEx::create(tableName);
-  if (p != nullptr)
-  {
-    m = p->SQL_table_model(parent);
-    delete p;
-  }
-  return m;
+  if (tableName == IMAGE_SQL_TABLE_NAME)
+    return new ImageModel(parent);
+  if (tableName == CATEGORY_SQL_TABLE_NAME)
+    return new CategoryModel(parent);
+  if (tableName == STORE_SQL_TABLE_NAME)
+    return new StoreModel(parent);
+  if (tableName == PRODUCT_SQL_TABLE_NAME)
+    return new ProductModel(parent);
+  if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    return new ProductCodeModel(parent);
+  if (tableName == NOTE_SQL_TABLE_NAME)
+    return new PurchaseModel(parent);
+  if (tableName == USER_SQL_TABLE_NAME)
+    return new UserModel(parent);
+  if (tableName == REMINDER_SQL_TABLE_NAME)
+    return new ReminderModel(parent);
+  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    return new ShoppingListModel(parent);
+  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return new EmployeeModel(parent);
+  if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return new SupplierModel(parent);
+  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+    return new ActiveUserModel(parent);
+  if (tableName == ADDRESS_SQL_TABLE_NAME)
+    return new AddressModel(parent);
+  if (tableName == PHONE_SQL_TABLE_NAME)
+    return new PhoneModel(parent);
+  if (tableName == DISCOUNT_SQL_TABLE_NAME)
+    return new DiscountModel(parent);
+  return nullptr;
 }

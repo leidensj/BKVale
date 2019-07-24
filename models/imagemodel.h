@@ -1,15 +1,15 @@
-#ifndef ADDRESSMODEL_H
-#define ADDRESSMODEL_H
+#ifndef IMAGEMODEL_H
+#define IMAGEMODEL_H
 
 #include "jmodel.h"
 
-class AddressModel : public JModel
+class ImageModel : public JModel
 {
 public:
-  AddressModel(QObject *parent);
+  ImageModel(QObject *parent);
   QString getStrQuery();
   void select(QHeaderView* header);
   QVariant data(const QModelIndex &idx, int role) const;
 };
 
-#endif // ADDRESSMODEL_H
+#endif // IMAGEMODEL_H

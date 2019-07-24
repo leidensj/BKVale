@@ -25,7 +25,6 @@ struct Form : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
-  JModel* SQL_table_model(QObject* parent) const;
 
   QString name() const { return m_name; }
   QByteArray image() const { return m_image.m_image; }

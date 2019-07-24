@@ -1,22 +1,22 @@
-#include "categorymodel.h"
+#include "usermodel.h"
 
-CategoryModel::CategoryModel(QObject *parent)
+UserModel::UserModel(QObject *parent)
   : JModel(parent)
 {
 
 }
 
-QString CategoryModel::getStrQuery()
+QString UserModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SQL_COLID ","
-                   CATEGORY_SQL_COL02
+                   USER_SQL_COL01
                    " FROM "
-                   CATEGORY_SQL_TABLE_NAME);
+                   USER_SQL_TABLE_NAME);
   return strQuery;
 }
 
-void CategoryModel::select(QHeaderView* header)
+void UserModel::select(QHeaderView* header)
 {
   JModel::select("");
   setHeaderData(0, Qt::Horizontal, tr("ID"));

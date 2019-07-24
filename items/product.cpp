@@ -1,88 +1,4 @@
 #include "product.h"
-#include "jmodel.h"
-
-class ProductModel : public JModel
-{
-public:
-  ProductModel(QObject *parent)
-    : JModel(parent)
-  {
-
-  }
-
-  QString getStrQuery()
-  {
-    QString strQuery("SELECT "
-                     PRODUCT_SQL_TABLE_NAME "." SQL_COLID ","
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01 ","
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL04 ","
-                     CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL02
-                     " FROM "
-                     PRODUCT_SQL_TABLE_NAME
-                     " LEFT OUTER JOIN "
-                     CATEGORY_SQL_TABLE_NAME
-                     " ON "
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL02
-                     " = "
-                     CATEGORY_SQL_TABLE_NAME "." SQL_COLID);
-    return strQuery;
-  }
-
-  void select(QHeaderView* header)
-  {
-    JModel::select("");
-    setHeaderData(0, Qt::Horizontal, tr("ID"));
-    setHeaderData(1, Qt::Horizontal, tr("Nome"));
-    setHeaderData(2, Qt::Horizontal, tr("Unidade"));
-    setHeaderData(3, Qt::Horizontal, tr("Categoria"));
-    if (header != nullptr && header->count() == 4)
-    {
-      header->hideSection(0);
-      header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
-    }
-  }
-};
-
-class ProductCodeModel : public JModel
-{
-public:
-  ProductCodeModel(QObject *parent)
-    : JModel(parent)
-  {
-
-  }
-
-  QString getStrQuery()
-  {
-    QString strQuery("SELECT "
-                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." SQL_COLID ","
-                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL02 ","
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01
-                     " FROM "
-                     PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
-                     " LEFT OUTER JOIN "
-                     PRODUCT_SQL_TABLE_NAME
-                     " ON " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL01
-                     " = " PRODUCT_SQL_TABLE_NAME "." SQL_COLID);
-    return strQuery;
-  }
-
-  void select(QHeaderView* header)
-  {
-    JModel::select("");
-    setHeaderData(0, Qt::Horizontal, tr("ID"));
-    setHeaderData(1, Qt::Horizontal, tr("Código"));
-    setHeaderData(2, Qt::Horizontal, tr("Produto"));
-    if (header != nullptr && header->count() == 3)
-    {
-      header->hideSection(0);
-      header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-      header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
-    }
-  }
-};
 
 Package::Package()
 {
@@ -181,11 +97,6 @@ bool ProductCode::SQL_select_proc(QSqlQuery& /*query*/, QString& /*error*/)
 bool ProductCode::SQL_remove_proc(QSqlQuery& /*query*/) const
 {
   return false;
-}
-
-JModel* ProductCode::SQL_table_model(QObject* parent) const
-{
-  return new ProductCodeModel(parent);
 }
 
 Product::Product()
@@ -433,9 +344,4 @@ bool Product::SQL_select_by_code(const ProductCode& code, QString& error)
     }
   }
   return SQL_finish(db, query, bSuccess, error);
-}
-
-JModel* Product::SQL_table_model(QObject* parent) const
-{
-  return new ProductModel(parent);
 }

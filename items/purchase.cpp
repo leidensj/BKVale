@@ -77,61 +77,6 @@ public:
   }
 };
 
-PurchaseItem::PurchaseItem()
-{
-  clear();
-}
-
-void PurchaseItem::clear(bool bClearId)
-{
-  if (bClearId)
-    m_id.clear();
-  m_product.clear();
-  m_ammount = 0.0;
-  m_price = 0.0;
-  m_package.clear();
-}
-
-bool PurchaseItem::isValid() const
-{
-  return true;
-}
-
-bool PurchaseItem::operator !=(const JItem& other) const
-{
-  const PurchaseItem& another = dynamic_cast<const PurchaseItem&>(other);
-  return
-      m_product.m_id != another.m_product.m_id ||
-      m_ammount != another.m_ammount ||
-      m_price != another.m_price ||
-      m_package != another.m_package;
-}
-
-bool PurchaseItem::operator ==(const JItem& other) const
-{
-  return !(*this != other);
-}
-
-double PurchaseItem::subtotal() const
-{
-  return m_ammount * m_price;
-}
-
-QString PurchaseItem::strSubtotal() const
-{
-  return st_strMoney(subtotal());
-}
-
-QString PurchaseItem::strAmmount() const
-{
-  return st_strAmmount(m_ammount);
-}
-
-QString PurchaseItem::strPrice() const
-{
-  return st_strMoney(m_price);
-}
-
 PaymentItem::PaymentItem()
 {
   clear();
@@ -335,32 +280,8 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
     m_id.set(query.lastInsertId().toLongLong());
     for (int i = 0; i != m_vItem.size() && bSuccess; ++i)
     {
-      query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                    NOTE_ITEMS_SQL_COL01 ","
-                    NOTE_ITEMS_SQL_COL02 ","
-                    NOTE_ITEMS_SQL_COL03 ","
-                    NOTE_ITEMS_SQL_COL04 ","
-                    NOTE_ITEMS_SQL_COL05 ","
-                    NOTE_ITEMS_SQL_COL06 ","
-                    NOTE_ITEMS_SQL_COL07
-                    ") VALUES ("
-                    "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
-                    "(:_v04),"
-                    "(:_v05),"
-                    "(:_v06),"
-                    "(:_v07))");
-      query.bindValue(":_v01", m_id.get());
-      query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
-      query.bindValue(":_v03", m_vItem.at(i).m_ammount);
-      query.bindValue(":_v04", m_vItem.at(i).m_price);
-      query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
-      query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
-      query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
-      bSuccess = query.exec();
-      if (bSuccess)
-        m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+      m_vItem[i].m_ownerId = m_id;
+      bSuccess = m_vItem.at(i).SQL_insert_proc(query);
     }
   }
 
@@ -409,41 +330,11 @@ bool Purchase::SQL_update_proc(QSqlQuery& query) const
 
   if (bSuccess)
   {
-    query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", m_id.get());
-    bSuccess = query.exec();
-  }
-
-  if (bSuccess)
-  {
+    bSuccess = PurchaseElement::SQL_remove_by_owner_id_proc(query, m_id);
     for (int i = 0; i != m_vItem.size() && bSuccess; ++i)
     {
-      query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                    NOTE_ITEMS_SQL_COL01 ","
-                    NOTE_ITEMS_SQL_COL02 ","
-                    NOTE_ITEMS_SQL_COL03 ","
-                    NOTE_ITEMS_SQL_COL04 ","
-                    NOTE_ITEMS_SQL_COL05 ","
-                    NOTE_ITEMS_SQL_COL06 ","
-                    NOTE_ITEMS_SQL_COL07
-                    " ) VALUES ("
-                    "(:_v01),"
-                    "(:_v02),"
-                    "(:_v03),"
-                    "(:_v04),"
-                    "(:_v05),"
-                    "(:_v06),"
-                    "(:_v07))");
-      query.bindValue(":_v01", m_id.get());
-      query.bindValue(":_v02", m_vItem.at(i).m_product.m_id.get());
-      query.bindValue(":_v03", m_vItem.at(i).m_ammount);
-      query.bindValue(":_v04", m_vItem.at(i).m_price);
-      query.bindValue(":_v05", m_vItem.at(i).m_package.m_bIsPackage);
-      query.bindValue(":_v06", m_vItem.at(i).m_package.m_unity);
-      query.bindValue(":_v07", m_vItem.at(i).m_package.m_ammount);
-      bSuccess = query.exec();
-      if (bSuccess)
-        m_vItem.at(i).m_id.set(query.lastInsertId().toLongLong());
+      m_vItem[i].m_ownerId = m_id;
+      bSuccess = m_vItem.at(i).SQL_insert_proc(query);
     }
   }
 
@@ -515,35 +406,8 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
   }
 
   if (bSuccess)
-  {
-    query.prepare("SELECT "
-                  SQL_COLID ","
-                  NOTE_ITEMS_SQL_COL02 ","
-                  NOTE_ITEMS_SQL_COL03 ","
-                  NOTE_ITEMS_SQL_COL04 ","
-                  NOTE_ITEMS_SQL_COL05 ","
-                  NOTE_ITEMS_SQL_COL06 ","
-                  NOTE_ITEMS_SQL_COL07
-                  " FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                  " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
-    query.bindValue(":_v01", m_id.get());
-    bSuccess = query.exec();
-    if (bSuccess)
-    {
-      while (query.next())
-      {
-        PurchaseItem o;
-        o.m_id.set(query.value(0).toLongLong());
-        o.m_product.m_id.set(query.value(1).toLongLong());
-        o.m_ammount = query.value(2).toDouble();
-        o.m_price = query.value(3).toDouble();
-        o.m_package.m_bIsPackage = query.value(4).toBool();
-        o.m_package.m_unity = query.value(5).toString();
-        o.m_package.m_ammount = query.value(6).toDouble();
-        m_vItem.push_back(o);
-      }
-    }
-  }
+    bSuccess = PurchaseElement::SQL_select_by_owner_id_proc(query, m_id, m_vItem, error);
+
 
   if (bSuccess)
   {
@@ -553,17 +417,6 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess && m_employee.m_id.isValid())
     m_employee.SQL_select_proc(query, error);
-
-  if (bSuccess)
-  {
-    for (int i = 0; i != m_vItem.size(); ++i)
-    {
-      if (m_vItem.at(i).m_product.m_id.isValid())
-        bSuccess = m_vItem[i].m_product.SQL_select_proc(query, error);
-      if (!bSuccess)
-        break;
-    }
-  }
 
   if (bSuccess)
   {
@@ -597,56 +450,6 @@ bool Purchase::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
-}
-
-PurchaseItem Purchase::SQL_select_last_item(Id supplierId, Id productId)
-{
-  PurchaseItem o;
-  QString error;
-  if (!SQL_isOpen(error))
-    return o;
-
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  db.transaction();
-  QSqlQuery query(db);
-
-  query.prepare("SELECT "
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL03 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL04 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL05 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL06 ","
-                NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL07
-                " FROM " NOTE_SQL_TABLE_NAME
-                " INNER JOIN " NOTE_ITEMS_SQL_TABLE_NAME
-                " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID
-                " = " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
-                " WHERE " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
-                " = (:_v01)"
-                " AND " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02
-                " = (:_v02) "
-                " ORDER BY " NOTE_ITEMS_SQL_TABLE_NAME "." SQL_COLID
-                " DESC LIMIT 1");
-  query.bindValue(":_v01", supplierId.get());
-  query.bindValue(":_v02", productId.get());
-  bool bSuccess = query.exec();
-
-  if (bSuccess && query.next())
-  {
-    o.m_id.set(query.value(0).toLongLong());
-    o.m_product.m_id.set(query.value(1).toLongLong());
-    o.m_ammount = query.value(2).toDouble();
-    o.m_price = query.value(3).toDouble();
-    o.m_package.m_bIsPackage = query.value(4).toBool();
-    o.m_package.m_unity = query.value(5).toString();
-    o.m_package.m_ammount = query.value(6).toDouble();
-    if (o.m_product.m_id.isValid())
-      bSuccess = o.m_product.SQL_select_proc(query, error);
-  }
-
-  SQL_finish(db, query, bSuccess, error);
-  return o;
 }
 
 JModel* Purchase::SQL_table_model(QObject* parent) const

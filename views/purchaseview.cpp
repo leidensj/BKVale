@@ -452,7 +452,7 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
-    _o.m_vItem.push_back(dynamic_cast<const PurchaseItem&>(m_table->getItem(i)));
+    _o.m_vItem.push_back(dynamic_cast<const PurchaseElement&>(m_table->getItem(i)));
 }
 
 void PurchaseView::setItem(const JItemSQL& o)

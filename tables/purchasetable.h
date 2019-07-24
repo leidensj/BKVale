@@ -30,7 +30,7 @@ public slots:
   double computeTotal() const;
 
 private:
-  mutable PurchaseItem m_ref;
+  mutable PurchaseElement m_ref;
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
 

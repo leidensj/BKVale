@@ -61,7 +61,7 @@ const JItem& PurchaseTable::getItem(int row) const
 
 void PurchaseTable::addItemAndLoadPrices(Id supplierId, bool bCode)
 {
-  addItem(PurchaseItem());
+  addItem(PurchaseElement());
   int row = rowCount() - 1;
   auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)Column::Description));
   if (bCode)
@@ -71,9 +71,9 @@ void PurchaseTable::addItemAndLoadPrices(Id supplierId, bool bCode)
   const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
   if (product.m_id.isValid())
   {
-    PurchaseItem o;
+    PurchaseElement o;
     if (supplierId.isValid())
-      o = Purchase::SQL_select_last_item(supplierId, product.m_id);
+      o.SQL_select_last(supplierId, product.m_id);
     auto ptPriceCell = dynamic_cast<DoubleItem*>(item(row, (int)Column::Price));
     ptPriceCell->setValue(o.m_price);
     auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)Column::Unity));
@@ -87,7 +87,7 @@ void PurchaseTable::addItemAndLoadPrices(Id supplierId, bool bCode)
 
 void PurchaseTable::addItem(const JItem& o)
 {
-  const PurchaseItem& _o = dynamic_cast<const PurchaseItem&>(o);
+  const PurchaseElement& _o = dynamic_cast<const PurchaseElement&>(o);
 
   blockSignals(true);
 

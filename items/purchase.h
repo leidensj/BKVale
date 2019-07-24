@@ -10,25 +10,7 @@
 #include "defines.h"
 #include "jitemsql.h"
 #include "employee.h"
-
-struct PurchaseItem : public JItem
-{
-  PurchaseItem();
-  void clear(bool bClearId = true);
-  bool isValid() const;
-  bool operator !=(const JItem& other) const;
-  bool operator ==(const JItem& other) const;
-
-  double subtotal() const;
-  QString strSubtotal() const;
-  QString strAmmount() const;
-  QString strPrice() const;
-
-  Product m_product;
-  double m_ammount;
-  double m_price;
-  Package m_package;
-};
+#include "purchaseelement.h"
 
 struct PaymentItem : public JItem
 {
@@ -63,7 +45,6 @@ struct Purchase : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
   JModel* SQL_table_model(QObject* parent) const;
-  static PurchaseItem SQL_select_last_item(Id supplierId, Id productId);
 
   void setEmployee(const JItemSQL& e) const;
 
@@ -86,7 +67,7 @@ struct Purchase : public JItemSQL
   PaymentMethod m_paymentMethod;
   QVector<PaymentItem> m_vPaymentItem;
   QString m_observation;
-  QVector<PurchaseItem> m_vItem;
+  QVector<PurchaseElement> m_vItem;
   double m_disccount;
   mutable Employee m_employee;
 };

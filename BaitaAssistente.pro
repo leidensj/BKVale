@@ -79,7 +79,11 @@ SOURCES += main.cpp\
     views/userview.cpp \
     shopview.cpp \
     widgets/jfilter.cpp \
-    filters/purchasefilter.cpp
+    filters/purchasefilter.cpp \
+    items/purchaseelement.cpp \
+    models/addressmodel.cpp \
+    models/categorymodel.cpp \
+    models/employeemodel.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -151,7 +155,12 @@ HEADERS  += mainwindow.h \
     views/shoppinglistview.h \
     views/userview.h \
     widgets/jfilter.h \
-    filters/purchasefilter.h
+    filters/purchasefilter.h \
+    items/jitemelementsql.h \
+    items/purchaseelement.h \
+    models/addressmodel.h \
+    models/categorymodel.h \
+    models/employeemodel.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

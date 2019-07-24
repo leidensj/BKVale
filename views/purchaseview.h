@@ -89,7 +89,6 @@ class PurchaseView : public JItemView
 public:
   explicit PurchaseView(QWidget *parent = 0);
   ~PurchaseView();
-  void addPurchaseItem(const PurchaseItem& o);
   bool save(Id& id);
   void setDate(const QDate& dt);
   QDate getDate() const;

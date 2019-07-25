@@ -149,20 +149,20 @@ namespace
   void purchaseAppendBody(const Purchase& o, QString& text)
   {
     text += ESC_ALIGN_LEFT;
-    for (int i = 0; i != o.m_vItem.size(); ++i)
+    for (int i = 0; i != o.m_vElement.size(); ++i)
     {
       QString item;
       {
-        QString itemPt1 = o.m_vItem.at(i).strAmmount();
-        itemPt1 += o.m_vItem.at(i).m_package.strUnity(o.m_vItem.at(i).m_product.m_unity);
-        itemPt1 += " x " + o.m_vItem.at(i).strPrice();
-        QString itemPt2 = o.m_vItem.at(i).strSubtotal();
+        QString itemPt1 = o.m_vElement.at(i).strAmmount();
+        itemPt1 += o.m_vElement.at(i).m_package.strUnity(o.m_vElement.at(i).m_product.m_unity);
+        itemPt1 += " x " + o.m_vElement.at(i).strPrice();
+        QString itemPt2 = o.m_vElement.at(i).strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += ".";
         item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      text += o.m_vItem.at(i).m_product.m_name + ESC_LF + item + ESC_LF;
+      text += o.m_vElement.at(i).m_product.m_name + ESC_LF + item + ESC_LF;
     }
   }
 }

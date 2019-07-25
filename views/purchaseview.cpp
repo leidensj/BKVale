@@ -159,14 +159,14 @@ Purchase::PaymentMethod PaymentWidget::getPaymentMethod() const
   return Purchase::PaymentMethod::Credit;
 }
 
-QVector<PaymentItem> PaymentWidget::getPaymentItems() const
+QVector<PaymentElement> PaymentWidget::getPayments() const
 {
-  QVector<PaymentItem> v;
+  QVector<PaymentElement> v;
   if (m_rdoCredit->isChecked())
   {
     for (int i = 0; i != m_tbCredit->rowCount(); ++i)
     {
-      PaymentItem o;
+      PaymentElement o;
       o.m_value += dynamic_cast<DoubleItem*>(m_tbCredit->item(i, (int)Column::Value))->getValue();
       o.m_date = dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->getDate();
       v.push_back(o);
@@ -197,7 +197,7 @@ void PaymentWidget::setPaymentMethod(Purchase::PaymentMethod o)
     m_rdoCredit->setChecked(true);
 }
 
-void PaymentWidget::setPaymentItems(const QVector<PaymentItem>& v)
+void PaymentWidget::setPayments(const QVector<PaymentElement>& v)
 {
   m_tbCredit->removeAllItems();
   for (int i = 0; i != v.size(); ++i)
@@ -448,11 +448,11 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_date = m_dtPicker->getDate();
   _o.m_supplier.m_id = m_supplierPicker->getId();
   _o.m_paymentMethod = m_wPayment->getPaymentMethod();
-  _o.m_vPaymentItem = m_wPayment->getPaymentItems();
+  _o.m_vPayment = m_wPayment->getPayments();
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->getValue();
   for (int i = 0; i != m_table->rowCount(); ++i)
-    _o.m_vItem.push_back(dynamic_cast<const PurchaseElement&>(m_table->getItem(i)));
+    _o.m_vElement.push_back(dynamic_cast<const PurchaseElement&>(m_table->getItem(i)));
 }
 
 void PurchaseView::setItem(const JItemSQL& o)
@@ -462,12 +462,12 @@ void PurchaseView::setItem(const JItemSQL& o)
   m_supplierPicker->clear();
   m_dtPicker->setDate(_o.m_date);
   m_snNumber->setValue(_o.m_number);
-  for (int i = 0; i != _o.m_vItem.size(); ++i)
-    m_table->addItem(_o.m_vItem.at(i));
+  for (int i = 0; i != _o.m_vElement.size(); ++i)
+    m_table->addItem(_o.m_vElement.at(i));
   m_supplierPicker->setItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);
   m_wPayment->setPaymentMethod(_o.m_paymentMethod);
-  m_wPayment->setPaymentItems(_o.m_vPaymentItem);
+  m_wPayment->setPayments(_o.m_vPayment);
   m_edDisccount->setText(_o.m_disccount);
   updateControls();
 }

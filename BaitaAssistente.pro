@@ -95,7 +95,8 @@ SOURCES += main.cpp\
     models/activeusermodel.cpp \
     models/jmodel.cpp \
     models/productcodemodel.cpp \
-    models/discountmodel.cpp
+    models/discountmodel.cpp \
+    items/paymentelement.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -184,7 +185,8 @@ HEADERS  += mainwindow.h \
     models/activeusermodel.h \
     models/jmodel.h \
     models/productcodemodel.h \
-    models/discountmodel.h
+    models/discountmodel.h \
+    items/paymentelement.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

@@ -55,9 +55,9 @@ class PaymentWidget : public QWidget
 public:
   explicit PaymentWidget(QWidget* parent = nullptr);
   Purchase::PaymentMethod getPaymentMethod() const;
-  QVector<PaymentItem> getPaymentItems() const;
+  QVector<PaymentElement> getPayments() const;
   void setPaymentMethod(Purchase::PaymentMethod o);
-  void setPaymentItems(const QVector<PaymentItem>& v);
+  void setPayments(const QVector<PaymentElement>& v);
   QIcon getIcon() const;
   QString getText() const;
 

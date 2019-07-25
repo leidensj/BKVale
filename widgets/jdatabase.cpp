@@ -482,7 +482,7 @@ JDatabaseSelector::JDatabaseSelector(const QString& tableName,
   vlayout0->addWidget(m_database);
   setLayout(vlayout0);
 
-  resize(500, 400);
+  resize(640, 480);
 
   QString title = "Selecionar " + JItemEx::text(tableName);
   QString icon = JItemEx::icon(tableName);

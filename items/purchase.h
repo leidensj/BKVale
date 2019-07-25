@@ -11,18 +11,7 @@
 #include "jitemsql.h"
 #include "employee.h"
 #include "purchaseelement.h"
-
-struct PaymentItem : public JItem
-{
-  double m_value;
-  QDate m_date;
-
-  PaymentItem();
-  void clear(bool bClearId = true);
-  bool operator != (const JItem& other) const;
-  bool operator == (const JItem& other) const;
-  bool isValid() const;
-};
+#include "paymentelement.h"
 
 struct Purchase : public JItemSQL
 {
@@ -64,9 +53,9 @@ struct Purchase : public JItemSQL
   QDate m_date;
   Supplier m_supplier;
   PaymentMethod m_paymentMethod;
-  QVector<PaymentItem> m_vPaymentItem;
+  QVector<PaymentElement> m_vPayment;
   QString m_observation;
-  QVector<PurchaseElement> m_vItem;
+  QVector<PurchaseElement> m_vElement;
   double m_disccount;
   mutable Employee m_employee;
 };

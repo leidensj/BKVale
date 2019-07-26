@@ -241,7 +241,7 @@ void PaymentWidget::emitMethodChangedSignal()
 }
 
 PurchaseView::PurchaseView(QWidget *parent)
-  : JItemView(NOTE_SQL_TABLE_NAME, parent)
+  : JItemView(PURCHASE_SQL_TABLE_NAME, parent)
   , m_btnOpenLast(nullptr)
   , m_btnAddCode(nullptr)
   , m_btnAddRemove(nullptr)

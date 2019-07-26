@@ -47,7 +47,7 @@ JItemSQL* JItemEx::create(const QString& tableName)
     return new Product;
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return new ProductCode;
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return new Purchase;
   if (tableName == USER_SQL_TABLE_NAME)
     return new User;
@@ -80,14 +80,14 @@ JItemSQL* JItemEx::create(const QString& tableName, Id id)
 
 bool JItemEx::authenticationToInsertUpdate(const QString& tableName)
 {
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return true;
   return false;
 }
 
 bool JItemEx::authenticationToRemove(const QString& tableName)
 {
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return true;
   return false;
 }
@@ -106,7 +106,7 @@ QString JItemEx::text(const QString& tableName)
     return "Produto";
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return "Código";
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return "Compra";
   if (tableName == USER_SQL_TABLE_NAME)
     return "Usuário";
@@ -143,7 +143,7 @@ QString JItemEx::icon(const QString& tableName)
     return ":/icons/res/item.png";
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return ":/icons/res/barcode.png";
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return ":/icons/res/purchase.png";
   if (tableName == USER_SQL_TABLE_NAME)
     return ":/icons/res/user.png";
@@ -178,7 +178,7 @@ JModel* JItemEx::model(const QString& tableName, QObject* parent)
     return new ProductModel(parent);
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return new ProductCodeModel(parent);
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return new PurchaseModel(parent);
   if (tableName == USER_SQL_TABLE_NAME)
     return new UserModel(parent);

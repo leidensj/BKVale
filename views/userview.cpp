@@ -220,7 +220,7 @@ QString UserView::idxToTableName(Idx idx)
     case Idx::Store:
       return STORE_SQL_TABLE_NAME;
     case Idx::Purchase:
-      return NOTE_SQL_TABLE_NAME;
+      return PURCHASE_SQL_TABLE_NAME;
     case Idx::Reminder:
       return REMINDER_SQL_TABLE_NAME;
     case Idx::ShoppingList:

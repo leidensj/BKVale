@@ -59,13 +59,13 @@ QString PurchaseElement::strPrice() const
 bool PurchaseElement::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " NOTE_ITEMS_SQL_TABLE_NAME " ("
-                NOTE_ITEMS_SQL_COL01 ","
-                NOTE_ITEMS_SQL_COL02 ","
-                NOTE_ITEMS_SQL_COL03 ","
-                NOTE_ITEMS_SQL_COL04 ","
-                NOTE_ITEMS_SQL_COL05 ","
-                NOTE_ITEMS_SQL_COL06 ","
-                NOTE_ITEMS_SQL_COL07
+                NOTE_ELEMENTS_SQL_COL_NID ","
+                NOTE_ELEMENTS_SQL_COL_PID ","
+                NOTE_ELEMENTS_SQL_COL_AMT ","
+                NOTE_ITEMS_SQL_COL_PRC ","
+                NOTE_ELEMENTS_SQL_COL_PCK ","
+                NOTE_ELEMENTS_SQL_COL_UNT ","
+                NOTE_ELEMENTS_SQL_COL_PAM
                 ") VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -94,14 +94,14 @@ bool PurchaseElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, 
   v.clear();
   query.prepare("SELECT "
                 SQL_COLID ","
-                NOTE_ITEMS_SQL_COL02 ","
-                NOTE_ITEMS_SQL_COL03 ","
-                NOTE_ITEMS_SQL_COL04 ","
-                NOTE_ITEMS_SQL_COL05 ","
-                NOTE_ITEMS_SQL_COL06 ","
-                NOTE_ITEMS_SQL_COL07
+                NOTE_ELEMENTS_SQL_COL_PID ","
+                NOTE_ELEMENTS_SQL_COL_AMT ","
+                NOTE_ITEMS_SQL_COL_PRC ","
+                NOTE_ELEMENTS_SQL_COL_PCK ","
+                NOTE_ELEMENTS_SQL_COL_UNT ","
+                NOTE_ELEMENTS_SQL_COL_PAM
                 " FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
+                " WHERE " NOTE_ELEMENTS_SQL_COL_NID " = (:_v01)");
   query.bindValue(":_v01", ownerId.get());
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -131,13 +131,13 @@ bool PurchaseElement::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                NOTE_ITEMS_SQL_COL01 ","
-                NOTE_ITEMS_SQL_COL02 ","
-                NOTE_ITEMS_SQL_COL03 ","
-                NOTE_ITEMS_SQL_COL04 ","
-                NOTE_ITEMS_SQL_COL05 ","
-                NOTE_ITEMS_SQL_COL06 ","
-                NOTE_ITEMS_SQL_COL07
+                NOTE_ELEMENTS_SQL_COL_NID ","
+                NOTE_ELEMENTS_SQL_COL_PID ","
+                NOTE_ELEMENTS_SQL_COL_AMT ","
+                NOTE_ITEMS_SQL_COL_PRC ","
+                NOTE_ELEMENTS_SQL_COL_PCK ","
+                NOTE_ELEMENTS_SQL_COL_UNT ","
+                NOTE_ELEMENTS_SQL_COL_PAM
                 " FROM " NOTE_ITEMS_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -179,13 +179,13 @@ void PurchaseElement::SQL_select_last(Id productId, Id supplierId)
 
   query.prepare("SELECT "
                 NOTE_ITEMS_SQL_TABLE_NAME "." SQL_COLID
-                " FROM " NOTE_SQL_TABLE_NAME
+                " FROM " PURCHASE_SQL_TABLE_NAME
                 " INNER JOIN " NOTE_ITEMS_SQL_TABLE_NAME
-                " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID
-                " = " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL01
-                " WHERE " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03
+                " ON " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+                " = " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ELEMENTS_SQL_COL_NID
+                " WHERE " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL
                 " = (:_v01)"
-                " AND " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ITEMS_SQL_COL02
+                " AND " NOTE_ITEMS_SQL_TABLE_NAME "." NOTE_ELEMENTS_SQL_COL_PID
                 " = (:_v02) "
                 " ORDER BY " NOTE_ITEMS_SQL_TABLE_NAME "." SQL_COLID
                 " DESC LIMIT 1");
@@ -205,7 +205,7 @@ void PurchaseElement::SQL_select_last(Id productId, Id supplierId)
 bool PurchaseElement::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
 {
   query.prepare("DELETE FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                " WHERE " NOTE_ITEMS_SQL_COL01 " = (:_v01)");
+                " WHERE " NOTE_ELEMENTS_SQL_COL_NID " = (:_v01)");
   query.bindValue(":_v01", ownerId.get());
   return query.exec();
 }

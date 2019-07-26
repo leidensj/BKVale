@@ -129,12 +129,12 @@ void Purchase::adjustPayment()
 
 QString Purchase::SQL_tableName() const
 {
-  return NOTE_SQL_TABLE_NAME;
+  return PURCHASE_SQL_TABLE_NAME;
 }
 
 bool Purchase::SQL_insert_proc(QSqlQuery& query) const
 {
-  bool bSuccess = query.exec("SELECT MAX(" NOTE_SQL_COL01 ") FROM " NOTE_SQL_TABLE_NAME);
+  bool bSuccess = query.exec("SELECT MAX(" PURCHASE_SQL_COL_NMB ") FROM " PURCHASE_SQL_TABLE_NAME);
   if (bSuccess)
   {
     m_number = query.next()
@@ -142,14 +142,14 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
                : NOTE_DEFAULT_NUMBER;
     m_number = m_number > NOTE_DEFAULT_NUMBER ? m_number : NOTE_DEFAULT_NUMBER;
 
-    query.prepare("INSERT INTO " NOTE_SQL_TABLE_NAME " ("
-                  NOTE_SQL_COL01 ","
-                  NOTE_SQL_COL02 ","
-                  NOTE_SQL_COL03 ","
-                  NOTE_SQL_COL04 ","
-                  NOTE_SQL_COL05 ","
-                  NOTE_SQL_COL06 ","
-                  NOTE_SQL_COL07
+    query.prepare("INSERT INTO " PURCHASE_SQL_TABLE_NAME " ("
+                  PURCHASE_SQL_COL_NMB ","
+                  PURCHASE_SQL_COL_DTE ","
+                  PURCHASE_SQL_COL_SPL ","
+                  PURCHASE_SQL_COL_OBS ","
+                  PURCHASE_SQL_COL_DSC ","
+                  PURCHASE_SQL_COL_EMP ","
+                  PURCHASE_SQL_COL_MTH
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
@@ -188,13 +188,13 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
 
 bool Purchase::SQL_update_proc(QSqlQuery& query) const
 {
-  query.prepare("UPDATE " NOTE_SQL_TABLE_NAME " SET "
-                NOTE_SQL_COL02 " = (:_v02),"
-                NOTE_SQL_COL03 " = (:_v03),"
-                NOTE_SQL_COL04 " = (:_v04),"
-                NOTE_SQL_COL05 " = (:_v05),"
-                NOTE_SQL_COL06 " = (:_v06),"
-                NOTE_SQL_COL07 " = (:_v07) "
+  query.prepare("UPDATE " PURCHASE_SQL_TABLE_NAME " SET "
+                PURCHASE_SQL_COL_DTE " = (:_v02),"
+                PURCHASE_SQL_COL_SPL " = (:_v03),"
+                PURCHASE_SQL_COL_OBS " = (:_v04),"
+                PURCHASE_SQL_COL_DSC " = (:_v05),"
+                PURCHASE_SQL_COL_EMP " = (:_v06),"
+                PURCHASE_SQL_COL_MTH " = (:_v07) "
                 "WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v02", m_date);
@@ -233,14 +233,14 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
   clear(false);
   error.clear();
   query.prepare("SELECT "
-                NOTE_SQL_COL01 ","
-                NOTE_SQL_COL02 ","
-                NOTE_SQL_COL03 ","
-                NOTE_SQL_COL04 ","
-                NOTE_SQL_COL05 ","
-                NOTE_SQL_COL06 ","
-                NOTE_SQL_COL07
-                " FROM " NOTE_SQL_TABLE_NAME
+                PURCHASE_SQL_COL_NMB ","
+                PURCHASE_SQL_COL_DTE ","
+                PURCHASE_SQL_COL_SPL ","
+                PURCHASE_SQL_COL_OBS ","
+                PURCHASE_SQL_COL_DSC ","
+                PURCHASE_SQL_COL_EMP ","
+                PURCHASE_SQL_COL_MTH
+                " FROM " PURCHASE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   bool bSuccess = query.exec();
@@ -281,7 +281,7 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
 
 bool Purchase::SQL_remove_proc(QSqlQuery& query) const
 {
-  query.prepare("DELETE FROM " NOTE_SQL_TABLE_NAME
+  query.prepare("DELETE FROM " PURCHASE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();

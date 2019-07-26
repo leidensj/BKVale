@@ -18,7 +18,7 @@ void Employee::clear(bool bClearId)
 
 bool Employee::hasPermissionToEdit(const QString& tableName) const
 {
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return m_bPurchaseEdit;
   else
     return false;
@@ -26,7 +26,7 @@ bool Employee::hasPermissionToEdit(const QString& tableName) const
 
 bool Employee::hasPermissionToRemove(const QString& tableName) const
 {
-  if (tableName == NOTE_SQL_TABLE_NAME)
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
     return m_bPurchaseRemove;
   else
     return false;

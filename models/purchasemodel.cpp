@@ -10,22 +10,22 @@ PurchaseModel::PurchaseModel(QObject *parent)
 QString PurchaseModel::getStrQuery()
 {
   QString strQuery("SELECT "
-                   NOTE_SQL_TABLE_NAME "." SQL_COLID ","
-                   NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL01 ","
-                   NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 ","
+                   PURCHASE_SQL_TABLE_NAME "." SQL_COLID ","
+                   PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_NMB ","
+                   PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DTE ","
                    FORM_SQL_TABLE_NAME "." FORM_SQL_COL03 ","
                    FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
-                                                          "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL05 ")"
-                                                                                                                                      " FROM " NOTE_SQL_TABLE_NAME
+                                                          "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DSC ")"
+                                                                                                                                      " FROM " PURCHASE_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
-                   "(SELECT " NOTE_ITEMS_SQL_COL01 ","
-                                                   "COALESCE(SUM(" NOTE_ITEMS_SQL_COL03 "*" NOTE_ITEMS_SQL_COL04 "), 0) AS _TSUBTOTAL"
+                   "(SELECT " NOTE_ELEMENTS_SQL_COL_NID ","
+                                                   "COALESCE(SUM(" NOTE_ELEMENTS_SQL_COL_AMT "*" NOTE_ITEMS_SQL_COL_PRC "), 0) AS _TSUBTOTAL"
                                                                                                                  " FROM " NOTE_ITEMS_SQL_TABLE_NAME
-                   " GROUP BY " NOTE_ITEMS_SQL_COL01 ") AS _TTOTAL"
-                                                     " ON " NOTE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." NOTE_ITEMS_SQL_COL01
+                   " GROUP BY " NOTE_ELEMENTS_SQL_COL_NID ") AS _TTOTAL"
+                                                     " ON " PURCHASE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." NOTE_ELEMENTS_SQL_COL_NID
                    " LEFT OUTER JOIN "
                    SUPPLIER_SQL_TABLE_NAME
-                   " ON " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 "=" SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
+                   " ON " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL "=" SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
                    " LEFT OUTER JOIN "
                    FORM_SQL_TABLE_NAME
                    " ON " SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL01 " = " FORM_SQL_TABLE_NAME "." SQL_COLID);

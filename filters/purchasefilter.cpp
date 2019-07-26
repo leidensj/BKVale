@@ -55,7 +55,7 @@ QString PurchaseFilter::getFilter() const
 {
   QString strFilter;
   if (m_cbDate->isChecked())
-    strFilter += " " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL02 " BETWEEN '" +
+    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DTE " BETWEEN '" +
                  m_dtBegin->date().toString(Qt::ISODate) + "' AND '" +
                  m_dtEnd->date().toString(Qt::ISODate) + "' ";
 
@@ -65,7 +65,7 @@ QString PurchaseFilter::getFilter() const
   {
     if (!strFilter.isEmpty())
       strFilter += " AND ";
-    strFilter += " " NOTE_SQL_TABLE_NAME "." NOTE_SQL_COL03 " IN (";
+    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " IN (";
     for (int i = 0; i != vSupplier.size(); ++i)
       strFilter += vSupplier.at(i).str() + ",";
     strFilter.chop(1);
@@ -78,10 +78,10 @@ QString PurchaseFilter::getFilter() const
   {
     if (!strFilter.isEmpty())
       strFilter += " AND ";
-    strFilter += " " NOTE_SQL_TABLE_NAME "." SQL_COLID
-                 " = ANY (SELECT " NOTE_ITEMS_SQL_COL01 " FROM "
+    strFilter += " " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+                 " = ANY (SELECT " NOTE_ELEMENTS_SQL_COL_NID " FROM "
                  NOTE_ITEMS_SQL_TABLE_NAME " WHERE "
-                 NOTE_ITEMS_SQL_COL02 " IN (";
+                 NOTE_ELEMENTS_SQL_COL_PID " IN (";
     for (int i = 0; i != vProduct.size(); ++i)
       strFilter += vProduct.at(i).str() + ",";
     strFilter.chop(1);

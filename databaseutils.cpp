@@ -282,33 +282,33 @@ bool BaitaSQL::createTables(QString& error)
                           STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
-  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_SQL_TABLE_NAME " ("
+  bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PURCHASE_SQL_TABLE_NAME " ("
                         SQL_COLID " SERIAL PRIMARY KEY,"
-                        NOTE_SQL_COL01 " INTEGER UNIQUE NOT NULL,"
-                        NOTE_SQL_COL02 " DATE NOT NULL,"
-                        NOTE_SQL_COL03 " INTEGER,"
-                        NOTE_SQL_COL04 " TEXT,"
-                        NOTE_SQL_COL05 " REAL,"
-                        NOTE_SQL_COL06 " INTEGER,"
-                        NOTE_SQL_COL07 " INTEGER,"
-                        "FOREIGN KEY(" NOTE_SQL_COL03 ") REFERENCES "
+                        PURCHASE_SQL_COL_NMB " INTEGER UNIQUE NOT NULL,"
+                        PURCHASE_SQL_COL_DTE " DATE NOT NULL,"
+                        PURCHASE_SQL_COL_SPL " INTEGER,"
+                        PURCHASE_SQL_COL_OBS " TEXT,"
+                        PURCHASE_SQL_COL_DSC " REAL,"
+                        PURCHASE_SQL_COL_EMP " INTEGER,"
+                        PURCHASE_SQL_COL_MTH " INTEGER,"
+                        "FOREIGN KEY(" PURCHASE_SQL_COL_SPL ") REFERENCES "
                         SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
-                        "FOREIGN KEY(" NOTE_SQL_COL06 ") REFERENCES "
+                        "FOREIGN KEY(" PURCHASE_SQL_COL_EMP ") REFERENCES "
                         EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          NOTE_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
-                          NOTE_ITEMS_SQL_COL02 " INTEGER,"
-                          NOTE_ITEMS_SQL_COL03 " REAL,"
-                          NOTE_ITEMS_SQL_COL04 " REAL,"
-                          NOTE_ITEMS_SQL_COL05 " BOOLEAN,"
-                          NOTE_ITEMS_SQL_COL06 " TEXT,"
-                          NOTE_ITEMS_SQL_COL07 " REAL,"
-                          "FOREIGN KEY(" NOTE_ITEMS_SQL_COL01 ") REFERENCES "
-                          NOTE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" NOTE_ITEMS_SQL_COL02 ") REFERENCES "
+                          NOTE_ELEMENTS_SQL_COL_NID " INTEGER NOT NULL,"
+                          NOTE_ELEMENTS_SQL_COL_PID " INTEGER,"
+                          NOTE_ELEMENTS_SQL_COL_AMT " REAL,"
+                          NOTE_ITEMS_SQL_COL_PRC " REAL,"
+                          NOTE_ELEMENTS_SQL_COL_PCK " BOOLEAN,"
+                          NOTE_ELEMENTS_SQL_COL_UNT " TEXT,"
+                          NOTE_ELEMENTS_SQL_COL_PAM " REAL,"
+                          "FOREIGN KEY(" NOTE_ELEMENTS_SQL_COL_NID ") REFERENCES "
+                          PURCHASE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" NOTE_ELEMENTS_SQL_COL_PID ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
@@ -318,7 +318,7 @@ bool BaitaSQL::createTables(QString& error)
                           NOTE_PAYMENT_ITEMS_SQL_COL02 " DATE,"
                           NOTE_PAYMENT_ITEMS_SQL_COL03 " REAL,"
                           "FOREIGN KEY(" NOTE_PAYMENT_ITEMS_SQL_COL01 ") REFERENCES "
-                          NOTE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+                          PURCHASE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHOPPING_LIST_SQL_TABLE_NAME " ("

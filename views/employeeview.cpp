@@ -49,8 +49,8 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_trPermissions->setColumnCount(1);
   m_trPermissions->header()->setVisible(false);
   auto root = new QTreeWidgetItem;
-  root->setText(0, JItemEx::text(NOTE_SQL_TABLE_NAME));
-  root->setIcon(0, QIcon(JItemEx::icon(NOTE_SQL_TABLE_NAME)));
+  root->setText(0, JItemEx::text(PURCHASE_SQL_TABLE_NAME));
+  root->setIcon(0, QIcon(JItemEx::icon(PURCHASE_SQL_TABLE_NAME)));
   m_trPermissions->insertTopLevelItem(0, root);
   m_triPurchaseEdit = new QTreeWidgetItem;
   m_triPurchaseRemove = new QTreeWidgetItem;

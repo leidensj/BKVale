@@ -169,5 +169,6 @@
         <file>res/shoppinglistmgt.png</file>
         <file>res/pencil.png</file>
         <file>res/purchase.png</file>
+        <file>res/apportionment.png</file>
     </qresource>
 </RCC>

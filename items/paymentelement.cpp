@@ -33,10 +33,10 @@ bool PaymentElement::isValid() const
 
 bool PaymentElement::SQL_insert_proc(QSqlQuery& query) const
 {
-  query.prepare("INSERT INTO " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME " ("
-                NOTE_PAYMENT_ITEMS_SQL_COL01 ","
-                NOTE_PAYMENT_ITEMS_SQL_COL02 ","
-                NOTE_PAYMENT_ITEMS_SQL_COL03
+  query.prepare("INSERT INTO " PAYMENT_ELEMENTS_SQL_TABLE_NAME " ("
+                PAYMENT_ELEMENTS_SQL_COL_NID ","
+                PAYMENT_ELEMENTS_SQL_COL_DTE ","
+                PAYMENT_ELEMENTS_SQL_COL_VLE
                 ") VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -54,10 +54,10 @@ bool PaymentElement::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                NOTE_PAYMENT_ITEMS_SQL_COL01 ","
-                NOTE_PAYMENT_ITEMS_SQL_COL02 ","
-                NOTE_PAYMENT_ITEMS_SQL_COL03
-                " FROM " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME
+                PAYMENT_ELEMENTS_SQL_COL_NID ","
+                PAYMENT_ELEMENTS_SQL_COL_DTE ","
+                PAYMENT_ELEMENTS_SQL_COL_VLE
+                " FROM " PAYMENT_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   bool bSuccess = query.exec();
@@ -87,10 +87,10 @@ bool PaymentElement::SQL_select_by_owner_id_proc(QSqlQuery& query,
   v.clear();
   query.prepare("SELECT "
                 SQL_COLID ","
-                NOTE_PAYMENT_ITEMS_SQL_COL02 ","
-                NOTE_PAYMENT_ITEMS_SQL_COL03
-                " FROM " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME
-                " WHERE " NOTE_PAYMENT_ITEMS_SQL_COL01 " = (:_v01)");
+                PAYMENT_ELEMENTS_SQL_COL_DTE ","
+                PAYMENT_ELEMENTS_SQL_COL_VLE
+                " FROM " PAYMENT_ELEMENTS_SQL_TABLE_NAME
+                " WHERE " PAYMENT_ELEMENTS_SQL_COL_NID " = (:_v01)");
   query.bindValue(":_v01", ownerId.get());
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -110,8 +110,8 @@ bool PaymentElement::SQL_select_by_owner_id_proc(QSqlQuery& query,
 
 bool PaymentElement::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
 {
-  query.prepare("DELETE FROM " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME
-                " WHERE " NOTE_PAYMENT_ITEMS_SQL_COL01 " = (:_v01)");
+  query.prepare("DELETE FROM " PAYMENT_ELEMENTS_SQL_TABLE_NAME
+                " WHERE " PAYMENT_ELEMENTS_SQL_COL_NID " = (:_v01)");
   query.bindValue(":_v01", ownerId.get());
   return query.exec();
 }

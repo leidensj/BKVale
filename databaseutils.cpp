@@ -297,27 +297,27 @@ bool BaitaSQL::createTables(QString& error)
                         EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_ITEMS_SQL_TABLE_NAME " ("
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PURCHASE_ELEMENTS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          NOTE_ELEMENTS_SQL_COL_NID " INTEGER NOT NULL,"
-                          NOTE_ELEMENTS_SQL_COL_PID " INTEGER,"
-                          NOTE_ELEMENTS_SQL_COL_AMT " REAL,"
-                          NOTE_ITEMS_SQL_COL_PRC " REAL,"
-                          NOTE_ELEMENTS_SQL_COL_PCK " BOOLEAN,"
-                          NOTE_ELEMENTS_SQL_COL_UNT " TEXT,"
-                          NOTE_ELEMENTS_SQL_COL_PAM " REAL,"
-                          "FOREIGN KEY(" NOTE_ELEMENTS_SQL_COL_NID ") REFERENCES "
+                          PURCHASE_ELEMENTS_SQL_COL_NID " INTEGER NOT NULL,"
+                          PURCHASE_ELEMENTS_SQL_COL_PID " INTEGER,"
+                          PURCHASE_ELEMENTS_SQL_COL_AMT " REAL,"
+                          PURCHASE_ELEMENTS_SQL_COL_PRC " REAL,"
+                          PURCHASE_ELEMENTS_SQL_COL_PCK " BOOLEAN,"
+                          PURCHASE_ELEMENTS_SQL_COL_UNT " TEXT,"
+                          PURCHASE_ELEMENTS_SQL_COL_PAM " REAL,"
+                          "FOREIGN KEY(" PURCHASE_ELEMENTS_SQL_COL_NID ") REFERENCES "
                           PURCHASE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" NOTE_ELEMENTS_SQL_COL_PID ") REFERENCES "
+                          "FOREIGN KEY(" PURCHASE_ELEMENTS_SQL_COL_PID ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " NOTE_PAYMENT_ITEMS_SQL_TABLE_NAME " ("
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PAYMENT_ELEMENTS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          NOTE_PAYMENT_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
-                          NOTE_PAYMENT_ITEMS_SQL_COL02 " DATE,"
-                          NOTE_PAYMENT_ITEMS_SQL_COL03 " REAL,"
-                          "FOREIGN KEY(" NOTE_PAYMENT_ITEMS_SQL_COL01 ") REFERENCES "
+                          PAYMENT_ELEMENTS_SQL_COL_NID " INTEGER NOT NULL,"
+                          PAYMENT_ELEMENTS_SQL_COL_DTE " DATE,"
+                          PAYMENT_ELEMENTS_SQL_COL_VLE " REAL,"
+                          "FOREIGN KEY(" PAYMENT_ELEMENTS_SQL_COL_NID ") REFERENCES "
                           PURCHASE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)

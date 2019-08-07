@@ -6,9 +6,6 @@
 #include <QGroupBox>
 #include <QFormLayout>
 
-/* PRODUCT FILTER */
-/*WHERE _NOTES._ID = ANY (SELECT _NOTEID FROM _NOTE_ITEMS WHERE _PRODUCTID IN(...))*/
-
 PurchaseFilter::PurchaseFilter(QWidget* parent)
   : JFilter(parent)
   , m_cbDate(nullptr)
@@ -79,9 +76,9 @@ QString PurchaseFilter::getFilter() const
     if (!strFilter.isEmpty())
       strFilter += " AND ";
     strFilter += " " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
-                 " = ANY (SELECT " NOTE_ELEMENTS_SQL_COL_NID " FROM "
-                 NOTE_ITEMS_SQL_TABLE_NAME " WHERE "
-                 NOTE_ELEMENTS_SQL_COL_PID " IN (";
+                 " = ANY (SELECT " PURCHASE_ELEMENTS_SQL_COL_NID " FROM "
+                 PURCHASE_ELEMENTS_SQL_TABLE_NAME " WHERE "
+                 PURCHASE_ELEMENTS_SQL_COL_PID " IN (";
     for (int i = 0; i != vProduct.size(); ++i)
       strFilter += vProduct.at(i).str() + ",";
     strFilter.chop(1);

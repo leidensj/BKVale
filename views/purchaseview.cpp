@@ -256,6 +256,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_edSum(nullptr)
   , m_teObservation(nullptr)
   , m_filter(nullptr)
+  , m_btnApportionment(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -363,9 +364,16 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
+  m_btnApportionment = new QPushButton;
+  m_btnApportionment->setFlat(true);
+  m_btnApportionment->setIconSize(QSize(16, 16));
+  m_btnApportionment->setIcon(QIcon(":/icons/res/apportionment.png"));
+  m_btnApportionment->setToolTip(tr("Ratear valor entre os produtos"));
+
   QHBoxLayout* ltTotal = new QHBoxLayout;
   ltTotal->setContentsMargins(0, 0, 0, 0);
   ltTotal->addWidget(m_edDisccount);
+  ltTotal->addWidget(m_btnApportionment);
   ltTotal->addStretch();
   ltTotal->addWidget(m_edTotal);
 

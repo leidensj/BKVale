@@ -139,8 +139,8 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
   {
     m_number = query.next()
                ? query.value(0).toLongLong() + 1
-               : NOTE_DEFAULT_NUMBER;
-    m_number = m_number > NOTE_DEFAULT_NUMBER ? m_number : NOTE_DEFAULT_NUMBER;
+               : PURCHASE_DEFAULT_NUMBER;
+    m_number = m_number > PURCHASE_DEFAULT_NUMBER ? m_number : PURCHASE_DEFAULT_NUMBER;
 
     query.prepare("INSERT INTO " PURCHASE_SQL_TABLE_NAME " ("
                   PURCHASE_SQL_COL_NMB ","

@@ -117,6 +117,7 @@ private:
   JLineEdit* m_edSum;
   QPlainTextEdit* m_teObservation;
   PurchaseFilter* m_filter;
+  QPushButton* m_btnApportionment;
 
 private slots:
   void removeProduct();

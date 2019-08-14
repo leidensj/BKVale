@@ -30,7 +30,7 @@ class JTable;
 class QTableWidgetItem;
 class QRadioButton;
 class PurchaseFilter;
-class QComboBox;
+class JDatabaseComboBox;
 
 class PaymentWidget : public QWidget
 {
@@ -119,7 +119,7 @@ private:
   QPlainTextEdit* m_teObservation;
   PurchaseFilter* m_filter;
   QPushButton* m_btnApportionment;
-  QComboBox* m_cbStore;
+  JDatabaseComboBox* m_cbStore;
 
 private slots:
   void removeProduct();

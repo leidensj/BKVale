@@ -10,6 +10,7 @@
 #include "widgets/jtablewidgetitem.h"
 #include "widgets/jdatepicker.h"
 #include "filters/purchasefilter.h"
+#include "models/storemodel.h"
 #include "packageeditor.h"
 #include <QPlainTextEdit>
 #include <QLineEdit>
@@ -22,6 +23,7 @@
 #include <QTabWidget>
 #include <QFormLayout>
 #include <QRadioButton>
+#include <QComboBox>
 #include "items/jitemex.h"
 
 PaymentWidget::PaymentWidget(QWidget* parent)
@@ -257,6 +259,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_teObservation(nullptr)
   , m_filter(nullptr)
   , m_btnApportionment(nullptr)
+  , m_cbStore(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -288,6 +291,12 @@ PurchaseView::PurchaseView(QWidget *parent)
     font.setPointSize(12);
     lblNumber->setFont(font);
   }
+
+  JModel* model = new StoreModel(this);
+  model->select();
+  m_cbStore = new QComboBox;
+  m_cbStore->setModel(model);
+  m_cbStore->setModelColumn(1);
 
   m_snNumber = new QSpinBox();
   m_snNumber->setReadOnly(true);
@@ -338,6 +347,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_supplierPicker->setPlaceholderText(true);
 
   QVBoxLayout* ltHeader = new QVBoxLayout;
+  ltHeader->addWidget(m_cbStore);
   ltHeader->addLayout(ltCmd);
   ltHeader->addWidget(m_supplierPicker);
 
@@ -465,6 +475,8 @@ void PurchaseView::getItem(JItemSQL& o) const
 
 void PurchaseView::setItem(const JItemSQL& o)
 {
+  JModel* model = dynamic_cast<JModel*>(m_cbStore->model());
+  model->select();
   const Purchase& _o = dynamic_cast<const Purchase&>(o);
   m_table->removeAllItems();
   m_supplierPicker->clear();

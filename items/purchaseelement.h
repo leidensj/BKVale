@@ -16,7 +16,7 @@ struct PurchaseElement : public JItemElementSQL
   bool SQL_insert_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
 
-  void SQL_select_last(Id productId, Id supplierId);
+  void SQL_select_last(Id supplierId, Id productId);
   static bool SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<PurchaseElement>& v, QString& error);
   static bool SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId);
 

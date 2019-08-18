@@ -142,8 +142,15 @@
     </property>
     <addaction name="actionDiscount"/>
    </widget>
+   <widget class="QMenu" name="menuRelat_rios">
+    <property name="title">
+     <string>Relatórios</string>
+    </property>
+    <addaction name="actionPurchaseReport"/>
+   </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
+   <addaction name="menuRelat_rios"/>
    <addaction name="menuFerramentas"/>
    <addaction name="menuProt_tipos"/>
    <addaction name="menuImpressora"/>
@@ -421,6 +428,15 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar quais produtos comprar e que quantidades</string>
+   </property>
+  </action>
+  <action name="actionPurchaseReport">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/purchase.png</normaloff>:/icons/res/purchase.png</iconset>
+   </property>
+   <property name="text">
+    <string>Relatório de Compras</string>
    </property>
   </action>
  </widget>

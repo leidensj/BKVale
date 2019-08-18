@@ -167,7 +167,7 @@ bool PurchaseElement::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-void PurchaseElement::SQL_select_last(Id productId, Id supplierId)
+void PurchaseElement::SQL_select_last(Id supplierId, Id productId)
 {
   QString error;
   if (!JItemSQL::SQL_isOpen(error))

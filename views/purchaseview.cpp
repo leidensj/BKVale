@@ -23,7 +23,10 @@
 #include <QTabWidget>
 #include <QFormLayout>
 #include <QRadioButton>
+#include <QSettings>
 #include "items/jitemex.h"
+
+#define SETTINGS_PURCHASE_STORE_ID "purchase/storeid"
 
 PaymentWidget::PaymentWidget(QWidget* parent)
   : QWidget(parent)
@@ -464,6 +467,7 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_vPayment = m_wPayment->getPayments();
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->getValue();
+  _o.m_store.m_id = m_cbStore->getCurrentId();
   for (int i = 0; i != m_table->rowCount(); ++i)
     _o.m_vElement.push_back(dynamic_cast<const PurchaseElement&>(m_table->getItem(i)));
 }
@@ -472,6 +476,12 @@ void PurchaseView::setItem(const JItemSQL& o)
 {
   m_cbStore->refresh();
   const Purchase& _o = dynamic_cast<const Purchase&>(o);
+  if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
+  {
+    QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
+    _o.m_store.m_id.set(settings.value(SETTINGS_PURCHASE_STORE_ID).toLongLong());
+    m_cbStore->setCurrentId(_o.m_store.m_id);
+  }
   m_table->removeAllItems();
   m_supplierPicker->clear();
   m_dtPicker->setDate(_o.m_date);
@@ -542,6 +552,11 @@ bool PurchaseView::save(Id& id)
   bool bSuccess = m_database->save(o);
   if (bSuccess)
   {
+    if (o.m_store.m_id.isValid())
+    {
+      QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
+      settings.setValue(SETTINGS_PURCHASE_STORE_ID, o.m_store.m_id.get());
+    }
     id = o.m_id;
     m_lastId = o.m_id;
     create();

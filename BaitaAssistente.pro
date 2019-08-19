@@ -96,7 +96,8 @@ SOURCES += main.cpp\
     models/jmodel.cpp \
     models/productcodemodel.cpp \
     models/discountmodel.cpp \
-    items/paymentelement.cpp
+    items/paymentelement.cpp \
+    widgets/jdatabasecombobox.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -186,7 +187,8 @@ HEADERS  += mainwindow.h \
     models/jmodel.h \
     models/productcodemodel.h \
     models/discountmodel.h \
-    items/paymentelement.h
+    items/paymentelement.h \
+    widgets/jdatabasecombobox.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

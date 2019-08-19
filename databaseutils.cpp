@@ -291,10 +291,13 @@ bool BaitaSQL::createTables(QString& error)
                         PURCHASE_SQL_COL_DSC " REAL,"
                         PURCHASE_SQL_COL_EMP " INTEGER,"
                         PURCHASE_SQL_COL_MTH " INTEGER,"
+                        PURCHASE_SQL_COL_STR " INTEGER,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_SPL ") REFERENCES "
                         SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_EMP ") REFERENCES "
-                        EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                        EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
+                        "FOREIGN KEY(" PURCHASE_SQL_COL_STR ") REFERENCES "
+                        STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PURCHASE_ELEMENTS_SQL_TABLE_NAME " ("

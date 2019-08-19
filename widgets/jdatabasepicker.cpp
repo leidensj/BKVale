@@ -93,8 +93,13 @@ bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIm
         QString str, strTooltip;
         for (int i = 0; i != m_names.size(); ++i)
         {
-          str += m_names.at(i) + "; ";
-          strTooltip += m_names.at(i) + "\n";
+          str += m_names.at(i);
+          strTooltip += m_names.at(i);
+          if (i != (m_names.size() - 1))
+          {
+            str += "; ";
+            strTooltip += "\n";
+          }
         }
         m_edText->setText(str);
         m_edText->setToolTip(strTooltip);

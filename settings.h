@@ -18,6 +18,7 @@ struct Settings
   QSerialPort::FlowControl m_serialFlowControl;
   QSerialPort::Parity m_serialParity;
   QSerialPort::StopBits m_serialStopBits;
+  qlonglong m_purchaseStoreId;
 
   void clear();
   void save() const;

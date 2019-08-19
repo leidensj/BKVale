@@ -2,9 +2,6 @@
 #include "defines.h"
 #include <QSettings>
 
-#define COMPANY_NAME "LEICO"
-#define APP_NAME     "BaitaAssistente"
-
 #define DATABASE_HOST_NAME     "databaseHostName"
 #define DATABASE_PORT          "databasePort"
 #define IS_ETHERNET            "isethernet"
@@ -41,7 +38,7 @@ void Settings::clear()
 
 void Settings::save() const
 {
-  QSettings settings(COMPANY_NAME, APP_NAME);
+  QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
   settings.setValue(DATABASE_HOST_NAME, m_databaseHostName);
   settings.setValue(DATABASE_PORT, m_databasePort);
   settings.setValue(IS_ETHERNET, m_bIsPrinterEthernet);
@@ -57,7 +54,7 @@ void Settings::save() const
 
 void Settings::load()
 {
-  QSettings settings(COMPANY_NAME, APP_NAME);
+  QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
   m_databaseHostName = settings.value(DATABASE_HOST_NAME).toString();
   m_databasePort = settings.value(DATABASE_PORT, DEFAULT_DATABASE_PORT).toInt();
   m_bIsPrinterEthernet = settings.value(IS_ETHERNET, false).toBool();

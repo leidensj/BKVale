@@ -12,6 +12,7 @@
 #include "employee.h"
 #include "purchaseelement.h"
 #include "paymentelement.h"
+#include "store.h"
 
 struct Purchase : public JItemSQL
 {
@@ -57,6 +58,7 @@ struct Purchase : public JItemSQL
   QString m_observation;
   QVector<PurchaseElement> m_vElement;
   double m_disccount;
+  Store m_store;
   mutable Employee m_employee;
 };
 

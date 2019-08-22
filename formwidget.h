@@ -11,10 +11,11 @@ class QDateEdit;
 class JDatabasePicker;
 class QCheckBox;
 class QPushButton;
-class PhoneTable;
 class AddressTable;
 class JAddRemoveButtons;
 class JPlainTextEdit;
+class JTable;
+class QTableWidgetItem;
 
 class FormInfoWidget : public QWidget
 {
@@ -86,10 +87,14 @@ public:
   void fillForm(Form& o) const;
 
   JAddRemoveButtons* m_btnAddRemove;
-  PhoneTable* m_tbPhone;
+  JTable* m_tbPhone;
 
 private slots:
   void updateControls();
+  void updateTable(QTableWidgetItem*);
+  void addPhone();
+  void setPhones(const QVector<Phone>& v);
+  void getPhones(QVector<Phone>& v) const;
 };
 
 class FormAddressWidget : public QWidget

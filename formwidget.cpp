@@ -3,7 +3,6 @@
 #include "widgets/jdatabasepicker.h"
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jplaintextedit.h"
-#include "tables/phonetable.h"
 #include "tables/addresstable.h"
 #include <QLayout>
 #include <QFormLayout>
@@ -223,30 +222,103 @@ FormPhoneWidget::FormPhoneWidget(QWidget* parent)
   , m_btnAddRemove(nullptr)
   , m_tbPhone(nullptr)
 {
-  m_tbPhone = new PhoneTable;
+  m_tbPhone = new JTable;
   m_btnAddRemove = new JAddRemoveButtons;
+
+  m_tbPhone->setColumnCount(4);
+  QStringList headers;
+  headers << "País" << "Código" << "Número" << "Nome";
+  m_tbPhone->setHorizontalHeaderLabels(headers);
+  m_tbPhone->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
+  m_tbPhone->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+  m_tbPhone->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::ResizeToContents);
+  m_tbPhone->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
 
   QVBoxLayout* lt = new QVBoxLayout;
   lt->addWidget(m_btnAddRemove);
   lt->addWidget(m_tbPhone);
 
-  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), m_tbPhone, SLOT(addItem()));
+  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addPhone()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), m_tbPhone, SLOT(removeItem()));
   connect(m_tbPhone, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
+  connect(m_tbPhone, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateTable(QTableWidgetItem*)));
   setLayout(lt);
 }
 
 void FormPhoneWidget::setForm(const Form& o)
 {
+  setPhones(o.m_vPhone);
+}
+
+void FormPhoneWidget::addPhone()
+{
+  m_tbPhone->insertRow(m_tbPhone->rowCount());
+  int row = m_tbPhone->rowCount() - 1;
+
+  auto itCountryCode = new DoubleItem(JItem::DataType::Integer, DoubleItem::Color::None, false, "+");
+  auto itCode = new DoubleItem(JItem::DataType::Integer, DoubleItem::Color::None, false, "(", ")");
+  auto itNumber = new QTableWidgetItem;
+  auto itName = new QTableWidgetItem;
+
+
+  m_tbPhone->setItem(row, 0, itCountryCode);
+  m_tbPhone->setItem(row, 1, itCode);
+  m_tbPhone->setItem(row, 2, itNumber);
+  m_tbPhone->setItem(row, 3, itName);
+
+  Phone o;
+  itCountryCode->setValue(o.m_countryCode);
+  itCode->setValue(o.m_code);
+
+  m_tbPhone->setCurrentItem(itCountryCode);
+  m_tbPhone->setFocus();
+}
+
+void FormPhoneWidget::setPhones(const QVector<Phone>& v)
+{
   m_tbPhone->removeAllItems();
-  for (int i = 0; i != o.m_vPhone.size(); ++i)
-    m_tbPhone->addItem(o.m_vPhone.at(i));
+  for (int i = 0; i != v.size(); ++i)
+  {
+    addPhone();
+    dynamic_cast<DoubleItem*>(m_tbPhone->item(i, 0))->setValue(v.at(i).m_countryCode);
+    dynamic_cast<DoubleItem*>(m_tbPhone->item(i, 1))->setValue(v.at(i).m_code);
+    m_tbPhone->item(i, 2)->setText(v.at(i).m_number);
+    m_tbPhone->item(i, 3)->setText(v.at(i).m_name);
+  }
+}
+
+void FormPhoneWidget::getPhones(QVector<Phone>& v) const
+{
+  v.clear();
+  for (int i = 0; i != m_tbPhone->rowCount(); ++i)
+  {
+    Phone o;
+    o.m_countryCode += (int)dynamic_cast<DoubleItem*>(m_tbPhone->item(i, 0))->getValue();
+    o.m_code = (int)dynamic_cast<DoubleItem*>(m_tbPhone->item(i, 1))->getValue();
+    o.m_number = m_tbPhone->item(i, 2)->text();
+    o.m_name = m_tbPhone->item(i, 3)->text();
+    v.push_back(o);
+  }
 }
 
 void FormPhoneWidget::fillForm(Form& o) const
 {
-  for (int i = 0; i != m_tbPhone->rowCount(); ++i)
-    o.m_vPhone.push_back(dynamic_cast<const Phone&>(m_tbPhone->getItem(i)));
+  QVector<Phone> v;
+  getPhones(v);
+  o.m_vPhone.append(v);
+}
+
+void FormPhoneWidget::updateTable(QTableWidgetItem* p)
+{
+  switch (p->column())
+  {
+    case 0:
+    case 1:
+      dynamic_cast<ExpItem*>(p)->evaluate();
+      break;
+    default:
+      break;
+  }
 }
 
 void FormPhoneWidget::updateControls()

@@ -86,7 +86,11 @@ public:
     Foreground
   };
 
-  DoubleItem(JItem::DataType type, Color color, bool bCheckable = false);
+  DoubleItem(JItem::DataType type,
+             Color color,
+             bool bCheckable = false,
+             const QString& prefix = "",
+             const QString& sufix = "");
   void setValue(double val);
   double getValue() const;
   void evaluate();
@@ -96,6 +100,8 @@ private:
   const JItem::DataType m_type;
   const Color m_color;
   const bool m_bCheckable;
+  const QString m_prefix;
+  const QString m_sufix;
 };
 
 class DateItem : public ExpItem

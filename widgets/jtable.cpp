@@ -138,10 +138,16 @@ void JItemTable::setHeaderIconSearchable(int pos)
   setHeaderIcon(pos, QIcon(":/icons/res/binoculars.png"));
 }
 
-DoubleItem::DoubleItem(JItem::DataType type, Color color, bool bCheckable)
+DoubleItem::DoubleItem(JItem::DataType type,
+                       Color color,
+                       bool bCheckable,
+                       const QString& prefix,
+                       const QString& sufix)
   : m_type(type)
   , m_color(color)
   , m_bCheckable(bCheckable)
+  , m_prefix(prefix)
+  , m_sufix(sufix)
 {
   if (m_bCheckable)
   {
@@ -153,7 +159,7 @@ DoubleItem::DoubleItem(JItem::DataType type, Color color, bool bCheckable)
 void DoubleItem::setValue(double val)
 {
   setData(Qt::UserRole, val);
-  setText(JItem::st_str(val, m_type));
+  setText(m_prefix + JItem::st_str(val, m_type) + m_sufix);
 
   if (m_bCheckable)
   {

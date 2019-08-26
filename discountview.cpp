@@ -65,7 +65,7 @@ DiscountView::DiscountView(QWidget* parent)
 
   m_lblCode = new QLabel;
   m_lblCode->setText(tr("Código:"));
-  m_edCode = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags2);
+  m_edCode = new JLineEdit(Text::Input::Alphanumeric, JLineEdit::st_defaultFlags2);
   m_edCode->setPlaceholderText(tr("*"));
   m_edCode->setMaxLength(DISCOUNT_CODE_MAX_LENGTH);
   m_edCode->setReadOnly(true);

@@ -1,48 +1,12 @@
 #include "jlineedit.h"
 #include "tinyexpr.h"
+#include "jregexpvalidator.h"
 
-namespace
-{
-QString getRegEx(JLineEdit::Input input)
-{
-  switch (input)
-  {
-    case JLineEdit::Input::Alphanumeric:
-      return "^[a-zA-Z0-9]*$";
-    case JLineEdit::Input::AlphanumericAndSpaces:
-      return "^[a-zA-Z0-9 ]*$";
-    case JLineEdit::Input::Numeric:
-      return "^[0-9]*$";
-    case JLineEdit::Input::BasicMath:
-      return "^[0-9/\\-\\*\\+\\.][^,]*$";
-    case JLineEdit::Input::ASCII:
-      return "[ -~]*";
-    case JLineEdit::Input::All:
-    default:
-      return "";
-  }
-}
-}
-
-JRegExpValidator::JRegExpValidator(bool toUpper, const QRegExp & rx,QObject* parent)
-  : QRegExpValidator(rx, parent)
-  , m_toUpper(toUpper)
-{
-
-}
-
-QValidator::State JRegExpValidator::validate(QString& input, int& pos) const
-{
-  if (m_toUpper)
-    input = input.toUpper();
-  return QRegExpValidator::validate(input, pos);
-}
-
-JLineEdit::JLineEdit(Input input, int flags, QWidget* parent)
+JLineEdit::JLineEdit(Text::Input input, int flags, QWidget* parent)
   : QLineEdit(parent)
   , m_flags(flags)
 {
-  if (input != Input::All)
+  if (input != Text::Input::All)
     setValidator(new JRegExpValidator(flags & (int)Flags::ToUpper,
                                       QRegExp(getRegEx(input)), this));
 }
@@ -87,11 +51,11 @@ void JLineEdit::setTextBlockingSignals(const QString& str)
   blockSignals(false);
 }
 
-JExpLineEdit::JExpLineEdit(JItem::DataType type,
+JExpLineEdit::JExpLineEdit(Data::Type type,
                            int flags,
                            double defaultValue,
                            QWidget* parent)
-  : JLineEdit(Input::All, flags, parent)
+  : JLineEdit(Text::Input::All, flags, parent)
   , m_dataType(type)
   , m_defaultValue(defaultValue)
   , m_currentValue(defaultValue)
@@ -113,7 +77,7 @@ void JExpLineEdit::evaluate()
   if (!error)
   {
     m_currentValue = val;
-    setTextBlockingSignals(JItem::st_str(val, m_dataType));
+    setTextBlockingSignals(Data::str(val, m_dataType));
     emit valueChanged(m_currentValue);
   }
 
@@ -138,5 +102,5 @@ void JExpLineEdit::setText(double val)
 
 QString JExpLineEdit::text() const
 {
-  return JItem::st_str(getValue(), m_dataType);
+  return Data::str(getValue(), m_dataType);
 }

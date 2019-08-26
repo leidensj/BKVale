@@ -33,7 +33,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formDetails = new FormDetailsWidget;
   m_formPhone = new FormPhoneWidget;
   m_formAddress= new FormAddressWidget;
-  m_edPincode = new JLineEdit(JLineEdit::Input::Alphanumeric);
+  m_edPincode = new JLineEdit(Text::Input::Alphanumeric);
   m_tbHours = new JTable;
   m_tbHours->setColumnCount(2);
   QStringList headers;

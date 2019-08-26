@@ -97,7 +97,9 @@ SOURCES += main.cpp\
     models/productcodemodel.cpp \
     models/discountmodel.cpp \
     items/paymentelement.cpp \
-    widgets/jdatabasecombobox.cpp
+    widgets/jdatabasecombobox.cpp \
+    common.cpp \
+    widgets/jregexpvalidator.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -188,7 +190,9 @@ HEADERS  += mainwindow.h \
     models/productcodemodel.h \
     models/discountmodel.h \
     items/paymentelement.h \
-    widgets/jdatabasecombobox.h
+    widgets/jdatabasecombobox.h \
+    common.h \
+    widgets/jregexpvalidator.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

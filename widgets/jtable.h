@@ -86,7 +86,7 @@ public:
     Foreground
   };
 
-  DoubleItem(JItem::DataType type,
+  DoubleItem(Data::Type type,
              Color color,
              bool bCheckable = false,
              const QString& prefix = "",
@@ -97,7 +97,7 @@ public:
 
 private:
   bool evaluate(const QString& exp);
-  const JItem::DataType m_type;
+  const Data::Type m_type;
   const Color m_color;
   const bool m_bCheckable;
   const QString m_prefix;
@@ -135,6 +135,18 @@ public:
 private:
   bool evaluate(const QString& exp);
   QTime m_defaultTime;
+};
+
+class TextItem : public ExpItem
+{
+public:
+  TextItem(Text::Input input, bool toUpper);
+  void evaluate();
+
+private:
+  bool evaluate(const QString& exp);
+  Text::Input m_input;
+  bool m_toUpper;
 };
 
 #endif // JITEMTABLE_H

@@ -21,17 +21,17 @@ ProductView::ProductView(QWidget* parent)
   , m_tbCode(nullptr)
   , m_btns(nullptr)
 {
-  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                            JLineEdit::st_defaultFlags1);
   m_edName->setMaxLength(PRODUCT_MAX_NAME_LENGTH);
   m_edName->setPlaceholderText("*");
 
-  m_edUnity = new JLineEdit(JLineEdit::Input::Alphanumeric,
+  m_edUnity = new JLineEdit(Text::Input::Alphanumeric,
                             JLineEdit::st_defaultFlags1);
   m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
   m_edUnity->setPlaceholderText("*");
 
-  m_edDetails = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edDetails = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                               JLineEdit::st_defaultFlags1);
   m_edDetails->setMaxLength(PRODUCT_MAX_DETAILS_LENGTH);
 

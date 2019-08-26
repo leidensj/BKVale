@@ -77,7 +77,7 @@ JDatabase::JDatabase(const QString& tableName,
   hlayout0->addWidget(m_btnOpen);
   hlayout0->addWidget(m_btnRemove);
 
-  m_edSearch = new JLineEdit(JLineEdit::Input::All, (int)JLineEdit::Flags::ToUpper);
+  m_edSearch = new JLineEdit(Text::Input::All, (int)JLineEdit::Flags::ToUpper);
   m_edSearch->setToolTip(tr("Procurar (Ctrl+F)"));
   m_edSearch->setClearButtonEnabled(true);
 

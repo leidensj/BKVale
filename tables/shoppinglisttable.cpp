@@ -45,8 +45,8 @@ void ShoppingListTable::addItem(const JItem& o)
   int row = rowCount() - 1;
   setItem(row, (int)ShoppingListColumn::Unity, new PackageTableWidgetItem);
   setItem(row, (int)ShoppingListColumn::Description, new ProductTableWidgetItem);
-  setItem(row, (int)ShoppingListColumn::Ammount, new DoubleItem(JItem::DataType::Ammount, DoubleItem::Color::Background));
-  setItem(row, (int)ShoppingListColumn::Price, new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Background));
+  setItem(row, (int)ShoppingListColumn::Ammount, new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background));
+  setItem(row, (int)ShoppingListColumn::Price, new DoubleItem(Data::Type::Money, DoubleItem::Color::Background));
   setItem(row, (int)ShoppingListColumn::Supplier, new SupplierTableWidgetItem);
 
   setCurrentCell(row, (int)ShoppingListColumn::Ammount);

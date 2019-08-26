@@ -39,8 +39,8 @@ FormInfoWidget::FormInfoWidget(QWidget* parent)
   m_rdoPerson->setChecked(true);
   m_rdoCompany = new QRadioButton;
   m_rdoCompany->setText(tr("Jurídica"));
-  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
-  m_edAlias = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_edAlias = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_lblName = new QLabel;
   m_lblAlias = new QLabel;
   m_lblCreationDate = new QLabel(tr("Data de criação:"));
@@ -131,11 +131,11 @@ FormDetailsWidget::FormDetailsWidget(QWidget* parent)
   , m_cbBirthDate(nullptr)
   , m_imagePicker(nullptr)
 {
-  m_edCpfCnpj = new JLineEdit(JLineEdit::Input::Numeric, JLineEdit::st_defaultFlags2);
-  m_edRgIE= new JLineEdit(JLineEdit::Input::Numeric, JLineEdit::st_defaultFlags2);
+  m_edCpfCnpj = new JLineEdit(Text::Input::Numeric, JLineEdit::st_defaultFlags2);
+  m_edRgIE= new JLineEdit(Text::Input::Numeric, JLineEdit::st_defaultFlags2);
   m_lblCpfCnpj = new QLabel;
   m_lblRgIE = new QLabel;
-  m_edEmail = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
+  m_edEmail = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags2);
   m_teDetails = new JPlainTextEdit;
   m_dtBirthDate = new QDateEdit;
   m_dtBirthDate->setCalendarPopup(true);
@@ -255,8 +255,8 @@ void FormPhoneWidget::addPhone()
   m_tbPhone->insertRow(m_tbPhone->rowCount());
   int row = m_tbPhone->rowCount() - 1;
 
-  auto itCountryCode = new DoubleItem(JItem::DataType::Integer, DoubleItem::Color::None, false, "+");
-  auto itCode = new DoubleItem(JItem::DataType::Integer, DoubleItem::Color::None, false, "(", ")");
+  auto itCountryCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, "+");
+  auto itCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, "(", ")");
   auto itNumber = new QTableWidgetItem;
   auto itName = new QTableWidgetItem;
 

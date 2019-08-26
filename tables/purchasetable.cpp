@@ -93,11 +93,11 @@ void PurchaseTable::addItem(const JItem& o)
 
   insertRow(rowCount());
   int row = rowCount() - 1;
-  setItem(row, (int)Column::Ammount, new DoubleItem(JItem::DataType::Ammount, DoubleItem::Color::Background));
+  setItem(row, (int)Column::Ammount, new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background));
   setItem(row, (int)Column::Unity, new PackageTableWidgetItem);
   setItem(row, (int)Column::Description, new ProductTableWidgetItem);
-  setItem(row, (int)Column::Price, new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Background));
-  setItem(row, (int)Column::SubTotal, new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Foreground));
+  setItem(row, (int)Column::Price, new DoubleItem(Data::Type::Money, DoubleItem::Color::Background));
+  setItem(row, (int)Column::SubTotal, new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground));
   setCurrentCell(row, (int)Column::Ammount);
 
   ((DoubleItem*)item(row, (int)Column::Ammount))->setValue(_o.m_ammount);

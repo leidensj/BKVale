@@ -20,7 +20,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
  , m_edText(nullptr)
  , m_imageView(nullptr)
 {
-  m_edText = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags1);
+  m_edText = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags1);
   m_edText->setReadOnly(true);
   QAction* action = m_edText->addAction(QIcon(":/icons/res/binoculars.png"), QLineEdit::LeadingPosition);
   QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);

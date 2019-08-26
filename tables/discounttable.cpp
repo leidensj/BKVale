@@ -196,7 +196,7 @@ void DiscountTable::update(int row, int column)
     case DiscountItem::Column::Ammount:
     {
       double value = evaluate(row, column);
-      setText(row, column, JItem::st_strAmmount(value));
+      setText(row, column, Data::strAmmount(value));
     } break;
     case DiscountItem::Column::Unity:
     case DiscountItem::Column::Name:

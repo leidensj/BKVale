@@ -4,6 +4,7 @@
 #include <QLayout>
 #include <QPushButton>
 #include "tinyexpr.h"
+#include "jregexpvalidator.h"
 
 JTable::JTable(int flags, QWidget* parent)
  : QTableWidget(parent)
@@ -138,7 +139,7 @@ void JItemTable::setHeaderIconSearchable(int pos)
   setHeaderIcon(pos, QIcon(":/icons/res/binoculars.png"));
 }
 
-DoubleItem::DoubleItem(JItem::DataType type,
+DoubleItem::DoubleItem(Data::Type type,
                        Color color,
                        bool bCheckable,
                        const QString& prefix,
@@ -159,7 +160,7 @@ DoubleItem::DoubleItem(JItem::DataType type,
 void DoubleItem::setValue(double val)
 {
   setData(Qt::UserRole, val);
-  setText(m_prefix + JItem::st_str(val, m_type) + m_sufix);
+  setText(m_prefix + Data::str(val, m_type) + m_sufix);
 
   if (m_bCheckable)
   {
@@ -300,4 +301,26 @@ void TimeItem::evaluate()
 {
   if (!evaluate(text()))
     setTime(getTime());
+}
+
+TextItem::TextItem(Text::Input input, bool toUpper)
+  : m_input(input)
+  , m_toUpper(toUpper)
+{
+
+}
+
+bool TextItem::evaluate(const QString& exp)
+{
+  JRegExpValidator val(m_toUpper, Text::getRegEx(m_input));
+  bool bValid = val.validate(exp, exp.length()) == QValidator::State::Acceptable;
+  if (bValid)
+    setData(Qt::UserRole, exp);
+  return bValid;
+}
+
+void TimeItem::evaluate()
+{
+  if (!evaluate(text()))
+    setText(data(Qt::UserRole).toString());
 }

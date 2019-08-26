@@ -58,7 +58,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 {
   m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
-  m_edTitle = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edTitle = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
 
   m_snLines = new JSpinBox;

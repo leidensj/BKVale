@@ -134,9 +134,9 @@ void PaymentWidget::updateControls()
   m_tbCredit->setEnabled(m_rdoCredit->isChecked());
   m_btnAddRemove->setEnabled(m_rdoCredit->isChecked());
   double total = computeTotal();
-  bool bValid = isDatesValid() && JItem::st_areEqual(m_purchaseTotal, total, JItem::DataType::Money);;
-  m_lblPurchaseTotal->setText(tr("Total da compra: ") + JItem::st_strMoney(m_purchaseTotal));
-  m_lblPaymentTotal->setText(("Total do pagamento: ") + JItem::st_strMoney(total));
+  bool bValid = isDatesValid() && Data::areEqual(m_purchaseTotal, total, Data::Type::Money);;
+  m_lblPurchaseTotal->setText(tr("Total da compra: ") + Data::strMoney(m_purchaseTotal));
+  m_lblPaymentTotal->setText(("Total do pagamento: ") + Data::strMoney(total));
   m_lblPaymentTotal->setVisible(m_rdoCredit->isChecked());
   setWindowIcon(getIcon());
   emit isValidSignal(bValid);
@@ -217,7 +217,7 @@ void PaymentWidget::addRow()
   m_tbCredit->insertRow(m_tbCredit->rowCount());
   int row = m_tbCredit->rowCount() - 1;
 
-  auto itValue = new DoubleItem(JItem::DataType::Money, DoubleItem::Color::Foreground);
+  auto itValue = new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground);
   auto itDate = new DateItem(m_purchaseDate, DateItem::Color::DateBeforeDefault);
 
   m_tbCredit->setItem(row, (int)Column::Date, itDate);
@@ -357,7 +357,7 @@ PurchaseView::PurchaseView(QWidget *parent)
 
   m_table = new PurchaseTable;
 
-  m_edTotal = new JExpLineEdit(JItem::DataType::Money);
+  m_edTotal = new JExpLineEdit(Data::Type::Money);
   m_edTotal->setReadOnly(true);
   m_edTotal->setPlaceholderText(tr("TOTAL"));
   m_edTotal->setAlignment(Qt::AlignRight);
@@ -368,7 +368,7 @@ PurchaseView::PurchaseView(QWidget *parent)
     m_edTotal->setFont(font);
   }
 
-  m_edDisccount = new JExpLineEdit(JItem::DataType::Money);
+  m_edDisccount = new JExpLineEdit(Data::Type::Money);
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
@@ -407,9 +407,9 @@ PurchaseView::PurchaseView(QWidget *parent)
 
   m_filter = new PurchaseFilter;
 
-  m_edEntries = new JLineEdit(JLineEdit::Input::All);
+  m_edEntries = new JLineEdit(Text::Input::All);
   m_edEntries->setReadOnly(true);
-  m_edSum = new JLineEdit(JLineEdit::Input::All);
+  m_edSum = new JLineEdit(Text::Input::All);
   m_edSum->setReadOnly(true);
   QFormLayout* ltDbInfo = new QFormLayout;
   ltDbInfo->addRow(tr("Número de compras:"), m_edEntries);
@@ -522,8 +522,8 @@ void PurchaseView::updateControls()
 
 void PurchaseView::updateStatistics()
 {
-  m_edEntries->setText(JItem::st_strInt(m_database->getNumberOfEntries()));
-  m_edSum->setText(JItem::st_strMoney(m_database->getSum(5)));
+  m_edEntries->setText(Data::strInt(m_database->getNumberOfEntries()));
+  m_edSum->setText(Data::strMoney(m_database->getSum(5)));
 }
 
 void PurchaseView::addProduct()

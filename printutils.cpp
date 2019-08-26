@@ -434,7 +434,7 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
     {
       str += ESC_DOUBLE_FONT_ON "[     ][     ]";
       if (lst.m_vItem.at(i).m_ammount != 0.0)
-        str += "[" + JItem::st_strFmt(lst.m_vItem.at(i).m_ammount) +
+        str += "[" + Data::strFmt(lst.m_vItem.at(i).m_ammount) +
                lst.m_vItem.at(i).m_package.strUnity(lst.m_vItem.at(i).m_product.m_unity) + "]";
       str += ESC_DOUBLE_FONT_OFF ESC_LF;
     }
@@ -519,12 +519,12 @@ QString DiscountPrinter::buildRedeem(const Discount& o)
   {
     case Discount::Type::Value:
     {
-      str += JItem::st_strMoney(o.m_value) +
+      str += Data::strMoney(o.m_value) +
              ESC_DOUBLE_FONT_OFF;
     } break;
     case Discount::Type::Percentage:
     {
-      str += JItem::st_strPercentage(o.m_percentage) +
+      str += Data::strPercentage(o.m_percentage) +
              ESC_DOUBLE_FONT_OFF;
     } break;
     case Discount::Type::Product:

@@ -8,7 +8,7 @@ ImageView::ImageView(QWidget* parent)
   , m_edImageName(nullptr)
   , m_imageView(nullptr)
 {
-  m_edImageName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_edImageName = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_edImageName->setPlaceholderText(tr("Nome"));
   m_imageView = new JImageView(true);
 

@@ -70,7 +70,7 @@ LoginDialog::LoginDialog(ActiveUser& login,
   lblPort->setMinimumSize(24, 24);
   lblPort->setMaximumSize(24, 24);
   lblPort->setScaledContents(true);
-  m_user = new JLineEdit(JLineEdit::Input::Alphanumeric, JLineEdit::st_defaultFlags1);
+  m_user = new JLineEdit(Text::Input::Alphanumeric, JLineEdit::st_defaultFlags1);
   m_user->setPlaceholderText(tr("Usuário"));
   m_user->setMinimumHeight(24);
   m_user->setMaximumHeight(24);
@@ -80,7 +80,7 @@ LoginDialog::LoginDialog(ActiveUser& login,
     m_user->setFont(f);
   }
 
-  m_password = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
+  m_password = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags2);
   m_password->setPlaceholderText(tr("Senha"));
   m_password->setEchoMode(QLineEdit::EchoMode::Password);
   {
@@ -96,7 +96,7 @@ LoginDialog::LoginDialog(ActiveUser& login,
   m_capsLock->setScaledContents(true);
   m_capsLock->setToolTip("Caps Lock");
 
-  m_hostName = new JLineEdit(JLineEdit::Input::All, JLineEdit::st_defaultFlags2);
+  m_hostName = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags2);
   m_hostName->setPlaceholderText(tr("Servidor"));
   {
     QFont f = m_hostName->font();

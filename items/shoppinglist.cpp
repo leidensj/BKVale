@@ -43,17 +43,17 @@ double ShoppingListItem::subtotal() const
 
 QString ShoppingListItem::strSubtotal() const
 {
-  return st_strMoney(subtotal());
+  return Data::strMoney(subtotal());
 }
 
 QString ShoppingListItem::strAmmount() const
 {
-  return st_strAmmount(m_ammount);
+  return Data::strAmmount(m_ammount);
 }
 
 QString ShoppingListItem::strPrice() const
 {
-  return st_strMoney(m_price);
+  return Data::strMoney(m_price);
 }
 
 ShoppingList::ShoppingList()

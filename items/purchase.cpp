@@ -58,12 +58,12 @@ QString Purchase::strDayOfWeek() const
 
 QString Purchase::strNumber() const
 {
-  return st_strInt(m_number);
+  return Data::strInt(m_number);
 }
 
 QString Purchase::strDisccount() const
 {
-  return st_strMoney(m_disccount);
+  return Data::strMoney(m_disccount);
 }
 
 double Purchase::total() const
@@ -84,12 +84,12 @@ double Purchase::subTotal() const
 
 QString Purchase::strTotal() const
 {
-  return st_strMoney(total());
+  return Data::strMoney(total());
 }
 
 QString Purchase::strSubTotal() const
 {
-  return st_strMoney(subTotal());
+  return Data::strMoney(subTotal());
 }
 
 bool Purchase::isPaymentValid() const
@@ -99,7 +99,7 @@ bool Purchase::isPaymentValid() const
     bool bValid = true;
     for (int i = 0; i != m_vPayment.size() && bValid; ++i)
       bValid = m_vPayment.at(i).m_date >= m_date;
-    return bValid && st_areEqual(total(), paymentTotal(), DataType::Money);
+    return bValid && Data::areEqual(total(), paymentTotal(), Data::Type::Money);
   }
   return true;
 }

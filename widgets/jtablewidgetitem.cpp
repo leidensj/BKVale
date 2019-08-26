@@ -78,7 +78,7 @@ AddressEditorDlg::AddressEditorDlg(QWidget* parent)
   setWindowTitle(tr("Endereço"));
   setWindowIcon(QIcon(":/icons/res/address.png"));
 
-  m_edPostalCode = new JLineEdit(JLineEdit::Input::Numeric,
+  m_edPostalCode = new JLineEdit(Text::Input::Numeric,
                                  JLineEdit::st_defaultFlags2);
   m_edPostalCode->setInputMask(ADDRESS_CEP_MASK);
   m_btnPostalCode = new QPushButton();
@@ -86,26 +86,26 @@ AddressEditorDlg::AddressEditorDlg(QWidget* parent)
   m_btnPostalCode->setIconSize(QSize(16, 16));
   m_btnPostalCode->setIcon(QIcon(":/icons/res/process.png"));
   m_btnPostalCode->setToolTip(tr("Buscar CEP"));
-  m_edNeighborhood = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edNeighborhood = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                                    JLineEdit::st_defaultFlags1);
   m_edNeighborhood->setPlaceholderText(tr("*"));
-  m_edStreet = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edStreet = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                              JLineEdit::st_defaultFlags1);
   m_edStreet->setPlaceholderText(tr("*"));
   m_spnNumber = new JSpinBox;
   m_spnNumber->setMinimum(0);
   m_spnNumber->setMaximum(999999);
   m_spnNumber->setPrefix(tr("Nº "));
-  m_edCity = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
-                                  JLineEdit::st_defaultFlags1);
+  m_edCity = new JLineEdit(Text::Input::AlphanumericAndSpaces,
+                           JLineEdit::st_defaultFlags1);
   m_edCity->setPlaceholderText(tr("*"));
   m_cbState = new QComboBox();
   for (int i = 0; i != ADDRESS_NUMBER_OF_BRAZILIAN_STATES; ++i)
     m_cbState->addItem(Address::st_getBRState((Address::EBRState)i).m_name);
   m_cbState->setCurrentIndex((int)Address::EBRState::RS);
-  m_edComplement = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edComplement = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                                  JLineEdit::st_defaultFlags1);
-  m_edReference = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edReference = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                                 JLineEdit::st_defaultFlags1);
 
   QHBoxLayout* ltPostalCode = new QHBoxLayout();
@@ -231,9 +231,9 @@ PhoneEditorDlg::PhoneEditorDlg(QWidget* parent)
   setWindowTitle(tr("Telefone"));
   setWindowIcon(QIcon(":/icons/res/phone.png"));
 
-  m_edNumber = new JLineEdit(JLineEdit::Input::Numeric,
+  m_edNumber = new JLineEdit(Text::Input::Numeric,
                              JLineEdit::st_defaultFlags2);
-  m_edName = new JLineEdit(JLineEdit::Input::AlphanumericAndSpaces,
+  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                            JLineEdit::st_defaultFlags1);
   m_edName->setPlaceholderText(tr("Nome (opcional)"));
   m_edNumber->setPlaceholderText(tr("*"));

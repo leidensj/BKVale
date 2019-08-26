@@ -7,7 +7,7 @@ DiscountItem::DiscountItem()
 
 QString DiscountItem::strAmmount() const
 {
-  return JItem::st_strAmmount(m_ammount);
+  return Data::strAmmount(m_ammount);
 }
 
 void DiscountItem::clear(bool bClearId)

@@ -43,17 +43,17 @@ double PurchaseElement::subtotal() const
 
 QString PurchaseElement::strSubtotal() const
 {
-  return st_strMoney(subtotal());
+  return Data::strMoney(subtotal());
 }
 
 QString PurchaseElement::strAmmount() const
 {
-  return st_strAmmount(m_ammount);
+  return Data::strAmmount(m_ammount);
 }
 
 QString PurchaseElement::strPrice() const
 {
-  return st_strMoney(m_price);
+  return Data::strMoney(m_price);
 }
 
 bool PurchaseElement::SQL_insert_proc(QSqlQuery& query) const

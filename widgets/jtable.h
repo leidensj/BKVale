@@ -89,6 +89,7 @@ public:
   DoubleItem(Data::Type type,
              Color color,
              bool bCheckable = false,
+             bool bAcceptNegative = true,
              const QString& prefix = "",
              const QString& sufix = "");
   void setValue(double val);
@@ -100,6 +101,7 @@ private:
   const Data::Type m_type;
   const Color m_color;
   const bool m_bCheckable;
+  const bool m_bAcceptNegative;
   const QString m_prefix;
   const QString m_sufix;
 };
@@ -140,7 +142,7 @@ private:
 class TextItem : public ExpItem
 {
 public:
-  TextItem(Text::Input input, bool toUpper);
+  TextItem(Text::Input input, bool toUpper = true);
   void evaluate();
 
 private:

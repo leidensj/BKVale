@@ -142,11 +142,13 @@ void JItemTable::setHeaderIconSearchable(int pos)
 DoubleItem::DoubleItem(Data::Type type,
                        Color color,
                        bool bCheckable,
+                       bool bAcceptNegative,
                        const QString& prefix,
                        const QString& sufix)
   : m_type(type)
   , m_color(color)
   , m_bCheckable(bCheckable)
+  , m_bAcceptNegative(bAcceptNegative)
   , m_prefix(prefix)
   , m_sufix(sufix)
 {
@@ -194,9 +196,15 @@ bool DoubleItem::evaluate(const QString& exp)
   auto stdExp = exp.toStdString();
   int error = 0;
   double val = te_interp(stdExp.c_str(), &error);
-  if (!error)
-    setValue(val);
-  return !error;
+  bool bValid = !error;
+  if (bValid)
+  {
+    if (!m_bAcceptNegative && val < 0)
+      bValid = false;
+    else
+      setValue(val);
+  }
+  return bValid;
 }
 
 void DoubleItem::evaluate()
@@ -312,14 +320,21 @@ TextItem::TextItem(Text::Input input, bool toUpper)
 
 bool TextItem::evaluate(const QString& exp)
 {
-  JRegExpValidator val(m_toUpper, Text::getRegEx(m_input));
-  bool bValid = val.validate(exp, exp.length()) == QValidator::State::Acceptable;
+  JRegExpValidator val(m_toUpper, QRegExp(Text::getRegEx(m_input)));
+  QString exp2 = exp;
+  if (m_toUpper)
+    exp2.toUpper();
+  int pos = exp2.length();
+  bool bValid = val.validate(exp2, pos) == QValidator::State::Acceptable;
   if (bValid)
-    setData(Qt::UserRole, exp);
+  {
+    setData(Qt::UserRole, exp2);
+    setText(exp2);
+  }
   return bValid;
 }
 
-void TimeItem::evaluate()
+void TextItem::evaluate()
 {
   if (!evaluate(text()))
     setText(data(Qt::UserRole).toString());

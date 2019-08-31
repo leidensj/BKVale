@@ -255,10 +255,10 @@ void FormPhoneWidget::addPhone()
   m_tbPhone->insertRow(m_tbPhone->rowCount());
   int row = m_tbPhone->rowCount() - 1;
 
-  auto itCountryCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, "+");
-  auto itCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, "(", ")");
-  auto itNumber = new QTableWidgetItem;
-  auto itName = new QTableWidgetItem;
+  auto itCountryCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "+");
+  auto itCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "(", ")");
+  auto itNumber = new TextItem(Text::Input::Numeric, false);
+  auto itName = new TextItem(Text::Input::AlphanumericAndSpaces, true);
 
 
   m_tbPhone->setItem(row, 0, itCountryCode);
@@ -270,7 +270,7 @@ void FormPhoneWidget::addPhone()
   itCountryCode->setValue(o.m_countryCode);
   itCode->setValue(o.m_code);
 
-  m_tbPhone->setCurrentItem(itCountryCode);
+  m_tbPhone->setCurrentItem(itNumber);
   m_tbPhone->setFocus();
 }
 
@@ -310,15 +310,7 @@ void FormPhoneWidget::fillForm(Form& o) const
 
 void FormPhoneWidget::updateTable(QTableWidgetItem* p)
 {
-  switch (p->column())
-  {
-    case 0:
-    case 1:
-      dynamic_cast<ExpItem*>(p)->evaluate();
-      break;
-    default:
-      break;
-  }
+  dynamic_cast<ExpItem*>(p)->evaluate();
 }
 
 void FormPhoneWidget::updateControls()

@@ -224,6 +224,7 @@ void TimeCard::saveAndAccept()
                                                   "/desktop/livro_" +
                                                   idt.toString("yyyy") + "_" +
                                                   idt.toString("MM") +
+                                                  "_" +
                                                   o.m_form.strAliasName().replace(" ", "") +
                                                   ".pdf",
                                                   tr("PDF (*.pdf)"));

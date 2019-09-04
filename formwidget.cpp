@@ -258,7 +258,7 @@ void FormPhoneWidget::addPhone()
   auto itCountryCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "+");
   auto itCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "(", ")");
   auto itNumber = new TextItem(Text::Input::Numeric, false);
-  auto itName = new TextItem(Text::Input::AlphanumericAndSpaces, true);
+  auto itName = new TextItem(Text::Input::ASCII, true);
 
 
   m_tbPhone->setItem(row, 0, itCountryCode);

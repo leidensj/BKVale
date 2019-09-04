@@ -333,6 +333,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   QHBoxLayout* ltCmd = new QHBoxLayout();
   ltCmd->setContentsMargins(0, 0, 0, 0);
   ltCmd->setAlignment(Qt::AlignLeft);
+  ltCmd->addWidget(m_cbStore);
   ltCmd->addWidget(lblNumber);
   ltCmd->addWidget(m_snNumber);
   ltCmd->addWidget(line1);
@@ -345,7 +346,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_supplierPicker->setPlaceholderText(true);
 
   QVBoxLayout* ltHeader = new QVBoxLayout;
-  ltHeader->addWidget(m_cbStore);
   ltHeader->addLayout(ltCmd);
   ltHeader->addWidget(m_supplierPicker);
 
@@ -374,7 +374,7 @@ PurchaseView::PurchaseView(QWidget *parent)
 
   m_btnApportionment = new QPushButton;
   m_btnApportionment->setFlat(true);
-  m_btnApportionment->setIconSize(QSize(16, 16));
+  m_btnApportionment->setIconSize(QSize(24, 24));
   m_btnApportionment->setIcon(QIcon(":/icons/res/apportionment.png"));
   m_btnApportionment->setToolTip(tr("Ratear valor entre os produtos"));
 

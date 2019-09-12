@@ -5,28 +5,11 @@
 #include <QPushButton>
 #include "tinyexpr.h"
 #include "jregexpvalidator.h"
+#include "jdatabase.h"
 
-JTable::JTable(int flags, QWidget* parent)
+JTable::JTable(QWidget* parent)
  : QTableWidget(parent)
 {
-  if (flags & (int)Flags::BigFont)
-  {
-    QFont f = font();
-    f.setPointSize(12);
-    setFont(f);
-    f = horizontalHeader()->font();
-    f.setPointSize(12);
-  }
-
-  if (flags & (int)Flags::Uppercase)
-  {
-    QFont f = font();
-    f.setCapitalization(QFont::AllUppercase);
-    setFont(f);
-    f.setCapitalization(QFont::Capitalize);
-    horizontalHeader()->setFont(f);
-  }
-
   setSelectionBehavior(QAbstractItemView::SelectItems);
   setSelectionMode(QAbstractItemView::SingleSelection);
   horizontalHeader()->setHighlightSections(false);
@@ -35,6 +18,17 @@ JTable::JTable(int flags, QWidget* parent)
 
   QObject::connect(this, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(emitChangedSignal()));
   QObject::connect(this, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(emitActivateSignal(int, int)));
+}
+
+void JTable::setLargerSize(bool b)
+{
+  int pointSize = b ? 12 : 8;
+  QFont f = font();
+  f.setPointSize(pointSize);
+  setFont(f);
+  f = horizontalHeader()->font();
+  f.setPointSize(pointSize);
+  horizontalHeader()->setFont(f);
 }
 
 void JTable::removeItem()
@@ -76,36 +70,32 @@ void JTable::keyPressEvent(QKeyEvent *event)
   else if (event->key() == Qt::Key_Delete)
   {
     if (currentIndex().isValid())
-      emit deleteSignal(currentIndex().row(), currentIndex().column());
+    {
+      JTableItem* p = dynamic_cast<JTableItem*>(item(currentIndex.row(), currentIndex.column()));
+      if (p != nullptr)
+        p->erase();
+    }
     QTableWidget::keyPressEvent(event);
   }
   else if (event->key() == Qt::Key_Space)
   {
     if (currentIndex().isValid())
-      emit activateSignal(currentIndex().row(), currentIndex().column());
+    {
+      JTableItem* p = dynamic_cast<JTableItem*>(item(currentIndex.row(), currentIndex.column()));
+      if (p != nullptr)
+        p->activate();
+    }
     QTableWidget::keyPressEvent(event);
   }
   else
   {
     QTableWidget::keyPressEvent(event);
   }
-
 }
 
 void JTable::emitChangedSignal()
 {
   emit changedSignal(isValidCurrentRow());
-}
-
-
-void JTable::emitDeleteSignal(int row, int column)
-{
-  emit deleteSignal(row, column);
-}
-
-void JTable::emitActivateSignal(int row, int column)
-{
-  emit activateSignal(row, column);
 }
 
 bool JTable::isValidRow(int row) const
@@ -118,25 +108,9 @@ bool JTable::isValidCurrentRow() const
   return isValidRow(currentRow());
 }
 
-JItemTable::JItemTable(int flags, QWidget* parent)
-  : JTable(flags, parent)
+void JTable::setHeaderIcon(int pos, const QIcon& icon)
 {
-  connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(update(int, int)));
-  connect(this, SIGNAL(activateSignal(int,int)), this, SLOT(itemActivate(int, int)));
-  connect(this, SIGNAL(deleteSignal(int,int)), this, SLOT(itemDelete(int, int)));
-}
-
-void JItemTable::setHeaderIcon(int pos, const QIcon& icon)
-{
-  model()->setHeaderData(pos,
-                         Qt::Horizontal,
-                         icon,
-                         Qt::DecorationRole);
-}
-
-void JItemTable::setHeaderIconSearchable(int pos)
-{
-  setHeaderIcon(pos, QIcon(":/icons/res/binoculars.png"));
+  model()->setHeaderData(pos, Qt::Horizontal, icon, Qt::DecorationRole);
 }
 
 DoubleItem::DoubleItem(Data::Type type,
@@ -213,6 +187,22 @@ void DoubleItem::evaluate()
     setValue(getValue());
 }
 
+void DoubleItem::erase()
+{
+  setValue("0");
+}
+
+void DoubleItem::activate()
+{
+
+}
+
+void DoubleItem::evaluate()
+{
+  if (!evaluate(text()))
+    setValue(getValue());
+}
+
 DateItem::DateItem(const QDate& defaultDate, Color color)
   : m_defaultDate(defaultDate)
   , m_color(color)
@@ -276,6 +266,17 @@ void DateItem::evaluate()
     setDate(getDate());
 }
 
+void DateItem::erase()
+{
+  setDate(m_defaultDate);
+  evaluate();
+}
+
+void DateItem::activate()
+{
+
+}
+
 TimeItem::TimeItem(const QTime& defaultTime)
   : m_defaultTime(defaultTime)
 {
@@ -311,6 +312,17 @@ void TimeItem::evaluate()
     setTime(getTime());
 }
 
+void TimeItem::erase()
+{
+  setTime(m_defaultTime);
+  evaluate();
+}
+
+void TimeItem::activate()
+{
+
+}
+
 TextItem::TextItem(Text::Input input, bool toUpper)
   : m_input(input)
   , m_toUpper(toUpper)
@@ -338,4 +350,63 @@ void TextItem::evaluate()
 {
   if (!evaluate(text()))
     setText(data(Qt::UserRole).toString());
+}
+
+void TextItem::erase()
+{
+  setText("");
+  evaluate();
+}
+
+void TextItem::activate()
+{
+
+}
+
+JItemSQLItem::JItemSQLItem(const QString& tableName)
+  : m_tableName(tableName)
+{
+  setTextColor(QColor(Qt::darkGray));
+  setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+}
+
+void JItemSQLItem::evaluate()
+{
+
+}
+
+bool JItemSQLItem::evaluate(const QString& exp)
+{
+
+}
+
+void JItemSQLItem::erase()
+{
+  setData(Qt::UserRole, INVALID_ID);
+  setText("");
+}
+
+void JItemSQLItem::activate()
+{
+  JDatabaseSelector dlg(m_tableName, false, tableWidget());
+  if (dlg.exec())
+  {
+    JItemSQL* p = dlg.getDatabase()->getCurrentItem();
+    if (p != nullptr)
+    {
+      setData(Qt::UserRole, p->m_id.get());
+      setText(p->name());
+    }
+  }
+}
+
+Id JItemSQLItem::getId() const
+{
+  return data(Qt::UserRole).toLongLong();
+}
+
+void JItemSQLItem::setItem(Id id, const QString& name)
+{
+  setData(Qt::UserRole, id.get());
+  setText(name);
 }

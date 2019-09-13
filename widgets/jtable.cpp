@@ -16,8 +16,8 @@ JTable::JTable(QWidget* parent)
   verticalHeader()->setSectionsMovable(true);
   verticalHeader()->setHighlightSections(false);
 
-  QObject::connect(this, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(emitChangedSignal()));
-  QObject::connect(this, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(emitActivateSignal(int, int)));
+  QObject::connect(this, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(activate(QTableWidgetItem*)));
+  QObject::connect(this, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(evaluate(QTableWidgetItem*)));
 }
 
 void JTable::setLargerSize(bool b)
@@ -70,21 +70,13 @@ void JTable::keyPressEvent(QKeyEvent *event)
   else if (event->key() == Qt::Key_Delete)
   {
     if (currentIndex().isValid())
-    {
-      JTableItem* p = dynamic_cast<JTableItem*>(item(currentIndex.row(), currentIndex.column()));
-      if (p != nullptr)
-        p->erase();
-    }
+      erase(item(currentIndex.row(), currentIndex.column()));
     QTableWidget::keyPressEvent(event);
   }
   else if (event->key() == Qt::Key_Space)
   {
     if (currentIndex().isValid())
-    {
-      JTableItem* p = dynamic_cast<JTableItem*>(item(currentIndex.row(), currentIndex.column()));
-      if (p != nullptr)
-        p->activate();
-    }
+      activate(item(currentIndex.row(), currentIndex.column()));
     QTableWidget::keyPressEvent(event);
   }
   else
@@ -113,6 +105,36 @@ void JTable::setHeaderIcon(int pos, const QIcon& icon)
   model()->setHeaderData(pos, Qt::Horizontal, icon, Qt::DecorationRole);
 }
 
+void JTable::activate(QTableWidgetItem* p)
+{
+  if (p != nullptr)
+  {
+    JTableItem* p2 = dynamic_cast<JTableItem*>(p);
+    p2->activate();
+    emitChangedSignal();
+  }
+}
+
+void JTable::erase(QTableWidgetItem* p)
+{
+  if (p != nullptr)
+  {
+    JTableItem* p2 = dynamic_cast<JTableItem*>(p);
+    p2->erase();
+    emitChangedSignal();
+  }
+}
+
+void JTable::evaluate(QTableWidgetItem* p)
+{
+  if (p != nullptr)
+  {
+    JTableItem* p2 = dynamic_cast<JTableItem*>(p);
+    p2->evaluate();
+    emitChangedSignal();
+  }
+}
+
 DoubleItem::DoubleItem(Data::Type type,
                        Color color,
                        bool bCheckable,
@@ -133,8 +155,9 @@ DoubleItem::DoubleItem(Data::Type type,
   }
 }
 
-void DoubleItem::setValue(double val)
+void DoubleItem::setValue(const QVariant& v)
 {
+  double val = v.toDouble();
   setData(Qt::UserRole, val);
   setText(m_prefix + Data::str(val, m_type) + m_sufix);
 
@@ -160,14 +183,9 @@ void DoubleItem::setValue(double val)
   }
 }
 
-double DoubleItem::getValue() const
+void DoubleItem::evaluate()
 {
-  return data(Qt::UserRole).toDouble();
-}
-
-bool DoubleItem::evaluate(const QString& exp)
-{
-  auto stdExp = exp.toStdString();
+  auto stdExp = text().toStdString();
   int error = 0;
   double val = te_interp(stdExp.c_str(), &error);
   bool bValid = !error;
@@ -178,18 +196,14 @@ bool DoubleItem::evaluate(const QString& exp)
     else
       setValue(val);
   }
-  return bValid;
-}
 
-void DoubleItem::evaluate()
-{
-  if (!evaluate(text()))
+  if (!bValid)
     setValue(getValue());
 }
 
 void DoubleItem::erase()
 {
-  setValue("0");
+  setValue(0.0);
 }
 
 void DoubleItem::activate()
@@ -197,21 +211,16 @@ void DoubleItem::activate()
 
 }
 
-void DoubleItem::evaluate()
-{
-  if (!evaluate(text()))
-    setValue(getValue());
-}
-
 DateItem::DateItem(const QDate& defaultDate, Color color)
   : m_defaultDate(defaultDate)
   , m_color(color)
 {
-  setDate(m_defaultDate);
+  setValue(m_defaultDate);
 }
 
-void DateItem::setDate(const QDate& dt)
+void DateItem::setValue(const QVariant& v)
 {
+  QDate dt = v.toDate();
   setData(Qt::UserRole, dt);
   setText(dt.toString("dd/MM/yyyy"));
 
@@ -227,27 +236,23 @@ void DateItem::setDate(const QDate& dt)
   }
 }
 
-QDate DateItem::getDate()const
+void DateItem::evaluate()
 {
-  return data(Qt::UserRole).toDate();
-}
 
-bool DateItem::evaluate(const QString& exp)
-{
-  QDate dt = QDate::fromString(exp, "dd/MM/yyyy");
+  QDate dt = QDate::fromString(text(), "dd/MM/yyyy");
   if (!dt.isValid())
   {
-    dt = QDate::fromString(exp, "dd/MM/yy");
+    dt = QDate::fromString(text(), "dd/MM/yy");
     if (!dt.isValid())
     {
-      dt = QDate::fromString(exp, "ddMMyyyy");
+      dt = QDate::fromString(text(), "ddMMyyyy");
       if (!dt.isValid())
       {
-        dt = QDate::fromString(exp, "ddMM");
+        dt = QDate::fromString(text(), "ddMM");
         dt.setDate(QDate::currentDate().year(), dt.month(), dt.day());
         if (!dt.isValid())
         {
-          dt = QDate::fromString(exp, "dd");
+          dt = QDate::fromString(text(), "dd");
           dt.setDate(QDate::currentDate().year(), QDate::currentDate().month(), dt.day());
         }
       }
@@ -255,21 +260,14 @@ bool DateItem::evaluate(const QString& exp)
   }
 
   if (dt.isValid())
-    setDate(dt);
-
-  return dt.isValid();
-}
-
-void DateItem::evaluate()
-{
-  if (!evaluate(text()))
-    setDate(getDate());
+    setValue(dt);
+  else
+    setValue(getValue());
 }
 
 void DateItem::erase()
 {
-  setDate(m_defaultDate);
-  evaluate();
+  setValue(m_defaultDate);
 }
 
 void DateItem::activate()
@@ -280,42 +278,31 @@ void DateItem::activate()
 TimeItem::TimeItem(const QTime& defaultTime)
   : m_defaultTime(defaultTime)
 {
-  setTime(m_defaultTime);
+  setValue(m_defaultTime);
 }
 
-void TimeItem::setTime(const QTime& t)
+void TimeItem::setValue(const QVariant& v)
 {
+  QTime t = v.toTime();
   setData(Qt::UserRole, t);
   setText(t.toString("HH:mm"));
 }
 
-QTime TimeItem::getTime()const
+void TimeItem::evaluate()
 {
-  return data(Qt::UserRole).toTime();
-}
-
-bool TimeItem::evaluate(const QString& exp)
-{
-  QTime t = QTime::fromString(exp, "HH:mm");
+  QTime t = QTime::fromString(text(), "HH:mm");
   if (!t.isValid())
     t = QTime::fromString(exp, "HHmm");
 
   if (t.isValid())
-    setTime(t);
-
-  return t.isValid();
-}
-
-void TimeItem::evaluate()
-{
-  if (!evaluate(text()))
-    setTime(getTime());
+    setValue(t);
+  else
+    setValue(getValue());
 }
 
 void TimeItem::erase()
 {
-  setTime(m_defaultTime);
-  evaluate();
+  setValue(m_defaultTime);
 }
 
 void TimeItem::activate()
@@ -330,32 +317,29 @@ TextItem::TextItem(Text::Input input, bool toUpper)
 
 }
 
-bool TextItem::evaluate(const QString& exp)
+void TextItem::setValue(const QVariant& v)
 {
-  JRegExpValidator val(m_toUpper, QRegExp(Text::getRegEx(m_input)));
-  QString exp2 = exp;
-  if (m_toUpper)
-    exp2.toUpper();
-  int pos = exp2.length();
-  bool bValid = val.validate(exp2, pos) == QValidator::State::Acceptable;
-  if (bValid)
-  {
-    setData(Qt::UserRole, exp2);
-    setText(exp2);
-  }
-  return bValid;
+  setData(Qt::UserRole, v.toString());
+  setText(v.toString());
 }
 
 void TextItem::evaluate()
 {
-  if (!evaluate(text()))
-    setText(data(Qt::UserRole).toString());
+  JRegExpValidator val(m_toUpper, QRegExp(Text::getRegEx(m_input)));
+  QString str = text();
+  if (m_toUpper)
+    str.toUpper();
+  int pos = str.length();
+  bool bValid = val.validate(str, pos) == QValidator::State::Acceptable;
+  if (bValid)
+    setValue(str);
+  else
+    setValue(getValue());
 }
 
 void TextItem::erase()
 {
   setText("");
-  evaluate();
 }
 
 void TextItem::activate()
@@ -368,22 +352,6 @@ JItemSQLItem::JItemSQLItem(const QString& tableName)
 {
   setTextColor(QColor(Qt::darkGray));
   setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-}
-
-void JItemSQLItem::evaluate()
-{
-
-}
-
-bool JItemSQLItem::evaluate(const QString& exp)
-{
-
-}
-
-void JItemSQLItem::erase()
-{
-  setData(Qt::UserRole, INVALID_ID);
-  setText("");
 }
 
 void JItemSQLItem::activate()
@@ -400,13 +368,18 @@ void JItemSQLItem::activate()
   }
 }
 
-Id JItemSQLItem::getId() const
+void JItemSQLItem::evaluate()
 {
-  return data(Qt::UserRole).toLongLong();
+
 }
 
-void JItemSQLItem::setItem(Id id, const QString& name)
+void JItemSQLItem::erase()
 {
-  setData(Qt::UserRole, id.get());
-  setText(name);
+  setData(Qt::UserRole, INVALID_ID);
+  setText("");
+}
+
+void JItemSQLItem::setValue(const QVariant& v)
+{
+  setData(Qt::UserRole, v.toLongLong());
 }

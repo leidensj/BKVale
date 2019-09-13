@@ -20,6 +20,7 @@ public:
   bool isValidRow(int row) const;
   bool hasItems() const;
   bool isValidCurrentRow() const;
+  virtual void addRow() = 0;
 
 public slots:
   virtual void removeItem();
@@ -27,6 +28,9 @@ public slots:
 
 protected slots:
   void emitChangedSignal();
+  void activate(QTableWidgetItem* p);
+  void erase(QTableWidgetItem* p);
+  void evaluate(QTableWidgetItem* p);
 
 protected:
   void keyPressEvent(QKeyEvent *event);
@@ -42,9 +46,8 @@ public:
   virtual void evaluate() = 0;
   virtual void erase() = 0;
   virtual void activate() = 0;
-
-private:
-  virtual bool evaluate(const QString& exp) = 0;
+  virtual void setValue(const QVariant& v) = 0;
+  virtual QVariant getValue() const { return data(Qt::UserRole); }
 };
 
 class DoubleItem : public JTableItem
@@ -63,12 +66,12 @@ public:
              bool bAcceptNegative = true,
              const QString& prefix = "",
              const QString& sufix = "");
-  void setValue(double val);
-  double getValue() const;
   void evaluate();
+  void erase();
+  void activate();
+  void setValue(const QVariant& v);
 
 private:
-  bool evaluate(const QString& exp);
   const Data::Type m_type;
   const Color m_color;
   const bool m_bCheckable;
@@ -87,12 +90,12 @@ public:
   };
 
   DateItem(const QDate& defaultDate, Color color = Color::None);
-  void setDate(const QDate& dt);
-  QDate getDate() const;
   void evaluate();
+  void erase();
+  void activate();
+  void setValue(const QVariant& v);
 
 private:
-  bool evaluate(const QString& exp);
   QDate m_defaultDate;
   Color m_color;
 };
@@ -101,12 +104,12 @@ class TimeItem : public JTableItem
 {
 public:
   TimeItem(const QTime& defaultTime);
-  void setTime(const QTime& t);
-  QTime getTime() const;
   void evaluate();
+  void erase();
+  void activate();
+  void setValue(const QVariant& v);
 
 private:
-  bool evaluate(const QString& exp);
   QTime m_defaultTime;
 };
 
@@ -115,9 +118,11 @@ class TextItem : public JTableItem
 public:
   TextItem(Text::Input input, bool toUpper = true);
   void evaluate();
+  void erase();
+  void activate();
+  void setValue(const QVariant& v);
 
 private:
-  bool evaluate(const QString& exp);
   Text::Input m_input;
   bool m_toUpper;
 };
@@ -127,11 +132,11 @@ class JItemSQLItem : public JTableItem
 public:
   JItemSQLItem(const QString& tableName);
   void evaluate();
-  Id getId() const;
-  void setItem(Id id, const QString& name);
+  void erase();
+  void activate();
+  void setValue(const QVariant& v);
 
 private:
-  bool evaluate(const QString& exp);
   const QString& m_tableName;
 };
 

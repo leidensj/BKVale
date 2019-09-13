@@ -7,9 +7,16 @@
 #include "jregexpvalidator.h"
 #include "jdatabase.h"
 
-JTable::JTable(QWidget* parent)
+JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
  : QTableWidget(parent)
 {
+  if (btns != nullptr)
+  {
+    connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
+    connect(btns->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
+    connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
+  }
+
   setSelectionBehavior(QAbstractItemView::SelectItems);
   setSelectionMode(QAbstractItemView::SingleSelection);
   horizontalHeader()->setHighlightSections(false);
@@ -103,6 +110,15 @@ bool JTable::isValidCurrentRow() const
 void JTable::setHeaderIcon(int pos, const QIcon& icon)
 {
   model()->setHeaderData(pos, Qt::Horizontal, icon, Qt::DecorationRole);
+}
+
+JTableItem* JTable::getItem(int row, int column) const
+{
+  JTableItem* p = nullptr;
+  QTableWidgetItem* p2 = item(row, column);
+  if (p2 != nullptr)
+    p = dynamic_cast<JTableItem*>(p2);
+  return p;
 }
 
 void JTable::activate(QTableWidgetItem* p)

@@ -4,7 +4,7 @@
 #include "widgets/jtable.h"
 #include "items/product.h"
 
-class ProductCodeTable : public JItemTable
+class ProductCodeTable : public JTable
 {
   Q_OBJECT
 
@@ -14,20 +14,10 @@ class ProductCodeTable : public JItemTable
   };
 
 public:
-  explicit ProductCodeTable(QWidget* parent = nullptr);
-  const JItem& getItem(int row) const;
-
-public slots:
-  void addItem(const JItem& o);
-  void addItem();
-
-private:
-  mutable ProductCode m_ref;
-
-protected slots:
-  void update(int row, int column);
-  void itemActivate(int row, int column);
-  void itemDelete(int row, int column);
+  explicit ProductCodeTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  void addRow();
+  void getCodes(QVector& v) const;
+  void setCodes(const QVector& v);
 };
 
 #endif // PRODUCTCODETABLE_H

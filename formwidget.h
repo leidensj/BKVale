@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "items/form.h"
+#include "tables/phonetable.h"
 
 class QLabel;
 class QRadioButton;
@@ -87,14 +88,7 @@ public:
   void fillForm(Form& o) const;
 
   JAddRemoveButtons* m_btnAddRemove;
-  JTable* m_tbPhone;
-
-private slots:
-  void updateControls();
-  void updateTable(QTableWidgetItem*);
-  void addPhone();
-  void setPhones(const QVector<Phone>& v);
-  void getPhones(QVector<Phone>& v) const;
+  PhoneTable* m_tbPhone;
 };
 
 class FormAddressWidget : public QWidget

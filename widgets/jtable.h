@@ -6,25 +6,39 @@
 #include <QHeaderView>
 #include <QDate>
 #include "items/jitem.h"
+#include "jaddremovebuttons.h"
 
 class QKeyEvent;
 class QPushButton;
 
-class JTable : private QTableWidget
+class JTableItem : public QTableWidgetItem
+{
+public:
+  virtual void evaluate() = 0;
+  virtual void erase() = 0;
+  virtual void activate() = 0;
+  virtual void setValue(const QVariant& v) = 0;
+  virtual QVariant getValue() const { return data(Qt::UserRole); }
+};
+
+
+class JTable : protected QTableWidget
 {
   Q_OBJECT
 
 public:
-  explicit JTable(QWidget* parent = nullptr);
+  explicit JTable(JAddRemoveButtons* btns, QWidget* parent);
+  ~JTable();
   void setLargerSize(bool b);
   bool isValidRow(int row) const;
   bool hasItems() const;
   bool isValidCurrentRow() const;
-  virtual void addRow() = 0;
+  JTableItem* getItem(int row, int column) const;
 
 public slots:
   virtual void removeItem();
   virtual void removeAllItems();
+  virtual void addRow() = 0;
 
 protected slots:
   void emitChangedSignal();
@@ -38,16 +52,6 @@ protected:
 
 signals:
   void changedSignal(bool bIsRowSelected);
-};
-
-class JTableItem : public QTableWidgetItem
-{
-public:
-  virtual void evaluate() = 0;
-  virtual void erase() = 0;
-  virtual void activate() = 0;
-  virtual void setValue(const QVariant& v) = 0;
-  virtual QVariant getValue() const { return data(Qt::UserRole); }
 };
 
 class DoubleItem : public JTableItem

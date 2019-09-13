@@ -31,20 +31,9 @@ DiscountTable::DiscountTable(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)DiscountItem::Column::Unity, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)DiscountItem::Column::Name, QHeaderView::Stretch);
 
-  QObject::connect(this,
-                   SIGNAL(cellChanged(int, int)),
-                   this,
-                   SLOT(update(int, int)));
-
-  QObject::connect(this,
-                   SIGNAL(currentCellChanged(int, int, int, int)),
-                   this,
-                   SLOT(emitChangedSignal()));
-
-  QObject::connect(this,
-                   SIGNAL(cellDoubleClicked(int, int)),
-                   this,
-                   SLOT(emitEditSignal(int, int)));
+  QObject::connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(update(int, int)));
+  QObject::connect(this, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(emitChangedSignal()));
+  QObject::connect(this, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(emitEditSignal(int, int)));
 }
 
 void DiscountTable::keyPressEvent(QKeyEvent *event)

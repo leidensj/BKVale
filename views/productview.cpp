@@ -46,8 +46,8 @@ ProductView::ProductView(QWidget* parent)
   m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME);
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
 
-  m_tbCode = new ProductCodeTable;
   m_btns = new JAddRemoveButtons;
+  m_tbCode = new ProductCodeTable(m_btns);
 
   QVBoxLayout* ltCode = new QVBoxLayout;
   ltCode->addWidget(m_btns);
@@ -70,9 +70,6 @@ ProductView::ProductView(QWidget* parent)
 
   m_tab->addTab(tabInfoFrame, QIcon(":/icons/res/item.png"), tr("Produto"));
   m_tab->addTab(tabCodeFrame, QIcon(":/icons/res/barcode.png"), tr("Códigos"));
-  connect(m_tbCode, SIGNAL(changedSignal(bool)), m_btns->m_btnRemove, SLOT(setEnabled(bool)));
-  connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_tbCode, SLOT(addItem()));
-  connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_tbCode, SLOT(removeItem()));
 
   setFocusWidgetOnCreate(m_edName);
   create();
@@ -95,8 +92,7 @@ void ProductView::getItem(JItemSQL& o) const
   _o.m_bSell = m_cbSell->isChecked();
   _o.m_category.m_id = m_categoryPicker->getId();
   _o.m_image.m_id = m_imagePicker->getId();
-  for (int i = 0; i != m_tbCode->rowCount(); ++i)
-    _o.m_vCode.push_back(dynamic_cast<const ProductCode&>(m_tbCode->getItem(i)));
+  m_tbCode->getCodes(_o.m_vCode);
 }
 
 void ProductView::setItem(const JItemSQL &o)
@@ -109,7 +105,5 @@ void ProductView::setItem(const JItemSQL &o)
   m_cbSell->setChecked(_o.m_bSell);
   m_categoryPicker->setItem(_o.m_category);
   m_imagePicker->setItem(_o.m_image);
-  m_tbCode->removeAllItems();
-  for (int i = 0; i != _o.m_vCode.size(); ++i)
-    m_tbCode->addItem(_o.m_vCode.at(i));
+  m_tbCode->setCodes(_o.m_vCode);
 }

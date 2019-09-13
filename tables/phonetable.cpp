@@ -1,79 +1,66 @@
 #include "phonetable.h"
-#include "databaseutils.h"
 #include <QHeaderView>
-#include <QKeyEvent>
-#include "widgets/jtablewidgetitem.h"
 
-PhoneTable::PhoneTable(QWidget* parent)
-  : JItemTable((int)Flags::NoFlags, parent)
+PhoneTable::PhoneTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
 {
-  setColumnCount(1);
+  setColumnCount(4);
   QStringList headers;
-  headers << "Telefone";
+  headers << "País" << "Código" << "Número" << "Nome";
   setHorizontalHeaderLabels(headers);
 
-  horizontalHeader()->setSectionResizeMode((int)Column::Phone, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)Column::CountryCode, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Code, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Number, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Name, QHeaderView::Stretch);
 }
 
-const JItem& PhoneTable::getItem(int row) const
+void PhoneTable::addRow()
 {
-  m_ref.clear();
-  if (isValidRow(row))
-  {
-    int idx = verticalHeader()->logicalIndex(row);
-    m_ref = ((PhoneEditorTableWidgetItem*)item(idx, (int)Column::Phone))->getItem();
-  }
-  return m_ref;
-}
-
-void PhoneTable::addItem()
-{
-  addItem(Phone());
+  insertRow(rowCount());
   int row = rowCount() - 1;
-  auto ptPhoneCell = (PhoneEditorTableWidgetItem*)(item(row, (int)Column::Phone));
-  if (!ptPhoneCell->selectItem())
-    removeItem();
+
+  auto itCountryCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "+");
+  auto itCode = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "(", ")");
+  auto itNumber = new TextItem(Text::Input::Numeric, false);
+  auto itName = new TextItem(Text::Input::ASCII, true);
+
+  setItem(row, (int)Column::CountryCode, itCountryCode);
+  setItem(row, (int)Column::Code, itCode);
+  setItem(row, (int)Column::Number, itNumber);
+  setItem(row, (int)Column::Name, itName);
+
+  Phone o;
+  itCountryCode->setValue(o.m_countryCode);
+  itCode->setValue(o.m_code);
+
+  setCurrentItem(itNumber);
   setFocus();
 }
 
-void PhoneTable::addItem(const JItem& o)
+void PhoneTable::getPhones(QVector<Phone>& v) const
 {
-  const Phone& _o = dynamic_cast<const Phone&>(o);
-
-  blockSignals(true);
-
-  insertRow(rowCount());
-  int row = rowCount() - 1;
-  setItem(row, (int)Column::Phone, new PhoneEditorTableWidgetItem);
-  setCurrentCell(row, (int)Column::Phone);
-
-  ((PhoneEditorTableWidgetItem*)item(row, (int)Column::Phone))->setItem(_o);
-
-  setCurrentCell(row, (int)Column::Phone);
-  blockSignals(false);
-}
-
-void PhoneTable::update(int /*row*/, int /*column*/)
-{
-  blockSignals(true);
-  blockSignals(false);
-  emitChangedSignal();
-}
-
-void PhoneTable::itemActivate(int row, int column)
-{
-  if (column == (int)Column::Phone)
+  v.clear();
+  for (int i = 0; i != rowCount(); ++i)
   {
-    auto ptPhone = (PhoneEditorTableWidgetItem*)item(row, column);
-    ptPhone->selectItem();
+    Phone o;
+    o.m_countryCode = getItem(i, (int)Column::CountryCode)->getValue().toDouble();
+    o.m_code = getItem(i, (int)Column::Code)->getValue().toDouble();
+    o.m_number = getItem(i, (int)Column::Number)->getValue().toString();
+    o.m_name = getItem(i, (int)Column::Name)->getValue().toString();
+    v.push_back(o);
   }
 }
 
-void PhoneTable::itemDelete(int row, int column)
+void PhoneTable::setPhones(const QVector<Phone>& v)
 {
-  if (column == (int)Column::Phone)
+  removeAllItems();
+  for (int i = 0; i != v.size(); ++i)
   {
-    auto ptPhone = (PhoneEditorTableWidgetItem*)item(row, column);
-    ptPhone->setItem(Phone());
+    addRow();
+    getItem(i, (int)Column::CountryCode)->setValue(v.at(i).m_countryCode);
+    getItem(i, (int)Column::Code)->setValue(v.at(i).m_code);
+    getItem(i, (int)Column::Number)->setValue(v.at(i).m_number);
+    getItem(i, (int)Column::Name)->setValue(v.at(i).m_name);
   }
 }

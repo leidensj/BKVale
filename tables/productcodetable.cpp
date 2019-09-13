@@ -4,8 +4,8 @@
 #include <QKeyEvent>
 #include "widgets/jtablewidgetitem.h"
 
-ProductCodeTable::ProductCodeTable(QWidget* parent)
-  : JItemTable((int)Flags::NoFlags, parent)
+ProductCodeTable::ProductCodeTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
 {
   setColumnCount(1);
   QStringList headers;
@@ -15,50 +15,35 @@ ProductCodeTable::ProductCodeTable(QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)Column::Code, QHeaderView::Stretch);
 }
 
-const JItem& ProductCodeTable::getItem(int row) const
+void ProductCodeTable::addRow()
 {
-  m_ref.clear();
-  if (isValidRow(row))
-  {
-    int idx = verticalHeader()->logicalIndex(row);
-    m_ref.m_code = item(idx, (int)Column::Code)->text();
-  }
-  return m_ref;
-}
+  insertRow(rowCount());
+  int row = rowCount() - 1;
 
-void ProductCodeTable::addItem()
-{
-  addItem(ProductCode());
+  auto it = new TextItem(Text::Input::ASCII, true);
+  setItem(row, (int)Column::Code, it);
+
+  setCurrentItem(it);
   setFocus();
 }
 
-void ProductCodeTable::addItem(const JItem& o)
+void ProductCodeTable::getPhones(QVector<ProductCode>& v) const
 {
-  const ProductCode& _o = dynamic_cast<const ProductCode&>(o);
-
-  blockSignals(true);
-
-  insertRow(rowCount());
-  int row = rowCount() - 1;
-  setItem(row, (int)Column::Code, new QTableWidgetItem(_o.m_code));
-  setCurrentCell(row, (int)Column::Code);
-
-  blockSignals(false);
+  v.clear();
+  for (int i = 0; i != rowCount(); ++i)
+  {
+    ProductCode o;
+    o.m_code = getItem(i, (int)Column::Code)->getValue().toString();
+    v.push_back(o);
+  }
 }
 
-void ProductCodeTable::update(int /*row*/, int /*column*/)
+void ProductCodeTable::setPhones(const QVector<Phone>& v)
 {
-  blockSignals(true);
-  blockSignals(false);
-  emitChangedSignal();
-}
-
-void ProductCodeTable::itemActivate(int /*row*/, int /*column*/)
-{
-
-}
-
-void ProductCodeTable::itemDelete(int /*row*/, int /*column*/)
-{
-
+  removeAllItems();
+  for (int i = 0; i != v.size(); ++i)
+  {
+    addRow();
+    getItem(i, (int)Column::Code)->setValue(v.at(i).m_code);
+  }
 }

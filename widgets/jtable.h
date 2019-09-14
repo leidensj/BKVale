@@ -144,4 +144,18 @@ private:
   const QString& m_tableName;
 };
 
+class PackageItem : public JTableItem
+{
+public:
+  PackageItem();
+  void evaluate();
+  void erase();
+  void activate();
+  void setValue(const QVariant& v);
+  void setPackage(const Package& pck, const QString& productUnity);
+private:
+  Package m_pck;
+  QString m_productUnity;
+};
+
 #endif // JITEMTABLE_H

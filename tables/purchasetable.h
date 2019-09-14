@@ -4,9 +4,7 @@
 #include "widgets/jtable.h"
 #include "items/purchase.h"
 
-#define PURCHASE_TABLE_NUMBER_OF_COLUMNS 5
-
-class PurchaseTable : public JItemTable
+class PurchaseTable : public JTable
 {
   Q_OBJECT
 
@@ -16,28 +14,25 @@ public:
   {
     Ammount,
     Unity,
-    Description,
+    Product,
     Price,
     SubTotal
   };
 
-  explicit PurchaseTable(QWidget* parent = nullptr);
-  const JItem& getItem(int row) const;
+  explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  void getPurchases(QVector<Purchase>& v) const;
+  void setPurchases(const QVector<Purchase>& v);
 
 public slots:
-  void addItem(const JItem& o);
-  void addItemAndLoadPrices(Id supplierId, bool bCode);
+  void addRow();
   double computeTotal() const;
 
 private:
-  mutable PurchaseElement m_ref;
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
 
 protected slots:
   void update(int row, int column);
-  void itemActivate(int row, int column);
-  void itemDelete(int row, int column);
 };
 
 #endif // PURCHASETABLE_H

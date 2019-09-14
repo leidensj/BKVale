@@ -6,6 +6,7 @@
 #include "tinyexpr.h"
 #include "jregexpvalidator.h"
 #include "jdatabase.h"
+#include "packageeditor.h"
 
 JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
  : QTableWidget(parent)
@@ -398,4 +399,48 @@ void JItemSQLItem::erase()
 void JItemSQLItem::setValue(const QVariant& v)
 {
   setData(Qt::UserRole, v.toLongLong());
+}
+
+PackageItem::PackageItem()
+{
+
+}
+
+void PackageItem::setPackage(const Package& pck, const QString& productUnity)
+{
+  m_pck = pck;
+  m_productUnity = productUnity;
+}
+
+void PackageItem::activate()
+{
+  PackageEditor dlg(m_pck, m_productUnity);
+  if (dlg.exec())
+
+  JDatabaseSelector dlg(m_tableName, false, tableWidget());
+  if (dlg.exec())
+  {
+    JItemSQL* p = dlg.getDatabase()->getCurrentItem();
+    if (p != nullptr)
+    {
+      setData(Qt::UserRole, p->m_id.get());
+      setText(p->name());
+    }
+  }
+}
+
+void JItemSQLItem::evaluate()
+{
+
+}
+
+void JItemSQLItem::erase()
+{
+  setData(Qt::UserRole, INVALID_ID);
+  setText("");
+}
+
+void JItemSQLItem::setValue(const QVariant& v)
+{
+
 }

@@ -18,9 +18,11 @@ class PhoneTable : public JTable
 
 public:
   explicit PhoneTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
-  void addRow();
   void getPhones(QVector<Phone>& v) const;
   void setPhones(const QVector<Phone>& v);
+
+public slots:
+  void addRow();
 };
 
 #endif // PHONETABLE_H

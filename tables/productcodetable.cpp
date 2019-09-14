@@ -38,7 +38,7 @@ void ProductCodeTable::getPhones(QVector<ProductCode>& v) const
   }
 }
 
-void ProductCodeTable::setPhones(const QVector<Phone>& v)
+void ProductCodeTable::setPhones(const QVector<ProductCode>& v)
 {
   removeAllItems();
   for (int i = 0; i != v.size(); ++i)

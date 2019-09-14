@@ -4,35 +4,37 @@
 #include <QKeyEvent>
 #include "widgets/jtablewidgetitem.h"
 
-PurchaseTable::PurchaseTable(QWidget* parent)
-  : JItemTable((int)Flags::BigFont, parent)
+PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable((int)Flags::BigFont, parent)
 {
-  setColumnCount(PURCHASE_TABLE_NUMBER_OF_COLUMNS);
+  setColumnCount(5);
   QStringList headers;
   headers << "Quantidade" << "Unidade" << "Produto" << "Preço" << "Subtotal";
   setHorizontalHeaderLabels(headers);
-  setHeaderIcon((int)Column::Unity, QIcon(":/icons/res/item.png"));
-  setHeaderIconSearchable((int)Column::Description);
+  setHeaderIcon((int)Column::Unity, QIcon(":/icons/res/unity.png"));
+  setHeaderIcon((int)Column::Product, QIcon(":/icons/res/item.png"));
 
   horizontalHeader()->setSectionResizeMode((int)Column::Ammount, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Unity, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)Column::Description, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)Column::Product, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)Column::Price, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::SubTotal, QHeaderView::ResizeToContents);
+
+  connect(this, SIGNAL(cellChanged(int,int)), this, SLOT(update(int,int)));
 }
 
 double PurchaseTable::computePrice(int row) const
 {
-  const double ammount = ((DoubleItem*)item(row, (int)Column::Ammount))->getValue();
-  const double subTotal = ((DoubleItem*)item(row, (int)Column::SubTotal))->getValue();
+  const double ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
+  const double subTotal = getItem(row, (int)Column::SubTotal)->getValue().toDouble();
   const double price = ammount ? subTotal / ammount : 0.0;
   return price;
 }
 
 double PurchaseTable::computeSubTotal(int row) const
 {
-  const double ammount = ((DoubleItem*)item(row, (int)Column::Ammount))->getValue();
-  const double price = ((DoubleItem*)item(row, (int)Column::Price))->getValue();
+  const double ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
+  const double price = getItem(row, (int)Column::Price)->getValue().toDouble();
   const double subTotal = ammount * price;
   return subTotal;
 }
@@ -41,8 +43,37 @@ double PurchaseTable::computeTotal() const
 {
   double total = 0.0;
   for (int row = 0; row != rowCount(); ++row)
-    total += ((DoubleItem*)item(row, (int)Column::SubTotal))->getValue();
+    total += getItem(row, (int)Column::SubTotal)->getValue().toDouble();
   return total;
+}
+
+void PurchaseTable::addRow()
+{
+  insertRow(rowCount());
+  int row = rowCount() - 1;
+
+
+  setItem(row, (int)Column::Ammount, new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background));
+  setItem(row, (int)Column::Unity, new PackageTableWidgetItem);
+  setItem(row, (int)Column::Description, new ProductTableWidgetItem);
+  setItem(row, (int)Column::Price, new DoubleItem(Data::Type::Money, DoubleItem::Color::Background));
+  setItem(row, (int)Column::SubTotal, new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground));
+
+  auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::None, false, false, "+");
+  //auto itUnity = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "(", ")");
+  auto itProduct = new JItemSQLItem(PRODUCT_SQL_TABLE_NAME);
+  auto itPrice = new DoubleItem(Data::Type::Money, true);
+  auto itSubtotal = new DoubleItem(Data::Type::Money, true);
+
+  setItem(row, (int)Column::Ammount, itAmmount);
+  //setItem(row, (int)Column::Unity, itCode);
+  setItem(row, (int)Column::Product, itProduct);
+  setItem(row, (int)Column::Price, itPrice);
+  setItem(row, (int)Column::SubTotal, itSubtotal);
+
+  itProduct->activate();
+  setCurrentItem(itAmmount);
+  setFocus();
 }
 
 const JItem& PurchaseTable::getItem(int row) const
@@ -145,26 +176,4 @@ void PurchaseTable::update(int row, int column)
 
   blockSignals(false);
   emitChangedSignal();
-}
-
-void PurchaseTable::itemActivate(int row, int column)
-{
-  if (column == (int)Column::Description)
-  {
-    auto ptProduct = (ProductTableWidgetItem*)item(row, column);
-    ptProduct->selectItem(PRODUCT_FILTER_BUY);
-    auto ptPackage = (PackageTableWidgetItem*)item(row, (int)Column::Unity);
-    ptPackage->setItem(Package(), dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
-  }
-  else if (column == (int)Column::Unity)
-  {
-    auto ptProduct = (ProductTableWidgetItem*)item(row, (int)Column::Description);
-    auto ptPackage = (PackageTableWidgetItem*)item(row, column);
-    ptPackage->selectItem(dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
-  }
-}
-
-void PurchaseTable::itemDelete(int /*row*/, int /*column*/)
-{
-
 }

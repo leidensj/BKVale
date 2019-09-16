@@ -402,45 +402,61 @@ void JItemSQLItem::setValue(const QVariant& v)
 }
 
 PackageItem::PackageItem()
+  : m_dlg(nullptr)
 {
-
-}
-
-void PackageItem::setPackage(const Package& pck, const QString& productUnity)
-{
-  m_pck = pck;
-  m_productUnity = productUnity;
+  m_dlg = new PackageEditor(tableWidget());
 }
 
 void PackageItem::activate()
 {
-  PackageEditor dlg(m_pck, m_productUnity);
-  if (dlg.exec())
-
-  JDatabaseSelector dlg(m_tableName, false, tableWidget());
-  if (dlg.exec())
+  if (m_dlg->exec())
   {
-    JItemSQL* p = dlg.getDatabase()->getCurrentItem();
-    if (p != nullptr)
-    {
-      setData(Qt::UserRole, p->m_id.get());
-      setText(p->name());
-    }
+    QList<QVariant> lst;
+    Package pck = m_dlg->getPackage();
+    lst.push_back(pck.m_bIsPackage);
+    lst.push_back(pck.m_unity);
+    lst.push_back(pck.m_ammount);
+    setValue(QVariant(lst));
   }
 }
 
-void JItemSQLItem::evaluate()
+void PackageItem::evaluate()
 {
 
 }
 
-void JItemSQLItem::erase()
+void PackageItem::erase()
 {
+
   setData(Qt::UserRole, INVALID_ID);
-  setText("");
 }
 
-void JItemSQLItem::setValue(const QVariant& v)
+void PackageItem::setValue(const QVariant& v)
 {
-
+  m_dlg->setParent(tableWidget());
+  Package pck;
+  QString productUnity;
+  for (int i = 0; i != v.toList().size(); ++i)
+  {
+    switch (i)
+    {
+      case 0:
+        pck.m_bIsPackage = v.toList().at(i).toBool();
+        break;
+      case 1:
+        pck.m_unity = v.toList().at(i).toString();
+        break;
+      case 2:
+        pck.m_ammount = v.toList().at(i).toDouble();
+        break;
+      case 3:
+        productUnity = v.toList().at(i).toString();
+        break;
+      default:
+        break;
+    }
+  }
+  m_dlg->setPackage(pck, productUnity);
+  setData(Qt::UserRole, v);
+  setText(pck.strFormattedUnity(productUnity));
 }

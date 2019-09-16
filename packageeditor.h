@@ -14,7 +14,7 @@ class PackageEditor : public QDialog
   Q_OBJECT
 
 public:
-  explicit PackageEditor(const Package& package, const QString& productUnity, QWidget* parent = 0);
+  explicit PackageEditor(QWidget* parent = 0);
   Package getPackage() const;
   void setPackage(const Package& package, const QString& productUnity);
 

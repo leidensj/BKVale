@@ -144,6 +144,7 @@ private:
   const QString& m_tableName;
 };
 
+class PackageEditor;
 class PackageItem : public JTableItem
 {
 public:
@@ -152,10 +153,8 @@ public:
   void erase();
   void activate();
   void setValue(const QVariant& v);
-  void setPackage(const Package& pck, const QString& productUnity);
 private:
-  Package m_pck;
-  QString m_productUnity;
+  PackageEditor* m_dlg;
 };
 
 #endif // JITEMTABLE_H

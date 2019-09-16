@@ -99,7 +99,13 @@ SOURCES += main.cpp\
     items/paymentelement.cpp \
     widgets/jdatabasecombobox.cpp \
     common.cpp \
-    widgets/jregexpvalidator.cpp
+    widgets/jregexpvalidator.cpp \
+    tableitems/doubleitem.cpp \
+    tableitems/dateitem.cpp \
+    tableitems/timeitem.cpp \
+    tableitems/textitem.cpp \
+    tableitems/packageitem.cpp \
+    tableitems/sqlitem.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -192,7 +198,14 @@ HEADERS  += mainwindow.h \
     items/paymentelement.h \
     widgets/jdatabasecombobox.h \
     common.h \
-    widgets/jregexpvalidator.h
+    widgets/jregexpvalidator.h \
+    tableitems/doubleitem.h \
+    tableitems/jtableitem.h \
+    tableitems/dateitem.h \
+    tableitems/timeitem.h \
+    tableitems/textitem.h \
+    tableitems/packageitem.h \
+    tableitems/sqlitem.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

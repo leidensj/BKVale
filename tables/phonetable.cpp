@@ -43,11 +43,12 @@ void PhoneTable::getPhones(QVector<Phone>& v) const
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
+    int row = verticalHeader()->logicalIndex(row);
     Phone o;
-    o.m_countryCode = getItem(i, (int)Column::CountryCode)->getValue().toDouble();
-    o.m_code = getItem(i, (int)Column::Code)->getValue().toDouble();
-    o.m_number = getItem(i, (int)Column::Number)->getValue().toString();
-    o.m_name = getItem(i, (int)Column::Name)->getValue().toString();
+    o.m_countryCode = getItem(row, (int)Column::CountryCode)->getValue().toDouble();
+    o.m_code = getItem(row, (int)Column::Code)->getValue().toDouble();
+    o.m_number = getItem(row, (int)Column::Number)->getValue().toString();
+    o.m_name = getItem(row, (int)Column::Name)->getValue().toString();
     v.push_back(o);
   }
 }

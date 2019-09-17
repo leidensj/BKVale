@@ -1,6 +1,34 @@
 #include "sqlitem.h"
 #include "widgets/jdatabase.h"
 
+QVariant SQLItem::toVariant(const SQLItemAbv& o)
+{
+  QList<QVariant> lst;
+  lst.push_back(o.m_id);
+  lst.push_back(o.m_name);
+  return QVariant(lst);
+}
+
+SQLItemAbv SQLItem::toSQLItemAbv(const QVariant& v)
+{
+  SQLItemAbv o;
+  for (int i = 0; i != v.toList().size(); ++i)
+  {
+    switch (i)
+    {
+      case 0:
+        o.m_id = v.toList().at(i).toLongLong();
+        break;
+      case 1:
+        o.m_name = v.toList().at(i).toString();
+        break;
+      default:
+        break;
+    }
+  }
+  return o;
+}
+
 SQLItem::SQLItem(const QString& tableName)
   : m_tableName(tableName)
 {
@@ -15,10 +43,7 @@ void SQLItem::activate()
   {
     JItemSQL* p = dlg.getDatabase()->getCurrentItem();
     if (p != nullptr)
-    {
-      setData(Qt::UserRole, p->m_id.get());
-      setText(p->name());
-    }
+      setValue(toVariant(SQLItemAbv(p->m_id.get(), p->name())));
   }
 }
 
@@ -29,11 +54,12 @@ void SQLItem::evaluate()
 
 void SQLItem::erase()
 {
-  setData(Qt::UserRole, INVALID_ID);
-  setText("");
+  setValue(SQLItemAbv());
 }
 
 void SQLItem::setValue(const QVariant& v)
 {
-  setData(Qt::UserRole, v.toLongLong());
+  SQLItemAbv abv = toSQLItemAbv(v);
+  setData(Qt::UserRole, abv.m_id);
+  setText(abv.m_name);
 }

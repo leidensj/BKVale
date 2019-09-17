@@ -1,41 +1,9 @@
 #include "packageitem.h"
 #include "packageeditor.h"
 
-PackageItem::PackageItem()
-  : m_dlg(nullptr)
+Package PackageItem::toPackage(const QVariant& v)
 {
-  m_dlg = new PackageEditor(tableWidget());
-}
-
-void PackageItem::activate()
-{
-  if (m_dlg->exec())
-  {
-    QList<QVariant> lst;
-    Package pck = m_dlg->getPackage();
-    lst.push_back(pck.m_bIsPackage);
-    lst.push_back(pck.m_unity);
-    lst.push_back(pck.m_ammount);
-    setValue(QVariant(lst));
-  }
-}
-
-void PackageItem::evaluate()
-{
-
-}
-
-void PackageItem::erase()
-{
-
-  setData(Qt::UserRole, INVALID_ID);
-}
-
-void PackageItem::setValue(const QVariant& v)
-{
-  m_dlg->setParent(tableWidget());
   Package pck;
-  QString productUnity;
   for (int i = 0; i != v.toList().size(); ++i)
   {
     switch (i)
@@ -49,14 +17,53 @@ void PackageItem::setValue(const QVariant& v)
       case 2:
         pck.m_ammount = v.toList().at(i).toDouble();
         break;
-      case 3:
-        productUnity = v.toList().at(i).toString();
-        break;
       default:
         break;
     }
   }
-  m_dlg->setPackage(pck, productUnity);
+  return pck;
+}
+
+QVariant PackageItem::toVariant(const Package& pck)
+{
+  QList<QVariant> lst;
+  lst.push_back(pck.m_bIsPackage);
+  lst.push_back(pck.m_unity);
+  lst.push_back(pck.m_ammount);
+  return QVariant(lst);
+}
+
+PackageItem::PackageItem()
+{
+  setTextColor(QColor(Qt::darkGray));
+  setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+}
+
+void PackageItem::setProductUnity(const QString& productUnity)
+{
+  m_productUnity = productUnity;
+}
+
+void PackageItem::activate()
+{
+  PackageEditor dlg;
+  dlg.setPackage(toPackage(getValue()), m_productUnity);
+  if (dlg->exec())
+    setValue(toVariant(dlg.getPackage()));
+}
+
+void PackageItem::evaluate()
+{
+
+}
+
+void PackageItem::erase()
+{
+  setValue(toVariant(Package()));
+}
+
+void PackageItem::setValue(const QVariant& v)
+{
   setData(Qt::UserRole, v);
-  setText(pck.strFormattedUnity(productUnity));
+  setText(toPackage(v).strFormattedUnity(m_productUnity));
 }

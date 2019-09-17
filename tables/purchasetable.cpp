@@ -3,6 +3,9 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include "widgets/jtablewidgetitem.h"
+#include "tableitems/doubleitem.h"
+#include "tableitems/packageitem.h"
+#include "tableitems/sqlitem.h"
 
 PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable((int)Flags::BigFont, parent)
@@ -52,21 +55,14 @@ void PurchaseTable::addRow()
   insertRow(rowCount());
   int row = rowCount() - 1;
 
-
-  setItem(row, (int)Column::Ammount, new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background));
-  setItem(row, (int)Column::Unity, new PackageTableWidgetItem);
-  setItem(row, (int)Column::Description, new ProductTableWidgetItem);
-  setItem(row, (int)Column::Price, new DoubleItem(Data::Type::Money, DoubleItem::Color::Background));
-  setItem(row, (int)Column::SubTotal, new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground));
-
   auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::None, false, false, "+");
-  //auto itUnity = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None, false, false, "(", ")");
-  auto itProduct = new JItemSQLItem(PRODUCT_SQL_TABLE_NAME);
+  auto itUnity = new PackageItem();
+  auto itProduct = new SQLItem(PRODUCT_SQL_TABLE_NAME);
   auto itPrice = new DoubleItem(Data::Type::Money, true);
   auto itSubtotal = new DoubleItem(Data::Type::Money, true);
 
   setItem(row, (int)Column::Ammount, itAmmount);
-  //setItem(row, (int)Column::Unity, itCode);
+  setItem(row, (int)Column::Unity, itUnity);
   setItem(row, (int)Column::Product, itProduct);
   setItem(row, (int)Column::Price, itPrice);
   setItem(row, (int)Column::SubTotal, itSubtotal);
@@ -76,18 +72,32 @@ void PurchaseTable::addRow()
   setFocus();
 }
 
-const JItem& PurchaseTable::getItem(int row) const
+void PurchaseTable::getPurchases(QVector<PurchaseElement>& v) const
 {
-  m_ref.clear();
-  if (isValidRow(row))
+  v.clear();
+  for (int i = 0; i != rowCount(); ++i)
   {
-    int idx = verticalHeader()->logicalIndex(row);
-    m_ref.m_ammount = ((DoubleItem*)item(idx, (int)Column::Ammount))->getValue();
-    m_ref.m_price = ((DoubleItem*)item(idx, (int)Column::Price))->getValue();
-    m_ref.m_package = ((PackageTableWidgetItem*)item(idx, (int)Column::Unity))->getItem();
-    m_ref.m_product = dynamic_cast<const Product&>(((ProductTableWidgetItem*)item(idx, (int)Column::Description))->getItem());
+    PurchaseElement o;
+    int row = verticalHeader()->logicalIndex(row);
+    o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
+    o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
+    o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Unity)->getValue());
+    o.m_product.m_id.set(getItem(row, (int)Column::Product)->getValue().toLongLong());
+    v.push_back(o);
   }
-  return m_ref;
+}
+
+void PurchaseTable::setPurchases(const QVector<PurchaseElement>& v)
+{
+  removeAllItems();
+  for (int i = 0; i != v.size(); ++i)
+  {
+    addRow();
+    getItem(i, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
+    getItem(i, (int)Column::Price)->setValue(v.at(i).m_price);
+    getItem(i, (int)Column::Unity)->setValue(PackageItem::toVariant(v.at(i).m_package));
+    getItem(i, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(v.at(i).m_product.m_id, v.at(i).m_product.name())));
+  }
 }
 
 void PurchaseTable::addItemAndLoadPrices(Id supplierId, bool bCode)

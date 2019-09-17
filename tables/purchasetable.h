@@ -20,8 +20,8 @@ public:
   };
 
   explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
-  void getPurchases(QVector<Purchase>& v) const;
-  void setPurchases(const QVector<Purchase>& v);
+  void getPurchases(QVector<PurchaseElement>& v) const;
+  void setPurchases(const QVector<PurchaseElement>& v);
 
 public slots:
   void addRow();

@@ -32,8 +32,9 @@ void ProductCodeTable::getPhones(QVector<ProductCode>& v) const
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
+    int row = verticalHeader()->logicalIndex(i);
     ProductCode o;
-    o.m_code = getItem(i, (int)Column::Code)->getValue().toString();
+    o.m_code = getItem(row, (int)Column::Code)->getValue().toString();
     v.push_back(o);
   }
 }

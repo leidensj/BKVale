@@ -48,7 +48,7 @@ void PackageItem::activate()
 {
   PackageEditor dlg;
   dlg.setPackage(toPackage(getValue()), m_productUnity);
-  if (dlg->exec())
+  if (dlg.exec())
     setValue(toVariant(dlg.getPackage()));
 }
 

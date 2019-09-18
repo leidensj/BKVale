@@ -14,7 +14,7 @@ class AddressTable : public JTable
   };
 
 public:
-  explicit AddressTable(QWidget* parent = nullptr);
+  explicit AddressTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   const JItem& getItem(int row) const;
 
 public slots:

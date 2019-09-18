@@ -2,10 +2,9 @@
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
-#include "widgets/jtablewidgetitem.h"
 
-AddressTable::AddressTable(QWidget* parent)
-  : JItemTable((int)Flags::NoFlags , parent)
+AddressTable::AddressTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JItemTable(btns , parent)
 {
   setColumnCount(1);
   QStringList headers;

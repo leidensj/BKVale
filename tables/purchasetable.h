@@ -25,11 +25,16 @@ public:
 
 public slots:
   void addRow();
+  void addRowAndActivate(Id supplierId);
+  void addRowByCode(Id supplierId);
   double computeTotal() const;
+  void setSupplierId(Id id);
 
 private:
   double computePrice(int row) const;
   double computeSubTotal(int row) const;
+  void loadProductInfo(int row);
+  Id m_supplierId;
 
 protected slots:
   void update(int row, int column);

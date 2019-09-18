@@ -2,13 +2,13 @@
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
-#include "widgets/jtablewidgetitem.h"
+#include "widgets/jdatabase.h"
 #include "tableitems/doubleitem.h"
 #include "tableitems/packageitem.h"
 #include "tableitems/sqlitem.h"
 
 PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable((int)Flags::BigFont, parent)
+  : JTable(btns, parent)
 {
   setColumnCount(5);
   QStringList headers;
@@ -57,7 +57,7 @@ void PurchaseTable::addRow()
 
   auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::None, false, false, "+");
   auto itUnity = new PackageItem();
-  auto itProduct = new SQLItem(PRODUCT_SQL_TABLE_NAME);
+  auto itProduct = new SQLItem(PRODUCT_SQL_TABLE_NAME, PRODUCT_FILTER_BUY);
   auto itPrice = new DoubleItem(Data::Type::Money, true);
   auto itSubtotal = new DoubleItem(Data::Type::Money, true);
 
@@ -70,6 +70,31 @@ void PurchaseTable::addRow()
   itProduct->activate();
   setCurrentItem(itAmmount);
   setFocus();
+}
+
+void PurchaseTable::addRowAndActivate()
+{
+  addRow();
+  getItem(rowCount() - 1, (int)Column::Product)->activate();
+  loadProductInfo(rowCount() - 1);
+}
+
+void PurchaseTable::addRowByCode()
+{
+  JDatabaseSelector dlg(PRODUCT_CODE_ITEMS_SQL_TABLE_NAME, false, this);
+  dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);
+  if (dlg.exec())
+  {
+    ProductCode* p = dynamic_cast<ProductCode*>(dlg.getDatabase()->getCurrentItem());
+    Product o;
+    QString error;
+    if (o.SQL_select_by_code(*p, error))
+    {
+      addRow();
+      getItem(rowCount() - 1, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(o.m_id, o.name())));
+      loadProductInfo(rowCount() - 1);
+    }
+  }
 }
 
 void PurchaseTable::getPurchases(QVector<PurchaseElement>& v) const
@@ -100,57 +125,23 @@ void PurchaseTable::setPurchases(const QVector<PurchaseElement>& v)
   }
 }
 
-void PurchaseTable::addItemAndLoadPrices(Id supplierId, bool bCode)
+void PurchaseTable::loadProductInfo(int row)
 {
-  addItem(PurchaseElement());
-  int row = rowCount() - 1;
-  auto ptProductCell = dynamic_cast<ProductTableWidgetItem*>(item(row, (int)Column::Description));
-  if (bCode)
-    ptProductCell->selectItemByCode(PRODUCT_FILTER_BUY);
-  else
-    ptProductCell->selectItem(PRODUCT_FILTER_BUY);
-  const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  if (product.m_id.isValid())
+  SQLItemAbv abv = SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue());
+  if (abv.m_id.isValid())
   {
     PurchaseElement o;
-    if (supplierId.isValid())
-      o.SQL_select_last(supplierId, product.m_id);
-    auto ptPriceCell = dynamic_cast<DoubleItem*>(item(row, (int)Column::Price));
-    ptPriceCell->setValue(o.m_price);
-    auto ptPackageCell = dynamic_cast<PackageTableWidgetItem*>(item(row, (int)Column::Unity));
-    ptPackageCell->setItem(o.m_package, product.m_unity);
+    o.SQL_select_last(m_supplierId, abv.m_id);
+    getItem(row, (int)Column::Price)->setValue(o.m_price);
+    dynamic_cast<PackageItem*>(getItem(row, (int)Column::Unity))->setProductUnity(o.m_product.m_unity);
+    getItem(row, (int)Column::Unity)->setValue(PackageItem::toVariant(o.m_package));
   }
-  else
-    removeItem();
-
-  setFocus();
 }
 
-void PurchaseTable::addItem(const JItem& o)
+void PurchaseTable::setSupplierId(Id id)
 {
-  const PurchaseElement& _o = dynamic_cast<const PurchaseElement&>(o);
-
-  blockSignals(true);
-
-  insertRow(rowCount());
-  int row = rowCount() - 1;
-  setItem(row, (int)Column::Ammount, new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background));
-  setItem(row, (int)Column::Unity, new PackageTableWidgetItem);
-  setItem(row, (int)Column::Description, new ProductTableWidgetItem);
-  setItem(row, (int)Column::Price, new DoubleItem(Data::Type::Money, DoubleItem::Color::Background));
-  setItem(row, (int)Column::SubTotal, new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground));
-  setCurrentCell(row, (int)Column::Ammount);
-
-  ((DoubleItem*)item(row, (int)Column::Ammount))->setValue(_o.m_ammount);
-  ((DoubleItem*)item(row, (int)Column::Price))->setValue(_o.m_price);
-  ((DoubleItem*)item(row, (int)Column::SubTotal))->setValue(_o.subtotal());
-  ((ProductTableWidgetItem*)item(row, (int)Column::Description))->setItem(_o.m_product);
-  ((PackageTableWidgetItem*)item(row, (int)Column::Unity))->setItem(_o.m_package, _o.m_product.m_unity);
-
-  setCurrentCell(row, (int)Column::Ammount);
-  blockSignals(false);
+  m_supplierId = id;
 }
-
 
 void PurchaseTable::update(int row, int column)
 {
@@ -158,28 +149,15 @@ void PurchaseTable::update(int row, int column)
   switch ((Column)column)
   {
     case Column::Ammount:
-    {
-      auto ptAmmount = (DoubleItem*)item(row, column);
-      ptAmmount->evaluate();
-      auto ptSubtotal = (DoubleItem*)item(row, (int)Column::SubTotal);
-      ptSubtotal->setValue(computeSubTotal(row));
-    } break;
     case Column::Price:
-    {
-      auto ptPrice = (DoubleItem*)item(row, column);
-      ptPrice->evaluate();
-      auto ptSubtotal = (DoubleItem*)item(row, (int)Column::SubTotal);
-      ptSubtotal->setValue(computeSubTotal(row));
-    } break;
+      getItem(row, (int)Column::SubTotal)->setValue(computeSubTotal(row));
+      break;
     case Column::SubTotal:
-    {
-      auto ptSubtotal = (DoubleItem*)item(row, column);
-      ptSubtotal->evaluate();
-      auto ptPrice = (DoubleItem*)item(row, (int)Column::Price);
-      ptPrice->setValue(computePrice(row));
-      //Re-compute subtotal
-      ptSubtotal->setValue(computeSubTotal(row));
-    } break;
+      getItem(row, (int)Column::Price)->setValue(computePrice(row));
+      getItem(row, (int)Column::SubTotal)->setValue(computeSubTotal(row));
+      break;
+    case Column::Product:
+      loadProductInfo(row);
     default:
       break;
   }

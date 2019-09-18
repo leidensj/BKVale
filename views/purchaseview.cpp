@@ -435,6 +435,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
   connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setPurchaseTotal(double)));
   connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setPurchaseDate(const QDate&)));
+  connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(this, SIGNAL(itemSelectedSignal()), SLOT(updateControls()));
 
   setFocusWidgetOnCreate(m_supplierPicker);
@@ -498,6 +499,7 @@ void PurchaseView::setItem(const JItemSQL& o)
 
 void PurchaseView::supplierChanged()
 {
+  m_table->setSupplierId(m_supplierPicker->getId());
   if (m_supplierPicker->getId().isValid())
   {
     if (m_table->hasItems())

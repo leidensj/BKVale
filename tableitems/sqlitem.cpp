@@ -29,8 +29,9 @@ SQLItemAbv SQLItem::toSQLItemAbv(const QVariant& v)
   return o;
 }
 
-SQLItem::SQLItem(const QString& tableName)
+SQLItem::SQLItem(const QString& tableName, const QString& filter)
   : m_tableName(tableName)
+  , m_filter(filter)
 {
   setTextColor(QColor(Qt::darkGray));
   setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
@@ -39,6 +40,7 @@ SQLItem::SQLItem(const QString& tableName)
 void SQLItem::activate()
 {
   JDatabaseSelector dlg(m_tableName, false, tableWidget());
+  dlg.getDatabase()->setFixedFilter(m_filter);
   if (dlg.exec())
   {
     JItemSQL* p = dlg.getDatabase()->getCurrentItem();
@@ -62,4 +64,14 @@ void SQLItem::setValue(const QVariant& v)
   SQLItemAbv abv = toSQLItemAbv(v);
   setData(Qt::UserRole, abv.m_id);
   setText(abv.m_name);
+}
+
+void SQLItem::setTableName(const QString& tableName)
+{
+ m_tableName = tableName;
+}
+
+void SQLItem::setFilter(const QString& filter)
+{
+  m_filter = filter;
 }

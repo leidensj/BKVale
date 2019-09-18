@@ -56,7 +56,6 @@ SOURCES += main.cpp\
     widgets/jplaintextedit.cpp \
     widgets/jspinbox.cpp \
     widgets/jtable.cpp \
-    widgets/jtablewidgetitem.cpp \
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
     items/purchase.cpp \
@@ -106,7 +105,8 @@ SOURCES += main.cpp\
     tableitems/textitem.cpp \
     tableitems/packageitem.cpp \
     tableitems/sqlitem.cpp \
-    addresseditor.cpp
+    addresseditor.cpp \
+    tableitems/addressitem.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -152,7 +152,6 @@ HEADERS  += mainwindow.h \
     widgets/jdatabase.h \
     widgets/jplaintextedit.h \
     widgets/jspinbox.h \
-    widgets/jtablewidgetitem.h \
     widgets/jtimeedit.h \
     items/jitem.h \
     items/jitemsql.h \
@@ -207,7 +206,8 @@ HEADERS  += mainwindow.h \
     tableitems/textitem.h \
     tableitems/packageitem.h \
     tableitems/sqlitem.h \
-    addresseditor.h
+    addresseditor.h \
+    tableitems/addressitem.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

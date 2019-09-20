@@ -1,26 +1,75 @@
 #include "shoppinglisttable.h"
 #include "tinyexpr.h"
-#include "widgets/jtablewidgetitem.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include "tableitems/doubleitem.h"
+#include "tableitems/packageitem.h"
+#include "tableitems/sqlitem.h"
 
-ShoppingListTable::ShoppingListTable(QWidget* parent)
-  : JItemTable((int) Flags::NoFlags, parent)
+ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
 {
   setColumnCount(SHOPPING_LIST_NUMBER_OF_COLUMNS);
   QStringList headers;
   headers << "Unidade" << "Produto" << "Quantidade" << "Preço" << "Fornecedor";
   setHorizontalHeaderLabels(headers);
 
-  horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Unity, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Description, QHeaderView::Stretch);
-  horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Ammount, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)ShoppingListColumn::Price, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Package, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Product, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)Column::Ammount, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Price, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Supplier, QHeaderView::ResizeToContents);
 
-  setHeaderIconSearchable((int)ShoppingListColumn::Description);
-  setHeaderIconSearchable((int)ShoppingListColumn::Supplier);
-  setHeaderIcon((int)ShoppingListColumn::Unity, QIcon(":/icons/res/item.png"));
+  setHeaderIcon((int)Column::Package, QIcon(":/icons/res/unity.png"));
+  setHeaderIcon((int)Column::Product, QIcon(":/icons/res/item.png"));
+  setHeaderIcon((int)Column::Supplier, QIcon(":/icons/res/supplier.png"));
+}
+
+void ShoppingListTable::addRow()
+{
+  insertRow(rowCount());
+  int row = rowCount() - 1;
+
+  auto itPackage = new PackageItem();
+  auto itProduct = new SQLItem(PRODUCT_SQL_TABLE_NAME, PRODUCT_FILTER_BUY);
+  auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background);
+  auto itPrice = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background);
+  auto itSupplier = new SQLItem(SUPPLIER_SQL_TABLE_NAME);
+  setItem(row, (int)Column::Package, itPackage);
+  setItem(row, (int)Column::Product, itProduct);
+  setItem(row, (int)Column::Ammount, itAmmount);
+  setItem(row, (int)Column::Price, itPrice);
+  setItem(row, (int)Column::Supplier, itSupplier);
+
+  setCurrentItem(itAmmount);
+  setFocus();
+}
+
+void ShoppingListTable::getListItems(QVector<ShoppingListItem>& v) const
+{
+  v.clear();
+  for (int i = 0; i != rowCount(); ++i)
+  {
+    int row = verticalHeader()->logicalIndex(i);
+    ShoppingListItem o;
+    o.m_package = getItem(row, (int)Column::Code)->getValue().toString();
+    o.m_product.m_id = getItem(row, (int)Column::Code)->getValue().toString();
+    o.m_ammount = getItem(row, (int)Column::Code)->getValue().toString();
+    o.m_price = getItem(row, (int)Column::Code)->getValue().toString();
+    o.m_supplier = getItem(row, (int)Column::Code)->getValue().toString();
+    v.push_back(o);
+  }
+}
+
+void ShoppingListTable::getListItems(const QVector<ShoppingListItem>& v)
+{
+  removeAllItems();
+  for (int i = 0; i != v.size(); ++i)
+  {
+    addRow();
+    getItem(i, (int)Column::Code)->setValue(v.at(i).m_code);
+  }
 }
 
 const JItem& ShoppingListTable::getItem(int row) const

@@ -2,9 +2,10 @@
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
+#include "tableitems/addressitem.h"
 
 AddressTable::AddressTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JItemTable(btns , parent)
+  : JTable(btns , parent)
 {
   setColumnCount(1);
   QStringList headers;
@@ -14,65 +15,35 @@ AddressTable::AddressTable(JAddRemoveButtons* btns, QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)Column::Address, QHeaderView::Stretch);
 }
 
-const JItem& AddressTable::getItem(int row) const
+void AddressTable::getAddresses(QVector<Address>& v) const
 {
-  m_ref.clear();
-  if (isValidRow(row))
+  v.clear();
+  for (int i = 0; i != rowCount(); ++i)
   {
-    int idx = verticalHeader()->logicalIndex(row);
-    m_ref = ((AddressEditorTableWidgetItem*)item(idx, (int)Column::Address))->getItem();
+    int row = verticalHeader()->logicalIndex(i);
+    v.push_back(AddressItem::toAddress(getItem(row, (int)Column::Address)->getValue()););
   }
-  return m_ref;
 }
 
-void AddressTable::addItem()
+void AddressTable::setAddresses(const QVector<Address>& v)
 {
-  addItem(Address());
-  int row = rowCount() - 1;
-  auto ptAddressCell = (AddressEditorTableWidgetItem*)(item(row, (int)Column::Address));
-  if (!ptAddressCell->selectItem())
-    removeItem();
-  setFocus();
+  removeAllItems();
+  for (int i = 0; i != v.size(); ++i)
+  {
+    addRow();
+    getItem(i, (int)Column::Address)->setValue(AddressItem::toVariant(v.at(i)));
+  }
 }
 
-void AddressTable::addItem(const JItem& o)
+void AddressTable::addRow()
 {
-  const Address& _o = dynamic_cast<const Address&>(o);
-
-  blockSignals(true);
-
   insertRow(rowCount());
   int row = rowCount() - 1;
-  setItem(row, (int)Column::Address, new AddressEditorTableWidgetItem);
-  setCurrentCell(row, (int)Column::Address);
 
-  ((AddressEditorTableWidgetItem*)item(row, (int)Column::Address))->setItem(_o);
+  auto it = new AddressItem();
+  setItem(row, (int)Column::Address, it);
 
-  setCurrentCell(row, (int)Column::Address);
-  blockSignals(false);
-}
-
-void AddressTable::update(int /*row*/, int /*column*/)
-{
-  blockSignals(true);
-  blockSignals(false);
-  emitChangedSignal();
-}
-
-void AddressTable::itemActivate(int row, int column)
-{
-  if (column == (int)Column::Address)
-  {
-    auto ptAddress = (AddressEditorTableWidgetItem*)item(row, column);
-    ptAddress->selectItem();
-  }
-}
-
-void AddressTable::itemDelete(int row, int column)
-{
-  if (column == (int)Column::Address)
-  {
-    auto ptPhone = (AddressEditorTableWidgetItem*)item(row, column);
-    ptPhone->setItem(Address());
-  }
+  setCurrentItem(it);
+  setFocus();
+  it->activate();
 }

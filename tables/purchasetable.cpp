@@ -55,11 +55,11 @@ void PurchaseTable::addRow()
   insertRow(rowCount());
   int row = rowCount() - 1;
 
-  auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::None, false, false, "+");
+  auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background);
   auto itUnity = new PackageItem();
   auto itProduct = new SQLItem(PRODUCT_SQL_TABLE_NAME, PRODUCT_FILTER_BUY);
-  auto itPrice = new DoubleItem(Data::Type::Money, true);
-  auto itSubtotal = new DoubleItem(Data::Type::Money, true);
+  auto itPrice = new DoubleItem(Data::Type::Money, DoubleItem::Color::Background);
+  auto itSubtotal = new DoubleItem(Data::Type::Money, DoubleItem::Color::Background);
 
   setItem(row, (int)Column::Ammount, itAmmount);
   setItem(row, (int)Column::Unity, itUnity);
@@ -91,7 +91,8 @@ void PurchaseTable::addRowByCode()
     if (o.SQL_select_by_code(*p, error))
     {
       addRow();
-      getItem(rowCount() - 1, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(o.m_id, o.name())));
+      getItem(rowCount() - 1, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(o.m_id.get(),
+                                                                                            o.name())));
       loadProductInfo(rowCount() - 1);
     }
   }
@@ -121,14 +122,15 @@ void PurchaseTable::setPurchases(const QVector<PurchaseElement>& v)
     getItem(i, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(i, (int)Column::Price)->setValue(v.at(i).m_price);
     getItem(i, (int)Column::Unity)->setValue(PackageItem::toVariant(v.at(i).m_package));
-    getItem(i, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(v.at(i).m_product.m_id, v.at(i).m_product.name())));
+    getItem(i, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(v.at(i).m_product.m_id.get(),
+                                                                             v.at(i).m_product.name())));
   }
 }
 
 void PurchaseTable::loadProductInfo(int row)
 {
   SQLItemAbv abv = SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue());
-  if (abv.m_id.isValid())
+  if (Id::st_isValid(abv.m_id))
   {
     PurchaseElement o;
     o.SQL_select_last(m_supplierId, abv.m_id);

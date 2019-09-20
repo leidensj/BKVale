@@ -5,26 +5,27 @@
 #include "items/shoppinglist.h"
 #include "widgets/jtable.h"
 
-class ShoppingListTable : public JItemTable
+class ShoppingListTable : public JTable
 {
   Q_OBJECT
 
+  enum class Column
+  {
+    Package,
+    Product,
+    Ammount,
+    Price,
+    Supplier
+  };
+
 public:
-  explicit ShoppingListTable(QWidget* parent = 0);
-  const JItem& getItem(int row) const;
+  explicit ShoppingListTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  void getListItems(QVector<ShoppingListItem>& v) const;
+  void setListItems(const QVector<ShoppingListItem>& v);
 
 public slots:
-  void addItem(const JItem& o);
-  void addItem();
+  void addRow();
   void showSupplierColumn(bool b);
-
-protected slots:
-  void update(int row, int column);
-  void itemActivate(int row, int column);
-  void itemDelete(int row, int column);
-
-private:
-  mutable ShoppingListItem m_ref;
 };
 
 #endif // SHOPPINGLISTTABLE_H

@@ -248,8 +248,8 @@ FormAddressWidget::FormAddressWidget(QWidget* parent)
   , m_btnAddRemove(nullptr)
   , m_tbAddress(nullptr)
 {
-  m_tbAddress = new AddressTable;
   m_btnAddRemove = new JAddRemoveButtons;
+  m_tbAddress = new AddressTable(m_btnAddRemove);
 
   QVBoxLayout* lt = new QVBoxLayout;
   lt->addWidget(m_btnAddRemove);
@@ -263,15 +263,12 @@ FormAddressWidget::FormAddressWidget(QWidget* parent)
 
 void FormAddressWidget::setForm(const Form& o)
 {
-  m_tbAddress->removeAllItems();
-  for (int i = 0; i != o.m_vAddress.size(); ++i)
-    m_tbAddress->addItem(o.m_vAddress.at(i));
+  m_tbAddress->setAddresses(o.m_vAddress);
 }
 
 void FormAddressWidget::fillForm(Form& o) const
 {
-  for (int i = 0; i != m_tbAddress->rowCount(); ++i)
-    o.m_vAddress.push_back(dynamic_cast<const Address&>(m_tbAddress->getItem(i)));
+  m_tbAddress->getAddresses(o.m_vAddress);
 }
 
 void FormAddressWidget::updateControls()

@@ -12,15 +12,6 @@
 #include "defines.h"
 #include "jitemsql.h"
 
-enum class ShoppingListColumn : int
-{
-  Unity,
-  Description,
-  Ammount,
-  Price,
-  Supplier
-};
-
 struct ShoppingListItem : public JItem
 {
   ShoppingListItem();

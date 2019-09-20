@@ -1,15 +1,16 @@
 #include "jtable.h"
 #include <QKeyEvent>
 #include <QHeaderView>
+#include <QPushButton>
 
 JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
  : QTableWidget(parent)
 {
   if (btns != nullptr)
   {
-    connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
-    connect(btns->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
-    connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
+    QObject::connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
+    QObject::connect(btns->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
+    QObject::connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
   }
 
   setSelectionBehavior(QAbstractItemView::SelectItems);
@@ -72,13 +73,13 @@ void JTable::keyPressEvent(QKeyEvent *event)
   else if (event->key() == Qt::Key_Delete)
   {
     if (currentIndex().isValid())
-      erase(item(currentIndex.row(), currentIndex.column()));
+      erase(item(currentIndex().row(), currentIndex().column()));
     QTableWidget::keyPressEvent(event);
   }
   else if (event->key() == Qt::Key_Space)
   {
     if (currentIndex().isValid())
-      activate(item(currentIndex.row(), currentIndex.column()));
+      activate(item(currentIndex().row(), currentIndex().column()));
     QTableWidget::keyPressEvent(event);
   }
   else

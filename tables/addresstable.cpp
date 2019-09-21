@@ -21,7 +21,7 @@ void AddressTable::getAddresses(QVector<Address>& v) const
   for (int i = 0; i != rowCount(); ++i)
   {
     int row = verticalHeader()->logicalIndex(i);
-    v.push_back(AddressItem::toAddress(getItem(row, (int)Column::Address)->getValue()););
+    v.push_back(AddressItem::toAddress(getItem(row, (int)Column::Address)->getValue()));
   }
 }
 

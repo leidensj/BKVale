@@ -19,7 +19,7 @@ class FormInfoWidget;
 class FormDetailsWidget;
 class FormPhoneWidget;
 class FormAddressWidget;
-class JTable;
+class EmployeeHoursTable;
 class QTreeWidget;
 class QTableWidgetItem;
 
@@ -36,12 +36,6 @@ public slots:
 protected slots:
   void setItem(const JItemSQL& o);
 
-private slots:
-  void addHour();
-  void removeHour();
-  void updateControls();
-  void updateHoursTable(QTableWidgetItem* p);
-
 private:
   Id m_formId;
   FormInfoWidget* m_formInfo;
@@ -52,7 +46,7 @@ private:
   QTreeWidget* m_trPermissions;
   QTreeWidgetItem* m_triPurchaseEdit;
   QTreeWidgetItem* m_triPurchaseRemove;
-  JTable* m_tbHours;
+  EmployeeHoursTable* m_tbHours;
   JAddRemoveButtons* m_btnAddRemove;
 };
 

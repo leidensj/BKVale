@@ -76,7 +76,11 @@ void PurchaseTable::addRowAndActivate()
 {
   addRow();
   getItem(rowCount() - 1, (int)Column::Product)->activate();
-  loadProductInfo(rowCount() - 1);
+  SQLItemAbv abv = SQLItem::toSQLItemAbv(getItem(rowCount() - 1, (int)Column::Product)->getValue());
+  if (Id::st_isValid(abv.m_id))
+    loadProductInfo(rowCount() - 1);
+  else
+    removeItem();
 }
 
 void PurchaseTable::addRowByCode()
@@ -98,7 +102,7 @@ void PurchaseTable::addRowByCode()
   }
 }
 
-void PurchaseTable::getPurchases(QVector<PurchaseElement>& v) const
+void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
 {
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
@@ -113,7 +117,7 @@ void PurchaseTable::getPurchases(QVector<PurchaseElement>& v) const
   }
 }
 
-void PurchaseTable::setPurchases(const QVector<PurchaseElement>& v)
+void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v)
 {
   removeAllItems();
   for (int i = 0; i != v.size(); ++i)

@@ -4,7 +4,7 @@
 #include "widgets/jspinbox.h"
 #include "widgets/jtimeedit.h"
 #include "widgets/jaddremovebuttons.h"
-#include "widgets/jtable.h"
+#include "tables/employeehourstable.h"
 #include "items/jitemex.h"
 #include <QFormLayout>
 #include <QCheckBox>
@@ -34,16 +34,8 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formPhone = new FormPhoneWidget;
   m_formAddress= new FormAddressWidget;
   m_edPincode = new JLineEdit(Text::Input::Alphanumeric);
-  m_tbHours = new JTable;
-  m_tbHours->setColumnCount(2);
-  QStringList headers;
-  headers << "Início" << "Fim";
-  m_tbHours->setHorizontalHeaderLabels(headers);
-  m_tbHours->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
-  m_tbHours->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
-  m_tbHours->setSelectionBehavior(QAbstractItemView::SelectItems);
-  m_tbHours->setSelectionMode(QAbstractItemView::SingleSelection);
   m_btnAddRemove = new JAddRemoveButtons;
+  m_tbHours = new EmployeeHoursTable(m_btnAddRemove);
 
   m_trPermissions = new QTreeWidget;
   m_trPermissions->setColumnCount(1);
@@ -86,12 +78,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_tab->addTab(m_formPhone, QIcon(":/icons/res/phone.png"), tr("Telefone"));
   m_tab->addTab(m_formAddress, QIcon(":/icons/res/address.png"), tr("Endereço"));
 
-  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addHour()));
-  connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeHour()));
-  connect(m_tbHours, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
-  connect(m_tbHours, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateHoursTable(QTableWidgetItem*)));
-  connect(this, SIGNAL(itemSelectedSignal()), this, SLOT(updateControls()));
 
   m_formInfo->m_lblCreationDate->hide();
   m_formInfo->m_dtCreationDate->hide();
@@ -116,13 +103,7 @@ void EmployeeView::getItem(JItemSQL& o) const
   _o.m_pincode = m_edPincode->text();
   _o.m_bPurchaseEdit = m_triPurchaseEdit->checkState(0) == Qt::Checked;
   _o.m_bPurchaseRemove = m_triPurchaseRemove->checkState(0) == Qt::Checked;
-  for (int i = 0; i != m_tbHours->rowCount(); ++i)
-  {
-    TimeInterval t;
-    t.m_tmBegin = dynamic_cast<TimeItem*>(m_tbHours->item(i, 0))->getTime();
-    t.m_tmEnd = dynamic_cast<TimeItem*>(m_tbHours->item(i, 1))->getTime();
-    _o.m_hours.push_back(t);
-  }
+  m_tbHours->getHours(_o.m_hours);
 }
 
 void EmployeeView::setItem(const JItemSQL& o)
@@ -136,43 +117,5 @@ void EmployeeView::setItem(const JItemSQL& o)
   m_edPincode->setText(_o.m_pincode);
   m_triPurchaseEdit->setCheckState(0, _o.m_bPurchaseEdit ? Qt::Checked : Qt::Unchecked);
   m_triPurchaseRemove->setCheckState(0, _o.m_bPurchaseRemove ? Qt::Checked : Qt::Unchecked);
-  m_tbHours->setRowCount(0);
-  for (int i = 0; i != _o.m_hours.size(); ++i)
-  {
-    addHour();
-    dynamic_cast<TimeItem*>(m_tbHours->item(i, 0))->setTime(_o.m_hours.at(i).m_tmBegin);
-    dynamic_cast<TimeItem*>(m_tbHours->item(i, 1))->setTime(_o.m_hours.at(i).m_tmEnd);
-  }
-}
-
-void EmployeeView::addHour()
-{
-  auto begin = new TimeItem(QTime::fromString("00:00", "HH:mm"));
-  auto end = new TimeItem(QTime::fromString("00:00", "HH:mm"));
-  begin->setToolTip(tr("Hora e minutos hh:mm"));
-  end->setToolTip(tr("Hora e minutos hh:mm"));
-  m_tbHours->insertRow(m_tbHours->rowCount());
-  int row = m_tbHours->rowCount() - 1;
-  m_tbHours->setItem(row, 0, begin);
-  m_tbHours->setItem(row, 1, end);
-  m_tbHours->setCurrentItem(begin);
-  updateControls();
-  m_tbHours->setFocus();
-}
-
-void EmployeeView::removeHour()
-{
-  if (m_tbHours->currentRow() >= 0)
-    m_tbHours->removeRow(m_tbHours->currentRow());
-  updateControls();
-}
-
-void EmployeeView::updateHoursTable(QTableWidgetItem* p)
-{
-  dynamic_cast<ExpItem*>(p)->evaluate();
-}
-
-void EmployeeView::updateControls()
-{
-  m_btnAddRemove->m_btnRemove->setEnabled(m_tbHours->currentRow() >= 0);
+  m_tbHours->setHours(_o.m_hours);
 }

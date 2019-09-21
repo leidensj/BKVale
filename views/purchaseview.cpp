@@ -6,12 +6,10 @@
 #include "widgets/jlineedit.h"
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jdoublespinbox.h"
-#include "widgets/jtable.h"
-#include "widgets/jtablewidgetitem.h"
 #include "widgets/jdatepicker.h"
-#include "filters/purchasefilter.h"
 #include "widgets/jdatabasecombobox.h"
-#include "packageeditor.h"
+#include "filters/purchasefilter.h"
+#include "tables/paymenttable.h"
 #include <QPlainTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
@@ -33,10 +31,9 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   , m_rdoCash(nullptr)
   , m_rdoBonus(nullptr)
   , m_rdoCredit(nullptr)
-  , m_tbCredit(nullptr)
+  , m_tbPayment(nullptr)
   , m_btnAddRemove(nullptr)
   , m_purchaseTotal(0.0)
-  , m_purchaseDate(QDate::currentDate())
 {
   m_rdoCredit = new QRadioButton;
   m_rdoCredit->setIcon(QIcon(":/icons/res/credit.png"));
@@ -54,13 +51,7 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   m_lblPaymentTotal = new QLabel;
 
   m_btnAddRemove = new JAddRemoveButtons;
-  m_tbCredit = new JTable;
-  m_tbCredit->setColumnCount(2);
-  QStringList headers;
-  headers << "Data" << "Valor";
-  m_tbCredit->setHorizontalHeaderLabels(headers);
-  m_tbCredit->horizontalHeader()->setSectionResizeMode((int)Column::Date, QHeaderView::ResizeMode::ResizeToContents);
-  m_tbCredit->horizontalHeader()->setSectionResizeMode((int)Column::Value, QHeaderView::ResizeMode::Stretch);
+  m_tbPayment = new PaymentTable(m_btnAddRemove);
 
   QHBoxLayout* ltButtons = new QHBoxLayout;
   ltButtons->setAlignment(Qt::AlignLeft);
@@ -71,7 +62,7 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   QVBoxLayout* lt = new QVBoxLayout;
   lt->addLayout(ltButtons);
   lt->addWidget(m_btnAddRemove);
-  lt->addWidget(m_tbCredit);
+  lt->addWidget(m_tbPayment);
   lt->addWidget(m_lblPurchaseTotal);
   lt->addWidget(m_lblPaymentTotal);
 
@@ -80,14 +71,12 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   connect(m_rdoCash, SIGNAL(clicked(bool)), this, SLOT(emitMethodChangedSignal()));
   connect(m_rdoBonus, SIGNAL(clicked(bool)), this, SLOT(emitMethodChangedSignal()));
   connect(m_rdoCredit, SIGNAL(clicked(bool)), this, SLOT(emitMethodChangedSignal()));
-  connect(m_rdoCash, SIGNAL(clicked(bool)), m_tbCredit, SLOT(removeAllItems()));
-  connect(m_rdoBonus, SIGNAL(clicked(bool)), m_tbCredit, SLOT(removeAllItems()));
+  connect(m_rdoCash, SIGNAL(clicked(bool)), m_tbPayment, SLOT(removeAllItems()));
+  connect(m_rdoBonus, SIGNAL(clicked(bool)), m_tbPayment, SLOT(removeAllItems()));
   connect(m_rdoCredit, SIGNAL(clicked(bool)), this, SLOT(fillCredit()));
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
   connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeRow()));
-  connect(m_tbCredit, SIGNAL(changedSignal(bool)), m_btnAddRemove->m_btnRemove, SLOT(setEnabled(bool)));
-  connect(m_tbCredit, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
-  connect(m_tbCredit, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateTable(QTableWidgetItem*)));
+  connect(m_tbPayment, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
 
   setLayout(lt);
   updateControls();
@@ -115,25 +104,20 @@ bool PaymentWidget::isDatesValid() const
 {
   bool bValid = true;
   if (m_rdoCredit->isChecked())
-    for (int i = 0; i != m_tbCredit->rowCount() && bValid; ++i)
-      bValid = dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->getDate() >= m_purchaseDate;
+  {
+    QVector<PaymentElement> v;
+    m_tbPayment->getPaymentElements(v);
+    for (int i = 0; i != v.size() && bValid; ++i)
+      bValid = v.at(i).m_date >= m_tbPayment->getPurchaseDate();
+  }
   return bValid;
-}
-
-double PaymentWidget::computeTotal() const
-{
-  double total = 0.0;
-  if (m_rdoCredit->isChecked())
-    for (int i = 0; i != m_tbCredit->rowCount(); ++i)
-      total += dynamic_cast<DoubleItem*>(m_tbCredit->item(i, (int)Column::Value))->getValue();
-  return total;
 }
 
 void PaymentWidget::updateControls()
 {
-  m_tbCredit->setEnabled(m_rdoCredit->isChecked());
+  m_tbPayment->setEnabled(m_rdoCredit->isChecked());
   m_btnAddRemove->setEnabled(m_rdoCredit->isChecked());
-  double total = computeTotal();
+  double total = m_tbPayment->sum((int)PaymentTable::Column::Value);
   bool bValid = isDatesValid() && Data::areEqual(m_purchaseTotal, total, Data::Type::Money);;
   m_lblPurchaseTotal->setText(tr("Total da compra: ") + Data::strMoney(m_purchaseTotal));
   m_lblPaymentTotal->setText(("Total do pagamento: ") + Data::strMoney(total));
@@ -142,16 +126,9 @@ void PaymentWidget::updateControls()
   emit isValidSignal(bValid);
 }
 
-void PaymentWidget::updateTable(QTableWidgetItem* p)
-{
-  dynamic_cast<ExpItem*>(p)->evaluate();
-}
-
 void PaymentWidget::fillCredit()
 {
-  m_tbCredit->removeAllItems();
-  addRow();
-  updateControls();
+  m_tbPayment->fill(m_purchaseTotal);
 }
 
 Purchase::PaymentMethod PaymentWidget::getPaymentMethod() const
@@ -166,22 +143,13 @@ Purchase::PaymentMethod PaymentWidget::getPaymentMethod() const
 QVector<PaymentElement> PaymentWidget::getPayments() const
 {
   QVector<PaymentElement> v;
-  if (m_rdoCredit->isChecked())
-  {
-    for (int i = 0; i != m_tbCredit->rowCount(); ++i)
-    {
-      PaymentElement o;
-      o.m_value += dynamic_cast<DoubleItem*>(m_tbCredit->item(i, (int)Column::Value))->getValue();
-      o.m_date = dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->getDate();
-      v.push_back(o);
-    }
-  }
+  m_tbPayment->getPaymentElements(v);
   return v;
 }
 
 void PaymentWidget::setPurchaseDate(const QDate& dt)
 {
-  m_purchaseDate = dt;
+  m_tbPayment->setPurchaseDate(dt);
   updateControls();
 }
 
@@ -203,40 +171,7 @@ void PaymentWidget::setPaymentMethod(Purchase::PaymentMethod o)
 
 void PaymentWidget::setPayments(const QVector<PaymentElement>& v)
 {
-  m_tbCredit->removeAllItems();
-  for (int i = 0; i != v.size(); ++i)
-  {
-    addRow();
-    dynamic_cast<DoubleItem*>(m_tbCredit->item(i, (int)Column::Value))->setValue(v.at(i).m_value);
-    dynamic_cast<DateItem*>(m_tbCredit->item(i, (int)Column::Date))->setDate(v.at(i).m_date);
-  }
-}
-
-void PaymentWidget::addRow()
-{
-  m_tbCredit->insertRow(m_tbCredit->rowCount());
-  int row = m_tbCredit->rowCount() - 1;
-
-  auto itValue = new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground);
-  auto itDate = new DateItem(m_purchaseDate, DateItem::Color::DateBeforeDefault);
-
-  m_tbCredit->setItem(row, (int)Column::Date, itDate);
-  m_tbCredit->setItem(row, (int)Column::Value, itValue);
-
-  double total = computeTotal();
-  double val = m_purchaseTotal > total ? m_purchaseTotal - total : 0.0;
-  itValue->setValue(val);
-  itDate->setDate(m_purchaseDate.addMonths(itDate->row() + 1));
-  updateControls();
-  m_tbCredit->setCurrentItem(itDate);
-  m_tbCredit->setFocus();
-}
-
-void PaymentWidget::removeRow()
-{
-  if (m_tbCredit->currentRow() >= 0)
-    m_tbCredit->removeRow(m_tbCredit->currentRow());
-  updateControls();
+  m_tbPayment->setPaymentElements(v);
 }
 
 void PaymentWidget::emitMethodChangedSignal()
@@ -421,10 +356,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_tabDb->addTab(frDbInfo, QIcon(":/icons/res/statistics.png"), tr("Estatísticas"));
 
   setContentsMargins(9, 9, 9, 9);
-  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
-  connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeProduct()));
-  connect(m_table, SIGNAL(changedSignal(bool)), m_btnAddRemove->m_btnRemove, SLOT(setEnabled(bool)));
-  connect(m_btnAddCode, SIGNAL(clicked(bool)), this, SLOT(addProduct()));
+  connect(m_btnAddCode, SIGNAL(clicked(bool)), m_table, SLOT(addRowByCode()));
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
@@ -449,14 +381,6 @@ PurchaseView::~PurchaseView()
 
 }
 
-void PurchaseView::removeProduct()
-{
-  m_table->removeItem();
-  if (!m_table->hasItems())
-    m_supplierPicker->setFocus();
-  updateControls();
-}
-
 void PurchaseView::getItem(JItemSQL& o) const
 {
   Purchase& _o = dynamic_cast<Purchase&>(o);
@@ -469,8 +393,7 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->getValue();
   _o.m_store.m_id = m_cbStore->getCurrentId();
-  for (int i = 0; i != m_table->rowCount(); ++i)
-    _o.m_vElement.push_back(dynamic_cast<const PurchaseElement&>(m_table->getItem(i)));
+  m_table->getPurchaseElements(_o.m_vElement);
 }
 
 void PurchaseView::setItem(const JItemSQL& o)
@@ -487,8 +410,7 @@ void PurchaseView::setItem(const JItemSQL& o)
   m_supplierPicker->clear();
   m_dtPicker->setDate(_o.m_date);
   m_snNumber->setValue(_o.m_number);
-  for (int i = 0; i != _o.m_vElement.size(); ++i)
-    m_table->addItem(_o.m_vElement.at(i));
+  m_table->setPurchaseElements(_o.m_vElement);
   m_supplierPicker->setItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);
   m_wPayment->setPaymentMethod(_o.m_paymentMethod);
@@ -500,16 +422,8 @@ void PurchaseView::setItem(const JItemSQL& o)
 void PurchaseView::supplierChanged()
 {
   m_table->setSupplierId(m_supplierPicker->getId());
-  if (m_supplierPicker->getId().isValid())
-  {
-    if (m_table->hasItems())
-    {
-      m_table->setCurrentCell(0, 0);
-      m_table->setFocus();
-    }
-    else if (!m_id.isValid())
-      m_btnAddRemove->m_btnAdd->click();
-  }
+  if (m_supplierPicker->getId().isValid() && !m_table->hasItems() && !m_id.isValid())
+    m_btnAddRemove->m_btnAdd->click();
   updateControls();
 }
 
@@ -526,11 +440,6 @@ void PurchaseView::updateStatistics()
 {
   m_edEntries->setText(Data::strInt(m_database->getNumberOfEntries()));
   m_edSum->setText(Data::strMoney(m_database->getSum(5)));
-}
-
-void PurchaseView::addProduct()
-{
-  m_table->addItemAndLoadPrices(m_supplierPicker->getId(), sender() == m_btnAddCode);
 }
 
 bool PurchaseView::save(Id& id)

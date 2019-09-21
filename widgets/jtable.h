@@ -19,11 +19,13 @@ public:
   bool hasItems() const;
   bool isValidCurrentRow() const;
   JTableItem* getItem(int row, int column) const;
+  double sum(int column) const;
 
 public slots:
   virtual void removeItem();
   virtual void removeAllItems();
   virtual void addRow() = 0;
+  void setEnabled(bool b);
 
 protected slots:
   void emitChangedSignal();

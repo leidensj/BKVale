@@ -1,8 +1,6 @@
 #include "productcodetable.h"
-#include "databaseutils.h"
 #include <QHeaderView>
-#include <QKeyEvent>
-#include "widgets/jtablewidgetitem.h"
+#include "tableitems/textitem.h"
 
 ProductCodeTable::ProductCodeTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)
@@ -27,7 +25,7 @@ void ProductCodeTable::addRow()
   setFocus();
 }
 
-void ProductCodeTable::getPhones(QVector<ProductCode>& v) const
+void ProductCodeTable::getCodes(QVector<ProductCode>& v) const
 {
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
@@ -39,7 +37,7 @@ void ProductCodeTable::getPhones(QVector<ProductCode>& v) const
   }
 }
 
-void ProductCodeTable::setPhones(const QVector<ProductCode>& v)
+void ProductCodeTable::setCodes(const QVector<ProductCode>& v)
 {
   removeAllItems();
   for (int i = 0; i != v.size(); ++i)

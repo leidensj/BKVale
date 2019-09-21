@@ -19,8 +19,8 @@ class PurchaseTable : public JTable
 
 public:
   explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
-  void getPurchases(QVector<PurchaseElement>& v) const;
-  void setPurchases(const QVector<PurchaseElement>& v);
+  void getPurchaseElements(QVector<PurchaseElement>& v) const;
+  void setPurchaseElements(const QVector<PurchaseElement>& v);
 
 public slots:
   void addRow();

@@ -146,3 +146,19 @@ void JTable::evaluate(QTableWidgetItem* p)
     emitChangedSignal();
   }
 }
+
+double JTable::sum(int column) const
+{
+  double total = 0.0;
+  if (columnCount() < column)
+  {
+    for (int i = 0; i != rowCount(); ++i)
+      total += getItem(i, column)->getValue().toDouble();
+  }
+  return total;
+}
+
+void JTable::setEnabled(bool b)
+{
+  return QTableWidget::setEnabled(b);
+}

@@ -26,7 +26,7 @@ class QLabel;
 class JLineEdit;
 class QTableWidget;
 class JAddRemoveButtons;
-class JTable;
+class PaymentTable;
 class QTableWidgetItem;
 class QRadioButton;
 class PurchaseFilter;
@@ -39,19 +39,12 @@ class PaymentWidget : public QWidget
   QRadioButton* m_rdoCash;
   QRadioButton* m_rdoBonus;
   QRadioButton* m_rdoCredit;
-  JTable* m_tbCredit;
+  PaymentTable* m_tbPayment;
   QLabel* m_lblPurchaseTotal;
   QLabel* m_lblPaymentTotal;
   JAddRemoveButtons* m_btnAddRemove;
 
   double m_purchaseTotal;
-  QDate m_purchaseDate;
-
-  enum class Column
-  {
-    Date,
-    Value
-  };
 
 public:
   explicit PaymentWidget(QWidget* parent = nullptr);
@@ -71,11 +64,9 @@ private slots:
   void updateControls();
   void addRow();
   void removeRow();
-  void updateTable(QTableWidgetItem* p);
   void emitMethodChangedSignal();
 
 private:
-  double computeTotal() const;
   bool isDatesValid() const;
 
 signals:
@@ -122,10 +113,8 @@ private:
   JDatabaseComboBox* m_cbStore;
 
 private slots:
-  void removeProduct();
   void supplierChanged();
   void lastItemSelected();
-  void addProduct();
   void updateControls();
   void updateStatistics();
 

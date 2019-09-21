@@ -3,6 +3,7 @@
 TimeItem::TimeItem(const QTime& defaultTime)
   : m_defaultTime(defaultTime)
 {
+  setToolTip(tr("Hora e minutos hh:mm"));
   setValue(m_defaultTime);
 }
 

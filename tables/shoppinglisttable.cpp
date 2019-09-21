@@ -46,148 +46,61 @@ void ShoppingListTable::addRow()
   setFocus();
 }
 
-void ShoppingListTable::getListItems(QVector<ShoppingListItem>& v) const
+void ShoppingListTable::getListElements(QVector<ShoppingListItem>& v) const
 {
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
     int row = verticalHeader()->logicalIndex(i);
     ShoppingListItem o;
-    o.m_package = getItem(row, (int)Column::Code)->getValue().toString();
-    o.m_product.m_id = getItem(row, (int)Column::Code)->getValue().toString();
-    o.m_ammount = getItem(row, (int)Column::Code)->getValue().toString();
-    o.m_price = getItem(row, (int)Column::Code)->getValue().toString();
-    o.m_supplier = getItem(row, (int)Column::Code)->getValue().toString();
+    o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
+    o.m_product.m_id.set(getItem(row, (int)Column::Product)->getValue().toLongLong());
+    o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
+    o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
+    o.m_supplier.m_id.set(getItem(row, (int)Column::Supplier)->getValue().toLongLong());
     v.push_back(o);
   }
 }
 
-void ShoppingListTable::getListItems(const QVector<ShoppingListItem>& v)
+void ShoppingListTable::setListElements(const QVector<ShoppingListItem>& v)
 {
   removeAllItems();
   for (int i = 0; i != v.size(); ++i)
   {
     addRow();
-    getItem(i, (int)Column::Code)->setValue(v.at(i).m_code);
+    getItem(i, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
+    getItem(i, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(v.at(i).m_product.m_id.get(), v.at(i).m_product.name())));
+    getItem(i, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
+    getItem(i, (int)Column::Price)->setValue(v.at(i).m_price);
+    getItem(i, (int)Column::Supplier)->setValue(SQLItem::toVariant(SQLItemAbv(v.at(i).m_supplier.m_id.get(), v.at(i).m_supplier.name())));
   }
 }
 
-const JItem& ShoppingListTable::getItem(int row) const
+void ShoppingListTable::addRowAndActivate()
 {
-  m_ref.clear();
-  if (isValidRow(row))
-  {
-    int idx = verticalHeader()->logicalIndex(row);
-    m_ref.m_ammount = ((DoubleItem*)item(idx, (int)ShoppingListColumn::Ammount))->getValue();
-    m_ref.m_price = ((DoubleItem*)item(idx, (int)ShoppingListColumn::Price))->getValue();
-    m_ref.m_package = ((PackageTableWidgetItem*)item(idx, (int)ShoppingListColumn::Unity))->getItem();
-    m_ref.m_product = dynamic_cast<const Product&>(((ProductTableWidgetItem*)item(idx, (int)ShoppingListColumn::Description))->getItem());
-    m_ref.m_supplier = dynamic_cast<const Supplier&>(((SupplierTableWidgetItem*)item(idx, (int)ShoppingListColumn::Supplier))->getItem());
-  }
-  return m_ref;
-}
-
-void ShoppingListTable::addItem(const JItem& o)
-{
-  blockSignals(true);
-  insertRow(rowCount());
-  int row = rowCount() - 1;
-  setItem(row, (int)ShoppingListColumn::Unity, new PackageTableWidgetItem);
-  setItem(row, (int)ShoppingListColumn::Description, new ProductTableWidgetItem);
-  setItem(row, (int)ShoppingListColumn::Ammount, new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background));
-  setItem(row, (int)ShoppingListColumn::Price, new DoubleItem(Data::Type::Money, DoubleItem::Color::Background));
-  setItem(row, (int)ShoppingListColumn::Supplier, new SupplierTableWidgetItem);
-
-  setCurrentCell(row, (int)ShoppingListColumn::Ammount);
-
-  const ShoppingListItem& _o = dynamic_cast<const ShoppingListItem&>(o);
-  ((DoubleItem*)item(row, (int)ShoppingListColumn::Ammount))->setValue(_o.m_ammount);
-  ((DoubleItem*)item(row, (int)ShoppingListColumn::Price))->setValue(_o.m_price);
-  ((ProductTableWidgetItem*)item(row, (int)ShoppingListColumn::Description))->setItem(_o.m_product);
-  ((PackageTableWidgetItem*)item(row, (int)ShoppingListColumn::Unity))->setItem(_o.m_package, _o.m_product.m_unity);
-  ((SupplierTableWidgetItem*)item(row, (int)ShoppingListColumn::Supplier))->setItem(_o.m_supplier);
-  blockSignals(false);
-}
-
-void ShoppingListTable::addItem()
-{
-  addItem(ShoppingListItem());
-  itemActivate(rowCount() - 1, (int)ShoppingListColumn::Description);
-  auto ptProductCell = (ProductTableWidgetItem*)item(rowCount() - 1, (int)ShoppingListColumn::Description);
-  const Product& product = dynamic_cast<const Product&>(ptProductCell->getItem());
-  if (!product.m_id.isValid())
+  addRow();
+  getItem(rowCount() - 1, (int)Column::Product)->activate();
+  SQLItemAbv abv = SQLItem::toSQLItemAbv(getItem(rowCount() - 1, (int)Column::Product)->getValue());
+  if (!Id::st_isValid(abv.m_id))
     removeItem();
   else
   {
     for (int i = 0; i != rowCount() - 1; ++i)
     {
-      getItem(i);
-      if (m_ref.m_product.m_id != product.m_id)
-        continue;
-
-      if (QMessageBox::question(this,
-                            tr("Produto duplicado"),
-                            tr("O produto '%1' já consta na lista. Deseja adicioná-lo novamente?").arg(product.m_name),
-                            QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
-        removeItem();
-      break;
+      if (SQLItem::toSQLItemAbv(getItem(i, (int)Column::Product)->getValue()).m_id == abv.m_id)
+      {
+        if (QMessageBox::question(this,
+                              tr("Produto duplicado"),
+                              tr("O produto '%1' já consta na lista. Deseja adicioná-lo novamente?").arg(abv.m_name),
+                              QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
+          removeItem();
+        break;
+      }
     }
-  }
-  setFocus();
-}
-
-void ShoppingListTable::update(int row, int column)
-{
-  blockSignals(true);
-  switch ((ShoppingListColumn)column)
-  {
-    case ShoppingListColumn::Ammount:
-    case ShoppingListColumn::Price:
-    {
-      auto pt = static_cast<DoubleItem*>(item(row, column));
-      pt->evaluate();
-    } break;
-    default:
-      break;
-  }
-
-  blockSignals(false);
-  emitChangedSignal();
-}
-
-void ShoppingListTable::itemActivate(int row, int column)
-{
-  if (column == (int)ShoppingListColumn::Description)
-  {
-    auto ptProduct = (ProductTableWidgetItem*)item(row, column);
-    ptProduct->selectItem(PRODUCT_FILTER_BUY);
-    auto ptPackage = (PackageTableWidgetItem*)item(row, (int)ShoppingListColumn::Unity);
-    ptPackage->setItem(Package(), dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
-  }
-  else if (column == (int)ShoppingListColumn::Unity)
-  {
-    auto ptProduct = (ProductTableWidgetItem*)item(row, (int)ShoppingListColumn::Description);
-    auto ptPackage = (PackageTableWidgetItem*)item(row, column);
-    ptPackage->selectItem(dynamic_cast<const Product&>(ptProduct->getItem()).m_unity);
-  }
-  else if (column == (int)ShoppingListColumn::Supplier)
-  {
-    auto ptSupplier = (SupplierTableWidgetItem*)item(row, column);
-    ptSupplier->selectItem("");
-  }
-}
-
-void ShoppingListTable::itemDelete(int row, int column)
-{
-  if (column == (int)ShoppingListColumn::Supplier)
-  {
-    auto ptSupplier = (SupplierTableWidgetItem*)item(row, column);
-    ptSupplier->setItem(Supplier());
   }
 }
 
 void ShoppingListTable::showSupplierColumn(bool b)
 {
-  b ? showColumn((int)ShoppingListColumn::Supplier)
-    : hideColumn((int)ShoppingListColumn::Supplier);
+  b ? showColumn((int)Column::Supplier) : hideColumn((int)Column::Supplier);
 }

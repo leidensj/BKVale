@@ -1,5 +1,7 @@
 #include "phonetable.h"
 #include <QHeaderView>
+#include "tableitems/doubleitem.h"
+#include "tableitems/textitem.h"
 
 PhoneTable::PhoneTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)

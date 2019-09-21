@@ -20,11 +20,12 @@ class ShoppingListTable : public JTable
 
 public:
   explicit ShoppingListTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
-  void getListItems(QVector<ShoppingListItem>& v) const;
-  void setListItems(const QVector<ShoppingListItem>& v);
+  void getListElements(QVector<ShoppingListItem>& v) const;
+  void setListElements(const QVector<ShoppingListItem>& v);
 
 public slots:
   void addRow();
+  void addRowAndActivate();
   void showSupplierColumn(bool b);
 };
 

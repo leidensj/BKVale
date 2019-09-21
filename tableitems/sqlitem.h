@@ -13,7 +13,7 @@ struct SQLItemAbv
   }
 
   SQLItemAbv(qlonglong id, const QString& name)
-   : m_id(INVALID_ID)
+   : m_id(id)
    , m_name(name)
   {
 

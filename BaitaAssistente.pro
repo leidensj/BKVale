@@ -106,7 +106,9 @@ SOURCES += main.cpp\
     tableitems/packageitem.cpp \
     tableitems/sqlitem.cpp \
     addresseditor.cpp \
-    tableitems/addressitem.cpp
+    tableitems/addressitem.cpp \
+    tables/paymenttable.cpp \
+    tables/employeehourstable.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -207,7 +209,9 @@ HEADERS  += mainwindow.h \
     tableitems/packageitem.h \
     tableitems/sqlitem.h \
     addresseditor.h \
-    tableitems/addressitem.h
+    tableitems/addressitem.h \
+    tables/paymenttable.h \
+    tables/employeehourstable.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

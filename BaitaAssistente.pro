@@ -108,7 +108,8 @@ SOURCES += main.cpp\
     addresseditor.cpp \
     tableitems/addressitem.cpp \
     tables/paymenttable.cpp \
-    tables/employeehourstable.cpp
+    tables/employeehourstable.cpp \
+    tables/storeemployeestable.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -211,7 +212,8 @@ HEADERS  += mainwindow.h \
     addresseditor.h \
     tableitems/addressitem.h \
     tables/paymenttable.h \
-    tables/employeehourstable.h
+    tables/employeehourstable.h \
+    tables/storeemployeestable.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

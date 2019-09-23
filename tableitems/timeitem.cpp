@@ -3,7 +3,7 @@
 TimeItem::TimeItem(const QTime& defaultTime)
   : m_defaultTime(defaultTime)
 {
-  setToolTip(tr("Hora e minutos hh:mm"));
+  setToolTip(QObject::tr("Hora e minutos hh:mm"));
   setValue(m_defaultTime);
 }
 
@@ -18,7 +18,7 @@ void TimeItem::evaluate()
 {
   QTime t = QTime::fromString(text(), "HH:mm");
   if (!t.isValid())
-    t = QTime::fromString(exp, "HHmm");
+    t = QTime::fromString(text(), "HHmm");
 
   if (t.isValid())
     setValue(t);

@@ -27,6 +27,9 @@ public slots:
   void addRow();
   void addRowAndActivate();
   void showSupplierColumn(bool b);
+
+private slots:
+  void update(int row, int column);
 };
 
 #endif // SHOPPINGLISTTABLE_H

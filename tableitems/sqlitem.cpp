@@ -56,14 +56,13 @@ void SQLItem::evaluate()
 
 void SQLItem::erase()
 {
-  setValue(SQLItemAbv());
+  setValue(toVariant(SQLItemAbv()));
 }
 
 void SQLItem::setValue(const QVariant& v)
 {
-  SQLItemAbv abv = toSQLItemAbv(v);
-  setData(Qt::UserRole, abv.m_id);
-  setText(abv.m_name);
+  setData(Qt::UserRole, v);
+  setText(toSQLItemAbv(v).m_name);
 }
 
 void SQLItem::setTableName(const QString& tableName)

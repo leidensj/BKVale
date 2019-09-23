@@ -33,8 +33,10 @@ void PaymentTable::addRow()
   auto itDate = new DateItem(m_dtPurchase, DateItem::Color::DateBeforeDefault);
   auto itValue = new DoubleItem(Data::Type::Integer, DoubleItem::Color::Foreground);
 
+  blockSignals(true);
   setItem(row, (int)Column::Date, itDate);
   setItem(row, (int)Column::Value, itValue);
+  blockSignals(false);
 
   setCurrentItem(itDate);
   setFocus();

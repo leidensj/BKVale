@@ -24,6 +24,8 @@ ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, QWidget* parent)
   setHeaderIcon((int)Column::Package, QIcon(":/icons/res/unity.png"));
   setHeaderIcon((int)Column::Product, QIcon(":/icons/res/item.png"));
   setHeaderIcon((int)Column::Supplier, QIcon(":/icons/res/supplier.png"));
+
+  connect(this, SIGNAL(changedSignal(int,int)), this, SLOT(update(int,int)));
 }
 
 void ShoppingListTable::addRow()
@@ -36,13 +38,20 @@ void ShoppingListTable::addRow()
   auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background);
   auto itPrice = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background);
   auto itSupplier = new SQLItem(SUPPLIER_SQL_TABLE_NAME);
+
+  blockSignals(true);
   setItem(row, (int)Column::Package, itPackage);
   setItem(row, (int)Column::Product, itProduct);
   setItem(row, (int)Column::Ammount, itAmmount);
   setItem(row, (int)Column::Price, itPrice);
   setItem(row, (int)Column::Supplier, itSupplier);
+  blockSignals(false);
 
+  itProduct->activate();
   setCurrentItem(itAmmount);
+  if (!Id::st_isValid(SQLItem::toSQLItemAbv(itProduct->getValue()).m_id))
+    removeRow(row);
+
   setFocus();
 }
 
@@ -103,4 +112,29 @@ void ShoppingListTable::addRowAndActivate()
 void ShoppingListTable::showSupplierColumn(bool b)
 {
   b ? showColumn((int)Column::Supplier) : hideColumn((int)Column::Supplier);
+}
+
+void ShoppingListTable::update(int row, int column)
+{
+  blockSignals(true);
+  switch ((Column)column)
+  {
+    case Column::Product:
+    {
+      SQLItemAbv abv = SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue());
+      if (Id::st_isValid(abv.m_id))
+      {
+        QString error;
+        Product p;
+        p.m_id = abv.m_id;
+        p.SQL_select(error);
+        dynamic_cast<PackageItem*>(getItem(row, (int)Column::Package))->setProductUnity(p.m_unity);
+      }
+    } break;
+    default:
+      break;
+  }
+
+  blockSignals(false);
+  emitChangedSignal();
 }

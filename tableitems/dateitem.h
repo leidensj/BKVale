@@ -2,6 +2,7 @@
 #define DATEITEM_H
 
 #include "jtableitem.h"
+#include <QDate>
 
 class DateItem : public JTableItem
 {

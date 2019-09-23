@@ -129,7 +129,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   calendarLayout->addLayout(monthLayout5);
 
   m_btns = new JAddRemoveButtons;
-  m_table = new ShoppingListTable;
+  m_table = new ShoppingListTable(m_btns);
 
   QVBoxLayout* ltTable = new QVBoxLayout;
   ltTable->addWidget(m_btns);
@@ -149,11 +149,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_tab->addTab(tabCalendar, QIcon(":/icons/res/calendar.png"), tr("Calendário"));
 
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-  connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
-  connect(m_table, SIGNAL(changedSignal(bool)), m_btns->m_btnRemove, SLOT(setEnabled(bool)));
-  connect(m_btns->m_btnAdd, SIGNAL(clicked(bool)), m_table, SLOT(addItem()));
-  connect(m_btns->m_btnRemove, SIGNAL(clicked(bool)), m_table, SLOT(removeItem()));
-  connect(this, SIGNAL(itemSelectedSignal()), this, SLOT(updateControls()));
 
   setFocusWidgetOnCreate(m_edTitle);
   create();
@@ -176,9 +171,7 @@ void ShoppingListView::setItem(const JItemSQL& o)
     m_vbtnWeek[i]->setChecked(_o.m_weekDays[i]);
   for (int i = 0; i != 31; ++i)
     m_vbtnMonth[i]->setChecked(_o.m_monthDays[i]);
-  m_table->removeAllItems();
-  for (int i = 0; i != _o.m_vItem.size(); ++i)
-    m_table->addItem(_o.m_vItem.at(i));
+  m_table->setListElements(_o.m_vItem);
   updateControls();
 }
 
@@ -192,10 +185,9 @@ void ShoppingListView::getItem(JItemSQL& o) const
   _o.m_supplier.m_id = m_supplierPicker->getId();
   _o.m_image.m_id = m_imagePicker->getId();
   _o.m_nLines = m_snLines->value();
+  m_table->getListElements(_o.m_vItem);
   for (int i = 0; i != 7; ++i)
     _o.m_weekDays[i] = m_vbtnWeek[i]->isChecked();
   for (int i = 0; i != 31; ++i)
     _o.m_monthDays[i] = m_vbtnMonth[i]->isChecked();
-  for (int i = 0; i != m_table->rowCount(); ++i)
-    _o.m_vItem.push_back(dynamic_cast<const ShoppingListItem&>(m_table->getItem(i)));
 }

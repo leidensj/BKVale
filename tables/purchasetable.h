@@ -8,6 +8,8 @@ class PurchaseTable : public JTable
 {
   Q_OBJECT
 
+public:
+
   enum class Column
   {
     Ammount,
@@ -17,7 +19,6 @@ class PurchaseTable : public JTable
     SubTotal
   };
 
-public:
   explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   void getPurchaseElements(QVector<PurchaseElement>& v) const;
   void setPurchaseElements(const QVector<PurchaseElement>& v);
@@ -26,7 +27,6 @@ public slots:
   void addRow();
   void addRowAndActivate();
   void addRowByCode();
-  double computeTotal() const;
   void setSupplierId(Id id);
 
 private:

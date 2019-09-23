@@ -2,6 +2,7 @@
 #define TEXTITEM_H
 
 #include "jtableitem.h"
+#include "common.h"
 
 class TextItem : public JTableItem
 {

@@ -255,9 +255,6 @@ FormAddressWidget::FormAddressWidget(QWidget* parent)
   lt->addWidget(m_btnAddRemove);
   lt->addWidget(m_tbAddress);
 
-  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), m_tbAddress, SLOT(addItem()));
-  connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), m_tbAddress, SLOT(removeItem()));
-  connect(m_tbAddress, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   setLayout(lt);
 }
 
@@ -269,9 +266,4 @@ void FormAddressWidget::setForm(const Form& o)
 void FormAddressWidget::fillForm(Form& o) const
 {
   m_tbAddress->getAddresses(o.m_vAddress);
-}
-
-void FormAddressWidget::updateControls()
-{
-  m_btnAddRemove->m_btnRemove->setEnabled(m_tbAddress->isValidCurrentRow());
 }

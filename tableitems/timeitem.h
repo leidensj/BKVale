@@ -2,6 +2,7 @@
 #define TIMEITEM_H
 
 #include "jtableitem.h"
+#include <QTime>
 
 class TimeItem : public JTableItem
 {

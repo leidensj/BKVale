@@ -41,7 +41,10 @@ void AddressTable::addRow()
   int row = rowCount() - 1;
 
   auto it = new AddressItem();
+
+  blockSignals(true);
   setItem(row, (int)Column::Address, it);
+  blockSignals(false);
 
   setCurrentItem(it);
   setFocus();

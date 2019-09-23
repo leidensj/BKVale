@@ -42,6 +42,7 @@ PackageItem::PackageItem()
 void PackageItem::setProductUnity(const QString& productUnity)
 {
   m_productUnity = productUnity;
+  setValue(toVariant(Package()));
 }
 
 void PackageItem::activate()

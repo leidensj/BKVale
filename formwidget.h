@@ -102,9 +102,6 @@ public:
 
   JAddRemoveButtons* m_btnAddRemove;
   AddressTable* m_tbAddress;
-
-private slots:
-  void updateControls();
 };
 
 #endif // FORMWIDGET_H

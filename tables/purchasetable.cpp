@@ -23,7 +23,7 @@ PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)Column::Price, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::SubTotal, QHeaderView::ResizeToContents);
 
-  connect(this, SIGNAL(cellChanged(int,int)), this, SLOT(update(int,int)));
+  connect(this, SIGNAL(changedSignal(int,int)), this, SLOT(update(int,int)));
 }
 
 double PurchaseTable::computePrice(int row) const
@@ -42,14 +42,6 @@ double PurchaseTable::computeSubTotal(int row) const
   return subTotal;
 }
 
-double PurchaseTable::computeTotal() const
-{
-  double total = 0.0;
-  for (int row = 0; row != rowCount(); ++row)
-    total += getItem(row, (int)Column::SubTotal)->getValue().toDouble();
-  return total;
-}
-
 void PurchaseTable::addRow()
 {
   insertRow(rowCount());
@@ -61,14 +53,19 @@ void PurchaseTable::addRow()
   auto itPrice = new DoubleItem(Data::Type::Money, DoubleItem::Color::Background);
   auto itSubtotal = new DoubleItem(Data::Type::Money, DoubleItem::Color::Background);
 
+  blockSignals(true);
   setItem(row, (int)Column::Ammount, itAmmount);
   setItem(row, (int)Column::Unity, itUnity);
   setItem(row, (int)Column::Product, itProduct);
   setItem(row, (int)Column::Price, itPrice);
   setItem(row, (int)Column::SubTotal, itSubtotal);
+  blockSignals(false);
 
   itProduct->activate();
   setCurrentItem(itAmmount);
+  if (!Id::st_isValid(SQLItem::toSQLItemAbv(itProduct->getValue()).m_id))
+    removeRow(row);
+
   setFocus();
 }
 
@@ -136,10 +133,14 @@ void PurchaseTable::loadProductInfo(int row)
   SQLItemAbv abv = SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue());
   if (Id::st_isValid(abv.m_id))
   {
+    QString error;
+    Product p;
+    p.m_id = abv.m_id;
+    p.SQL_select(error);
     PurchaseElement o;
     o.SQL_select_last(m_supplierId, abv.m_id);
     getItem(row, (int)Column::Price)->setValue(o.m_price);
-    dynamic_cast<PackageItem*>(getItem(row, (int)Column::Unity))->setProductUnity(o.m_product.m_unity);
+    dynamic_cast<PackageItem*>(getItem(row, (int)Column::Unity))->setProductUnity(p.m_unity);
     getItem(row, (int)Column::Unity)->setValue(PackageItem::toVariant(o.m_package));
   }
 }

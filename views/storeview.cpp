@@ -1,9 +1,9 @@
 #include "storeview.h"
 #include "widgets/jlineedit.h"
 #include "widgets/jplaintextedit.h"
-#include "widgets/jtable.h"
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jdatabase.h"
+#include "tables/storeemployeestable.h"
 #include "formwidget.h"
 #include <QLayout>
 #include <QFormLayout>
@@ -24,14 +24,8 @@ StoreView::StoreView(QWidget* parent)
   m_formDetails = new FormDetailsWidget;
   m_formPhone = new FormPhoneWidget;
   m_formAddress= new FormAddressWidget;
-  m_tbEmployee = new JTable;
   m_btnAddRemove = new JAddRemoveButtons;
-
-  m_tbEmployee->setColumnCount(1);
-  QStringList headers;
-  headers << tr("Funcionário");
-  m_tbEmployee->setHorizontalHeaderLabels(headers);
-  m_tbEmployee->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+  m_tbEmployee = new StoreEmployeesTable(m_btnAddRemove);
 
   QVBoxLayout* ltTable = new QVBoxLayout;
   ltTable->addWidget(m_btnAddRemove);
@@ -48,8 +42,6 @@ StoreView::StoreView(QWidget* parent)
 
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
   connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addEmployee()));
-  connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), m_tbEmployee, SLOT(removeItem()));
-  connect(m_tbEmployee, SIGNAL(itemSelectionChanged()), this, SLOT(updateControls()));
   connect(this, SIGNAL(itemSelectedSignal()), this, SLOT(updateControls()));
 
   m_formInfo->m_lblCreationDate->hide();
@@ -59,11 +51,6 @@ StoreView::StoreView(QWidget* parent)
 
   setFocusWidgetOnCreate(m_formInfo->m_edName);
   create();
-}
-
-void StoreView::updateControls()
-{
-  m_btnAddRemove->m_btnRemove->setEnabled(m_tbEmployee->isValidCurrentRow());
 }
 
 void StoreView::getItem(JItemSQL& o) const
@@ -77,13 +64,7 @@ void StoreView::getItem(JItemSQL& o) const
   m_formDetails->fillForm(_o.m_form);
   m_formPhone->fillForm(_o.m_form);
   m_formAddress->fillForm(_o.m_form);
-  for (int i = 0; i != m_tbEmployee->rowCount(); ++i)
-  {
-    Employee e;
-    int row = m_tbEmployee->verticalHeader()->logicalIndex(i);
-    e.m_id.set(m_tbEmployee->item(row, 0)->data(Qt::UserRole).toLongLong());
-    _o.m_vEmployee.push_back(e);
-  }
+  m_tbEmployee->getEmployees(_o.m_vEmployee);
 }
 
 void StoreView::setItem(const JItemSQL& o)
@@ -94,38 +75,5 @@ void StoreView::setItem(const JItemSQL& o)
   m_formDetails->setForm(_o.m_form);
   m_formPhone->setForm(_o.m_form);
   m_formAddress->setForm(_o.m_form);
-  m_tbEmployee->removeAllItems();
-  for (int i = 0; i != _o.m_vEmployee.size(); ++i)
-    addEmployee(_o.m_vEmployee.at(i));
-}
-
-void StoreView::addEmployee()
-{
-  QString filter = EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN ("
-                   "SELECT " STORE_EMPLOYEES_SQL_TABLE_NAME "." STORE_EMPLOYEES_SQL_COL01
-                   " FROM " STORE_EMPLOYEES_SQL_TABLE_NAME ")";
-  if (m_tbEmployee->rowCount() != 0)
-  {
-    filter += " AND " EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN (";
-    for (int i = 0; i != m_tbEmployee->rowCount(); ++i)
-      filter += m_tbEmployee->item(i, 0)->data(Qt::UserRole).toString() + ",";
-    filter.chop(1);
-    filter += ")";
-  }
-
-  JDatabaseSelector dlg(EMPLOYEE_SQL_TABLE_NAME);
-  dlg.getDatabase()->setFixedFilter(filter);
-  dlg.exec();
-  auto pt = dynamic_cast<Employee*>(dlg.getDatabase()->getCurrentItem());
-  if (pt != nullptr)
-    addEmployee(*pt);
-}
-
-void StoreView::addEmployee(const Employee& e)
-{
-  m_tbEmployee->insertRow(m_tbEmployee->rowCount());
-  auto pt = new QTableWidgetItem(e.m_form.m_name);
-  pt->setFlags(pt ->flags() & ~Qt::ItemFlag::ItemIsEditable);
-  pt->setData(Qt::UserRole, e.m_id.get());
-  m_tbEmployee->setItem(m_tbEmployee->rowCount() - 1, 0, pt);
+  m_tbEmployee->setEmployees(_o.m_vEmployee);
 }

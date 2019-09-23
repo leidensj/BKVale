@@ -4,7 +4,7 @@
 #include "items/store.h"
 #include "widgets/jitemview.h"
 
-class JTable;
+class StoreEmployeesTable;
 class FormInfoWidget;
 class FormDetailsWidget;
 class FormPhoneWidget;
@@ -20,9 +20,6 @@ public:
 
 public slots:
   void getItem(JItemSQL& o) const;
-  void updateControls();
-  void addEmployee();
-  void addEmployee(const Employee& e);
 
 protected slots:
   void setItem(const JItemSQL& o);
@@ -33,7 +30,7 @@ private:
   FormDetailsWidget* m_formDetails;
   FormPhoneWidget* m_formPhone;
   FormAddressWidget* m_formAddress;
-  JTable* m_tbEmployee;
+  StoreEmployeesTable* m_tbEmployee;
   JAddRemoveButtons* m_btnAddRemove;
 };
 

@@ -39,6 +39,7 @@ protected:
 
 signals:
   void changedSignal(bool bIsRowSelected);
+  void changedSignal(int row, int column);
 };
 
 #endif // JITEMTABLE_H

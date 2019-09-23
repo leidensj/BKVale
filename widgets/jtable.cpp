@@ -9,6 +9,7 @@ JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
   if (btns != nullptr)
   {
     QObject::connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
+    QObject::connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(emitChangedSignal()));
     QObject::connect(btns->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
     QObject::connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
   }
@@ -21,6 +22,11 @@ JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
 
   QObject::connect(this, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(activate(QTableWidgetItem*)));
   QObject::connect(this, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(evaluate(QTableWidgetItem*)));
+}
+
+JTable::~JTable()
+{
+
 }
 
 void JTable::setLargerSize(bool b)
@@ -124,6 +130,7 @@ void JTable::activate(QTableWidgetItem* p)
     JTableItem* p2 = dynamic_cast<JTableItem*>(p);
     p2->activate();
     emitChangedSignal();
+    emit changedSignal(p2->row(), p2->column());
   }
 }
 
@@ -134,6 +141,7 @@ void JTable::erase(QTableWidgetItem* p)
     JTableItem* p2 = dynamic_cast<JTableItem*>(p);
     p2->erase();
     emitChangedSignal();
+    emit changedSignal(p2->row(), p2->column());
   }
 }
 
@@ -144,6 +152,7 @@ void JTable::evaluate(QTableWidgetItem* p)
     JTableItem* p2 = dynamic_cast<JTableItem*>(p);
     p2->evaluate();
     emitChangedSignal();
+    emit changedSignal(p2->row(), p2->column());
   }
 }
 

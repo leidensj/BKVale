@@ -27,10 +27,12 @@ void PhoneTable::addRow()
   auto itNumber = new TextItem(Text::Input::Numeric, false);
   auto itName = new TextItem(Text::Input::ASCII, true);
 
+  blockSignals(true);
   setItem(row, (int)Column::CountryCode, itCountryCode);
   setItem(row, (int)Column::Code, itCode);
   setItem(row, (int)Column::Number, itNumber);
   setItem(row, (int)Column::Name, itName);
+  blockSignals(false);
 
   Phone o;
   itCountryCode->setValue(o.m_countryCode);

@@ -17,7 +17,7 @@ public:
   static QVariant toVariant(const Package& pck);
   static Package toPackage(const QVariant& v);
 private:
-  QString* m_productUnity;
+  QString m_productUnity;
 };
 
 #endif // PACKAGEITEM_H

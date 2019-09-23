@@ -62,8 +62,6 @@ public slots:
 private slots:
   void fillCredit();
   void updateControls();
-  void addRow();
-  void removeRow();
   void emitMethodChangedSignal();
 
 private:

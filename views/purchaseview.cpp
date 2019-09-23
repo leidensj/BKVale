@@ -74,8 +74,6 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   connect(m_rdoCash, SIGNAL(clicked(bool)), m_tbPayment, SLOT(removeAllItems()));
   connect(m_rdoBonus, SIGNAL(clicked(bool)), m_tbPayment, SLOT(removeAllItems()));
   connect(m_rdoCredit, SIGNAL(clicked(bool)), this, SLOT(fillCredit()));
-  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
-  connect(m_btnAddRemove->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeRow()));
   connect(m_tbPayment, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
 
   setLayout(lt);
@@ -220,6 +218,7 @@ PurchaseView::PurchaseView(QWidget *parent)
 
   m_btnAddRemove = new JAddRemoveButtons;
   m_btnAddRemove->m_lt->addWidget(m_btnAddCode);
+  m_table = new PurchaseTable(m_btnAddRemove);
 
   QLabel* lblNumber = new QLabel();
   lblNumber->setText(tr("Número:"));
@@ -289,8 +288,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   frHeader->setFrameShadow(QFrame::Shadow::Plain);
   frHeader->setLayout(ltHeader);
   frHeader->setFixedHeight(frHeader->sizeHint().height());
-
-  m_table = new PurchaseTable;
 
   m_edTotal = new JExpLineEdit(Data::Type::Money);
   m_edTotal->setReadOnly(true);
@@ -430,10 +427,9 @@ void PurchaseView::supplierChanged()
 void PurchaseView::updateControls()
 {
   m_btnOpenLast->setEnabled(m_lastId.isValid());
-  double total = m_table->computeTotal() + m_edDisccount->getValue();
+  double total = m_table->sum((int)PurchaseTable::Column::SubTotal) + m_edDisccount->getValue();
   m_edTotal->setText(total);
   m_tab->setTabIcon(1, m_wPayment->getIcon());
-  emit changedSignal();
 }
 
 void PurchaseView::updateStatistics()

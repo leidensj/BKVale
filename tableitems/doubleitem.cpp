@@ -14,6 +14,7 @@ DoubleItem::DoubleItem(Data::Type type,
   , m_prefix(prefix)
   , m_sufix(sufix)
 {
+  setValue(0.0);
   if (m_bCheckable)
   {
     setFlags(flags() | Qt::ItemIsUserCheckable);

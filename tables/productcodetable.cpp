@@ -19,7 +19,10 @@ void ProductCodeTable::addRow()
   int row = rowCount() - 1;
 
   auto it = new TextItem(Text::Input::ASCII, true);
+
+  blockSignals(true);
   setItem(row, (int)Column::Code, it);
+  blockSignals(false);
 
   setCurrentItem(it);
   setFocus();

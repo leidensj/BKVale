@@ -22,8 +22,11 @@ void EmployeeHoursTable::addRow()
 
   auto itBegin = new TimeItem(QTime::fromString("00:00"));
   auto itEnd = new TimeItem(QTime::fromString("00:00"));
+
+  blockSignals(true);
   setItem(row, (int)Column::Begin, itBegin);
   setItem(row, (int)Column::End, itEnd);
+  blockSignals(false);
 
   setCurrentItem(itBegin);
   setFocus();

@@ -22,7 +22,8 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
 {
   m_edText = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags1);
   m_edText->setReadOnly(true);
-  QAction* action = m_edText->addAction(QIcon(":/icons/res/binoculars.png"), QLineEdit::LeadingPosition);
+  QIcon searchIcon = QIcon(JItemEx::icon(tableName));
+  QAction* action = m_edText->addAction(searchIcon.isNull() ? QIcon(":/icons/res/binoculars.png") : searchIcon, QLineEdit::LeadingPosition);
   QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);
 
   m_selector = new JDatabaseSelector(tableName, bMultiPicker, this);

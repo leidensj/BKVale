@@ -12,7 +12,7 @@ ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, QWidget* parent)
 {
   setColumnCount(SHOPPING_LIST_NUMBER_OF_COLUMNS);
   QStringList headers;
-  headers << "Unidade" << "Produto" << "Quantidade" << "Preço" << "Fornecedor";
+  headers << "Embalagem" << "Produto" << "Quantidade" << "Preço" << "Fornecedor";
   setHorizontalHeaderLabels(headers);
 
   horizontalHeader()->setSectionResizeMode((int)Column::Package, QHeaderView::ResizeToContents);
@@ -21,7 +21,7 @@ ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, QWidget* parent)
   horizontalHeader()->setSectionResizeMode((int)Column::Price, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Supplier, QHeaderView::ResizeToContents);
 
-  setHeaderIcon((int)Column::Package, QIcon(":/icons/res/unity.png"));
+  setHeaderIcon((int)Column::Package, QIcon(":/icons/res/package.png"));
   setHeaderIcon((int)Column::Product, QIcon(":/icons/res/item.png"));
   setHeaderIcon((int)Column::Supplier, QIcon(":/icons/res/supplier.png"));
 

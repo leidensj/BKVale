@@ -1,8 +1,9 @@
 #include "store.h"
 
-Store::Store()
+Store::Store(Id id)
 {
   clear();
+  m_id = id;
 }
 
 void Store::clear(bool bClearId)

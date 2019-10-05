@@ -12,13 +12,13 @@ PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
 {
   setColumnCount(5);
   QStringList headers;
-  headers << "Quantidade" << "Unidade" << "Produto" << "Preço" << "Subtotal";
+  headers << "Quantidade" << "Embalagem" << "Produto" << "Preço" << "Subtotal";
   setHorizontalHeaderLabels(headers);
-  setHeaderIcon((int)Column::Unity, QIcon(":/icons/res/unity.png"));
+  setHeaderIcon((int)Column::Package, QIcon(":/icons/res/package.png"));
   setHeaderIcon((int)Column::Product, QIcon(":/icons/res/item.png"));
 
   horizontalHeader()->setSectionResizeMode((int)Column::Ammount, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)Column::Unity, QHeaderView::ResizeToContents);
+  horizontalHeader()->setSectionResizeMode((int)Column::Package, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Product, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)Column::Price, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::SubTotal, QHeaderView::ResizeToContents);
@@ -48,14 +48,14 @@ void PurchaseTable::addRow()
   int row = rowCount() - 1;
 
   auto itAmmount = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::Background);
-  auto itUnity = new PackageItem();
+  auto itPackage = new PackageItem();
   auto itProduct = new SQLItem(PRODUCT_SQL_TABLE_NAME, PRODUCT_FILTER_BUY);
   auto itPrice = new DoubleItem(Data::Type::Money, DoubleItem::Color::Background);
   auto itSubtotal = new DoubleItem(Data::Type::Money, DoubleItem::Color::Background);
 
   blockSignals(true);
   setItem(row, (int)Column::Ammount, itAmmount);
-  setItem(row, (int)Column::Unity, itUnity);
+  setItem(row, (int)Column::Package, itPackage);
   setItem(row, (int)Column::Product, itProduct);
   setItem(row, (int)Column::Price, itPrice);
   setItem(row, (int)Column::SubTotal, itSubtotal);
@@ -108,7 +108,7 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
     int row = verticalHeader()->logicalIndex(row);
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
-    o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Unity)->getValue());
+    o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
     o.m_product.m_id.set(getItem(row, (int)Column::Product)->getValue().toLongLong());
     v.push_back(o);
   }
@@ -122,7 +122,7 @@ void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v)
     addRow();
     getItem(i, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(i, (int)Column::Price)->setValue(v.at(i).m_price);
-    getItem(i, (int)Column::Unity)->setValue(PackageItem::toVariant(v.at(i).m_package));
+    getItem(i, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
     getItem(i, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(v.at(i).m_product.m_id.get(),
                                                                              v.at(i).m_product.name())));
   }
@@ -140,8 +140,8 @@ void PurchaseTable::loadProductInfo(int row)
     PurchaseElement o;
     o.SQL_select_last(m_supplierId, abv.m_id);
     getItem(row, (int)Column::Price)->setValue(o.m_price);
-    dynamic_cast<PackageItem*>(getItem(row, (int)Column::Unity))->setProductUnity(p.m_unity);
-    getItem(row, (int)Column::Unity)->setValue(PackageItem::toVariant(o.m_package));
+    dynamic_cast<PackageItem*>(getItem(row, (int)Column::Package))->setProductUnity(p.m_unity);
+    getItem(row, (int)Column::Package)->setValue(PackageItem::toVariant(o.m_package));
   }
 }
 

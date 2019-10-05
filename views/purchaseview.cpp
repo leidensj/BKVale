@@ -7,7 +7,6 @@
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jdoublespinbox.h"
 #include "widgets/jdatepicker.h"
-#include "widgets/jdatabasecombobox.h"
 #include "filters/purchasefilter.h"
 #include "tables/paymenttable.h"
 #include <QPlainTextEdit>
@@ -186,6 +185,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_dtPicker(nullptr)
   , m_edTotal(nullptr)
   , m_supplierPicker(nullptr)
+  , m_storePicker(nullptr)
   , m_table(nullptr)
   , m_edDisccount(nullptr)
   , m_wPayment(nullptr)
@@ -194,7 +194,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_teObservation(nullptr)
   , m_filter(nullptr)
   , m_btnApportionment(nullptr)
-  , m_cbStore(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -219,6 +218,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_btnAddRemove = new JAddRemoveButtons;
   m_btnAddRemove->m_lt->addWidget(m_btnAddCode);
   m_table = new PurchaseTable(m_btnAddRemove);
+  m_table->setLargerSize(true);
 
   QLabel* lblNumber = new QLabel();
   lblNumber->setText(tr("Número:"));
@@ -227,8 +227,6 @@ PurchaseView::PurchaseView(QWidget *parent)
     font.setPointSize(12);
     lblNumber->setFont(font);
   }
-
-  m_cbStore = new JDatabaseComboBox(STORE_SQL_TABLE_NAME, 1);
 
   m_snNumber = new QSpinBox();
   m_snNumber->setReadOnly(true);
@@ -267,7 +265,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   QHBoxLayout* ltCmd = new QHBoxLayout();
   ltCmd->setContentsMargins(0, 0, 0, 0);
   ltCmd->setAlignment(Qt::AlignLeft);
-  ltCmd->addWidget(m_cbStore);
   ltCmd->addWidget(lblNumber);
   ltCmd->addWidget(m_snNumber);
   ltCmd->addWidget(line1);
@@ -279,8 +276,12 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
 
+  m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME);
+  m_storePicker->setPlaceholderText(true);
+
   QVBoxLayout* ltHeader = new QVBoxLayout;
   ltHeader->addLayout(ltCmd);
+  ltHeader->addWidget(m_storePicker);
   ltHeader->addWidget(m_supplierPicker);
 
   QFrame* frHeader = new QFrame();
@@ -389,19 +390,20 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_vPayment = m_wPayment->getPayments();
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->getValue();
-  _o.m_store.m_id = m_cbStore->getCurrentId();
+  _o.m_store.m_id = m_storePicker->getId();
   m_table->getPurchaseElements(_o.m_vElement);
 }
 
 void PurchaseView::setItem(const JItemSQL& o)
 {
-  m_cbStore->refresh();
   const Purchase& _o = dynamic_cast<const Purchase&>(o);
   if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
   {
     QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
-    _o.m_store.m_id.set(settings.value(SETTINGS_PURCHASE_STORE_ID).toLongLong());
-    m_cbStore->setCurrentId(_o.m_store.m_id);
+    Store store(Id(settings.value(SETTINGS_PURCHASE_STORE_ID).toLongLong()));
+    QString error;
+    if (store.SQL_select(error))
+      m_storePicker->setItem(store);
   }
   m_table->removeAllItems();
   m_supplierPicker->clear();

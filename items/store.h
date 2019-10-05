@@ -6,7 +6,7 @@
 
 struct Store : public JItemSQL
 {
-  Store();
+  Store(Id id = Id());
   void clear(bool bClearId = true);
   bool isValid() const;
   bool operator ==(const JItem& other) const;

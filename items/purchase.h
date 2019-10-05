@@ -23,7 +23,7 @@ struct Purchase : public JItemSQL
     Bonus
   };
 
-  Purchase(Id = Id());
+  Purchase(Id id = Id());
   void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;

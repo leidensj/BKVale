@@ -30,7 +30,6 @@ class PaymentTable;
 class QTableWidgetItem;
 class QRadioButton;
 class PurchaseFilter;
-class JDatabaseComboBox;
 
 class PaymentWidget : public QWidget
 {
@@ -100,6 +99,7 @@ private:
   JDatePicker* m_dtPicker;
   JExpLineEdit* m_edTotal;
   JDatabasePicker* m_supplierPicker;
+  JDatabasePicker* m_storePicker;
   PurchaseTable* m_table;
   JExpLineEdit* m_edDisccount;
   PaymentWidget* m_wPayment;
@@ -108,7 +108,6 @@ private:
   QPlainTextEdit* m_teObservation;
   PurchaseFilter* m_filter;
   QPushButton* m_btnApportionment;
-  JDatabaseComboBox* m_cbStore;
 
 private slots:
   void supplierChanged();

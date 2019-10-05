@@ -13,7 +13,7 @@ public:
   enum class Column
   {
     Ammount,
-    Unity,
+    Package,
     Product,
     Price,
     SubTotal

@@ -46,7 +46,7 @@ PackageEditor::PackageEditor(QWidget* parent)
   setLayout(mainLayout);
 
   setWindowTitle(tr("Modificar Embalagem"));
-  setWindowIcon(QIcon(":/icons/res/item.png"));
+  setWindowIcon(QIcon(":/icons/res/package.png"));
   setWindowFlags(Qt::WindowCloseButtonHint);
   layout()->setSizeConstraint(QLayout::SetFixedSize);
 

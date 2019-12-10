@@ -108,12 +108,14 @@ private:
   QPlainTextEdit* m_teObservation;
   PurchaseFilter* m_filter;
   QPushButton* m_btnApportionment;
+  QPushButton* m_btnHistory;
 
 private slots:
   void supplierChanged();
   void lastItemSelected();
   void updateControls();
   void updateStatistics();
+  void showHistory();
 
 signals:
   void changedSignal();

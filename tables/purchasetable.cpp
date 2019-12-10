@@ -105,11 +105,11 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
   for (int i = 0; i != rowCount(); ++i)
   {
     PurchaseElement o;
-    int row = verticalHeader()->logicalIndex(row);
+    int row = verticalHeader()->logicalIndex(i);
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
     o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
-    o.m_product.m_id.set(getItem(row, (int)Column::Product)->getValue().toLongLong());
+    o.m_product.m_id.set(SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue()).m_id);
     v.push_back(o);
   }
 }

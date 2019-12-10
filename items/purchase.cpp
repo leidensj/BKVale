@@ -303,3 +303,38 @@ void Purchase::setEmployee(const JItemSQL& e) const
 {
   m_employee = dynamic_cast<const Employee&>(e);
 }
+
+bool Purchase::SQL_select_all_supplier_id_items()
+{
+  QString error;
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  error.clear();
+  query.prepare("SELECT DISTINCT "
+                PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID
+                " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
+                " LEFT OUTER JOIN " PURCHASE_SQL_TABLE_NAME " ON "
+                PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID
+                " = " PURCHASE_SQL_TABLE_NAME "." SQL_COLID " WHERE "
+                PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " = (:_v00)");
+  query.bindValue(":_v00", m_supplier.m_id.get());
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    m_vElement.clear();
+    while (query.next())
+    {
+      PurchaseElement e;
+      e.SQL_select_last(m_supplier.m_id, Id(query.value(0).toLongLong()));
+      m_vElement.push_back(e);
+    }
+  }
+
+  return SQL_finish(db, query, bSuccess, error);
+}

@@ -194,6 +194,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_teObservation(nullptr)
   , m_filter(nullptr)
   , m_btnApportionment(nullptr)
+  , m_btnHistory(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -213,10 +214,19 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_btnAddCode->setIconSize(QSize(24, 24));
   m_btnAddCode->setIcon(QIcon(":/icons/res/barcodescan.png"));
   m_btnAddCode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
-  m_btnAddCode->setToolTip(tr("Adicionar pelo código(Alt+*)"));
+  m_btnAddCode->setToolTip(tr("Adicionar pelo código (Alt+*)"));
+
+  m_btnHistory = new QPushButton;
+  m_btnHistory->setFlat(true);
+  m_btnHistory->setText("");
+  m_btnHistory->setIconSize(QSize(24, 24));
+  m_btnHistory->setIcon(QIcon(":/icons/res/history.png"));
+  m_btnHistory->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Period));
+  m_btnHistory->setToolTip(tr("Adicionar pelo histório (Alt+.)"));
 
   m_btnAddRemove = new JAddRemoveButtons;
   m_btnAddRemove->m_lt->addWidget(m_btnAddCode);
+  m_btnAddRemove->m_lt->addWidget(m_btnHistory);
   m_table = new PurchaseTable(m_btnAddRemove);
   m_table->setLargerSize(true);
 
@@ -355,6 +365,7 @@ PurchaseView::PurchaseView(QWidget *parent)
 
   setContentsMargins(9, 9, 9, 9);
   connect(m_btnAddCode, SIGNAL(clicked(bool)), m_table, SLOT(addRowByCode()));
+  connect(m_btnHistory, SIGNAL(clicked(bool)), this, SLOT(showHistory()));
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
@@ -365,7 +376,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
   connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setPurchaseTotal(double)));
   connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setPurchaseDate(const QDate&)));
-  connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(this, SIGNAL(itemSelectedSignal()), SLOT(updateControls()));
 
   setFocusWidgetOnCreate(m_supplierPicker);
@@ -432,6 +442,7 @@ void PurchaseView::updateControls()
   double total = m_table->sum((int)PurchaseTable::Column::SubTotal) + m_edDisccount->getValue();
   m_edTotal->setText(total);
   m_tab->setTabIcon(1, m_wPayment->getIcon());
+  m_btnHistory->setEnabled(m_supplierPicker->getId().isValid());
 }
 
 void PurchaseView::updateStatistics()
@@ -502,4 +513,20 @@ void PurchaseView::setDate(const QDate& dt)
 QDate PurchaseView::getDate() const
 {
   return m_dtPicker->getDate();
+}
+
+#include <QDebug>
+
+void PurchaseView::showHistory()
+{
+  Purchase o;
+  o.m_supplier.m_id = m_supplierPicker->getId();
+  if (o.m_supplier.m_id.isValid())
+  {
+    o.SQL_select_all_supplier_id_items();
+    for (int i = 0; i != o.m_vElement.size(); ++i)
+    {
+      qDebug() << o.m_vElement.at(i).m_product.m_name;
+    }
+  }
 }

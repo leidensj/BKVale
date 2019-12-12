@@ -4,8 +4,8 @@
 #include <QKeyEvent>
 #include "tableitems/addressitem.h"
 
-AddressTable::AddressTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable(btns , parent)
+AddressTable::AddressTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+  : JTable(btns, bSelector, parent)
 {
   setColumnCount(1);
   QStringList headers;

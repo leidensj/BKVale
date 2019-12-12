@@ -3,8 +3,8 @@
 #include "tableitems/doubleitem.h"
 #include "tableitems/textitem.h"
 
-PhoneTable::PhoneTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable(btns, parent)
+PhoneTable::PhoneTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+  : JTable(btns, bSelector, parent)
 {
   setColumnCount(4);
   QStringList headers;

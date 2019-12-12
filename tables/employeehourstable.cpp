@@ -3,8 +3,8 @@
 #include <QKeyEvent>
 #include "tableitems/timeitem.h"
 
-EmployeeHoursTable::EmployeeHoursTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable(btns, parent)
+EmployeeHoursTable::EmployeeHoursTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+  : JTable(btns, bSelector, parent)
 {
   setColumnCount(2);
   QStringList headers;

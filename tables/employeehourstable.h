@@ -15,7 +15,7 @@ class EmployeeHoursTable : public JTable
   };
 
 public:
-  explicit EmployeeHoursTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  explicit EmployeeHoursTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
   void getHours(QVector<TimeInterval>& v) const;
   void setHours(const QVector<TimeInterval>& v);
 

@@ -19,7 +19,7 @@ class ShoppingListTable : public JTable
   };
 
 public:
-  explicit ShoppingListTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  explicit ShoppingListTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
   void getListElements(QVector<ShoppingListItem>& v) const;
   void setListElements(const QVector<ShoppingListItem>& v);
 

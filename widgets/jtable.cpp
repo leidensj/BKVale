@@ -3,8 +3,9 @@
 #include <QHeaderView>
 #include <QPushButton>
 
-JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
+JTable::JTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
  : QTableWidget(parent)
+ , m_bSelector(bSelector)
 {
   if (btns != nullptr)
   {
@@ -14,8 +15,18 @@ JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
     QObject::connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
   }
 
-  setSelectionBehavior(QAbstractItemView::SelectItems);
-  setSelectionMode(QAbstractItemView::SingleSelection);
+  if (m_bSelector)
+  {
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::MultiSelection);
+  }
+  else
+  {
+    setSelectionBehavior(QAbstractItemView::SelectItems);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+  }
+
   horizontalHeader()->setHighlightSections(false);
   verticalHeader()->setSectionsMovable(true);
   verticalHeader()->setHighlightSections(false);
@@ -127,10 +138,13 @@ void JTable::activate(QTableWidgetItem* p)
 {
   if (p != nullptr)
   {
-    JTableItem* p2 = dynamic_cast<JTableItem*>(p);
-    p2->activate();
-    emitChangedSignal();
-    emit changedSignal(p2->row(), p2->column());
+    if (!m_bSelector)
+    {
+      JTableItem* p2 = dynamic_cast<JTableItem*>(p);
+      p2->activate();
+      emitChangedSignal();
+      emit changedSignal(p2->row(), p2->column());
+    }
   }
 }
 
@@ -138,10 +152,13 @@ void JTable::erase(QTableWidgetItem* p)
 {
   if (p != nullptr)
   {
-    JTableItem* p2 = dynamic_cast<JTableItem*>(p);
-    p2->erase();
-    emitChangedSignal();
-    emit changedSignal(p2->row(), p2->column());
+    if (!m_bSelector)
+    {
+      JTableItem* p2 = dynamic_cast<JTableItem*>(p);
+      p2->erase();
+      emitChangedSignal();
+      emit changedSignal(p2->row(), p2->column());
+    }
   }
 }
 
@@ -169,5 +186,5 @@ double JTable::sum(int column) const
 
 void JTable::setEnabled(bool b)
 {
-  return QTableWidget::setEnabled(b);
+  QTableWidget::setEnabled(b);
 }

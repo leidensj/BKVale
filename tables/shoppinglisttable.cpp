@@ -7,8 +7,8 @@
 #include "tableitems/packageitem.h"
 #include "tableitems/sqlitem.h"
 
-ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable(btns, parent)
+ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+  : JTable(btns, bSelector, parent)
 {
   setColumnCount(SHOPPING_LIST_NUMBER_OF_COLUMNS);
   QStringList headers;
@@ -47,11 +47,7 @@ void ShoppingListTable::addRow()
   setItem(row, (int)Column::Supplier, itSupplier);
   blockSignals(false);
 
-  itProduct->activate();
   setCurrentItem(itAmmount);
-  if (!Id::st_isValid(SQLItem::toSQLItemAbv(itProduct->getValue()).m_id))
-    removeRow(row);
-
   setFocus();
 }
 

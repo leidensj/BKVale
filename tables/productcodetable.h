@@ -14,7 +14,7 @@ class ProductCodeTable : public JTable
   };
 
 public:
-  explicit ProductCodeTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  explicit ProductCodeTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
   void getCodes(QVector<ProductCode>& v) const;
   void setCodes(const QVector<ProductCode>& v);
 

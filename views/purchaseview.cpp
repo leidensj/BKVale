@@ -21,6 +21,7 @@
 #include <QFormLayout>
 #include <QRadioButton>
 #include <QSettings>
+#include <QDialogButtonBox>
 #include "items/jitemex.h"
 
 #define SETTINGS_PURCHASE_STORE_ID "purchase/storeid"
@@ -524,9 +525,26 @@ void PurchaseView::showHistory()
   if (o.m_supplier.m_id.isValid())
   {
     o.SQL_select_all_supplier_id_items();
-    for (int i = 0; i != o.m_vElement.size(); ++i)
+    PurchaseTable* tb = new PurchaseTable(nullptr, true);
+    tb->setPurchaseElements(o.m_vElement);
+    QDialog dlg(this);
+    QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    QVBoxLayout *layout = new QVBoxLayout;
+    dlg.setLayout(layout);
+    layout->addWidget(tb);
+    layout->addWidget(btns);
+    dlg.adjustSize();
+    connect(btns, SIGNAL(accepted()), &dlg, SLOT(accept()));
+    connect(btns, SIGNAL(rejected()), &dlg, SLOT(reject()));
+    dlg.setWindowFlags(Qt::Window);
+    dlg.setWindowTitle(tr("Selecionar Produto"));
+    dlg.setWindowIcon(QIcon(JItemEx::icon(PRODUCT_SQL_TABLE_NAME)));
+    dlg.setModal(true);
+    if (dlg.exec())
     {
-      qDebug() << o.m_vElement.at(i).m_product.m_name;
+      QVector<PurchaseElement> v;
+      tb->getPurchaseElements(v);
+      m_table->setPurchaseElements(v);
     }
   }
 }

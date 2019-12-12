@@ -7,8 +7,8 @@
 #include "tableitems/packageitem.h"
 #include "tableitems/sqlitem.h"
 
-PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable(btns, parent)
+PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+  : JTable(btns, bSelector, parent)
 {
   setColumnCount(5);
   QStringList headers;
@@ -61,11 +61,7 @@ void PurchaseTable::addRow()
   setItem(row, (int)Column::SubTotal, itSubtotal);
   blockSignals(false);
 
-  itProduct->activate();
   setCurrentItem(itAmmount);
-  if (!Id::st_isValid(SQLItem::toSQLItemAbv(itProduct->getValue()).m_id))
-    removeRow(row);
-
   setFocus();
 }
 
@@ -104,12 +100,15 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
-    PurchaseElement o;
     int row = verticalHeader()->logicalIndex(i);
+    if (m_bSelector && !selectedItems().contains(item(row, 0)))
+      continue;
+    PurchaseElement o;
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
     o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
     o.m_product.m_id.set(SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue()).m_id);
+    o.m_product.m_name = SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue()).m_name;
     v.push_back(o);
   }
 }

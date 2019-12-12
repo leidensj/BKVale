@@ -2,8 +2,8 @@
 #include <QHeaderView>
 #include "tableitems/sqlitem.h"
 
-StoreEmployeesTable::StoreEmployeesTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable(btns, parent)
+StoreEmployeesTable::StoreEmployeesTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+  : JTable(btns, bSelector, parent)
 {
   setColumnCount(1);
   QStringList headers;

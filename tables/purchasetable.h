@@ -19,7 +19,7 @@ public:
     SubTotal
   };
 
-  explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
   void getPurchaseElements(QVector<PurchaseElement>& v) const;
   void setPurchaseElements(const QVector<PurchaseElement>& v);
 

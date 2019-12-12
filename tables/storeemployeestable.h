@@ -15,7 +15,7 @@ class StoreEmployeesTable : public JTable
   };
 
 public:
-  explicit StoreEmployeesTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  explicit StoreEmployeesTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
   void getEmployees(QVector<Employee>& v) const;
   void setEmployees(const QVector<Employee>& v);
 

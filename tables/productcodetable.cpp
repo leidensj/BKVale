@@ -2,8 +2,8 @@
 #include <QHeaderView>
 #include "tableitems/textitem.h"
 
-ProductCodeTable::ProductCodeTable(JAddRemoveButtons* btns, QWidget* parent)
-  : JTable(btns, parent)
+ProductCodeTable::ProductCodeTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+  : JTable(btns, bSelector, parent)
 {
   setColumnCount(1);
   QStringList headers;

@@ -21,7 +21,7 @@ public:
 
   explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
   void getPurchaseElements(QVector<PurchaseElement>& v) const;
-  void setPurchaseElements(const QVector<PurchaseElement>& v);
+  void setPurchaseElements(const QVector<PurchaseElement>& v, bool bRemoveAllItems = true);
 
 public slots:
   void addRow();

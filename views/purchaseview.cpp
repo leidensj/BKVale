@@ -520,31 +520,33 @@ QDate PurchaseView::getDate() const
 
 void PurchaseView::showHistory()
 {
-  Purchase o;
-  o.m_supplier.m_id = m_supplierPicker->getId();
-  if (o.m_supplier.m_id.isValid())
+  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME, true, this);
+  QString str(PRODUCT_FILTER_BUY
+              " AND "
+              PRODUCT_SQL_TABLE_NAME "." SQL_COLID
+              " IN (SELECT DISTINCT "
+              PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID
+              " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
+              " WHERE "
+              PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID
+              " IN (SELECT DISTINCT "
+              PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+              " FROM " PURCHASE_SQL_TABLE_NAME
+              " WHERE "
+              PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " = " +
+              m_supplierPicker->getId().str() + "))");
+  dlg.getDatabase()->setFixedFilter(str);
+  if (dlg.exec())
   {
-    o.SQL_select_all_supplier_id_items();
-    PurchaseTable* tb = new PurchaseTable(nullptr, true);
-    tb->setPurchaseElements(o.m_vElement);
-    QDialog dlg(this);
-    QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    QVBoxLayout *layout = new QVBoxLayout;
-    dlg.setLayout(layout);
-    layout->addWidget(tb);
-    layout->addWidget(btns);
-    dlg.adjustSize();
-    connect(btns, SIGNAL(accepted()), &dlg, SLOT(accept()));
-    connect(btns, SIGNAL(rejected()), &dlg, SLOT(reject()));
-    dlg.setWindowFlags(Qt::Window);
-    dlg.setWindowTitle(tr("Selecionar Produto"));
-    dlg.setWindowIcon(QIcon(JItemEx::icon(PRODUCT_SQL_TABLE_NAME)));
-    dlg.setModal(true);
-    if (dlg.exec())
+    QVector<Id> vId = dlg.getDatabase()->getSelectedIds();
+    QVector<PurchaseElement> v;
+    for (int i = 0; i != vId.size(); ++i)
     {
-      QVector<PurchaseElement> v;
-      tb->getPurchaseElements(v);
-      m_table->setPurchaseElements(v);
+      PurchaseElement e;
+      e.SQL_select_last(m_supplierPicker->getId(), vId.at(i));
+      e.m_ammount = 0;
+      v.push_back(e);
     }
+    m_table->setPurchaseElements(v, false);
   }
 }

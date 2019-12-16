@@ -31,7 +31,7 @@ void PaymentTable::addRow()
   int row = rowCount() - 1;
 
   auto itDate = new DateItem(m_dtPurchase, DateItem::Color::DateBeforeDefault);
-  auto itValue = new DoubleItem(Data::Type::Integer, DoubleItem::Color::Foreground);
+  auto itValue = new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground);
 
   blockSignals(true);
   setItem(row, (int)Column::Date, itDate);

@@ -25,6 +25,7 @@ public slots:
   virtual void removeItem();
   virtual void removeAllItems();
   virtual void addRow() = 0;
+  virtual void addRowAndActivate();
   void setEnabled(bool b);
 
 protected slots:

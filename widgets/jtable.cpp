@@ -9,10 +9,10 @@ JTable::JTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
 {
   if (btns != nullptr)
   {
-    QObject::connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRow()));
-    QObject::connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(emitChangedSignal()));
-    QObject::connect(btns->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
-    QObject::connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
+    connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addRowAndActivate()));
+    connect(btns->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(emitChangedSignal()));
+    connect(btns->m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItem()));
+    connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
   }
 
   if (m_bSelector)
@@ -38,6 +38,11 @@ JTable::JTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
 JTable::~JTable()
 {
 
+}
+
+void JTable::addRowAndActivate()
+{
+  addRow();
 }
 
 void JTable::setLargerSize(bool b)

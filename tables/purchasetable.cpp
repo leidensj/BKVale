@@ -113,9 +113,9 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
   }
 }
 
-void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool bRemoveAllItems)
+void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool bClear)
 {
-  if (bRemoveAllItems)
+  if (bClear)
     removeAllItems();
   for (int i = 0; i != v.size(); ++i)
   {

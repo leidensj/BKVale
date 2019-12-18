@@ -181,7 +181,7 @@ void JTable::evaluate(QTableWidgetItem* p)
 double JTable::sum(int column) const
 {
   double total = 0.0;
-  if (columnCount() < column)
+  if (column < columnCount())
   {
     for (int i = 0; i != rowCount(); ++i)
       total += getItem(i, column)->getValue().toDouble();

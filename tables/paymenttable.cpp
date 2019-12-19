@@ -72,5 +72,4 @@ void PaymentTable::fill(double total)
   addRow();
   getItem(rowCount() - 1, (int)Column::Date)->setValue(m_dtPurchase);
   getItem(rowCount() - 1, (int)Column::Value)->setValue(total);
-
 }

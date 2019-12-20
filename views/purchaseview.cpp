@@ -33,7 +33,6 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   , m_rdoCredit(nullptr)
   , m_tbPayment(nullptr)
   , m_btnAddRemove(nullptr)
-  , m_purchaseTotal(0.0)
 {
   m_rdoCredit = new QRadioButton;
   m_rdoCredit->setIcon(QIcon(":/icons/res/credit.png"));
@@ -98,35 +97,21 @@ QString PaymentWidget::getText() const
   return tr("Crédito");
 }
 
-bool PaymentWidget::isDatesValid() const
-{
-  bool bValid = true;
-  if (m_rdoCredit->isChecked())
-  {
-    QVector<PaymentElement> v;
-    m_tbPayment->getPaymentElements(v);
-    for (int i = 0; i != v.size() && bValid; ++i)
-      bValid = v.at(i).m_date >= m_tbPayment->getPurchaseDate();
-  }
-  return bValid;
-}
-
 void PaymentWidget::updateControls()
 {
   m_tbPayment->setEnabled(m_rdoCredit->isChecked());
   m_btnAddRemove->setEnabled(m_rdoCredit->isChecked());
-  double total = m_tbPayment->sum((int)PaymentTable::Column::Value);
-  bool bValid = isDatesValid() && Data::areEqual(m_purchaseTotal, total, Data::Type::Money);;
-  m_lblPurchaseTotal->setText(tr("Total da compra: ") + Data::strMoney(m_purchaseTotal));
-  m_lblPaymentTotal->setText(("Total do pagamento: ") + Data::strMoney(total));
+  m_lblPurchaseTotal->setText(tr("Total da compra: ") + Data::strMoney(m_tbPayment->getPurchaseTotal()));
+  m_lblPaymentTotal->setText(("Total do pagamento: ") + Data::strMoney(m_tbPayment->total()));
   m_lblPaymentTotal->setVisible(m_rdoCredit->isChecked());
   setWindowIcon(getIcon());
-  emit isValidSignal(bValid);
+  emit isValidSignal(m_tbPayment->isValid());
 }
 
 void PaymentWidget::fillCredit()
 {
-  m_tbPayment->fill(m_purchaseTotal);
+  m_rdoCredit->setChecked(true);
+  m_tbPayment->fill();
 }
 
 Purchase::PaymentMethod PaymentWidget::getPaymentMethod() const
@@ -151,9 +136,9 @@ void PaymentWidget::setPurchaseDate(const QDate& dt)
   updateControls();
 }
 
-void PaymentWidget::setPurchaseTotal(double value)
+void PaymentWidget::setPurchaseTotal(double total)
 {
-  m_purchaseTotal = value;
+  m_tbPayment->setPurchaseTotal(total);
   updateControls();
 }
 

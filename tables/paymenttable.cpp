@@ -5,6 +5,7 @@
 
 PaymentTable::PaymentTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
   : JTable(btns, bSelector, parent)
+  , m_purchaseTotal(0.0)
 {
   setColumnCount(2);
   QStringList headers;
@@ -25,6 +26,21 @@ QDate PaymentTable::getPurchaseDate() const
   return m_dtPurchase;
 }
 
+void PaymentTable::setPurchaseTotal(double total)
+{
+  m_purchaseTotal = total;
+}
+
+double PaymentTable::getPurchaseTotal() const
+{
+  return m_purchaseTotal;
+}
+
+double PaymentTable::total() const
+{
+  return sum((int)Column::Value);
+}
+
 void PaymentTable::addRow()
 {
   insertRow(rowCount());
@@ -37,6 +53,9 @@ void PaymentTable::addRow()
   setItem(row, (int)Column::Date, itDate);
   setItem(row, (int)Column::Value, itValue);
   blockSignals(false);
+
+  getItem(row, (int)Column::Date)->setValue(m_dtPurchase.addMonths(row));
+
 
   setCurrentItem(itDate);
   setFocus();
@@ -66,11 +85,18 @@ void PaymentTable::setPaymentElements(const QVector<PaymentElement>& v)
   }
 }
 
-void PaymentTable::fill(double total)
+void PaymentTable::fill()
 {
   removeAllItems();
   addRow();
   getItem(rowCount() - 1, (int)Column::Date)->setValue(m_dtPurchase);
-  getItem(rowCount() - 1, (int)Column::Value)->setValue(total);
+  getItem(rowCount() - 1, (int)Column::Value)->setValue(m_purchaseTotal);
+}
 
+bool PaymentTable::isValid() const
+{
+  bool bValid = Data::areEqual(m_purchaseTotal, total(), Data::Type::Money);
+  for (int i = 0; i != rowCount() && bValid; ++i)
+    bValid = getItem(i, (int)Column::Date)->getValue().toDate() >= m_dtPurchase;
+  return bValid;
 }

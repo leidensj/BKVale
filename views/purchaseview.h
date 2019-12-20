@@ -43,8 +43,6 @@ class PaymentWidget : public QWidget
   QLabel* m_lblPaymentTotal;
   JAddRemoveButtons* m_btnAddRemove;
 
-  double m_purchaseTotal;
-
 public:
   explicit PaymentWidget(QWidget* parent = nullptr);
   Purchase::PaymentMethod getPaymentMethod() const;
@@ -56,15 +54,12 @@ public:
 
 public slots:
   void setPurchaseDate(const QDate& dt);
-  void setPurchaseTotal(double value);
+  void setPurchaseTotal(double total);
 
 private slots:
   void fillCredit();
   void updateControls();
   void emitMethodChangedSignal();
-
-private:
-  bool isDatesValid() const;
 
 signals:
   void isValidSignal(bool b);

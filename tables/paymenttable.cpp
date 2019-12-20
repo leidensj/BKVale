@@ -90,6 +90,7 @@ void PaymentTable::fill()
   removeAllItems();
   addRow();
   getItem(rowCount() - 1, (int)Column::Date)->setValue(m_dtPurchase);
+<<<<<<< HEAD
   getItem(rowCount() - 1, (int)Column::Value)->setValue(m_purchaseTotal);
 }
 
@@ -99,4 +100,7 @@ bool PaymentTable::isValid() const
   for (int i = 0; i != rowCount() && bValid; ++i)
     bValid = getItem(i, (int)Column::Date)->getValue().toDate() >= m_dtPurchase;
   return bValid;
+=======
+  getItem(rowCount() - 1, (int)Column::Value)->setValue(total);
+>>>>>>> origin/master
 }

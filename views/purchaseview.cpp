@@ -404,13 +404,17 @@ void PurchaseView::setItem(const JItemSQL& o)
   m_table->removeAllItems();
   m_supplierPicker->clear();
   m_dtPicker->setDate(_o.m_date);
+
   m_snNumber->setValue(_o.m_number);
   m_table->setPurchaseElements(_o.m_vElement);
   m_supplierPicker->setItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);
+  m_edDisccount->setText(_o.m_disccount);
+
+  m_wPayment->setPurchaseDate(m_dtPicker->getDate());
+  m_wPayment->setPurchaseTotal(m_edTotal->getValue());
   m_wPayment->setPaymentMethod(_o.m_paymentMethod);
   m_wPayment->setPayments(_o.m_vPayment);
-  m_edDisccount->setText(_o.m_disccount);
   updateControls();
 }
 

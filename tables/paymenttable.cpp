@@ -55,7 +55,7 @@ void PaymentTable::addRow()
   blockSignals(false);
 
   getItem(row, (int)Column::Date)->setValue(m_dtPurchase.addMonths(row));
-
+  getItem(row, (int)Column::Value)->setValue(total() > m_purchaseTotal ? 0.0 : m_purchaseTotal - total());
 
   setCurrentItem(itDate);
   setFocus();
@@ -90,7 +90,6 @@ void PaymentTable::fill()
   removeAllItems();
   addRow();
   getItem(rowCount() - 1, (int)Column::Date)->setValue(m_dtPurchase);
-<<<<<<< HEAD
   getItem(rowCount() - 1, (int)Column::Value)->setValue(m_purchaseTotal);
 }
 
@@ -100,7 +99,4 @@ bool PaymentTable::isValid() const
   for (int i = 0; i != rowCount() && bValid; ++i)
     bValid = getItem(i, (int)Column::Date)->getValue().toDate() >= m_dtPurchase;
   return bValid;
-=======
-  getItem(rowCount() - 1, (int)Column::Value)->setValue(total);
->>>>>>> origin/master
 }

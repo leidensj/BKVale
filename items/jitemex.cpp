@@ -10,7 +10,6 @@
 #include "phone.h"
 #include "address.h"
 #include "shoppinglist.h"
-#include "discount.h"
 #include "store.h"
 #include "supplier.h"
 #include "employee.h"
@@ -19,7 +18,6 @@
 #include "models/activeusermodel.h"
 #include "models/addressmodel.h"
 #include "models/categorymodel.h"
-#include "models/discountmodel.h"
 #include "models/employeemodel.h"
 #include "models/imagemodel.h"
 #include "models/phonemodel.h"
@@ -55,8 +53,6 @@ JItemSQL* JItemEx::create(const QString& tableName)
     return new Reminder;
   if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     return new ShoppingList;
-  if (tableName == DISCOUNT_SQL_TABLE_NAME)
-    return new Discount;
   if (tableName == EMPLOYEE_SQL_TABLE_NAME)
     return new Employee;
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
@@ -114,8 +110,6 @@ QString JItemEx::text(const QString& tableName)
     return "Lembrete";
   if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     return "Lista de Compras";
-  if (tableName == DISCOUNT_SQL_TABLE_NAME)
-    return "Desconto";
   if (tableName == EMPLOYEE_SQL_TABLE_NAME)
     return "Funcionário";
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
@@ -151,8 +145,6 @@ QString JItemEx::icon(const QString& tableName)
     return ":/icons/res/postit.png";
   if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
     return ":/icons/res/shopmgt.png";
-  if (tableName == DISCOUNT_SQL_TABLE_NAME)
-    return ":/icons/res/discount.png";
   if (tableName == EMPLOYEE_SQL_TABLE_NAME)
     return ":/icons/res/employee.png";
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
@@ -196,7 +188,5 @@ JModel* JItemEx::model(const QString& tableName, QObject* parent)
     return new AddressModel(parent);
   if (tableName == PHONE_SQL_TABLE_NAME)
     return new PhoneModel(parent);
-  if (tableName == DISCOUNT_SQL_TABLE_NAME)
-    return new DiscountModel(parent);
   return nullptr;
 }

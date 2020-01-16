@@ -291,13 +291,13 @@ bool BaitaSQL::createTables(QString& error)
                         PURCHASE_SQL_COL_DSC " REAL,"
                         PURCHASE_SQL_COL_EMP " INTEGER,"
                         PURCHASE_SQL_COL_MTH " INTEGER,"
-                        PURCHASE_SQL_COL_STR " INTEGER,"
+                        PURCHASE_SQL_COL_STR " INTEGER NOT NULL,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_SPL ") REFERENCES "
                         SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_EMP ") REFERENCES "
                         EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_STR ") REFERENCES "
-                        STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                        STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PURCHASE_ELEMENTS_SQL_TABLE_NAME " ("
@@ -374,31 +374,6 @@ bool BaitaSQL::createTables(QString& error)
                           ACTIVE_USERS_SQL_COL04 " TIMESTAMP,"
                           "FOREIGN KEY(" ACTIVE_USERS_SQL_COL02 ") REFERENCES "
                           USER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE NO ACTION);");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " DISCOUNT_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          DISCOUNT_SQL_COL01 " TEXT UNIQUE NOT NULL CHECK ("
-                          DISCOUNT_SQL_COL01 " <> ''),"
-                          DISCOUNT_SQL_COL02 " BOOLEAN,"
-                          DISCOUNT_SQL_COL03 " DATE,"
-                          DISCOUNT_SQL_COL04 " INTEGER,"
-                          DISCOUNT_SQL_COL05 " REAL,"
-                          DISCOUNT_SQL_COL06 " REAL CHECK ("
-                          DISCOUNT_SQL_COL06 " BETWEEN 0 AND 100),"
-                          DISCOUNT_SQL_COL07 " BOOLEAN,"
-                          DISCOUNT_SQL_COL08 " TEXT)");
-
-  if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " DISCOUNT_ITEMS_SQL_TABLE_NAME " ("
-                          SQL_COLID " SERIAL PRIMARY KEY,"
-                          DISCOUNT_ITEMS_SQL_COL01 " INTEGER NOT NULL,"
-                          DISCOUNT_ITEMS_SQL_COL02 " INTEGER NOT NULL,"
-                          DISCOUNT_ITEMS_SQL_COL03 " REAL,"
-                          "FOREIGN KEY(" DISCOUNT_ITEMS_SQL_COL01 ") REFERENCES "
-                          DISCOUNT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
-                          "FOREIGN KEY(" DISCOUNT_ITEMS_SQL_COL02 ") REFERENCES "
-                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
   {

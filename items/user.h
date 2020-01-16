@@ -40,7 +40,6 @@ struct User : public JItemSQL
   bool m_bImage;
   bool m_bShoppingList;
   bool m_bStore;
-  bool m_bDiscount;
   bool m_bTimeCard;
   QString m_password;
 };

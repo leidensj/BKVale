@@ -140,7 +140,6 @@ void UserView::getItem(JItemSQL& o) const
   _o.m_bImage = m_list->item((int)Idx::Image)->checkState() == Qt::Checked ? true : false;
   _o.m_bShoppingList = m_list->item((int)Idx::ShoppingList)->checkState() == Qt::Checked ? true : false;
   _o.m_bStore = m_list->item((int)Idx::Store)->checkState() == Qt::Checked ? true : false;
-  _o.m_bDiscount = m_list->item((int)Idx::Discount)->checkState() == Qt::Checked ? true : false;
   _o.m_bTimeCard = m_list->item((int)Idx::TimeCard)->checkState() == Qt::Checked ? true : false;
 }
 
@@ -164,7 +163,6 @@ void UserView::setItem(const JItemSQL& o)
   m_list->item((int)Idx::Reminder)->setCheckState(_o.m_bReminder ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::ShoppingList)->setCheckState(_o.m_bShoppingList ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Shop)->setCheckState(_o.m_bShop ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Discount)->setCheckState(_o.m_bDiscount ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::Settings)->setCheckState(_o.m_bSettings ? Qt::Checked : Qt::Unchecked);
   m_list->item((int)Idx::TimeCard)->setCheckState(_o.m_bTimeCard ? Qt::Checked : Qt::Unchecked);
 }
@@ -225,8 +223,6 @@ QString UserView::idxToTableName(Idx idx)
       return REMINDER_SQL_TABLE_NAME;
     case Idx::ShoppingList:
       return SHOPPING_LIST_SQL_TABLE_NAME;
-    case Idx::Discount:
-      return DISCOUNT_SQL_TABLE_NAME;
     default:
       return "";
   }

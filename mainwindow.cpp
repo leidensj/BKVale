@@ -14,7 +14,6 @@
 #include "views/userview.h"
 #include "views/imageview.h"
 #include "logindialog.h"
-#include "discountview.h"
 #include "shopview.h"
 #include "widgets/jdatabase.h"
 #include "timecard.h"
@@ -54,14 +53,12 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
   , m_shop(nullptr)
-  , m_discount(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
   , m_purchaseWindow(nullptr)
   , m_reminderWindow(nullptr)
   , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
-  , m_discountWindow(nullptr)
 {
   ui->setupUi(this);
 
@@ -75,7 +72,6 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;
   m_shop = new ShopView;
-  m_discount = new DiscountView;
 
   m_purchaseWindow = new JMdiSubWindow(this);
   m_purchaseWindow->setWindowTitle(ui->actionPurchases->text());
@@ -97,11 +93,6 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_shopWindow->setWindowIcon(ui->actionShoppingList->icon());
   m_shopWindow->setWidget(m_shop);
   m_mdi->addSubWindow(m_shopWindow);
-  m_discountWindow = new JMdiSubWindow(this);
-  m_discountWindow->setWindowTitle(ui->actionDiscount->text());
-  m_discountWindow->setWindowIcon(ui->actionDiscount->icon());
-  m_discountWindow->setWidget(m_discount);
-  m_mdi->addSubWindow(m_discountWindow);
 
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
@@ -125,8 +116,6 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
-  connect(ui->actionDiscount, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
-  connect(m_discount, SIGNAL(redeemSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
 
   connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
@@ -188,17 +177,15 @@ bool Tipi::connectPrinter()
   else
   {
     m_printerSerial.setPortName(m_settings.m_serialPort);
-    m_printerSerial.setBaudRate(m_settings.m_serialBaudRate);
-    m_printerSerial.setDataBits(m_settings.m_serialDataBits);
-    m_printerSerial.setFlowControl(m_settings.m_serialFlowControl);
-    m_printerSerial.setParity(m_settings.m_serialParity);
-    m_printerSerial.setStopBits(m_settings.m_serialStopBits);
     bSuccess = m_printerSerial.open(QIODevice::ReadWrite);
     if (bSuccess)
+    {
+      m_printerSerial.clear();
       bSuccess = Printer::printString(&m_printerSerial,
                                       m_settings.m_bIsPrinterEthernet,
                                       Printer::strCmdInit(),
                                       error);
+    }
     else
       error = m_printerSerial.errorString();
 
@@ -237,8 +224,6 @@ Functionality Tipi::getCurrentFunctionality() const
     return Functionality::Calculator;
   else if (activeWindow == m_shopWindow)
     return Functionality::Shop;
-  else if (activeWindow == m_discountWindow)
-    return Functionality::Discount;
   return Functionality::None;
 }
 
@@ -252,22 +237,14 @@ void Tipi::print()
       m_purchase->getItem(o);
       if (o.m_date != QDate::currentDate() && !o.m_id.isValid())
       {
-        int ret = QMessageBox::question(
-                    this,
-                    tr("Data"),
-                    tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
-                    QMessageBox::Apply | QMessageBox::Ignore | QMessageBox::Cancel,
-                    QMessageBox::Apply);
-        switch (ret)
+        if (QMessageBox::question(
+              this,
+              tr("Data"),
+              tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
+              QMessageBox::Yes | QMessageBox::No,
+              QMessageBox::Yes) == QMessageBox::Yes)
         {
-          case QMessageBox::Apply:
-            m_purchase->setDate(QDate::currentDate());
-            break;
-          case QMessageBox::Ignore:
-            break;
-          case QMessageBox::Cancel:
-          default:
-            return;
+           m_purchase->setDate(QDate::currentDate());
         }
       }
       o.clear(true);
@@ -319,12 +296,6 @@ void Tipi::print()
       ShopPrintDialog dlg;
       if (dlg.exec())
         print(ShoppingListPrinter::build(m_shop->getShoppingList(), dlg.getCount()));
-    } break;
-    case Functionality::Discount:
-    {
-      Discount o = m_discount->save();
-      if (o.m_id.isValid())
-        print(DiscountPrinter::build(o));
     } break;
     case Functionality::None:
     default:
@@ -398,7 +369,6 @@ void Tipi::updateControls()
   ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bReminder);
   ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bCalculator);
   ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShop);
-  ui->actionDiscount->setEnabled(bIsSQLOk && m_login.getUser().m_bDiscount);
 
   switch (getCurrentFunctionality())
   {
@@ -419,10 +389,6 @@ void Tipi::updateControls()
       break;
     case Functionality::Shop:
       ui->actionPrint->setEnabled(m_shop->getShoppingList().m_id.isValid());
-      break;
-    case Functionality::Discount:
-      ui->actionPrint->setEnabled(m_discount->getDiscount().isValid() &&
-                                  !m_discount->getDiscount().m_bRedeemed);
       break;
     default:
       break;
@@ -522,7 +488,6 @@ void Tipi::activateWindow()
   m_reminderWindow->hide();
   m_calculatorWindow->hide();
   m_shopWindow->hide();
-  m_discountWindow->hide();
   if (sender() == ui->actionPurchases)
   {
     m_purchaseWindow->showMaximized();
@@ -542,11 +507,6 @@ void Tipi::activateWindow()
   {
     m_shopWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_shopWindow);
-  }
-  else if (sender() == ui->actionDiscount)
-  {
-    m_discountWindow->showMaximized();
-    m_mdi->setActiveSubWindow(m_discountWindow);
   }
   updateControls();
 }

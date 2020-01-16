@@ -26,13 +26,11 @@ SOURCES += main.cpp\
     logindialog.cpp \
     pincodeview.cpp \
     packageeditor.cpp \
-    discountview.cpp \
     timecard.cpp \
     formwidget.cpp \
     items/activeuser.cpp \
     items/address.cpp \
     items/category.cpp \
-    items/discount.cpp \
     items/employee.cpp \
     items/form.cpp \
     items/image.cpp \
@@ -62,7 +60,6 @@ SOURCES += main.cpp\
     tables/purchasetable.cpp \
     tables/shoppinglisttable.cpp \
     tables/addresstable.cpp \
-    tables/discounttable.cpp \
     tables/phonetable.cpp \
     tables/productcodetable.cpp \
     views/purchaseview.cpp \
@@ -94,7 +91,6 @@ SOURCES += main.cpp\
     models/activeusermodel.cpp \
     models/jmodel.cpp \
     models/productcodemodel.cpp \
-    models/discountmodel.cpp \
     items/paymentelement.cpp \
     widgets/jdatabasecombobox.cpp \
     common.cpp \
@@ -127,13 +123,11 @@ HEADERS  += mainwindow.h \
     shopview.h \
     packageeditor.h \
     escpos.h \
-    discountview.h \
     timecard.h \
     timeinterval.h \
     items/address.h \
     items/activeuser.h \
     items/category.h \
-    items/discount.h \
     items/employee.h \
     items/form.h \
     items/image.h \
@@ -165,7 +159,6 @@ HEADERS  += mainwindow.h \
     tables/shoppinglisttable.h \
     tables/purchasetable.h \
     tables/addresstable.h \
-    tables/discounttable.h \
     tables/phonetable.h \
     tables/productcodetable.h \
     views/purchaseview.h \
@@ -197,7 +190,6 @@ HEADERS  += mainwindow.h \
     models/activeusermodel.h \
     models/jmodel.h \
     models/productcodemodel.h \
-    models/discountmodel.h \
     items/paymentelement.h \
     widgets/jdatabasecombobox.h \
     common.h \

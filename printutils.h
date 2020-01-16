@@ -9,7 +9,6 @@
 #include "items/product.h"
 #include "items/form.h"
 #include "items/shoppinglist.h"
-#include "items/discount.h"
 
 namespace Printer
 {
@@ -42,12 +41,6 @@ namespace ReminderPrinter
 namespace ShoppingListPrinter
 {
   QString build(const ShoppingList& lst, bool bPrintCount);
-}
-
-namespace DiscountPrinter
-{
-  QString build(const Discount& o);
-  QString buildRedeem(const Discount& o);
 }
 
 #endif // PRINTUTILS_H

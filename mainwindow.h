@@ -45,8 +45,7 @@ enum class Functionality : int
   Purchase,
   Reminder,
   Calculator,
-  Shop,
-  Discount
+  Shop
 };
 
 class QLabel;
@@ -55,7 +54,6 @@ class ReminderView;
 class ConsumptionWidget;
 class CalculatorWidget;
 class ShopView;
-class DiscountView;
 class JMdiSubWindow;
 
 class Tipi : public QMainWindow
@@ -78,7 +76,6 @@ private:
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
   ShopView* m_shop;
-  DiscountView* m_discount;
   QSerialPort m_printerSerial;
   QTcpSocket m_printerTCP;
   Settings m_settings;
@@ -88,7 +85,6 @@ private:
   JMdiSubWindow* m_reminderWindow;
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
-  JMdiSubWindow* m_discountWindow;
   bool connectPrinter();
   void disconnectPrinter();
   Functionality getCurrentFunctionality() const;

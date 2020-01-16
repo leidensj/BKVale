@@ -26,7 +26,6 @@ void User::clear(bool bClearId)
   m_bImage = false;
   m_bShoppingList = false;
   m_bStore = false;
-  m_bDiscount = false;
   m_bTimeCard = false;
   m_password.clear();
 }
@@ -61,7 +60,6 @@ bool User::operator != (const JItem& other) const
       m_bImage != another.m_bImage ||
       m_bShoppingList != another.m_bShoppingList ||
       m_bStore != another.m_bStore ||
-      m_bDiscount != another.m_bDiscount ||
       m_bTimeCard != another.m_bTimeCard;
 }
 
@@ -100,8 +98,7 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 USER_SQL_COL15 ","
                 USER_SQL_COL16 ","
                 USER_SQL_COL17 ","
-                USER_SQL_COL18 ","
-                USER_SQL_COL19 ")"
+                USER_SQL_COL18 ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -120,8 +117,7 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v15),"
                 "(:_v16),"
                 "(:_v17),"
-                "(:_v18),"
-                "(:_v19))");
+                "(:_v18))");
   query.bindValue(":_v01", m_strUser);
   query.bindValue(":_v02", strEncryptedPassword());
   query.bindValue(":_v03", m_bPurchase);
@@ -138,8 +134,7 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v15", m_bEmployee);
   query.bindValue(":_v16", m_bSupplier);
   query.bindValue(":_v17", m_bStore);
-  query.bindValue(":_v18", m_bDiscount);
-  query.bindValue(":_v19", m_bTimeCard);
+  query.bindValue(":_v18", m_bTimeCard);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -169,8 +164,7 @@ bool User::SQL_update_proc(QSqlQuery& query) const
               USER_SQL_COL15" = (:_v15),"
               USER_SQL_COL16" = (:_v16),"
               USER_SQL_COL17" = (:_v17),"
-              USER_SQL_COL18" = (:_v18),"
-              USER_SQL_COL19" = (:_v19)"
+              USER_SQL_COL18" = (:_v18)"
               " WHERE " SQL_COLID " = (:_v00)";
 
   query.prepare(strQuery);
@@ -192,8 +186,7 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v15", m_bEmployee);
   query.bindValue(":_v16", m_bSupplier);
   query.bindValue(":_v17", m_bStore);
-  query.bindValue(":_v18", m_bDiscount);
-  query.bindValue(":_v19", m_bTimeCard);
+  query.bindValue(":_v18", m_bTimeCard);
 
   return query.exec();
 }
@@ -219,8 +212,7 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
                 USER_SQL_COL15 ","
                 USER_SQL_COL16 ","
                 USER_SQL_COL17 ","
-                USER_SQL_COL18 ","
-                USER_SQL_COL19
+                USER_SQL_COL18
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -246,8 +238,7 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       m_bEmployee = query.value(14).toBool();
       m_bSupplier = query.value(15).toBool();
       m_bStore = query.value(16).toBool();
-      m_bDiscount = query.value(17).toBool();
-      m_bTimeCard = query.value(18).toBool();
+      m_bTimeCard = query.value(17).toBool();
     }
     else
     {

@@ -45,7 +45,6 @@ private:
     Reminder,
     ShoppingList,
     Shop,
-    Discount,
     TimeCard,
     Settings
   };

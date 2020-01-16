@@ -76,6 +76,36 @@
    <addaction name="actionExit"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="toolFunctionality">
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="windowTitle">
+    <string>Funcionalidades</string>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionPurchases"/>
+   <addaction name="actionReminders"/>
+   <addaction name="actionCalculator"/>
+   <addaction name="actionShoppingList"/>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -136,12 +166,6 @@
     </property>
     <addaction name="actionTimeCard"/>
    </widget>
-   <widget class="QMenu" name="menuProt_tipos">
-    <property name="title">
-     <string>Protótipos</string>
-    </property>
-    <addaction name="actionDiscount"/>
-   </widget>
    <widget class="QMenu" name="menuRelat_rios">
     <property name="title">
      <string>Relatórios</string>
@@ -152,40 +176,9 @@
    <addaction name="menuCadastros"/>
    <addaction name="menuRelat_rios"/>
    <addaction name="menuFerramentas"/>
-   <addaction name="menuProt_tipos"/>
    <addaction name="menuImpressora"/>
    <addaction name="menuConfigura_es"/>
    <addaction name="menuAjuda"/>
-  </widget>
-  <widget class="QToolBar" name="toolFunctionality">
-   <property name="focusPolicy">
-    <enum>Qt::NoFocus</enum>
-   </property>
-   <property name="windowTitle">
-    <string>Funcionalidades</string>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>32</width>
-     <height>32</height>
-    </size>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonIconOnly</enum>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionPurchases"/>
-   <addaction name="actionReminders"/>
-   <addaction name="actionCalculator"/>
-   <addaction name="actionShoppingList"/>
   </widget>
   <action name="actionPrint">
    <property name="icon">
@@ -359,18 +352,6 @@
    </property>
    <property name="toolTip">
     <string>Ver e imprimir listas de compras</string>
-   </property>
-  </action>
-  <action name="actionDiscount">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/discount.png</normaloff>:/icons/res/discount.png</iconset>
-   </property>
-   <property name="text">
-    <string>Descontos</string>
-   </property>
-   <property name="toolTip">
-    <string>Descontos</string>
    </property>
   </action>
   <action name="actionTimeCard">

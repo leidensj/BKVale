@@ -66,7 +66,7 @@ void PaymentTable::getPaymentElements(QVector<PaymentElement>& v) const
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
-    int row = verticalHeader()->logicalIndex(row);
+    int row = verticalHeader()->logicalIndex(i);
     PaymentElement o;
     o.m_date = getItem(row, (int)Column::Date)->getValue().toDate();
     o.m_value = getItem(row, (int)Column::Value)->getValue().toDouble();

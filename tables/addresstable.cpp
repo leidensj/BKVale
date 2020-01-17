@@ -48,5 +48,4 @@ void AddressTable::addRow()
 
   setCurrentItem(it);
   setFocus();
-  it->activate();
 }

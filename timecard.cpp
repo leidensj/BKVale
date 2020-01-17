@@ -40,7 +40,7 @@ TimeCard::TimeCard(QWidget* parent)
   m_spnExtraPages->setMaximum(9999);
 
   m_cbOpenFile = new QCheckBox;
-  m_cbOpenFile->setText(tr("Abrir arquivo automaticamente ao finalizar."));
+  m_cbOpenFile->setText(tr("Abrir arquivo automaticamente ao finalizar"));
   m_cbOpenFile->setCheckState(Qt::Checked);
 
   connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveAndAccept()));

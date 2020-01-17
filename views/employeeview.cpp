@@ -56,9 +56,12 @@ EmployeeView::EmployeeView(QWidget* parent)
   root->addChild(m_triPurchaseRemove);
   root->setExpanded(true);
 
-  m_formInfo->addWidget(tr("Código PIN:"), m_edPincode);
-
+  QHBoxLayout* ltPincode = new QHBoxLayout;
+  ltPincode->setContentsMargins(0, 0, 0, 0);
+  ltPincode->addWidget(new QLabel(tr("Código PIN:")));
+  ltPincode->addWidget(m_edPincode);
   QVBoxLayout* ltPermissions = new QVBoxLayout;
+  ltPermissions->addLayout(ltPincode);
   ltPermissions->addWidget(m_trPermissions);
 
   QFrame* frPermissions = new QFrame;

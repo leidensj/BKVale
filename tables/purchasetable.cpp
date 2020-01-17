@@ -121,11 +121,11 @@ void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool 
   {
     addRow();
     int row = rowCount() - 1;
-    getItem(row, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
-    getItem(row, (int)Column::Price)->setValue(v.at(i).m_price);
-    getItem(row, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
     getItem(row, (int)Column::Product)->setValue(SQLItem::toVariant(SQLItemAbv(v.at(i).m_product.m_id.get(),
                                                                                v.at(i).m_product.name())));
+    getItem(row, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
+    getItem(row, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
+    getItem(row, (int)Column::Price)->setValue(v.at(i).m_price);
   }
 }
 

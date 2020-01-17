@@ -60,7 +60,11 @@ void StoreEmployeesTable::updateFilter()
   {
     filter += " AND " EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN (";
     for (int i = 0; i != rowCount(); ++i)
-      filter += getItem(i, (int)Column::Employee)->getValue().toString() + ",";
+    {
+      SQLItemAbv abv = SQLItem::toSQLItemAbv(getItem(i, (int)Column::Employee)->getValue());
+      Id id(abv.m_id);
+      filter += id.str() + ",";
+    }
     filter.chop(1);
     filter += ")";
   }

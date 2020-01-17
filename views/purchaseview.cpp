@@ -421,8 +421,8 @@ void PurchaseView::setItem(const JItemSQL& o)
 void PurchaseView::supplierChanged()
 {
   m_table->setSupplierId(m_supplierPicker->getId());
-  if (m_supplierPicker->getId().isValid() && !m_table->hasItems() && !m_id.isValid())
-    m_btnAddRemove->m_btnAdd->click();
+  /*if (m_supplierPicker->getId().isValid() && !m_table->hasItems() && !m_id.isValid())
+    m_btnAddRemove->m_btnAdd->click();*/
   updateControls();
 }
 

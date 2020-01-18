@@ -13,6 +13,7 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   , m_dtEnd(nullptr)
   , m_supplierPicker(nullptr)
   , m_productPicker(nullptr)
+  , m_storePicker(nullptr)
 {
   m_cbDate = new QGroupBox;
   m_cbDate->setFlat(true);
@@ -25,6 +26,7 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME, true);
   m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
   m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);
+  m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME, true);
 
   QFormLayout* ltfr = new QFormLayout;
   ltfr->setContentsMargins(0, 0, 0, 0);
@@ -32,6 +34,7 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   ltfr->addRow(tr("Data final:"), m_dtEnd);
   ltfr->addRow(JItemEx::text(SUPPLIER_SQL_TABLE_NAME) + ":", m_supplierPicker);
   ltfr->addRow(JItemEx::text(PRODUCT_SQL_TABLE_NAME) + ":", m_productPicker);
+  ltfr->addRow(JItemEx::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
 
   QVBoxLayout* ltv = new QVBoxLayout;
   ltv->setAlignment(Qt::AlignTop);
@@ -45,6 +48,7 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   connect(m_dtEnd, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitFilterChangedSignal()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_productPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
+  connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   clear();
 }
 
@@ -83,6 +87,20 @@ QString PurchaseFilter::getFilter() const
       strFilter += vProduct.at(i).str() + ",";
     strFilter.chop(1);
     strFilter += ")) ";
+  }
+
+  QVector<Id> vStore = m_storePicker->getIds();
+
+  if (!vStore.isEmpty())
+  {
+    if (!strFilter.isEmpty())
+      strFilter += " AND ";
+    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_STR
+                 " IN (";
+    for (int i = 0; i != vStore.size(); ++i)
+      strFilter += vStore.at(i).str() + ",";
+    strFilter.chop(1);
+    strFilter += ") ";
   }
 
   return strFilter;

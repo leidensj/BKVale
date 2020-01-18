@@ -27,6 +27,7 @@ private:
   JDateEdit* m_dtEnd;
   JDatabasePicker* m_supplierPicker;
   JDatabasePicker* m_productPicker;
+  JDatabasePicker* m_storePicker;
 };
 
 #endif // PURCHASEFILTER_H

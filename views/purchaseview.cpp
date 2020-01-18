@@ -229,7 +229,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_snNumber->setButtonSymbols(QSpinBox::ButtonSymbols::NoButtons);
   m_snNumber->setMaximum(99999999);
   m_snNumber->setMinimum(0);
-  m_snNumber->setSpecialValueText(tr("S/N"));
+  m_snNumber->setSpecialValueText(tr("-"));
   m_snNumber->setMinimumSize(90, 0);
   m_snNumber->setAlignment(Qt::AlignRight);
   m_snNumber->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);

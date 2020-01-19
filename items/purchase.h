@@ -5,6 +5,7 @@
 #include <QString>
 #include <QVector>
 #include <QDate>
+#include <QIcon>
 #include "supplier.h"
 #include "product.h"
 #include "defines.h"
@@ -22,6 +23,9 @@ struct Purchase : public JItemSQL
     Cash,
     Bonus
   };
+
+  static QIcon st_paymentIcon(PaymentMethod e);
+  static QString st_paymentText(PaymentMethod e);
 
   Purchase(Id id = Id());
   void clear(bool bClearId = true);

@@ -6,6 +6,7 @@
 class JDatabasePicker;
 class JDateEdit;
 class QGroupBox;
+class QCheckBox;
 
 class PurchaseFilter : public JFilter
 {
@@ -28,6 +29,9 @@ private:
   JDatabasePicker* m_supplierPicker;
   JDatabasePicker* m_productPicker;
   JDatabasePicker* m_storePicker;
+  QCheckBox* m_cbPaymentCredit;
+  QCheckBox* m_cbPaymentCash;
+  QCheckBox* m_cbPaymentBonus;
 };
 
 #endif // PURCHASEFILTER_H

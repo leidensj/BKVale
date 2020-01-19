@@ -3,8 +3,10 @@
 #include "widgets/jdatabase.h"
 #include "widgets/jdateedit.h"
 #include "items/jitemex.h"
-#include <QGroupBox>
+#include "items/purchase.h"
 #include <QFormLayout>
+#include <QGroupBox>
+#include <QCheckBox>
 
 PurchaseFilter::PurchaseFilter(QWidget* parent)
   : JFilter(parent)
@@ -14,6 +16,9 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   , m_supplierPicker(nullptr)
   , m_productPicker(nullptr)
   , m_storePicker(nullptr)
+  , m_cbPaymentCredit(nullptr)
+  , m_cbPaymentCash(nullptr)
+  , m_cbPaymentBonus(nullptr)
 {
   m_cbDate = new QGroupBox;
   m_cbDate->setFlat(true);
@@ -27,6 +32,12 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
   m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);
   m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME, true);
+  m_cbPaymentCredit = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Credit));
+  m_cbPaymentCash = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Cash));
+  m_cbPaymentBonus = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Bonus));
+  m_cbPaymentCredit->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Credit));
+  m_cbPaymentCash->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Cash));
+  m_cbPaymentBonus->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Bonus));
 
   QFormLayout* ltfr = new QFormLayout;
   ltfr->setContentsMargins(0, 0, 0, 0);
@@ -35,6 +46,9 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   ltfr->addRow(JItemEx::text(SUPPLIER_SQL_TABLE_NAME) + ":", m_supplierPicker);
   ltfr->addRow(JItemEx::text(PRODUCT_SQL_TABLE_NAME) + ":", m_productPicker);
   ltfr->addRow(JItemEx::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
+  ltfr->addRow(tr("Pagamento:"), m_cbPaymentCredit);
+  ltfr->addRow(tr(""), m_cbPaymentCash);
+  ltfr->addRow(tr(""), m_cbPaymentBonus);
 
   QVBoxLayout* ltv = new QVBoxLayout;
   ltv->setAlignment(Qt::AlignTop);
@@ -49,6 +63,9 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_productPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
+  connect(m_cbPaymentCredit, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_cbPaymentCash, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_cbPaymentBonus, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   clear();
 }
 
@@ -103,6 +120,34 @@ QString PurchaseFilter::getFilter() const
     strFilter += ") ";
   }
 
+  if (m_cbPaymentCredit->isChecked() ||
+      m_cbPaymentCash->isChecked() ||
+      m_cbPaymentBonus->isChecked())
+  {
+    if (!strFilter.isEmpty())
+      strFilter += " AND ";
+    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
+                 " IN (";
+    if (m_cbPaymentCredit->isChecked())
+      strFilter += QString::number((int)Purchase::PaymentMethod::Credit) + ",";
+    if (m_cbPaymentCash->isChecked())
+      strFilter += QString::number((int)Purchase::PaymentMethod::Cash) + ",";
+    if (m_cbPaymentBonus->isChecked())
+      strFilter += QString::number((int)Purchase::PaymentMethod::Bonus) + ",";
+    strFilter.chop(1);
+    strFilter += ") ";
+  }
+  else
+  {
+    if (!strFilter.isEmpty())
+      strFilter += " AND ";
+    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
+                 " NOT IN (";
+    strFilter += QString::number((int)Purchase::PaymentMethod::Credit) + "," +
+                 QString::number((int)Purchase::PaymentMethod::Cash) + "," +
+                 QString::number((int)Purchase::PaymentMethod::Bonus) + ") ";
+  }
+
   return strFilter;
 }
 
@@ -113,6 +158,10 @@ void PurchaseFilter::clear()
   m_dtEnd->setDate(QDate::currentDate());
   m_supplierPicker->clear();
   m_productPicker->clear();
+  m_storePicker->clear();
+  m_cbPaymentCredit->setChecked(true);
+  m_cbPaymentCash->setChecked(true);
+  m_cbPaymentBonus->setChecked(true);
   updateControls();
 }
 

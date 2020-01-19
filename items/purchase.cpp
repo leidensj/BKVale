@@ -1,5 +1,35 @@
 #include "purchase.h"
 
+QIcon Purchase::st_paymentIcon(PaymentMethod e)
+{
+  switch (e)
+  {
+    case PaymentMethod::Credit:
+      return QIcon(":/icons/res/credit.png");
+    case PaymentMethod::Cash:
+      return QIcon(":/icons/res/cash.png");
+    case PaymentMethod::Bonus:
+      return QIcon(":/icons/res/bonus.png");
+    default:
+      return QIcon();
+  }
+}
+
+QString Purchase::st_paymentText(PaymentMethod e)
+{
+  switch (e)
+  {
+    case PaymentMethod::Credit:
+      return QObject::tr("A prazo");
+    case PaymentMethod::Cash:
+      return QObject::tr("A vista");
+    case PaymentMethod::Bonus:
+      return QObject::tr("Bonus");
+    default:
+      return "";
+  }
+}
+
 Purchase::Purchase(Id id)
 {
   clear();

@@ -35,16 +35,16 @@ PaymentWidget::PaymentWidget(QWidget* parent)
   , m_btnAddRemove(nullptr)
 {
   m_rdoCredit = new QRadioButton;
-  m_rdoCredit->setIcon(QIcon(":/icons/res/credit.png"));
-  m_rdoCredit->setText(tr("A prazo"));
+  m_rdoCredit->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Credit));
+  m_rdoCredit->setText(Purchase::st_paymentText(Purchase::PaymentMethod::Credit));
 
   m_rdoCash = new QRadioButton;
-  m_rdoCash->setIcon(QIcon(":/icons/res/cash.png"));
-  m_rdoCash->setText(tr("A vista"));
+  m_rdoCash->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Cash));
+  m_rdoCash->setText(Purchase::st_paymentText(Purchase::PaymentMethod::Cash));
 
   m_rdoBonus = new QRadioButton;
-  m_rdoBonus->setIcon(QIcon(":/icons/res/bonus.png"));
-  m_rdoBonus->setText(tr("Bonificação"));
+  m_rdoBonus->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Bonus));
+  m_rdoBonus->setText(Purchase::st_paymentText(Purchase::PaymentMethod::Bonus));
 
   m_lblPurchaseTotal = new QLabel;
   m_lblPaymentTotal = new QLabel;

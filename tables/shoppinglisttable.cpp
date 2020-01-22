@@ -59,7 +59,7 @@ void ShoppingListTable::getListElements(QVector<ShoppingListItem>& v) const
     int row = verticalHeader()->logicalIndex(i);
     ShoppingListItem o;
     o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
-    o.m_product.m_id.set(getItem(row, (int)Column::Product)->getValue().toLongLong());
+    o.m_product.m_id = SQLItem::toSQLItemAbv(getItem(row, (int)Column::Product)->getValue()).m_id;
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
     o.m_supplier.m_id.set(getItem(row, (int)Column::Supplier)->getValue().toLongLong());

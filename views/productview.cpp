@@ -113,7 +113,7 @@ void ProductView::setItem(const JItemSQL &o)
   m_imagePicker->setItem(_o.m_image);
   m_tbCode->setCodes(_o.m_vCode);
   const bool bNewItem = _o.m_id.isValid();
-  m_edUnity->setReadOnly(!bNewItem);
+  m_edUnity->setReadOnly(bNewItem);
   m_actUnity->setVisible(bNewItem);
   m_actUnity->setEnabled(bNewItem);
 }

@@ -27,6 +27,7 @@ public slots:
 
 protected slots:
   void setItem(const JItemSQL& o);
+  void editUnity();
 
 private:
   JLineEdit* m_edName;
@@ -38,6 +39,7 @@ private:
   JDatabasePicker* m_imagePicker;
   ProductCodeTable* m_tbCode;
   JAddRemoveButtons* m_btns;
+  QAction* m_actUnity;
 };
 
 #endif // PRODUCTVIEW_H

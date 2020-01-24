@@ -14,11 +14,12 @@ class PackageEditor : public QDialog
   Q_OBJECT
 
 public:
-  explicit PackageEditor(QWidget* parent = 0);
+  explicit PackageEditor(bool bUnityEditor = false, QWidget* parent = 0);
   Package getPackage() const;
   void setPackage(const Package& package, const QString& productUnity);
 
 private:
+  const bool m_bUnityEditor;
   QGroupBox* m_grpIsPackage;
   JLineEdit* m_edUnity;
   JExpLineEdit* m_edAmmount;

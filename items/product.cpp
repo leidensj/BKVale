@@ -345,3 +345,23 @@ bool Product::SQL_select_by_code(const ProductCode& code, QString& error)
   }
   return SQL_finish(db, query, bSuccess, error);
 }
+
+bool Product::SQL_update_unity(const Package& pck, QString& error)
+{
+  error.clear();
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
+                PRODUCT_SQL_COL04 " = (:_v01)"
+                " WHERE " SQL_COLID " = (:_v00)");
+  query.bindValue(":_v00", m_id.get());
+  query.bindValue(":_v01", pck.m_unity);
+
+  bool bSuccess = query.exec();
+  return SQL_finish(db, query, bSuccess, error);
+}

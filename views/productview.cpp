@@ -4,7 +4,9 @@
 #include "widgets/jdoublespinbox.h"
 #include "widgets/jaddremovebuttons.h"
 #include "tables/productcodetable.h"
+#include "packageeditor.h"
 #include <QLayout>
+#include <QAction>
 #include <QCheckBox>
 #include <QFormLayout>
 #include <QSplitter>
@@ -20,6 +22,7 @@ ProductView::ProductView(QWidget* parent)
   , m_imagePicker(nullptr)
   , m_tbCode(nullptr)
   , m_btns(nullptr)
+  , m_actUnity(nullptr)
 {
   m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                            JLineEdit::st_defaultFlags1);
@@ -48,6 +51,9 @@ ProductView::ProductView(QWidget* parent)
 
   m_btns = new JAddRemoveButtons;
   m_tbCode = new ProductCodeTable(m_btns);
+
+  m_actUnity = m_edUnity->addAction(QIcon(":/icons/res/package.png"), QLineEdit::TrailingPosition);
+  connect(m_actUnity, SIGNAL(triggered(bool)), this, SLOT(editUnity()));
 
   QVBoxLayout* ltCode = new QVBoxLayout;
   ltCode->addWidget(m_btns);
@@ -106,4 +112,19 @@ void ProductView::setItem(const JItemSQL &o)
   m_categoryPicker->setItem(_o.m_category);
   m_imagePicker->setItem(_o.m_image);
   m_tbCode->setCodes(_o.m_vCode);
+  const bool bNewItem = _o.m_id.isValid();
+  m_edUnity->setReadOnly(!bNewItem);
+  m_actUnity->setVisible(bNewItem);
+  m_actUnity->setEnabled(bNewItem);
+}
+
+void ProductView::editUnity()
+{
+  PackageEditor dlg(true);
+  Package pck;
+  dlg.setPackage(pck, m_edUnity->text());
+  if (dlg.exec())
+  {
+
+  }
 }

@@ -8,15 +8,16 @@
 #include "widgets/jlineedit.h"
 #include "widgets/jdoublespinbox.h"
 
-PackageEditor::PackageEditor(QWidget* parent)
+PackageEditor::PackageEditor(bool bUnityEditor, QWidget* parent)
   : QDialog(parent)
+  , m_bUnityEditor(bUnityEditor)
   , m_grpIsPackage(nullptr)
   , m_edUnity(nullptr)
   , m_edAmmount(nullptr)
   , m_lblUnity(nullptr)
 {
   m_grpIsPackage = new QGroupBox;
-  m_grpIsPackage->setCheckable(true);
+  m_grpIsPackage->setCheckable(m_bUnityEditor ? false : true);
   m_grpIsPackage->setChecked(false);
   m_grpIsPackage->setTitle(tr("Utilizar outra unidade"));
 
@@ -45,7 +46,7 @@ PackageEditor::PackageEditor(QWidget* parent)
   mainLayout->addWidget(buttonBox);
   setLayout(mainLayout);
 
-  setWindowTitle(tr("Modificar Embalagem"));
+  setWindowTitle(m_bUnityEditor ? tr("Modificar Unidade") : tr("Modificar Embalagem"));
   setWindowIcon(QIcon(":/icons/res/package.png"));
   setWindowFlags(Qt::WindowCloseButtonHint);
   layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -57,7 +58,8 @@ PackageEditor::PackageEditor(QWidget* parent)
 void PackageEditor::setPackage(const Package& package,
                                const QString& productUnity)
 {
-  m_grpIsPackage->setChecked(package.m_bIsPackage);
+  if (!m_bUnityEditor)
+    m_grpIsPackage->setChecked(package.m_bIsPackage);
   m_edUnity->setText(package.m_unity);
   m_edAmmount->setText(package.m_ammount);
   m_lblUnity->setText(productUnity);
@@ -66,7 +68,7 @@ void PackageEditor::setPackage(const Package& package,
 Package PackageEditor::getPackage() const
 {
   Package package;
-  package.m_bIsPackage = m_grpIsPackage->isChecked();
+  package.m_bIsPackage = m_bUnityEditor ? true : m_grpIsPackage->isChecked();
   package.m_unity = m_edUnity->text();
   package.m_ammount = m_edAmmount->getValue();
   return package;

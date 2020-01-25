@@ -9,7 +9,7 @@
 #include <QAction>
 #include <QCheckBox>
 #include <QFormLayout>
-#include <QSplitter>
+#include <QMessageBox>
 
 ProductView::ProductView(QWidget* parent)
   : JItemView(PRODUCT_SQL_TABLE_NAME, parent)
@@ -125,6 +125,21 @@ void ProductView::editUnity()
   dlg.setPackage(pck, m_edUnity->text());
   if (dlg.exec())
   {
+    pck = dlg.getPackage();
+    if (QMessageBox::question(this,
+                              tr("Modificar Unidade"),
+                              tr("Tem certeza de que deseja modificar a unidade deste produto e atualizar todas suas referências?\n"
+                                 "Unidade atual: %1\n"
+                                 "Nova unidade: %2\n"
+                                 "1%3=%4%5").arg(
+                                m_edUnity->text(),
+                                pck.m_unity,
+                                pck.m_unity,
+                                Data::strAmmount(pck.m_ammount),
+                                m_edUnity->text()),
+                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
 
+    }
   }
 }

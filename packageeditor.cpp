@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QIcon>
 #include <QDialogButtonBox>
+#include <QPushButton>
 #include "widgets/jlineedit.h"
 #include "widgets/jdoublespinbox.h"
 
@@ -15,6 +16,7 @@ PackageEditor::PackageEditor(bool bUnityEditor, QWidget* parent)
   , m_edUnity(nullptr)
   , m_edAmmount(nullptr)
   , m_lblUnity(nullptr)
+  , m_btns(nullptr)
 {
   m_grpIsPackage = new QGroupBox;
   m_grpIsPackage->setCheckable(m_bUnityEditor ? false : true);
@@ -39,11 +41,11 @@ PackageEditor::PackageEditor(bool bUnityEditor, QWidget* parent)
 
   m_grpIsPackage->setLayout(flayout);
 
-  QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  m_btns = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_grpIsPackage);
-  mainLayout->addWidget(buttonBox);
+  mainLayout->addWidget(m_btns);
   setLayout(mainLayout);
 
   setWindowTitle(m_bUnityEditor ? tr("Modificar Unidade") : tr("Modificar Embalagem"));
@@ -51,8 +53,12 @@ PackageEditor::PackageEditor(bool bUnityEditor, QWidget* parent)
   setWindowFlags(Qt::WindowCloseButtonHint);
   layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-  QObject::connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-  QObject::connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_btns, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(m_btns, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_edAmmount, SIGNAL(valueChanged(double)), this, SLOT(updateControls()));
+  connect(m_edUnity, SIGNAL(textChanged(const QString&)), this, SLOT(updateControls()));
+  connect(m_grpIsPackage, SIGNAL(clicked(bool)), this, SLOT(packageSelected()));
+  updateControls();
 }
 
 void PackageEditor::setPackage(const Package& package,
@@ -63,6 +69,7 @@ void PackageEditor::setPackage(const Package& package,
   m_edUnity->setText(package.m_unity);
   m_edAmmount->setText(package.m_ammount);
   m_lblUnity->setText(productUnity);
+
 }
 
 Package PackageEditor::getPackage() const
@@ -72,4 +79,24 @@ Package PackageEditor::getPackage() const
   package.m_unity = m_edUnity->text();
   package.m_ammount = m_edAmmount->getValue();
   return package;
+}
+
+void PackageEditor::packageSelected()
+{
+  if (m_grpIsPackage->isChecked())
+  {
+    updateControls();
+    m_edUnity->selectAll();
+    m_edUnity->setFocus();
+  }
+}
+
+void PackageEditor::updateControls()
+{
+  QPushButton* pt = m_btns->button(QDialogButtonBox::Ok);
+  if (pt != nullptr)
+  {
+    pt->setEnabled((!m_grpIsPackage->isChecked() && !m_bUnityEditor) ||
+                   (m_edAmmount->getValue() != 0.0 && !m_edUnity->text().isEmpty()));
+  }
 }

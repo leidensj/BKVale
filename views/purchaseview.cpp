@@ -505,8 +505,6 @@ QDate PurchaseView::getDate() const
   return m_dtPicker->getDate();
 }
 
-#include <QDebug>
-
 void PurchaseView::showHistory()
 {
   JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME, true, this);

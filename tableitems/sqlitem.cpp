@@ -1,23 +1,51 @@
 #include "sqlitem.h"
 #include "widgets/jdatabase.h"
 
-QVariant SQLItem::toVariant(const SQLItemAbv& o)
+SQLItemId::SQLItemId()
+ : m_id(INVALID_ID)
+{
+
+}
+
+SQLItemId::SQLItemId(Id id, const QString& name)
+ : m_id(id)
+ , m_name(name)
+{
+
+}
+
+SQLItemId::SQLItemId(const QVariant& v)
+{
+  fromVariant(v);
+}
+
+QVariant SQLItemId::toVariant() const
+{
+  return st_toVariant(*this);
+}
+
+void SQLItemId::fromVariant(const QVariant& v)
+{
+  *this = st_fromVariant(v);
+}
+
+QVariant SQLItemId::st_toVariant(const SQLItemId& o)
 {
   QList<QVariant> lst;
-  lst.push_back(o.m_id);
+  lst.push_back(o.m_id.get());
   lst.push_back(o.m_name);
   return QVariant(lst);
 }
 
-SQLItemAbv SQLItem::toSQLItemAbv(const QVariant& v)
+SQLItemId SQLItemId::st_fromVariant(const QVariant& v)
 {
-  SQLItemAbv o;
+  SQLItemId o;
   for (int i = 0; i != v.toList().size(); ++i)
   {
     switch (i)
     {
       case 0:
-        o.m_id = v.toList().at(i).toLongLong();
+        o.m_id.set(v.toList().at(i).toLongLong());
         break;
       case 1:
         o.m_name = v.toList().at(i).toString();
@@ -45,7 +73,8 @@ void SQLItem::activate()
   {
     JItemSQL* p = dlg.getDatabase()->getCurrentItem();
     if (p != nullptr)
-      setValue(toVariant(SQLItemAbv(p->m_id.get(), p->name())));
+      setValue(SQLItemId(p->m_id, p->name()).toVariant());
+
   }
 }
 
@@ -56,13 +85,13 @@ void SQLItem::evaluate()
 
 void SQLItem::erase()
 {
-  setValue(toVariant(SQLItemAbv()));
+  setValue(SQLItemId().toVariant());
 }
 
 void SQLItem::setValue(const QVariant& v)
 {
   setData(Qt::UserRole, v);
-  setText(toSQLItemAbv(v).m_name);
+  setText(SQLItemId(v).m_name);
 }
 
 void SQLItem::setTableName(const QString& tableName)

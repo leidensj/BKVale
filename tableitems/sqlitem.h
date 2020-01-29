@@ -4,19 +4,20 @@
 #include "jtableitem.h"
 #include "items/jitemsql.h"
 
-struct SQLItemId
+struct Duo
 {
   Id m_id;
   QString m_name;
 
-  SQLItemId();
-  SQLItemId(Id id, const QString& name);
-  SQLItemId(const QVariant& v);
+  Duo();
+  Duo(Id id, const QString& name);
+  Duo(const QVariant& v);
+  Duo(const JItemSQL& o);
   QVariant toVariant() const;
   void fromVariant(const QVariant& v);
 
-  static QVariant st_toVariant(const SQLItemId& o);
-  static SQLItemId st_fromVariant(const QVariant& v);
+  static QVariant st_toVariant(const Duo& o);
+  static Duo st_fromVariant(const QVariant& v);
 };
 
 class SQLItem : public JTableItem

@@ -346,16 +346,6 @@ bool Product::SQL_select_by_code(const ProductCode& code, QString& error)
   return SQL_finish(db, query, bSuccess, error);
 }
 
-
-#define PURCHASE_ELEMENTS_SQL_TABLE_NAME "_NOTE_ITEMS"
-#define PURCHASE_ELEMENTS_SQL_COL_NID "_NOTEID"
-#define PURCHASE_ELEMENTS_SQL_COL_PID "_PRODUCTID"
-#define PURCHASE_ELEMENTS_SQL_COL_AMT "_AMMOUNT"
-#define PURCHASE_ELEMENTS_SQL_COL_PRC "_PRICE"
-#define PURCHASE_ELEMENTS_SQL_COL_PCK "_IS_PACK"
-#define PURCHASE_ELEMENTS_SQL_COL_UNT "_PACK_UNITY"
-#define PURCHASE_ELEMENTS_SQL_COL_PAM "_PACK_AMMOUNT"
-
 bool Product::SQL_update_unity(const Package& pck, QString& error)
 {
   error.clear();
@@ -385,6 +375,24 @@ bool Product::SQL_update_unity(const Package& pck, QString& error)
                   PURCHASE_ELEMENTS_SQL_COL_PAM " = CASE WHEN "
                   PURCHASE_ELEMENTS_SQL_COL_PCK " = TRUE THEN "
                   PURCHASE_ELEMENTS_SQL_COL_PAM "/(:_v01) END"
+                  " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
+    query.bindValue(":_v00", m_id.get());
+    query.bindValue(":_v01", pck.m_ammount);
+    bSuccess = query.exec();
+  }
+
+  if (bSuccess && pck.m_ammount != 1.0 && pck.m_ammount != 0.0)
+  {
+    query.prepare("UPDATE " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " SET "
+                  SHOPPING_LIST_ITEMS_SQL_AMT " = CASE WHEN "
+                  SHOPPING_LIST_ITEMS_SQL_PCK " = FALSE THEN "
+                  SHOPPING_LIST_ITEMS_SQL_AMT "/(:_v01) END,"
+                  SHOPPING_LIST_ITEMS_SQL_PRC " = CASE WHEN "
+                  SHOPPING_LIST_ITEMS_SQL_PCK " = FALSE THEN "
+                  SHOPPING_LIST_ITEMS_SQL_PRC "*(:_v01) END,"
+                  SHOPPING_LIST_ITEMS_SQL_PAM " = CASE WHEN "
+                  SHOPPING_LIST_ITEMS_SQL_PCK " = TRUE THEN "
+                  SHOPPING_LIST_ITEMS_SQL_PAM "/(:_v01) END"
                   " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", pck.m_ammount);

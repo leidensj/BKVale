@@ -89,6 +89,10 @@ void PackageEditor::packageSelected()
     m_edUnity->selectAll();
     m_edUnity->setFocus();
   }
+  else
+  {
+    updateControls();
+  }
 }
 
 void PackageEditor::updateControls()

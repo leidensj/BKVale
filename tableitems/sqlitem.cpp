@@ -1,35 +1,41 @@
 #include "sqlitem.h"
 #include "widgets/jdatabase.h"
 
-SQLItemId::SQLItemId()
+Duo::Duo()
  : m_id(INVALID_ID)
 {
 
 }
 
-SQLItemId::SQLItemId(Id id, const QString& name)
+Duo::Duo(Id id, const QString& name)
  : m_id(id)
  , m_name(name)
 {
 
 }
 
-SQLItemId::SQLItemId(const QVariant& v)
+Duo::Duo(const QVariant& v)
 {
   fromVariant(v);
 }
 
-QVariant SQLItemId::toVariant() const
+Duo::Duo(const JItemSQL& o)
+{
+  m_id = o.m_id;
+  m_name = o.name();
+}
+
+QVariant Duo::toVariant() const
 {
   return st_toVariant(*this);
 }
 
-void SQLItemId::fromVariant(const QVariant& v)
+void Duo::fromVariant(const QVariant& v)
 {
   *this = st_fromVariant(v);
 }
 
-QVariant SQLItemId::st_toVariant(const SQLItemId& o)
+QVariant Duo::st_toVariant(const Duo& o)
 {
   QList<QVariant> lst;
   lst.push_back(o.m_id.get());
@@ -37,9 +43,9 @@ QVariant SQLItemId::st_toVariant(const SQLItemId& o)
   return QVariant(lst);
 }
 
-SQLItemId SQLItemId::st_fromVariant(const QVariant& v)
+Duo Duo::st_fromVariant(const QVariant& v)
 {
-  SQLItemId o;
+  Duo o;
   for (int i = 0; i != v.toList().size(); ++i)
   {
     switch (i)
@@ -73,7 +79,7 @@ void SQLItem::activate()
   {
     JItemSQL* p = dlg.getDatabase()->getCurrentItem();
     if (p != nullptr)
-      setValue(SQLItemId(p->m_id, p->name()).toVariant());
+      setValue(Duo(p->m_id, p->name()).toVariant());
 
   }
 }
@@ -85,13 +91,13 @@ void SQLItem::evaluate()
 
 void SQLItem::erase()
 {
-  setValue(SQLItemId().toVariant());
+  setValue(Duo().toVariant());
 }
 
 void SQLItem::setValue(const QVariant& v)
 {
   setData(Qt::UserRole, v);
-  setText(SQLItemId(v).m_name);
+  setText(Duo(v).m_name);
 }
 
 void SQLItem::setTableName(const QString& tableName)

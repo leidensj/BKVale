@@ -30,6 +30,16 @@
 #include "models/suppliermodel.h"
 #include "models/usermodel.h"
 
+#include "views/categoryview.h"
+#include "views/employeeview.h"
+#include "views/imageview.h"
+#include "views/productview.h"
+#include "views/purchaseview.h"
+#include "views/reminderview.h"
+#include "views/shoppinglistview.h"
+#include "views/storeview.h"
+#include "views/supplierview.h"
+#include "views/userview.h"
 
 JItemSQL* JItemEx::create(const QString& tableName)
 {
@@ -188,5 +198,28 @@ JModel* JItemEx::model(const QString& tableName, QObject* parent)
     return new AddressModel(parent);
   if (tableName == PHONE_SQL_TABLE_NAME)
     return new PhoneModel(parent);
+  return nullptr;
+}
+
+JItemView* JItemEx::view(const QString& tableName)
+{
+  if (tableName == CATEGORY_SQL_TABLE_NAME)
+    return new CategoryView;
+  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return new EmployeeView;
+  if (tableName == IMAGE_SQL_TABLE_NAME)
+    return new ImageView;
+  if (tableName == PRODUCT_SQL_TABLE_NAME)
+    return new ProductView;
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
+    return new PurchaseView;
+  if (tableName == REMINDER_SQL_TABLE_NAME)
+    return new ReminderView;
+  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    return new ShoppingListView;
+  if (tableName == STORE_SQL_TABLE_NAME)
+    return new StoreView;
+  if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return new SupplierView;
   return nullptr;
 }

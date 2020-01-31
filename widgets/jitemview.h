@@ -32,6 +32,7 @@ protected slots:
   virtual void itemsRemoved(const QVector<Id>& ids);
   virtual void save();
   void setFocusWidgetOnCreate(QWidget* w);
+  QPushButton* addViewButton(const QString& tableName);
 
 signals:
   void saveSignal();

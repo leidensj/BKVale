@@ -6,6 +6,7 @@
 #include "widgets/jspinbox.h"
 #include "widgets/jaddremovebuttons.h"
 #include "tables/shoppinglisttable.h"
+#include "items/jitemex.h"
 #include "packageeditor.h"
 #include <QSplitter>
 #include <QPlainTextEdit>
@@ -60,6 +61,14 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
   m_edTitle = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
+
+  QFrame *line = new QFrame;
+  line->setFrameShape(QFrame::VLine);
+  line->setFrameShadow(QFrame::Sunken);
+
+  m_ltButton->addWidget(line);
+  addViewButton(PRODUCT_SQL_TABLE_NAME);
+  addViewButton(SUPPLIER_SQL_TABLE_NAME);
 
   m_snLines = new JSpinBox;
   m_snLines->setMinimum(0);

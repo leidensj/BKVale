@@ -4,6 +4,7 @@
 #include "jitemsql.h"
 
 class QObject;
+class JItemView;
 
 namespace JItemEx
 {
@@ -14,5 +15,6 @@ bool authenticationToRemove(const QString& tableName);
 QString text(const QString& tableName);
 QString icon(const QString& tableName);
 JModel* model(const QString& tableName, QObject* parent);
+JItemView* view(const QString& tableName);
 }
 #endif // JItemEx_H

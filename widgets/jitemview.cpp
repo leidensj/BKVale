@@ -156,3 +156,15 @@ void JItemView::create()
     delete p;
   }
 }
+
+QPushButton* JItemView::addViewButton(const QString& tableName)
+{
+  QPushButton* btn = new QPushButton;
+  btn->setFlat(true);
+  btn->setText("");
+  btn->setIconSize(QSize(24, 24));
+  btn->setIcon(QIcon(JItemEx::icon(tableName)));
+  btn->setToolTip(tr("Gerenciar ") + JItemEx::text(tableName));
+  m_ltButton->addWidget(btn);
+  return btn;
+}

@@ -7,6 +7,8 @@
 #include <QTabWidget>
 #include <QSplitter>
 
+#define VIEW_BUTTON "VIEW_BUTTON"
+
 JItemView::JItemView(const QString& tableName, QWidget* parent)
   : QFrame(parent)
   , m_database(nullptr)
@@ -160,11 +162,39 @@ void JItemView::create()
 QPushButton* JItemView::addViewButton(const QString& tableName)
 {
   QPushButton* btn = new QPushButton;
+  btn->setProperty(VIEW_BUTTON, tableName);
   btn->setFlat(true);
   btn->setText("");
   btn->setIconSize(QSize(24, 24));
   btn->setIcon(QIcon(JItemEx::icon(tableName)));
   btn->setToolTip(tr("Gerenciar ") + JItemEx::text(tableName));
   m_ltButton->addWidget(btn);
+  connect(btn, SIGNAL(clicked(bool)), this, SLOT(viewButtonClicked()));
   return btn;
+}
+
+void JItemView::addSeparator()
+{
+  QFrame *line = new QFrame;
+  line->setFrameShape(QFrame::VLine);
+  line->setFrameShadow(QFrame::Sunken);
+  m_ltButton->addWidget(line);
+}
+
+void JItemView::viewButtonClicked()
+{
+  QString tableName = sender()->property(VIEW_BUTTON).toString();
+  QDialog dlg(this);
+  JItemView* view = JItemEx::view(tableName);
+  if (view != nullptr)
+  {
+    QHBoxLayout *lt = new QHBoxLayout;
+    dlg.setLayout(lt);
+    lt->addWidget(view);
+    dlg.setWindowFlags(Qt::Window);
+    dlg.setWindowTitle(tr("Gerenciar ") + JItemEx::text(tableName));
+    dlg.setWindowIcon(QIcon(JItemEx::icon(tableName)));
+    dlg.setModal(true);
+    dlg.exec();
+  }
 }

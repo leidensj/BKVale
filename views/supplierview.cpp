@@ -2,6 +2,7 @@
 #include "formwidget.h"
 #include <QFormLayout>
 #include <QRadioButton>
+#include "widgets/jlineedit.h"
 
 SupplierView::SupplierView(QWidget* parent)
   : JItemView(SUPPLIER_SQL_TABLE_NAME, parent)
@@ -10,6 +11,9 @@ SupplierView::SupplierView(QWidget* parent)
   , m_formPhone(nullptr)
   , m_formAddress(nullptr)
 {
+  addSeparator();
+  addViewButton(IMAGE_SQL_TABLE_NAME);
+
   m_formInfo = new FormInfoWidget;
   m_formDetails = new FormDetailsWidget;
   m_formPhone = new FormPhoneWidget;
@@ -24,7 +28,7 @@ SupplierView::SupplierView(QWidget* parent)
   m_formInfo->setCompany(true);
 
   // TODO WHY JLINEEDIT* TO QWIDGET NOT WORKING
-  setFocusWidgetOnCreate((QWidget*)m_formInfo->m_edName);
+  setFocusWidgetOnCreate(m_formInfo->m_edName);
   create();
 }
 

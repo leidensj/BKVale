@@ -29,6 +29,9 @@ EmployeeView::EmployeeView(QWidget* parent)
   , m_tbHours(nullptr)
   , m_btnAddRemove(nullptr)
 {
+  addSeparator();
+  addViewButton(IMAGE_SQL_TABLE_NAME);
+
   m_formInfo = new FormInfoWidget;
   m_formDetails = new FormDetailsWidget;
   m_formPhone = new FormPhoneWidget;

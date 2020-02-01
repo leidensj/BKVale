@@ -33,6 +33,8 @@ protected slots:
   virtual void save();
   void setFocusWidgetOnCreate(QWidget* w);
   QPushButton* addViewButton(const QString& tableName);
+  void addSeparator();
+  void viewButtonClicked();
 
 signals:
   void saveSignal();

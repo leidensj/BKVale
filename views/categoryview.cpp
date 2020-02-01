@@ -10,6 +10,9 @@ CategoryView::CategoryView(QWidget* parent)
   , m_edName(nullptr)
   , m_imagePicker(nullptr)
 {
+  addSeparator();
+  addViewButton(IMAGE_SQL_TABLE_NAME);
+
   m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);

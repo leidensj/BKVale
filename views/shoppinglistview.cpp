@@ -62,13 +62,10 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_edTitle = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
 
-  QFrame *line = new QFrame;
-  line->setFrameShape(QFrame::VLine);
-  line->setFrameShadow(QFrame::Sunken);
-
-  m_ltButton->addWidget(line);
+  addSeparator();
   addViewButton(PRODUCT_SQL_TABLE_NAME);
   addViewButton(SUPPLIER_SQL_TABLE_NAME);
+  addViewButton(IMAGE_SQL_TABLE_NAME);
 
   m_snLines = new JSpinBox;
   m_snLines->setMinimum(0);

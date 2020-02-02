@@ -20,7 +20,6 @@ StoreView::StoreView(QWidget* parent)
   , m_tbEmployee(nullptr)
   , m_btnAddRemove(nullptr)
 {
-  addSeparator();
   addViewButton(EMPLOYEE_SQL_TABLE_NAME);
   addViewButton(IMAGE_SQL_TABLE_NAME);
 

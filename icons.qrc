@@ -171,5 +171,6 @@
         <file>res/purchase.png</file>
         <file>res/apportionment.png</file>
         <file>res/history.png</file>
+        <file>res/more.png</file>
     </qresource>
 </RCC>

@@ -19,6 +19,7 @@ class JItemView : public QFrame
 
 public:
   explicit JItemView(const QString& tableName, QWidget* parent = nullptr);
+  ~JItemView();
   Id getId() const;
 
 public slots:
@@ -32,8 +33,7 @@ protected slots:
   virtual void itemsRemoved(const QVector<Id>& ids);
   virtual void save();
   void setFocusWidgetOnCreate(QWidget* w);
-  QPushButton* addViewButton(const QString& tableName);
-  void addSeparator();
+  void addViewButton(const QString& tableName);
   void viewButtonClicked();
 
 signals:
@@ -49,6 +49,7 @@ protected:
   QPushButton* m_btnCreate;
   QPushButton* m_btnSave;
   QPushButton* m_btnSearch;
+  QPushButton* m_btnMore;
 
 private:
   QDialog* m_dlgDb;

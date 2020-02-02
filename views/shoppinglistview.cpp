@@ -62,7 +62,6 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_edTitle = new JLineEdit(Text::Input::AlphanumericAndSpaces,
                             JLineEdit::st_defaultFlags1);
 
-  addSeparator();
   addViewButton(PRODUCT_SQL_TABLE_NAME);
   addViewButton(SUPPLIER_SQL_TABLE_NAME);
   addViewButton(IMAGE_SQL_TABLE_NAME);

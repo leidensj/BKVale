@@ -11,7 +11,6 @@ SupplierView::SupplierView(QWidget* parent)
   , m_formPhone(nullptr)
   , m_formAddress(nullptr)
 {
-  addSeparator();
   addViewButton(IMAGE_SQL_TABLE_NAME);
 
   m_formInfo = new FormInfoWidget;

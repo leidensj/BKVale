@@ -240,7 +240,7 @@ QString Address::name() const
   if (!str.isEmpty())
     str += " ";
   if (m_number != 0)
-    str += "Nº " + QString::number(m_number);
+    str += "Nro " + QString::number(m_number);
   if (!str.isEmpty())
     str += " ";
   if (!m_city.isEmpty())

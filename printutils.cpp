@@ -44,29 +44,38 @@ namespace
 
   void purchaseAppendHeader(const Purchase& o, QString& text)
   {
-    text += ESC_EXPAND_ON
-               ESC_ALIGN_CENTER
-               "BAITAKAO"
-               ESC_LF
-               "RUA SINIMBU 175 LOURDES"
-               ESC_LF
-               "32221034 32281666"
-               ESC_LF
-               "WWW.BAITAKAO.COM.BR"
-               ESC_LF
-               ESC_VERT_TAB
-               ESC_EXPAND_OFF;
+    if (!o.m_store.m_form.m_alias.isEmpty())
+    {
+      text += ESC_EXPAND_ON
+              ESC_ALIGN_CENTER +
+              o.m_store.m_form.m_alias +
+              ESC_LF
+              ESC_EXPAND_OFF;
+    }
+    text += ESC_ALIGN_CENTER +
+            o.m_store.m_form.m_name +
+            ESC_LF;
+    if (!o.m_store.m_form.m_vAddress.isEmpty())
+    {
+      text += o.m_store.m_form.m_vAddress.at(0).name() +
+              ESC_LF;
+    }
+    if (!o.m_store.m_form.m_vPhone.isEmpty())
+    {
+      text += o.m_store.m_form.m_vPhone.at(0).name() +
+              ESC_LF;
+    }
 
+    text += ESC_VERT_TAB;
     text += o.m_paymentMethod == Purchase::PaymentMethod::Cash
             ? "PAGAMENTO A VISTA"
             : "ORDEM DE RECEBIMENTO" ESC_LF "DE MERCADORIA";
-
     text += ESC_LF
-               ESC_VERT_TAB
-               ESC_DOUBLE_FONT_ON +
-               o.strNumber() + " "
-               ESC_DOUBLE_FONT_OFF
-               ESC_LF;
+            ESC_VERT_TAB
+            ESC_DOUBLE_FONT_ON +
+            o.strNumber() + " "
+            ESC_DOUBLE_FONT_OFF
+            ESC_LF;
 
 
     if (0 < o.strNumber().length() && o.strNumber().length() < 256)

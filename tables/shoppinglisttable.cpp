@@ -59,10 +59,10 @@ void ShoppingListTable::getListElements(QVector<ShoppingListItem>& v) const
     int row = verticalHeader()->logicalIndex(i);
     ShoppingListItem o;
     o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
-    o.m_product.m_id = Duo(getItem(row, (int)Column::Product)->getValue()).m_id;
+    o.m_product.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
-    o.m_supplier.m_id = Duo(getItem(row, (int)Column::Supplier)->getValue()).m_id;
+    o.m_supplier.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Supplier)->getValue());
     v.push_back(o);
   }
 }
@@ -74,10 +74,10 @@ void ShoppingListTable::setListElements(const QVector<ShoppingListItem>& v)
   {
     addRow();
     getItem(i, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
-    getItem(i, (int)Column::Product)->setValue(Duo(v.at(i).m_product).toVariant());
+    getItem(i, (int)Column::Product)->setValue(SQLItem::st_toVariant(v.at(i).m_product));
     getItem(i, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(i, (int)Column::Price)->setValue(v.at(i).m_price);
-    getItem(i, (int)Column::Supplier)->setValue(Duo(v.at(i).m_supplier).toVariant());
+    getItem(i, (int)Column::Supplier)->setValue(SQLItem::st_toVariant(v.at(i).m_supplier));
   }
 }
 
@@ -85,18 +85,19 @@ void ShoppingListTable::addRowAndActivate()
 {
   addRow();
   getItem(rowCount() - 1, (int)Column::Product)->activate();
-  Duo duo(getItem(rowCount() - 1, (int)Column::Product)->getValue());
-  if (!duo.m_id.isValid())
+  Id id = SQLItem::st_idFromVariant(getItem(rowCount() - 1, (int)Column::Product)->getValue());
+  QString name =  SQLItem::st_nameFromVariant(getItem(rowCount() - 1, (int)Column::Product)->getValue());
+  if (!id.isValid())
     removeItem();
   else
   {
     for (int i = 0; i != rowCount() - 1; ++i)
     {
-      if (Duo(getItem(i, (int)Column::Product)->getValue()).m_id == duo.m_id)
+      if (SQLItem::st_idFromVariant(getItem(i, (int)Column::Product)->getValue()) == id)
       {
         if (QMessageBox::question(this,
                               tr("Produto duplicado"),
-                              tr("O produto '%1' já consta na lista. Deseja adicioná-lo novamente?").arg(duo.m_name),
+                              tr("O produto '%1' já consta na lista. Deseja adicioná-lo novamente?").arg(name),
                               QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
           removeItem();
         break;
@@ -118,7 +119,7 @@ void ShoppingListTable::update(int row, int column)
     case Column::Product:
     {
       Product o;
-      o.m_id = Duo(getItem(row, (int)Column::Product)->getValue()).m_id;
+      o.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
       if (o.m_id.isValid())
       {
         QString error;

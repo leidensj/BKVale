@@ -69,7 +69,7 @@ void PurchaseTable::addRowAndActivate()
 {
   addRow();
   getItem(rowCount() - 1, (int)Column::Product)->activate();
-  if (Duo(getItem(rowCount() - 1, (int)Column::Product)->getValue()).m_id.isValid())
+  if (SQLItem::st_idFromVariant(getItem(rowCount() - 1, (int)Column::Product)->getValue()).isValid())
     loadProductInfo(rowCount() - 1);
   else
     removeItem();
@@ -87,7 +87,7 @@ void PurchaseTable::addRowByCode()
     if (o.SQL_select_by_code(*p, error))
     {
       addRow();
-      getItem(rowCount() - 1, (int)Column::Product)->setValue(Duo(o).toVariant());
+      getItem(rowCount() - 1, (int)Column::Product)->setValue(SQLItem::st_toVariant(o));
       loadProductInfo(rowCount() - 1);
     }
   }
@@ -105,9 +105,8 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
     o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
-    Duo duo(getItem(row, (int)Column::Product)->getValue());
-    o.m_product.m_id = duo.m_id;
-    o.m_product.m_name = duo.m_name;
+    o.m_product.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
+    o.m_product.m_name = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Product)->getValue());
     v.push_back(o);
   }
 }
@@ -120,7 +119,7 @@ void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool 
   {
     addRow();
     int row = rowCount() - 1;
-    getItem(row, (int)Column::Product)->setValue(Duo(v.at(i).m_product).toVariant());
+    getItem(row, (int)Column::Product)->setValue(SQLItem::st_toVariant(v.at(i).m_product));
     getItem(row, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
     getItem(row, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(row, (int)Column::Price)->setValue(v.at(i).m_price);
@@ -130,7 +129,7 @@ void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool 
 void PurchaseTable::loadProductInfo(int row)
 {
   Product o;
-  o.m_id = Duo(getItem(row, (int)Column::Product)->getValue()).m_id;
+  o.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
   if (o.m_id.isValid())
   {
     QString error;

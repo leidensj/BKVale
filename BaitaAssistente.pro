@@ -119,7 +119,6 @@ HEADERS  += mainwindow.h \
     calculator.h \
     logindialog.h \
     defines.h \
-    pincodeview.h \
     shopview.h \
     packageeditor.h \
     escpos.h \
@@ -205,7 +204,8 @@ HEADERS  += mainwindow.h \
     tableitems/addressitem.h \
     tables/paymenttable.h \
     tables/employeehourstable.h \
-    tables/storeemployeestable.h
+    tables/storeemployeestable.h \
+    pincodeview.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

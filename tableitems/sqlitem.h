@@ -4,22 +4,6 @@
 #include "jtableitem.h"
 #include "items/jitemsql.h"
 
-struct Duo
-{
-  Id m_id;
-  QString m_name;
-
-  Duo();
-  Duo(Id id, const QString& name);
-  Duo(const QVariant& v);
-  Duo(const JItemSQL& o);
-  QVariant toVariant() const;
-  void fromVariant(const QVariant& v);
-
-  static QVariant st_toVariant(const Duo& o);
-  static Duo st_fromVariant(const QVariant& v);
-};
-
 class SQLItem : public JTableItem
 {
 public:
@@ -28,6 +12,10 @@ public:
   void erase();
   void activate();
   void setValue(const QVariant& v);
+  static QVariant st_toVariant(const JItemSQL& o);
+  static QVariant st_toVariant(const Id& id, const QString& name);
+  static QString st_nameFromVariant(const QVariant& v);
+  static Id st_idFromVariant(const QVariant& v);
 
   void setTableName(const QString& tableName);
   void setFilter(const QString& filter);

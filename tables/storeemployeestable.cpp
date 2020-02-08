@@ -36,7 +36,7 @@ void StoreEmployeesTable::getEmployees(QVector<Employee>& v) const
   {
     int row = verticalHeader()->logicalIndex(i);
     Employee o;
-    o.m_id = Duo(getItem(row, (int)Column::Employee)->getValue()).m_id;
+    o.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Employee)->getValue());
     v.push_back(o);
   }
 }
@@ -47,7 +47,7 @@ void StoreEmployeesTable::setEmployees(const QVector<Employee>& v)
   for (int i = 0; i != v.size(); ++i)
   {
     addRow();
-    getItem(i, (int)Column::Employee)->setValue(Duo(v.at(i)).toVariant());
+    getItem(i, (int)Column::Employee)->setValue(SQLItem::st_toVariant(v.at(i)));
   }
 }
 
@@ -60,7 +60,7 @@ void StoreEmployeesTable::updateFilter()
   {
     filter += " AND " EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN (";
     for (int i = 0; i != rowCount(); ++i)
-      filter += Duo(getItem(i, (int)Column::Employee)->getValue()).m_id.str() + ",";
+      filter += SQLItem::st_idFromVariant(getItem(i, (int)Column::Employee)->getValue()).str() + ",";
     filter.chop(1);
     filter += ")";
   }

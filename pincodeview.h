@@ -1,5 +1,5 @@
-#ifndef PINCODEVIEW_H
-#define PINCODEVIEW_H
+#ifndef PINCODE_H
+#define PINCODE_H
 
 #include <QDialog>
 #include "items/employee.h"
@@ -53,4 +53,4 @@ private:
   QPushButton* m_btnClr;
 };
 
-#endif // PINCODEVIEW_H
+#endif // PINCODE_H

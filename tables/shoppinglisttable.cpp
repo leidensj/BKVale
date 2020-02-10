@@ -73,8 +73,8 @@ void ShoppingListTable::setListElements(const QVector<ShoppingListItem>& v)
   for (int i = 0; i != v.size(); ++i)
   {
     addRow();
-    getItem(i, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
     getItem(i, (int)Column::Product)->setValue(SQLItem::st_toVariant(v.at(i).m_product));
+    getItem(i, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
     getItem(i, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(i, (int)Column::Price)->setValue(v.at(i).m_price);
     getItem(i, (int)Column::Supplier)->setValue(SQLItem::st_toVariant(v.at(i).m_supplier));

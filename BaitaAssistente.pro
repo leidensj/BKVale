@@ -24,7 +24,6 @@ SOURCES += main.cpp\
     consumptionchart.cpp \
     calculatorwidget.cpp \
     logindialog.cpp \
-    pincodeview.cpp \
     packageeditor.cpp \
     timecard.cpp \
     formwidget.cpp \
@@ -105,7 +104,8 @@ SOURCES += main.cpp\
     tableitems/addressitem.cpp \
     tables/paymenttable.cpp \
     tables/employeehourstable.cpp \
-    tables/storeemployeestable.cpp
+    tables/storeemployeestable.cpp \
+    pincode.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -205,7 +205,7 @@ HEADERS  += mainwindow.h \
     tables/paymenttable.h \
     tables/employeehourstable.h \
     tables/storeemployeestable.h \
-    pincodeview.h
+    pincode.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

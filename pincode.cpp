@@ -1,4 +1,4 @@
-#include "pincodeview.h"
+#include "pincode.h"
 #include "databaseutils.h"
 #include <QFrame>
 #include <QLayout>
@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QKeyEvent>
+
+#define BUTTON_CODE "button_code"
 
 PinCodeView::PinCodeView(QWidget* parent)
   : QDialog(parent)
@@ -32,6 +34,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn7->setIconSize(QSize(64, 64));
   m_btn7->setIcon(QIcon(":/icons/res/calc7.png"));
   m_btn7->setShortcut(QKeySequence(Qt::Key_7));
+  m_btn7->setProperty(BUTTON_CODE, Qt::Key_7);
 
   m_btn8 = new QPushButton;
   m_btn8->setFlat(true);
@@ -39,6 +42,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn8->setIconSize(QSize(64, 64));
   m_btn8->setIcon(QIcon(":/icons/res/calc8.png"));
   m_btn8->setShortcut(QKeySequence(Qt::Key_8));
+  m_btn8->setProperty(BUTTON_CODE, Qt::Key_8);
 
   m_btn9 = new QPushButton;
   m_btn9->setFlat(true);
@@ -46,6 +50,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn9->setIconSize(QSize(64, 64));
   m_btn9->setIcon(QIcon(":/icons/res/calc9.png"));
   m_btn9->setShortcut(QKeySequence(Qt::Key_9));
+  m_btn9->setProperty(BUTTON_CODE, Qt::Key_9);
 
   QHBoxLayout* hline1 = new QHBoxLayout;
   hline1->addWidget(m_btn7);
@@ -59,6 +64,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn4->setIconSize(QSize(64, 64));
   m_btn4->setIcon(QIcon(":/icons/res/calc4.png"));
   m_btn4->setShortcut(QKeySequence(Qt::Key_4));
+  m_btn4->setProperty(BUTTON_CODE, Qt::Key_4);
 
   m_btn5 = new QPushButton;
   m_btn5->setFlat(true);
@@ -66,6 +72,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn5->setIconSize(QSize(64, 64));
   m_btn5->setIcon(QIcon(":/icons/res/calc5.png"));
   m_btn5->setShortcut(QKeySequence(Qt::Key_5));
+  m_btn5->setProperty(BUTTON_CODE, Qt::Key_5);
 
   m_btn6 = new QPushButton;
   m_btn6->setFlat(true);
@@ -73,6 +80,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn6->setIconSize(QSize(64, 64));
   m_btn6->setIcon(QIcon(":/icons/res/calc6.png"));
   m_btn6->setShortcut(QKeySequence(Qt::Key_6));
+  m_btn6->setProperty(BUTTON_CODE, Qt::Key_6);
 
   QHBoxLayout* hline2 = new QHBoxLayout;
   hline2->addWidget(m_btn4);
@@ -86,6 +94,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn1->setIconSize(QSize(64, 64));
   m_btn1->setIcon(QIcon(":/icons/res/calc1.png"));
   m_btn1->setShortcut(QKeySequence(Qt::Key_1));
+  m_btn1->setProperty(BUTTON_CODE, Qt::Key_1);
 
   m_btn2 = new QPushButton;
   m_btn2->setFlat(true);
@@ -93,6 +102,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn2->setIconSize(QSize(64, 64));
   m_btn2->setIcon(QIcon(":/icons/res/calc2.png"));
   m_btn2->setShortcut(QKeySequence(Qt::Key_2));
+  m_btn2->setProperty(BUTTON_CODE, Qt::Key_2);
 
   m_btn3 = new QPushButton;
   m_btn3->setFlat(true);
@@ -100,6 +110,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn3->setIconSize(QSize(64, 64));
   m_btn3->setIcon(QIcon(":/icons/res/calc3.png"));
   m_btn3->setShortcut(QKeySequence(Qt::Key_3));
+  m_btn3->setProperty(BUTTON_CODE, Qt::Key_3);
 
   QHBoxLayout* hline3 = new QHBoxLayout;
   hline3->addWidget(m_btn1);
@@ -113,6 +124,7 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btnClr->setIconSize(QSize(64, 64));
   m_btnClr->setIcon(QIcon(":/icons/res/calcclr.png"));
   m_btnClr->setShortcut(QKeySequence(Qt::Key_Backspace));
+  m_btnClr->setProperty(BUTTON_CODE, Qt::Key_Backspace);
 
   m_btn0 = new QPushButton;
   m_btn0->setFlat(true);
@@ -120,12 +132,14 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn0->setIconSize(QSize(64, 64));
   m_btn0->setIcon(QIcon(":/icons/res/calc0.png"));
   m_btn0->setShortcut(QKeySequence(Qt::Key_0));
+  m_btn0->setProperty(BUTTON_CODE, Qt::Key_0);
 
   m_btnEnter = new QPushButton;
   m_btnEnter->setFlat(true);
   m_btnEnter->setText("");
   m_btnEnter->setIconSize(QSize(64, 64));
-  m_btnEnter->setIcon(QIcon(":/icons/res/pincode.png"));
+  m_btnEnter->setIcon(QIcon(":/icons/res/ok.png"));
+  m_btnEnter->setProperty(BUTTON_CODE, Qt::Key_Enter);
 
   QHBoxLayout* hline4 = new QHBoxLayout();
   hline4->addWidget(m_btnClr);
@@ -141,7 +155,6 @@ PinCodeView::PinCodeView(QWidget* parent)
   f.setPointSize(24);
   f.setBold(true);
   m_edPinCode->setFont(f);
-  m_edPinCode->setReadOnly(true);
 
   QVBoxLayout* vlayoutl = new QVBoxLayout();
   vlayoutl->addWidget(m_edPinCode);
@@ -167,19 +180,65 @@ PinCodeView::PinCodeView(QWidget* parent)
   m_btn8->installEventFilter(this);
   m_btn9->installEventFilter(this);
 
-  QObject::connect(m_btnEnter, SIGNAL(clicked(bool)), this, SLOT(search()));
-  QObject::connect(m_btn0, SIGNAL(clicked(bool)), this, SLOT(pressed0()));
-  QObject::connect(m_btn1, SIGNAL(clicked(bool)), this, SLOT(pressed1()));
-  QObject::connect(m_btn2, SIGNAL(clicked(bool)), this, SLOT(pressed2()));
-  QObject::connect(m_btn3, SIGNAL(clicked(bool)), this, SLOT(pressed3()));
-  QObject::connect(m_btn4, SIGNAL(clicked(bool)), this, SLOT(pressed4()));
-  QObject::connect(m_btn5, SIGNAL(clicked(bool)), this, SLOT(pressed5()));
-  QObject::connect(m_btn6, SIGNAL(clicked(bool)), this, SLOT(pressed6()));
-  QObject::connect(m_btn7, SIGNAL(clicked(bool)), this, SLOT(pressed7()));
-  QObject::connect(m_btn8, SIGNAL(clicked(bool)), this, SLOT(pressed8()));
-  QObject::connect(m_btn9, SIGNAL(clicked(bool)), this, SLOT(pressed9()));
-  QObject::connect(m_btnClr, SIGNAL(clicked(bool)), this, SLOT(erase()));
+  QObject::connect(m_btnEnter, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn0, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn1, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn2, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn3, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn4, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn5, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn6, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn7, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn8, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btn9, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+  QObject::connect(m_btnClr, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
 
+}
+
+void PinCodeView::buttonPressed()
+{
+  auto p = sender();
+  if (p == nullptr)
+    return;
+  switch (p->property(BUTTON_CODE).toInt())
+  {
+    case Qt::Key_0:
+      append('0');
+      break;
+    case Qt::Key_1:
+      append('1');
+      break;
+    case Qt::Key_2:
+      append('2');
+      break;
+    case Qt::Key_3:
+      append('3');
+      break;
+    case Qt::Key_4:
+      append('4');
+      break;
+    case Qt::Key_5:
+      append('5');
+      break;
+    case Qt::Key_6:
+      append('6');
+      break;
+    case Qt::Key_7:
+      append('7');
+      break;
+    case Qt::Key_8:
+      append('8');
+      break;
+    case Qt::Key_9:
+      append('9');
+      break;
+    case Qt::Key_Enter:
+      search();
+      break;
+    case Qt::Key_Backspace:
+      erase();
+      break;
+  }
 }
 
 void PinCodeView::append(QChar c)
@@ -199,9 +258,6 @@ void PinCodeView::search()
     palette.setColor(QPalette::Base, QColor(255, 200, 200));
     m_edPinCode->setPalette(palette);
     m_edPinCode->setEchoMode(QLineEdit::EchoMode::Normal);
-    QFont f = m_edPinCode->font();
-    f.setPointSize(12);
-    m_edPinCode->setFont(f);
     m_edPinCode->setText(error);
     m_bError = true;
   }
@@ -220,9 +276,6 @@ void PinCodeView::erase()
     palette.setColor(QPalette::Base, Qt::white);
     m_edPinCode->setPalette(palette);
     m_edPinCode->setEchoMode(QLineEdit::EchoMode::Password);
-    QFont f = m_edPinCode->font();
-    f.setPointSize(24);
-    m_edPinCode->setFont(f);
     m_bError = false;
   }
 }

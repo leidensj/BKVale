@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "printutils.h"
-#include "pincodeview.h"
+#include "pincode.h"
 #include "views/productview.h"
 #include "views/categoryview.h"
 #include "views/purchaseview.h"

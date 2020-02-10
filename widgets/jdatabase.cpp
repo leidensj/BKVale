@@ -1,7 +1,7 @@
 #include "jdatabase.h"
 #include "jlineedit.h"
 #include "defines.h"
-#include "pincodeview.h"
+#include "pincode.h"
 #include "items/jitemex.h"
 #include "models/jmodel.h"
 #include <QDate>

@@ -3,8 +3,8 @@
 #include "tableitems/doubleitem.h"
 #include "tableitems/dateitem.h"
 
-PaymentTable::PaymentTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
-  : JTable(btns, bSelector, parent)
+PaymentTable::PaymentTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
   , m_purchaseTotal(0.0)
 {
   setColumnCount(2);

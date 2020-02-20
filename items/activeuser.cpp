@@ -8,11 +8,6 @@ ActiveUser::ActiveUser()
 
 ActiveUser::~ActiveUser()
 {
-  if (m_id.isValid())
-  {
-    QString error;
-    SQL_remove(error);
-  }
 }
 
 void ActiveUser::clear(bool bClearId)
@@ -191,4 +186,41 @@ bool ActiveUser::SQL_logout_proc(QSqlQuery& query)
     bSuccess = query.exec();
   }
   return bSuccess;
+}
+
+bool ActiveUser::SQL_select_current_user(QString& error)
+{
+  error.clear();
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                SQL_COLID
+                " FROM " ACTIVE_USERS_SQL_TABLE_NAME
+                " WHERE " ACTIVE_USERS_SQL_COL01 " IN (SELECT pg_backend_pid())");
+  bool bSuccess = query.exec();
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      m_id.set(query.value(0).toLongLong());
+    }
+    else
+    {
+      error = "Login não encontrado.";
+      bSuccess = false;
+    }
+  }
+
+  if (bSuccess)
+    bSuccess = SQL_select_proc(query, error);
+
+  if (bSuccess)
+    m_user.SQL_select_proc(query, error);
+
+  return SQL_finish(db, query, bSuccess, error);
 }

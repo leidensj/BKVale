@@ -44,8 +44,6 @@ StoreView::StoreView(QWidget* parent)
   m_tab->addTab(frTable, QIcon(":/icons/res/employee.png"), tr("Funcionários"));
 
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
-  connect(m_btnAddRemove->m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(addEmployee()));
-  connect(this, SIGNAL(itemSelectedSignal()), this, SLOT(updateControls()));
 
   m_formInfo->m_lblCreationDate->hide();
   m_formInfo->m_dtCreationDate->hide();

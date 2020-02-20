@@ -7,8 +7,8 @@
 #include "tableitems/packageitem.h"
 #include "tableitems/sqlitem.h"
 
-ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
-  : JTable(btns, bSelector, parent)
+ShoppingListTable::ShoppingListTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
 {
   setColumnCount(SHOPPING_LIST_NUMBER_OF_COLUMNS);
   QStringList headers;

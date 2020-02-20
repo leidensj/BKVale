@@ -3,9 +3,8 @@
 #include <QHeaderView>
 #include <QPushButton>
 
-JTable::JTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
+JTable::JTable(JAddRemoveButtons* btns, QWidget* parent)
  : QTableWidget(parent)
- , m_bSelector(bSelector)
 {
   if (btns != nullptr)
   {
@@ -15,17 +14,8 @@ JTable::JTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
     connect(this, SIGNAL(changedSignal(bool)), btns->m_btnRemove, SLOT(setEnabled(bool)));
   }
 
-  if (m_bSelector)
-  {
-    setEditTriggers(QAbstractItemView::NoEditTriggers);
-    setSelectionBehavior(QAbstractItemView::SelectRows);
-    setSelectionMode(QAbstractItemView::MultiSelection);
-  }
-  else
-  {
-    setSelectionBehavior(QAbstractItemView::SelectItems);
-    setSelectionMode(QAbstractItemView::SingleSelection);
-  }
+  setSelectionBehavior(QAbstractItemView::SelectItems);
+  setSelectionMode(QAbstractItemView::SingleSelection);
 
   horizontalHeader()->setHighlightSections(false);
   verticalHeader()->setSectionsMovable(true);
@@ -143,27 +133,21 @@ void JTable::activate(QTableWidgetItem* p)
 {
   if (p != nullptr)
   {
-    if (!m_bSelector)
-    {
-      JTableItem* p2 = dynamic_cast<JTableItem*>(p);
-      p2->activate();
-      emitChangedSignal();
-      emit changedSignal(p2->row(), p2->column());
-    }
-  }
+    JTableItem* p2 = dynamic_cast<JTableItem*>(p);
+    p2->activate();
+    emitChangedSignal();
+    emit changedSignal(p2->row(), p2->column());
+}
 }
 
 void JTable::erase(QTableWidgetItem* p)
 {
   if (p != nullptr)
   {
-    if (!m_bSelector)
-    {
-      JTableItem* p2 = dynamic_cast<JTableItem*>(p);
-      p2->erase();
-      emitChangedSignal();
-      emit changedSignal(p2->row(), p2->column());
-    }
+    JTableItem* p2 = dynamic_cast<JTableItem*>(p);
+    p2->erase();
+    emitChangedSignal();
+    emit changedSignal(p2->row(), p2->column());
   }
 }
 

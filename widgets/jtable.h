@@ -12,7 +12,7 @@ class JTable : protected QTableWidget
   Q_OBJECT
 
 public:
-  explicit JTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent);
+  explicit JTable(JAddRemoveButtons* btns, QWidget* parent);
   ~JTable();
   void setLargerSize(bool b);
   bool isValidRow(int row) const;
@@ -37,7 +37,6 @@ protected slots:
 protected:
   void keyPressEvent(QKeyEvent *event);
   void setHeaderIcon(int pos, const QIcon& icon);
-  const bool m_bSelector;
 
 signals:
   void changedSignal(bool bIsRowSelected);

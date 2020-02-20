@@ -17,7 +17,7 @@ class PhoneTable : public JTable
   };
 
 public:
-  explicit PhoneTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
+  explicit PhoneTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   void getPhones(QVector<Phone>& v) const;
   void setPhones(const QVector<Phone>& v);
 

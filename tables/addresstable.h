@@ -14,12 +14,13 @@ class AddressTable : public JTable
   };
 
 public:
-  explicit AddressTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
+  explicit AddressTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   void getAddresses(QVector<Address>& v) const;
   void setAddresses(const QVector<Address>& v);
 
 public slots:
   void addRow();
+  void addRowAndActivate();
 };
 
 #endif // ADDRESSTABLE_H

@@ -39,6 +39,8 @@ bool Address::operator ==(const JItem& other) const
 bool Address::isValid() const
 {
   return
+      m_number >= ADDRESS_STARTING_NUMBER &&
+      !m_city.isEmpty() &&
       !m_neighborhood.isEmpty() &&
       !m_street.isEmpty();
 }

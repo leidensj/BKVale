@@ -284,3 +284,28 @@ bool User::SQL_select_password_proc(QSqlQuery& query, QString& error)
   }
   return bSuccess;
 }
+
+bool User::hasPermission(const QString& tableName) const
+{
+  if (tableName == IMAGE_SQL_TABLE_NAME)
+    return m_bImage;
+  if (tableName == CATEGORY_SQL_TABLE_NAME)
+    return m_bCategory;
+  if (tableName == STORE_SQL_TABLE_NAME)
+    return m_bStore;
+  if (tableName == PRODUCT_SQL_TABLE_NAME)
+    return m_bProduct;
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
+    return m_bPurchase;
+  if (tableName == USER_SQL_TABLE_NAME)
+    return m_bUser;
+  if (tableName == REMINDER_SQL_TABLE_NAME)
+    return m_bReminder;
+  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    return m_bShoppingList;
+  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return m_bEmployee;
+  if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return m_bSupplier;
+  return false;
+}

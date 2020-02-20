@@ -7,8 +7,8 @@
 #include "tableitems/packageitem.h"
 #include "tableitems/sqlitem.h"
 
-PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
-  : JTable(btns, bSelector, parent)
+PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
 {
   setColumnCount(5);
   QStringList headers;
@@ -99,8 +99,6 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
   for (int i = 0; i != rowCount(); ++i)
   {
     int row = verticalHeader()->logicalIndex(i);
-    if (m_bSelector && !selectedItems().contains(item(row, 0)))
-      continue;
     PurchaseElement o;
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();

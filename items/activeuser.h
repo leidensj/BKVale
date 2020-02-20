@@ -23,6 +23,7 @@ public:
   bool SQL_login(const QString& strUser, const QString& strPassword, QString& error);
   bool SQL_logout(QString& error);
   bool SQL_logout_proc(QSqlQuery& query);
+  bool SQL_select_current_user(QString& error);
 
 private:
   User m_user;

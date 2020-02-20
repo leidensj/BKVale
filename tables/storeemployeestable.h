@@ -15,12 +15,13 @@ class StoreEmployeesTable : public JTable
   };
 
 public:
-  explicit StoreEmployeesTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
+  explicit StoreEmployeesTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   void getEmployees(QVector<Employee>& v) const;
   void setEmployees(const QVector<Employee>& v);
 
 public slots:
   void addRow();
+  void addRowAndActivate();
 
 private slots:
   void updateFilter();

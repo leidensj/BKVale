@@ -2,8 +2,8 @@
 #include <QHeaderView>
 #include "tableitems/sqlitem.h"
 
-StoreEmployeesTable::StoreEmployeesTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
-  : JTable(btns, bSelector, parent)
+StoreEmployeesTable::StoreEmployeesTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
 {
   setColumnCount(1);
   QStringList headers;
@@ -27,6 +27,16 @@ void StoreEmployeesTable::addRow()
 
   setCurrentItem(it);
   setFocus();
+}
+
+void StoreEmployeesTable::addRowAndActivate()
+{
+  addRow();
+  updateFilter();
+  JTableItem* it = getItem(rowCount() - 1, (int)Column::Employee);
+  it->activate();
+  if (!SQLItem::st_idFromVariant(it->getValue()).isValid())
+    removeItem();
 }
 
 void StoreEmployeesTable::getEmployees(QVector<Employee>& v) const

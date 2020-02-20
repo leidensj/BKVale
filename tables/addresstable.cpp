@@ -4,8 +4,8 @@
 #include <QKeyEvent>
 #include "tableitems/addressitem.h"
 
-AddressTable::AddressTable(JAddRemoveButtons* btns, bool bSelector, QWidget* parent)
-  : JTable(btns, bSelector, parent)
+AddressTable::AddressTable(JAddRemoveButtons* btns, QWidget* parent)
+  : JTable(btns, parent)
 {
   setColumnCount(1);
   QStringList headers;
@@ -48,4 +48,13 @@ void AddressTable::addRow()
 
   setCurrentItem(it);
   setFocus();
+}
+
+void AddressTable::addRowAndActivate()
+{
+  addRow();
+  JTableItem* it = getItem(rowCount() - 1, (int)Column::Address);
+  it->activate();
+  if (!AddressItem::toAddress(it->getValue()).isValid())
+    removeItem();
 }

@@ -44,8 +44,8 @@ void ReminderModel::select(QHeaderView* header)
   if (header != nullptr && header->count() == 10)
   {
     header->hideSection(0);
-    header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-    header->setSectionResizeMode(2, QHeaderView::ResizeMode::Fixed);
+    header->hideSection(2);
+    header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
     header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(5, QHeaderView::ResizeMode::ResizeToContents);
@@ -86,7 +86,7 @@ QVariant ReminderModel::data(const QModelIndex &idx, int role) const
       bool bTime = record(idx.row()).value(8).toBool();
       value = bTime ? value.toTime().toString("HH:mm:ss") : "";
     }
-    else if (idx.column() == 1 || idx.column() == 2)
+    else if (idx.column() == 1)
     {
       auto cap = (Reminder::Capitalization)record(idx.row()).value(9).toInt();
       switch (cap)
@@ -105,8 +105,8 @@ QVariant ReminderModel::data(const QModelIndex &idx, int role) const
   }
   else if (role == Qt::ToolTipRole)
   {
-    if (idx.column() == 2)
-      value = data(idx, Qt::DisplayRole);
+    if (idx.column() == 1)
+      value = data(idx.sibling(idx.row(), 2), Qt::DisplayRole);
   }
   return value;
 }

@@ -25,6 +25,8 @@ struct User : public JItemSQL
   QString strEncryptedPassword() const;
   static QString st_strEncryptedPassword(const QString& strPassword);
 
+  bool hasPermission(const QString& tableName) const;
+
   QString m_strUser;
   bool m_bPurchase;
   bool m_bReminder;

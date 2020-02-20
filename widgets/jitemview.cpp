@@ -7,6 +7,7 @@
 #include <QTabWidget>
 #include <QSplitter>
 #include <QMenu>
+#include "items/activeuser.h"
 
 #define VIEW_BUTTON "VIEW_BUTTON"
 
@@ -175,28 +176,37 @@ void JItemView::create()
 
 void JItemView::addViewButton(const QString& tableName)
 {
-  if (m_btnMore == nullptr)
+  QString error;
+  ActiveUser au;
+  if (au.SQL_select_current_user(error))
   {
-    m_btnMore = new QPushButton;
-    m_btnMore->setFlat(true);
-    m_btnMore->setText("");
-    m_btnMore->setIconSize(QSize(24, 24));
-    m_btnMore->setIcon(QIcon(":/icons/res/more.png"));
-    m_btnMore->setToolTip(tr("Mais"));
+    if (au.getUser().hasPermission(tableName))
+    {
+      if (m_btnMore == nullptr)
+      {
+        m_btnMore = new QPushButton;
+        m_btnMore->setFlat(true);
+        m_btnMore->setText("");
+        m_btnMore->setIconSize(QSize(24, 24));
+        m_btnMore->setIcon(QIcon(":/icons/res/more.png"));
+        m_btnMore->setToolTip(tr("Mais"));
 
-    QFrame *line = new QFrame;
-    line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Sunken);
-    m_ltButton->addWidget(line);
-    m_ltButton->addWidget(m_btnMore);
+        QFrame *line = new QFrame;
+        line->setFrameShape(QFrame::VLine);
+        line->setFrameShadow(QFrame::Sunken);
+        m_ltButton->addWidget(line);
+        m_ltButton->addWidget(m_btnMore);
+      }
+
+      if (m_btnMore->menu() == nullptr)
+        m_btnMore->setMenu(new QMenu);
+      QAction* act = m_btnMore->menu()->addAction(QIcon(JItemEx::icon(tableName)),
+                                                  tr("Gerenciar ") + JItemEx::text(tableName),
+                                                  this,
+                                                  SLOT(viewButtonClicked()));
+      act->setProperty(VIEW_BUTTON, tableName);
+    }
   }
-  if (m_btnMore->menu() == nullptr)
-    m_btnMore->setMenu(new QMenu);
-  QAction* act = m_btnMore->menu()->addAction(QIcon(JItemEx::icon(tableName)),
-                                              tr("Gerenciar ") + JItemEx::text(tableName),
-                                              this,
-                                              SLOT(viewButtonClicked()));
-  act->setProperty(VIEW_BUTTON, tableName);
 }
 
 void JItemView::viewButtonClicked()

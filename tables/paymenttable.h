@@ -15,7 +15,7 @@ public:
     Value,
   };
 
-  explicit PaymentTable(JAddRemoveButtons* btns = nullptr, bool bSelector = false, QWidget* parent = nullptr);
+  explicit PaymentTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   void getPaymentElements(QVector<PaymentElement>& v) const;
   void setPaymentElements(const QVector<PaymentElement>& v);
   void setPurchaseDate(const QDate& dt);

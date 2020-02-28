@@ -47,7 +47,7 @@ void PhoneTable::getPhones(QVector<Phone>& v) const
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
-    int row = verticalHeader()->logicalIndex(row);
+    int row = verticalHeader()->logicalIndex(i);
     Phone o;
     o.m_countryCode = getItem(row, (int)Column::CountryCode)->getValue().toDouble();
     o.m_code = getItem(row, (int)Column::Code)->getValue().toDouble();

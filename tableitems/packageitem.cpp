@@ -1,7 +1,7 @@
 #include "packageitem.h"
 #include "packageeditor.h"
 
-Package PackageItem::toPackage(const QVariant& v)
+Package PackageItem::st_fromVariant(const QVariant& v)
 {
   Package pck;
   for (int i = 0; i != v.toList().size(); ++i)
@@ -24,7 +24,7 @@ Package PackageItem::toPackage(const QVariant& v)
   return pck;
 }
 
-QVariant PackageItem::toVariant(const Package& pck)
+QVariant PackageItem::st_toVariant(const Package& pck)
 {
   QList<QVariant> lst;
   lst.push_back(pck.m_bIsPackage);
@@ -42,15 +42,15 @@ PackageItem::PackageItem()
 void PackageItem::setProductUnity(const QString& productUnity)
 {
   m_productUnity = productUnity;
-  setValue(toVariant(Package()));
+  setValue(st_toVariant(Package()));
 }
 
 void PackageItem::activate()
 {
   PackageEditor dlg;
-  dlg.setPackage(toPackage(getValue()), m_productUnity);
+  dlg.setPackage(st_fromVariant(getValue()), m_productUnity);
   if (dlg.exec())
-    setValue(toVariant(dlg.getPackage()));
+    setValue(st_toVariant(dlg.getPackage()));
 }
 
 void PackageItem::evaluate()
@@ -60,11 +60,11 @@ void PackageItem::evaluate()
 
 void PackageItem::erase()
 {
-  setValue(toVariant(Package()));
+  setValue(st_toVariant(Package()));
 }
 
 void PackageItem::setValue(const QVariant& v)
 {
   setData(Qt::UserRole, v);
-  setText(toPackage(v).strFormattedUnity(m_productUnity));
+  setText(st_fromVariant(v).strFormattedUnity(m_productUnity));
 }

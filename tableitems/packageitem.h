@@ -14,8 +14,8 @@ public:
   void setValue(const QVariant& v);
   void setProductUnity(const QString& productUnity);
 
-  static QVariant toVariant(const Package& pck);
-  static Package toPackage(const QVariant& v);
+  static QVariant st_toVariant(const Package& pck);
+  static Package st_fromVariant(const QVariant& v);
 private:
   QString m_productUnity;
 };

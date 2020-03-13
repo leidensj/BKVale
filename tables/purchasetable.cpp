@@ -102,7 +102,7 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
     PurchaseElement o;
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
-    o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
+    o.m_package = PackageItem::st_fromVariant(getItem(row, (int)Column::Package)->getValue());
     o.m_product.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
     o.m_product.m_name = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Product)->getValue());
     v.push_back(o);
@@ -118,7 +118,7 @@ void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool 
     addRow();
     int row = rowCount() - 1;
     getItem(row, (int)Column::Product)->setValue(SQLItem::st_toVariant(v.at(i).m_product));
-    getItem(row, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
+    getItem(row, (int)Column::Package)->setValue(PackageItem::st_toVariant(v.at(i).m_package));
     getItem(row, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(row, (int)Column::Price)->setValue(v.at(i).m_price);
   }
@@ -136,7 +136,7 @@ void PurchaseTable::loadProductInfo(int row)
     e.SQL_select_last(m_supplierId, o.m_id);
     getItem(row, (int)Column::Price)->setValue(e.m_price);
     dynamic_cast<PackageItem*>(getItem(row, (int)Column::Package))->setProductUnity(o.m_unity);
-    getItem(row, (int)Column::Package)->setValue(PackageItem::toVariant(e.m_package));
+    getItem(row, (int)Column::Package)->setValue(PackageItem::st_toVariant(e.m_package));
   }
 }
 

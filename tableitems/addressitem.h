@@ -13,8 +13,8 @@ public:
   void activate();
   void setValue(const QVariant& v);
 
-  static QVariant toVariant(const Address& o);
-  static Address toAddress(const QVariant& v);
+  static QVariant st_toVariant(const Address& o);
+  static Address st_fromVariant(const QVariant& v);
 };
 
 #endif // ADDRESSITEM_H

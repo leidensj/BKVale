@@ -58,7 +58,7 @@ void ShoppingListTable::getListElements(QVector<ShoppingListItem>& v) const
   {
     int row = verticalHeader()->logicalIndex(i);
     ShoppingListItem o;
-    o.m_package = PackageItem::toPackage(getItem(row, (int)Column::Package)->getValue());
+    o.m_package = PackageItem::st_fromVariant(getItem(row, (int)Column::Package)->getValue());
     o.m_product.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
@@ -74,7 +74,7 @@ void ShoppingListTable::setListElements(const QVector<ShoppingListItem>& v)
   {
     addRow();
     getItem(i, (int)Column::Product)->setValue(SQLItem::st_toVariant(v.at(i).m_product));
-    getItem(i, (int)Column::Package)->setValue(PackageItem::toVariant(v.at(i).m_package));
+    getItem(i, (int)Column::Package)->setValue(PackageItem::st_toVariant(v.at(i).m_package));
     getItem(i, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(i, (int)Column::Price)->setValue(v.at(i).m_price);
     getItem(i, (int)Column::Supplier)->setValue(SQLItem::st_toVariant(v.at(i).m_supplier));

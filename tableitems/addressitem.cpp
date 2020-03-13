@@ -1,7 +1,7 @@
 ﻿#include "addressitem.h"
 #include "addresseditor.h"
 
-Address AddressItem::toAddress(const QVariant& v)
+Address AddressItem::st_fromVariant(const QVariant& v)
 {
   Address o;
   for (int i = 0; i != v.toList().size(); ++i)
@@ -39,7 +39,7 @@ Address AddressItem::toAddress(const QVariant& v)
   return o;
 }
 
-QVariant AddressItem::toVariant(const Address& o)
+QVariant AddressItem::st_toVariant(const Address& o)
 {
   QList<QVariant> lst;
   lst.push_back(o.m_cep);
@@ -62,9 +62,9 @@ AddressItem::AddressItem()
 void AddressItem::activate()
 {
   AddressEditor dlg;
-  dlg.setAddress(toAddress(getValue()));
+  dlg.setAddress(st_fromVariant(getValue()));
   if (dlg.exec())
-    setValue(toVariant(dlg.getAddress()));
+    setValue(st_toVariant(dlg.getAddress()));
 }
 
 void AddressItem::evaluate()
@@ -74,11 +74,11 @@ void AddressItem::evaluate()
 
 void AddressItem::erase()
 {
-  setValue(toVariant(Address()));
+  setValue(st_toVariant(Address()));
 }
 
 void AddressItem::setValue(const QVariant& v)
 {
   setData(Qt::UserRole, v);
-  setText(toAddress(v).name());
+  setText(st_fromVariant(v).name());
 }

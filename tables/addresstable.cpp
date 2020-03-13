@@ -21,7 +21,7 @@ void AddressTable::getAddresses(QVector<Address>& v) const
   for (int i = 0; i != rowCount(); ++i)
   {
     int row = verticalHeader()->logicalIndex(i);
-    v.push_back(AddressItem::toAddress(getItem(row, (int)Column::Address)->getValue()));
+    v.push_back(AddressItem::st_fromVariant(getItem(row, (int)Column::Address)->getValue()));
   }
 }
 
@@ -31,7 +31,7 @@ void AddressTable::setAddresses(const QVector<Address>& v)
   for (int i = 0; i != v.size(); ++i)
   {
     addRow();
-    getItem(i, (int)Column::Address)->setValue(AddressItem::toVariant(v.at(i)));
+    getItem(i, (int)Column::Address)->setValue(AddressItem::st_toVariant(v.at(i)));
   }
 }
 
@@ -55,6 +55,6 @@ void AddressTable::addRowAndActivate()
   addRow();
   JTableItem* it = getItem(rowCount() - 1, (int)Column::Address);
   it->activate();
-  if (!AddressItem::toAddress(it->getValue()).isValid())
+  if (!AddressItem::st_fromVariant(it->getValue()).isValid())
     removeItem();
 }

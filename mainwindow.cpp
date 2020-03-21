@@ -188,7 +188,6 @@ bool Tipi::connectPrinter()
     }
     else
       error = m_printerSerial.errorString();
-
   }
 
 

@@ -346,7 +346,7 @@ bool Product::SQL_select_by_code(const ProductCode& code, QString& error)
   return SQL_finish(db, query, bSuccess, error);
 }
 
-bool Product::SQL_update_unity(const Package& pck, QString& error)
+bool Product::SQL_update_unity(const Package& pck, QString& error) const
 {
   error.clear();
   if (!SQL_isOpen(error))
@@ -368,13 +368,16 @@ bool Product::SQL_update_unity(const Package& pck, QString& error)
     query.prepare("UPDATE " PURCHASE_ELEMENTS_SQL_TABLE_NAME " SET "
                   PURCHASE_ELEMENTS_SQL_COL_AMT " = CASE WHEN "
                   PURCHASE_ELEMENTS_SQL_COL_PCK " = FALSE THEN "
-                  PURCHASE_ELEMENTS_SQL_COL_AMT "/(:_v01) END,"
+                  PURCHASE_ELEMENTS_SQL_COL_AMT "/(:_v01)"
+                  " ELSE " PURCHASE_ELEMENTS_SQL_COL_AMT " END,"
                   PURCHASE_ELEMENTS_SQL_COL_PRC " = CASE WHEN "
                   PURCHASE_ELEMENTS_SQL_COL_PCK " = FALSE THEN "
-                  PURCHASE_ELEMENTS_SQL_COL_PRC "*(:_v01) END,"
+                  PURCHASE_ELEMENTS_SQL_COL_PRC "*(:_v01)"
+                  " ELSE " PURCHASE_ELEMENTS_SQL_COL_PRC " END,"
                   PURCHASE_ELEMENTS_SQL_COL_PAM " = CASE WHEN "
                   PURCHASE_ELEMENTS_SQL_COL_PCK " = TRUE THEN "
-                  PURCHASE_ELEMENTS_SQL_COL_PAM "/(:_v01) END"
+                  PURCHASE_ELEMENTS_SQL_COL_PAM "/(:_v01)"
+                  " ELSE " PURCHASE_ELEMENTS_SQL_COL_PAM " END"
                   " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", pck.m_ammount);
@@ -386,13 +389,16 @@ bool Product::SQL_update_unity(const Package& pck, QString& error)
     query.prepare("UPDATE " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " SET "
                   SHOPPING_LIST_ITEMS_SQL_AMT " = CASE WHEN "
                   SHOPPING_LIST_ITEMS_SQL_PCK " = FALSE THEN "
-                  SHOPPING_LIST_ITEMS_SQL_AMT "/(:_v01) END,"
+                  SHOPPING_LIST_ITEMS_SQL_AMT "/(:_v01)"
+                  " ELSE " SHOPPING_LIST_ITEMS_SQL_AMT " END,"
                   SHOPPING_LIST_ITEMS_SQL_PRC " = CASE WHEN "
                   SHOPPING_LIST_ITEMS_SQL_PCK " = FALSE THEN "
-                  SHOPPING_LIST_ITEMS_SQL_PRC "*(:_v01) END,"
+                  SHOPPING_LIST_ITEMS_SQL_PRC "*(:_v01)"
+                  " ELSE " SHOPPING_LIST_ITEMS_SQL_PRC " END,"
                   SHOPPING_LIST_ITEMS_SQL_PAM " = CASE WHEN "
                   SHOPPING_LIST_ITEMS_SQL_PCK " = TRUE THEN "
-                  SHOPPING_LIST_ITEMS_SQL_PAM "/(:_v01) END"
+                  SHOPPING_LIST_ITEMS_SQL_PAM "/(:_v01)"
+                  " ELSE " SHOPPING_LIST_ITEMS_SQL_PAM " END"
                   " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", pck.m_ammount);

@@ -142,7 +142,18 @@ void ProductView::editUnity()
                                 m_edUnity->text()),
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
-
+      Product o;
+      getItem(o);
+      QString error;
+      if (!o.SQL_update_unity(pck, error))
+      {
+        QMessageBox::information(this, tr("Erro"), tr(" erro ao atualizar a unidade:\n%1").arg(error), QMessageBox::Ok);
+      }
+      else
+      {
+        o.SQL_select(error);
+        setItem(o);
+      }
     }
   }
 }

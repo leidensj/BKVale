@@ -55,7 +55,7 @@ struct Product : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
 
   bool SQL_select_by_code(const ProductCode& code, QString& error);
-  bool SQL_update_unity(const Package& pck, QString& error);
+  bool SQL_update_unity(const Package& pck, QString& error) const;
 
   Category m_category;
   Image m_image;

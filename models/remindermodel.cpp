@@ -25,7 +25,9 @@ QString ReminderModel::getStrQuery()
       REMINDER_SQL_COL11 ","
       REMINDER_SQL_COL04
       " FROM "
-      REMINDER_SQL_TABLE_NAME;
+      REMINDER_SQL_TABLE_NAME
+      " ORDER BY "
+      REMINDER_SQL_COL03 " DESC";
 }
 
 void ReminderModel::select(QHeaderView* header)
@@ -49,7 +51,7 @@ void ReminderModel::select(QHeaderView* header)
     header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(5, QHeaderView::ResizeMode::ResizeToContents);
-    header->setSectionResizeMode(6, QHeaderView::ResizeMode::ResizeToContents);
+    header->hideSection(6);
     header->hideSection(7);
     header->hideSection(8);
     header->hideSection(9);
@@ -64,9 +66,10 @@ QVariant ReminderModel::data(const QModelIndex &idx, int role) const
   QVariant value = QSqlQueryModel::data(idx, role);
   if (role == Qt::DecorationRole)
   {
-    if (idx.column() == 6)
+    if (idx.column() == 1)
     {
-      if (QSqlQueryModel::data(idx, Qt::EditRole).toBool())
+      bool bFavorite = data(idx.sibling(idx.row(), 6), Qt::EditRole).toBool();
+      if (bFavorite)
         value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
       else
         value = "";
@@ -74,9 +77,7 @@ QVariant ReminderModel::data(const QModelIndex &idx, int role) const
   }
   else if (role == Qt::DisplayRole)
   {
-    if (idx.column() == 6)
-      value = value.toBool() ? tr("Sim") : "";
-    else if (idx.column() == 4)
+    if (idx.column() == 4)
     {
       bool bDate = record(idx.row()).value(7).toBool();
       value = bDate ? value.toDate().toString("yyyy/MM/dd") : "";

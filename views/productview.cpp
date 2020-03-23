@@ -54,6 +54,7 @@ ProductView::ProductView(QWidget* parent)
 
   m_actUnity = m_edUnity->addAction(QIcon(":/icons/res/package.png"), QLineEdit::TrailingPosition);
   connect(m_actUnity, SIGNAL(triggered(bool)), this, SLOT(editUnity()));
+  m_actUnity->setToolTip(tr("Alterar Unidade"));
 
   addViewButton(CATEGORY_SQL_TABLE_NAME);
   addViewButton(IMAGE_SQL_TABLE_NAME);

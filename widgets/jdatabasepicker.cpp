@@ -25,6 +25,8 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   QIcon searchIcon = QIcon(JItemEx::icon(tableName));
   QAction* action = m_edText->addAction(searchIcon.isNull() ? QIcon(":/icons/res/binoculars.png") : searchIcon, QLineEdit::LeadingPosition);
   QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);
+  action->setToolTip(tr("Selecionar ") + JItemEx::text(tableName));
+  action2->setToolTip(tr("Remover ") + JItemEx::text(tableName));
 
   m_selector = new JDatabaseSelector(tableName, bMultiPicker, this);
 

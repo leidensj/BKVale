@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QRegExp>
+#include <QDateTime>
 
 namespace Data
 {
@@ -37,5 +38,9 @@ enum class Input
 };
 
 QString getRegEx(Input input);
+}
+
+namespace DateTime {
+QDateTime server();
 }
 #endif // COMMON_H

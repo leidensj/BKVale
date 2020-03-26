@@ -26,6 +26,7 @@
 #include <QCloseEvent>
 #include <QInputDialog>
 #include <QMdiSubWindow>
+#include <QTimer>
 
 class JMdiSubWindow : public QMdiSubWindow
 {
@@ -97,11 +98,14 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
   m_statusDatabasePath->setTextFormat(Qt::RichText);
-  m_statusUserName = new QLabel();
+  m_statusUserName = new QLabel;
   m_statusUserName->setAlignment(Qt::AlignCenter);
   m_statusUserName->setTextFormat(Qt::RichText);
+  m_statusTime = new QLabel;
+  m_statusTime->setAlignment(Qt::AlignCenter);
   statusBar()->addWidget(m_statusDatabasePath);
   statusBar()->addWidget(m_statusUserName);
+  statusBar()->addPermanentWidget(m_statusTime);
 
   connect(ui->actionPrint, SIGNAL(triggered(bool)), this, SLOT(print()));
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
@@ -129,8 +133,13 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
 
   connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
 
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
+  timer->start(60000);
+
   activateWindow();
   m_settings.load();
+  updateTime();
   updateControls();
   updateStatusBar();
 }
@@ -347,6 +356,12 @@ void Tipi::updateStatusBar()
                                                                         : m_settings.m_databaseHostName) +
                                 ":" +
                                 QString::number(m_settings.m_databasePort));
+}
+
+void Tipi::updateTime()
+{
+  QDateTime dt = DateTime::server();
+  m_statusTime->setText(dt.date().toString("dd/MM/yyyy ") + dt.time().toString("hh:mm"));
 }
 
 void Tipi::updateControls()

@@ -116,7 +116,6 @@ HEADERS  += mainwindow.h \
     qcustomplot.h \
     consumptionchart.h \
     calculatorwidget.h \
-    calculator.h \
     logindialog.h \
     defines.h \
     shopview.h \

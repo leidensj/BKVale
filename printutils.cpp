@@ -120,6 +120,8 @@ namespace
       text += ESC_EXPAND_OFF ESC_LF;
     }
 
+    QDateTime dt = DateTime::server();
+
     if (!o.m_observation.isEmpty())
       text += ESC_LF ESC_EXPAND_ON "Observacoes: " ESC_EXPAND_OFF + o.m_observation + ESC_LF;
     text += ESC_LF
@@ -130,8 +132,8 @@ namespace
                ESC_DOUBLE_FONT_OFF
                ESC_LF
                "Emissao: " +
-               QDate::currentDate().toString("dd/MM/yyyy ") +
-               QTime::currentTime().toString("hh:mm:ss") +
+               dt.date().toString("dd/MM/yyyy ") +
+               dt.time().toString("hh:mm:ss") +
                " @ " +
                QHostInfo::localHostName().toUpper() +
                ESC_LF
@@ -356,6 +358,7 @@ QString ReminderPrinter::build(const Reminder& r)
 
 QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
 {
+  QDateTime dt = DateTime::server();
   QString str;
   str += ESC_EXPAND_ON
          ESC_ALIGN_CENTER
@@ -367,10 +370,10 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
          ESC_DOUBLE_FONT_OFF
          ESC_LF
          ESC_EXPAND_ON +
-         QDate::currentDate().toString("dd/MM/yyyy") +
+         dt.date().toString("dd/MM/yyyy") +
          ESC_EXPAND_OFF
          ESC_LF +
-         QDate::currentDate().toString("dddd") +
+         dt.date().toString("dddd") +
          ESC_LF
          ESC_ALIGN_LEFT;
 

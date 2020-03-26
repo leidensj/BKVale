@@ -3,42 +3,24 @@
 
 #include <QFrame>
 #include <QPushButton>
-#include "calculator.h"
 
 class QLineEdit;
 class QPlainTextEdit;
 class QRadioButton;
-
-class CalculatorPushButton : public QPushButton
-{
-  Q_OBJECT
-
-public:
-  explicit CalculatorPushButton(Calculator::Button button, QWidget* parent = 0);
-
-private slots:
-  void emitCalculatorButtonClickedSignal();
-
-signals:
-  calculatorButtonClickedSignal(Calculator::Button button);
-
-private:
-  const Calculator::Button m_button;
-};
 
 class CalculatorWidget : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit CalculatorWidget(QWidget* parent = 0);
+  explicit CalculatorWidget(QWidget* parent = nullptr);
   QString getFullContent() const;
 
 private slots:
-  void calculatorButtonClicked(Calculator::Button button);
+  void buttonClicked();
   void clear();
   void reset();
-  void emitLineSignal(double value, Calculator::Button button);
+  void emitLineSignal(double value, int button);
 
 signals:
   void lineSignal(const QString& text);
@@ -70,9 +52,9 @@ private:
   QString m_display;
   double m_total;
   double m_lastValue;
-  Calculator::Button m_lastButton;
-  double calculate(double op1, double op2, Calculator::Button button);
-  QString buildPrintContent(double value, Calculator::Button button);
+  int m_lastButton;
+  double calculate(double op1, double op2, int button);
+  QString buildPrintContent(double value, int button);
 };
 
 #endif // CALCULATORWIDGET_H

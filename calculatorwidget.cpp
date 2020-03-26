@@ -9,19 +9,84 @@
 #include <QMessageBox>
 #include "escpos.h"
 
-CalculatorPushButton::CalculatorPushButton(Calculator::Button button, QWidget* parent)
-  : QPushButton(parent)
-  , m_button(button)
+#define KEY_CODE "KEY_CODE"
+
+namespace Calculator
 {
-  QObject::connect(this,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(emitCalculatorButtonClickedSignal()));
+inline bool isOP(int button)
+{
+  switch(button)
+  {
+    case Qt::Key_Plus:
+    case Qt::Key_Minus:
+    case Qt::Key_Asterisk:
+    case Qt::Key_Slash:
+      return true;
+    default:
+      return false;
+  }
 }
 
-void CalculatorPushButton::emitCalculatorButtonClickedSignal()
+inline bool isDigit(int button)
 {
-  emit calculatorButtonClickedSignal(m_button);
+  switch(button)
+  {
+    case Qt::Key_0:
+    case Qt::Key_1:
+    case Qt::Key_2:
+    case Qt::Key_3:
+    case Qt::Key_4:
+    case Qt::Key_5:
+    case Qt::Key_6:
+    case Qt::Key_7:
+    case Qt::Key_8:
+    case Qt::Key_9:
+      return true;
+    default:
+      return false;
+  }
+}
+
+inline bool isEqual(int button)
+{
+  return button == Qt::Key_Space;
+}
+
+inline bool isDecimal(int button)
+{
+  return button == Qt::Key_Period;
+}
+
+inline QString toStr(int button)
+{
+  switch(button)
+  {
+    case Qt::Key_0: return "0";
+    case Qt::Key_1: return "1";
+    case Qt::Key_2: return "2";
+    case Qt::Key_3: return "3";
+    case Qt::Key_4: return "4";
+    case Qt::Key_5: return "5";
+    case Qt::Key_6: return "6";
+    case Qt::Key_7: return "7";
+    case Qt::Key_8: return "8";
+    case Qt::Key_9: return "9";
+    case Qt::Key_Plus: return "+";
+    case Qt::Key_Minus: return "-";
+    case Qt::Key_Slash: return "/";
+    case Qt::Key_Asterisk: return "*";
+    case Qt::Key_Space: return "=";
+    case Qt::Key_Period: return ".";
+    default: return " ";
+  }
+}
+
+inline void removeDecimal(QString& strValue)
+{
+  if (strValue.contains(Calculator::toStr(Qt::Key_Period)))
+    strValue.remove(QRegExp("^[0]*"));
+  strValue.replace(Calculator::toStr(Qt::Key_Period), "");
+}
 }
 
 CalculatorWidget::CalculatorWidget(QWidget* parent)
@@ -48,21 +113,23 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   , m_view(nullptr)
   , m_total(0.0)
   , m_lastValue(0.0)
-  , m_lastButton(Calculator::Button::Nop)
+  , m_lastButton(Qt::Key_Standby)
 {
-  m_btnCls = new QPushButton();
+  m_btnCls = new QPushButton;
   m_btnCls->setFlat(true);
   m_btnCls->setText("");
   m_btnCls->setIconSize(QSize(64, 64));
   m_btnCls->setIcon(QIcon(":/icons/res/calccls.png"));
   m_btnCls->setShortcut(QKeySequence(Qt::Key_Escape));
+  m_btnCls->setProperty(KEY_CODE, Qt::Key_Escape);
 
-  m_btnClr = new QPushButton();
+  m_btnClr = new QPushButton;
   m_btnClr->setFlat(true);
   m_btnClr->setText("");
   m_btnClr->setIconSize(QSize(64, 64));
   m_btnClr->setIcon(QIcon(":/icons/res/calcclr.png"));
   m_btnClr->setShortcut(QKeySequence(Qt::Key_Backspace));
+  m_btnClr->setProperty(KEY_CODE, Qt::Key_Backspace);
 
   QHBoxLayout* hline0 = new QHBoxLayout();
   hline0->addWidget(m_btnCls);
@@ -70,33 +137,37 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline0->setAlignment(Qt::AlignLeft);
   hline0->setContentsMargins(0, 0, 0, 0);
 
-  m_btn7 = new CalculatorPushButton(Calculator::Button::Num7);
+  m_btn7 = new QPushButton;
   m_btn7->setFlat(true);
   m_btn7->setText("");
   m_btn7->setIconSize(QSize(64, 64));
   m_btn7->setIcon(QIcon(":/icons/res/calc7.png"));
   m_btn7->setShortcut(QKeySequence(Qt::Key_7));
+  m_btn7->setProperty(KEY_CODE, Qt::Key_7);
 
-  m_btn8 = new CalculatorPushButton(Calculator::Button::Num8);
+  m_btn8 = new QPushButton;
   m_btn8->setFlat(true);
   m_btn8->setText("");
   m_btn8->setIconSize(QSize(64, 64));
   m_btn8->setIcon(QIcon(":/icons/res/calc8.png"));
   m_btn8->setShortcut(QKeySequence(Qt::Key_8));
+  m_btn8->setProperty(KEY_CODE, Qt::Key_8);
 
-  m_btn9 = new CalculatorPushButton(Calculator::Button::Num9);
+  m_btn9 = new QPushButton;
   m_btn9->setFlat(true);
   m_btn9->setText("");
   m_btn9->setIconSize(QSize(64, 64));
   m_btn9->setIcon(QIcon(":/icons/res/calc9.png"));
   m_btn9->setShortcut(QKeySequence(Qt::Key_9));
+  m_btn9->setProperty(KEY_CODE, Qt::Key_9);
 
-  m_btnMul = new CalculatorPushButton(Calculator::Button::Mul);
+  m_btnMul = new QPushButton;
   m_btnMul->setFlat(true);
   m_btnMul->setText("");
   m_btnMul->setIconSize(QSize(64, 64));
   m_btnMul->setIcon(QIcon(":/icons/res/calcmul.png"));
   m_btnMul->setShortcut(QKeySequence(Qt::Key_Asterisk));
+  m_btnMul->setProperty(KEY_CODE, Qt::Key_Asterisk);
 
   QHBoxLayout* hline1 = new QHBoxLayout;
   hline1->addWidget(m_btn7);
@@ -106,33 +177,37 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline1->setAlignment(Qt::AlignLeft);
   hline1->setContentsMargins(0, 0, 0, 0);
 
-  m_btn4 = new CalculatorPushButton(Calculator::Button::Num4);
+  m_btn4 = new QPushButton;
   m_btn4->setFlat(true);
   m_btn4->setText("");
   m_btn4->setIconSize(QSize(64, 64));
   m_btn4->setIcon(QIcon(":/icons/res/calc4.png"));
   m_btn4->setShortcut(QKeySequence(Qt::Key_4));
+  m_btn4->setProperty(KEY_CODE, Qt::Key_4);
 
-  m_btn5 = new CalculatorPushButton(Calculator::Button::Num5);
+  m_btn5 = new QPushButton;
   m_btn5->setFlat(true);
   m_btn5->setText("");
   m_btn5->setIconSize(QSize(64, 64));
   m_btn5->setIcon(QIcon(":/icons/res/calc5.png"));
   m_btn5->setShortcut(QKeySequence(Qt::Key_5));
+  m_btn5->setProperty(KEY_CODE, Qt::Key_5);
 
-  m_btn6 = new CalculatorPushButton(Calculator::Button::Num6);
+  m_btn6 = new QPushButton;
   m_btn6->setFlat(true);
   m_btn6->setText("");
   m_btn6->setIconSize(QSize(64, 64));
   m_btn6->setIcon(QIcon(":/icons/res/calc6.png"));
   m_btn6->setShortcut(QKeySequence(Qt::Key_6));
+  m_btn6->setProperty(KEY_CODE, Qt::Key_6);
 
-  m_btnDiv = new CalculatorPushButton(Calculator::Button::Div);
+  m_btnDiv = new QPushButton;
   m_btnDiv->setFlat(true);
   m_btnDiv->setText("");
   m_btnDiv->setIconSize(QSize(64, 64));
   m_btnDiv->setIcon(QIcon(":/icons/res/calcdiv.png"));
   m_btnDiv->setShortcut(QKeySequence(Qt::Key_Slash));
+  m_btnDiv->setProperty(KEY_CODE, Qt::Key_Slash);
 
   QHBoxLayout* hline2 = new QHBoxLayout;
   hline2->addWidget(m_btn4);
@@ -142,33 +217,37 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline2->setAlignment(Qt::AlignLeft);
   hline2->setContentsMargins(0, 0, 0, 0);
 
-  m_btn1 = new CalculatorPushButton(Calculator::Button::Num1);
+  m_btn1 = new QPushButton;
   m_btn1->setFlat(true);
   m_btn1->setText("");
   m_btn1->setIconSize(QSize(64, 64));
   m_btn1->setIcon(QIcon(":/icons/res/calc1.png"));
   m_btn1->setShortcut(QKeySequence(Qt::Key_1));
+  m_btn1->setProperty(KEY_CODE, Qt::Key_1);
 
-  m_btn2 = new CalculatorPushButton(Calculator::Button::Num2);
+  m_btn2 = new QPushButton;
   m_btn2->setFlat(true);
   m_btn2->setText("");
   m_btn2->setIconSize(QSize(64, 64));
   m_btn2->setIcon(QIcon(":/icons/res/calc2.png"));
   m_btn2->setShortcut(QKeySequence(Qt::Key_2));
+  m_btn2->setProperty(KEY_CODE, Qt::Key_2);
 
-  m_btn3 = new CalculatorPushButton(Calculator::Button::Num3);
+  m_btn3 = new QPushButton;
   m_btn3->setFlat(true);
   m_btn3->setText("");
   m_btn3->setIconSize(QSize(64, 64));
   m_btn3->setIcon(QIcon(":/icons/res/calc3.png"));
   m_btn3->setShortcut(QKeySequence(Qt::Key_3));
+  m_btn3->setProperty(KEY_CODE, Qt::Key_3);
 
-  m_btnMin = new CalculatorPushButton(Calculator::Button::Min);
+  m_btnMin = new QPushButton;
   m_btnMin->setFlat(true);
   m_btnMin->setText("");
   m_btnMin->setIconSize(QSize(64, 64));
   m_btnMin->setIcon(QIcon(":/icons/res/calcmin.png"));
   m_btnMin->setShortcut(QKeySequence(Qt::Key_Minus));
+  m_btnMin->setProperty(KEY_CODE, Qt::Key_Minus);
 
   QHBoxLayout* hline3 = new QHBoxLayout;
   hline3->addWidget(m_btn1);
@@ -178,33 +257,37 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   hline3->setAlignment(Qt::AlignLeft);
   hline3->setContentsMargins(0, 0, 0, 0);
 
-  m_btn0 = new CalculatorPushButton(Calculator::Button::Num0);
+  m_btn0 = new QPushButton;
   m_btn0->setFlat(true);
   m_btn0->setText("");
   m_btn0->setIconSize(QSize(64, 64));
   m_btn0->setIcon(QIcon(":/icons/res/calc0.png"));
   m_btn0->setShortcut(QKeySequence(Qt::Key_0));
+  m_btn0->setProperty(KEY_CODE, Qt::Key_0);
 
-  m_btnDec = new CalculatorPushButton(Calculator::Button::Dec);
+  m_btnDec = new QPushButton;
   m_btnDec->setFlat(true);
   m_btnDec->setText("");
   m_btnDec->setIconSize(QSize(64, 64));
   m_btnDec->setIcon(QIcon(":/icons/res/calcdec.png"));
   m_btnDec->setShortcut(QKeySequence(Qt::Key_Period));
+  m_btnDec->setProperty(KEY_CODE, Qt::Key_Period);
 
-  m_btnEq = new CalculatorPushButton(Calculator::Button::Eq);
+  m_btnEq = new QPushButton;
   m_btnEq->setFlat(true);
   m_btnEq->setText("");
   m_btnEq->setIconSize(QSize(64, 64));
   m_btnEq->setIcon(QIcon(":/icons/res/calcequal.png"));
   m_btnEq->setShortcut(QKeySequence(Qt::Key_Space));
+  m_btnEq->setProperty(KEY_CODE, Qt::Key_Space);
 
-  m_btnPlus = new CalculatorPushButton(Calculator::Button::Plus);
+  m_btnPlus = new QPushButton;
   m_btnPlus->setFlat(true);
   m_btnPlus->setText("");
   m_btnPlus->setIconSize(QSize(64, 64));
   m_btnPlus->setIcon(QIcon(":/icons/res/calcplus.png"));
   m_btnPlus->setShortcut(QKeySequence(Qt::Key_Enter));
+  m_btnPlus->setProperty(KEY_CODE, Qt::Key_Enter);
 
   QHBoxLayout* hline4 = new QHBoxLayout;
   hline4->addWidget(m_btn0);
@@ -269,97 +352,43 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   setLayout(hlayout);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-  QObject::connect(m_btn0,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn1,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn2,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn3,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn4,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn5,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn6,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn7,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn8,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btn9,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btnEq,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btnPlus,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btnMin,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btnDiv,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btnMul,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btnDec,
-                   SIGNAL(calculatorButtonClickedSignal(Calculator::Button)),
-                   this,
-                   SLOT(calculatorButtonClicked(Calculator::Button)));
-  QObject::connect(m_btnClr,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(clear()));
-  QObject::connect(m_btnCls,
-                   SIGNAL(clicked(bool)),
-                   this,
-                   SLOT(reset()));
+  connect(m_btn0, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn1, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn2, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn3, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn4, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn5, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn6, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn7, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn8, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btn9, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btnEq, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btnPlus, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btnMin, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btnDiv, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btnMul, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btnDec, SIGNAL(clicked(bool)), this, SLOT(buttonClicked()));
+  connect(m_btnClr, SIGNAL(clicked(bool)), this, SLOT(clear()));
+  connect(m_btnCls, SIGNAL(clicked(bool)), this, SLOT(reset()));
 
   m_edDisplay->setText("0");
   m_view->setPlainText("0");
 }
 
-double CalculatorWidget::calculate(double op1, double op2, Calculator::Button button)
+double CalculatorWidget::calculate(double op1, double op2, int button)
 {
   if (!Calculator::isOP(button))
     return 0.0;
 
   switch (button)
   {
-    case Calculator::Button::Plus:
+    case Qt::Key_Enter:
       return op1 + op2;
-    case Calculator::Button::Min:
+    case Qt::Key_Minus:
       return op1 - op2;
-    case Calculator::Button::Div:
+    case Qt::Key_Slash:
       return op2 ? op1 / op2 : 0.0;
-    case Calculator::Button::Mul:
+    case Qt::Key_Asterisk:
       return op1 * op2;
     default:
       return 0.0;
@@ -371,7 +400,7 @@ QString CalculatorWidget::getFullContent() const
   return m_view->toPlainText();
 }
 
-void CalculatorWidget::emitLineSignal(double value, Calculator::Button button)
+void CalculatorWidget::emitLineSignal(double value, int button)
 {
   QString text = buildPrintContent(value, button);
   m_view->appendPlainText(text);
@@ -384,14 +413,14 @@ void CalculatorWidget::emitLineSignal(double value, Calculator::Button button)
   }
 }
 
-QString CalculatorWidget::buildPrintContent(double value, Calculator::Button button)
+QString CalculatorWidget::buildPrintContent(double value, int button)
 {
-  return Calculator::toStr(button) + " " +
-      QString::number(value, 'f').remove(QRegExp("\\.?0*$"));
+  return Calculator::toStr(button) + " " + QString::number(value, 'f').remove(QRegExp("\\.?0*$"));
 }
 
-void CalculatorWidget::calculatorButtonClicked(Calculator::Button button)
+void CalculatorWidget::buttonClicked()
 {
+  int button = sender()->property(KEY_CODE).toInt();
   if (Calculator::isOP(button))
   {
     double currentValue = m_edDisplay->text().toDouble();

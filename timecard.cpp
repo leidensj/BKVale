@@ -17,7 +17,7 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <QCheckBox>
-#include <QProgressDialog>
+#include <QThread>
 
 TimeCard::TimeCard(QWidget* parent)
  : QDialog(parent)
@@ -232,24 +232,41 @@ void TimeCard::saveAndAccept()
   if (fileName.isEmpty())
     return;
 
-  QProgressDialog progress(tr("Gerando livro ponto..."), QString(), 0, 3, this);
-  progress.setWindowModality(Qt::WindowModal);
+  accept();
 
+  QThread* thread = new QThread;
+  TimeCardGenerator* w = new TimeCardGenerator(fileName, html, m_cbOpenFile->isChecked());
+  w->moveToThread(thread);
+  connect(thread, SIGNAL(started()), w, SLOT(generate()));
+  connect(w, SIGNAL(finished()), thread, SLOT(quit()));
+  connect(w, SIGNAL(finished()), w, SLOT(deleteLater()));
+  connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+  thread->start();
+
+}
+
+TimeCardGenerator::TimeCardGenerator(const QString& fileName,
+                                     const QString& html,
+                                     bool bOpen)
+  : m_fileName(fileName)
+  , m_html(html)
+  , m_bOpen(bOpen)
+{
+
+}
+
+void TimeCardGenerator::generate()
+{
   QTextDocument doc;
-  doc.setHtml(html);
-
-  progress.setValue(1);
-
+  doc.setHtml(m_html);
   doc.setDocumentMargin(20);
   QPrinter printer(QPrinter::PrinterResolution);
   printer.setOutputFormat(QPrinter::PdfFormat);
   printer.setPaperSize(QPrinter::A4);
-  printer.setOutputFileName(fileName);
+  printer.setOutputFileName(m_fileName);
   doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
-  progress.setValue(2);
   doc.print(&printer);
-  progress.setValue(3);
-  accept();
-  if (m_cbOpenFile->isChecked())
-    QDesktopServices::openUrl(QUrl(fileName, QUrl::TolerantMode));
+  if (m_bOpen)
+    QDesktopServices::openUrl(QUrl(m_fileName, QUrl::TolerantMode));
+  emit finished();
 }

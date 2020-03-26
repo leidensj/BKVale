@@ -305,7 +305,7 @@ void JDatabase::removeItems()
 
   if (JItemEx::authenticationToRemove(m_tableName))
   {
-    PinCodeView w(this);
+    PinCode w(this);
     if (!w.exec())
       return;
 
@@ -420,7 +420,7 @@ bool JDatabase::save(const JItemSQL& o)
 {
   if (JItemEx::authenticationToInsertUpdate(m_tableName))
   {
-    PinCodeView w(this);
+    PinCode w(this);
     if (!w.exec())
       return false;
 

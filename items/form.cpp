@@ -17,7 +17,7 @@ void Form::clear(bool bClearId)
   m_RG_IE.clear();
   m_details.clear();
   m_dtBirth = QDate::currentDate();
-  m_dtCreation = QDate::currentDate();
+  m_dtCreation = DateTime::server().date();
   m_bCompany = false;
   m_vPhone.clear();
   m_vAddress.clear();

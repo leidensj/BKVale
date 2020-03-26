@@ -9,7 +9,7 @@
 
 #define BUTTON_CODE "button_code"
 
-PinCodeView::PinCodeView(QWidget* parent)
+PinCode::PinCode(QWidget* parent)
   : QDialog(parent)
   , m_bError(false)
   , m_edPinCode(nullptr)
@@ -195,7 +195,7 @@ PinCodeView::PinCodeView(QWidget* parent)
 
 }
 
-void PinCodeView::buttonPressed()
+void PinCode::buttonPressed()
 {
   auto p = sender();
   if (p == nullptr)
@@ -241,14 +241,14 @@ void PinCodeView::buttonPressed()
   }
 }
 
-void PinCodeView::append(QChar c)
+void PinCode::append(QChar c)
 {
   if (m_bError)
     erase();
   m_edPinCode->setText(m_edPinCode->text().append(c));
 }
 
-void PinCodeView::search()
+void PinCode::search()
 {
   QString error;
   m_employee.m_pincode = m_edPinCode->text();
@@ -267,7 +267,7 @@ void PinCodeView::search()
   }
 }
 
-void PinCodeView::erase()
+void PinCode::erase()
 {
   m_edPinCode->clear();
   if (m_bError)
@@ -280,12 +280,12 @@ void PinCodeView::erase()
   }
 }
 
-Employee PinCodeView::getEmployee() const
+Employee PinCode::getEmployee() const
 {
   return m_employee;
 }
 
-bool PinCodeView::eventFilter(QObject *target, QEvent *event)
+bool PinCode::eventFilter(QObject *target, QEvent *event)
 {
   if (event->type() == QEvent::KeyPress)
   {

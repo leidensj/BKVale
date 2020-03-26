@@ -1,4 +1,8 @@
 #include "common.h"
+#include "defines.h"
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QVariant>
 
 QString Data::strMoney(double value)
 {
@@ -73,4 +77,15 @@ QString Text::getRegEx(Input input)
     default:
       return "";
   }
+}
+
+QDateTime DateTime::server()
+{
+  QDateTime dt;
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  QSqlQuery query(db);
+  query.prepare("SELECT NOW()");
+  if (query.exec() && query.next())
+    dt = query.value(0).toDateTime();
+  return dt;
 }

@@ -81,6 +81,7 @@ private:
   Settings m_settings;
   QLabel* m_statusDatabasePath;
   QLabel* m_statusUserName;
+  QLabel* m_statusTime;
   JMdiSubWindow* m_purchaseWindow;
   JMdiSubWindow* m_reminderWindow;
   JMdiSubWindow* m_calculatorWindow;
@@ -92,6 +93,7 @@ private:
 private slots:
   void updateControls();
   void updateStatusBar();
+  void updateTime();
   void showInfo();
   void print();
   bool print(const QString& text);

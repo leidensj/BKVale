@@ -54,6 +54,7 @@ ProductView::ProductView(QWidget* parent)
 
   m_actUnity = m_edUnity->addAction(QIcon(":/icons/res/package.png"), QLineEdit::TrailingPosition);
   connect(m_actUnity, SIGNAL(triggered(bool)), this, SLOT(editUnity()));
+  m_actUnity->setToolTip(tr("Alterar Unidade"));
 
   addViewButton(CATEGORY_SQL_TABLE_NAME);
   addViewButton(IMAGE_SQL_TABLE_NAME);
@@ -142,7 +143,18 @@ void ProductView::editUnity()
                                 m_edUnity->text()),
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
-
+      Product o;
+      getItem(o);
+      QString error;
+      if (!o.SQL_update_unity(pck, error))
+      {
+        QMessageBox::information(this, tr("Erro"), tr(" erro ao atualizar a unidade:\n%1").arg(error), QMessageBox::Ok);
+      }
+      else
+      {
+        o.SQL_select(error);
+        setItem(o);
+      }
     }
   }
 }

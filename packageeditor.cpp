@@ -48,7 +48,7 @@ PackageEditor::PackageEditor(bool bUnityEditor, QWidget* parent)
   mainLayout->addWidget(m_btns);
   setLayout(mainLayout);
 
-  setWindowTitle(m_bUnityEditor ? tr("Modificar Unidade") : tr("Modificar Embalagem"));
+  setWindowTitle(m_bUnityEditor ? tr("Alterar Unidade") : tr("Alterar Embalagem"));
   setWindowIcon(QIcon(":/icons/res/package.png"));
   setWindowFlags(Qt::WindowCloseButtonHint);
   layout()->setSizeConstraint(QLayout::SetFixedSize);

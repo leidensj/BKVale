@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   LoginDialog l(login);
   if (l.exec() == QDialog::Accepted)
   {
-    Tipi w(login);
+    Goiabo w(login);
     w.show();
     return a.exec();
   }

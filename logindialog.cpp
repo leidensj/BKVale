@@ -46,9 +46,9 @@ LoginDialog::LoginDialog(ActiveUser& login,
   , m_btnLogin(nullptr)
 {
   QLabel* lblBaita = new QLabel();
-  lblBaita->setPixmap(QIcon(":/icons/res/tipi.png").pixmap(QSize(160, 96)));
-  lblBaita->setMinimumSize(160, 96);
-  lblBaita->setMaximumSize(160, 96);
+  lblBaita->setPixmap(QIcon(":/icons/res/goiabobannerlogin.png").pixmap(QSize(187, 64)));
+  lblBaita->setMinimumSize(187, 64);
+  lblBaita->setMaximumSize(187, 64);
   lblBaita->setScaledContents(true);
   QLabel* lblUser = new QLabel();
   lblUser->setPixmap(QIcon(":/icons/res/user.png").pixmap(QSize(24, 24)));
@@ -194,7 +194,7 @@ LoginDialog::LoginDialog(ActiveUser& login,
   connect(m_btnDatabaseOpt, SIGNAL(clicked(bool)), this, SLOT(showDatabaseOpt()));
   connect(m_password, SIGNAL(enterSignal()), this, SLOT(focusLogin()));
 
-  setWindowTitle(tr("Tipi Login"));
+  setWindowTitle(tr("Goiabo Login"));
   setWindowIcon(QIcon(":/icons/res/login.png"));
   updateCapsLock();
   setModal(true);

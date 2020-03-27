@@ -11,7 +11,7 @@
 #include <QPainter>
 
 namespace Ui {
-class Tipi;
+class Goiabo;
 }
 
 class JMdiArea : public QMdiArea
@@ -19,7 +19,7 @@ class JMdiArea : public QMdiArea
 public:
     JMdiArea(QWidget *parent = nullptr)
       : QMdiArea(parent)
-      , m_pixmap(":/icons/res/tipi.png")
+      , m_pixmap(":/icons/res/goiabobanner.png")
     {
       setBackground(QBrush(Qt::white));
       QFont f = font();
@@ -56,19 +56,19 @@ class CalculatorWidget;
 class ShopView;
 class JMdiSubWindow;
 
-class Tipi : public QMainWindow
+class Goiabo : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit Tipi(const ActiveUser& login, QWidget *parent = 0);
-  ~Tipi();
+  explicit Goiabo(const ActiveUser& login, QWidget *parent = 0);
+  ~Goiabo();
 
 protected:
   void closeEvent(QCloseEvent* event);
 
 private:
-  Ui::Tipi *ui;
+  Ui::Goiabo *ui;
   ActiveUser m_login;
   JMdiArea* m_mdi;
   PurchaseView* m_purchase;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Tipi</class>
- <widget class="QMainWindow" name="Tipi">
+ <class>Goiabo</class>
+ <widget class="QMainWindow" name="Goiabo">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,11 +17,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Tipi</string>
+   <string>Goiabo</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
-    <normaloff>:/icons/res/baita.png</normaloff>:/icons/res/baita.png</iconset>
+    <normaloff>:/icons/res/goiabo.png</normaloff>:/icons/res/goiabo.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">

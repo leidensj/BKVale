@@ -174,5 +174,7 @@
         <file>res/more.png</file>
         <file>res/ok.png</file>
         <file>res/goiabo.png</file>
+        <file>res/goiabobanner.png</file>
+        <file>res/goiabobannerlogin.png</file>
     </qresource>
 </RCC>

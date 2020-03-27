@@ -45,9 +45,9 @@ protected:
   }
 };
 
-Tipi::Tipi(const ActiveUser& login, QWidget *parent)
+Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   : QMainWindow(parent)
-  , ui(new Ui::Tipi)
+  , ui(new Ui::Goiabo)
   , m_login(login)
   , m_purchase(nullptr)
   , m_reminder(nullptr)
@@ -144,12 +144,12 @@ Tipi::Tipi(const ActiveUser& login, QWidget *parent)
   updateStatusBar();
 }
 
-Tipi::~Tipi()
+Goiabo::~Goiabo()
 {
   delete ui;
 }
 
-bool Tipi::connectPrinter()
+bool Goiabo::connectPrinter()
 {
   if (m_printerSerial.isOpen())
     m_printerSerial.close();
@@ -213,7 +213,7 @@ bool Tipi::connectPrinter()
   return bSuccess;
 }
 
-void Tipi::disconnectPrinter()
+void Goiabo::disconnectPrinter()
 {
   if (m_printerSerial.isOpen())
       m_printerSerial.close();
@@ -221,7 +221,7 @@ void Tipi::disconnectPrinter()
     m_printerTCP.close();
 }
 
-Functionality Tipi::getCurrentFunctionality() const
+Functionality Goiabo::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
   if (activeWindow == m_purchaseWindow)
@@ -235,7 +235,7 @@ Functionality Tipi::getCurrentFunctionality() const
   return Functionality::None;
 }
 
-void Tipi::print()
+void Goiabo::print()
 {
   switch (getCurrentFunctionality())
   {
@@ -311,7 +311,7 @@ void Tipi::print()
   }
 }
 
-bool Tipi::print(const QString& text)
+bool Goiabo::print(const QString& text)
 {
   bool bSuccess = connectPrinter();
   if (bSuccess)
@@ -334,7 +334,7 @@ bool Tipi::print(const QString& text)
   return bSuccess;
 }
 
-void Tipi::openSettingsDialog()
+void Goiabo::openSettingsDialog()
 {
   SettingsDlg dlg(m_settings);
   if (dlg.exec() == QDialog::Accepted)
@@ -344,7 +344,7 @@ void Tipi::openSettingsDialog()
   }
 }
 
-void Tipi::updateStatusBar()
+void Goiabo::updateStatusBar()
 {
   // para adicionar um ícone:
   // "<img src=':/icons/res/16user.png'> " + ...
@@ -357,13 +357,13 @@ void Tipi::updateStatusBar()
                                 QString::number(m_settings.m_databasePort));
 }
 
-void Tipi::updateTime()
+void Goiabo::updateTime()
 {
   QDateTime dt = DateTime::server();
   m_statusTime->setText(dt.date().toString("dd/MM/yyyy ") + dt.time().toString("hh:mm"));
 }
 
-void Tipi::updateControls()
+void Goiabo::updateControls()
 {
   const bool bIsSQLOk = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid() &&
                         QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isOpen();
@@ -409,12 +409,12 @@ void Tipi::updateControls()
   }
 }
 
-void Tipi::showInfo()
+void Goiabo::showInfo()
 {
 
 }
 
-void Tipi::openJItemSQLDialog()
+void Goiabo::openJItemSQLDialog()
 {
   JItemView* view = nullptr;
   if (sender() == ui->actionCategories)
@@ -449,7 +449,7 @@ void Tipi::openJItemSQLDialog()
   }
 }
 
-void Tipi::openLoginDialog()
+void Goiabo::openLoginDialog()
 {
   hide();
   LoginDialog l(m_login);
@@ -470,7 +470,7 @@ void Tipi::openLoginDialog()
 }
 
 
-void Tipi::openActiveUsersDialog()
+void Goiabo::openActiveUsersDialog()
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
@@ -484,7 +484,7 @@ void Tipi::openActiveUsersDialog()
   dlg.exec();
 }
 
-void Tipi::closeEvent(QCloseEvent* event)
+void Goiabo::closeEvent(QCloseEvent* event)
 {
   if (QMessageBox::question(this,
                             tr("Sair"),
@@ -496,7 +496,7 @@ void Tipi::closeEvent(QCloseEvent* event)
     event->ignore();
 }
 
-void Tipi::activateWindow()
+void Goiabo::activateWindow()
 {
   m_purchaseWindow->hide();
   m_reminderWindow->hide();
@@ -525,7 +525,7 @@ void Tipi::activateWindow()
   updateControls();
 }
 
-void Tipi::testTimeAccess()
+void Goiabo::testTimeAccess()
 {
   TimeCard c(this);
   c.exec();

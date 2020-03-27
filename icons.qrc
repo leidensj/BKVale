@@ -173,5 +173,6 @@
         <file>res/history.png</file>
         <file>res/more.png</file>
         <file>res/ok.png</file>
+        <file>res/goiabo.png</file>
     </qresource>
 </RCC>

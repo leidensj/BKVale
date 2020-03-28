@@ -105,7 +105,8 @@ SOURCES += main.cpp\
     tables/paymenttable.cpp \
     tables/employeehourstable.cpp \
     tables/storeemployeestable.cpp \
-    pincode.cpp
+    pincode.cpp \
+    imageviewer.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -204,7 +205,8 @@ HEADERS  += mainwindow.h \
     tables/paymenttable.h \
     tables/employeehourstable.h \
     tables/storeemployeestable.h \
-    pincode.h
+    pincode.h \
+    imageviewer.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

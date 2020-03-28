@@ -7,7 +7,7 @@
 
 class QPushButton;
 class JLineEdit;
-class JImageView;
+class ImageViewer;
 
 class ImageView : public JItemView
 {
@@ -24,7 +24,7 @@ protected slots:
 
 private:
   JLineEdit* m_edImageName;
-  JImageView* m_imageView;
+  ImageViewer* m_viewer;
 };
 
 #endif // IMAGEVIEW_H

@@ -176,5 +176,11 @@
         <file>res/goiabo.png</file>
         <file>res/goiabobanner.png</file>
         <file>res/goiabobannerlogin.png</file>
+        <file>res/collapse.png</file>
+        <file>res/copyclipboard.png</file>
+        <file>res/paste.png</file>
+        <file>res/zoomin.png</file>
+        <file>res/zoomout.png</file>
+        <file>res/fit.png</file>
     </qresource>
 </RCC>

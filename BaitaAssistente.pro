@@ -42,12 +42,13 @@ SOURCES += main.cpp\
     items/user.cpp \
     items/jitemex.cpp \
     widgets/jaddremovebuttons.cpp \
+  widgets/jclicklabel.cpp \
     widgets/jdatabase.cpp \
     widgets/jdatabasepicker.cpp \
     widgets/jdateedit.cpp \
     widgets/jdatepicker.cpp \
     widgets/jdoublespinbox.cpp \
-    widgets/jimageview.cpp \
+  widgets/jimageviewer.cpp \
     widgets/jitemview.cpp \
     widgets/jlineedit.cpp \
     widgets/jplaintextedit.cpp \
@@ -105,8 +106,7 @@ SOURCES += main.cpp\
     tables/paymenttable.cpp \
     tables/employeehourstable.cpp \
     tables/storeemployeestable.cpp \
-    pincode.cpp \
-    imageviewer.cpp
+    pincode.cpp
 
 HEADERS  += mainwindow.h \
     tinyexpr.h \
@@ -138,10 +138,11 @@ HEADERS  += mainwindow.h \
     items/supplier.h \
     items/user.h \
     items/jitemex.h \
+    widgets/jclicklabel.h \
+    widgets/jimageviewer.h \
     widgets/jitemview.h \
     widgets/jaddremovebuttons.h \
     widgets/jdatabasepicker.h \
-    widgets/jimageview.h \
     widgets/jdatepicker.h \
     widgets/jdoublespinbox.h \
     widgets/jdateedit.h \
@@ -205,8 +206,7 @@ HEADERS  += mainwindow.h \
     tables/paymenttable.h \
     tables/employeehourstable.h \
     tables/storeemployeestable.h \
-    pincode.h \
-    imageviewer.h
+    pincode.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

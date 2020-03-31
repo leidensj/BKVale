@@ -1,6 +1,6 @@
 #include "imageview.h"
 #include "widgets/jlineedit.h"
-#include "imageviewer.h"
+#include "widgets/jimageviewer.h"
 #include <QLayout>
 
 ImageView::ImageView(QWidget* parent)
@@ -10,7 +10,7 @@ ImageView::ImageView(QWidget* parent)
 {
   m_edImageName = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
   m_edImageName->setPlaceholderText(tr("Nome"));
-  m_viewer = new ImageViewer;
+  m_viewer = new JImageViewer;
   m_viewer->setContentsMargins(0, 0, 0, 0);
 
   QVBoxLayout* tablayout = new QVBoxLayout;

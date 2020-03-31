@@ -1,9 +1,11 @@
 #include "jdatabasepicker.h"
 #include "jlineedit.h"
-#include "jimageview.h"
 #include "defines.h"
 #include "jdatabase.h"
 #include "items/jitemex.h"
+#include "jimageviewer.h"
+#include "jclicklabel.h"
+#include <QDialog>
 #include <QPushButton>
 #include <QLayout>
 #include <QGroupBox>
@@ -18,7 +20,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
  , m_bMultiPicker(bMultiPicker)
  , m_selector(nullptr)
  , m_edText(nullptr)
- , m_imageView(nullptr)
+ , m_lblImage(nullptr)
 {
   m_edText = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags1);
   m_edText->setReadOnly(true);
@@ -30,12 +32,18 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
 
   m_selector = new JDatabaseSelector(tableName, bMultiPicker, this);
 
-  m_imageView = new JImageView(false, 24);
+  m_lblImage = new JClickLabel;
+  m_lblImage->setMinimumSize(24, 24);
+  m_lblImage->setMaximumSize(24, 24);
+  m_lblImage->setScaledContents(true);
+  m_lblImage->setFrameShape(QFrame::Shape::StyledPanel);
+  m_lblImage->setFrameShadow(QFrame::Shadow::Plain);
+  m_lblImage->setToolTip(tr("Clique para ampliar"));
 
   QHBoxLayout* hlayout0 = new QHBoxLayout;
   hlayout0->setContentsMargins(0, 0, 0, 0);
   hlayout0->addWidget(m_edText);
-  hlayout0->addWidget(m_imageView);
+  hlayout0->addWidget(m_lblImage);
 
   setLayout(hlayout0);
 
@@ -44,6 +52,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
   connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(setItems(const QVector<JItemSQL*>&)));
+  connect(m_lblImage, SIGNAL(clicked()), this, SLOT(showImage()));
   clear();
 }
 
@@ -118,8 +127,15 @@ bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIm
     m_names.clear();
     m_ids.push_back(id);
     m_edText->setText(name);
-    m_imageView->setImage(arImage);
-    m_imageView->hasImage() ? m_imageView->show() : m_imageView->hide();
+    if (!arImage.isEmpty() && ! arImage.isNull())
+    {
+      m_lblImage->show();
+      QPixmap pixmap(QSize(24, 24));
+      pixmap.loadFromData(arImage);
+      m_lblImage->setPixmap(pixmap);
+    }
+    else
+      m_lblImage->hide();
     return previousId != id;
   }
 }
@@ -139,8 +155,8 @@ void JDatabasePicker::clear()
   m_edText->setToolTip("");
   m_ids.clear();
   m_names.clear();
-  m_imageView->clearImage();
-  m_imageView->hasImage() ? m_imageView->show() : m_imageView->hide();
+  m_lblImage->setPixmap(QPixmap::fromImage(QImage()));
+  m_lblImage->hide();
   if (bChanged)
     emit changedSignal();
 }
@@ -163,4 +179,19 @@ QString JDatabasePicker::getText() const
 void JDatabasePicker::setPlaceholderText(bool bSet)
 {
   m_edText->setPlaceholderText(bSet ? getText() : "");
+}
+
+void JDatabasePicker::showImage()
+{
+  QDialog dlg(this);
+  JImageViewer* viewer = new JImageViewer(true);
+  viewer->setImage(m_lblImage->pixmap()->toImage());
+  QHBoxLayout *layout = new QHBoxLayout;
+  dlg.setLayout(layout);
+  layout->addWidget(viewer);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Imagem"));
+  dlg.setWindowIcon(QIcon(":/icons/res/icon.png"));
+  dlg.setModal(true);
+  dlg.exec();
 }

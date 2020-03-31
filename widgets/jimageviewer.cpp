@@ -1,5 +1,4 @@
-#include "imageviewer.h"
-
+#include "jimageviewer.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QDir>
@@ -19,7 +18,7 @@
 #include <QLayout>
 #include <QBuffer>
 
-ImageViewer::ImageViewer(QWidget *parent)
+JImageViewer::JImageViewer(bool bReadOnly, QWidget *parent)
    : QWidget(parent)
    , m_imageLabel(nullptr)
    , m_scrollArea(nullptr)
@@ -48,6 +47,8 @@ ImageViewer::ImageViewer(QWidget *parent)
   m_btnOpen->setIcon(QIcon(":/icons/res/open.png"));
   m_btnOpen->setShortcut(QKeySequence::Open);
   m_btnOpen->setToolTip(tr("Abrir"));
+  m_btnOpen->setEnabled(!bReadOnly);
+  m_btnOpen->setVisible(!bReadOnly);
 
   m_btnCopy = new QPushButton;
   m_btnCopy->setFlat(true);
@@ -55,6 +56,8 @@ ImageViewer::ImageViewer(QWidget *parent)
   m_btnCopy->setIcon(QIcon(":/icons/res/copyclipboard.png"));
   m_btnCopy->setShortcut(QKeySequence::Copy);
   m_btnCopy->setToolTip(tr("Copiar"));
+  m_btnCopy->setEnabled(!bReadOnly);
+  m_btnCopy->setVisible(!bReadOnly);
 
   m_btnPaste = new QPushButton;
   m_btnPaste->setFlat(true);
@@ -62,6 +65,8 @@ ImageViewer::ImageViewer(QWidget *parent)
   m_btnPaste->setIcon(QIcon(":/icons/res/paste.png"));
   m_btnPaste->setShortcut(QKeySequence::Paste);
   m_btnPaste->setToolTip(tr("Colar"));
+  m_btnPaste->setEnabled(!bReadOnly);
+  m_btnPaste->setVisible(!bReadOnly);
 
   m_btnZoomIn = new QPushButton;
   m_btnZoomIn->setFlat(true);
@@ -112,11 +117,12 @@ ImageViewer::ImageViewer(QWidget *parent)
   QVBoxLayout* lt = new QVBoxLayout;
   lt->addLayout(ltButtons);
   lt->addWidget(m_scrollArea);
-
   setLayout(lt);
+  m_btnFit->setChecked(true);
+  fitToWindow();
 }
 
-bool ImageViewer::loadFile(const QString& fileName)
+bool JImageViewer::loadFile(const QString& fileName)
 {
   QImageReader reader(fileName);
   reader.setAutoTransform(true);
@@ -135,7 +141,7 @@ bool ImageViewer::loadFile(const QString& fileName)
   return true;
 }
 
-void ImageViewer::setImage(const QImage& image)
+void JImageViewer::setImage(const QImage& image)
 {
   m_image = image;
   m_imageLabel->setPixmap(QPixmap::fromImage(image));
@@ -173,7 +179,7 @@ static void initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMo
     dialog.setDefaultSuffix("jpg");
 }
 
-void ImageViewer::open()
+void JImageViewer::open()
 {
   QFileDialog dialog(this, tr("Open File"));
   initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
@@ -181,11 +187,11 @@ void ImageViewer::open()
   while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
 }
 
-void ImageViewer::copy()
+void JImageViewer::copy()
 {
 #ifndef QT_NO_CLIPBOARD
     QGuiApplication::clipboard()->setImage(m_image);
-#endif // !QT_NO_CLIPBOARD
+#endif
 }
 
 #ifndef QT_NO_CLIPBOARD
@@ -202,7 +208,7 @@ static QImage clipboardImage()
 }
 #endif
 
-void ImageViewer::paste()
+void JImageViewer::paste()
 {
 #ifndef QT_NO_CLIPBOARD
   const QImage newImage = clipboardImage();
@@ -211,23 +217,23 @@ void ImageViewer::paste()
 #endif
 }
 
-void ImageViewer::zoomIn()
+void JImageViewer::zoomIn()
 {
   scaleImage(1.25);
 }
 
-void ImageViewer::zoomOut()
+void JImageViewer::zoomOut()
 {
   scaleImage(0.8);
 }
 
-void ImageViewer::normalSize()
+void JImageViewer::normalSize()
 {
   m_imageLabel->adjustSize();
   m_scaleFactor = 1.0;
 }
 
-void ImageViewer::fitToWindow()
+void JImageViewer::fitToWindow()
 {
   bool bFit = m_btnFit->isChecked();
   m_scrollArea->setWidgetResizable(bFit);
@@ -236,7 +242,7 @@ void ImageViewer::fitToWindow()
   updateActions();
 }
 
-void ImageViewer::updateActions()
+void JImageViewer::updateActions()
 {
   m_btnCopy->setEnabled(!m_image.isNull());
   m_btnZoomIn->setEnabled(!m_btnFit->isChecked());
@@ -244,7 +250,7 @@ void ImageViewer::updateActions()
   m_btnNormalSize->setEnabled(!m_btnFit->isChecked());
 }
 
-void ImageViewer::scaleImage(double factor)
+void JImageViewer::scaleImage(double factor)
 {
   if (!m_imageLabel->pixmap())
     return;
@@ -259,13 +265,13 @@ void ImageViewer::scaleImage(double factor)
   m_btnZoomOut->setEnabled(m_scaleFactor > 0.333);
 }
 
-void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
+void JImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
   scrollBar->setValue(int(factor * scrollBar->value()
-                            + ((factor - 1) * scrollBar->pageStep()/2)));
+                      + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
-QByteArray ImageViewer::getCompressedImageAsByteArray() const
+QByteArray JImageViewer::getCompressedImageAsByteArray() const
 {
   QByteArray bArray;
   if (!m_image.isNull())

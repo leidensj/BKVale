@@ -12,6 +12,7 @@ class JLineEdit;
 class JImageView;
 class JDatabaseSelector;
 class JDatabase;
+class JClickLabel;
 
 class JDatabasePicker : public QFrame
 {
@@ -36,6 +37,7 @@ public slots:
 
 private slots:
   void searchItem();
+  void showImage();
 
 signals:
   void changedSignal();
@@ -44,7 +46,7 @@ private:
   bool m_bMultiPicker;
   JDatabaseSelector* m_selector;
   JLineEdit* m_edText;
-  JImageView* m_imageView;
+  JClickLabel* m_lblImage;
   QVector<Id> m_ids;
   QVector<QString> m_names;
 };

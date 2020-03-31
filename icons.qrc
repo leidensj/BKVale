@@ -182,5 +182,6 @@
         <file>res/zoomin.png</file>
         <file>res/zoomout.png</file>
         <file>res/fit.png</file>
+        <file>res/copy.png</file>
     </qresource>
 </RCC>

@@ -53,7 +53,7 @@ JImageViewer::JImageViewer(bool bReadOnly, QWidget *parent)
   m_btnCopy = new QPushButton;
   m_btnCopy->setFlat(true);
   m_btnCopy->setIconSize(QSize(24, 24));
-  m_btnCopy->setIcon(QIcon(":/icons/res/copyclipboard.png"));
+  m_btnCopy->setIcon(QIcon(":/icons/res/copy.png"));
   m_btnCopy->setShortcut(QKeySequence::Copy);
   m_btnCopy->setToolTip(tr("Copiar"));
   m_btnCopy->setEnabled(!bReadOnly);

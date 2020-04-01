@@ -7,7 +7,7 @@
 
 class QKeyEvent;
 
-class JTable : protected QTableWidget
+class JTable : public QTableWidget
 {
   Q_OBJECT
 
@@ -26,7 +26,6 @@ public slots:
   virtual void removeAllItems();
   virtual void addRow() = 0;
   virtual void addRowAndActivate();
-  void setEnabled(bool b);
 
 protected slots:
   void emitChangedSignal();

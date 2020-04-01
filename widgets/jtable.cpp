@@ -172,8 +172,3 @@ double JTable::sum(int column) const
   }
   return total;
 }
-
-void JTable::setEnabled(bool b)
-{
-  QTableWidget::setEnabled(b);
-}

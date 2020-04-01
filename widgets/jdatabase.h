@@ -10,17 +10,16 @@
 
 class QPushButton;
 class QCheckBox;
-class JTableView;
 class JLineEdit;
 class QSortFilterProxyModel;
 class Employee;
 
-class JTableView : public QTableView
+class JEnterSignalTable : public QTableView
 {
   Q_OBJECT
 
 public:
-  explicit JTableView(QWidget *parent = 0);
+  explicit JEnterSignalTable(QWidget *parent = nullptr);
 
 signals:
   void enterKeyPressedSignal();
@@ -72,7 +71,7 @@ private:
   QPushButton* m_btnRemove;
   JLineEdit* m_edSearch;
   QCheckBox* m_cbContains;
-  JTableView* m_table;
+  JEnterSignalTable* m_table;
   QString m_tableName;
   QString m_dynamicFilter;
   QString m_fixedFilter;

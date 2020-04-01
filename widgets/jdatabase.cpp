@@ -18,13 +18,13 @@
 #include <QLabel>
 #include <QSortFilterProxyModel>
 
-JTableView::JTableView(QWidget *parent)
+JEnterSignalTable::JEnterSignalTable(QWidget *parent)
   : QTableView(parent)
 {
 
 }
 
-void JTableView::keyPressEvent(QKeyEvent* event)
+void JEnterSignalTable::keyPressEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_Enter ||
       event->key() == Qt::Key_Return)
@@ -93,7 +93,7 @@ JDatabase::JDatabase(const QString& tableName,
   hlayout1->addWidget(m_edSearch);
   hlayout1->addWidget(m_cbContains);
 
-  m_table = new JTableView();
+  m_table = new JEnterSignalTable;
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_table->setSelectionMode(m_mode == Mode::Full  ? QAbstractItemView::ExtendedSelection
                                                   : m_mode ==Mode::MultiSelector ? QAbstractItemView::MultiSelection

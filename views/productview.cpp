@@ -1,6 +1,6 @@
 #include "productview.h"
 #include "widgets/jlineedit.h"
-#include "widgets/jdatabasepicker.h"
+#include "controls/databasepicker.h"
 #include "widgets/jdoublespinbox.h"
 #include "widgets/jaddremovebuttons.h"
 #include "tables/productcodetable.h"
@@ -46,8 +46,8 @@ ProductView::ProductView(QWidget* parent)
   m_cbSell->setIcon(QIcon(":/icons/res/sell.png"));
   m_cbSell->setText(tr("Venda"));
 
-  m_categoryPicker = new JDatabasePicker(CATEGORY_SQL_TABLE_NAME);
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
+  m_categoryPicker = new DatabasePicker(CATEGORY_SQL_TABLE_NAME);
+  m_imagePicker = new DatabasePicker(IMAGE_SQL_TABLE_NAME);
 
   m_btns = new JAddRemoveButtons;
   m_tbCode = new ProductCodeTable(m_btns);

@@ -5,7 +5,7 @@
 #include <QStringList>
 #include "items/purchase.h"
 #include "items/employee.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 
 #define MAX_ITEMS 100
 
@@ -15,7 +15,7 @@ class QSpinBox;
 class QPushButton;
 class QCheckBox;
 class PurchaseTable;
-class JDatabasePicker;
+class DatabasePicker;
 class QDockWidget;
 class JDatabase;
 class QIODevice;
@@ -93,8 +93,8 @@ private:
   QSpinBox* m_snNumber;
   JDatePicker* m_dtPicker;
   JExpLineEdit* m_edTotal;
-  JDatabasePicker* m_supplierPicker;
-  JDatabasePicker* m_storePicker;
+  DatabasePicker* m_supplierPicker;
+  DatabasePicker* m_storePicker;
   PurchaseTable* m_table;
   JExpLineEdit* m_edDisccount;
   PaymentWidget* m_wPayment;

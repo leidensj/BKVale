@@ -5,18 +5,18 @@
 #include <QDialog>
 #include "items/shoppinglist.h"
 
-class JDatabase;
+class DatabaseViewer;
 class QDateEdit;
 class QPushButton;
 class QLabel;
 class QCheckBox;
 
-class ShopView : public QFrame
+class ShopWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  ShopView(QWidget* parent = nullptr);
+  ShopWidget(QWidget* parent = nullptr);
   ShoppingList getShoppingList() const;
 
 private slots:
@@ -25,7 +25,7 @@ private slots:
   void emitChangedSignal();
   
 private:
-  JDatabase* m_database;
+  DatabaseViewer* m_viewer;
   QDateEdit* m_dtDate;
   QPushButton* m_btnToday;
   QLabel* m_lblWeekDay;

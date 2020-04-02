@@ -53,7 +53,7 @@ class PurchaseView;
 class ReminderView;
 class ConsumptionWidget;
 class CalculatorWidget;
-class ShopView;
+class ShopWidget;
 class JMdiSubWindow;
 
 class Goiabo : public QMainWindow
@@ -75,7 +75,7 @@ private:
   ReminderView* m_reminder;
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
-  ShopView* m_shop;
+  ShopWidget* m_shop;
   QSerialPort m_printerSerial;
   QTcpSocket m_printerTCP;
   Settings m_settings;

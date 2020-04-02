@@ -3,11 +3,11 @@
 
 #include <QFrame>
 #include "items/image.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 
 class QPushButton;
 class JLineEdit;
-class JImageViewer;
+class ImageViewer;
 
 class ImageView : public JItemView
 {
@@ -24,7 +24,7 @@ protected slots:
 
 private:
   JLineEdit* m_edImageName;
-  JImageViewer* m_viewer;
+  ImageViewer* m_viewer;
 };
 
 #endif // IMAGEVIEW_H

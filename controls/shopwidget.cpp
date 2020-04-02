@@ -1,5 +1,5 @@
-#include "shopview.h"
-#include "widgets/jdatabase.h"
+#include "shopwidget.h"
+#include "controls/databaseviewer.h"
 #include "defines.h"
 #include "printutils.h"
 #include "escpos.h"
@@ -11,15 +11,15 @@
 #include <QCheckBox>
 #include <QDialogButtonBox>
 
-ShopView::ShopView(QWidget* parent)
-  : QFrame(parent)
-  , m_database(nullptr)
+ShopWidget::ShopWidget(QWidget* parent)
+  : QWidget(parent)
+  , m_viewer(nullptr)
   , m_dtDate(nullptr)
   , m_btnToday(nullptr)
   , m_lblWeekDay(nullptr)
 {
-  m_database = new JDatabase(SHOPPING_LIST_SQL_TABLE_NAME, JDatabase::Mode::ReadOnly);
-  m_database->layout()->setContentsMargins(0, 0, 0, 0);
+  m_viewer = new DatabaseViewer(SHOPPING_LIST_SQL_TABLE_NAME, DatabaseViewer::Mode::ReadOnly);
+  m_viewer->layout()->setContentsMargins(0, 0, 0, 0);
   m_dtDate = new QDateEdit;
   m_dtDate->setCalendarPopup(true);
   m_dtDate->setDate(QDate::currentDate());
@@ -39,19 +39,19 @@ ShopView::ShopView(QWidget* parent)
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addLayout(headerLayout);
-  mainLayout->addWidget(m_database);
+  mainLayout->addWidget(m_viewer);
   setLayout(mainLayout);
 
   connect(m_btnToday, SIGNAL(clicked(bool)), this, SLOT(setToday()));
   connect(m_dtDate, SIGNAL(dateChanged(const QDate&)), this, SLOT(updateControls()));
   connect(m_dtDate, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitChangedSignal()));
-  connect(m_database, SIGNAL(currentRowChangedSignal(int)), this, SLOT(emitChangedSignal()));
+  connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(emitChangedSignal()));
 
   setToday();
   updateControls();
 }
 
-void ShopView::updateControls()
+void ShopWidget::updateControls()
 {
   QDate date = m_dtDate->date();
   m_btnToday->setIcon(QIcon(m_dtDate->date() == QDate::currentDate()
@@ -62,26 +62,26 @@ void ShopView::updateControls()
                  QString::number(date.dayOfWeek()) + SHOPPING_LIST_SEPARATOR "%'"
                  " OR " SHOPPING_LIST_SQL_COL06 " LIKE '%" SHOPPING_LIST_SEPARATOR +
                  QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
-  m_database->setFixedFilter(filter);
+  m_viewer->setFixedFilter(filter);
 }
 
-void ShopView::setToday()
+void ShopWidget::setToday()
 {
   m_dtDate->setDate(QDate::currentDate());
   updateControls();
 }
 
-ShoppingList ShopView::getShoppingList() const
+ShoppingList ShopWidget::getShoppingList() const
 {
-  m_database->selectItems();
-  ShoppingList* plst = dynamic_cast<ShoppingList*>(m_database->getCurrentItem());
+  m_viewer->selectItems();
+  ShoppingList* plst = dynamic_cast<ShoppingList*>(m_viewer->getCurrentItem());
   ShoppingList lst;
   if (plst != nullptr)
     lst = *plst;
   return lst;
 }
 
-void ShopView::emitChangedSignal()
+void ShopWidget::emitChangedSignal()
 {
   emit changedSignal();
 }

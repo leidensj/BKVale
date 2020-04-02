@@ -2,7 +2,7 @@
 #define EMPLOYEEHOURSTABLE_H
 
 #include "timeinterval.h"
-#include "widgets/jtable.h"
+#include "jtable.h"
 
 class EmployeeHoursTable : public JTable
 {

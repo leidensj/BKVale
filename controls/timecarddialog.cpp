@@ -1,13 +1,12 @@
-#include "timecard.h"
+#include "timecarddialog.h"
 #include <QTextDocument>
 #include <QPrinter>
 #include <QDate>
 #include "items/jitem.h"
 #include "items/store.h"
 #include "items/employee.h"
-#include "widgets/jdatabasepicker.h"
+#include "controls/databasepicker.h"
 #include "widgets/jspinbox.h"
-#include "widgets/jdatabase.h"
 #include <QDateEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -19,7 +18,7 @@
 #include <QCheckBox>
 #include <QThread>
 
-TimeCard::TimeCard(QWidget* parent)
+TimeCardDialog::TimeCardDialog(QWidget* parent)
  : QDialog(parent)
  , m_storePicker(nullptr)
  , m_date(nullptr)
@@ -29,7 +28,7 @@ TimeCard::TimeCard(QWidget* parent)
 {
   setWindowTitle(tr("Livro Ponto"));
   setWindowIcon(QIcon(":/icons/res/timecard.png"));
-  m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME);
+  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
   m_date = new QDateEdit(QDate::currentDate());
   m_date->setDisplayFormat("MMMM yyyy");
 
@@ -61,16 +60,16 @@ TimeCard::TimeCard(QWidget* parent)
   updateControls();
 }
 
-void TimeCard::updateControls()
+void TimeCardDialog::updateControls()
 {
   QPushButton* pt = m_buttons->button(QDialogButtonBox::Save);
   if (pt != nullptr)
     pt->setEnabled(m_storePicker->getId().isValid());
 }
 
-void TimeCard::saveAndAccept()
+void TimeCardDialog::saveAndAccept()
 {
-  auto pt = static_cast<Store*>(m_storePicker->getDatabase()->getCurrentItem());
+  auto pt = static_cast<Store*>(m_storePicker->getViewer()->getCurrentItem());
   Store o;
   if (pt != nullptr)
     o = *pt;

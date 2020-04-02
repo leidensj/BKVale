@@ -1,6 +1,6 @@
 #include "purchasefilter.h"
-#include "widgets/jdatabasepicker.h"
-#include "widgets/jdatabase.h"
+#include "controls/databasepicker.h"
+#include "controls/databaseviewer.h"
 #include "widgets/jdateedit.h"
 #include "items/jitemex.h"
 #include "items/purchase.h"
@@ -28,10 +28,10 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   m_dtBegin->setCalendarPopup(true);
   m_dtEnd = new JDateEdit;
   m_dtEnd->setCalendarPopup(true);
-  m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME, true);
-  m_productPicker = new JDatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
-  m_productPicker->getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);
-  m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME, true);
+  m_supplierPicker = new DatabasePicker(SUPPLIER_SQL_TABLE_NAME, true);
+  m_productPicker = new DatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
+  m_productPicker->getViewer()->setFixedFilter(PRODUCT_FILTER_BUY);
+  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME, true);
   m_cbPaymentCredit = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Credit));
   m_cbPaymentCash = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Cash));
   m_cbPaymentBonus = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Bonus));

@@ -1,5 +1,5 @@
 #include "jitemview.h"
-#include "jdatabase.h"
+#include "controls/databaseviewer.h"
 #include "items/jitemex.h"
 #include <QPushButton>
 #include <QLayout>
@@ -7,13 +7,14 @@
 #include <QTabWidget>
 #include <QSplitter>
 #include <QMenu>
+#include <QDialog>
 #include "items/activeuser.h"
 
 #define VIEW_BUTTON "VIEW_BUTTON"
 
 JItemView::JItemView(const QString& tableName, QWidget* parent)
   : QFrame(parent)
-  , m_database(nullptr)
+  , m_viewer(nullptr)
   , m_tab(nullptr)
   , m_tabDb(nullptr)
   , m_ltButton(nullptr)
@@ -65,12 +66,12 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   setLayout(mainLayout);
 
-  m_database = new JDatabase(tableName);
+  m_viewer = new DatabaseViewer(tableName);
   m_dlgDb = new QDialog(this);
 
   QVBoxLayout* ltDb = new QVBoxLayout;
   ltDb->setContentsMargins(0, 0, 0, 0);
-  ltDb->addWidget(m_database);
+  ltDb->addWidget(m_viewer);
   QFrame* frDb = new QFrame;
   frDb->setLayout(ltDb);
 
@@ -87,9 +88,9 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
-  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(selectItem(const JItemSQL&)));
-  connect(m_database, SIGNAL(itemSelectedSignal(const JItemSQL&)), m_dlgDb, SLOT(accept()));
-  connect(m_database, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
+  connect(m_viewer, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(selectItem(const JItemSQL&)));
+  connect(m_viewer, SIGNAL(itemSelectedSignal(const JItemSQL&)), m_dlgDb, SLOT(accept()));
+  connect(m_viewer, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
 
   setMinimumWidth(600);
@@ -132,12 +133,12 @@ void JItemView::itemsRemoved(const QVector<Id>& ids)
 bool JItemView::save(Id& id)
 {
   id.clear();
-  JItemSQL* p = JItemEx::create(m_database->getTableName());
+  JItemSQL* p = JItemEx::create(m_viewer->getTableName());
   bool bSuccess = false;
   if (p != nullptr)
   {
     getItem(*p);
-    bSuccess = m_database->save(*p);
+    bSuccess = m_viewer->save(*p);
     if (bSuccess)
     {
       create();
@@ -166,7 +167,7 @@ void JItemView::setFocusWidgetOnCreate(QWidget* w)
 
 void JItemView::create()
 {
-  JItemSQL* p = JItemEx::create(m_database->getTableName());
+  JItemSQL* p = JItemEx::create(m_viewer->getTableName());
   if (p != nullptr)
   {
     selectItem(*p);

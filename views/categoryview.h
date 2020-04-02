@@ -2,11 +2,11 @@
 #define CATEGORYVIEW_H
 
 #include "items/category.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 
 class QPushButton;
 class JLineEdit;
-class JDatabasePicker;
+class DatabasePicker;
 
 class CategoryView : public JItemView
 {
@@ -23,7 +23,7 @@ protected slots:
 
 private:
   JLineEdit* m_edName;
-  JDatabasePicker* m_imagePicker;
+  DatabasePicker* m_imagePicker;
 };
 
 #endif // CATEGORYVIEW_H

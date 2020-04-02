@@ -1,5 +1,5 @@
 #include "sqlitem.h"
-#include "widgets/jdatabase.h"
+#include "controls/databaseselector.h"
 
 SQLItem::SQLItem(const QString& tableName, const QString& filter)
   : m_tableName(tableName)
@@ -11,11 +11,11 @@ SQLItem::SQLItem(const QString& tableName, const QString& filter)
 
 void SQLItem::activate()
 {
-  JDatabaseSelector dlg(m_tableName, false, tableWidget());
-  dlg.getDatabase()->setFixedFilter(m_filter);
+  DatabaseSelector dlg(m_tableName, false, tableWidget());
+  dlg.getViewer()->setFixedFilter(m_filter);
   if (dlg.exec())
   {
-    JItemSQL* p = dlg.getDatabase()->getCurrentItem();
+    JItemSQL* p = dlg.getViewer()->getCurrentItem();
     if (p != nullptr)
       setValue(SQLItem::st_toVariant(*p));
   }

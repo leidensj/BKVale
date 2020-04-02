@@ -1,5 +1,5 @@
 #include "supplierview.h"
-#include "formwidget.h"
+#include "editors/formeditor.h"
 #include <QFormLayout>
 #include <QRadioButton>
 #include "widgets/jlineedit.h"
@@ -13,10 +13,10 @@ SupplierView::SupplierView(QWidget* parent)
 {
   addViewButton(IMAGE_SQL_TABLE_NAME);
 
-  m_formInfo = new FormInfoWidget;
-  m_formDetails = new FormDetailsWidget;
-  m_formPhone = new FormPhoneWidget;
-  m_formAddress= new FormAddressWidget;
+  m_formInfo = new FormInfoEditor;
+  m_formDetails = new FormDetailsEditor;
+  m_formPhone = new FormPhoneEditor;
+  m_formAddress= new FormAddressEditor;
 
   m_tab->addTab(m_formInfo, QIcon(":/icons/res/resume.png"), tr("Informações"));
   m_tab->addTab(m_formDetails, QIcon(":/icons/res/details.png"), tr("Detalhes"));

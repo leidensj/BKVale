@@ -1,5 +1,5 @@
-#ifndef JIMAGEVIEWER_H
-#define JIMAGEVIEWER_H
+#ifndef IMAGEVIEWER_H
+#define IMAGEVIEWER_H
 
 class QPushButton;
 class QLabel;
@@ -9,12 +9,12 @@ class QScrollBar;
 
 #include <QWidget>
 
-class JImageViewer : public QWidget
+class ImageViewer : public QWidget
 {
   Q_OBJECT
 
 public:
-  JImageViewer(bool bReadOnly = false, QWidget *parent = nullptr);
+  ImageViewer(bool bReadOnly = false, QWidget *parent = nullptr);
   bool loadFile(const QString& fileName);
   void setImage(const QImage& image);
   QByteArray getCompressedImageAsByteArray() const;

@@ -1,4 +1,4 @@
-#include "pincode.h"
+#include "pincodedialog.h"
 #include "databaseutils.h"
 #include <QFrame>
 #include <QLayout>
@@ -9,7 +9,7 @@
 
 #define BUTTON_CODE "button_code"
 
-PinCode::PinCode(QWidget* parent)
+PinCodeDialog::PinCodeDialog(QWidget* parent)
   : QDialog(parent)
   , m_bError(false)
   , m_edPinCode(nullptr)
@@ -195,7 +195,7 @@ PinCode::PinCode(QWidget* parent)
 
 }
 
-void PinCode::buttonPressed()
+void PinCodeDialog::buttonPressed()
 {
   auto p = sender();
   if (p == nullptr)
@@ -241,14 +241,14 @@ void PinCode::buttonPressed()
   }
 }
 
-void PinCode::append(QChar c)
+void PinCodeDialog::append(QChar c)
 {
   if (m_bError)
     erase();
   m_edPinCode->setText(m_edPinCode->text().append(c));
 }
 
-void PinCode::search()
+void PinCodeDialog::search()
 {
   QString error;
   m_employee.m_pincode = m_edPinCode->text();
@@ -267,7 +267,7 @@ void PinCode::search()
   }
 }
 
-void PinCode::erase()
+void PinCodeDialog::erase()
 {
   m_edPinCode->clear();
   if (m_bError)
@@ -280,12 +280,12 @@ void PinCode::erase()
   }
 }
 
-Employee PinCode::getEmployee() const
+Employee PinCodeDialog::getEmployee() const
 {
   return m_employee;
 }
 
-bool PinCode::eventFilter(QObject *target, QEvent *event)
+bool PinCodeDialog::eventFilter(QObject *target, QEvent *event)
 {
   if (event->type() == QEvent::KeyPress)
   {

@@ -2,7 +2,7 @@
 #define STOREEMPLOYEESTABLE_H
 
 
-#include "widgets/jtable.h"
+#include "jtable.h"
 #include "items/employee.h"
 
 class StoreEmployeesTable : public JTable

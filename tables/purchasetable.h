@@ -1,7 +1,7 @@
 #ifndef PURCHASETABLE_H
 #define PURCHASETABLE_H
 
-#include "widgets/jtable.h"
+#include "jtable.h"
 #include "items/purchase.h"
 
 class PurchaseTable : public JTable

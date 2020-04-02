@@ -7,12 +7,12 @@
 class QPushButton;
 class QLineEdit;
 
-class PinCode : public QDialog
+class PinCodeDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit PinCode(QWidget* parent = nullptr);
+  explicit PinCodeDialog(QWidget* parent = nullptr);
   Employee getEmployee() const;
 
 protected:

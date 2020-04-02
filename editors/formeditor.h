@@ -1,5 +1,5 @@
-#ifndef FORMWIDGET_H
-#define FORMWIDGET_H
+#ifndef FORMEDITOR_H
+#define FORMEDITOR_H
 
 #include <QWidget>
 #include "items/form.h"
@@ -9,7 +9,7 @@ class QLabel;
 class QRadioButton;
 class JLineEdit;
 class QDateEdit;
-class JDatabasePicker;
+class DatabasePicker;
 class QCheckBox;
 class QPushButton;
 class AddressTable;
@@ -18,12 +18,12 @@ class JPlainTextEdit;
 class JTable;
 class QTableWidgetItem;
 
-class FormInfoWidget : public QWidget
+class FormInfoEditor : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit FormInfoWidget(QWidget* parent = 0);
+  explicit FormInfoEditor(QWidget* parent = 0);
   void setForm(const Form& o);
   void fillForm(Form& o) const;
   QDateEdit* m_dtCreationDate;
@@ -48,7 +48,7 @@ signals:
   void userTypeChangedSignal(bool bCompany);
 };
 
-class FormDetailsWidget : public QWidget
+class FormDetailsEditor : public QWidget
 {
   Q_OBJECT
 
@@ -57,7 +57,7 @@ class FormDetailsWidget : public QWidget
   QString m_strPreviousRgIE;
 
 public:
-  explicit FormDetailsWidget(QWidget* parent = 0);
+  explicit FormDetailsEditor(QWidget* parent = 0);
   void setForm(const Form& o);
   void fillForm(Form& o) const;
 
@@ -69,7 +69,7 @@ public:
   JPlainTextEdit* m_teDetails;
   QDateEdit* m_dtBirthDate;
   QCheckBox* m_cbBirthDate;
-  JDatabasePicker* m_imagePicker;
+  DatabasePicker* m_imagePicker;
 
 private slots:
   void updateControls();
@@ -78,12 +78,12 @@ public slots:
   void switchUserType(bool bCompany);
 };
 
-class FormPhoneWidget : public QWidget
+class FormPhoneEditor : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit FormPhoneWidget(QWidget* parent = 0);
+  explicit FormPhoneEditor(QWidget* parent = 0);
   void setForm(const Form& o);
   void fillForm(Form& o) const;
 
@@ -91,12 +91,12 @@ public:
   PhoneTable* m_tbPhone;
 };
 
-class FormAddressWidget : public QWidget
+class FormAddressEditor : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit FormAddressWidget(QWidget* parent = 0);
+  explicit FormAddressEditor(QWidget* parent = 0);
   void setForm(const Form& o);
   void fillForm(Form& o) const;
 
@@ -104,4 +104,4 @@ public:
   AddressTable* m_tbAddress;
 };
 
-#endif // FORMWIDGET_H
+#endif // FORMEDITOR_H

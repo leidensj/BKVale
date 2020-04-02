@@ -1,7 +1,7 @@
 #ifndef PAYMENTTABLE_H
 #define PAYMENTTABLE_H
 
-#include "widgets/jtable.h"
+#include "jtable.h"
 #include "items/paymentelement.h"
 
 class PaymentTable : public JTable

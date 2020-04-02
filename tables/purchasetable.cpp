@@ -2,7 +2,7 @@
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
-#include "widgets/jdatabase.h"
+#include "controls/databaseselector.h"
 #include "tableitems/doubleitem.h"
 #include "tableitems/packageitem.h"
 #include "tableitems/sqlitem.h"
@@ -77,11 +77,11 @@ void PurchaseTable::addRowAndActivate()
 
 void PurchaseTable::addRowByCode()
 {
-  JDatabaseSelector dlg(PRODUCT_CODE_ITEMS_SQL_TABLE_NAME, false, this);
-  dlg.getDatabase()->setFixedFilter(PRODUCT_FILTER_BUY);
+  DatabaseSelector dlg(PRODUCT_CODE_ITEMS_SQL_TABLE_NAME, false, this);
+  dlg.getViewer()->setFixedFilter(PRODUCT_FILTER_BUY);
   if (dlg.exec())
   {
-    ProductCode* p = dynamic_cast<ProductCode*>(dlg.getDatabase()->getCurrentItem());
+    ProductCode* p = dynamic_cast<ProductCode*>(dlg.getViewer()->getCurrentItem());
     Product o;
     QString error;
     if (o.SQL_select_by_code(*p, error))

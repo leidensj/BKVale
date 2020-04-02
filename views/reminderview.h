@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include "items/reminder.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 #include <QDialog>
 
 class JLineEdit;

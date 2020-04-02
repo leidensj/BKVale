@@ -2,9 +2,9 @@
 #include "widgets/jlineedit.h"
 #include "widgets/jplaintextedit.h"
 #include "widgets/jaddremovebuttons.h"
-#include "widgets/jdatabase.h"
+#include "controls/databaseviewer.h"
 #include "tables/storeemployeestable.h"
-#include "formwidget.h"
+#include "editors/formeditor.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QRadioButton>
@@ -23,10 +23,10 @@ StoreView::StoreView(QWidget* parent)
   addViewButton(EMPLOYEE_SQL_TABLE_NAME);
   addViewButton(IMAGE_SQL_TABLE_NAME);
 
-  m_formInfo = new FormInfoWidget;
-  m_formDetails = new FormDetailsWidget;
-  m_formPhone = new FormPhoneWidget;
-  m_formAddress= new FormAddressWidget;
+  m_formInfo = new FormInfoEditor;
+  m_formDetails = new FormDetailsEditor;
+  m_formPhone = new FormPhoneEditor;
+  m_formAddress= new FormAddressEditor;
   m_btnAddRemove = new JAddRemoveButtons;
   m_tbEmployee = new StoreEmployeesTable(m_btnAddRemove);
 

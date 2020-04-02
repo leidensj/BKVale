@@ -1,9 +1,8 @@
 #ifndef SHOPPINGLISTTABLE_H
 #define SHOPPINGLISTTABLE_H
 
-#include <QTableWidget>
 #include "items/shoppinglist.h"
-#include "widgets/jtable.h"
+#include "jtable.h"
 
 class ShoppingListTable : public JTable
 {

@@ -4,9 +4,9 @@
 #include <QFrame>
 #include <QVector>
 #include "items/shoppinglist.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 
-class JDatabasePicker;
+class DatabasePicker;
 class QCheckBox;
 class JLineEdit;
 class ShoppingListTable;
@@ -34,8 +34,8 @@ private:
   JLineEdit* m_edTitle;
   JSpinBox* m_snLines;
   QPlainTextEdit* m_teDescription;
-  JDatabasePicker* m_supplierPicker;
-  JDatabasePicker* m_imagePicker;
+  DatabasePicker* m_supplierPicker;
+  DatabasePicker* m_imagePicker;
 
   ShoppingListTable* m_table;
   JAddRemoveButtons* m_btns;

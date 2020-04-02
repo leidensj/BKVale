@@ -1,6 +1,6 @@
-#include "formwidget.h"
+#include "formeditor.h"
 #include "widgets/jlineedit.h"
-#include "widgets/jdatabasepicker.h"
+#include "controls/databasepicker.h"
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jplaintextedit.h"
 #include "tables/addresstable.h"
@@ -16,7 +16,7 @@
 #include <QGroupBox>
 #include <QPushButton>
 
-FormInfoWidget::FormInfoWidget(QWidget* parent)
+FormInfoEditor::FormInfoEditor(QWidget* parent)
   : QWidget(parent)
   , m_dtCreationDate(nullptr)
   , m_type(nullptr)
@@ -68,7 +68,7 @@ FormInfoWidget::FormInfoWidget(QWidget* parent)
   setLayout(lt);
 }
 
-void FormInfoWidget::addWidget(const QString& text, QWidget* w)
+void FormInfoEditor::addWidget(const QString& text, QWidget* w)
 {
   if (w != nullptr)
   {
@@ -77,14 +77,14 @@ void FormInfoWidget::addWidget(const QString& text, QWidget* w)
   }
 }
 
-void FormInfoWidget::setCompany(bool b)
+void FormInfoEditor::setCompany(bool b)
 {
   m_rdoCompany->setChecked(b);
   m_rdoPerson->setChecked(!b);
   switchUserType();
 }
 
-void FormInfoWidget::setForm(const Form& o)
+void FormInfoEditor::setForm(const Form& o)
 {
   m_edName->setText(o.m_name);
   m_edAlias->setText(o.m_alias);
@@ -94,7 +94,7 @@ void FormInfoWidget::setForm(const Form& o)
   switchUserType();
 }
 
-void FormInfoWidget::fillForm(Form& o) const
+void FormInfoEditor::fillForm(Form& o) const
 {
   o.m_name = m_edName->text();
   o.m_alias = m_edAlias->text();
@@ -102,7 +102,7 @@ void FormInfoWidget::fillForm(Form& o) const
   o.m_bCompany = m_rdoCompany->isChecked();
 }
 
-void FormInfoWidget::switchUserType()
+void FormInfoEditor::switchUserType()
 {
   if (m_rdoCompany->isChecked())
   {
@@ -118,7 +118,7 @@ void FormInfoWidget::switchUserType()
   emit userTypeChangedSignal(m_rdoCompany->isChecked());
 }
 
-FormDetailsWidget::FormDetailsWidget(QWidget* parent)
+FormDetailsEditor::FormDetailsEditor(QWidget* parent)
   : QWidget(parent)
   , m_bPreviousWasCompany(false)
   , m_edCpfCnpj(nullptr)
@@ -143,7 +143,7 @@ FormDetailsWidget::FormDetailsWidget(QWidget* parent)
   m_dtBirthDate->setDate(QDate::currentDate());
   m_cbBirthDate = new QCheckBox;
   m_cbBirthDate->setChecked(false);
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
+  m_imagePicker = new DatabasePicker(IMAGE_SQL_TABLE_NAME);
 
   QFormLayout* lt = new QFormLayout;
   lt->addRow(m_lblCpfCnpj, m_edCpfCnpj);
@@ -158,7 +158,7 @@ FormDetailsWidget::FormDetailsWidget(QWidget* parent)
   updateControls();
 }
 
-void FormDetailsWidget::setForm(const Form& o)
+void FormDetailsEditor::setForm(const Form& o)
 {
   m_bPreviousWasCompany = o.m_bCompany;
   m_strPreviousCpfCnpj = o.m_CPF_CNPJ;
@@ -174,7 +174,7 @@ void FormDetailsWidget::setForm(const Form& o)
   switchUserType(o.m_bCompany);
 }
 
-void FormDetailsWidget::fillForm(Form& o) const
+void FormDetailsEditor::fillForm(Form& o) const
 {
   o.m_image.m_id = m_imagePicker->getId();
   o.m_email = m_edEmail->text();
@@ -185,7 +185,7 @@ void FormDetailsWidget::fillForm(Form& o) const
   o.m_dtBirth = m_dtBirthDate->date();
 }
 
-void FormDetailsWidget::switchUserType(bool bCompany)
+void FormDetailsEditor::switchUserType(bool bCompany)
 {
   if (bCompany)
   {
@@ -209,7 +209,7 @@ void FormDetailsWidget::switchUserType(bool bCompany)
   }
 }
 
-void FormDetailsWidget::updateControls()
+void FormDetailsEditor::updateControls()
 {
   m_dtBirthDate->setEnabled(m_cbBirthDate->isChecked());
   if (m_cbBirthDate->isChecked() &&
@@ -217,7 +217,7 @@ void FormDetailsWidget::updateControls()
     m_dtBirthDate->setDate(QDate::currentDate());
 }
 
-FormPhoneWidget::FormPhoneWidget(QWidget* parent)
+FormPhoneEditor::FormPhoneEditor(QWidget* parent)
   : QWidget(parent)
   , m_btnAddRemove(nullptr)
   , m_tbPhone(nullptr)
@@ -231,19 +231,19 @@ FormPhoneWidget::FormPhoneWidget(QWidget* parent)
   setLayout(lt);
 }
 
-void FormPhoneWidget::setForm(const Form& o)
+void FormPhoneEditor::setForm(const Form& o)
 {
   m_tbPhone->setPhones(o.m_vPhone);
 }
 
-void FormPhoneWidget::fillForm(Form& o) const
+void FormPhoneEditor::fillForm(Form& o) const
 {
   QVector<Phone> v;
   m_tbPhone->getPhones(v);
   o.m_vPhone.append(v);
 }
 
-FormAddressWidget::FormAddressWidget(QWidget* parent)
+FormAddressEditor::FormAddressEditor(QWidget* parent)
   : QWidget(parent)
   , m_btnAddRemove(nullptr)
   , m_tbAddress(nullptr)
@@ -258,12 +258,12 @@ FormAddressWidget::FormAddressWidget(QWidget* parent)
   setLayout(lt);
 }
 
-void FormAddressWidget::setForm(const Form& o)
+void FormAddressEditor::setForm(const Form& o)
 {
   m_tbAddress->setAddresses(o.m_vAddress);
 }
 
-void FormAddressWidget::fillForm(Form& o) const
+void FormAddressEditor::fillForm(Form& o) const
 {
   m_tbAddress->getAddresses(o.m_vAddress);
 }

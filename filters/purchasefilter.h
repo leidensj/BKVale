@@ -1,9 +1,9 @@
 #ifndef PURCHASEFILTERDLG_H
 #define PURCHASEFILTERDLG_H
 
-#include "widgets/jfilter.h"
+#include "jfilter.h"
 
-class JDatabasePicker;
+class DatabasePicker;
 class JDateEdit;
 class QGroupBox;
 class QCheckBox;
@@ -26,9 +26,9 @@ private:
   QGroupBox* m_cbDate;
   JDateEdit* m_dtBegin;
   JDateEdit* m_dtEnd;
-  JDatabasePicker* m_supplierPicker;
-  JDatabasePicker* m_productPicker;
-  JDatabasePicker* m_storePicker;
+  DatabasePicker* m_supplierPicker;
+  DatabasePicker* m_productPicker;
+  DatabasePicker* m_storePicker;
   QCheckBox* m_cbPaymentCredit;
   QCheckBox* m_cbPaymentCash;
   QCheckBox* m_cbPaymentBonus;

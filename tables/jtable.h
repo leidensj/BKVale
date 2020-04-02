@@ -2,7 +2,7 @@
 #define JITEMTABLE_H
 
 #include <QTableWidget>
-#include "jaddremovebuttons.h"
+#include "widgets/jaddremovebuttons.h"
 #include "tableitems/jtableitem.h"
 
 class QKeyEvent;

@@ -1,6 +1,6 @@
 #include "employeeview.h"
+#include "controls/databasepicker.h"
 #include "widgets/jlineedit.h"
-#include "widgets/jdatabasepicker.h"
 #include "widgets/jspinbox.h"
 #include "widgets/jtimeedit.h"
 #include "widgets/jaddremovebuttons.h"
@@ -14,7 +14,7 @@
 #include <QHeaderView>
 #include <QRadioButton>
 #include <QTreeWidget>
-#include "formwidget.h"
+#include "editors/formeditor.h"
 
 EmployeeView::EmployeeView(QWidget* parent)
   : JItemView(EMPLOYEE_SQL_TABLE_NAME, parent)
@@ -31,10 +31,10 @@ EmployeeView::EmployeeView(QWidget* parent)
 {
   addViewButton(IMAGE_SQL_TABLE_NAME);
 
-  m_formInfo = new FormInfoWidget;
-  m_formDetails = new FormDetailsWidget;
-  m_formPhone = new FormPhoneWidget;
-  m_formAddress= new FormAddressWidget;
+  m_formInfo = new FormInfoEditor;
+  m_formDetails = new FormDetailsEditor;
+  m_formPhone = new FormPhoneEditor;
+  m_formAddress= new FormAddressEditor;
   m_edPincode = new JLineEdit(Text::Input::Alphanumeric);
   m_btnAddRemove = new JAddRemoveButtons;
   m_tbHours = new EmployeeHoursTable(m_btnAddRemove);

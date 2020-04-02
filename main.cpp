@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "logindialog.h"
+#include "controls/logindialog.h"
 #include "databaseutils.h"
 #include "settings.h"
 #include <QApplication>

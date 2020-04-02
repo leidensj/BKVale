@@ -1,6 +1,6 @@
 #include "categoryview.h"
 #include "widgets/jlineedit.h"
-#include "widgets/jdatabasepicker.h"
+#include "controls/databasepicker.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
@@ -16,7 +16,7 @@ CategoryView::CategoryView(QWidget* parent)
   m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
 
-  m_imagePicker = new JDatabasePicker(IMAGE_SQL_TABLE_NAME);
+  m_imagePicker = new DatabasePicker(IMAGE_SQL_TABLE_NAME);
 
   QFormLayout* ltForm = new QFormLayout;
   ltForm->addRow(tr("Nome:"), m_edName);

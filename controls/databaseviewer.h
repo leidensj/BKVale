@@ -1,8 +1,7 @@
-#ifndef JDATABASE_H
-#define JDATABASE_H
+#ifndef DATABASEVIEWER_H
+#define DATABASEVIEWER_H
 
-#include <QFrame>
-#include <QDialog>
+#include <QWidget>
 #include <QModelIndex>
 #include <QVector>
 #include <QTableView>
@@ -28,7 +27,7 @@ protected:
   void keyPressEvent(QKeyEvent* event);
 };
 
-class JDatabase : public QFrame
+class DatabaseViewer : public QWidget
 {
   Q_OBJECT
 
@@ -41,10 +40,10 @@ public:
     ReadOnly
   };
 
-  explicit JDatabase(const QString& tableName,
-                     Mode mode = Mode::Full,
-                     QWidget *parent = 0);
-  ~JDatabase();
+  explicit DatabaseViewer(const QString& tableName,
+                          Mode mode = Mode::Full,
+                          QWidget *parent = 0);
+  ~DatabaseViewer();
   QString getTableName() const;
   JItemSQL* getCurrentItem() const;
   QVector<Id> getSelectedIds() const;
@@ -97,25 +96,4 @@ signals:
   void refreshSignal();
 };
 
-class JDatabaseSelector : public QDialog
-{
-  Q_OBJECT
-
-public:
-  explicit JDatabaseSelector(const QString& tableName,
-                             bool bMultiSelector = false,
-                             QWidget* parent = 0);
-
-  JDatabase* getDatabase() const;
-
-protected:
-  void closeEvent(QCloseEvent * e);
-
-private slots:
-  void itemsSelected(const QVector<JItemSQL*>& v);
-
-private:
-  JDatabase* m_database;
-};
-
-#endif // JDATABASE_H
+#endif // DATABASEVIEWER_H

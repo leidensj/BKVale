@@ -1,8 +1,9 @@
 #include "purchaseview.h"
 #include "databaseutils.h"
 #include "tables/purchasetable.h"
-#include "widgets/jdatabasepicker.h"
-#include "widgets/jdatabase.h"
+#include "controls/databasepicker.h"
+#include "controls/databaseviewer.h"
+#include "controls/databaseselector.h"
 #include "widgets/jlineedit.h"
 #include "widgets/jaddremovebuttons.h"
 #include "widgets/jdoublespinbox.h"
@@ -269,10 +270,10 @@ PurchaseView::PurchaseView(QWidget *parent)
   ltCmd->addWidget(line2);
   ltCmd->addWidget(m_btnAddRemove);
 
-  m_supplierPicker = new JDatabasePicker(SUPPLIER_SQL_TABLE_NAME);
+  m_supplierPicker = new DatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
 
-  m_storePicker = new JDatabasePicker(STORE_SQL_TABLE_NAME);
+  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
   m_storePicker->setPlaceholderText(true);
 
   QVBoxLayout* ltHeader = new QVBoxLayout;
@@ -357,7 +358,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
-  connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_database, SLOT(setDynamicFilter(const QString&)));
+  connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_viewer, SLOT(setDynamicFilter(const QString&)));
   connect(m_tabDb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
   connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setPurchaseTotal(double)));
@@ -437,8 +438,8 @@ void PurchaseView::updateControls()
 
 void PurchaseView::updateStatistics()
 {
-  m_edEntries->setText(Data::strInt(m_database->getNumberOfEntries()));
-  m_edSum->setText(Data::strMoney(m_database->getSum(5)));
+  m_edEntries->setText(Data::strInt(m_viewer->getNumberOfEntries()));
+  m_edSum->setText(Data::strMoney(m_viewer->getSum(5)));
 }
 
 bool PurchaseView::save(Id& id)
@@ -459,7 +460,7 @@ bool PurchaseView::save(Id& id)
     return false;
   }
 
-  bool bSuccess = m_database->save(o);
+  bool bSuccess = m_viewer->save(o);
   if (bSuccess)
   {
     if (o.m_store.m_id.isValid())
@@ -478,7 +479,7 @@ bool PurchaseView::save(Id& id)
 void PurchaseView::lastItemSelected()
 {
   if (m_lastId.isValid())
-    m_database->selectItem(m_lastId);
+    m_viewer->selectItem(m_lastId);
 }
 
 void PurchaseView::selectItem(const JItemSQL& o)
@@ -507,7 +508,7 @@ QDate PurchaseView::getDate() const
 
 void PurchaseView::showHistory()
 {
-  JDatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME, true, this);
+  DatabaseSelector dlg(PRODUCT_SQL_TABLE_NAME, true, this);
   QString str(PRODUCT_FILTER_BUY
               " AND "
               PRODUCT_SQL_TABLE_NAME "." SQL_COLID
@@ -522,10 +523,10 @@ void PurchaseView::showHistory()
               " WHERE "
               PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " = " +
               m_supplierPicker->getId().str() + "))");
-  dlg.getDatabase()->setFixedFilter(str);
+  dlg.getViewer()->setFixedFilter(str);
   if (dlg.exec())
   {
-    QVector<Id> vId = dlg.getDatabase()->getSelectedIds();
+    QVector<Id> vId = dlg.getViewer()->getSelectedIds();
     QVector<PurchaseElement> v;
     for (int i = 0; i != vId.size(); ++i)
     {

@@ -1,6 +1,6 @@
 #include "reminderview.h"
+#include "controls/databaseviewer.h"
 #include "widgets/jlineedit.h"
-#include "widgets/jdatabase.h"
 #include "widgets/jspinbox.h"
 #include "widgets/jdatepicker.h"
 #include "widgets/jtimeedit.h"

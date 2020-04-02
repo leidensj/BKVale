@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include "items/user.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 
 class QCheckBox;
 class JLineEdit;

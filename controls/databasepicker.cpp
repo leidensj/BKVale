@@ -1,10 +1,11 @@
-#include "jdatabasepicker.h"
-#include "jlineedit.h"
+#include "databasepicker.h"
+#include "widgets/jlineedit.h"
+#include "widgets/jclicklabel.h"
 #include "defines.h"
-#include "jdatabase.h"
+#include "databaseviewer.h"
 #include "items/jitemex.h"
-#include "jimageviewer.h"
-#include "jclicklabel.h"
+#include "imageviewer.h"
+#include "databaseselector.h"
 #include <QDialog>
 #include <QPushButton>
 #include <QLayout>
@@ -13,9 +14,9 @@
 #include <QLabel>
 #include <QAction>
 
-JDatabasePicker::JDatabasePicker(const QString& tableName,
-                                 bool bMultiPicker,
-                                 QWidget* parent)
+DatabasePicker::DatabasePicker(const QString& tableName,
+                               bool bMultiPicker,
+                               QWidget* parent)
  : QFrame(parent)
  , m_bMultiPicker(bMultiPicker)
  , m_selector(nullptr)
@@ -30,7 +31,7 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   action->setToolTip(tr("Selecionar ") + JItemEx::text(tableName));
   action2->setToolTip(tr("Remover ") + JItemEx::text(tableName));
 
-  m_selector = new JDatabaseSelector(tableName, bMultiPicker, this);
+  m_selector = new DatabaseSelector(tableName, bMultiPicker, this);
 
   m_lblImage = new JClickLabel;
   m_lblImage->setMinimumSize(24, 24);
@@ -51,17 +52,17 @@ JDatabasePicker::JDatabasePicker(const QString& tableName,
   connect(action2, SIGNAL(triggered(bool)), this, SLOT(clear()));
   connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
-  connect(m_selector->getDatabase(), SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(setItems(const QVector<JItemSQL*>&)));
+  connect(m_selector->getViewer(), SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(setItems(const QVector<JItemSQL*>&)));
   connect(m_lblImage, SIGNAL(clicked()), this, SLOT(showImage()));
   clear();
 }
 
-JDatabase* JDatabasePicker::getDatabase() const
+DatabaseViewer* DatabasePicker::getViewer() const
 {
-  return m_selector->getDatabase();
+  return m_selector->getViewer();
 }
 
-void JDatabasePicker::setItems(const QVector<JItemSQL*>& v)
+void DatabasePicker::setItems(const QVector<JItemSQL*>& v)
 {
   m_selector->close();
   clear();
@@ -77,12 +78,12 @@ void JDatabasePicker::setItems(const QVector<JItemSQL*>& v)
     emit changedSignal();
 }
 
-bool JDatabasePicker::setItem(const JItemSQL& o)
+bool DatabasePicker::setItem(const JItemSQL& o)
 {
   return setItem(o.m_id, o.name(), o.image());
 }
 
-bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arImage)
+bool DatabasePicker::setItem(Id id, const QString& name, const QByteArray& arImage)
 {
   if (m_bMultiPicker)
   {
@@ -140,15 +141,15 @@ bool JDatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIm
   }
 }
 
-void JDatabasePicker::searchItem()
+void DatabasePicker::searchItem()
 {
-  m_selector->getDatabase()->refresh();
+  m_selector->getViewer()->refresh();
   if (m_bMultiPicker && !m_ids.isEmpty())
-    m_selector->getDatabase()->selectIds(m_ids);
+    m_selector->getViewer()->selectIds(m_ids);
   m_selector->exec();
 }
 
-void JDatabasePicker::clear()
+void DatabasePicker::clear()
 {
   bool bChanged = !m_edText->text().isEmpty();
   m_edText->clear();
@@ -161,30 +162,30 @@ void JDatabasePicker::clear()
     emit changedSignal();
 }
 
-Id JDatabasePicker::getId() const
+Id DatabasePicker::getId() const
 {
   return Id(m_bMultiPicker ? INVALID_ID : m_ids.isEmpty() ? INVALID_ID : m_ids.at(0));
 }
 
-const QVector<Id>& JDatabasePicker::getIds() const
+const QVector<Id>& DatabasePicker::getIds() const
 {
   return m_ids;
 }
 
-QString JDatabasePicker::getText() const
+QString DatabasePicker::getText() const
 {
-  return JItemEx::text(m_selector->getDatabase()->getTableName());
+  return JItemEx::text(m_selector->getViewer()->getTableName());
 }
 
-void JDatabasePicker::setPlaceholderText(bool bSet)
+void DatabasePicker::setPlaceholderText(bool bSet)
 {
   m_edText->setPlaceholderText(bSet ? getText() : "");
 }
 
-void JDatabasePicker::showImage()
+void DatabasePicker::showImage()
 {
   QDialog dlg(this);
-  JImageViewer* viewer = new JImageViewer(true);
+  ImageViewer* viewer = new ImageViewer(true);
   viewer->setImage(m_lblImage->pixmap()->toImage());
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);

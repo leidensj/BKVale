@@ -4,11 +4,10 @@
 #include <QFrame>
 #include "items/jitemsql.h"
 #include <QPushButton>
-#include "widgets/jdatabase.h"
+#include "controls/databaseviewer.h"
 #include <QTabWidget>
 
 class QPushButton;
-class JDatabase;
 class QTabWidget;
 class QDialog;
 class QHBoxLayout;
@@ -42,7 +41,7 @@ signals:
 
 protected:
   Id m_id;
-  JDatabase* m_database;
+  DatabaseViewer* m_viewer;
   QTabWidget* m_tab;
   QTabWidget* m_tabDb;
   QHBoxLayout* m_ltButton;

@@ -1,7 +1,7 @@
-#include "jdatabase.h"
-#include "jlineedit.h"
+#include "databaseviewer.h"
+#include "widgets/jlineedit.h"
 #include "defines.h"
-#include "pincode.h"
+#include "pincodedialog.h"
 #include "items/jitemex.h"
 #include "models/jmodel.h"
 #include <QDate>
@@ -34,10 +34,10 @@ void JEnterSignalTable::keyPressEvent(QKeyEvent* event)
   QTableView::keyPressEvent(event);
 }
 
-JDatabase::JDatabase(const QString& tableName,
-                     Mode mode,
-                     QWidget *parent)
-  : QFrame(parent)
+DatabaseViewer::DatabaseViewer(const QString& tableName,
+                               Mode mode,
+                               QWidget *parent)
+  : QWidget(parent)
   , m_mode(mode)
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
@@ -164,12 +164,12 @@ JDatabase::JDatabase(const QString& tableName,
   searchChanged();
 }
 
-JDatabase::~JDatabase()
+DatabaseViewer::~DatabaseViewer()
 {
   clearCurrentItems();
 }
 
-void JDatabase::clearCurrentItems()
+void DatabaseViewer::clearCurrentItems()
 {
   for (int i = 0; i != m_currentItems.size(); ++i)
   {
@@ -180,7 +180,7 @@ void JDatabase::clearCurrentItems()
   m_currentItems.clear();
 }
 
-QVector<Id> JDatabase::getSelectedIds() const
+QVector<Id> DatabaseViewer::getSelectedIds() const
 {
   JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
   QModelIndexList lst = m_table->selectionModel()->selectedRows();
@@ -195,7 +195,7 @@ QVector<Id> JDatabase::getSelectedIds() const
   return ids;
 }
 
-void JDatabase::selectIds(const QVector<Id>& ids)
+void DatabaseViewer::selectIds(const QVector<Id>& ids)
 {
   for (int i = 0; i != ids.size(); ++i)
   {
@@ -208,19 +208,19 @@ void JDatabase::selectIds(const QVector<Id>& ids)
     m_table->setFocus();
 }
 
-void JDatabase::selectItems()
+void DatabaseViewer::selectItems()
 {
   selectItems(getSelectedIds());
 }
 
-void JDatabase::selectItem(Id id)
+void DatabaseViewer::selectItem(Id id)
 {
   QVector<Id> ids;
   ids.push_back(id);
   selectItems(ids);
 }
 
-void JDatabase::selectItems(const QVector<Id> ids)
+void DatabaseViewer::selectItems(const QVector<Id> ids)
 {
   clearCurrentItems();
 
@@ -253,7 +253,7 @@ void JDatabase::selectItems(const QVector<Id> ids)
   }
 }
 
-void JDatabase::refresh()
+void DatabaseViewer::refresh()
 {
   JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
   if (m_fixedFilter.isEmpty() && m_dynamicFilter.isEmpty())
@@ -281,14 +281,14 @@ void JDatabase::refresh()
   emit refreshSignal();
 }
 
-void JDatabase::enableControls()
+void DatabaseViewer::enableControls()
 {
   bool bSelected = m_table->currentIndex().isValid();
   m_btnOpen->setEnabled(bSelected);
   m_btnRemove->setEnabled(bSelected);
 }
 
-void JDatabase::removeItems()
+void DatabaseViewer::removeItems()
 {
   QVector<Id> ids = getSelectedIds();
 
@@ -305,7 +305,7 @@ void JDatabase::removeItems()
 
   if (JItemEx::authenticationToRemove(m_tableName))
   {
-    PinCode w(this);
+    PinCodeDialog w(this);
     if (!w.exec())
       return;
 
@@ -339,7 +339,7 @@ void JDatabase::removeItems()
   refresh();
 }
 
-void JDatabase::searchChanged()
+void DatabaseViewer::searchChanged()
 {
   int column = m_table->horizontalHeader()->sortIndicatorSection();
   m_proxyModel->setFilterKeyColumn(column);
@@ -362,7 +362,7 @@ void JDatabase::searchChanged()
   emit refreshSignal();
 }
 
-void JDatabase::searchEnter()
+void DatabaseViewer::searchEnter()
 {
   m_table->setFocus();
   if (m_proxyModel->rowCount() != 0)
@@ -376,51 +376,51 @@ void JDatabase::searchEnter()
   }
 }
 
-void JDatabase::clearSearch()
+void DatabaseViewer::clearSearch()
 {
   m_edSearch->clear();
   searchChanged();
 }
 
-void JDatabase::containsPressed()
+void DatabaseViewer::containsPressed()
 {
   searchChanged();
   m_edSearch->setFocus();
 }
 
-void JDatabase::focusSearch()
+void DatabaseViewer::focusSearch()
 {
   m_edSearch->selectAll();
   m_edSearch->setFocus();
 }
 
-void JDatabase::setFixedFilter(const QString& fixedFilter)
+void DatabaseViewer::setFixedFilter(const QString& fixedFilter)
 {
   m_fixedFilter = fixedFilter;
   refresh();
 }
 
-void JDatabase::setDynamicFilter(const QString& dynamicFilter)
+void DatabaseViewer::setDynamicFilter(const QString& dynamicFilter)
 {
   m_dynamicFilter = dynamicFilter;
   refresh();
 }
 
-QString JDatabase::getTableName() const
+QString DatabaseViewer::getTableName() const
 {
   return m_tableName;
 }
 
-JItemSQL* JDatabase::getCurrentItem() const
+JItemSQL* DatabaseViewer::getCurrentItem() const
 {
   return m_currentItems.size() != 0 ? m_currentItems.at(0) : nullptr;
 }
 
-bool JDatabase::save(const JItemSQL& o)
+bool DatabaseViewer::save(const JItemSQL& o)
 {
   if (JItemEx::authenticationToInsertUpdate(m_tableName))
   {
-    PinCode w(this);
+    PinCodeDialog w(this);
     if (!w.exec())
       return false;
 
@@ -450,63 +450,20 @@ bool JDatabase::save(const JItemSQL& o)
   return bSuccess;
 }
 
-void JDatabase::emitCurrentRowChangedSignal()
+void DatabaseViewer::emitCurrentRowChangedSignal()
 {
   emit currentRowChangedSignal(m_table->currentIndex().row());
 }
 
-int JDatabase::getNumberOfEntries() const
+int DatabaseViewer::getNumberOfEntries() const
 {
   return m_proxyModel->rowCount();
 }
 
-double JDatabase::getSum(int column) const
+double DatabaseViewer::getSum(int column) const
 {
   double sum = 0.0;
   for (int row = 0; row != m_proxyModel->rowCount(); ++row)
     sum += m_proxyModel->data(m_proxyModel->index(row, column), Qt::EditRole).toDouble();
   return sum;
-}
-
-JDatabaseSelector::JDatabaseSelector(const QString& tableName,
-                                     bool bMultiSelector,
-                                     QWidget* parent)
-  : QDialog(parent)
-  , m_database(nullptr)
-{
-  m_database = new JDatabase(tableName, bMultiSelector ? JDatabase::Mode::MultiSelector : JDatabase::Mode::SingleSelector);
-  m_database->layout()->setContentsMargins(0, 0, 0, 0);
-  QVBoxLayout* vlayout0 = new QVBoxLayout;
-  if (bMultiSelector)
-    vlayout0->addWidget(new QLabel(tr("Selecione os itens desejados e pressione Enter para confirmar.")));
-  vlayout0->addWidget(m_database);
-  setLayout(vlayout0);
-
-  resize(640, 480);
-
-  QString title = "Selecionar " + JItemEx::text(tableName);
-  QString icon = JItemEx::icon(tableName);
-
-  setWindowTitle(title);
-  if (!icon.isEmpty())
-    setWindowIcon(QIcon(icon));
-
-  QObject::connect(m_database, SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(itemsSelected(const QVector<JItemSQL*>&)));
-}
-
-void JDatabaseSelector::itemsSelected(const QVector<JItemSQL*>& /*v*/)
-{
-  accept();
-}
-
-JDatabase* JDatabaseSelector::getDatabase() const
-{
-  return m_database;
-}
-
-void JDatabaseSelector::closeEvent(QCloseEvent * e)
-{
-  m_database->clearSearch();
-  m_database->refresh();
-  QDialog::closeEvent(e);
 }

@@ -1,7 +1,7 @@
 #ifndef ADDRESSTABLE_H
 #define ADDRESSTABLE_H
 
-#include "widgets/jtable.h"
+#include "jtable.h"
 #include "items/address.h"
 
 class AddressTable : public JTable

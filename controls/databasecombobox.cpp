@@ -1,11 +1,11 @@
-#include "jdatabasecombobox.h"
+#include "databasecombobox.h"
 #include "items/jitemex.h"
 #include "models/jmodel.h"
 #include <QMessageBox>
 
-JDatabaseComboBox::JDatabaseComboBox(const QString& tableName,
-                                     int modelColumn,
-                                     QWidget* parent)
+DatabaseComboBox::DatabaseComboBox(const QString& tableName,
+                                   int modelColumn,
+                                   QWidget* parent)
   : QComboBox(parent)
 {
   JModel* pModel = JItemEx::model(tableName, this);
@@ -20,7 +20,7 @@ JDatabaseComboBox::JDatabaseComboBox(const QString& tableName,
   setModelColumn(modelColumn);
 }
 
-void JDatabaseComboBox::refresh()
+void DatabaseComboBox::refresh()
 {
   JModel* pModel = dynamic_cast<JModel*>(model());
   if (pModel != nullptr)
@@ -29,7 +29,7 @@ void JDatabaseComboBox::refresh()
     setCurrentIndex(0);
 }
 
-Id JDatabaseComboBox::getCurrentId() const
+Id DatabaseComboBox::getCurrentId() const
 {
   JModel* pModel = dynamic_cast<JModel*>(model());
   if (pModel != nullptr)
@@ -41,7 +41,7 @@ Id JDatabaseComboBox::getCurrentId() const
   return Id();
 }
 
-void JDatabaseComboBox::setCurrentId(const Id& id)
+void DatabaseComboBox::setCurrentId(const Id& id)
 {
   JModel* pModel = dynamic_cast<JModel*>(model());
   if (pModel != nullptr)

@@ -4,13 +4,13 @@
 #include <QFrame>
 #include "items/product.h"
 #include "items/category.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 
 class QLabel;
 class JLineEdit;
 class JDoubleSpinBox;
 class QCheckBox;
-class JDatabasePicker;
+class DatabasePicker;
 class ProductCodeTable;
 class JAddRemoveButtons;
 
@@ -35,8 +35,8 @@ private:
   JLineEdit* m_edDetails;
   QCheckBox* m_cbBuy;
   QCheckBox* m_cbSell;
-  JDatabasePicker* m_categoryPicker;
-  JDatabasePicker* m_imagePicker;
+  DatabasePicker* m_categoryPicker;
+  DatabasePicker* m_imagePicker;
   ProductCodeTable* m_tbCode;
   JAddRemoveButtons* m_btns;
   QAction* m_actUnity;

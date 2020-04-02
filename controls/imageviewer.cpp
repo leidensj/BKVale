@@ -1,4 +1,4 @@
-#include "jimageviewer.h"
+#include "imageviewer.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QDir>
@@ -18,7 +18,7 @@
 #include <QLayout>
 #include <QBuffer>
 
-JImageViewer::JImageViewer(bool bReadOnly, QWidget *parent)
+ImageViewer::ImageViewer(bool bReadOnly, QWidget *parent)
    : QWidget(parent)
    , m_imageLabel(nullptr)
    , m_scrollArea(nullptr)
@@ -122,7 +122,7 @@ JImageViewer::JImageViewer(bool bReadOnly, QWidget *parent)
   fitToWindow();
 }
 
-bool JImageViewer::loadFile(const QString& fileName)
+bool ImageViewer::loadFile(const QString& fileName)
 {
   QImageReader reader(fileName);
   reader.setAutoTransform(true);
@@ -141,7 +141,7 @@ bool JImageViewer::loadFile(const QString& fileName)
   return true;
 }
 
-void JImageViewer::setImage(const QImage& image)
+void ImageViewer::setImage(const QImage& image)
 {
   m_image = image;
   m_imageLabel->setPixmap(QPixmap::fromImage(image));
@@ -179,7 +179,7 @@ static void initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMo
     dialog.setDefaultSuffix("jpg");
 }
 
-void JImageViewer::open()
+void ImageViewer::open()
 {
   QFileDialog dialog(this, tr("Open File"));
   initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
@@ -187,7 +187,7 @@ void JImageViewer::open()
   while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
 }
 
-void JImageViewer::copy()
+void ImageViewer::copy()
 {
 #ifndef QT_NO_CLIPBOARD
     QGuiApplication::clipboard()->setImage(m_image);
@@ -208,7 +208,7 @@ static QImage clipboardImage()
 }
 #endif
 
-void JImageViewer::paste()
+void ImageViewer::paste()
 {
 #ifndef QT_NO_CLIPBOARD
   const QImage newImage = clipboardImage();
@@ -217,23 +217,23 @@ void JImageViewer::paste()
 #endif
 }
 
-void JImageViewer::zoomIn()
+void ImageViewer::zoomIn()
 {
   scaleImage(1.25);
 }
 
-void JImageViewer::zoomOut()
+void ImageViewer::zoomOut()
 {
   scaleImage(0.8);
 }
 
-void JImageViewer::normalSize()
+void ImageViewer::normalSize()
 {
   m_imageLabel->adjustSize();
   m_scaleFactor = 1.0;
 }
 
-void JImageViewer::fitToWindow()
+void ImageViewer::fitToWindow()
 {
   bool bFit = m_btnFit->isChecked();
   m_scrollArea->setWidgetResizable(bFit);
@@ -242,7 +242,7 @@ void JImageViewer::fitToWindow()
   updateActions();
 }
 
-void JImageViewer::updateActions()
+void ImageViewer::updateActions()
 {
   m_btnCopy->setEnabled(!m_image.isNull());
   m_btnZoomIn->setEnabled(!m_btnFit->isChecked());
@@ -250,7 +250,7 @@ void JImageViewer::updateActions()
   m_btnNormalSize->setEnabled(!m_btnFit->isChecked());
 }
 
-void JImageViewer::scaleImage(double factor)
+void ImageViewer::scaleImage(double factor)
 {
   if (!m_imageLabel->pixmap())
     return;
@@ -265,13 +265,13 @@ void JImageViewer::scaleImage(double factor)
   m_btnZoomOut->setEnabled(m_scaleFactor > 0.333);
 }
 
-void JImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
+void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
   scrollBar->setValue(int(factor * scrollBar->value()
                       + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
-QByteArray JImageViewer::getCompressedImageAsByteArray() const
+QByteArray ImageViewer::getCompressedImageAsByteArray() const
 {
   QByteArray bArray;
   if (!m_image.isNull())

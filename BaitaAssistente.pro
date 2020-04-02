@@ -14,7 +14,22 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
+  controls/calculatorwidget.cpp \
+  controls/databasecombobox.cpp \
+  controls/databasepicker.cpp \
+  controls/databaseselector.cpp \
+  controls/databaseviewer.cpp \
+  controls/imageviewer.cpp \
+  controls/logindialog.cpp \
+  controls/pincodedialog.cpp \
+  controls/shopwidget.cpp \
+  controls/timecarddialog.cpp \
+  editors/addresseditor.cpp \
+  editors/formeditor.cpp \
+  editors/packageeditor.cpp \
+  filters/jfilter.cpp \
         mainwindow.cpp \
+  tables/jtable.cpp \
     tinyexpr.c \
     settingsdlg.cpp \
     printutils.cpp \
@@ -22,11 +37,6 @@ SOURCES += main.cpp\
     settings.cpp \
     qcustomplot.cpp \
     consumptionchart.cpp \
-    calculatorwidget.cpp \
-    logindialog.cpp \
-    packageeditor.cpp \
-    timecard.cpp \
-    formwidget.cpp \
     items/activeuser.cpp \
     items/address.cpp \
     items/category.cpp \
@@ -41,19 +51,15 @@ SOURCES += main.cpp\
     items/supplier.cpp \
     items/user.cpp \
     items/jitemex.cpp \
+  views/jitemview.cpp \
     widgets/jaddremovebuttons.cpp \
   widgets/jclicklabel.cpp \
-    widgets/jdatabase.cpp \
-    widgets/jdatabasepicker.cpp \
     widgets/jdateedit.cpp \
     widgets/jdatepicker.cpp \
     widgets/jdoublespinbox.cpp \
-  widgets/jimageviewer.cpp \
-    widgets/jitemview.cpp \
     widgets/jlineedit.cpp \
     widgets/jplaintextedit.cpp \
     widgets/jspinbox.cpp \
-    widgets/jtable.cpp \
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
     items/purchase.cpp \
@@ -72,8 +78,6 @@ SOURCES += main.cpp\
     views/shoppinglistview.cpp \
     views/productview.cpp \
     views/userview.cpp \
-    shopview.cpp \
-    widgets/jfilter.cpp \
     filters/purchasefilter.cpp \
     items/purchaseelement.cpp \
     models/addressmodel.cpp \
@@ -92,7 +96,6 @@ SOURCES += main.cpp\
     models/jmodel.cpp \
     models/productcodemodel.cpp \
     items/paymentelement.cpp \
-    widgets/jdatabasecombobox.cpp \
     common.cpp \
     widgets/jregexpvalidator.cpp \
     tableitems/doubleitem.cpp \
@@ -101,14 +104,27 @@ SOURCES += main.cpp\
     tableitems/textitem.cpp \
     tableitems/packageitem.cpp \
     tableitems/sqlitem.cpp \
-    addresseditor.cpp \
     tableitems/addressitem.cpp \
     tables/paymenttable.cpp \
     tables/employeehourstable.cpp \
-    tables/storeemployeestable.cpp \
-    pincode.cpp
+    tables/storeemployeestable.cpp
 
 HEADERS  += mainwindow.h \
+    controls/calculatorwidget.h \
+    controls/databasecombobox.h \
+    controls/databasepicker.h \
+    controls/databaseselector.h \
+    controls/databaseviewer.h \
+    controls/imageviewer.h \
+    controls/logindialog.h \
+    controls/pincodedialog.h \
+    controls/shopwidget.h \
+    controls/timecarddialog.h \
+    editors/addresseditor.h \
+    editors/formeditor.h \
+    editors/packageeditor.h \
+    filters/jfilter.h \
+    tables/jtable.h \
     tinyexpr.h \
     settingsdlg.h \
     printutils.h \
@@ -116,13 +132,8 @@ HEADERS  += mainwindow.h \
     settings.h \
     qcustomplot.h \
     consumptionchart.h \
-    calculatorwidget.h \
-    logindialog.h \
     defines.h \
-    shopview.h \
-    packageeditor.h \
     escpos.h \
-    timecard.h \
     timeinterval.h \
     items/address.h \
     items/activeuser.h \
@@ -138,23 +149,18 @@ HEADERS  += mainwindow.h \
     items/supplier.h \
     items/user.h \
     items/jitemex.h \
+    views/jitemview.h \
     widgets/jclicklabel.h \
-    widgets/jimageviewer.h \
-    widgets/jitemview.h \
     widgets/jaddremovebuttons.h \
-    widgets/jdatabasepicker.h \
     widgets/jdatepicker.h \
     widgets/jdoublespinbox.h \
     widgets/jdateedit.h \
-    widgets/jdatabase.h \
     widgets/jplaintextedit.h \
     widgets/jspinbox.h \
     widgets/jtimeedit.h \
     items/jitem.h \
     items/jitemsql.h \
-    widgets/jtable.h \
     widgets/jlineedit.h \
-    formwidget.h \
     items/purchase.h \
     tables/shoppinglisttable.h \
     tables/purchasetable.h \
@@ -171,7 +177,6 @@ HEADERS  += mainwindow.h \
     views/storeview.h \
     views/shoppinglistview.h \
     views/userview.h \
-    widgets/jfilter.h \
     filters/purchasefilter.h \
     items/jitemelementsql.h \
     items/purchaseelement.h \
@@ -191,7 +196,6 @@ HEADERS  += mainwindow.h \
     models/jmodel.h \
     models/productcodemodel.h \
     items/paymentelement.h \
-    widgets/jdatabasecombobox.h \
     common.h \
     widgets/jregexpvalidator.h \
     tableitems/doubleitem.h \
@@ -201,12 +205,10 @@ HEADERS  += mainwindow.h \
     tableitems/textitem.h \
     tableitems/packageitem.h \
     tableitems/sqlitem.h \
-    addresseditor.h \
     tableitems/addressitem.h \
     tables/paymenttable.h \
     tables/employeehourstable.h \
-    tables/storeemployeestable.h \
-    pincode.h
+    tables/storeemployeestable.h
 
 FORMS    += mainwindow.ui \
     settingsdlg.ui

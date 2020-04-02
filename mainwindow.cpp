@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "printutils.h"
-#include "pincode.h"
+#include "controls/pincodedialog.h"
 #include "views/productview.h"
 #include "views/categoryview.h"
 #include "views/purchaseview.h"
@@ -10,14 +10,13 @@
 #include "views/reminderview.h"
 #include "views/shoppinglistview.h"
 #include "views/storeview.h"
-#include "calculatorwidget.h"
+#include "controls/calculatorwidget.h"
+#include "controls/shopwidget.h"
 #include "views/userview.h"
 #include "views/imageview.h"
-#include "logindialog.h"
-#include "shopview.h"
-#include "widgets/jdatabase.h"
-#include "timecard.h"
-
+#include "controls/logindialog.h"
+#include "controls/databaseviewer.h"
+#include "controls/timecarddialog.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -72,7 +71,7 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   m_purchase = new PurchaseView;
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;
-  m_shop = new ShopView;
+  m_shop = new ShopWidget;
 
   m_purchaseWindow = new JMdiSubWindow(this);
   m_purchaseWindow->setWindowTitle(ui->actionPurchases->text());
@@ -475,7 +474,7 @@ void Goiabo::openActiveUsersDialog()
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  JDatabase* w = new JDatabase(ACTIVE_USERS_SQL_TABLE_NAME, JDatabase::Mode::ReadOnly);
+  DatabaseViewer* w = new DatabaseViewer(ACTIVE_USERS_SQL_TABLE_NAME, DatabaseViewer::Mode::ReadOnly);
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Usuários Ativos"));
@@ -527,6 +526,6 @@ void Goiabo::activateWindow()
 
 void Goiabo::testTimeAccess()
 {
-  TimeCard c(this);
-  c.exec();
+  TimeCardDialog dlg(this);
+  dlg.exec();
 }

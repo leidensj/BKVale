@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-class JDatabasePicker;
+class DatabasePicker;
 class QDateEdit;
 class QDialogButtonBox;
 class QCheckBox;
@@ -28,19 +28,19 @@ private:
   bool m_bOpen;
 };
 
-class TimeCard : public QDialog
+class TimeCardDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit TimeCard(QWidget* parent = nullptr);
+  explicit TimeCardDialog(QWidget* parent = nullptr);
 
 private slots:
   void saveAndAccept();
   void updateControls();
 
 private:
-  JDatabasePicker* m_storePicker;
+  DatabasePicker* m_storePicker;
   QDateEdit* m_date;
   QDialogButtonBox* m_buttons;
   JSpinBox* m_spnExtraPages;

@@ -2,12 +2,12 @@
 #define SUPPLIERVIEW_H
 
 #include "items/supplier.h"
-#include "widgets/jitemview.h"
+#include "jitemview.h"
 
-class FormInfoWidget;
-class FormDetailsWidget;
-class FormPhoneWidget;
-class FormAddressWidget;
+class FormInfoEditor;
+class FormDetailsEditor;
+class FormPhoneEditor;
+class FormAddressEditor;
 
 class SupplierView : public JItemView
 {
@@ -24,10 +24,10 @@ protected slots:
 
 private:
   Id m_formId;
-  FormInfoWidget* m_formInfo;
-  FormDetailsWidget* m_formDetails;
-  FormPhoneWidget* m_formPhone;
-  FormAddressWidget* m_formAddress;
+  FormInfoEditor* m_formInfo;
+  FormDetailsEditor* m_formDetails;
+  FormPhoneEditor* m_formPhone;
+  FormAddressEditor* m_formAddress;
 };
 
 #endif // EMPLOYEEVIEW_H

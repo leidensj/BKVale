@@ -1,14 +1,14 @@
-#include "settingsdlg.h"
-#include "ui_settingsdlg.h"
+#include "settingsdialog.h"
+#include "ui_settingsdialog.h"
 #include "defines.h"
 #include <QSerialPortInfo>
 #include <QPushButton>
 #include <QFileDialog>
 
-SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
+SettingsDialog::SettingsDialog(const Settings& settings, QWidget *parent)
   : QDialog(parent)
   , m_settings(settings)
-  , ui(new Ui::SettingsDlg)
+  , ui(new Ui::SettingsDialog)
 {
   ui->setupUi(this);
 
@@ -17,12 +17,12 @@ SettingsDlg::SettingsDlg(const Settings& settings, QWidget *parent)
   doDataExchange(true);
 }
 
-SettingsDlg::~SettingsDlg()
+SettingsDialog::~SettingsDialog()
 {
   delete ui;
 }
 
-void SettingsDlg::doDataExchange(bool toUI)
+void SettingsDialog::doDataExchange(bool toUI)
 {
   if (toUI)
   {
@@ -41,7 +41,7 @@ void SettingsDlg::doDataExchange(bool toUI)
   }
 }
 
-void SettingsDlg::refreshAvailablePorts()
+void SettingsDialog::refreshAvailablePorts()
 {
   ui->cbSerialPort->clear();
   const auto info = QSerialPortInfo::availablePorts();
@@ -49,7 +49,7 @@ void SettingsDlg::refreshAvailablePorts()
     ui->cbSerialPort->addItem(it.portName());
 }
 
-void SettingsDlg::update()
+void SettingsDialog::update()
 {
   doDataExchange(false);
 }

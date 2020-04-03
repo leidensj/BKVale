@@ -1,5 +1,5 @@
 #include "packageitem.h"
-#include "packageeditor.h"
+#include "editors/packageeditor.h"
 
 Package PackageItem::st_fromVariant(const QVariant& v)
 {

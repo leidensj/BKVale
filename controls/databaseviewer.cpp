@@ -42,6 +42,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
+  , m_ltButton(nullptr)
   , m_edSearch(nullptr)
   , m_cbContains(nullptr)
   , m_table(nullptr)
@@ -71,11 +72,11 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   m_btnRefresh->setToolTip(tr("Atualizar (F5)"));
   m_btnRefresh->setShortcut(QKeySequence(Qt::Key_F5));
 
-  QHBoxLayout* hlayout0 = new QHBoxLayout();
-  hlayout0->setContentsMargins(0, 0, 0, 0);
-  hlayout0->setAlignment(Qt::AlignLeft);
-  hlayout0->addWidget(m_btnOpen);
-  hlayout0->addWidget(m_btnRemove);
+  m_ltButton = new QHBoxLayout;
+  m_ltButton->setContentsMargins(0, 0, 0, 0);
+  m_ltButton->setAlignment(Qt::AlignLeft);
+  m_ltButton->addWidget(m_btnOpen);
+  m_ltButton->addWidget(m_btnRemove);
 
   m_edSearch = new JLineEdit(Text::Input::All, (int)JLineEdit::Flags::ToUpper);
   m_edSearch->setToolTip(tr("Procurar (Ctrl+F)"));
@@ -104,7 +105,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   m_table->verticalHeader()->hide();
 
   QVBoxLayout* vlayout1 = new QVBoxLayout();
-  vlayout1->addLayout(hlayout0);
+  vlayout1->addLayout(m_ltButton);
   vlayout1->addLayout(hlayout1);
   vlayout1->addWidget(m_table);
   setLayout(vlayout1);
@@ -466,4 +467,17 @@ double DatabaseViewer::getSum(int column) const
   for (int row = 0; row != m_proxyModel->rowCount(); ++row)
     sum += m_proxyModel->data(m_proxyModel->index(row, column), Qt::EditRole).toDouble();
   return sum;
+}
+
+QPushButton* DatabaseViewer::addButton(const QString& toolTip, const QIcon& icon, int shortcut)
+{
+  QPushButton* btn = new QPushButton;
+  btn->setFlat(true);
+  btn->setToolTip(toolTip);
+  btn->setIconSize(QSize(24, 24));
+  btn->setIcon(icon);
+  if (shortcut)
+    btn->setShortcut(QKeySequence(shortcut));
+  m_ltButton->addWidget(btn);
+  return btn;
 }

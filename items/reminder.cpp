@@ -210,3 +210,22 @@ QStringList Reminder::SQL_select_subjects()
   }
   return lst;
 }
+
+ bool Reminder::SQL_toggleFavorite(QString& error) const
+ {
+   error.clear();
+
+   if (!SQL_isOpen(error))
+     return false;
+
+   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+   db.transaction();
+   QSqlQuery query(db);
+   query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME
+                 " SET " REMINDER_SQL_COL03 " = NOT " REMINDER_SQL_COL03
+                 " WHERE " SQL_COLID " = (:_v00)");
+   query.bindValue(":_v00", m_id.get());
+   bool bSuccess = query.exec();
+   return SQL_finish(db, query, bSuccess, error);
+ }
+

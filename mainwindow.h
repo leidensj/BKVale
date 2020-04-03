@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QTcpSocket>
-#include "settingsdlg.h"
+#include "settingsdialog.h"
 #include "databaseutils.h"
 #include "items/activeuser.h"
 #include <QMdiArea>

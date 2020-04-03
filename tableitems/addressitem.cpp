@@ -1,5 +1,5 @@
 ﻿#include "addressitem.h"
-#include "addresseditor.h"
+#include "editors/addresseditor.h"
 
 Address AddressItem::st_fromVariant(const QVariant& v)
 {

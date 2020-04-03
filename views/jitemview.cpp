@@ -8,6 +8,8 @@
 #include <QSplitter>
 #include <QMenu>
 #include <QDialog>
+#include <QDesktopWidget>
+#include <QApplication>
 #include "items/activeuser.h"
 
 #define VIEW_BUTTON "VIEW_BUTTON"
@@ -85,6 +87,8 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_dlgDb->setWindowTitle(JItemEx::text(tableName));
   m_dlgDb->setWindowIcon(QIcon(JItemEx::icon(tableName)));
   m_dlgDb->setModal(true);
+  QRect rect = QApplication::desktop()->availableGeometry(this);
+  m_dlgDb->resize(rect.width() * 0.7, rect.height() * 0.7);
 
   connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));

@@ -1,5 +1,5 @@
 #include "shoppinglisttable.h"
-#include "tinyexpr.h"
+#include "libraries/tinyexpr.h"
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QMessageBox>

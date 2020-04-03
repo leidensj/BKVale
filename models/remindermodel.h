@@ -5,6 +5,20 @@
 
 class ReminderModel : public JModel
 {
+  enum class Column
+  {
+    Id,
+    Title,
+    Message,
+    Subject,
+    Date,
+    Time,
+    Favorite,
+    HasDate,
+    HasTime,
+    Capital
+  };
+
 public:
   ReminderModel(QObject *parent);
   QString getStrQuery();

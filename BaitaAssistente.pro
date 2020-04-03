@@ -28,14 +28,14 @@ SOURCES += main.cpp\
   editors/formeditor.cpp \
   editors/packageeditor.cpp \
   filters/jfilter.cpp \
+  libraries/qcustomplot.cpp \
+  libraries/tinyexpr.c \
         mainwindow.cpp \
+  settingsdialog.cpp \
   tables/jtable.cpp \
-    tinyexpr.c \
-    settingsdlg.cpp \
     printutils.cpp \
     databaseutils.cpp \
     settings.cpp \
-    qcustomplot.cpp \
     consumptionchart.cpp \
     items/activeuser.cpp \
     items/address.cpp \
@@ -124,13 +124,13 @@ HEADERS  += mainwindow.h \
     editors/formeditor.h \
     editors/packageeditor.h \
     filters/jfilter.h \
+    libraries/qcustomplot.h \
+    libraries/tinyexpr.h \
+    settingsdialog.h \
     tables/jtable.h \
-    tinyexpr.h \
-    settingsdlg.h \
     printutils.h \
     databaseutils.h \
     settings.h \
-    qcustomplot.h \
     consumptionchart.h \
     defines.h \
     escpos.h \
@@ -211,7 +211,7 @@ HEADERS  += mainwindow.h \
     tables/storeemployeestable.h
 
 FORMS    += mainwindow.ui \
-    settingsdlg.ui
+  settingsdialog.ui
 
 RESOURCES += \
     icons.qrc

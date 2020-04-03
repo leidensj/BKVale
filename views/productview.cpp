@@ -4,7 +4,7 @@
 #include "widgets/jdoublespinbox.h"
 #include "widgets/jaddremovebuttons.h"
 #include "tables/productcodetable.h"
-#include "packageeditor.h"
+#include "editors/packageeditor.h"
 #include <QLayout>
 #include <QAction>
 #include <QCheckBox>

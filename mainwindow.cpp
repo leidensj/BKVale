@@ -335,7 +335,7 @@ bool Goiabo::print(const QString& text)
 
 void Goiabo::openSettingsDialog()
 {
-  SettingsDlg dlg(m_settings);
+  SettingsDialog dlg(m_settings);
   if (dlg.exec() == QDialog::Accepted)
   {
     m_settings = dlg.getSettings();

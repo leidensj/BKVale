@@ -1,26 +1,25 @@
-#ifndef SETTINGSDLG_H
-#define SETTINGSDLG_H
+#ifndef SETTINGSDIALOG_H
+#define SETTINGSDIALOG_H
 
 #include <QDialog>
-#include <QSerialPort>
 #include "settings.h"
 
 namespace Ui {
-class SettingsDlg;
+class SettingsDialog;
 }
 
-class SettingsDlg : public QDialog
+class SettingsDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit SettingsDlg(const Settings& settings, QWidget *parent = 0);
-  ~SettingsDlg();
+  explicit SettingsDialog(const Settings& settings, QWidget *parent = 0);
+  ~SettingsDialog();
   const Settings& getSettings() const { return m_settings; }
 
 private:
   Settings m_settings;
-  Ui::SettingsDlg *ui;
+  Ui::SettingsDialog *ui;
   void doDataExchange(bool toUI);
 
 private slots:
@@ -28,4 +27,4 @@ private slots:
   void update();
 };
 
-#endif // SETTINGSDLG_H
+#endif // SETTINGSDIALOG_H

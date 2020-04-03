@@ -12,6 +12,7 @@ class QCheckBox;
 class JLineEdit;
 class QSortFilterProxyModel;
 class Employee;
+class QHBoxLayout;
 
 class JEnterSignalTable : public QTableView
 {
@@ -53,6 +54,7 @@ public:
   double getSum(int column) const;
 
   bool save(const JItemSQL& jItem);
+  QPushButton* addButton(const QString& toolTip, const QIcon& icon, int shortcut = 0);
 
 public slots:
   void refresh();
@@ -68,6 +70,7 @@ private:
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
+  QHBoxLayout* m_ltButton;
   JLineEdit* m_edSearch;
   QCheckBox* m_cbContains;
   JEnterSignalTable* m_table;

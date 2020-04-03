@@ -33,28 +33,28 @@ QString ReminderModel::getStrQuery()
 void ReminderModel::select(QHeaderView* header)
 {
   JModel::select(getStrQuery());
-  setHeaderData(0, Qt::Horizontal, tr("ID"));
-  setHeaderData(1, Qt::Horizontal, tr("Título"));
-  setHeaderData(2, Qt::Horizontal, tr("Mensagem"));
-  setHeaderData(3, Qt::Horizontal, tr("Assunto"));
-  setHeaderData(4, Qt::Horizontal, tr("Data"));
-  setHeaderData(5, Qt::Horizontal, tr("Hora"));
-  setHeaderData(6, Qt::Horizontal, tr("Favorito"));
-  setHeaderData(7, Qt::Horizontal, tr("Data Informada"));
-  setHeaderData(8, Qt::Horizontal, tr("Hora Informada"));
-  setHeaderData(9, Qt::Horizontal, tr("Maiúsuclas"));
+  setHeaderData((int)Column::Id, Qt::Horizontal, tr("ID"));
+  setHeaderData((int)Column::Title, Qt::Horizontal, tr("Título"));
+  setHeaderData((int)Column::Message, Qt::Horizontal, tr("Mensagem"));
+  setHeaderData((int)Column::Subject, Qt::Horizontal, tr("Assunto"));
+  setHeaderData((int)Column::Date, Qt::Horizontal, tr("Data"));
+  setHeaderData((int)Column::Time, Qt::Horizontal, tr("Hora"));
+  setHeaderData((int)Column::Favorite, Qt::Horizontal, tr("Favorito"));
+  setHeaderData((int)Column::HasDate, Qt::Horizontal, tr("Data Informada"));
+  setHeaderData((int)Column::HasTime, Qt::Horizontal, tr("Hora Informada"));
+  setHeaderData((int)Column::Capital, Qt::Horizontal, tr("Maiúsuclas"));
   if (header != nullptr && header->count() == 10)
   {
-    header->hideSection(0);
-    header->hideSection(2);
-    header->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
-    header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
-    header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
-    header->setSectionResizeMode(5, QHeaderView::ResizeMode::ResizeToContents);
-    header->hideSection(6);
-    header->hideSection(7);
-    header->hideSection(8);
-    header->hideSection(9);
+    header->hideSection((int)Column::Id);
+    header->hideSection((int)Column::Message);
+    header->setSectionResizeMode((int)Column::Title, QHeaderView::ResizeMode::Stretch);
+    header->setSectionResizeMode((int)Column::Subject, QHeaderView::ResizeMode::ResizeToContents);
+    header->setSectionResizeMode((int)Column::Date, QHeaderView::ResizeMode::ResizeToContents);
+    header->hideSection((int)Column::Time);
+    header->hideSection((int)Column::Favorite);
+    header->hideSection((int)Column::HasDate);
+    header->hideSection((int)Column::HasTime);
+    header->hideSection((int)Column::Capital);
   }
 }
 
@@ -66,9 +66,9 @@ QVariant ReminderModel::data(const QModelIndex &idx, int role) const
   QVariant value = QSqlQueryModel::data(idx, role);
   if (role == Qt::DecorationRole)
   {
-    if (idx.column() == 1)
+    if (idx.column() == (int)Column::Title)
     {
-      bool bFavorite = data(idx.sibling(idx.row(), 6), Qt::EditRole).toBool();
+      bool bFavorite = data(idx.sibling(idx.row(), (int)Column::Favorite), Qt::EditRole).toBool();
       if (bFavorite)
         value = QVariant::fromValue(QIcon(":/icons/res/favorite.png"));
       else
@@ -77,19 +77,18 @@ QVariant ReminderModel::data(const QModelIndex &idx, int role) const
   }
   else if (role == Qt::DisplayRole)
   {
-    if (idx.column() == 4)
+    if (idx.column() == (int)Column::Date)
     {
-      bool bDate = record(idx.row()).value(7).toBool();
-      value = bDate ? value.toDate().toString("yyyy/MM/dd") : "";
+      value = tr("%1 %2").arg(record(idx.row()).value((int)Column::HasDate).toBool()
+                              ? record(idx.row()).value((int)Column::Date).toDate().toString("yyyy/MM/dd")
+                              : "",
+                              record(idx.row()).value((int)Column::HasTime).toBool()
+                              ? record(idx.row()).value((int)Column::Time).toTime().toString("HH:mm:ss")
+                              : "");
     }
-    else if (idx.column() == 5)
+    else if (idx.column() == (int)Column::Title)
     {
-      bool bTime = record(idx.row()).value(8).toBool();
-      value = bTime ? value.toTime().toString("HH:mm:ss") : "";
-    }
-    else if (idx.column() == 1)
-    {
-      auto cap = (Reminder::Capitalization)record(idx.row()).value(9).toInt();
+      auto cap = (Reminder::Capitalization)record(idx.row()).value((int)Column::Capital).toInt();
       switch (cap)
       {
         case Reminder::Capitalization::AllUppercase:
@@ -106,7 +105,7 @@ QVariant ReminderModel::data(const QModelIndex &idx, int role) const
   }
   else if (role == Qt::ToolTipRole)
   {
-    if (idx.column() == 1)
+    if (idx.column() == (int)Column::Title)
       value = data(idx.sibling(idx.row(), 2), Qt::DisplayRole);
   }
   return value;

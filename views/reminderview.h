@@ -30,6 +30,7 @@ protected slots:
 private slots:
   void emitChangedSignal();
   void updateControls();
+  void setFavorite();
 
 signals:
   void changedSignal();
@@ -47,6 +48,7 @@ private:
   QCheckBox* m_cbDate;
   JTimeEdit* m_time;
   QCheckBox* m_cbTime;
+  QPushButton* m_btnPin;
 };
 
 class ReminderPrintDialog : public QDialog

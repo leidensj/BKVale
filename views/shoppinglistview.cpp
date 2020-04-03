@@ -7,7 +7,7 @@
 #include "widgets/jaddremovebuttons.h"
 #include "tables/shoppinglisttable.h"
 #include "items/jitemex.h"
-#include "packageeditor.h"
+#include "editors/packageeditor.h"
 #include <QSplitter>
 #include <QPlainTextEdit>
 #include <QTabWidget>

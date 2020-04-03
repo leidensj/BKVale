@@ -30,6 +30,7 @@ ReminderView::ReminderView(QWidget *parent)
   , m_cbDate(nullptr)
   , m_time(nullptr)
   , m_cbTime(nullptr)
+  , m_btnPin(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -70,6 +71,7 @@ ReminderView::ReminderView(QWidget *parent)
   m_date = new JDatePicker;
   m_cbTime = new QCheckBox;
   m_time = new JTimeEdit;
+  m_btnPin = m_viewer->addButton(tr("Fixar"), QIcon(":/icons/res/favorite.png"));
 
   QLabel* lblBarcode = new QLabel();
   lblBarcode->setPixmap(QIcon(":/icons/res/barcode.png").pixmap(QSize(24, 24)));
@@ -117,6 +119,7 @@ ReminderView::ReminderView(QWidget *parent)
   connect(m_cbCapitalization, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
   connect(m_cbDate, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
   connect(m_cbTime, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
+  connect(m_btnPin, SIGNAL(clicked(bool)), this, SLOT(setFavorite()));
 
   updateControls();
   setFocusWidgetOnCreate(m_edTitle);
@@ -224,6 +227,23 @@ void ReminderView::updateControls()
   QFont f3 = m_subject->lineEdit()->font();
   f3.setCapitalization(cap);
   m_subject->lineEdit()->setFont(f3);
+}
+
+void ReminderView::setFavorite()
+{
+  QVector<Id> vid = m_viewer->getSelectedIds();
+  if (vid.size() != 0)
+  {
+    for (int i = 0; i != vid.size(); ++i)
+    {
+      QString error;
+      Reminder o;
+      o.m_id = vid.at(i);
+      o.SQL_toggleFavorite(error);
+    }
+    m_viewer->refresh();
+    m_viewer->selectIds(vid);
+  }
 }
 
 ReminderPrintDialog::ReminderPrintDialog(QWidget* parent)

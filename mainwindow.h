@@ -103,6 +103,7 @@ private slots:
   void openActiveUsersDialog();
   void activateWindow();
   void testTimeAccess();
+  void testPurchaseReport();
 };
 
 #endif // MAINWINDOW_H

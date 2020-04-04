@@ -417,7 +417,7 @@
      <normaloff>:/icons/res/purchase.png</normaloff>:/icons/res/purchase.png</iconset>
    </property>
    <property name="text">
-    <string>Relatório de Compras</string>
+    <string>Compras</string>
    </property>
   </action>
  </widget>

@@ -17,6 +17,7 @@
 #include "controls/logindialog.h"
 #include "controls/databaseviewer.h"
 #include "controls/timecarddialog.h"
+#include "purchasereport.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -129,6 +130,8 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   connect(ui->actionUsers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionSuppliers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+
+  connect(ui->actionPurchaseReport, SIGNAL(triggered(bool)), this, SLOT(testPurchaseReport()));
 
   connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
 
@@ -527,5 +530,11 @@ void Goiabo::activateWindow()
 void Goiabo::testTimeAccess()
 {
   TimeCardDialog dlg(this);
+  dlg.exec();
+}
+
+void Goiabo::testPurchaseReport()
+{
+  PurchaseReport dlg;
   dlg.exec();
 }

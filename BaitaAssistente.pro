@@ -31,6 +31,7 @@ SOURCES += main.cpp\
   libraries/qcustomplot.cpp \
   libraries/tinyexpr.c \
         mainwindow.cpp \
+  purchasereport.cpp \
   settingsdialog.cpp \
   tables/jtable.cpp \
     printutils.cpp \
@@ -126,6 +127,7 @@ HEADERS  += mainwindow.h \
     filters/jfilter.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \
+    purchasereport.h \
     settingsdialog.h \
     tables/jtable.h \
     printutils.h \

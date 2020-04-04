@@ -368,3 +368,25 @@ bool Purchase::SQL_select_all_supplier_id_items()
 
   return SQL_finish(db, query, bSuccess, error);
 }
+
+QVector<Id> Purchase::st_SQL_select_all_purchases(const QString& filter)
+{
+  QVector<Id> ids;
+  QString error;
+  if (!SQL_isOpen(error))
+    return ids;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+  QString str;
+  str = "SELECT DISTINCT " SQL_COLID " FROM " PURCHASE_SQL_TABLE_NAME;
+  if (!filter.isEmpty())
+    str += " WHERE " + filter;
+  query.prepare(str);
+  bool bSuccess = query.exec();
+  while (bSuccess && query.next())
+    ids.push_back(query.value(0).toLongLong());
+  SQL_finish(db, query, bSuccess, error);
+  return ids;
+}

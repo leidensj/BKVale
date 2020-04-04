@@ -6,6 +6,7 @@
 #include "items/purchase.h"
 #include "items/employee.h"
 #include "jitemview.h"
+#include "purchasereport.h"
 
 #define MAX_ITEMS 100
 
@@ -30,6 +31,7 @@ class PaymentTable;
 class QTableWidgetItem;
 class QRadioButton;
 class PurchaseFilter;
+class PurchaseReport;
 
 class PaymentWidget : public QWidget
 {
@@ -98,18 +100,15 @@ private:
   PurchaseTable* m_table;
   JExpLineEdit* m_edDisccount;
   PaymentWidget* m_wPayment;
-  JLineEdit* m_edEntries;
-  JLineEdit* m_edSum;
   QPlainTextEdit* m_teObservation;
   PurchaseFilter* m_filter;
-  QPushButton* m_btnApportionment;
+  PurchaseReport* m_report;
   QPushButton* m_btnHistory;
 
 private slots:
   void supplierChanged();
   void lastItemSelected();
   void updateControls();
-  void updateStatistics();
   void showHistory();
 
 signals:

@@ -176,11 +176,9 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_table(nullptr)
   , m_edDisccount(nullptr)
   , m_wPayment(nullptr)
-  , m_edEntries(nullptr)
-  , m_edSum(nullptr)
   , m_teObservation(nullptr)
   , m_filter(nullptr)
-  , m_btnApportionment(nullptr)
+  , m_report(nullptr)
   , m_btnHistory(nullptr)
 {
   m_btnSave->setEnabled(false);
@@ -302,16 +300,9 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
-  m_btnApportionment = new QPushButton;
-  m_btnApportionment->setFlat(true);
-  m_btnApportionment->setIconSize(QSize(24, 24));
-  m_btnApportionment->setIcon(QIcon(":/icons/res/apportionment.png"));
-  m_btnApportionment->setToolTip(tr("Ratear valor entre os produtos"));
-
   QHBoxLayout* ltTotal = new QHBoxLayout;
   ltTotal->setContentsMargins(0, 0, 0, 0);
   ltTotal->addWidget(m_edDisccount);
-  ltTotal->addWidget(m_btnApportionment);
   ltTotal->addStretch();
   ltTotal->addWidget(m_edTotal);
 
@@ -336,19 +327,9 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_tab->addTab(frObservation, QIcon(":/icons/res/pencil.png"), tr("Observações"));
 
   m_filter = new PurchaseFilter;
-
-  m_edEntries = new JLineEdit(Text::Input::All);
-  m_edEntries->setReadOnly(true);
-  m_edSum = new JLineEdit(Text::Input::All);
-  m_edSum->setReadOnly(true);
-  QFormLayout* ltDbInfo = new QFormLayout;
-  ltDbInfo->addRow(tr("Número de compras:"), m_edEntries);
-  ltDbInfo->addRow(tr("Soma das compras:"), m_edSum);
-  QFrame* frDbInfo = new QFrame;
-  frDbInfo->setLayout(ltDbInfo);
-
+  m_report = new PurchaseReport(m_filter);
   m_tabDb->addTab(m_filter, QIcon(":/icons/res/filter.png"), tr("Filtro"));
-  m_tabDb->addTab(frDbInfo, QIcon(":/icons/res/statistics.png"), tr("Estatísticas"));
+  m_tabDb->addTab(m_report, QIcon(":/icons/res/statistics.png"), tr("Relatórios"));
 
   setContentsMargins(9, 9, 9, 9);
   connect(m_btnAddCode, SIGNAL(clicked(bool)), m_table, SLOT(addRowByCode()));
@@ -359,7 +340,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_viewer, SLOT(setDynamicFilter(const QString&)));
-  connect(m_tabDb, SIGNAL(currentChanged(int)), this, SLOT(updateStatistics()));
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
   connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setPurchaseTotal(double)));
   connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setPurchaseDate(const QDate&)));
@@ -368,7 +348,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   setFocusWidgetOnCreate(m_supplierPicker);
   create();
   updateControls();
-  updateStatistics();
 }
 
 PurchaseView::~PurchaseView()
@@ -434,12 +413,6 @@ void PurchaseView::updateControls()
   m_edTotal->setText(total);
   m_tab->setTabIcon(1, m_wPayment->getIcon());
   m_btnHistory->setEnabled(m_supplierPicker->getId().isValid());
-}
-
-void PurchaseView::updateStatistics()
-{
-  m_edEntries->setText(Data::strInt(m_viewer->getNumberOfEntries()));
-  m_edSum->setText(Data::strMoney(m_viewer->getSum(5)));
 }
 
 bool PurchaseView::save(Id& id)

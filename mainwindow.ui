@@ -166,15 +166,8 @@
     </property>
     <addaction name="actionTimeCard"/>
    </widget>
-   <widget class="QMenu" name="menuRelat_rios">
-    <property name="title">
-     <string>Relatórios</string>
-    </property>
-    <addaction name="actionPurchaseReport"/>
-   </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
-   <addaction name="menuRelat_rios"/>
    <addaction name="menuFerramentas"/>
    <addaction name="menuImpressora"/>
    <addaction name="menuConfigura_es"/>
@@ -409,15 +402,6 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar quais produtos comprar e que quantidades</string>
-   </property>
-  </action>
-  <action name="actionPurchaseReport">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/purchase.png</normaloff>:/icons/res/purchase.png</iconset>
-   </property>
-   <property name="text">
-    <string>Compras</string>
    </property>
   </action>
  </widget>

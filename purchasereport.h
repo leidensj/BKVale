@@ -1,24 +1,25 @@
 #ifndef PURCHASEREPORT_H
 #define PURCHASEREPORT_H
 
-#include <QDialog>
+#include <QWidget>
 
-class PurchaseFilter;
 class QPushButton;
 class QTextEdit;
+class PurchaseFilter;
 
-class PurchaseReport : public QDialog
+class PurchaseReport : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit PurchaseReport(QWidget* parent = nullptr);
+  explicit PurchaseReport(PurchaseFilter* filter, QWidget* parent = nullptr);
 
 private slots:
   void process();
+  void updateControls();
 
 private:
-  PurchaseFilter* m_filter;
+  const PurchaseFilter* m_filter;
   QPushButton* m_btnProcess;
   QPushButton* m_btnPrint;
   QTextEdit* m_report;

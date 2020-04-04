@@ -6,19 +6,13 @@
 #include <QPushButton>
 #include <QTextEdit>
 
-PurchaseReport::PurchaseReport(QWidget* parent)
- : QDialog(parent)
- , m_filter(nullptr)
+PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
+ : QWidget(parent)
+ , m_filter(filter)
  , m_btnProcess(nullptr)
  , m_btnPrint(nullptr)
  , m_report(nullptr)
 {
-  setWindowIcon(QIcon(":/icons/res/purchase.png"));
-  setWindowTitle(tr("Relatório de Compras"));
-
-  m_filter = new PurchaseFilter;
-  QFrame *line = new QFrame;
-  line->setFrameShape(QFrame::HLine);
   m_btnProcess = new QPushButton;
   m_btnProcess->setFlat(true);
   m_btnProcess->setIconSize(QSize(24, 24));
@@ -37,23 +31,51 @@ PurchaseReport::PurchaseReport(QWidget* parent)
   ltButtons->setAlignment(Qt::AlignLeft);
   ltButtons->addWidget(m_btnProcess);
   ltButtons->addWidget(m_btnPrint);
-  QVBoxLayout* ltControls = new QVBoxLayout;
-  ltControls->setContentsMargins(0, 0, 0 ,0);
-  ltControls->addWidget(m_filter);
-  ltControls->addWidget(line);
-  ltControls->addLayout(ltButtons);
-  QHBoxLayout* ltMain = new QHBoxLayout;
-  ltMain->addLayout(ltControls);
+  QVBoxLayout* ltMain = new QVBoxLayout;
+  ltMain->addLayout(ltButtons);
   ltMain->addWidget(m_report);
 
   connect(m_btnProcess, SIGNAL(clicked(bool)), this, SLOT(process()));
+  connect(m_report, SIGNAL(textChanged()), this, SLOT(updateControls()));
   setLayout(ltMain);
+  updateControls();
+}
+
+void PurchaseReport::updateControls()
+{
+  m_btnPrint->setEnabled(!m_report->document()->isEmpty());
 }
 
 void PurchaseReport::process()
 {
-  QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
-  m_report->clear();
-  for (int i = 0; i != ids.size(); ++i)
-    m_report->append(QString::number(ids.at(i).get()));
+  if (m_filter != nullptr)
+  {
+    QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
+    m_report->clear();
+    double total = 0.0;
+    for (int i = 0; i != ids.size(); ++i)
+    {
+      Purchase o(ids.at(i));
+      QString error;
+      if (o.SQL_select(error))
+      {
+        m_report->append(tr("Número: %1").arg(o.strNumber()));
+        m_report->append(tr("Loja: %1").arg(o.m_store.name()));
+        m_report->append(tr("Fornecedor: %1").arg(o.m_supplier.m_id.isValid()
+                                                  ? o.m_supplier.name()
+                                                  : tr("Não Informado")));
+        m_report->append(tr("Data: %1 %2").arg(o.strDate(), o.strDayOfWeek()));
+        m_report->append(tr("Subtotal:  %1").arg(o.strSubTotal()));
+        if (o.m_disccount > 0.0)
+          m_report->append(tr("%1: %2").arg(o.m_disccount > 0
+                                            ? tr("Acréscimos") : tr("Descontos"),
+                                            o.strDisccount()));
+        m_report->append(tr("Total:  %1").arg(o.strTotal()));
+        m_report->append("");
+        total += o.total();
+      }
+      m_report->append(tr("Número de compras: %1").arg(Data::strInt(ids.size())));
+      m_report->append(tr("Total das compras: %1").arg(Data::strMoney(total)));
+    }
+  }
 }

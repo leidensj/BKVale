@@ -5,6 +5,7 @@
 #include <QFrame>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QProgressDialog>
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
@@ -17,7 +18,7 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
   m_btnProcess->setFlat(true);
   m_btnProcess->setIconSize(QSize(24, 24));
   m_btnProcess->setIcon(QIcon(":/icons/res/process.png"));
-  m_btnProcess->setToolTip(tr("Processar"));
+  m_btnProcess->setToolTip(tr("Gerar"));
   m_btnPrint = new QPushButton;
   m_btnPrint->setFlat(true);
   m_btnPrint->setIconSize(QSize(24, 24));
@@ -52,30 +53,53 @@ void PurchaseReport::process()
   {
     QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
     m_report->clear();
+    if (ids.size() == 0)
+      return;
+    QProgressDialog progress("Gerando relatório...", "Abortar", 0, ids.size(), this);
+    progress.setWindowIcon(QIcon(":/icons/res/process.png"));
+    progress.setWindowTitle(tr("Relatório"));
+    progress.setMinimumDuration(500);
+    progress.setWindowModality(Qt::WindowModal);
     double total = 0.0;
-    for (int i = 0; i != ids.size(); ++i)
+    int i = 0;
+    for (i = 0; i != ids.size(); ++i)
     {
       Purchase o(ids.at(i));
       QString error;
       if (o.SQL_select(error))
       {
-        m_report->append(tr("Número: %1").arg(o.strNumber()));
-        m_report->append(tr("Loja: %1").arg(o.m_store.name()));
-        m_report->append(tr("Fornecedor: %1").arg(o.m_supplier.m_id.isValid()
-                                                  ? o.m_supplier.name()
-                                                  : tr("Não Informado")));
-        m_report->append(tr("Data: %1 %2").arg(o.strDate(), o.strDayOfWeek()));
-        m_report->append(tr("Subtotal:  %1").arg(o.strSubTotal()));
-        if (o.m_disccount > 0.0)
-          m_report->append(tr("%1: %2").arg(o.m_disccount > 0
-                                            ? tr("Acréscimos") : tr("Descontos"),
-                                            o.strDisccount()));
-        m_report->append(tr("Total:  %1").arg(o.strTotal()));
-        m_report->append("");
+        QString str(tr("Número: %1\n"
+                       "Loja: %2\n"
+                       "Fornecedor: %3\n"
+                       "Data: %4 %5\n"
+                       "Subtotal: %6\n"
+                       "%7%8"
+                       "Total: %9\n").arg(o.strNumber(),
+                                           o.m_store.name(),
+                                           o.m_supplier.m_id.isValid()
+                                           ? o.m_supplier.name()
+                                           : tr("Não Informado"),
+                                           o.strDate(),
+                                           o.strDayOfWeek(),
+                                           o.strSubTotal(),
+                                           o.m_disccount > 0
+                                           ? tr("Acréscimos: ")
+                                           : o.m_disccount < 0 ? tr("Descontos: ") : "",
+                                           o.m_disccount != 0
+                                           ? o.strDisccount() + "\n"
+                                           : "",
+                                           o.strTotal()));
+        m_report->append(str);
         total += o.total();
       }
-      m_report->append(tr("Número de compras: %1").arg(Data::strInt(ids.size())));
-      m_report->append(tr("Total das compras: %1").arg(Data::strMoney(total)));
+      progress.setValue(i);
+      if (progress.wasCanceled())
+        break;
     }
+    if (i != ids.size())
+      i--;
+    progress.setValue(ids.size());
+    m_report->append(tr("Número de compras: %1").arg(Data::strInt(i)));
+    m_report->append(tr("Total das compras: %1").arg(Data::strMoney(total)));
   }
 }

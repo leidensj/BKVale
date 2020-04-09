@@ -1,5 +1,5 @@
 #include "doubleitem.h"
-#include "tinyexpr.h"
+#include "libraries/tinyexpr.h"
 
 DoubleItem::DoubleItem(Data::Type type,
                        Color color,

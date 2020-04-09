@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/reportsxml"/>
+    <qresource prefix="/">
+        <file>reportsxml/purchase.xml</file>
+    </qresource>
+</RCC>

@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include <QVector>
-#include "qcustomplot.h"
+#include "libraries/qcustomplot.h"
 
 class ConsumptionChart : public QFrame
 {

@@ -1,5 +1,5 @@
 #include "jlineedit.h"
-#include "tinyexpr.h"
+#include "libraries/tinyexpr.h"
 #include "jregexpvalidator.h"
 
 JLineEdit::JLineEdit(Text::Input input, int flags, QWidget* parent)

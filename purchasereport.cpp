@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QProgressDialog>
+#include <qtrpt.h>
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
@@ -38,6 +39,7 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
 
   connect(m_btnProcess, SIGNAL(clicked(bool)), this, SLOT(process()));
   connect(m_report, SIGNAL(textChanged()), this, SLOT(updateControls()));
+
   setLayout(ltMain);
   updateControls();
 }
@@ -55,6 +57,25 @@ void PurchaseReport::process()
     m_report->clear();
     if (ids.size() == 0)
       return;
+
+    QtRPT* rpt = new QtRPT(this);
+    rpt->loadReport(":/reportsxml/purchase.xml");
+    connect(rpt, &QtRPT::setDSInfo, [ids](DataSetInfo& ds)
+    {
+      ds.recordCount = ids.size();
+    });
+    connect(rpt, &QtRPT::setValue, [ids](const int recNo, const QString paramName, QVariant &paramValue, const int /*reportPage*/)
+    {
+      Purchase o(ids.at(recNo));
+      QString error;
+      if (o.SQL_select(error))
+      {
+        if (paramName == "supplier")
+          paramValue = o.m_supplier.m_form.name();
+      }
+    });
+    rpt->printExec(true);
+
     QProgressDialog progress("Gerando relatório...", "Abortar", 0, ids.size(), this);
     progress.setWindowIcon(QIcon(":/icons/res/process.png"));
     progress.setWindowTitle(tr("Relatório"));

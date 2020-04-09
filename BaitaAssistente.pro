@@ -216,7 +216,10 @@ FORMS    += mainwindow.ui \
   settingsdialog.ui
 
 RESOURCES += \
-    icons.qrc
+    icons.qrc \
+    reports.qrc
 
 INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.
+
+include($$PWD/QtRptProject/QtRPT/QtRPT.pri)

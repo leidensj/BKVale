@@ -35,7 +35,7 @@ QVariant PackageItem::st_toVariant(const Package& pck)
 
 PackageItem::PackageItem()
 {
-  setTextColor(QColor(Qt::darkGray));
+  setForeground(QBrush(QColor(Qt::darkGray)));
   setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 

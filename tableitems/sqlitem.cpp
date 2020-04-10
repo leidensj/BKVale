@@ -5,7 +5,7 @@ SQLItem::SQLItem(const QString& tableName, const QString& filter)
   : m_tableName(tableName)
   , m_filter(filter)
 {
-  setTextColor(QColor(Qt::darkGray));
+  setForeground(QBrush(Qt::darkGray));
   setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 

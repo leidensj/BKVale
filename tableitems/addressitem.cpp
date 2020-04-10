@@ -55,7 +55,7 @@ QVariant AddressItem::st_toVariant(const Address& o)
 
 AddressItem::AddressItem()
 {
-  setTextColor(QColor(Qt::darkGray));
+  setForeground(QBrush(QColor(Qt::darkGray)));
   setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 

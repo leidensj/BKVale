@@ -16,7 +16,7 @@ void DateItem::setValue(const QVariant& v)
   switch (m_color)
   {
     case Color::DateBeforeDefault:
-      setBackgroundColor(dt < m_defaultDate ? QColor(255, 200, 200) : QColor(Qt::white));
+      setBackground(QBrush(dt < m_defaultDate ? QColor(255, 200, 200) : QColor(Qt::white)));
       setToolTip(dt < m_defaultDate ? "A data é anterior a " + m_defaultDate.toString("dd/MM/yyyy") : "");
       break;
     case Color::None:

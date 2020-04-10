@@ -39,10 +39,10 @@ void DoubleItem::setValue(const QVariant& v)
   switch (m_color)
   {
     case Color::Background:
-      setBackgroundColor(val == 0.0 ? QColor(255, 200, 200) : QColor(Qt::white));
+      setBackground(QBrush(QColor(val == 0.0 ? QColor(255, 200, 200) : QColor(Qt::white))));
       break;
     case Color::Foreground:
-      setTextColor(QColor(val >= 0 ? Qt::red : Qt::darkGreen));
+      setForeground(QBrush(QColor(val >= 0 ? Qt::red : Qt::darkGreen)));
       break;
     case Color::None:
     default:

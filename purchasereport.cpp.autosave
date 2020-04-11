@@ -68,7 +68,6 @@ void PurchaseReport::process()
     QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
     QSqlQuery query(db);
     QString error;
-    bool bSuccess = false;
     Purchase o;
 
     connect(rpt, &QtRPT::setDSInfo, [ids](DataSetInfo& ds)

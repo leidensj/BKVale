@@ -219,7 +219,11 @@ RESOURCES += \
     icons.qrc \
     reports.qrc
 
-INCLUDEPATH += $$PWD/.
-DEPENDPATH += $$PWD/.
+INCLUDEPATH += $$PWD/. \
+               $$PWD/cutereport/include/
+DEPENDPATH += $$PWD/. \
+              $$INCLUDEPATH
+#LIBS += -L"cutereport_1.3.2_src/lib" -lCuteReport -lCuteReportWidgets
 
-include($$PWD/QtRptProject/QtRPT/QtRPT.pri)
+#include($$PWD/QtRptProject/QtRPT/QtRPT.pri)
+include($$PWD/cutereport/include/CuteReport.pri)

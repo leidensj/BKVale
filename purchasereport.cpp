@@ -6,7 +6,8 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QProgressDialog>
-#include <qtrpt.h>
+#include "reportcore.h"
+#include "reportinterface.h"
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
@@ -55,7 +56,12 @@ void PurchaseReport::process()
 {
   if (m_filter != nullptr)
   {
-    QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
+    //CuteReport::ReportCore* pt = new CuteReport::ReportCore(this);
+
+
+
+
+    /*QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
     m_report->clear();
     if (ids.size() == 0)
       return;
@@ -74,7 +80,7 @@ void PurchaseReport::process()
     {
       ds.recordCount = ids.size();
     });
-    connect(rpt, &QtRPT::setValue, [&](const int recNo, const QString paramName, QVariant &paramValue, const int /*reportPage*/)
+    connect(rpt, &QtRPT::setValue, [&](const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)
     {
       qDebug() << "Funcao " << QString::number(recNo) << " param " << paramName << " :" << QTime::currentTime().toString("hh:mm:ss");
       if (paramName == "supplier")
@@ -92,7 +98,7 @@ void PurchaseReport::process()
     rpt->printExec(true);
     qDebug() << "End: " << QTime::currentTime().toString("hh:mm:ss");
 
-    /*QProgressDialog progress("Gerando relatório...", "Abortar", 0, ids.size(), this);
+    QProgressDialog progress("Gerando relatório...", "Abortar", 0, ids.size(), this);
     progress.setWindowIcon(QIcon(":/icons/res/process.png"));
     progress.setWindowTitle(tr("Relatório"));
     progress.setMinimumDuration(500);

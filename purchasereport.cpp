@@ -8,6 +8,8 @@
 #include <QProgressDialog>
 #include "reportcore.h"
 #include "reportinterface.h"
+#include "reportpreview.h"
+#include "qtrpt.h"
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
@@ -56,20 +58,21 @@ void PurchaseReport::process()
 {
   if (m_filter != nullptr)
   {
-    //CuteReport::ReportCore* pt = new CuteReport::ReportCore(this);
+    /*CuteReport::ReportCore* reportCore = new CuteReport::ReportCore(this);
+    CuteReport::ReportPreview* preview = new CuteReport::ReportPreview(this);
+    preview->setReportCore(reportCore);
+    CuteReport::ReportInterface * reportObject = reportCore->loadReport("git:report.qtrp");
+    preview->connectReport(reportObject);
+    preview->show();
+    preview->run();*/
 
-
-
-
-    /*QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
+    QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
     m_report->clear();
     if (ids.size() == 0)
       return;
 
-    qDebug() << "New: " << QTime::currentTime().toString("hh:mm:ss");
     QtRPT* rpt = new QtRPT(this);
     rpt->loadReport(":/reportsxml/purchase.xml");
-    qDebug() << "Load: " << QTime::currentTime().toString("hh:mm:ss");
 
     QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
     QSqlQuery query(db);
@@ -143,6 +146,6 @@ void PurchaseReport::process()
       i--;
     progress.setValue(ids.size());
     m_report->append(tr("Número de compras: %1").arg(Data::strInt(i)));
-    m_report->append(tr("Total das compras: %1").arg(Data::strMoney(total)));*/
+    m_report->append(tr("Total das compras: %1").arg(Data::strMoney(total)));
   }
 }

@@ -219,11 +219,18 @@ RESOURCES += \
     icons.qrc \
     reports.qrc
 
-INCLUDEPATH += $$PWD/. \
-               $$PWD/cutereport/include/
-DEPENDPATH += $$PWD/. \
-              $$INCLUDEPATH
-#LIBS += -L"cutereport_1.3.2_src/lib" -lCuteReport -lCuteReportWidgets
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportCore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportCored
+else:unix: LIBS += -L$$PWD/cutereport/ -lCuteReportCore
 
-#include($$PWD/QtRptProject/QtRPT/QtRPT.pri)
-include($$PWD/cutereport/include/CuteReport.pri)
+INCLUDEPATH += $$PWD/cutereport/include/cutereport
+DEPENDPATH += $$PWD/cutereport/include/cutereport
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportWidgets
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportWidgetsd
+else:unix: LIBS += -L$$PWD/cutereport/ -lCuteReportWidgets
+
+INCLUDEPATH += $$PWD/cutereport/include/cutereport
+DEPENDPATH += $$PWD/cutereport/include/cutereport
+
+include($$PWD/QtRptProject/QtRPT/QtRPT.pri)

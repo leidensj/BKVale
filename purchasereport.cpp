@@ -58,94 +58,15 @@ void PurchaseReport::process()
 {
   if (m_filter != nullptr)
   {
-    /*CuteReport::ReportCore* reportCore = new CuteReport::ReportCore(this);
-    CuteReport::ReportPreview* preview = new CuteReport::ReportPreview(this);
-    preview->setReportCore(reportCore);
-    CuteReport::ReportInterface * reportObject = reportCore->loadReport("git:report.qtrp");
-    preview->connectReport(reportObject);
-    preview->show();
-    preview->run();*/
-
-    QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
-    m_report->clear();
-    if (ids.size() == 0)
-      return;
-
     QtRPT* rpt = new QtRPT(this);
     rpt->loadReport(":/reportsxml/purchase.xml");
-
-    QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    QSqlQuery query(db);
-    QString error;
-    Purchase o;
-
-    connect(rpt, &QtRPT::setDSInfo, [ids](DataSetInfo& ds)
-    {
-      ds.recordCount = ids.size();
-    });
-    connect(rpt, &QtRPT::setValue, [&](const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)
-    {
-      qDebug() << "Funcao " << QString::number(recNo) << " param " << paramName << " :" << QTime::currentTime().toString("hh:mm:ss");
-      if (paramName == "supplier")
-      {
-        //qDebug() << "Fetch begin: " << QTime::currentTime().toString("hh:mm:ss.z");
-        o.m_id = ids.at(recNo);
-        if (o.SQL_select_proc(query, error))
-        //{
-          //qDebug() << "Fetch end: " << QTime::currentTime().toString("hh:mm:ss.z");
-          paramValue = o.m_supplier.name();
-        //}
-      }
-    });
-    qDebug() << "Exec: " << QTime::currentTime().toString("hh:mm:ss");
+    rpt->setUserSqlConnection(0, "db", "QPSQL", "BaitaAssistente", "localhost", "BaitaAssistente", "jfljfl", 5432, POSTGRE_CONNECTION_NAME,
+                              "SELECT _NOTES._NUMBER AS NUMBER, _NOTES._DATE AS _DATE, _NOTES._OBSERVATION AS OBSERVATION, _NOTES._DISCCOUNT AS DISCCOUNT, _NOTES._PAYMENT_METHOD AS PAYMENT, SUPPLIERFORM._NAME AS SUPPLIER, STOREFORM._NAME AS STORE, _PRODUCTS._NAME AS PRODUCT, _PRODUCTS._UNITY AS UNITY, _NOTE_ITEMS._AMMOUNT AS AMMOUNT, _NOTE_ITEMS._PRICE AS PRICE, _NOTE_ITEMS._IS_PACK AS ISPACK, _NOTE_ITEMS._PACK_UNITY AS PACKUNITY, _NOTE_ITEMS._PACK_AMMOUNT AS PACKAMMOUNT, _NOTE_ITEMS._PRICE * _NOTE_ITEMS._AMMOUNT AS SUBTOTAL FROM _NOTE_ITEMS LEFT JOIN _NOTES ON _NOTE_ITEMS._NOTEID = _NOTES._ID LEFT JOIN _SUPPLIERS ON _NOTES._SUPPLIERID = _SUPPLIERS._ID LEFT JOIN _FORMS AS SUPPLIERFORM ON _SUPPLIERS._FORMID = SUPPLIERFORM._ID LEFT JOIN _STORES ON _NOTES._STOREID = _STORES._ID LEFT JOIN _FORMS AS STOREFORM ON _STORES._FORMID = STOREFORM._ID LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID;");
+    RptSqlConnection ds = rpt->pageList[0]->sqlConnection;
+    connect(rpt, &QtRPT::setDSInfo, [](DataSetInfo& ds)
+        {
+          ds.recordCount = 6669;
+        });
     rpt->printExec(true);
-    qDebug() << "End: " << QTime::currentTime().toString("hh:mm:ss");
-
-    QProgressDialog progress("Gerando relatório...", "Abortar", 0, ids.size(), this);
-    progress.setWindowIcon(QIcon(":/icons/res/process.png"));
-    progress.setWindowTitle(tr("Relatório"));
-    progress.setMinimumDuration(500);
-    progress.setWindowModality(Qt::WindowModal);
-    double total = 0.0;
-    int i = 0;
-    for (i = 0; i != ids.size(); ++i)
-    {
-      Purchase o(ids.at(i));
-      QString error;
-      if (o.SQL_select(error))
-      {
-        QString str(tr("Número: %1\n"
-                       "Loja: %2\n"
-                       "Fornecedor: %3\n"
-                       "Data: %4 %5\n"
-                       "Subtotal: %6\n"
-                       "%7%8"
-                       "Total: %9\n").arg(o.strNumber(),
-                                           o.m_store.name(),
-                                           o.m_supplier.m_id.isValid()
-                                           ? o.m_supplier.name()
-                                           : tr("Não Informado"),
-                                           o.strDate(),
-                                           o.strDayOfWeek(),
-                                           o.strSubTotal(),
-                                           o.m_disccount > 0
-                                           ? tr("Acréscimos: ")
-                                           : o.m_disccount < 0 ? tr("Descontos: ") : "",
-                                           o.m_disccount != 0
-                                           ? o.strDisccount() + "\n"
-                                           : "",
-                                           o.strTotal()));
-        m_report->append(str);
-        total += o.total();
-      }
-      progress.setValue(i);
-      if (progress.wasCanceled())
-        break;
-    }
-    if (i != ids.size())
-      i--;
-    progress.setValue(ids.size());
-    m_report->append(tr("Número de compras: %1").arg(Data::strInt(i)));
-    m_report->append(tr("Total das compras: %1").arg(Data::strMoney(total)));
   }
 }

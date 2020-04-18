@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Reports email="aliks-os@ukr.net" programmer="Aleksey Osipov" lib="QtRPT">
   <Script><![CDATA[]]></Script>
-  <Report orientation="0" watermarkOpacity="1.33511968908904e-306" borderWidth="1" pageHeight="1188" marginsTop="40" marginsBottom="40" border="0" pageNo="1" pageWidth="840" marginsRight="40" watermark="0" borderStyle="" watermarkPixmap="" marginsLeft="40" borderColor="">
-    <ReportBand width="760" type="ReportTitle" height="41" name="RepTitleBand1" bandNo="1">
-      <TContainerField top="1" aligmentH="hCenter" fontSize="18" textWrap="0" fontColor="rgba(0,0,0,255)" backgroundColor="rgba(255,255,255,255)" fontItalic="0" highlighting="" fontFamily="MS Shell Dlg 2" groupName="" printing="1" borderBottom="rgba(255,255,255,255)" fontBold="0" aligmentV="vCenter" borderLeft="rgba(255,255,255,255)" borderWidth="1px" type="label" borderRight="rgba(255,255,255,255)" ZValue="11" width="753" height="31" borderTop="rgba(255,255,255,255)" name="field1" format="" fontUnderline="0" autoHeight="0" left="5" borderColor="rgba(0,0,0,255)" fontStrikeout="0" borderStyle="solid" value="Relatório de compras" rotate="0"/>
+  <Report borderWidth="1" marginsBottom="40" watermark="0" marginsRight="40" border="0" pageNo="1" watermarkOpacity="1.33511968908904e-306" pageWidth="840" borderStyle="" pageHeight="1188" marginsLeft="40" orientation="0" borderColor="" watermarkPixmap="" marginsTop="40">
+    <ReportBand type="ReportTitle" height="41" name="RepTitleBand1" bandNo="1" width="760">
+      <TContainerField borderWidth="1px" name="field1" borderRight="rgba(255,255,255,255)" left="5" aligmentH="hCenter" borderColor="rgba(0,0,0,255)" fontSize="18" autoHeight="0" textWrap="0" borderStyle="solid" fontColor="rgba(0,0,0,255)" ZValue="11" height="31" format="" printing="1" aligmentV="vCenter" width="753" groupName="" fontBold="0" fontItalic="0" borderBottom="rgba(255,255,255,255)" backgroundColor="rgba(255,255,255,255)" highlighting="" rotate="0" top="1" value="Relatório de compras" type="label" fontUnderline="0" fontStrikeout="0" fontFamily="MS Shell Dlg 2" borderTop="rgba(255,255,255,255)" borderLeft="rgba(255,255,255,255)"/>
     </ReportBand>
-    <ReportBand width="760" type="MasterData" height="28" name="MasterDataBand1" dataSourceName="" bandNo="1">
-      <TContainerField top="2" aligmentH="hLeft" fontSize="8" textWrap="0" fontColor="rgba(0,0,0,255)" backgroundColor="rgba(255,255,255,255)" fontItalic="0" highlighting="" fontFamily="MS Shell Dlg 2" groupName="" printing="1" borderBottom="rgba(255,255,255,255)" fontBold="0" aligmentV="vCenter" borderLeft="rgba(255,255,255,255)" borderWidth="1px" type="label" borderRight="rgba(255,255,255,255)" ZValue="11" width="200" height="20" borderTop="rgba(255,255,255,255)" name="field2" format="" fontUnderline="0" autoHeight="0" left="5" borderColor="rgba(0,0,0,255)" fontStrikeout="0" borderStyle="solid" value="[supplier]" rotate="0"/>
+    <ReportBand type="MasterData" height="28" name="MasterDataBand1" bandNo="1" width="760" dataSourceName="">
+      <TContainerField borderWidth="1px" name="supplier" borderRight="rgba(255,255,255,255)" left="5" aligmentH="hLeft" borderColor="rgba(0,0,0,255)" fontSize="8" autoHeight="0" textWrap="0" borderStyle="solid" fontColor="rgba(0,0,0,255)" ZValue="11" height="20" format="" printing="1" aligmentV="vCenter" width="751" groupName="" fontBold="0" fontItalic="0" borderBottom="rgba(255,255,255,255)" backgroundColor="rgba(255,255,255,255)" highlighting="" rotate="0" top="2" value="Tentando &lt;LineNo> [db.product]" type="label" fontUnderline="0" fontStrikeout="0" fontFamily="MS Shell Dlg 2" borderTop="rgba(255,255,255,255)" borderLeft="rgba(255,255,255,255)"/>
     </ReportBand>
+    <DataSource dbName="" charsetCoding="" type="SQL" dbPort="" dbCoding="" name="DB1" dbUser="" dbType="QPSQL" dbPassword="" dbConnectionName="" dbHost=""><diagram/>
+    </DataSource>
   </Report>
 </Reports>

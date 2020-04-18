@@ -292,6 +292,10 @@ bool QtRPT::setPrinter(QPrinter *printer)
 
 void QtRPT::makeReportObjectStructure()
 {
+    QList<RptSqlConnection> ds;
+    for (int i = 0; i != pageList.size(); ++i)
+      ds.append(pageList.at(i)->sqlConnection);
+
     clearObject();
     for (int i = 0; i < m_xmlDoc.documentElement().childNodes().count(); i++) {
         QDomNode domNode = m_xmlDoc.documentElement().childNodes().at(i);
@@ -301,6 +305,8 @@ void QtRPT::makeReportObjectStructure()
             auto pageObject = new RptPageObject();
             pageObject->setProperty(this, docElem);
             pageList.append(pageObject);
+            if (pageList.size() <= ds.size())
+              pageList[pageList.size() -1]->sqlConnection = ds.at(pageList.size() - 1);
         } else if (docElem.tagName() == "Script") {
             QDomNode cdataNode = domNode.childNodes().at(0);
             if (cdataNode.isCDATASection()) {

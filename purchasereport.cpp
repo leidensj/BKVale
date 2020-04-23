@@ -62,19 +62,31 @@ void PurchaseReport::process()
     QFile data("output.txt");
     if (data.open(QFile::WriteOnly | QFile::Truncate))
     {
-      QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
-      Purchase o;
-      QString error;
       QTextStream out(&data);
-      qDebug() << "Size: " << QString::number(ids.size());
       qDebug() << "Inicio: " << QTime::currentTime().toString("hh:mm:ss.zzz");
       QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
       QSqlQuery query(db);
-      for (int i = 0; i != ids.size(); ++i)
+      query.prepare("SELECT _NOTES._NUMBER AS NUMBER, _NOTES._DATE AS _DATE, _NOTES._OBSERVATION AS OBSERVATION, _NOTES._DISCCOUNT AS DISCCOUNT, _NOTES._PAYMENT_METHOD AS PAYMENT,"
+                    "SUPPLIERFORM._NAME AS SUPPLIER, STOREFORM._NAME AS STORE,"
+                    "_PRODUCTS._NAME AS PRODUCT, _PRODUCTS._UNITY AS UNITY,"
+                    "_NOTE_ITEMS._AMMOUNT AS AMMOUNT, _NOTE_ITEMS._PRICE AS PRICE, _NOTE_ITEMS._IS_PACK AS ISPACK, _NOTE_ITEMS._PACK_UNITY AS PACKUNITY, _NOTE_ITEMS._PACK_AMMOUNT AS PACKAMMOUNT,"
+                    "_NOTE_ITEMS._PRICE * _NOTE_ITEMS._AMMOUNT AS SUBTOTAL "
+                    "FROM _NOTE_ITEMS "
+                    "LEFT JOIN _NOTES ON _NOTE_ITEMS._NOTEID = _NOTES._ID "
+                    "LEFT JOIN _SUPPLIERS ON _NOTES._SUPPLIERID = _SUPPLIERS._ID "
+                    "LEFT JOIN _FORMS AS SUPPLIERFORM ON _SUPPLIERS._FORMID = SUPPLIERFORM._ID "
+                    "LEFT JOIN _STORES ON _NOTES._STOREID = _STORES._ID "
+                    "LEFT JOIN _FORMS AS STOREFORM ON _STORES._FORMID = STOREFORM._ID "
+                    "LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID");
+      if (query.exec())
       {
-        o.m_id = ids.at(i);
-        if (o.SQL_select_proc(query, error))
-          out << o.strNumber() << " " << o.m_supplier.name() << Qt::endl;
+        int lastNumber = -1;
+        while (query.next())
+        {
+          if (query.value(0).toInt() != lastNumber)
+            out << query.value("SUPPLIER").toString() << Qt::endl;
+          lastNumber = query.value(0).toInt();
+        }
       }
       qDebug() << "Fim: " << QTime::currentTime().toString("hh:mm:ss.zzz");
     }

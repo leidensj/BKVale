@@ -52,34 +52,31 @@ void PurchaseReport::updateControls()
   m_btnPrint->setEnabled(!m_report->document()->isEmpty());
 }
 
+#include <QTextStream>
 #include <qdebug.h>
 
 void PurchaseReport::process()
 {
   if (m_filter != nullptr)
   {
-    QString strQuery = "SELECT _NOTES._ID AS NOTEID, _NOTES._NUMBER AS NUMBER, _NOTES._DATE AS _DATE, _NOTES._OBSERVATION AS OBSERVATION, _NOTES._DISCCOUNT AS DISCCOUNT, _NOTES._PAYMENT_METHOD AS PAYMENT, SUPPLIERFORM._NAME AS SUPPLIER, STOREFORM._NAME AS STORE, _PRODUCTS._NAME AS PRODUCT, _PRODUCTS._UNITY AS UNITY, _NOTE_ITEMS._AMMOUNT AS AMMOUNT, _NOTE_ITEMS._PRICE AS PRICE, _NOTE_ITEMS._IS_PACK AS ISPACK, _NOTE_ITEMS._PACK_UNITY AS PACKUNITY, _NOTE_ITEMS._PACK_AMMOUNT AS PACKAMMOUNT, _NOTE_ITEMS._PRICE * _NOTE_ITEMS._AMMOUNT AS SUBTOTAL FROM _NOTE_ITEMS LEFT JOIN _NOTES ON _NOTE_ITEMS._NOTEID = _NOTES._ID LEFT JOIN _SUPPLIERS ON _NOTES._SUPPLIERID = _SUPPLIERS._ID LEFT JOIN _FORMS AS SUPPLIERFORM ON _SUPPLIERS._FORMID = SUPPLIERFORM._ID LEFT JOIN _STORES ON _NOTES._STOREID = _STORES._ID LEFT JOIN _FORMS AS STOREFORM ON _STORES._FORMID = STOREFORM._ID LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID";
-    QString strFilter = m_filter->getFilter();
-    if (!strFilter.isEmpty())
-      strQuery += " WHERE " + strFilter;
-    QtRPT* rpt = new QtRPT(this);
-    rpt->loadReport(":/reportsxml/purchase.xml");
-    rpt->setUserSqlConnection(0, "db", "QPSQL",
-                              "BaitaAssistente", "localhost", "BaitaAssistente",
-                              "jfljfl", 5432, POSTGRE_CONNECTION_NAME,
-                              strQuery);
-    RptSqlConnection ds = rpt->pageList[0]->sqlConnection;
-    connect(rpt, &QtRPT::setDSInfo, [strFilter](DataSetInfo& ds)
+    QFile data("output.txt");
+    if (data.open(QFile::WriteOnly | QFile::Truncate))
     {
+      QVector<Id> ids(Purchase::st_SQL_select_all_purchases(m_filter->getFilter()));
+      Purchase o;
+      QString error;
+      QTextStream out(&data);
+      qDebug() << "Size: " << QString::number(ids.size());
+      qDebug() << "Inicio: " << QTime::currentTime().toString("hh:mm:ss.zzz");
       QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
       QSqlQuery query(db);
-      QString strQuery = "SELECT COUNT(*) FROM _NOTE_ITEMS LEFT JOIN _NOTES ON _NOTE_ITEMS._NOTEID = _NOTES._ID LEFT JOIN _SUPPLIERS ON _NOTES._SUPPLIERID = _SUPPLIERS._ID LEFT JOIN _FORMS AS SUPPLIERFORM ON _SUPPLIERS._FORMID = SUPPLIERFORM._ID LEFT JOIN _STORES ON _NOTES._STOREID = _STORES._ID LEFT JOIN _FORMS AS STOREFORM ON _STORES._FORMID = STOREFORM._ID LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID";
-      if (!strFilter.isEmpty())
-        strQuery += " WHERE " + strFilter;
-      query.prepare(strQuery);
-      if (query.exec() && query.next())
-        ds.recordCount = query.value(0).toInt();
-    });
-    rpt->printExec(true);
+      for (int i = 0; i != ids.size(); ++i)
+      {
+        o.m_id = ids.at(i);
+        if (o.SQL_select_proc(query, error))
+          out << o.strNumber() << " " << o.m_supplier.name() << Qt::endl;
+      }
+      qDebug() << "Fim: " << QTime::currentTime().toString("hh:mm:ss.zzz");
+    }
   }
 }

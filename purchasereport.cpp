@@ -6,16 +6,13 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QProgressDialog>
-#include "reportcore.h"
-#include "reportinterface.h"
-#include "reportpreview.h"
-#include "qtrpt.h"
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
  , m_filter(filter)
  , m_btnProcess(nullptr)
  , m_btnPrint(nullptr)
+ , m_btnPdf(nullptr)
  , m_report(nullptr)
 {
   m_btnProcess = new QPushButton;
@@ -28,6 +25,11 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
   m_btnPrint->setIconSize(QSize(24, 24));
   m_btnPrint->setIcon(QIcon(":/icons/res/printer.png"));
   m_btnPrint->setToolTip(tr("Imprimir"));
+  m_btnPdf = new QPushButton;
+  m_btnPdf->setFlat(true);
+  m_btnPdf->setIconSize(QSize(24, 24));
+  m_btnPdf->setIcon(QIcon(":/icons/res/pdf.png"));
+  m_btnPdf->setToolTip(tr("Salvar como PDF"));
   m_report = new QTextEdit;
   m_report->setReadOnly(true);
 
@@ -36,6 +38,7 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
   ltButtons->setAlignment(Qt::AlignLeft);
   ltButtons->addWidget(m_btnProcess);
   ltButtons->addWidget(m_btnPrint);
+  ltButtons->addWidget(m_btnPdf);
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(ltButtons);
   ltMain->addWidget(m_report);
@@ -60,6 +63,7 @@ void PurchaseReport::process()
   if (m_filter == nullptr)
     return;
 
+  m_report->clear();
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   QSqlQuery query(db);
   query.prepare("SELECT _NOTES._NUMBER AS NUMBER," //0
@@ -71,12 +75,13 @@ void PurchaseReport::process()
                 "STOREFORM._NAME AS STORE," //6
                 "_PRODUCTS._NAME AS PRODUCT," //7
                 "_PRODUCTS._UNITY AS UNITY," //8
-                "_NOTE_ITEMS._AMMOUNT AS AMMOUNT," //9
-                "_NOTE_ITEMS._PRICE AS PRICE," //10
-                "_NOTE_ITEMS._IS_PACK AS ISPACK," //11
-                "_NOTE_ITEMS._PACK_UNITY AS PACKUNITY," //12
-                "_NOTE_ITEMS._PACK_AMMOUNT AS PACKAMMOUNT," //13
-                "_NOTE_ITEMS._PRICE * _NOTE_ITEMS._AMMOUNT AS SUBTOTAL " //14
+                "_NOTE_ITEMS._PRODUCTID AS PRODUCTID," //9
+                "_NOTE_ITEMS._AMMOUNT AS AMMOUNT," //10
+                "_NOTE_ITEMS._PRICE AS PRICE," //11
+                "_NOTE_ITEMS._IS_PACK AS ISPACK," //12
+                "_NOTE_ITEMS._PACK_UNITY AS PACKUNITY," //13
+                "_NOTE_ITEMS._PACK_AMMOUNT AS PACKAMMOUNT," //14
+                "_NOTE_ITEMS._PRICE * _NOTE_ITEMS._AMMOUNT AS SUBTOTAL " //15
                 "FROM _NOTE_ITEMS "
                 "LEFT JOIN _NOTES ON _NOTE_ITEMS._NOTEID = _NOTES._ID "
                 "LEFT JOIN _SUPPLIERS ON _NOTES._SUPPLIERID = _SUPPLIERS._ID "
@@ -84,69 +89,57 @@ void PurchaseReport::process()
                 "LEFT JOIN _STORES ON _NOTES._STOREID = _STORES._ID "
                 "LEFT JOIN _FORMS AS STOREFORM ON _STORES._FORMID = STOREFORM._ID "
                 "LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID");
-  if (query.exec() && query.next())
+  if (query.exec())
   {
-    auto r = new QtRPT(this);
-    r->loadReport(":/reportsxml/purchase.xml");
-    connect(r, &QtRPT::setValue,
-            [&query](const int recNo, const QString paramName, QVariant &paramValue, const int /*reportPage*/)
-    {
-      qDebug() << "recNo " <<recNo << " query.at() " << query.at();
-      if (recNo == (query.at() + 1))
-        query.next();
-      else if (recNo == (query.at() - 1))
-        query.previous();
+    int currentNumber = -1;
+    double currentSubtotal = 0.0;
+    QProgressDialog progress(tr("Gerando Relatório"), tr("Cancelar"), 0, query.size(), this);
+    progress.setWindowModality(Qt::WindowModal);
+    if (query.size() != 0)
+      m_report->append("<html><body><h1>Relatório de Compras</h1></body></html>");
 
-      if (query.at() == recNo)
-      {
-        if (paramName == "number")
-        {
-          paramValue = query.value(0);
-        }
-        else if(paramName == "_date")
-        {
-          paramValue = query.value(1).toDate().toString("dd/MM/yyyy dddd");
-        }
-        else if(paramName == "payment")
-        {
-          paramValue = Purchase::st_paymentText((Purchase::PaymentMethod)query.value(4).toInt());
-        }
-        else if(paramName == "supplier")
-        {
-          paramValue = query.value(5);
-        }
-        else if(paramName == "store")
-        {
-          paramValue = query.value(6);
-        }
-        else if(paramName == "product")
-        {
-          paramValue = query.value(7);
-        }
-        else if(paramName == "ammount")
-        {
-          paramValue = Data::strAmmount(query.value(9).toDouble()) +
-                       (query.value(11).toBool()
-                        ? query.value(12).toString()
-                        : query.value(8).toString()) +
-                       " x R$" + Data::strMoney(query.value(10).toDouble());
-        }
-        else if(paramName == "subtotal")
-        {
-          paramValue = query.value(14);
-        }
-        else if(paramName == "disccount")
-        {
-          paramValue = query.value(3);
-        }
-      }
-    });
-    int count = query.size();
-    connect(r, &QtRPT::setDSInfo,[count](DataSetInfo& ds)
+    while (query.next())
     {
-      if (ds.reportPage == 0)
-        ds.recordCount = count;
-    });
-    r->printExec();
+      if (currentNumber != query.value(0).toInt())
+      {
+        m_report->append(tr("Número: ") + Data::strInt(query.value(0).toInt()));
+        m_report->append(tr("Data: ") + query.value(1).toDate().toString("dd/MM/yyyy dddd"));
+        m_report->append(tr("Pagamento: ") + Purchase::st_paymentText((Purchase::PaymentMethod)query.value(4).toInt()));
+        m_report->append(tr("Fornecedor: ") + query.value(5).toString());
+        m_report->append(tr("Loja: ") + query.value(6).toString());
+        currentNumber = query.value(0).toInt();
+      }
+      if (query.value(9).toInt() != 0)
+      {
+        m_report->append(Data::strAmmount(query.value(10).toDouble()) +
+                         (query.value(12).toBool()
+                          ? query.value(13).toString()
+                          : query.value(8).toString()) +
+                         " x " + Data::strMoney(query.value(11).toDouble()) +
+                         " " + query.value(7).toString() +
+                         " " + Data::strMoney(query.value(15).toDouble()));
+        currentSubtotal +=query.value(15).toDouble();
+      }
+      bool bPrintFooter = !query.next();
+      if (!bPrintFooter)
+      {
+        bPrintFooter = query.value(0).toInt() != currentNumber;
+        query.previous();
+      }
+      if (bPrintFooter)
+      {
+        if (query.value(3).toDouble() != 0.0)
+        {
+          m_report->append(tr("Subtotal: ") + Data::strMoney(currentSubtotal));
+          m_report->append(tr("Desconto: ") + Data::strMoney(query.value(3).toDouble()));
+        }
+        m_report->append(tr("TOTAL: ") + Data::strMoney(currentSubtotal + query.value(3).toDouble()));
+        currentSubtotal = 0.0;
+      }
+      progress.setValue(query.at());
+      if (progress.wasCanceled())
+          break;
+    }
+    progress.setValue(query.size());
   }
 }

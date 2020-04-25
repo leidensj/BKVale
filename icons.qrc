@@ -183,5 +183,6 @@
         <file>res/zoomout.png</file>
         <file>res/fit.png</file>
         <file>res/copy.png</file>
+        <file>res/pdf.png</file>
     </qresource>
 </RCC>

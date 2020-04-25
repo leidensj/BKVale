@@ -22,6 +22,7 @@ private:
   const PurchaseFilter* m_filter;
   QPushButton* m_btnProcess;
   QPushButton* m_btnPrint;
+  QPushButton* m_btnPdf;
   QTextEdit* m_report;
 };
 

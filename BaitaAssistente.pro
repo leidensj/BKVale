@@ -108,7 +108,8 @@ SOURCES += main.cpp\
     tableitems/addressitem.cpp \
     tables/paymenttable.cpp \
     tables/employeehourstable.cpp \
-    tables/storeemployeestable.cpp
+    tables/storeemployeestable.cpp \
+  widgets/pdfgenerator.cpp
 
 HEADERS  += mainwindow.h \
     controls/calculatorwidget.h \
@@ -210,7 +211,8 @@ HEADERS  += mainwindow.h \
     tableitems/addressitem.h \
     tables/paymenttable.h \
     tables/employeehourstable.h \
-    tables/storeemployeestable.h
+    tables/storeemployeestable.h \
+    widgets/pdfgenerator.h
 
 FORMS    += mainwindow.ui \
   settingsdialog.ui

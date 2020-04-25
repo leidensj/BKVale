@@ -9,25 +9,6 @@ class QDialogButtonBox;
 class QCheckBox;
 class JSpinBox;
 
-class TimeCardGenerator : public QObject
-{
-  Q_OBJECT
-
-public:
-  TimeCardGenerator(const QString& fileName, const QString& html, bool bOpen);
-
-public slots:
-  void generate();
-
-signals:
-  void finished();
-
-private:
-  QString m_fileName;
-  QString m_html;
-  bool m_bOpen;
-};
-
 class TimeCardDialog : public QDialog
 {
   Q_OBJECT

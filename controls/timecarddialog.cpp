@@ -1,12 +1,11 @@
 #include "timecarddialog.h"
-#include <QTextDocument>
-#include <QPrinter>
 #include <QDate>
 #include "items/jitem.h"
 #include "items/store.h"
 #include "items/employee.h"
 #include "controls/databasepicker.h"
 #include "widgets/jspinbox.h"
+#include "widgets/pdfgenerator.h"
 #include <QDateEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -14,7 +13,6 @@
 #include <QFileDialog>
 #include <QLocale>
 #include <QPushButton>
-#include <QDesktopServices>
 #include <QCheckBox>
 #include <QThread>
 
@@ -232,40 +230,6 @@ void TimeCardDialog::saveAndAccept()
     return;
 
   accept();
-
-  QThread* thread = new QThread;
-  TimeCardGenerator* w = new TimeCardGenerator(fileName, html, m_cbOpenFile->isChecked());
-  w->moveToThread(thread);
-  connect(thread, SIGNAL(started()), w, SLOT(generate()));
-  connect(w, SIGNAL(finished()), thread, SLOT(quit()));
-  connect(w, SIGNAL(finished()), w, SLOT(deleteLater()));
-  connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-  thread->start();
-
-}
-
-TimeCardGenerator::TimeCardGenerator(const QString& fileName,
-                                     const QString& html,
-                                     bool bOpen)
-  : m_fileName(fileName)
-  , m_html(html)
-  , m_bOpen(bOpen)
-{
-
-}
-
-void TimeCardGenerator::generate()
-{
-  QTextDocument doc;
-  doc.setHtml(m_html);
-  doc.setDocumentMargin(20);
-  QPrinter printer(QPrinter::PrinterResolution);
-  printer.setOutputFormat(QPrinter::PdfFormat);
-  printer.setPaperSize(QPrinter::A4);
-  printer.setOutputFileName(m_fileName);
-  doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
-  doc.print(&printer);
-  if (m_bOpen)
-    QDesktopServices::openUrl(QUrl(m_fileName, QUrl::TolerantMode));
-  emit finished();
+  PdfGenerator* w = new PdfGenerator(fileName, html, m_cbOpenFile->isChecked(), false);
+  w->generate();
 }

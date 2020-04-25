@@ -198,15 +198,14 @@ QStringList Reminder::SQL_select_subjects()
   if (SQL_isOpen(error))
   {
     QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-    db.transaction();
     QSqlQuery query(db);
     query.prepare("SELECT DISTINCT "
                   REMINDER_SQL_COL12
                   " FROM " REMINDER_SQL_TABLE_NAME);
     bool bSuccess = query.exec();
     while (bSuccess && query.next())
-      lst.push_back(query.value(0).toString());
-    SQL_finish(db, query, bSuccess, error);
+      if (!query.value(0).toString().isEmpty())
+        lst.push_back(query.value(0).toString());
   }
   return lst;
 }

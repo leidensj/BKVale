@@ -168,14 +168,14 @@ void PurchaseReport::process()
       {
         if (query.value(9).toInt() != 0) // hasProduct
           html += "</table>";
-        html += "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">";
+        html += "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
         if (query.value(3).toDouble() != 0.0)
         {
-          html += QString("<tr><td>Subtotal: %1</td></tr>").arg(Data::strMoney(currentSubtotal));
-          html += QString("<tr><td>Desconto: %1</td></tr>").arg(Data::strMoney(query.value(3).toDouble()));
+          html += QString("<tr><td align=\"right\">Subtotal: %1</td></tr>").arg(Data::strMoney(currentSubtotal));
+          html += QString("<tr><td align=\"right\">Desconto: %1</td></tr>").arg(Data::strMoney(query.value(3).toDouble()));
         }
         double total = currentSubtotal + query.value(3).toDouble();
-        html += QString("<tr><td>TOTAL: %1</td></tr></table>").arg(Data::strMoney(total));
+        html += QString("<tr><td align=\"right\">TOTAL: %1</td></tr></table><hr>").arg(Data::strMoney(total));
         currentSubtotal = 0.0;
         currentTotal += total;
       }
@@ -186,7 +186,7 @@ void PurchaseReport::process()
     progress.setValue(query.size());
     if (query.size() != 0)
     {
-      html += QString("<br><h3>Número de compras: %1</h3>").arg(Data::strInt(nPurchases));
+      html += QString("<h3>Número de compras: %1</h3>").arg(Data::strInt(nPurchases));
       html += QString("<h3>Total das compras: %1</h3>").arg(Data::strMoney(currentTotal));
       html += "</body></html>";
       scrollValue = m_report->verticalScrollBar()->value();

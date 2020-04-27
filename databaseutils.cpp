@@ -290,7 +290,7 @@ bool BaitaSQL::createTables(QString& error)
                         PURCHASE_SQL_COL_OBS " TEXT,"
                         PURCHASE_SQL_COL_DSC " REAL,"
                         PURCHASE_SQL_COL_EMP " INTEGER,"
-                        PURCHASE_SQL_COL_MTH " INTEGER,"
+                        PURCHASE_SQL_COL_MTH " INTEGER NOT NULL,"
                         PURCHASE_SQL_COL_STR " INTEGER NOT NULL,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_SPL ") REFERENCES "
                         SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"

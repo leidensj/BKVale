@@ -7,6 +7,8 @@
 #include <QTextEdit>
 #include <QProgressDialog>
 #include <QScrollBar>
+#include <QFileDialog>
+#include "widgets/pdfgenerator.h"
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
@@ -46,6 +48,7 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
 
   connect(m_btnProcess, SIGNAL(clicked(bool)), this, SLOT(process()));
   connect(m_report, SIGNAL(textChanged()), this, SLOT(updateControls()));
+  connect(m_btnPdf, SIGNAL(clicked(bool)), this, SLOT(saveAsPdf()));
 
   setLayout(ltMain);
   updateControls();
@@ -54,9 +57,24 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
 void PurchaseReport::updateControls()
 {
   m_btnPrint->setEnabled(!m_report->document()->isEmpty());
+  m_btnPdf->setEnabled(!m_report->document()->isEmpty());
 }
 
-#include <qdebug.h>
+void PurchaseReport::saveAsPdf()
+{
+  QString fileName = QFileDialog::getSaveFileName(this,
+                                                  tr("Salvar relatório"),
+                                                  "/desktop/relatorio_compras_" +
+                                                  QDate::currentDate().toString("dd_MM_yyyy") +
+                                                  ".pdf",
+                                                  tr("PDF (*.pdf)"));
+
+  if (fileName.isEmpty())
+    return;
+
+  PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), true, true);
+  w->generate();
+}
 
 void PurchaseReport::process()
 {
@@ -111,6 +129,7 @@ void PurchaseReport::process()
 
     while (query.next())
     {
+      const bool bHasProduct = query.value(9).toInt() != 0 || query.value(15).toDouble() != 0.0;
       if (currentNumber != query.value(0).toInt())
       {
         html += QString(
@@ -120,6 +139,8 @@ void PurchaseReport::process()
             "<td width=\"30%\">Data: %2</td>"
             "<td width=\"40%\">Pagamento: %3</td>"
           "</tr>"
+        "</table>"
+        "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
           "<tr>"
             "<td width=\"50%\">Fornecedor: %4</td>"
             "<td width=\"50%\">Loja: %5</td>"
@@ -129,7 +150,7 @@ void PurchaseReport::process()
                         Purchase::st_paymentText((Purchase::PaymentMethod)query.value(4).toInt()),
                         query.value(5).toString(),
                         query.value(6).toString());
-        if (query.value(9).toInt() != 0) // hasProduct
+        if (bHasProduct)
         {
           html +=
           "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">"
@@ -142,7 +163,7 @@ void PurchaseReport::process()
         currentNumber = query.value(0).toInt();
         nPurchases++;
       }
-      if (query.value(9).toInt() != 0) // hasProduct
+      if (bHasProduct)
       {
         html += QString(
         "<tr>"
@@ -166,7 +187,7 @@ void PurchaseReport::process()
 
       if (bPrintFooter)
       {
-        if (query.value(9).toInt() != 0) // hasProduct
+        if (bHasProduct)
           html += "</table>";
         html += "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
         if (query.value(3).toDouble() != 0.0)
@@ -186,12 +207,16 @@ void PurchaseReport::process()
     progress.setValue(query.size());
     if (query.size() != 0)
     {
-      html += QString("<h3>Número de compras: %1</h3>").arg(Data::strInt(nPurchases));
-      html += QString("<h3>Total das compras: %1</h3>").arg(Data::strMoney(currentTotal));
-      html += "</body></html>";
+      html += QString(
+      "<br><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">"
+        "<tr><th colspan=\"2\">Sumário</th></tr>"
+        "<tr><td align=\"center\">Número de compras: %1</td>"
+            "<td align=\"center\">Total das compras: %2</td></tr></table></body></html>").arg(Data::strInt(nPurchases), Data::strMoney(currentTotal));
       scrollValue = m_report->verticalScrollBar()->value();
       m_report->setHtml(html);
       m_report->verticalScrollBar()->setValue(scrollValue);
     }
   }
+
+  updateControls();
 }

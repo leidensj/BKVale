@@ -17,6 +17,7 @@ public:
 private slots:
   void process();
   void updateControls();
+  void saveAsPdf();
 
 private:
   const PurchaseFilter* m_filter;

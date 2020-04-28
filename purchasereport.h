@@ -16,8 +16,9 @@ public:
   explicit PurchaseReport(PurchaseFilter* filter, QWidget* parent = nullptr);
 
 private slots:
+
   void process();
-  void process1();
+  void processPurchase();
   void processProduct();
   void updateControls();
   void saveAsPdf();

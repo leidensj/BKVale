@@ -7,13 +7,10 @@
 #include <QTextEdit>
 #include <QProgressDialog>
 #include <QScrollBar>
-<<<<<<< HEAD
 #include <QFileDialog>
-#include "widgets/pdfgenerator.h"
-=======
 #include <QRadioButton>
-#include <QGroupBox>
->>>>>>> origin/master
+#include <QLabel>
+#include "widgets/pdfgenerator.h"
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
@@ -50,26 +47,26 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
   m_rdoSupplier = new QRadioButton(tr("Fornecedor"));
   m_rdoSupplier->setIcon(QIcon(":/icons/res/supplier.png"));
 
-  QHBoxLayout* ltRdos = new QHBoxLayout;
-  ltRdos->setAlignment(Qt::AlignLeft);
-  ltRdos->addWidget(m_rdoPurchase);
-  ltRdos->addWidget(m_rdoProduct);
-  ltRdos->addWidget(m_rdoSupplier);
-  QGroupBox* grp = new QGroupBox(tr("Agrupar"));
-  grp->setLayout(ltRdos);
+  QFrame* vFrame1 = new QFrame;
+  vFrame1->setFrameShape(QFrame::VLine);
+
   QHBoxLayout* ltButtons= new QHBoxLayout;
   ltButtons->setContentsMargins(0, 0, 0 ,0);
   ltButtons->setAlignment(Qt::AlignLeft);
   ltButtons->addWidget(m_btnProcess);
   ltButtons->addWidget(m_btnPrint);
   ltButtons->addWidget(m_btnPdf);
-  ltButtons->addWidget(grp);
+  ltButtons->addWidget(vFrame1);
+  ltButtons->addWidget(new QLabel(tr("Agrupar:")));
+  ltButtons->addWidget(m_rdoPurchase);
+  ltButtons->addWidget(m_rdoProduct);
+  ltButtons->addWidget(m_rdoSupplier);
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(ltButtons);
   ltMain->addWidget(m_report);
 
-  connect(m_btnProcess, SIGNAL(clicked(bool)), this, SLOT(process1()));
+  connect(m_btnProcess, SIGNAL(clicked(bool)), this, SLOT(process()));
   connect(m_report, SIGNAL(textChanged()), this, SLOT(updateControls()));
   connect(m_btnPdf, SIGNAL(clicked(bool)), this, SLOT(saveAsPdf()));
 
@@ -99,10 +96,10 @@ void PurchaseReport::saveAsPdf()
   w->generate();
 }
 
-void PurchaseReport::process1()
+void PurchaseReport::process()
 {
   if (m_rdoPurchase->isChecked())
-    process();
+    processPurchase();
   else if (m_rdoProduct->isChecked())
     processProduct();
 }
@@ -140,7 +137,7 @@ void PurchaseReport::processProduct()
                      "LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID";
   if (!m_filter->getFilter().isEmpty())
     strQuery += " WHERE " + m_filter->getFilter();
-  strQuery += " ORDER BY PRODUCT DESC, NUMBER ASC";
+  strQuery += " ORDER BY PRODUCT ASC, NUMBER DESC";
   query.prepare(strQuery);
   if (query.exec())
   {
@@ -168,13 +165,7 @@ void PurchaseReport::processProduct()
         {
           html +=
           "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">"
-            "<tr>"
-              "<th>Número</th>"
-              "<th>Data</th>"
-              "<th>Fornecedor</th>"
-              "<th>Quantidade</th>"
-              "<th>Subtotal</th>"
-            "</tr>";
+          "<tr><th>Número</th><th>Data</th><th>Fornecedor</th><th>Quantidade</th><th>Subtotal</th></tr>";
         }
         currentProduct = query.value(9).toInt();
         nPurchases++;
@@ -209,13 +200,10 @@ void PurchaseReport::processProduct()
       if (bPrintFooter)
       {
         html += "</table><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
-        if (query.value(3).toDouble() != 0.0)
-        {
-          html += QString("<tr><td align=\"right\">Média de preço: %1</td></tr>").arg(Data::strMoney(currentSubtotal / currentAmmount));
-          html += QString("<tr><td align=\"right\">Total: %1</td></tr></table>").arg(Data::strMoney(currentSubtotal));
-        }
-
+        html += QString("<tr><td align=\"right\">Média de preço: %1</td></tr>").arg(Data::strMoney(currentSubtotal / currentAmmount));
+        html += QString("<tr><td align=\"right\">Total: %1</td></tr></table>").arg(Data::strMoney(currentSubtotal));
         currentSubtotal = 0.0;
+        currentAmmount = 0.0;
       }
       progress.setValue(query.at());
       if (progress.wasCanceled())
@@ -232,7 +220,7 @@ void PurchaseReport::processProduct()
   }
 }
 
-void PurchaseReport::process()
+void PurchaseReport::processPurchase()
 {
   if (m_filter == nullptr)
     return;
@@ -265,7 +253,7 @@ void PurchaseReport::process()
                      "LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID";
   if (!m_filter->getFilter().isEmpty())
     strQuery += " WHERE " + m_filter->getFilter();
-  strQuery += " ORDER BY NUMBER ASC";
+  strQuery += " ORDER BY NUMBER DESC";
   query.prepare(strQuery);
   if (query.exec())
   {
@@ -279,7 +267,7 @@ void PurchaseReport::process()
     QString html;
     if (query.size() != 0)
     {
-      html += "<html><body><h1 align=\"center\">Relatório de Compras</h1>";
+      html += "<html><body><h1 align=\"center\">Relatório de Compras</h1><br>";
       scrollValue = m_report->verticalScrollBar()->value();
     }
 
@@ -289,7 +277,7 @@ void PurchaseReport::process()
       if (currentNumber != query.value(0).toInt())
       {
         html += QString(
-        "<br><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
+        "<div><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
           "<tr>"
             "<td width=\"30%\">Número: %1</td>"
             "<td width=\"30%\">Data: %2</td>"
@@ -352,7 +340,7 @@ void PurchaseReport::process()
           html += QString("<tr><td align=\"right\">Desconto: %1</td></tr>").arg(Data::strMoney(query.value(3).toDouble()));
         }
         double total = currentSubtotal + query.value(3).toDouble();
-        html += QString("<tr><td align=\"right\">TOTAL: %1</td></tr></table><hr>").arg(Data::strMoney(total));
+        html += QString("<tr><td align=\"right\">TOTAL: %1</td></tr></table><hr></div>").arg(Data::strMoney(total));
         currentSubtotal = 0.0;
         currentTotal += total;
       }
@@ -364,10 +352,10 @@ void PurchaseReport::process()
     if (query.size() != 0)
     {
       html += QString(
-      "<br><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">"
+      "<br><div><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">"
         "<tr><th colspan=\"2\">Sumário</th></tr>"
         "<tr><td align=\"center\">Número de compras: %1</td>"
-            "<td align=\"center\">Total das compras: %2</td></tr></table></body></html>").arg(Data::strInt(nPurchases), Data::strMoney(currentTotal));
+            "<td align=\"center\">Total das compras: %2</td></tr></table></div></body></html>").arg(Data::strInt(nPurchases), Data::strMoney(currentTotal));
       scrollValue = m_report->verticalScrollBar()->value();
       m_report->setHtml(html);
       m_report->verticalScrollBar()->setValue(scrollValue);

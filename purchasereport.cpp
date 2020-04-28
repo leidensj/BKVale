@@ -7,8 +7,13 @@
 #include <QTextEdit>
 #include <QProgressDialog>
 #include <QScrollBar>
+<<<<<<< HEAD
 #include <QFileDialog>
 #include "widgets/pdfgenerator.h"
+=======
+#include <QRadioButton>
+#include <QGroupBox>
+>>>>>>> origin/master
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
@@ -17,6 +22,9 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  , m_btnPrint(nullptr)
  , m_btnPdf(nullptr)
  , m_report(nullptr)
+ , m_rdoPurchase(nullptr)
+ , m_rdoProduct(nullptr)
+ , m_rdoSupplier(nullptr)
 {
   m_btnProcess = new QPushButton;
   m_btnProcess->setFlat(true);
@@ -35,18 +43,33 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
   m_btnPdf->setToolTip(tr("Salvar como PDF"));
   m_report = new QTextEdit;
   m_report->setReadOnly(true);
+  m_rdoPurchase = new QRadioButton(tr("Compra"));
+  m_rdoPurchase->setIcon(QIcon(":/icons/res/purchase.png"));
+  m_rdoProduct = new QRadioButton(tr("Produto"));
+  m_rdoProduct->setIcon(QIcon(":/icons/res/item.png"));
+  m_rdoSupplier = new QRadioButton(tr("Fornecedor"));
+  m_rdoSupplier->setIcon(QIcon(":/icons/res/supplier.png"));
 
+  QHBoxLayout* ltRdos = new QHBoxLayout;
+  ltRdos->setAlignment(Qt::AlignLeft);
+  ltRdos->addWidget(m_rdoPurchase);
+  ltRdos->addWidget(m_rdoProduct);
+  ltRdos->addWidget(m_rdoSupplier);
+  QGroupBox* grp = new QGroupBox(tr("Agrupar"));
+  grp->setLayout(ltRdos);
   QHBoxLayout* ltButtons= new QHBoxLayout;
   ltButtons->setContentsMargins(0, 0, 0 ,0);
   ltButtons->setAlignment(Qt::AlignLeft);
   ltButtons->addWidget(m_btnProcess);
   ltButtons->addWidget(m_btnPrint);
   ltButtons->addWidget(m_btnPdf);
+  ltButtons->addWidget(grp);
+
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(ltButtons);
   ltMain->addWidget(m_report);
 
-  connect(m_btnProcess, SIGNAL(clicked(bool)), this, SLOT(process()));
+  connect(m_btnProcess, SIGNAL(clicked(bool)), this, SLOT(process1()));
   connect(m_report, SIGNAL(textChanged()), this, SLOT(updateControls()));
   connect(m_btnPdf, SIGNAL(clicked(bool)), this, SLOT(saveAsPdf()));
 
@@ -74,6 +97,139 @@ void PurchaseReport::saveAsPdf()
 
   PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), true, true);
   w->generate();
+}
+
+void PurchaseReport::process1()
+{
+  if (m_rdoPurchase->isChecked())
+    process();
+  else if (m_rdoProduct->isChecked())
+    processProduct();
+}
+
+void PurchaseReport::processProduct()
+{
+  if (m_filter == nullptr)
+    return;
+
+  m_report->clear();
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  QSqlQuery query(db);
+  QString strQuery = "SELECT _NOTES._NUMBER AS NUMBER," //0
+                     "_NOTES._DATE AS _DATE," //1
+                     "_NOTES._OBSERVATION AS OBSERVATION," //2
+                     "_NOTES._DISCCOUNT AS DISCCOUNT," //3
+                     "_NOTES._PAYMENT_METHOD AS PAYMENT," //4
+                     "SUPPLIERFORM._NAME AS SUPPLIER," //5
+                     "STOREFORM._NAME AS STORE," //6
+                     "_PRODUCTS._NAME AS PRODUCT," //7
+                     "_PRODUCTS._UNITY AS UNITY," //8
+                     "_NOTE_ITEMS._PRODUCTID AS PRODUCTID," //9
+                     "_NOTE_ITEMS._AMMOUNT AS AMMOUNT," //10
+                     "_NOTE_ITEMS._PRICE AS PRICE," //11
+                     "_NOTE_ITEMS._IS_PACK AS ISPACK," //12
+                     "_NOTE_ITEMS._PACK_UNITY AS PACKUNITY," //13
+                     "_NOTE_ITEMS._PACK_AMMOUNT AS PACKAMMOUNT," //14
+                     "_NOTE_ITEMS._PRICE * _NOTE_ITEMS._AMMOUNT AS SUBTOTAL " //15
+                     "FROM _NOTE_ITEMS "
+                     "LEFT JOIN _NOTES ON _NOTE_ITEMS._NOTEID = _NOTES._ID "
+                     "FULL JOIN _SUPPLIERS ON _NOTES._SUPPLIERID = _SUPPLIERS._ID "
+                     "LEFT JOIN _FORMS AS SUPPLIERFORM ON _SUPPLIERS._FORMID = SUPPLIERFORM._ID "
+                     "LEFT JOIN _STORES ON _NOTES._STOREID = _STORES._ID "
+                     "LEFT JOIN _FORMS AS STOREFORM ON _STORES._FORMID = STOREFORM._ID "
+                     "LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID";
+  if (!m_filter->getFilter().isEmpty())
+    strQuery += " WHERE " + m_filter->getFilter();
+  strQuery += " ORDER BY PRODUCT DESC, NUMBER ASC";
+  query.prepare(strQuery);
+  if (query.exec())
+  {
+    qlonglong currentProduct = -1;
+    double currentSubtotal = 0.0;
+    double currentAmmount = 0.0;
+    int nPurchases = 0;
+    int scrollValue = 0;
+    QProgressDialog progress(tr("Gerando Relatório"), tr("Cancelar"), 0, query.size(), this);
+    progress.setWindowModality(Qt::WindowModal);
+    QString html;
+    if (query.size() != 0)
+    {
+      html += "<html><body><h1 align=\"center\">Relatório de Compras</h1>";
+      scrollValue = m_report->verticalScrollBar()->value();
+    }
+
+    while (query.next())
+    {
+      if (currentProduct != query.value(9).toInt())
+      {
+        html += QString("<h3>Produto: %1</h3>").arg(query.value(7).toString());
+
+        if (query.value(9).toInt() != 0) // hasProduct
+        {
+          html +=
+          "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;\">"
+            "<tr>"
+              "<th>Número</th>"
+              "<th>Data</th>"
+              "<th>Fornecedor</th>"
+              "<th>Quantidade</th>"
+              "<th>Subtotal</th>"
+            "</tr>";
+        }
+        currentProduct = query.value(9).toInt();
+        nPurchases++;
+      }
+      html += QString(
+                "<tr>"
+                "<td width=\"15%\">%1</td>"
+                "<td width=\"15%\">%2</td>"
+                "<td width=\"35%\">%3</td>"
+                "<td width=\"20%\">%4</td>"
+                "<td width=\"15%\">%5</td>"
+                "</tr>").arg(Data::strInt(query.value(0).toInt()),
+                             query.value(1).toDate().toString("dd/MM/yyyy"),
+                             query.value(5).toString(),
+                             Data::strAmmount(query.value(10).toDouble()) +
+                             (query.value(12).toBool()
+                              ? query.value(13).toString()
+                              : query.value(8).toString()) +
+                             " x " + Data::strMoney(query.value(11).toDouble()),
+                             Data::strMoney(query.value(15).toDouble()));
+      currentSubtotal += query.value(15).toDouble();
+      double ammount = query.value(10).toDouble();
+      if (query.value(12).toBool()) // isPack
+        ammount *= query.value(14).toDouble();
+      currentAmmount += ammount;
+
+      bool bPrintFooter = !query.next();
+      if (!bPrintFooter)
+        bPrintFooter = query.value(9).toInt() != currentProduct;
+      query.previous();
+
+      if (bPrintFooter)
+      {
+        html += "</table><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
+        if (query.value(3).toDouble() != 0.0)
+        {
+          html += QString("<tr><td align=\"right\">Média de preço: %1</td></tr>").arg(Data::strMoney(currentSubtotal / currentAmmount));
+          html += QString("<tr><td align=\"right\">Total: %1</td></tr></table>").arg(Data::strMoney(currentSubtotal));
+        }
+
+        currentSubtotal = 0.0;
+      }
+      progress.setValue(query.at());
+      if (progress.wasCanceled())
+          break;
+    }
+    progress.setValue(query.size());
+    if (query.size() != 0)
+    {
+      html += "<hr></body></html>";
+      scrollValue = m_report->verticalScrollBar()->value();
+      m_report->setHtml(html);
+      m_report->verticalScrollBar()->setValue(scrollValue);
+    }
+  }
 }
 
 void PurchaseReport::process()

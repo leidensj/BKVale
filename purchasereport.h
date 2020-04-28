@@ -6,6 +6,7 @@
 class QPushButton;
 class QTextEdit;
 class PurchaseFilter;
+class QRadioButton;
 
 class PurchaseReport : public QWidget
 {
@@ -16,6 +17,8 @@ public:
 
 private slots:
   void process();
+  void process1();
+  void processProduct();
   void updateControls();
 
 private:
@@ -24,6 +27,10 @@ private:
   QPushButton* m_btnPrint;
   QPushButton* m_btnPdf;
   QTextEdit* m_report;
+  QRadioButton* m_rdoPurchase;
+  QRadioButton* m_rdoProduct;
+  QRadioButton* m_rdoSupplier;
+  QString getQuery() const;
 };
 
 #endif // PURCHASEREPORT_H

@@ -218,21 +218,4 @@ FORMS    += mainwindow.ui \
   settingsdialog.ui
 
 RESOURCES += \
-    icons.qrc \
-    reports.qrc
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportCore
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportCored
-else:unix: LIBS += -L$$PWD/cutereport/ -lCuteReportCore
-
-INCLUDEPATH += $$PWD/cutereport/include/cutereport
-DEPENDPATH += $$PWD/cutereport/include/cutereport
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportWidgets
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/cutereport/ -lCuteReportWidgetsd
-else:unix: LIBS += -L$$PWD/cutereport/ -lCuteReportWidgets
-
-INCLUDEPATH += $$PWD/cutereport/include/cutereport
-DEPENDPATH += $$PWD/cutereport/include/cutereport
-
-include($$PWD/QtRptProject/QtRPT/QtRPT.pri)
+    icons.qrc

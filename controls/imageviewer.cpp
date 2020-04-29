@@ -181,7 +181,7 @@ static void initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMo
 
 void ImageViewer::open()
 {
-  QFileDialog dialog(this, tr("Open File"));
+  QFileDialog dialog(this, tr("Abrir arquivo"));
   initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
 
   while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}

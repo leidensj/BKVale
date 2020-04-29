@@ -22,6 +22,7 @@ private slots:
   void processProduct();
   void updateControls();
   void saveAsPdf();
+  void print();
 
 private:
   const PurchaseFilter* m_filter;

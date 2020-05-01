@@ -27,6 +27,7 @@ void PdfGenerator::work()
   printer.setOutputFileName(m_fileName);
   if (!m_bShowPageNumber)
     doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+  printer.setPageMargins(0, 0, 0, 0, QPrinter::Millimeter);
   doc.print(&printer);
   if (m_bOpen)
     QDesktopServices::openUrl(QUrl(m_fileName, QUrl::TolerantMode));

@@ -2,6 +2,7 @@
 #define PURCHASEREPORT_H
 
 #include <QWidget>
+#include <QSqlQuery>
 
 class QPushButton;
 class QTextEdit;
@@ -16,15 +17,18 @@ public:
   explicit PurchaseReport(PurchaseFilter* filter, QWidget* parent = nullptr);
 
 private slots:
-
+  void fetch();
   void process();
   void processPurchase();
+  void processProductBegin();
   void processProduct();
   void updateControls();
   void saveAsPdf();
   void print();
 
 private:
+  QSqlQuery m_query;
+  QString m_html;
   const PurchaseFilter* m_filter;
   QPushButton* m_btnProcess;
   QPushButton* m_btnPrint;

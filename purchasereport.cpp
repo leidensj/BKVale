@@ -11,9 +11,12 @@
 #include <QFileDialog>
 #include <QRadioButton>
 #include <QLabel>
+#include <QPrinter>
+#include <QPrintDialog>
 
 PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
  : QWidget(parent)
+ , m_query(QSqlDatabase::database(POSTGRE_CONNECTION_NAME))
  , m_filter(filter)
  , m_btnProcess(nullptr)
  , m_btnPrint(nullptr)
@@ -71,6 +74,7 @@ PurchaseReport::PurchaseReport(PurchaseFilter* filter, QWidget* parent)
   connect(m_report, SIGNAL(textChanged()), this, SLOT(updateControls()));
   connect(m_btnPdf, SIGNAL(clicked(bool)), this, SLOT(saveAsPdf()));
   connect(m_btnPrint, SIGNAL(clicked(bool)), this, SLOT(print()));
+  connect(m_report->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(fetch()));
 
   setLayout(ltMain);
   updateControls();
@@ -81,9 +85,6 @@ void PurchaseReport::updateControls()
   m_btnPrint->setEnabled(!m_report->document()->isEmpty());
   m_btnPdf->setEnabled(!m_report->document()->isEmpty());
 }
-
-#include <QPrinter>
-#include <QPrintDialog>
 
 void PurchaseReport::print()
 {
@@ -119,17 +120,17 @@ void PurchaseReport::process()
   if (m_rdoPurchase->isChecked())
     processPurchase();
   else if (m_rdoProduct->isChecked())
-    processProduct();
+    processProductBegin();
 }
 
-void PurchaseReport::processProduct()
+void PurchaseReport::processProductBegin()
 {
+  m_query.clear();
+  m_report->clear();
+  m_html.clear();
   if (m_filter == nullptr)
     return;
 
-  m_report->clear();
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  QSqlQuery query(db);
   QString strQuery = "SELECT _NOTES._NUMBER AS NUMBER," //0
                      "_NOTES._DATE AS _DATE," //1
                      "_NOTES._OBSERVATION AS OBSERVATION," //2
@@ -156,32 +157,34 @@ void PurchaseReport::processProduct()
   if (!m_filter->getFilter().isEmpty())
     strQuery += " WHERE " + m_filter->getFilter();
   strQuery += " ORDER BY PRODUCT ASC, _DATE DESC, SUPPLIER ASC, NUMBER DESC";
-  query.prepare(strQuery);
-  if (query.exec())
+  m_query.prepare(strQuery);
+  if (m_query.exec(strQuery) && m_query.next())
   {
-    qlonglong currentProduct = -1;
-    double currentSubtotal = 0.0;
-    double currentAmmount = 0.0;
-    int scrollValue = 0;
-    QProgressDialog progress(tr("Gerando Relatório"), tr("Cancelar"), 0, query.size(), this);
-    progress.setWindowModality(Qt::WindowModal);
-    QString html;
-    if (query.size() != 0)
-    {
-      html += "<html><body><h1 align=\"center\">Relatório de Compras</h1>";
-      scrollValue = m_report->verticalScrollBar()->value();
-    }
+    m_html += "<html><body><h1 align=\"center\">Relatório de Compras</h1>";
+    processProduct();
+  }
+}
 
-    while (query.next())
+void PurchaseReport::processProduct()
+{
+  if (!m_query.isValid())
+    return;
+
+  int scrollValue = m_report->verticalScrollBar()->value();
+  qlonglong currentProduct = -1;
+  double currentSubtotal = 0.0;
+  double currentAmmount = 0.0;
+  int nEntries = 0;
+  do
+  {
+    if (currentProduct != m_query.value(9).toLongLong())
     {
-      if (currentProduct != query.value(9).toLongLong())
-      {
-        currentProduct = query.value(9).toLongLong();
-        html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
-                        "<thead><tr><th colspan=\"6\">Produto: %1</th></tr>").arg(query.value(7).toString());
-        html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Subtotal</th></tr>";
-      }
-      html += QString(
+      currentProduct = m_query.value(9).toLongLong();
+      m_html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+                        "<thead><tr><th colspan=\"6\">Produto: %1</th></tr>").arg(m_query.value(7).toString());
+      m_html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Subtotal</th></tr>";
+    }
+    m_html += QString(
                 "<tr>"
                 "<td width=\"7%\">%1</td>"
                 "<td width=\"7%\">%2</td>"
@@ -189,54 +192,54 @@ void PurchaseReport::processProduct()
                 "<td width=\"28%\">%4</td>"
                 "<td width=\"20%\">%5</td>"
                 "<td width=\"10%\">%6</td>"
-                "</tr>").arg(query.value(1).toDate().toString("dd/MM/yyyy"),
-                             Data::strInt(query.value(0).toLongLong()),
-                             query.value(5).toString(),
-                             query.value(6).toString(),
-                             Data::strAmmount(query.value(10).toDouble()) +
-                             (query.value(12).toBool()
-                              ? query.value(13).toString()
-                              : query.value(8).toString()) +
-                             " x " + Data::strMoney(query.value(11).toDouble()),
-                             Data::strMoney(query.value(15).toDouble()));
-      currentSubtotal += query.value(15).toDouble();
-      double ammount = query.value(10).toDouble();
-      if (query.value(12).toBool()) // isPack
-        ammount *= query.value(14).toDouble();
-      currentAmmount += ammount;
+                "</tr>").arg(m_query.value(1).toDate().toString("dd/MM/yyyy"),
+                             Data::strInt(m_query.value(0).toLongLong()),
+                             m_query.value(5).toString(),
+                             m_query.value(6).toString(),
+                             Data::strAmmount(m_query.value(10).toDouble()) +
+                             (m_query.value(12).toBool()
+                              ? m_query.value(13).toString()
+                              : m_query.value(8).toString()) +
+                             " x " + Data::strMoney(m_query.value(11).toDouble()),
+                             Data::strMoney(m_query.value(15).toDouble()));
+    currentSubtotal += m_query.value(15).toDouble();
+    double ammount = m_query.value(10).toDouble();
+    if (m_query.value(12).toBool()) // isPack
+      ammount *= m_query.value(14).toDouble();
+    currentAmmount += ammount;
 
-      bool bHasNext = query.next();
-      bool bPrintFooter = !bHasNext || currentProduct != query.value(9).toLongLong();
-      query.previous();
+    bool bHasNext = m_query.next();
+    bool bPrintFooter = !bHasNext || currentProduct != m_query.value(9).toLongLong();
+    m_query.previous();
 
-      if (bPrintFooter)
-      {
-        html += "</table><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
-        html += QString(
-        "<tr><th align=\"right\">Sumário do Produto: %1</td></tr>"
-        "<tr><td align=\"right\">Quantidade: %2</td></tr>"
-        "<tr><td align=\"right\">Média de preço: %3</td></tr>"
-        "<tr><td align=\"right\">Total: %4</td></tr></table>").arg(query.value(7).toString(),
-                                                                   Data::strAmmount(currentAmmount) + query.value(8).toString(),
-                                                                   Data::strMoney(currentSubtotal / currentAmmount),
-                                                                   Data::strMoney(currentSubtotal));
-        currentSubtotal = 0.0;
-        currentAmmount = 0.0;
-      }
-
-      progress.setValue(query.at());
-      if (progress.wasCanceled())
-          break;
-    }
-    progress.setValue(query.size());
-    if (query.size() != 0)
+    if (bPrintFooter)
     {
-      html += "<hr></body></html>";
-      scrollValue = m_report->verticalScrollBar()->value();
-      m_report->setHtml(html);
-      m_report->verticalScrollBar()->setValue(scrollValue);
+      m_html += "</table><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
+      m_html += QString(
+                  "<tr><th align=\"right\">Sumário do Produto: %1</td></tr>"
+                  "<tr><td align=\"right\">Quantidade: %2</td></tr>"
+                  "<tr><td align=\"right\">Média de preço: %3</td></tr>"
+                  "<tr><td align=\"right\">Total: %4</td></tr></table>").arg(m_query.value(7).toString(),
+                                                                             Data::strAmmount(currentAmmount) + m_query.value(8).toString(),
+                                                                             Data::strMoney(currentSubtotal / currentAmmount),
+                                                                             Data::strMoney(currentSubtotal));
+      currentSubtotal = 0.0;
+      currentAmmount = 0.0;
     }
+  } while (m_query.next() && nEntries++ != 100);
+
+  if (!m_html.isEmpty())
+  {
+    m_report->setHtml(m_html + "<hr></body></html>");
+    m_report->verticalScrollBar()->setValue(scrollValue);
   }
+}
+
+void PurchaseReport::fetch()
+{
+  if (m_rdoProduct->isChecked())
+    if (m_report->verticalScrollBar()->value() == m_report->verticalScrollBar()->maximum())
+      processProduct();
 }
 
 void PurchaseReport::processPurchase()

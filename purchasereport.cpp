@@ -168,7 +168,7 @@ void PurchaseReport::processProduct()
     QString html;
     if (query.size() != 0)
     {
-      html += "<html><body><h1 align=\"center\">Relatório de Compras</h1><br>";
+      html += "<html><body><h1 align=\"center\">Relatório de Compras</h1>";
       scrollValue = m_report->verticalScrollBar()->value();
     }
 
@@ -177,7 +177,7 @@ void PurchaseReport::processProduct()
       if (currentProduct != query.value(9).toLongLong())
       {
         currentProduct = query.value(9).toLongLong();
-        html += QString("<table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+        html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
                         "<thead><tr><th colspan=\"6\">Produto: %1</th></tr>").arg(query.value(7).toString());
         html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Subtotal</th></tr>";
       }
@@ -212,9 +212,14 @@ void PurchaseReport::processProduct()
       if (bPrintFooter)
       {
         html += "</table><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
-        html += QString("<tr><th align=\"right\">Sumário do Produto: %1</td></tr>").arg(query.value(7).toString());
-        html += QString("<tr><td align=\"right\">Média de preço: %1</td></tr>").arg(Data::strMoney(currentSubtotal / currentAmmount));
-        html += QString("<tr><td align=\"right\">Total: %1</td></tr></table>").arg(Data::strMoney(currentSubtotal));
+        html += QString(
+        "<tr><th align=\"right\">Sumário do Produto: %1</td></tr>"
+        "<tr><td align=\"right\">Quantidade: %2</td></tr>"
+        "<tr><td align=\"right\">Média de preço: %3</td></tr>"
+        "<tr><td align=\"right\">Total: %4</td></tr></table>").arg(query.value(7).toString(),
+                                                                   Data::strAmmount(currentAmmount) + query.value(8).toString(),
+                                                                   Data::strMoney(currentSubtotal / currentAmmount),
+                                                                   Data::strMoney(currentSubtotal));
         currentSubtotal = 0.0;
         currentAmmount = 0.0;
       }
@@ -291,7 +296,7 @@ void PurchaseReport::processPurchase()
       if (currentNumber != query.value(0).toInt())
       {
         html += QString(
-        "<div><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
+        "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
           "<thead><tr>"
             "<td width=\"30%\">Número: %1</td>"
             "<td width=\"30%\">Data: %2</td>"
@@ -354,7 +359,7 @@ void PurchaseReport::processPurchase()
           html += QString("<tr><td align=\"right\">Desconto: %1</td></tr>").arg(Data::strMoney(query.value(3).toDouble()));
         }
         double total = currentSubtotal + query.value(3).toDouble();
-        html += QString("<tr><td align=\"right\">TOTAL: %1</td></tr></table><hr></div>").arg(Data::strMoney(total));
+        html += QString("<tr><td align=\"right\">TOTAL: %1</td></tr></table><hr>").arg(Data::strMoney(total));
         currentSubtotal = 0.0;
         currentTotal += total;
       }
@@ -366,10 +371,10 @@ void PurchaseReport::processPurchase()
     if (query.size() != 0)
     {
       html += QString(
-      "<br><div><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+      "<br><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
         "<tr><th colspan=\"2\">Sumário</th></tr>"
         "<tr><td align=\"center\">Número de compras: %1</td>"
-            "<td align=\"center\">Total das compras: %2</td></tr></table></div></body></html>").arg(Data::strInt(nPurchases), Data::strMoney(currentTotal));
+            "<td align=\"center\">Total das compras: %2</td></tr></table></body></html>").arg(Data::strInt(nPurchases), Data::strMoney(currentTotal));
       scrollValue = m_report->verticalScrollBar()->value();
       m_report->setHtml(html);
       m_report->verticalScrollBar()->setValue(scrollValue);

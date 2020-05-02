@@ -14,7 +14,7 @@ class PurchaseFilter : public JFilter
 
 public:
   explicit PurchaseFilter(QWidget* parent = nullptr);
-  QString getFilter() const;
+  virtual QString getFilter() const;
 
 public slots:
   void clear();
@@ -22,7 +22,13 @@ public slots:
 private slots:
   void updateControls();
 
-private:
+protected:
+  virtual QString getDateFilter() const;
+  virtual QString getSupplierFilter() const;
+  virtual QString getProductFilter() const;
+  virtual QString getStoreFilter() const;
+  virtual QString getPaymentFilter() const;
+
   QGroupBox* m_cbDate;
   JDateEdit* m_dtBegin;
   JDateEdit* m_dtEnd;

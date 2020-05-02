@@ -69,84 +69,118 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   clear();
 }
 
-QString PurchaseFilter::getFilter() const
+QString PurchaseFilter::getDateFilter() const
 {
-  QString strFilter;
+  QString str;
   if (m_cbDate->isChecked())
-    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DTE " BETWEEN '" +
-                 m_dtBegin->date().toString(Qt::ISODate) + "' AND '" +
-                 m_dtEnd->date().toString(Qt::ISODate) + "' ";
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DTE " BETWEEN '" +
+           m_dtBegin->date().toString(Qt::ISODate) + "' AND '" +
+           m_dtEnd->date().toString(Qt::ISODate) + "' ";
+  return str;
+}
 
+QString PurchaseFilter::getSupplierFilter() const
+{
+  QString str;
   QVector<Id> vSupplier = m_supplierPicker->getIds();
-
   if (!vSupplier.isEmpty())
   {
-    if (!strFilter.isEmpty())
-      strFilter += " AND ";
-    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " IN (";
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " IN (";
     for (int i = 0; i != vSupplier.size(); ++i)
-      strFilter += vSupplier.at(i).str() + ",";
-    strFilter.chop(1);
-    strFilter += ") ";
+      str += vSupplier.at(i).str() + ",";
+    str.chop(1);
+    str += ") ";
   }
+  return str;
+}
 
+QString PurchaseFilter::getProductFilter() const
+{
+  QString str;
   QVector<Id> vProduct = m_productPicker->getIds();
-
   if (!vProduct.isEmpty())
   {
-    if (!strFilter.isEmpty())
-      strFilter += " AND ";
-    strFilter += " " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
-                 " = ANY (SELECT " PURCHASE_ELEMENTS_SQL_COL_NID " FROM "
-                 PURCHASE_ELEMENTS_SQL_TABLE_NAME " WHERE "
-                 PURCHASE_ELEMENTS_SQL_COL_PID " IN (";
+    str += " " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+           " = ANY (SELECT " PURCHASE_ELEMENTS_SQL_COL_NID " FROM "
+           PURCHASE_ELEMENTS_SQL_TABLE_NAME " WHERE "
+           PURCHASE_ELEMENTS_SQL_COL_PID " IN (";
     for (int i = 0; i != vProduct.size(); ++i)
-      strFilter += vProduct.at(i).str() + ",";
-    strFilter.chop(1);
-    strFilter += ")) ";
+      str += vProduct.at(i).str() + ",";
+    str.chop(1);
+    str += ")) ";
   }
+  return str;
+}
 
+QString PurchaseFilter::getStoreFilter() const
+{
+  QString str;
   QVector<Id> vStore = m_storePicker->getIds();
-
   if (!vStore.isEmpty())
   {
-    if (!strFilter.isEmpty())
-      strFilter += " AND ";
-    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_STR
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_STR
                  " IN (";
     for (int i = 0; i != vStore.size(); ++i)
-      strFilter += vStore.at(i).str() + ",";
-    strFilter.chop(1);
-    strFilter += ") ";
+      str += vStore.at(i).str() + ",";
+    str.chop(1);
+    str += ") ";
   }
+  return str;
+}
+
+QString PurchaseFilter::getPaymentFilter() const
+{
+  QString str;
 
   if (m_cbPaymentCredit->isChecked() ||
       m_cbPaymentCash->isChecked() ||
       m_cbPaymentBonus->isChecked())
   {
-    if (!strFilter.isEmpty())
-      strFilter += " AND ";
-    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
-                 " IN (";
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
+           " IN (";
     if (m_cbPaymentCredit->isChecked())
-      strFilter += QString::number((int)Purchase::PaymentMethod::Credit) + ",";
+      str += QString::number((int)Purchase::PaymentMethod::Credit) + ",";
     if (m_cbPaymentCash->isChecked())
-      strFilter += QString::number((int)Purchase::PaymentMethod::Cash) + ",";
+      str += QString::number((int)Purchase::PaymentMethod::Cash) + ",";
     if (m_cbPaymentBonus->isChecked())
-      strFilter += QString::number((int)Purchase::PaymentMethod::Bonus) + ",";
-    strFilter.chop(1);
-    strFilter += ") ";
+      str += QString::number((int)Purchase::PaymentMethod::Bonus) + ",";
+    str.chop(1);
+    str += ") ";
   }
   else
   {
-    if (!strFilter.isEmpty())
-      strFilter += " AND ";
-    strFilter += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
-                 " NOT IN (";
-    strFilter += QString::number((int)Purchase::PaymentMethod::Credit) + "," +
-                 QString::number((int)Purchase::PaymentMethod::Cash) + "," +
-                 QString::number((int)Purchase::PaymentMethod::Bonus) + ") ";
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
+           " NOT IN (";
+    str += QString::number((int)Purchase::PaymentMethod::Credit) + "," +
+           QString::number((int)Purchase::PaymentMethod::Cash) + "," +
+           QString::number((int)Purchase::PaymentMethod::Bonus) + ") ";
   }
+  return str;
+}
+
+QString PurchaseFilter::getFilter() const
+{
+  QString strFilter = getDateFilter();
+
+  QString str = getSupplierFilter();
+  if (!str.isEmpty() && !strFilter.isEmpty())
+    strFilter += " AND ";
+  strFilter += str;
+
+  str = getProductFilter();
+  if (!str.isEmpty() && !strFilter.isEmpty())
+    strFilter += " AND ";
+  strFilter += str;
+
+  str = getStoreFilter();
+  if (!str.isEmpty() && !strFilter.isEmpty())
+    strFilter += " AND ";
+  strFilter += str;
+
+  str = getPaymentFilter();
+  if (!str.isEmpty() && !strFilter.isEmpty())
+    strFilter += " AND ";
+  strFilter += str;
 
   return strFilter;
 }

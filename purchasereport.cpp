@@ -226,12 +226,16 @@ void PurchaseReport::processProduct()
       currentSubtotal = 0.0;
       currentAmmount = 0.0;
     }
-  } while (m_query.next() && nEntries++ != 100);
+    else if (nEntries == 100)
+      nEntries--;
+  } while (m_query.next() && nEntries++ < 100);
 
   if (!m_html.isEmpty())
   {
+    m_report->verticalScrollBar()->blockSignals(true);
     m_report->setHtml(m_html + "<hr></body></html>");
     m_report->verticalScrollBar()->setValue(scrollValue);
+    m_report->verticalScrollBar()->blockSignals(false);
   }
 }
 

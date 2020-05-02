@@ -10,6 +10,7 @@
 #include "views/reminderview.h"
 #include "views/shoppinglistview.h"
 #include "views/storeview.h"
+#include "controls/report.h"
 #include "controls/calculatorwidget.h"
 #include "controls/shopwidget.h"
 #include "views/userview.h"
@@ -49,6 +50,7 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   , ui(new Ui::Goiabo)
   , m_login(login)
   , m_purchase(nullptr)
+  , m_report(nullptr)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
@@ -56,6 +58,7 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
   , m_purchaseWindow(nullptr)
+  , m_reportWindow(nullptr)
   , m_reminderWindow(nullptr)
   , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
@@ -69,6 +72,7 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   setCentralWidget(m_mdi);
 
   m_purchase = new PurchaseView;
+  m_report = new Report;
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;
   m_shop = new ShopWidget;
@@ -78,6 +82,11 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   m_purchaseWindow->setWindowIcon(ui->actionPurchases->icon());
   m_purchaseWindow->setWidget(m_purchase);
   m_mdi->addSubWindow(m_purchaseWindow);
+  m_reportWindow = new JMdiSubWindow(this);
+  m_reportWindow->setWindowTitle(ui->actionReports->text());
+  m_reportWindow->setWindowIcon(ui->actionReports->icon());
+  m_reportWindow->setWidget(m_report);
+  m_mdi->addSubWindow(m_reportWindow);
   m_reminderWindow = new JMdiSubWindow(this);
   m_reminderWindow->setWindowTitle(ui->actionReminders->text());
   m_reminderWindow->setWindowIcon(ui->actionReminders->icon());
@@ -110,12 +119,14 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(ui->actionInfo, SIGNAL(triggered(bool)), this, SLOT(showInfo()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_report, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_reminder, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_calculator, SIGNAL(lineSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
   connect(m_shop, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(close()));
   connect(ui->actionPurchases, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionReports, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
@@ -225,6 +236,8 @@ Functionality Goiabo::getCurrentFunctionality() const
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
   if (activeWindow == m_purchaseWindow)
     return Functionality::Purchase;
+  if (activeWindow == m_reportWindow)
+    return Functionality::Report;
   else if (activeWindow == m_reminderWindow)
     return Functionality::Reminder;
   else if (activeWindow == m_calculatorWindow)
@@ -391,13 +404,16 @@ void Goiabo::updateControls()
       m_purchase->getItem(o);
       ui->actionPrint->setEnabled(o.isValid());
     }  break;
+    case Functionality::Report:
+      ui->actionPrint->setEnabled(false);
+      break;
     case Functionality::Reminder:
     {
       Reminder o;
       m_reminder->getItem(o);
       ui->actionPrint->setEnabled(o.isValid());
     } break;
-      case Functionality::Calculator:
+    case Functionality::Calculator:
       ui->actionPrint->setEnabled(true);
       break;
     case Functionality::Shop:
@@ -498,6 +514,7 @@ void Goiabo::closeEvent(QCloseEvent* event)
 void Goiabo::activateWindow()
 {
   m_purchaseWindow->hide();
+  m_reportWindow->hide();
   m_reminderWindow->hide();
   m_calculatorWindow->hide();
   m_shopWindow->hide();
@@ -505,6 +522,11 @@ void Goiabo::activateWindow()
   {
     m_purchaseWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_purchaseWindow);
+  }
+  else if (sender() == ui->actionReports)
+  {
+    m_reportWindow->showMaximized();
+    m_mdi->setActiveSubWindow(m_reportWindow);
   }
   else if (sender() == ui->actionReminders)
   {

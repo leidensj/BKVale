@@ -39,6 +39,13 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   m_cbPaymentCash->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Cash));
   m_cbPaymentBonus->setIcon(Purchase::st_paymentIcon(Purchase::PaymentMethod::Bonus));
 
+  QHBoxLayout* ltPayment = new QHBoxLayout;
+  ltPayment->setContentsMargins(0, 0, 0, 0);
+  ltPayment->setAlignment(Qt::AlignLeft);
+  ltPayment->addWidget(m_cbPaymentCredit);
+  ltPayment->addWidget(m_cbPaymentCash);
+  ltPayment->addWidget(m_cbPaymentBonus);
+
   QFormLayout* ltfr = new QFormLayout;
   ltfr->setContentsMargins(0, 0, 0, 0);
   ltfr->addRow(tr("Data inicial:"), m_dtBegin);
@@ -46,9 +53,7 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   ltfr->addRow(JItemEx::text(SUPPLIER_SQL_TABLE_NAME) + ":", m_supplierPicker);
   ltfr->addRow(JItemEx::text(PRODUCT_SQL_TABLE_NAME) + ":", m_productPicker);
   ltfr->addRow(JItemEx::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
-  ltfr->addRow(tr("Pagamento:"), m_cbPaymentCredit);
-  ltfr->addRow(tr(""), m_cbPaymentCash);
-  ltfr->addRow(tr(""), m_cbPaymentBonus);
+  ltfr->addRow(tr("Pagamento:"), ltPayment);
 
   QVBoxLayout* ltv = new QVBoxLayout;
   ltv->setAlignment(Qt::AlignTop);

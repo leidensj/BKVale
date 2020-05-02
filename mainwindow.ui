@@ -102,6 +102,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionPurchases"/>
+   <addaction name="actionReports"/>
    <addaction name="actionReminders"/>
    <addaction name="actionCalculator"/>
    <addaction name="actionShoppingList"/>
@@ -402,6 +403,15 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar quais produtos comprar e que quantidades</string>
+   </property>
+  </action>
+  <action name="actionReports">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/statistics.png</normaloff>:/icons/res/statistics.png</iconset>
+   </property>
+   <property name="text">
+    <string>Relatórios</string>
    </property>
   </action>
  </widget>

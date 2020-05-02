@@ -45,7 +45,8 @@ enum class Functionality : int
   Purchase,
   Reminder,
   Calculator,
-  Shop
+  Shop,
+  Report
 };
 
 class QLabel;
@@ -55,6 +56,7 @@ class ConsumptionWidget;
 class CalculatorWidget;
 class ShopWidget;
 class JMdiSubWindow;
+class Report;
 
 class Goiabo : public QMainWindow
 {
@@ -72,6 +74,7 @@ private:
   ActiveUser m_login;
   JMdiArea* m_mdi;
   PurchaseView* m_purchase;
+  Report* m_report;
   ReminderView* m_reminder;
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
@@ -83,6 +86,7 @@ private:
   QLabel* m_statusUserName;
   QLabel* m_statusTime;
   JMdiSubWindow* m_purchaseWindow;
+  JMdiSubWindow* m_reportWindow;
   JMdiSubWindow* m_reminderWindow;
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;

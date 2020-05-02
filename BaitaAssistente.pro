@@ -22,6 +22,7 @@ SOURCES += main.cpp\
   controls/imageviewer.cpp \
   controls/logindialog.cpp \
   controls/pincodedialog.cpp \
+  controls/report.cpp \
   controls/shopwidget.cpp \
   controls/timecarddialog.cpp \
   editors/addresseditor.cpp \
@@ -120,6 +121,7 @@ HEADERS  += mainwindow.h \
     controls/imageviewer.h \
     controls/logindialog.h \
     controls/pincodedialog.h \
+    controls/report.h \
     controls/shopwidget.h \
     controls/timecarddialog.h \
     editors/addresseditor.h \

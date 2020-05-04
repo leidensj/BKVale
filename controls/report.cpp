@@ -38,7 +38,7 @@ Report::Report(QWidget *parent)
 
   m_rptPurchase = new PurchaseReport;
   QVBoxLayout *ltPurchase = new QVBoxLayout;
-  QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+  QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   ltPurchase->addWidget(m_rptPurchase);
   ltPurchase->addWidget(btns);
 

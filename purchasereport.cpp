@@ -79,7 +79,7 @@ QString PurchaseReport::processProduct() const
                      "LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID";
   if (!getFilter().isEmpty())
     strQuery += " WHERE " + getFilter();
-  strQuery += " ORDER BY PRODUCT ASC, _DATE DESC, SUPPLIER ASC, NUMBER DESC";
+  strQuery += " ORDER BY PRODUCT ASC, _DATE DESC, NUMBER DESC, SUPPLIER ASC";
   QSqlQuery query(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   query.prepare(strQuery);
 

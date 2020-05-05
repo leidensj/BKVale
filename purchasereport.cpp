@@ -7,6 +7,7 @@
 #include <QRadioButton>
 #include <QLabel>
 #include <QCheckBox>
+#include <QPushButton>
 
 PurchaseReport::PurchaseReport(QWidget* parent)
  : PurchaseFilter(parent)
@@ -14,6 +15,9 @@ PurchaseReport::PurchaseReport(QWidget* parent)
  , m_rdoProduct(nullptr)
  , m_rdoSupplier(nullptr)
 {
+  m_btnClear->setIconSize(QSize(16, 16));
+  m_dtInt->layout()->setContentsMargins(0, 9, 0, 0);
+  m_dtInt->setFlat(true);
   m_rdoPurchase = new QRadioButton(tr("Compra"));
   m_rdoPurchase->setIcon(QIcon(":/icons/res/purchase.png"));
   m_rdoPurchase->setChecked(true);
@@ -117,7 +121,7 @@ QString PurchaseReport::processProduct() const
     {
       currentProduct = query.value(9).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
-                      "<thead><tr><th colspan=\"6\">Produto: %1</th></tr>").arg(query.value(7).toString());
+                      "<thead><tr><th align=\"left\" colspan=\"6\">%1</th></tr>").arg(query.value(7).toString());
       html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Subtotal</th></tr>";
     }
     html += QString(
@@ -152,7 +156,7 @@ QString PurchaseReport::processProduct() const
     {
       html += "</table><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
       html += QString(
-                  "<tr><th align=\"right\">Sumário do Produto: %1</td></tr>"
+                  "<tr><th align=\"right\">Sumário: %1</td></tr>"
                   "<tr><td align=\"right\">Quantidade: %2</td></tr>"
                   "<tr><td align=\"right\">Média de preço: %3</td></tr>"
                   "<tr><td align=\"right\">Total: %4</td></tr></table>").arg(query.value(7).toString(),

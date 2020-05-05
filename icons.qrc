@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/icons">
-        <file>res/bkvale.png</file>
         <file>res/connected.png</file>
         <file>res/disconnected.png</file>
         <file>res/printer.png</file>
@@ -19,7 +18,6 @@
         <file>res/note.png</file>
         <file>res/shop.png</file>
         <file>res/text.png</file>
-        <file>res/stock.png</file>
         <file>res/revert.png</file>
         <file>res/save.png</file>
         <file>res/item.png</file>
@@ -67,15 +65,12 @@
         <file>res/login.png</file>
         <file>res/password.png</file>
         <file>res/exit.png</file>
-        <file>res/enter.png</file>
         <file>res/capslockon.png</file>
         <file>res/capslockoff.png</file>
         <file>res/view.png</file>
         <file>res/cash.png</file>
         <file>res/check.png</file>
         <file>res/center.png</file>
-        <file>res/16database.png</file>
-        <file>res/16user.png</file>
         <file>res/supplier.png</file>
         <file>res/category.png</file>
         <file>res/icon.png</file>
@@ -85,21 +80,14 @@
         <file>res/employee.png</file>
         <file>res/buy.png</file>
         <file>res/sell.png</file>
-        <file>res/building.png</file>
         <file>res/client.png</file>
-        <file>res/house.png</file>
         <file>res/person.png</file>
         <file>res/resume.png</file>
-        <file>res/phonemobile.png</file>
-        <file>res/phonecomercial.png</file>
         <file>res/phone.png</file>
         <file>res/address.png</file>
         <file>res/pincode.png</file>
         <file>res/undo.png</file>
-        <file>res/brazil.png</file>
         <file>res/cashier.png</file>
-        <file>res/visit.png</file>
-        <file>res/whatsapp.png</file>
         <file>res/cal1.png</file>
         <file>res/cal2.png</file>
         <file>res/cal3.png</file>
@@ -129,7 +117,6 @@
         <file>res/cal28.png</file>
         <file>res/cal29.png</file>
         <file>res/cal31.png</file>
-        <file>res/phoneback.png</file>
         <file>res/calw1.png</file>
         <file>res/calw2.png</file>
         <file>res/calw3.png</file>
@@ -144,11 +131,9 @@
         <file>res/reservation.png</file>
         <file>res/edit.png</file>
         <file>res/package.png</file>
-        <file>res/databasebackup.png</file>
         <file>res/filterclear.png</file>
         <file>res/arrowdropdown.png</file>
         <file>res/arrowdropup.png</file>
-        <file>res/networkcable.png</file>
         <file>res/users.png</file>
         <file>res/barcode.png</file>
         <file>res/barcodescan.png</file>
@@ -184,5 +169,8 @@
         <file>res/fit.png</file>
         <file>res/copy.png</file>
         <file>res/pdf.png</file>
+        <file>res/calendarmonth.png</file>
+        <file>res/calendarweek.png</file>
+        <file>res/calendaryear.png</file>
     </qresource>
 </RCC>

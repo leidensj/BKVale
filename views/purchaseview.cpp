@@ -178,7 +178,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_wPayment(nullptr)
   , m_teObservation(nullptr)
   , m_filter(nullptr)
-  , m_report(nullptr)
   , m_btnHistory(nullptr)
 {
   m_btnSave->setEnabled(false);
@@ -327,9 +326,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_tab->addTab(frObservation, QIcon(":/icons/res/pencil.png"), tr("Observações"));
 
   m_filter = new PurchaseFilter;
-  m_report = new PurchaseReport(m_filter);
   m_tabDb->addTab(m_filter, QIcon(":/icons/res/filter.png"), tr("Filtro"));
-  m_tabDb->addTab(m_report, QIcon(":/icons/res/statistics.png"), tr("Relatórios"));
 
   setContentsMargins(9, 9, 9, 9);
   connect(m_btnAddCode, SIGNAL(clicked(bool)), m_table, SLOT(addRowByCode()));

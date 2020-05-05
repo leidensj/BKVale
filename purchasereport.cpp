@@ -1,10 +1,12 @@
 #include "purchasereport.h"
 #include "items/purchase.h"
 #include "controls/databasepicker.h"
+#include "widgets/jdateinterval.h"
 #include <QLayout>
 #include <QFrame>
 #include <QRadioButton>
 #include <QLabel>
+#include <QCheckBox>
 
 PurchaseReport::PurchaseReport(QWidget* parent)
  : PurchaseFilter(parent)
@@ -28,6 +30,7 @@ PurchaseReport::PurchaseReport(QWidget* parent)
   m_ltButton->addWidget(m_rdoPurchase);
   m_ltButton->addWidget(m_rdoProduct);
   m_ltButton->addWidget(m_rdoSupplier);
+  m_dtInt->week();
 }
 
 QString PurchaseReport::getProductFilter() const
@@ -50,6 +53,26 @@ QString PurchaseReport::process() const
   if (m_rdoProduct->isChecked())
     return processProduct();
   return processPurchase();
+}
+
+QString PurchaseReport::strFilterHtml() const
+{
+  QString str("<table>");
+  str += QString("<tr><td>Data: %1</td></tr>").arg(m_dtInt->isChecked()
+                                                   ? (m_dtInt->getInitialDate().toString("dd/MM/yyyy")
+                                                      + " a "
+                                                      + m_dtInt->getFinalDate().toString("dd/MM/yyyy"))
+                                                   : "todas");
+  str += QString("<tr><td>Fornecedor: %1</td></tr>").arg(m_supplierPicker->getText());
+  str += QString("<tr><td>Produto: %1</td></tr>").arg(m_productPicker->getText());;
+  str += QString("<tr><td>Loja: %1</td></tr>").arg(m_storePicker->getText());;
+  str += QString("<tr><td>Pagamento: %1 %2 %3</td></tr>").arg(m_cbPaymentCredit->isChecked()
+                                                              ? Purchase::st_paymentText(Purchase::PaymentMethod::Credit) : "",
+                                                              m_cbPaymentCash->isChecked()
+                                                              ? Purchase::st_paymentText(Purchase::PaymentMethod::Cash) : "",
+                                                              m_cbPaymentBonus->isChecked()
+                                                              ? Purchase::st_paymentText(Purchase::PaymentMethod::Bonus) : "");
+  return str += "</table>";
 }
 
 QString PurchaseReport::processProduct() const
@@ -81,12 +104,10 @@ QString PurchaseReport::processProduct() const
     strQuery += " WHERE " + getFilter();
   strQuery += " ORDER BY PRODUCT ASC, _DATE DESC, NUMBER DESC, SUPPLIER ASC";
   QSqlQuery query(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  query.prepare(strQuery);
-
   if (!(query.exec(strQuery) && query.next()))
     return "";
 
-  QString html("<html><body><h1 align=\"center\">Relatório de Compras</h1>");
+  QString html("<html><body><h1 align=\"center\">Relatório de Compras</h1>" + strFilterHtml());
   qlonglong currentProduct = -1;
   double currentSubtotal = 0.0;
   double currentAmmount = 0.0;
@@ -149,8 +170,6 @@ QString PurchaseReport::processProduct() const
 
 QString PurchaseReport::processPurchase() const
 {
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  QSqlQuery query(db);
   QString strQuery = "SELECT _NOTES._NUMBER AS NUMBER," //0
                      "_NOTES._DATE AS _DATE," //1
                      "_NOTES._OBSERVATION AS OBSERVATION," //2
@@ -177,16 +196,16 @@ QString PurchaseReport::processPurchase() const
   if (!getFilter().isEmpty())
     strQuery += " WHERE " + getFilter();
   strQuery += " ORDER BY NUMBER DESC";
-  query.prepare(strQuery);
-
-  if (!(query.exec() && query.next()))
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  QSqlQuery query(db);
+  if (!(query.exec(strQuery) && query.next()))
       return "";
 
   int currentNumber = -1;
   double currentSubtotal = 0.0;
   double currentTotal = 0.0;
   int nPurchases = 0;
-  QString html("<html><body><h1 align=\"center\">Relatório de Compras</h1><br>");
+  QString html("<html><body><h1 align=\"center\">Relatório de Compras</h1>" + strFilterHtml());
 
   do
   {
@@ -194,7 +213,7 @@ QString PurchaseReport::processPurchase() const
     if (currentNumber != query.value(0).toInt())
     {
       html += QString(
-      "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
+      "<br><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
         "<tr><td width=\"30%\">Número: %1</td>"
         "<td width=\"30%\">Data: %2</td>"
         "<td width=\"40%\">Pagamento: %3</td></tr></table>"

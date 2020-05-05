@@ -4,9 +4,8 @@
 #include "jfilter.h"
 
 class DatabasePicker;
-class JDateEdit;
-class QGroupBox;
 class QCheckBox;
+class JDateInterval;
 
 class PurchaseFilter : public JFilter
 {
@@ -19,9 +18,6 @@ public:
 public slots:
   void clear();
 
-private slots:
-  void updateControls();
-
 protected:
   virtual QString getDateFilter() const;
   virtual QString getSupplierFilter() const;
@@ -29,9 +25,7 @@ protected:
   virtual QString getStoreFilter() const;
   virtual QString getPaymentFilter() const;
 
-  QGroupBox* m_cbDate;
-  JDateEdit* m_dtBegin;
-  JDateEdit* m_dtEnd;
+  JDateInterval* m_dtInt;
   DatabasePicker* m_supplierPicker;
   DatabasePicker* m_productPicker;
   DatabasePicker* m_storePicker;

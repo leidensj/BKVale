@@ -21,6 +21,7 @@ protected:
   virtual QString getProductFilter() const;
 
 private:
+  QString strFilterHtml() const;
   QString processPurchase() const;
   QString processProduct() const;
   QRadioButton* m_rdoPurchase;

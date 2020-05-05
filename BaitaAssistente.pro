@@ -57,6 +57,7 @@ SOURCES += main.cpp\
     widgets/jaddremovebuttons.cpp \
   widgets/jclicklabel.cpp \
     widgets/jdateedit.cpp \
+  widgets/jdateinterval.cpp \
     widgets/jdatepicker.cpp \
     widgets/jdoublespinbox.cpp \
     widgets/jlineedit.cpp \
@@ -157,6 +158,7 @@ HEADERS  += mainwindow.h \
     views/jitemview.h \
     widgets/jclicklabel.h \
     widgets/jaddremovebuttons.h \
+    widgets/jdateinterval.h \
     widgets/jdatepicker.h \
     widgets/jdoublespinbox.h \
     widgets/jdateedit.h \

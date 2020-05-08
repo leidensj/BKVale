@@ -59,23 +59,70 @@ QString PurchaseReport::process() const
   return processPurchase();
 }
 
+#include "controls/databaseviewer.h"
+
 QString PurchaseReport::strFilterHtml() const
 {
   QString str("<table>");
-  str += QString("<tr><td>Data: %1</td></tr>").arg(m_dtInt->isChecked()
-                                                   ? (m_dtInt->getInitialDate().toString("dd/MM/yyyy")
-                                                      + " a "
-                                                      + m_dtInt->getFinalDate().toString("dd/MM/yyyy"))
-                                                   : "todas");
-  str += QString("<tr><td>Fornecedor: %1</td></tr>").arg(m_supplierPicker->getText());
-  str += QString("<tr><td>Produto: %1</td></tr>").arg(m_productPicker->getText());;
-  str += QString("<tr><td>Loja: %1</td></tr>").arg(m_storePicker->getText());;
-  str += QString("<tr><td>Pagamento: %1 %2 %3</td></tr>").arg(m_cbPaymentCredit->isChecked()
-                                                              ? Purchase::st_paymentText(Purchase::PaymentMethod::Credit) : "",
-                                                              m_cbPaymentCash->isChecked()
-                                                              ? Purchase::st_paymentText(Purchase::PaymentMethod::Cash) : "",
-                                                              m_cbPaymentBonus->isChecked()
-                                                              ? Purchase::st_paymentText(Purchase::PaymentMethod::Bonus) : "");
+  QString aux;
+  if (!m_dtInt->isChecked())
+    aux = tr("não especificado");
+  else
+    aux = m_dtInt->getInitialDate().toString("dd/MM/yyyy") +
+          tr(" a ")
+          + m_dtInt->getFinalDate().toString("dd/MM/yyyy");
+  str += QString("<tr><td>Data: %1</td></tr>").arg(aux);
+
+  QVector<JItemSQL*> v = m_supplierPicker->getViewer()->getCurrentItems();
+  aux.clear();
+  if (!v.isEmpty())
+  {
+    for (int i = 0; i != v.size(); ++i)
+      aux += v.at(i)->name() + ";";
+    aux.chop(1);
+  }
+  if (aux.isEmpty())
+    aux = tr("não especificado");
+  str += QString("<tr><td>Fornecedor: %1</td></tr>").arg(aux);
+
+  v = m_productPicker->getViewer()->getCurrentItems();
+  aux.clear();
+  if (!v.isEmpty())
+  {
+    for (int i = 0; i != v.size(); ++i)
+      aux += v.at(i)->name() + ";";
+    aux.chop(1);
+  }
+  if (aux.isEmpty())
+    aux = tr("não especificado");
+  str += QString("<tr><td>Produto: %1</td></tr>").arg(aux);
+
+  v = m_storePicker->getViewer()->getCurrentItems();
+  aux.clear();
+  if (!v.isEmpty())
+  {
+    for (int i = 0; i != v.size(); ++i)
+      aux += v.at(i)->name() + ";";
+    aux.chop(1);
+  }
+  if (aux.isEmpty())
+    aux = tr("não especificado");
+  str += QString("<tr><td>Loja: %1</td></tr>").arg(aux);
+
+  aux.clear();
+  if (!m_cbPaymentCredit->isChecked() && !m_cbPaymentCash->isChecked() && !m_cbPaymentBonus->isChecked())
+    aux = tr("não especificado");
+  else
+  {
+    if (m_cbPaymentCredit->isChecked())
+      str += Purchase::st_paymentText(Purchase::PaymentMethod::Credit) + ";";
+    if(m_cbPaymentCash->isChecked())
+      aux += Purchase::st_paymentText(Purchase::PaymentMethod::Cash)  + ";";
+    if (m_cbPaymentBonus->isChecked())
+      aux += Purchase::st_paymentText(Purchase::PaymentMethod::Bonus)  + ";";
+    str.chop(1);
+  }
+  str += QString("<tr><td>Pagamento: %1</td></tr>").arg(aux);
   return str += "</table>";
 }
 

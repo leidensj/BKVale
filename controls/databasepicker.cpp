@@ -172,14 +172,14 @@ const QVector<Id>& DatabasePicker::getIds() const
   return m_ids;
 }
 
-QString DatabasePicker::getText() const
+QString DatabasePicker::getTableText() const
 {
   return JItemEx::text(m_selector->getViewer()->getTableName());
 }
 
 void DatabasePicker::setPlaceholderText(bool bSet)
 {
-  m_edText->setPlaceholderText(bSet ? getText() : "");
+  m_edText->setPlaceholderText(bSet ? getTableText() : "");
 }
 
 void DatabasePicker::showImage()

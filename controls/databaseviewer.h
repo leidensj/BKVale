@@ -49,7 +49,7 @@ public:
   JItemSQL* getCurrentItem() const;
   QVector<Id> getSelectedIds() const;
   void selectIds(const QVector<Id>& ids);
-  const QVector<JItemSQL*> getCurrentItems() const;
+  const QVector<JItemSQL*>& getCurrentItems() const;
   int getNumberOfEntries() const;
   double getSum(int column) const;
 

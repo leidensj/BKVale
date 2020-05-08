@@ -24,7 +24,7 @@ public:
   const QVector<Id>& getIds() const;
   void setPlaceholderText(bool bSet);
   DatabaseViewer* getViewer() const;
-  QString getText() const;
+  QString getTableText() const;
 
 public slots:
   void clear();

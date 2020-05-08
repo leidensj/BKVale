@@ -67,11 +67,9 @@ void TimeCardDialog::updateControls()
 
 void TimeCardDialog::saveAndAccept()
 {
-  auto pt = static_cast<Store*>(m_storePicker->getViewer()->getCurrentItem());
-  Store o;
-  if (pt != nullptr)
-    o = *pt;
-
+  Store o(m_storePicker->getViewer()->getFirstSelectedId());
+  QString error;
+  o.SQL_select(error);
   QDate dt(m_date->date());
   QString html;
   QDate idt = dt.addDays(-1 * dt.day() + 1);

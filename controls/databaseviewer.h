@@ -43,13 +43,12 @@ public:
 
   explicit DatabaseViewer(const QString& tableName,
                           Mode mode = Mode::Full,
-                          QWidget *parent = 0);
+                          QWidget *parent = nullptr);
   ~DatabaseViewer();
   QString getTableName() const;
-  JItemSQL* getCurrentItem() const;
   QVector<Id> getSelectedIds() const;
+  Id getFirstSelectedId() const;
   void selectIds(const QVector<Id>& ids);
-  const QVector<JItemSQL*>& getCurrentItems() const;
   int getNumberOfEntries() const;
   double getSum(int column) const;
 
@@ -58,9 +57,6 @@ public:
 
 public slots:
   void refresh();
-  void selectItems();
-  void selectItem(Id id);
-  void selectItems(const QVector<Id> ids);
   void setFixedFilter(const QString& fixedFilter);
   void setDynamicFilter(const QString& dynamicFilter);
   void clearSearch();
@@ -77,10 +73,7 @@ private:
   QString m_tableName;
   QString m_dynamicFilter;
   QString m_fixedFilter;
-  QVector<JItemSQL*> m_currentItems;
   QSortFilterProxyModel* m_proxyModel;
-
-  void clearCurrentItems();
 
 private slots:
   void searchChanged();
@@ -90,10 +83,10 @@ private slots:
   void removeItems();
   void focusSearch();
   void emitCurrentRowChangedSignal();
+  void emititemsSelectedSignalSignal();
 
 signals:
-  void itemSelectedSignal(const JItemSQL& item);
-  void itemsSelectedSignal(const QVector<JItemSQL*>& items);
+  void itemsSelectedSignal();
   void itemsRemovedSignal(const QVector<Id>& ids);
   void currentRowChangedSignal(int row);
   void refreshSignal();

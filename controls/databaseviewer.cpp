@@ -136,10 +136,10 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
 
   if (m_mode != Mode::ReadOnly)
   {
-    connect(m_table, SIGNAL(enterKeyPressedSignal()), this, SLOT(selectItems()));
-    connect(m_btnOpen, SIGNAL(clicked(bool)), this, SLOT(selectItems()));
+    connect(m_table, SIGNAL(enterKeyPressedSignal()), this, SLOT(emititemsSelectedSignalSignal()));
+    connect(m_btnOpen, SIGNAL(clicked(bool)), this, SLOT(emititemsSelectedSignalSignal()));
+    connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(emititemsSelectedSignalSignal()));
     connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItems()));
-    connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(selectItems()));
   }
 
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(focusSearch()));
@@ -167,25 +167,29 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
 
 DatabaseViewer::~DatabaseViewer()
 {
-  clearCurrentItems();
+
 }
 
-void DatabaseViewer::clearCurrentItems()
+Id DatabaseViewer::getFirstSelectedId() const
 {
-  for (int i = 0; i != m_currentItems.size(); ++i)
+  QModelIndexList lst = m_table->selectionModel()->selectedRows();
+  Id id;
+  if (lst.size() != 0)
   {
-    JItemSQL* pt = m_currentItems.at(i);
-    if (pt != nullptr)
-      delete pt;
+    QModelIndex idx = m_proxyModel->mapToSource(lst.at(0));
+    if (idx.isValid())
+    {
+      JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
+      id = Id(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong());
+    }
   }
-  m_currentItems.clear();
+  return id;
 }
 
 QVector<Id> DatabaseViewer::getSelectedIds() const
 {
   JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
   QModelIndexList lst = m_table->selectionModel()->selectedRows();
-
   QVector<Id> ids;
   for (int i = 0; i != lst.size(); ++i)
   {
@@ -207,51 +211,6 @@ void DatabaseViewer::selectIds(const QVector<Id>& ids)
 
   if (ids.size() != 0)
     m_table->setFocus();
-}
-
-void DatabaseViewer::selectItems()
-{
-  selectItems(getSelectedIds());
-}
-
-void DatabaseViewer::selectItem(Id id)
-{
-  QVector<Id> ids;
-  ids.push_back(id);
-  selectItems(ids);
-}
-
-void DatabaseViewer::selectItems(const QVector<Id> ids)
-{
-  clearCurrentItems();
-
-  for (int i = 0; i != ids.size(); ++i)
-  {
-    QString error;
-    bool bSuccess = false;
-    auto p = JItemEx::create(m_tableName, ids.at(i));
-    if (p != nullptr)
-    {
-      bSuccess = p->SQL_select(error);
-      if (bSuccess)
-        m_currentItems.push_back(p);
-    }
-
-    if (!bSuccess)
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("O seguinte erro ocorreu ao selecionar o item com ID "
-                               "'%1':\n'%2'").arg(ids.at(i).str(), error));
-    }
-  }
-
-  if (!m_currentItems.isEmpty())
-  {
-    if (m_currentItems.at(0) != nullptr)
-      emit itemSelectedSignal(*m_currentItems.at(0));
-    emit itemsSelectedSignal(m_currentItems);
-  }
 }
 
 void DatabaseViewer::refresh()
@@ -412,11 +371,6 @@ QString DatabaseViewer::getTableName() const
   return m_tableName;
 }
 
-JItemSQL* DatabaseViewer::getCurrentItem() const
-{
-  return m_currentItems.size() != 0 ? m_currentItems.at(0) : nullptr;
-}
-
 bool DatabaseViewer::save(const JItemSQL& o)
 {
   if (JItemEx::authenticationToInsertUpdate(m_tableName))
@@ -449,6 +403,11 @@ bool DatabaseViewer::save(const JItemSQL& o)
   else
     QMessageBox::critical(this, tr("Erro"), tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
   return bSuccess;
+}
+
+void DatabaseViewer::emititemsSelectedSignalSignal()
+{
+  emit itemsSelectedSignal();
 }
 
 void DatabaseViewer::emitCurrentRowChangedSignal()

@@ -22,6 +22,7 @@ public:
 
   Id getId() const;
   const QVector<Id>& getIds() const;
+  const QVector<QString>& getNames() const;
   void setPlaceholderText(bool bSet);
   DatabaseViewer* getViewer() const;
   QString getTableText() const;

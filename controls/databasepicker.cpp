@@ -172,6 +172,11 @@ const QVector<Id>& DatabasePicker::getIds() const
   return m_ids;
 }
 
+const QVector<QString>& DatabasePicker::getNames() const
+{
+  return m_names;
+}
+
 QString DatabasePicker::getTableText() const
 {
   return JItemEx::text(m_selector->getViewer()->getTableName());

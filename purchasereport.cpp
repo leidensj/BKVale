@@ -73,36 +73,36 @@ QString PurchaseReport::strFilterHtml() const
           + m_dtInt->getFinalDate().toString("dd/MM/yyyy");
   str += QString("<tr><td>Data: %1</td></tr>").arg(aux);
 
-  QVector<JItemSQL*> v = m_supplierPicker->getViewer()->getCurrentItems();
+  auto vs = m_supplierPicker->getNames();
   aux.clear();
-  if (!v.isEmpty())
+  if (!vs.isEmpty())
   {
-    for (int i = 0; i != v.size(); ++i)
-      aux += v.at(i)->name() + ";";
+    for (int i = 0; i != vs.size(); ++i)
+      aux += vs.at(i) + ";";
     aux.chop(1);
   }
   if (aux.isEmpty())
     aux = tr("não especificado");
   str += QString("<tr><td>Fornecedor: %1</td></tr>").arg(aux);
 
-  v = m_productPicker->getViewer()->getCurrentItems();
+  auto vp = m_productPicker->getNames();
   aux.clear();
-  if (!v.isEmpty())
+  if (!vp.isEmpty())
   {
-    for (int i = 0; i != v.size(); ++i)
-      aux += v.at(i)->name() + ";";
+    for (int i = 0; i != vp.size(); ++i)
+      aux += vp.at(i) + ";";
     aux.chop(1);
   }
   if (aux.isEmpty())
     aux = tr("não especificado");
   str += QString("<tr><td>Produto: %1</td></tr>").arg(aux);
 
-  v = m_storePicker->getViewer()->getCurrentItems();
+  auto vst = m_storePicker->getNames();
   aux.clear();
-  if (!v.isEmpty())
+  if (!vst.isEmpty())
   {
-    for (int i = 0; i != v.size(); ++i)
-      aux += v.at(i)->name() + ";";
+    for (int i = 0; i != vst.size(); ++i)
+      aux += vst.at(i) + ";";
     aux.chop(1);
   }
   if (aux.isEmpty())

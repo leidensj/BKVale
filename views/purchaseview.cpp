@@ -449,7 +449,8 @@ bool PurchaseView::save(Id& id)
 void PurchaseView::lastItemSelected()
 {
   if (m_lastId.isValid())
-    m_viewer->selectItem(m_lastId);
+    m_viewer->selectId(m_lastId);
+  selectItem(Purchase(m_lastId));
 }
 
 void PurchaseView::selectItem(const JItemSQL& o)

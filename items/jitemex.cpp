@@ -15,6 +15,9 @@
 #include "employee.h"
 #include "activeuser.h"
 
+#include <QMessageBox>
+#include "controls/pincodedialog.h"
+
 #include "models/activeusermodel.h"
 #include "models/addressmodel.h"
 #include "models/categorymodel.h"
@@ -222,4 +225,107 @@ JItemView* JItemEx::view(const QString& tableName)
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return new SupplierView;
   return nullptr;
+}
+
+bool JItemEx::select(JItemSQL& o, QWidget* parent)
+{
+  if (!o.m_id.isValid())
+    return false;
+
+  QString error;
+  bool bSuccess = o.SQL_select(error);
+  if (!bSuccess)
+  {
+    QMessageBox::critical(parent,
+                          QObject::tr("Erro"),
+                          QObject::tr("O seguinte erro ocorreu ao selecionar o item com ID "
+                             "'%1':\n'%2'").arg(o.m_id.str(), error));
+  }
+  return bSuccess;
+}
+
+bool JItemEx::remove(const Id& id, const QString& tableName, bool bNeedsConfirmation, QWidget* parent)
+{
+  if (bNeedsConfirmation)
+  {
+    if (QMessageBox::question(parent,
+                              QObject::tr("Remover itens"),
+                              QObject::tr("Tem certeza que deseja remover os itens selecionados?"),
+                              QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
+    {
+      return false;
+    }
+  }
+
+  bool bSuccess = false;
+  QString error;
+  if (bNeedsConfirmation)
+  {
+    if (JItemEx::authenticationToRemove(tableName))
+    {
+      PinCodeDialog w(parent);
+      if (!w.exec())
+        return false;
+
+      Employee e = w.getEmployee();
+      if (!e.m_id.isValid())
+        error = QObject::tr("Pincode informado não encontrado.");
+      else if (!e.hasPermissionToRemove(tableName))
+        error = QObject::tr("Funcionário não possui permissão.");
+      bSuccess = error.isEmpty();
+    }
+  }
+
+  if (bSuccess)
+  {
+    auto p = JItemEx::create(tableName, id);
+    if (p != nullptr)
+    {
+      QString error;
+      bSuccess = p->SQL_remove(error);
+      delete p;
+    }
+  }
+
+  if (!bSuccess)
+    QMessageBox::warning(parent, QObject::tr("Erro"), error, QMessageBox::Ok);
+  return bSuccess;
+}
+
+void JItemEx::remove(const QVector<Id>& ids, const QString& tableName, QWidget* parent)
+{
+  if (ids.size() == 0)
+    return;
+
+  for (int i = 0; i != ids.size(); ++i)
+    remove(ids.at(i), tableName, false, parent);
+}
+
+bool JItemEx::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
+{
+  bool bSuccess = false;
+  QString error;
+  if (JItemEx::authenticationToInsertUpdate(tableName))
+  {
+    PinCodeDialog w(parent);
+    if (!w.exec())
+      return false;
+
+    Employee e = w.getEmployee();
+    if (!e.m_id.isValid())
+      error = QObject::tr("Pincode informado não encontrado.");
+    else if (!e.hasPermissionToEdit(tableName))
+      error = QObject::tr("Funcionário não possui permissão.");
+
+    bSuccess = error.isEmpty();
+    o.setEmployee(e);
+  }
+
+  if (bSuccess)
+    bSuccess = o.SQL_insert_update(error);
+
+  if (!bSuccess)
+    QMessageBox::critical(parent, QObject::tr("Erro"), QObject::tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
+
+  return bSuccess;
 }

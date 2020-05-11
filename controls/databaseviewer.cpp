@@ -136,9 +136,9 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
 
   if (m_mode != Mode::ReadOnly)
   {
-    connect(m_table, SIGNAL(enterKeyPressedSignal()), this, SLOT(emititemsSelectedSignalSignal()));
-    connect(m_btnOpen, SIGNAL(clicked(bool)), this, SLOT(emititemsSelectedSignalSignal()));
-    connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(emititemsSelectedSignalSignal()));
+    connect(m_table, SIGNAL(enterKeyPressedSignal()), this, SLOT(emitItemsSelectedSignal()));
+    connect(m_btnOpen, SIGNAL(clicked(bool)), this, SLOT(emitItemsSelectedSignal()));
+    connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(emitItemsSelectedSignal()));
     connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItems()));
   }
 
@@ -170,7 +170,7 @@ DatabaseViewer::~DatabaseViewer()
 
 }
 
-Id DatabaseViewer::getFirstSelectedId() const
+Id DatabaseViewer::firstSelectedId() const
 {
   QModelIndexList lst = m_table->selectionModel()->selectedRows();
   Id id;
@@ -186,7 +186,14 @@ Id DatabaseViewer::getFirstSelectedId() const
   return id;
 }
 
-QVector<Id> DatabaseViewer::getSelectedIds() const
+void DatabaseViewer::selectId(const Id& id)
+{
+  QVector<Id> ids;
+  ids.push_back(id);
+  selectIds(ids);
+}
+
+QVector<Id> DatabaseViewer::selectedIds() const
 {
   JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
   QModelIndexList lst = m_table->selectionModel()->selectedRows();
@@ -202,6 +209,7 @@ QVector<Id> DatabaseViewer::getSelectedIds() const
 
 void DatabaseViewer::selectIds(const QVector<Id>& ids)
 {
+  m_table->clearSelection();
   for (int i = 0; i != ids.size(); ++i)
   {
     QModelIndexList lst = m_proxyModel->match(m_proxyModel->index(0, 0), Qt::EditRole, ids.at(i).get(), 1, Qt::MatchExactly);
@@ -250,51 +258,8 @@ void DatabaseViewer::enableControls()
 
 void DatabaseViewer::removeItems()
 {
-  QVector<Id> ids = getSelectedIds();
-
-  if (ids.size() == 0)
-    return;
-
-  if (QMessageBox::question(this,
-                            tr("Remover itens"),
-                            tr("Tem certeza que deseja remover os itens selecionados?"),
-                            QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
-  {
-    return;
-  }
-
-  if (JItemEx::authenticationToRemove(m_tableName))
-  {
-    PinCodeDialog w(this);
-    if (!w.exec())
-      return;
-
-    Employee e = w.getEmployee();
-    QString error;
-    if (!e.m_id.isValid())
-      error = tr("Pincode informado não encontrado.");
-    else if (!e.hasPermissionToRemove(m_tableName))
-      error = tr("Funcionário não possui permissão.");
-
-    if (!error.isEmpty())
-    {
-      QMessageBox::warning(this, tr("Erro"), error, QMessageBox::Ok);
-      return;
-    }
-  }
-
-  for (int i = 0; i != ids.size(); ++i)
-  {
-    Id id = ids.at(i);
-    auto p = JItemEx::create(m_tableName, id);
-    if (p != nullptr)
-    {
-      QString error;
-      p->SQL_remove(error);
-      delete p;
-    }
-  }
-
+  QVector<Id> ids = selectedIds();
+  JItemEx::remove(ids, m_tableName, this);
   emit itemsRemovedSignal(ids);
   refresh();
 }
@@ -371,41 +336,7 @@ QString DatabaseViewer::getTableName() const
   return m_tableName;
 }
 
-bool DatabaseViewer::save(const JItemSQL& o)
-{
-  if (JItemEx::authenticationToInsertUpdate(m_tableName))
-  {
-    PinCodeDialog w(this);
-    if (!w.exec())
-      return false;
-
-    Employee e = w.getEmployee();
-    QString error;
-    if (!e.m_id.isValid())
-      error = tr("Pincode informado não encontrado.");
-    else if (!e.hasPermissionToEdit(m_tableName))
-      error = tr("Funcionário não possui permissão.");
-
-    if (!error.isEmpty())
-    {
-      QMessageBox::warning(this, tr("Erro"), error, QMessageBox::Ok);
-      return false;
-    }
-    o.setEmployee(e);
-  }
-
-  QString error;
-  bool bSuccess = false;
-  bSuccess = o.SQL_insert_update(error);
-
-  if (bSuccess)
-    refresh();
-  else
-    QMessageBox::critical(this, tr("Erro"), tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
-  return bSuccess;
-}
-
-void DatabaseViewer::emititemsSelectedSignalSignal()
+void DatabaseViewer::emitItemsSelectedSignal()
 {
   emit itemsSelectedSignal();
 }
@@ -415,12 +346,12 @@ void DatabaseViewer::emitCurrentRowChangedSignal()
   emit currentRowChangedSignal(m_table->currentIndex().row());
 }
 
-int DatabaseViewer::getNumberOfEntries() const
+int DatabaseViewer::rowCount() const
 {
   return m_proxyModel->rowCount();
 }
 
-double DatabaseViewer::getSum(int column) const
+double DatabaseViewer::sum(int column) const
 {
   double sum = 0.0;
   for (int row = 0; row != m_proxyModel->rowCount(); ++row)

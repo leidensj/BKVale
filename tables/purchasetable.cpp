@@ -81,14 +81,17 @@ void PurchaseTable::addRowByCode()
   dlg.getViewer()->setFixedFilter(PRODUCT_FILTER_BUY);
   if (dlg.exec())
   {
-    ProductCode* p = dynamic_cast<ProductCode*>(dlg.getViewer()->getCurrentItem());
-    Product o;
-    QString error;
-    if (o.SQL_select_by_code(*p, error))
+    ProductCode c(dlg.getViewer()->firstSelectedId());
+    if (c.m_id.isValid())
     {
-      addRow();
-      getItem(rowCount() - 1, (int)Column::Product)->setValue(SQLItem::st_toVariant(o));
-      loadProductInfo(rowCount() - 1);
+      Product o;
+      QString error;
+      if (o.SQL_select_by_code(c, error))
+      {
+        addRow();
+        getItem(rowCount() - 1, (int)Column::Product)->setValue(SQLItem::st_toVariant(o));
+        loadProductInfo(rowCount() - 1);
+      }
     }
   }
 }

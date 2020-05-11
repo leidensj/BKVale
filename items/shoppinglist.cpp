@@ -56,9 +56,10 @@ QString ShoppingListItem::strPrice() const
   return Data::strMoney(m_price);
 }
 
-ShoppingList::ShoppingList()
+ShoppingList::ShoppingList(Id id)
 {
   clear();
+  m_id = id;
 }
 
 void ShoppingList::clear(bool bClearId)

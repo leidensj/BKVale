@@ -34,9 +34,10 @@ QString Package::strUnity(const QString& productUnity) const
   return m_bIsPackage ? m_unity : productUnity;
 }
 
-ProductCode::ProductCode()
+ProductCode::ProductCode(Id id)
 {
   clear();
+  m_id = id;
 }
 
 void ProductCode::clear(bool bClearId)

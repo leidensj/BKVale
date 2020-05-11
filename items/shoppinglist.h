@@ -34,7 +34,7 @@ struct ShoppingListItem : public JItem
 
 struct ShoppingList : public JItemSQL
 {
-  ShoppingList();
+  ShoppingList(Id id = Id());
   void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;

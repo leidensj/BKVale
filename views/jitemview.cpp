@@ -142,7 +142,7 @@ bool JItemView::save(Id& id)
   if (p != nullptr)
   {
     getItem(*p);
-    bSuccess = m_viewer->save(*p);
+    bSuccess = JItemEx::save(*p, m_viewer->getTableName(), this);
     if (bSuccess)
     {
       create();

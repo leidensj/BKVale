@@ -46,13 +46,12 @@ public:
                           QWidget *parent = nullptr);
   ~DatabaseViewer();
   QString getTableName() const;
-  QVector<Id> getSelectedIds() const;
-  Id getFirstSelectedId() const;
+  void selectId(const Id& id);
   void selectIds(const QVector<Id>& ids);
-  int getNumberOfEntries() const;
-  double getSum(int column) const;
-
-  bool save(const JItemSQL& jItem);
+  QVector<Id> selectedIds() const;
+  Id firstSelectedId() const;
+  int rowCount() const;
+  double sum(int column) const;
   QPushButton* addButton(const QString& toolTip, const QIcon& icon, int shortcut = 0);
 
 public slots:
@@ -83,7 +82,7 @@ private slots:
   void removeItems();
   void focusSearch();
   void emitCurrentRowChangedSignal();
-  void emititemsSelectedSignalSignal();
+  void emitItemsSelectedSignal();
 
 signals:
   void itemsSelectedSignal();

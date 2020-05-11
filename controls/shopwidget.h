@@ -17,7 +17,7 @@ class ShopWidget : public QWidget
 
 public:
   ShopWidget(QWidget* parent = nullptr);
-  ShoppingList getShoppingList() const;
+  ShoppingList getShoppingList();
 
 private slots:
   void updateControls();

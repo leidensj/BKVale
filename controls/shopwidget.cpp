@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "printutils.h"
 #include "escpos.h"
+#include "items/jitemex.h"
 #include <QLabel>
 #include <QPushButton>
 #include <QDateEdit>
@@ -71,14 +72,11 @@ void ShopWidget::setToday()
   updateControls();
 }
 
-ShoppingList ShopWidget::getShoppingList() const
+ShoppingList ShopWidget::getShoppingList()
 {
-  m_viewer->selectItems();
-  ShoppingList* plst = dynamic_cast<ShoppingList*>(m_viewer->getCurrentItem());
-  ShoppingList lst;
-  if (plst != nullptr)
-    lst = *plst;
-  return lst;
+  ShoppingList o(m_viewer->firstSelectedId());
+  JItemEx::select(o, this);
+  return o;
 }
 
 void ShopWidget::emitChangedSignal()

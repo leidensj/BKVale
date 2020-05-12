@@ -29,7 +29,7 @@ public slots:
 
 protected slots:
   virtual void setItem(const JItemSQL& o) = 0;
-  virtual void itemsRemoved(const QVector<Id>& ids);
+  virtual void itemsRemoved(const Ids& ids);
   virtual void save();
   void setFocusWidgetOnCreate(QWidget* w);
   void addViewButton(const QString& tableName);

@@ -82,7 +82,7 @@ public slots:
   void getItem(JItemSQL& o) const;
 
 protected slots:
-  void itemsRemoved(const QVector<Id>& ids);
+  void itemsRemoved(const Ids& ids);
   void setItem(const JItemSQL& o);
 
 private:

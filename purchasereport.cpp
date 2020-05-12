@@ -16,8 +16,6 @@ PurchaseReport::PurchaseReport(QWidget* parent)
  , m_rdoSupplier(nullptr)
 {
   m_btnClear->setIconSize(QSize(16, 16));
-  m_dtInt->layout()->setContentsMargins(0, 9, 0, 0);
-  m_dtInt->setFlat(true);
   m_rdoPurchase = new QRadioButton(tr("Compra"));
   m_rdoPurchase->setIcon(QIcon(":/icons/res/purchase.png"));
   m_rdoPurchase->setChecked(true);
@@ -34,18 +32,17 @@ PurchaseReport::PurchaseReport(QWidget* parent)
   m_ltButton->addWidget(m_rdoPurchase);
   m_ltButton->addWidget(m_rdoProduct);
   m_ltButton->addWidget(m_rdoSupplier);
-  m_dtInt->week();
 }
 
 QString PurchaseReport::getProductFilter() const
 {
   QString str;
-  QVector<Id> vProduct = m_productPicker->getIds();
-  if (!vProduct.isEmpty())
+  Ids ids(m_productPicker->getIds());
+  if (!ids.isEmpty())
   {
     str += " _NOTE_ITEMS._PRODUCTID IN (";
-    for (int i = 0; i != vProduct.size(); ++i)
-      str += vProduct.at(i).str() + ",";
+    for (auto id : ids)
+      str += id.str() + ",";
     str.chop(1);
     str += ") ";
   }
@@ -77,9 +74,9 @@ QString PurchaseReport::strFilterHtml() const
   aux.clear();
   if (!vs.isEmpty())
   {
-    for (int i = 0; i != vs.size(); ++i)
-      aux += vs.at(i) + ";";
-    aux.chop(1);
+    for (auto it : vs)
+      aux += it + "; ";
+    aux.chop(2);
   }
   if (aux.isEmpty())
     aux = tr("não especificado");
@@ -89,9 +86,9 @@ QString PurchaseReport::strFilterHtml() const
   aux.clear();
   if (!vp.isEmpty())
   {
-    for (int i = 0; i != vp.size(); ++i)
-      aux += vp.at(i) + ";";
-    aux.chop(1);
+    for (auto it : vp)
+      aux += it + "; ";
+    aux.chop(2);
   }
   if (aux.isEmpty())
     aux = tr("não especificado");
@@ -101,9 +98,9 @@ QString PurchaseReport::strFilterHtml() const
   aux.clear();
   if (!vst.isEmpty())
   {
-    for (int i = 0; i != vst.size(); ++i)
-      aux += vst.at(i) + ";";
-    aux.chop(1);
+    for (auto it :vst)
+      aux += it + "; ";
+    aux.chop(2);
   }
   if (aux.isEmpty())
     aux = tr("não especificado");
@@ -115,7 +112,7 @@ QString PurchaseReport::strFilterHtml() const
   else
   {
     if (m_cbPaymentCredit->isChecked())
-      str += Purchase::st_paymentText(Purchase::PaymentMethod::Credit) + ";";
+      aux += Purchase::st_paymentText(Purchase::PaymentMethod::Credit) + ";";
     if(m_cbPaymentCash->isChecked())
       aux += Purchase::st_paymentText(Purchase::PaymentMethod::Cash)  + ";";
     if (m_cbPaymentBonus->isChecked())

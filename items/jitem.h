@@ -5,6 +5,7 @@
 #include "common.h"
 #include <QRegExp>
 #include <QVariant>
+#include <QVector>
 
 class Id
 {
@@ -34,5 +35,8 @@ struct JItem
   virtual bool operator ==(const JItem& other) const = 0;
   virtual bool operator !=(const JItem& other) const = 0;
 };
+
+typedef QVector<Id> Ids;
+typedef QVector<QString> Names;
 
 #endif // JITEM_H

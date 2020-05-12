@@ -13,27 +13,21 @@ DatabaseSelector::DatabaseSelector(const QString& tableName,
                                 ? DatabaseViewer::Mode::MultiSelector
                                 : DatabaseViewer::Mode::SingleSelector);
   m_viewer->layout()->setContentsMargins(0, 0, 0, 0);
-  QVBoxLayout* vlayout0 = new QVBoxLayout;
+  QVBoxLayout* lt = new QVBoxLayout;
   if (bMultiSelector)
-    vlayout0->addWidget(new QLabel(tr("Selecione os itens desejados e pressione Enter para confirmar.")));
-  vlayout0->addWidget(m_viewer);
-  setLayout(vlayout0);
-
+    lt->addWidget(new QLabel(tr("Selecione os itens desejados e pressione Enter para confirmar.")));
+  lt->addWidget(m_viewer);
+  setLayout(lt);
   resize(640, 480);
 
-  QString title = "Selecionar " + JItemEx::text(tableName);
+  QString title = tr("Selecionar ") + JItemEx::text(tableName);
   QString icon = JItemEx::icon(tableName);
 
   setWindowTitle(title);
   if (!icon.isEmpty())
     setWindowIcon(QIcon(icon));
 
-  QObject::connect(m_viewer, SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(itemsSelected(const QVector<JItemSQL*>&)));
-}
-
-void DatabaseSelector::itemsSelected(const QVector<JItemSQL*>& /*v*/)
-{
-  accept();
+  QObject::connect(m_viewer, SIGNAL(itemsSelectedSignal()), this, SLOT(accept()));
 }
 
 DatabaseViewer* DatabaseSelector::getViewer() const

@@ -59,8 +59,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 {
   m_supplierPicker = new DatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_imagePicker = new DatabasePicker(IMAGE_SQL_TABLE_NAME);
-  m_edTitle = new JLineEdit(Text::Input::AlphanumericAndSpaces,
-                            JLineEdit::st_defaultFlags1);
+  m_edTitle = new JLineEdit(Text::Input::AlphanumericAndSpaces, true);
 
   addViewButton(PRODUCT_SQL_TABLE_NAME);
   addViewButton(SUPPLIER_SQL_TABLE_NAME);
@@ -161,7 +160,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
 void ShoppingListView::updateControls()
 {
-  m_table->showSupplierColumn(!m_supplierPicker->getId().isValid());
+  m_table->showSupplierColumn(!m_supplierPicker->getFirstId().isValid());
 }
 
 void ShoppingListView::setItem(const JItemSQL& o)
@@ -169,8 +168,8 @@ void ShoppingListView::setItem(const JItemSQL& o)
   const ShoppingList& _o = dynamic_cast<const ShoppingList&>(o);
   m_edTitle->setText(_o.m_title);
   m_teDescription->setPlainText(_o.m_description);
-  m_supplierPicker->setItem(_o.m_supplier);
-  m_imagePicker->setItem(_o.m_image);
+  m_supplierPicker->addItem(_o.m_supplier);
+  m_imagePicker->addItem(_o.m_image);
   m_snLines->setValue(_o.m_nLines);
   for (int i = 0; i != 7; ++i)
     m_vbtnWeek[i]->setChecked(_o.m_weekDays[i]);
@@ -187,8 +186,8 @@ void ShoppingListView::getItem(JItemSQL& o) const
   _o.m_id = m_id;
   _o.m_title = m_edTitle->text();
   _o.m_description = m_teDescription->toPlainText();
-  _o.m_supplier.m_id = m_supplierPicker->getId();
-  _o.m_image.m_id = m_imagePicker->getId();
+  _o.m_supplier.m_id = m_supplierPicker->getFirstId();
+  _o.m_image.m_id = m_imagePicker->getFirstId();
   _o.m_nLines = m_snLines->value();
   m_table->getListElements(_o.m_vItem);
   for (int i = 0; i != 7; ++i)

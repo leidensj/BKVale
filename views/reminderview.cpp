@@ -34,7 +34,7 @@ ReminderView::ReminderView(QWidget *parent)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
-  m_edTitle = new JLineEdit(Text::Input::ASCII, JLineEdit::st_defaultFlags2);
+  m_edTitle = new JLineEdit(Text::Input::ASCII, false);
   m_edTitle->setPlaceholderText(tr("Título"));
   m_teMessage = new QPlainTextEdit();
   m_teMessage->setPlaceholderText(tr("Mensagem"));
@@ -55,14 +55,14 @@ ReminderView::ReminderView(QWidget *parent)
   m_cbFavorite->setIcon(QIcon(":/icons/res/favorite.png"));
   m_cbFavorite->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F));
   m_cbFavorite->setToolTip(tr("Marcar como favorito"));
-  m_edBarcode = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags2);
+  m_edBarcode = new JLineEdit(Text::Input::All, false);
   m_edBarcode->setPlaceholderText(tr("Código de barras"));
   m_edBarcode->setMaxLength(REMINDER_MAX_BARCODE_CODE93_LENGTH);
   m_edBarcode->setClearButtonEnabled(true);
   m_cbBarcodeHRI = new QCheckBox;
   m_cbBarcodeHRI->setText(tr("Incluir HRI"));
   m_subject = new QComboBox;
-  JLineEdit* edType = new JLineEdit(Text::Input::ASCII, JLineEdit::st_defaultFlags2);
+  JLineEdit* edType = new JLineEdit(Text::Input::ASCII, false);
   edType->setPlaceholderText(tr("Assunto"));
   m_subject->setEditable(true);
   m_subject->setLineEdit(edType);
@@ -231,18 +231,17 @@ void ReminderView::updateControls()
 
 void ReminderView::setFavorite()
 {
-  QVector<Id> vid = m_viewer->getSelectedIds();
-  if (vid.size() != 0)
+  Ids ids(m_viewer->getSelectedIds());
+  if (!ids.isEmpty())
   {
-    for (int i = 0; i != vid.size(); ++i)
+    for (auto id : ids)
     {
       QString error;
-      Reminder o;
-      o.m_id = vid.at(i);
+      Reminder o(id);
       o.SQL_toggleFavorite(error);
     }
     m_viewer->refresh();
-    m_viewer->selectIds(vid);
+    m_viewer->selectIds(ids);
   }
 }
 

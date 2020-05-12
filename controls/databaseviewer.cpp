@@ -39,6 +39,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
                                QWidget *parent)
   : QWidget(parent)
   , m_mode(mode)
+  , m_tableName(tableName)
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
@@ -75,7 +76,8 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   m_ltButton->addWidget(m_btnOpen);
   m_ltButton->addWidget(m_btnRemove);
 
-  m_edSearch = new JLineEdit(Text::Input::All, (int)JLineEdit::Flags::ToUpper);
+  m_edSearch = new JLineEdit(Text::Input::All, true);
+  m_edSearch->setArrowsAndEnterAsTab(false);
   m_edSearch->setToolTip(tr("Procurar (Ctrl+F)"));
   m_edSearch->setClearButtonEnabled(true);
 
@@ -93,9 +95,9 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
 
   m_table = new JEnterSignalTable;
   m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_table->setSelectionMode(m_mode == Mode::Full  ? QAbstractItemView::ExtendedSelection
-                                                  : m_mode ==Mode::MultiSelector ? QAbstractItemView::MultiSelection
-                                                                                 : QAbstractItemView::SingleSelection);
+  m_table->setSelectionMode(m_mode == Mode::Edit  ? QAbstractItemView::ExtendedSelection
+                                                  : m_mode == Mode::MultiSelector ? QAbstractItemView::MultiSelection
+                                                                                  : QAbstractItemView::SingleSelection);
   m_table->setEditTriggers(QTableView::NoEditTriggers);
   m_table->setSortingEnabled(true);
   m_table->horizontalHeader()->setHighlightSections(false);
@@ -116,9 +118,8 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
 
   m_proxyModel = new QSortFilterProxyModel(this);
   m_proxyModel->setSourceModel(model);
-  m_proxyModel->setSortRole(Qt::EditRole);
+  m_proxyModel->setSortRole(Qt::DisplayRole);
 
-  m_tableName = tableName;
   m_table->setModel(m_proxyModel);
   model->select(m_table->horizontalHeader());
 
@@ -144,21 +145,13 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   if (m_table->horizontalHeader()->count() > 1)
     m_table->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
-  if (m_mode == Mode::SingleSelector || m_mode == Mode::MultiSelector)
+  if (m_mode != Mode::Edit)
   {
     m_btnOpen->hide();
     m_btnRemove->setEnabled(false);
     m_btnRemove->hide();
     m_edSearch->setFocus();
   }
-  else if (m_mode == Mode::ReadOnly)
-  {
-    m_btnOpen->hide();
-    m_btnRemove->setEnabled(false);
-    m_btnRemove->hide();
-    m_edSearch->setFocus();
-  }
-
   searchChanged();
 }
 
@@ -185,17 +178,17 @@ Id DatabaseViewer::getFirstSelectedId() const
 
 void DatabaseViewer::selectId(const Id& id)
 {
-  QVector<Id> ids;
+  Ids ids;
   ids.push_back(id);
   selectIds(ids);
 }
 
-void DatabaseViewer::selectIds(const QVector<Id>& ids)
+void DatabaseViewer::selectIds(const Ids& ids)
 {
   m_table->clearSelection();
-  for (int i = 0; i != ids.size(); ++i)
+  for (auto id : ids)
   {
-    QModelIndexList lst = m_proxyModel->match(m_proxyModel->index(0, 0), Qt::EditRole, ids.at(i).get(), 1, Qt::MatchExactly);
+    QModelIndexList lst = m_proxyModel->match(m_proxyModel->index(0, 0), Qt::EditRole, id.get(), 1, Qt::MatchExactly);
     if (lst.size() != 0)
       m_table->selectRow(lst.at(0).row());
   }
@@ -204,14 +197,14 @@ void DatabaseViewer::selectIds(const QVector<Id>& ids)
     m_table->setFocus();
 }
 
-QVector<Id> DatabaseViewer::getSelectedIds() const
+Ids DatabaseViewer::getSelectedIds() const
 {
   JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
   QModelIndexList lst = m_table->selectionModel()->selectedRows();
-  QVector<Id> ids;
-  for (int i = 0; i != lst.size(); ++i)
+  Ids ids;
+  for (auto i : lst)
   {
-    QModelIndex idx = m_proxyModel->mapToSource(lst.at(i));
+    QModelIndex idx = m_proxyModel->mapToSource(i);
     if (idx.isValid())
       ids.push_back(Id(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong()));
   }
@@ -240,7 +233,7 @@ void DatabaseViewer::refresh()
 
   m_proxyModel->invalidate();
   enableControls();
-  if (m_mode != Mode::Full)
+  if (m_mode != Mode::Edit)
     m_edSearch->setFocus();
 
   emit refreshSignal();
@@ -255,7 +248,7 @@ void DatabaseViewer::enableControls()
 
 void DatabaseViewer::removeItems()
 {
-  QVector<Id> ids = getSelectedIds();
+  Ids ids = getSelectedIds();
   JItemEx::remove(ids, m_tableName, this);
   emit itemsRemovedSignal(ids);
   refresh();

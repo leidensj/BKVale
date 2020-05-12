@@ -2,8 +2,6 @@
 #define DATABASEPICKER_H
 
 #include <QFrame>
-#include <QString>
-#include <QVector>
 #include <QSqlDatabase>
 #include "items/jitemsql.h"
 #include "databaseviewer.h"
@@ -19,23 +17,21 @@ class DatabasePicker : public QFrame
 
 public:
   explicit DatabasePicker(const QString& tableName, bool bMultiPicker = false, QWidget* parent = nullptr);
-
-  Id getId() const;
-  const QVector<Id>& getIds() const;
-  const QVector<QString>& getNames() const;
+  Id getFirstId() const;
+  QString getFirstName() const;
+  const Ids& getIds() const;
+  const Names& getNames() const;
   void setPlaceholderText(bool bSet);
   DatabaseViewer* getViewer() const;
   QString getTableText() const;
 
 public slots:
   void clear();
-  void setItems(const QVector<JItemSQL*>& v);
-  bool setItem(const JItemSQL& o);
-  bool setItem(Id id,
-               const QString& name,
-               const QByteArray& arImage);
+  bool addItem(const JItemSQL& o);
+  bool addItem(Id id, const QString& name, const QByteArray& arImage);
 
 private slots:
+  void setSelectorItems();
   void searchItem();
   void showImage();
 
@@ -47,8 +43,8 @@ private:
   DatabaseSelector* m_selector;
   JLineEdit* m_edText;
   JClickLabel* m_lblImage;
-  QVector<Id> m_ids;
-  QVector<QString> m_names;
+  Ids m_ids;
+  Names m_names;
 };
 
 #endif // DATABASEPICKER_H

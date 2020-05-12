@@ -1,9 +1,10 @@
 #include "reminder.h"
 #include <QSqlRecord>
 
-Reminder::Reminder()
+Reminder::Reminder(Id id)
 {
   clear();
+  m_id = id;
 }
 
 void Reminder::clear(bool bClearId)

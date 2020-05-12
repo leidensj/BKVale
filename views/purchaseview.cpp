@@ -284,7 +284,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   frHeader->setLayout(ltHeader);
   frHeader->setFixedHeight(frHeader->sizeHint().height());
 
-  m_edTotal = new JExpLineEdit(Data::Type::Money);
+  m_edTotal = new JExpLineEdit(Data::Type::Money, false);
   m_edTotal->setReadOnly(true);
   m_edTotal->setPlaceholderText(tr("TOTAL"));
   m_edTotal->setAlignment(Qt::AlignRight);
@@ -295,7 +295,7 @@ PurchaseView::PurchaseView(QWidget *parent)
     m_edTotal->setFont(font);
   }
 
-  m_edDisccount = new JExpLineEdit(Data::Type::Money);
+  m_edDisccount = new JExpLineEdit(Data::Type::Money, false);
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
@@ -358,12 +358,12 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.clear(true);
   _o.m_id = m_id;
   _o.m_date = m_dtPicker->getDate();
-  _o.m_supplier.m_id = m_supplierPicker->getId();
+  _o.m_supplier.m_id = m_supplierPicker->getFirstId();
   _o.m_paymentMethod = m_wPayment->getPaymentMethod();
   _o.m_vPayment = m_wPayment->getPayments();
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->getValue();
-  _o.m_store.m_id = m_storePicker->getId();
+  _o.m_store.m_id = m_storePicker->getFirstId();
   m_table->getPurchaseElements(_o.m_vElement);
 }
 
@@ -376,7 +376,7 @@ void PurchaseView::setItem(const JItemSQL& o)
     Store store(Id(settings.value(SETTINGS_PURCHASE_STORE_ID).toLongLong()));
     QString error;
     if (store.SQL_select(error))
-      m_storePicker->setItem(store);
+      m_storePicker->addItem(store);
   }
   m_table->removeAllItems();
   m_supplierPicker->clear();
@@ -384,7 +384,7 @@ void PurchaseView::setItem(const JItemSQL& o)
 
   m_snNumber->setValue(_o.m_number);
   m_table->setPurchaseElements(_o.m_vElement);
-  m_supplierPicker->setItem(_o.m_supplier);
+  m_supplierPicker->addItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);
   m_edDisccount->setText(_o.m_disccount);
 
@@ -397,7 +397,7 @@ void PurchaseView::setItem(const JItemSQL& o)
 
 void PurchaseView::supplierChanged()
 {
-  m_table->setSupplierId(m_supplierPicker->getId());
+  m_table->setSupplierId(m_supplierPicker->getFirstId());
   /*if (m_supplierPicker->getId().isValid() && !m_table->hasItems() && !m_id.isValid())
     m_btnAddRemove->m_btnAdd->click();*/
   updateControls();
@@ -409,7 +409,7 @@ void PurchaseView::updateControls()
   double total = m_table->sum((int)PurchaseTable::Column::SubTotal) + m_edDisccount->getValue();
   m_edTotal->setText(total);
   m_tab->setTabIcon(1, m_wPayment->getIcon());
-  m_btnHistory->setEnabled(m_supplierPicker->getId().isValid());
+  m_btnHistory->setEnabled(m_supplierPicker->getFirstId().isValid());
 }
 
 bool PurchaseView::save(Id& id)
@@ -462,7 +462,7 @@ void PurchaseView::setItem()
   JItemView::setItem();
 }
 
-void PurchaseView::itemsRemoved(const QVector<Id>& ids)
+void PurchaseView::itemsRemoved(const Ids& ids)
 {
   JItemView::itemsRemoved(ids);
   if (ids.contains(m_lastId))
@@ -495,16 +495,16 @@ void PurchaseView::showHistory()
               " FROM " PURCHASE_SQL_TABLE_NAME
               " WHERE "
               PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " = " +
-              m_supplierPicker->getId().str() + "))");
+              m_supplierPicker->getFirstId().str() + "))");
   dlg.getViewer()->setFixedFilter(str);
   if (dlg.exec())
   {
-    QVector<Id> ids = dlg.getViewer()->getSelectedIds();
+    Ids ids = dlg.getViewer()->getSelectedIds();
     QVector<PurchaseElement> v;
-    for (int i = 0; i != ids.size(); ++i)
+    for (auto id : ids)
     {
       PurchaseElement e;
-      e.SQL_select_last(m_supplierPicker->getId(), ids.at(i));
+      e.SQL_select_last(m_supplierPicker->getFirstId(), id);
       e.m_ammount = 0;
       v.push_back(e);
     }

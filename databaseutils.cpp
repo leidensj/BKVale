@@ -79,7 +79,7 @@ bool BaitaSQL::init(const QString& hostName,
                     int port,
                     QString& error)
 {
-  QSqlDatabase db = QSqlDatabase::database(POSTGRE_CONNECTION_NAME);
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   bool bSuccess = db.isValid();
   if (bSuccess)
   {

@@ -35,24 +35,25 @@ class DatabaseViewer : public QWidget
 public:
   enum class Mode
   {
-    Full,
+    Edit,
     SingleSelector,
     MultiSelector,
     ReadOnly
   };
 
-  explicit DatabaseViewer(const QString& tableName,
-                          Mode mode = Mode::Full,
-                          QWidget *parent = nullptr);
+  explicit DatabaseViewer(const QString& tableName, Mode mode, QWidget *parent = nullptr);
   ~DatabaseViewer();
   QString getTableName() const;
-  QVector<Id> getSelectedIds() const;
+  Ids getSelectedIds() const;
   Id getFirstSelectedId() const;
   int getRowCount() const;
   double getSum(int column) const;
   void selectId(const Id& id);
-  void selectIds(const QVector<Id>& ids);
+  void selectIds(const Ids& ids);
   QPushButton* addButton(const QString& toolTip, const QIcon& icon, int shortcut = 0);
+
+  const Mode m_mode;
+  const QString m_tableName;
 
 public slots:
   void refresh();
@@ -61,7 +62,6 @@ public slots:
   void clearSearch();
 
 private:
-  const Mode m_mode;
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
@@ -69,7 +69,6 @@ private:
   JLineEdit* m_edSearch;
   QCheckBox* m_cbContains;
   JEnterSignalTable* m_table;
-  QString m_tableName;
   QString m_dynamicFilter;
   QString m_fixedFilter;
   QSortFilterProxyModel* m_proxyModel;
@@ -86,7 +85,7 @@ private slots:
 
 signals:
   void itemsSelectedSignal();
-  void itemsRemovedSignal(const QVector<Id>& ids);
+  void itemsRemovedSignal(const Ids& ids);
   void currentRowChangedSignal(int row);
   void refreshSignal();
 };

@@ -62,12 +62,12 @@ void TimeCardDialog::updateControls()
 {
   QPushButton* pt = m_buttons->button(QDialogButtonBox::Save);
   if (pt != nullptr)
-    pt->setEnabled(m_storePicker->getId().isValid());
+    pt->setEnabled(m_storePicker->getFirstId().isValid());
 }
 
 void TimeCardDialog::saveAndAccept()
 {
-  Store o(m_storePicker->getId());
+  Store o(m_storePicker->getFirstId());
   QString error;
   // TODO
   if (!o.m_id.isValid() || !o.SQL_select(error))

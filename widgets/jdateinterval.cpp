@@ -62,11 +62,21 @@ JDateInterval::JDateInterval(QWidget *parent)
   connect(m_btnMonth, SIGNAL(clicked(bool)), this, SLOT(month()));
   connect(m_btnWeek, SIGNAL(clicked(bool)), this, SLOT(week()));
   connect(m_btnDay, SIGNAL(clicked(bool)), this, SLOT(day()));
-  connect(m_dtInit, SIGNAL(dateChanged(const QDate&)), this, SLOT(initialDateChanged(const QDate&)));
-  connect(m_dtFinal, SIGNAL(dateChanged(const QDate&)), this, SLOT(finalDateChanged(const QDate&)));
+  connect(m_dtInit, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitInitialDateChangedSignal(const QDate&)));
+  connect(m_dtFinal, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitFinalDateChangedSignal(const QDate&)));
 
   day();
   setLayout(ltMain);
+}
+
+void JDateInterval::emitInitialDateChangedSignal(const QDate& dt)
+{
+  emit initialDateChangedSignal(dt);
+}
+
+void JDateInterval::emitFinalDateChangedSignal(const QDate& dt)
+{
+  emit finalDateChangedSignal(dt);
 }
 
 void JDateInterval::year()

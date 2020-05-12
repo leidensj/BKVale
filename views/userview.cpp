@@ -29,21 +29,20 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
   lblPassword->setMaximumSize(24, 24);
   lblPassword->setScaledContents(true);
 
-  m_user = new JLineEdit(Text::Input::Alphanumeric, JLineEdit::st_defaultFlags1);
+  m_user = new JLineEdit(Text::Input::Alphanumeric, true);
   m_user->setPlaceholderText(tr("Usuário"));
   m_user->setMaxLength(USER_MAX_USERNAME_LENGTH);
 
   m_lblPasswordMsg = new QLabel;
   m_lblPasswordMsg->setText(tr("Redefinir a senha:"));
 
-  m_password = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags2);
+  m_password = new JLineEdit(Text::Input::All, false);
   m_password->setPlaceholderText(tr("Senha"));
   m_user->setMaxLength(USER_MAX_PASSWORD_LENGTH);
   m_password->setEchoMode(QLineEdit::EchoMode::Password);
 
   m_viewPassword = new QPushButton;
   m_viewPassword->setFlat(true);
-  m_viewPassword->setText("");
   m_viewPassword->setIconSize(QSize(16, 16));
   m_viewPassword->setIcon(QIcon(":/icons/res/view.png"));
   m_viewPassword->setCheckable(true);
@@ -178,7 +177,7 @@ void UserView::viewPassword(bool b)
                              : QLineEdit::EchoMode::Password);
 }
 
-void UserView::itemsRemoved(const QVector<Id>& ids)
+void UserView::itemsRemoved(const Ids& ids)
 {
   if (!m_bHasLoggedUserChanged)
     m_bHasLoggedUserChanged = ids.contains(m_bHasLoggedUserChanged);

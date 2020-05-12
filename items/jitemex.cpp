@@ -292,7 +292,7 @@ bool JItemEx::remove(const Id& id, const QString& tableName, bool bNeedsConfirma
   return bSuccess;
 }
 
-void JItemEx::remove(const QVector<Id>& ids, const QString& tableName, QWidget* parent)
+void JItemEx::remove(const Ids& ids, const QString& tableName, QWidget* parent)
 {
   if (ids.size() == 0)
     return;

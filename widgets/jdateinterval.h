@@ -23,9 +23,13 @@ public slots:
   void week();
   void day();
 
+private slots:
+  void emitInitialDateChangedSignal(const QDate& dt);
+  void emitFinalDateChangedSignal(const QDate& dt);
+
 signals:
-  void initialDateChanged(const QDate& dt);
-  void finalDateChanged(const QDate& dt);
+  void initialDateChangedSignal(const QDate& dt);
+  void finalDateChangedSignal(const QDate& dt);
 
 private:
   QPushButton* m_btnYear;

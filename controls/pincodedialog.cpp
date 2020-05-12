@@ -30,7 +30,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
   setWindowTitle(tr("Selecionar Funcionário"));
   m_btn7 = new QPushButton;
   m_btn7->setFlat(true);
-  m_btn7->setText("");
   m_btn7->setIconSize(QSize(64, 64));
   m_btn7->setIcon(QIcon(":/icons/res/calc7.png"));
   m_btn7->setShortcut(QKeySequence(Qt::Key_7));
@@ -38,7 +37,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn8 = new QPushButton;
   m_btn8->setFlat(true);
-  m_btn8->setText("");
   m_btn8->setIconSize(QSize(64, 64));
   m_btn8->setIcon(QIcon(":/icons/res/calc8.png"));
   m_btn8->setShortcut(QKeySequence(Qt::Key_8));
@@ -46,7 +44,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn9 = new QPushButton;
   m_btn9->setFlat(true);
-  m_btn9->setText("");
   m_btn9->setIconSize(QSize(64, 64));
   m_btn9->setIcon(QIcon(":/icons/res/calc9.png"));
   m_btn9->setShortcut(QKeySequence(Qt::Key_9));
@@ -60,7 +57,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn4 = new QPushButton;
   m_btn4->setFlat(true);
-  m_btn4->setText("");
   m_btn4->setIconSize(QSize(64, 64));
   m_btn4->setIcon(QIcon(":/icons/res/calc4.png"));
   m_btn4->setShortcut(QKeySequence(Qt::Key_4));
@@ -68,7 +64,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn5 = new QPushButton;
   m_btn5->setFlat(true);
-  m_btn5->setText("");
   m_btn5->setIconSize(QSize(64, 64));
   m_btn5->setIcon(QIcon(":/icons/res/calc5.png"));
   m_btn5->setShortcut(QKeySequence(Qt::Key_5));
@@ -76,7 +71,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn6 = new QPushButton;
   m_btn6->setFlat(true);
-  m_btn6->setText("");
   m_btn6->setIconSize(QSize(64, 64));
   m_btn6->setIcon(QIcon(":/icons/res/calc6.png"));
   m_btn6->setShortcut(QKeySequence(Qt::Key_6));
@@ -90,7 +84,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn1 = new QPushButton;
   m_btn1->setFlat(true);
-  m_btn1->setText("");
   m_btn1->setIconSize(QSize(64, 64));
   m_btn1->setIcon(QIcon(":/icons/res/calc1.png"));
   m_btn1->setShortcut(QKeySequence(Qt::Key_1));
@@ -98,7 +91,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn2 = new QPushButton;
   m_btn2->setFlat(true);
-  m_btn2->setText("");
   m_btn2->setIconSize(QSize(64, 64));
   m_btn2->setIcon(QIcon(":/icons/res/calc2.png"));
   m_btn2->setShortcut(QKeySequence(Qt::Key_2));
@@ -106,7 +98,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn3 = new QPushButton;
   m_btn3->setFlat(true);
-  m_btn3->setText("");
   m_btn3->setIconSize(QSize(64, 64));
   m_btn3->setIcon(QIcon(":/icons/res/calc3.png"));
   m_btn3->setShortcut(QKeySequence(Qt::Key_3));
@@ -120,7 +111,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btnClr = new QPushButton;
   m_btnClr->setFlat(true);
-  m_btnClr->setText("");
   m_btnClr->setIconSize(QSize(64, 64));
   m_btnClr->setIcon(QIcon(":/icons/res/calcclr.png"));
   m_btnClr->setShortcut(QKeySequence(Qt::Key_Backspace));
@@ -128,7 +118,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btn0 = new QPushButton;
   m_btn0->setFlat(true);
-  m_btn0->setText("");
   m_btn0->setIconSize(QSize(64, 64));
   m_btn0->setIcon(QIcon(":/icons/res/calc0.png"));
   m_btn0->setShortcut(QKeySequence(Qt::Key_0));
@@ -136,7 +125,6 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
 
   m_btnEnter = new QPushButton;
   m_btnEnter->setFlat(true);
-  m_btnEnter->setText("");
   m_btnEnter->setIconSize(QSize(64, 64));
   m_btnEnter->setIcon(QIcon(":/icons/res/ok.png"));
   m_btnEnter->setProperty(BUTTON_CODE, Qt::Key_Enter);

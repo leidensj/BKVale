@@ -1,8 +1,9 @@
 #include "phone.h"
 
-Phone::Phone()
+Phone::Phone(Id id)
 {
   clear();
+  m_id = id;
 }
 
 void Phone::clear(bool bClearId)

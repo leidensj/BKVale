@@ -2,13 +2,18 @@
 #include "libraries/tinyexpr.h"
 #include "jregexpvalidator.h"
 
-JLineEdit::JLineEdit(Text::Input input, int flags, QWidget* parent)
+JLineEdit::JLineEdit(Text::Input input, bool bToUpper, QWidget* parent)
   : QLineEdit(parent)
-  , m_flags(flags)
+  , m_bToUpper(bToUpper)
+  , m_bArrowsAndEnterAsTab(true)
 {
   if (input != Text::Input::All)
-    setValidator(new JRegExpValidator(flags & (int)Flags::ToUpper,
-                                      QRegExp(getRegEx(input)), this));
+    setValidator(new JRegExpValidator(bToUpper, QRegExp(getRegEx(input)), this));
+}
+
+void JLineEdit::setArrowsAndEnterAsTab(bool b)
+{
+  m_bArrowsAndEnterAsTab = b;
 }
 
 void JLineEdit::keyPressEvent(QKeyEvent *event)
@@ -18,19 +23,19 @@ void JLineEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Enter:
     case Qt::Key_Return:
     {
-      if (m_flags & (int)Flags::EnterAsTab)
+      if (m_bArrowsAndEnterAsTab)
         focusNextChild();
       emit enterSignal();
     } break;
     case Qt::Key_Down:
     {
-      if (m_flags & (int)Flags::ArrowsAsTab)
+      if (m_bArrowsAndEnterAsTab)
         focusNextChild();
       emit keyDownSignal();
     } break;
     case Qt::Key_Up:
     {
-      if (m_flags && (int)Flags::ArrowsAsTab)
+      if (m_bArrowsAndEnterAsTab)
         focusPreviousChild();
       emit keyUpSignal();
     } break;
@@ -51,11 +56,8 @@ void JLineEdit::setTextBlockingSignals(const QString& str)
   blockSignals(false);
 }
 
-JExpLineEdit::JExpLineEdit(Data::Type type,
-                           int flags,
-                           double defaultValue,
-                           QWidget* parent)
-  : JLineEdit(Text::Input::All, flags, parent)
+JExpLineEdit::JExpLineEdit(Data::Type type, bool bToUpper, double defaultValue, QWidget* parent)
+  : JLineEdit(Text::Input::All, bToUpper, parent)
   , m_dataType(type)
   , m_defaultValue(defaultValue)
   , m_currentValue(defaultValue)

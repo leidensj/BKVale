@@ -13,9 +13,10 @@ void Address::clear(bool bClearId)
   m_reference.clear();
 }
 
-Address::Address()
+Address::Address(Id id)
 {
   clear();
+  m_id = id;
 }
 
 bool Address::operator !=(const JItem& other) const

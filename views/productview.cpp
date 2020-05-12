@@ -24,18 +24,15 @@ ProductView::ProductView(QWidget* parent)
   , m_btns(nullptr)
   , m_actUnity(nullptr)
 {
-  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces,
-                           JLineEdit::st_defaultFlags1);
+  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces, true);
   m_edName->setMaxLength(PRODUCT_MAX_NAME_LENGTH);
   m_edName->setPlaceholderText("*");
 
-  m_edUnity = new JLineEdit(Text::Input::Alphanumeric,
-                            JLineEdit::st_defaultFlags1);
+  m_edUnity = new JLineEdit(Text::Input::Alphanumeric, true);
   m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
   m_edUnity->setPlaceholderText("*");
 
-  m_edDetails = new JLineEdit(Text::Input::AlphanumericAndSpaces,
-                              JLineEdit::st_defaultFlags1);
+  m_edDetails = new JLineEdit(Text::Input::AlphanumericAndSpaces, true);
   m_edDetails->setMaxLength(PRODUCT_MAX_DETAILS_LENGTH);
 
   m_cbBuy = new QCheckBox;
@@ -100,8 +97,8 @@ void ProductView::getItem(JItemSQL& o) const
   _o.m_details = m_edDetails->text();
   _o.m_bBuy = m_cbBuy->isChecked();
   _o.m_bSell = m_cbSell->isChecked();
-  _o.m_category.m_id = m_categoryPicker->getId();
-  _o.m_image.m_id = m_imagePicker->getId();
+  _o.m_category.m_id = m_categoryPicker->getFirstId();
+  _o.m_image.m_id = m_imagePicker->getFirstId();
   m_tbCode->getCodes(_o.m_vCode);
 }
 
@@ -113,8 +110,8 @@ void ProductView::setItem(const JItemSQL &o)
   m_edDetails->setText(_o.m_details);
   m_cbBuy->setChecked(_o.m_bBuy);
   m_cbSell->setChecked(_o.m_bSell);
-  m_categoryPicker->setItem(_o.m_category);
-  m_imagePicker->setItem(_o.m_image);
+  m_categoryPicker->addItem(_o.m_category);
+  m_imagePicker->addItem(_o.m_image);
   m_tbCode->setCodes(_o.m_vCode);
   const bool bNewItem = _o.m_id.isValid();
   m_edUnity->setReadOnly(bNewItem);

@@ -35,7 +35,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formDetails = new FormDetailsEditor;
   m_formPhone = new FormPhoneEditor;
   m_formAddress= new FormAddressEditor;
-  m_edPincode = new JLineEdit(Text::Input::Alphanumeric);
+  m_edPincode = new JLineEdit(Text::Input::Alphanumeric, false);
   m_btnAddRemove = new JAddRemoveButtons;
   m_tbHours = new EmployeeHoursTable(m_btnAddRemove);
 

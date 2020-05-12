@@ -8,7 +8,7 @@
 
 struct Phone : public JItemSQL
 {
-  Phone();
+  Phone(Id id = Id());
   void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;

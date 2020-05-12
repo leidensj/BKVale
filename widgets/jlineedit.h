@@ -11,31 +11,16 @@ class JLineEdit : public QLineEdit
   Q_OBJECT
 
 public:
-  enum class Flags
-  {
-    ToUpper = 1 << 0,
-    EnterAsTab = 1 << 1,
-    ArrowsAsTab = 1 << 2,
-  };
-
-  static const int st_defaultFlags1 = (int)Flags::ToUpper |
-                                      (int)Flags::EnterAsTab |
-                                      (int)Flags::ArrowsAsTab;
-  static const int st_defaultFlags2 = (int)Flags::EnterAsTab |
-                                      (int)Flags::ArrowsAsTab;
-
-  explicit JLineEdit(Text::Input input,
-                     int flags = st_defaultFlags2,
-                     QWidget* parent = nullptr);
-
+  explicit JLineEdit(Text::Input input, bool bToUpper, QWidget* parent = nullptr);
   void setTextBlockingSignals(const QString& str);
+  void setArrowsAndEnterAsTab(bool b);
 
 protected:
   void keyPressEvent(QKeyEvent *event);
 
 private:
-  const int m_flags;
-
+  const bool m_bToUpper;
+  bool m_bArrowsAndEnterAsTab;
 signals:
   void enterSignal();
   void keyDownSignal();
@@ -48,11 +33,7 @@ class JExpLineEdit : public JLineEdit
   Q_OBJECT
 
 public:
-  JExpLineEdit(Data::Type type = Data::Type::Fmt,
-               int flags = st_defaultFlags1,
-               double defaultValue = 0.0,
-               QWidget* parent = nullptr);
-
+  JExpLineEdit(Data::Type type, bool bToUpper, double defaultValue = 0.0, QWidget* parent = nullptr);
   double getValue() const;
   void setText(const QString& text);
   void setText(double val);

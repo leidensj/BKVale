@@ -339,14 +339,13 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
                   " WHERE " ADDRESS_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
-    QVector<Id> ids;
+    Ids ids;
     while (bSuccess && query.next())
       ids.push_back(Id(query.value(0).toLongLong()));
 
-    for (int i = 0; i != ids.size(); ++i)
+    for (auto id : ids)
     {
-      Address o;
-      o.m_id.set(ids.at(i).get());
+      Address o(id);
       bSuccess = o.SQL_select_proc(query, error);
       if (!bSuccess)
         break;
@@ -362,14 +361,13 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
                   " WHERE " PHONE_SQL_COL01 " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
-    QVector<Id> ids;
+    Ids ids;
     while (bSuccess && query.next())
       ids.push_back(Id(query.value(0).toLongLong()));
 
-    for (int i = 0; i != ids.size(); ++i)
+    for (auto id : ids)
     {
-      Phone o;
-      o.m_id.set(ids.at(i).get());
+      Phone o(id);
       bSuccess = o.SQL_select_proc(query, error);
       if (!bSuccess)
         break;

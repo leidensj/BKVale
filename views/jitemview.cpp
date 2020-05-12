@@ -65,7 +65,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   setLayout(mainLayout);
 
-  m_viewer = new DatabaseViewer(tableName);
+  m_viewer = new DatabaseViewer(tableName, DatabaseViewer::Mode::Edit);
   m_dlgDb = new QDialog(this);
 
   QVBoxLayout* ltDb = new QVBoxLayout;
@@ -91,7 +91,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
   connect(m_viewer, SIGNAL(itemsSelectedSignal()), this, SLOT(setItem()));
   connect(m_viewer, SIGNAL(itemsSelectedSignal()), m_dlgDb, SLOT(accept()));
-  connect(m_viewer, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
+  connect(m_viewer, SIGNAL(itemsRemovedSignal(const Ids&)), this, SLOT(itemsRemoved(const Ids&)));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
 
   setMinimumWidth(600);
@@ -128,7 +128,7 @@ void JItemView::setItem()
   }
 }
 
-void JItemView::itemsRemoved(const QVector<Id>& ids)
+void JItemView::itemsRemoved(const Ids& ids)
 {
   if (ids.contains(getId()))
     clear();

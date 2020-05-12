@@ -12,7 +12,7 @@ CategoryView::CategoryView(QWidget* parent)
 {
   addViewButton(IMAGE_SQL_TABLE_NAME);
 
-  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces, true);
   m_edName->setPlaceholderText(tr("*"));
   m_edName->setMaxLength(CATEGORY_MAX_NAME_LENGTH);
 
@@ -34,7 +34,7 @@ void CategoryView::getItem(JItemSQL& o) const
   Category& _o = dynamic_cast<Category&>(o);
   _o.clear(true);
   _o.m_id = m_id;
-  _o.m_image.m_id = m_imagePicker->getId();
+  _o.m_image.m_id = m_imagePicker->getFirstId();
   _o.m_name = m_edName->text();
 }
 
@@ -42,5 +42,5 @@ void CategoryView::setItem(const JItemSQL& o)
 {
   const Category& _o = static_cast<const Category&>(o);
   m_edName->setText(_o.m_name);
-  m_imagePicker->setItem(_o.m_image);
+  m_imagePicker->addItem(_o.m_image);
 }

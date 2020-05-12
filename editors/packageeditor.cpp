@@ -23,10 +23,10 @@ PackageEditor::PackageEditor(bool bUnityEditor, QWidget* parent)
   m_grpIsPackage->setChecked(false);
   m_grpIsPackage->setTitle(tr("Utilizar outra unidade"));
 
-  m_edUnity = new JLineEdit(Text::Input::Alphanumeric, JLineEdit::st_defaultFlags1);
+  m_edUnity = new JLineEdit(Text::Input::Alphanumeric, true);
   m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
 
-  m_edAmmount = new JExpLineEdit(Data::Type::Ammount);
+  m_edAmmount = new JExpLineEdit(Data::Type::Ammount, false);
   m_lblUnity = new QLabel;
 
   QHBoxLayout* ltAmmount = new QHBoxLayout;

@@ -39,8 +39,8 @@ FormInfoEditor::FormInfoEditor(QWidget* parent)
   m_rdoPerson->setChecked(true);
   m_rdoCompany = new QRadioButton;
   m_rdoCompany->setText(tr("Jurídica"));
-  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
-  m_edAlias = new JLineEdit(Text::Input::AlphanumericAndSpaces, JLineEdit::st_defaultFlags1);
+  m_edName = new JLineEdit(Text::Input::AlphanumericAndSpaces, true);
+  m_edAlias = new JLineEdit(Text::Input::AlphanumericAndSpaces, true);
   m_lblName = new QLabel;
   m_lblAlias = new QLabel;
   m_lblCreationDate = new QLabel(tr("Data de criação:"));
@@ -131,11 +131,11 @@ FormDetailsEditor::FormDetailsEditor(QWidget* parent)
   , m_cbBirthDate(nullptr)
   , m_imagePicker(nullptr)
 {
-  m_edCpfCnpj = new JLineEdit(Text::Input::Numeric, JLineEdit::st_defaultFlags2);
-  m_edRgIE= new JLineEdit(Text::Input::Numeric, JLineEdit::st_defaultFlags2);
+  m_edCpfCnpj = new JLineEdit(Text::Input::Numeric, false);
+  m_edRgIE= new JLineEdit(Text::Input::Numeric, false);
   m_lblCpfCnpj = new QLabel;
   m_lblRgIE = new QLabel;
-  m_edEmail = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags2);
+  m_edEmail = new JLineEdit(Text::Input::All, false);
   m_teDetails = new JPlainTextEdit;
   m_dtBirthDate = new QDateEdit;
   m_dtBirthDate->setCalendarPopup(true);
@@ -164,7 +164,7 @@ void FormDetailsEditor::setForm(const Form& o)
   m_strPreviousCpfCnpj = o.m_CPF_CNPJ;
   m_strPreviousRgIE = o.m_RG_IE;
 
-  m_imagePicker->setItem(o.m_image);
+  m_imagePicker->addItem(o.m_image);
   m_edEmail->setText(o.m_email);
   m_edCpfCnpj->setText(o.m_CPF_CNPJ);
   m_edRgIE->setText(o.m_RG_IE);
@@ -176,7 +176,7 @@ void FormDetailsEditor::setForm(const Form& o)
 
 void FormDetailsEditor::fillForm(Form& o) const
 {
-  o.m_image.m_id = m_imagePicker->getId();
+  o.m_image.m_id = m_imagePicker->getFirstId();
   o.m_email = m_edEmail->text();
   o.m_CPF_CNPJ = m_edCpfCnpj->text();
   o.m_RG_IE = m_edRgIE->text();

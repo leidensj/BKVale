@@ -18,6 +18,8 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   , m_cbPaymentBonus(nullptr)
 {
   m_dtInt = new JDateInterval;
+  m_dtInt->layout()->setContentsMargins(0, 9, 0, 0);
+  m_dtInt->setFlat(true);
   m_supplierPicker = new DatabasePicker(SUPPLIER_SQL_TABLE_NAME, true);
   m_productPicker = new DatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
   m_productPicker->getViewer()->setFixedFilter(PRODUCT_FILTER_BUY);
@@ -50,8 +52,8 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   m_fr->setLayout(ltv);
 
   connect(m_dtInt, SIGNAL(toggled(bool)), this, SLOT(emitFilterChangedSignal()));
-  connect(m_dtInt, SIGNAL(initialDateChanged(const QDate&)), this, SLOT(emitFilterChangedSignal()));
-  connect(m_dtInt, SIGNAL(finalDateChanged(const QDate&)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_dtInt, SIGNAL(initialDateChangedSignal(const QDate&)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_dtInt, SIGNAL(finalDateChangedSignal(const QDate&)), this, SLOT(emitFilterChangedSignal()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_productPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
@@ -74,12 +76,12 @@ QString PurchaseFilter::getDateFilter() const
 QString PurchaseFilter::getSupplierFilter() const
 {
   QString str;
-  QVector<Id> vSupplier = m_supplierPicker->getIds();
-  if (!vSupplier.isEmpty())
+  Ids ids = m_supplierPicker->getIds();
+  if (!ids.isEmpty())
   {
     str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " IN (";
-    for (int i = 0; i != vSupplier.size(); ++i)
-      str += vSupplier.at(i).str() + ",";
+    for (auto id : ids)
+      str += id.str() + ",";
     str.chop(1);
     str += ") ";
   }
@@ -89,15 +91,15 @@ QString PurchaseFilter::getSupplierFilter() const
 QString PurchaseFilter::getProductFilter() const
 {
   QString str;
-  QVector<Id> vProduct = m_productPicker->getIds();
-  if (!vProduct.isEmpty())
+  Ids ids = m_productPicker->getIds();
+  if (!ids.isEmpty())
   {
     str += " " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
            " = ANY (SELECT " PURCHASE_ELEMENTS_SQL_COL_NID " FROM "
            PURCHASE_ELEMENTS_SQL_TABLE_NAME " WHERE "
            PURCHASE_ELEMENTS_SQL_COL_PID " IN (";
-    for (int i = 0; i != vProduct.size(); ++i)
-      str += vProduct.at(i).str() + ",";
+    for (auto id : ids)
+      str += id.str() + ",";
     str.chop(1);
     str += ")) ";
   }
@@ -107,13 +109,13 @@ QString PurchaseFilter::getProductFilter() const
 QString PurchaseFilter::getStoreFilter() const
 {
   QString str;
-  QVector<Id> vStore = m_storePicker->getIds();
-  if (!vStore.isEmpty())
+  Ids ids = m_storePicker->getIds();
+  if (!ids.isEmpty())
   {
     str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_STR
                  " IN (";
-    for (int i = 0; i != vStore.size(); ++i)
-      str += vStore.at(i).str() + ",";
+    for (auto id : ids)
+      str += id.str() + ",";
     str.chop(1);
     str += ") ";
   }

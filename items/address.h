@@ -23,7 +23,7 @@ struct Address : public JItemSQL
     QString m_mask;
   };
 
-  Address();
+  Address(Id id = Id());
   void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;

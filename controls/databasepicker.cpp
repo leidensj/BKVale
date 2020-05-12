@@ -23,7 +23,7 @@ DatabasePicker::DatabasePicker(const QString& tableName,
  , m_edText(nullptr)
  , m_lblImage(nullptr)
 {
-  m_edText = new JLineEdit(Text::Input::All, JLineEdit::st_defaultFlags1);
+  m_edText = new JLineEdit(Text::Input::All, true);
   m_edText->setReadOnly(true);
   QIcon searchIcon = QIcon(JItemEx::icon(tableName));
   QAction* action = m_edText->addAction(searchIcon.isNull() ? QIcon(":/icons/res/binoculars.png") : searchIcon, QLineEdit::LeadingPosition);
@@ -52,7 +52,7 @@ DatabasePicker::DatabasePicker(const QString& tableName,
   connect(action2, SIGNAL(triggered(bool)), this, SLOT(clear()));
   connect(m_edText, SIGNAL(deleteSignal()), this, SLOT(clear()));
   connect(m_edText, SIGNAL(enterSignal()), this, SLOT(searchItem()));
-  connect(m_selector->getViewer(), SIGNAL(itemsSelectedSignal(const QVector<JItemSQL*>&)), this, SLOT(setItems(const QVector<JItemSQL*>&)));
+  connect(m_selector, SIGNAL(accepted()), this, SLOT(setSelectorItems()));
   connect(m_lblImage, SIGNAL(clicked()), this, SLOT(showImage()));
   clear();
 }
@@ -62,58 +62,53 @@ DatabaseViewer* DatabasePicker::getViewer() const
   return m_selector->getViewer();
 }
 
-void DatabasePicker::setItems(const QVector<JItemSQL*>& v)
+void DatabasePicker::setSelectorItems()
 {
-  m_selector->close();
   clear();
   bool bChanged = false;
-  for (int i = 0; i != v.size(); ++i)
+  Ids ids(m_selector->getViewer()->getSelectedIds());
+  for (auto id : ids)
   {
-    if (v.at(i) == nullptr)
-      continue;
-    if (setItem(*v.at(i)))
-      bChanged = true;
+    auto p = JItemEx::create(m_selector->getViewer()->getTableName(), id);
+    if (p != nullptr && p->m_id.isValid())
+    {
+      if (JItemEx::select(*p))
+      {
+        addItem(*p);
+        bChanged = true;
+      }
+      delete p;
+    }
   }
   if (bChanged)
     emit changedSignal();
 }
 
-bool DatabasePicker::setItem(const JItemSQL& o)
+bool DatabasePicker::addItem(const JItemSQL& o)
 {
-  return setItem(o.m_id, o.name(), o.image());
+  return addItem(o.m_id, o.name(), o.image());
 }
 
-bool DatabasePicker::setItem(Id id, const QString& name, const QByteArray& arImage)
+bool DatabasePicker::addItem(Id id, const QString& name, const QByteArray& arImage)
 {
   if (m_bMultiPicker)
   {
     bool bFound = false;
     if (id.isValid())
     {
-      for (int i = 0; i != m_ids.size(); ++i)
-      {
-        if (m_ids.at(i) == id)
-        {
-          bFound = true;
-          break;
-        }
-      }
-
+      bFound = m_ids.contains(id);
       if (!bFound)
       {
         m_ids.push_back(id);
         m_names.push_back(name);
         QString str, strTooltip;
-        for (int i = 0; i != m_names.size(); ++i)
+        for (auto name : m_names)
         {
-          str += m_names.at(i);
-          strTooltip += m_names.at(i);
-          if (i != (m_names.size() - 1))
-          {
-            str += "; ";
-            strTooltip += "\n";
-          }
+          str += name + "; ";
+          strTooltip += name + "\n";
         }
+        str.chop(2);
+        strTooltip.chop(1);
         m_edText->setText(str);
         m_edText->setToolTip(strTooltip);
       }
@@ -123,7 +118,7 @@ bool DatabasePicker::setItem(Id id, const QString& name, const QByteArray& arIma
   else
   {
     Id previousId;
-    previousId.set(m_ids.isEmpty() ? INVALID_ID : m_ids.at(0).get());
+    previousId = m_ids.isEmpty() ? INVALID_ID : m_ids.at(0);
     m_ids.clear();
     m_names.clear();
     m_ids.push_back(id);
@@ -162,17 +157,22 @@ void DatabasePicker::clear()
     emit changedSignal();
 }
 
-Id DatabasePicker::getId() const
+Id DatabasePicker::getFirstId() const
 {
-  return Id(m_bMultiPicker ? INVALID_ID : m_ids.isEmpty() ? INVALID_ID : m_ids.at(0));
+  return Id(m_ids.isEmpty() ? INVALID_ID : m_ids.at(0));
 }
 
-const QVector<Id>& DatabasePicker::getIds() const
+QString DatabasePicker::getFirstName() const
+{
+  return m_names.isEmpty() ? "" : m_names.at(0);
+}
+
+const Ids& DatabasePicker::getIds() const
 {
   return m_ids;
 }
 
-const QVector<QString>& DatabasePicker::getNames() const
+const Names& DatabasePicker::getNames() const
 {
   return m_names;
 }

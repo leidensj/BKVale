@@ -1,4 +1,5 @@
 #include "sqlitem.h"
+#include "items/jitemex.h"
 #include "controls/databaseselector.h"
 
 SQLItem::SQLItem(const QString& tableName, const QString& filter)
@@ -15,9 +16,15 @@ void SQLItem::activate()
   dlg.getViewer()->setFixedFilter(m_filter);
   if (dlg.exec())
   {
-    JItemSQL* p = dlg.getViewer()->getCurrentItem();
+    auto p = JItemEx::create(m_tableName);
     if (p != nullptr)
-      setValue(SQLItem::st_toVariant(*p));
+    {
+      p->m_id = dlg.getViewer()->getFirstSelectedId();
+      QString error;
+      if (p->SQL_select(error))
+        setValue(SQLItem::st_toVariant(*p));
+      delete p;
+    }
   }
 }
 

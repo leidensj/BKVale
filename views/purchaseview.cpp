@@ -430,7 +430,7 @@ bool PurchaseView::save(Id& id)
     return false;
   }
 
-  bool bSuccess = m_viewer->save(o);
+  bool bSuccess = JItemEx::save(o, m_viewer->getTableName(), this);
   if (bSuccess)
   {
     if (o.m_store.m_id.isValid())
@@ -449,15 +449,17 @@ bool PurchaseView::save(Id& id)
 void PurchaseView::lastItemSelected()
 {
   if (m_lastId.isValid())
+  {
     m_viewer->selectId(m_lastId);
-  selectItem(Purchase(m_lastId));
+    setItem();
+  }
 }
 
-void PurchaseView::selectItem(const JItemSQL& o)
+void PurchaseView::setItem()
 {
-  if (!m_lastId.isValid() || o.m_id.isValid())
-    m_lastId = o.m_id;
-  JItemView::selectItem(o);
+  if (!m_lastId.isValid() || m_viewer->getFirstSelectedId().isValid())
+    m_lastId = m_viewer->getFirstSelectedId();
+  JItemView::setItem();
 }
 
 void PurchaseView::itemsRemoved(const QVector<Id>& ids)
@@ -497,12 +499,12 @@ void PurchaseView::showHistory()
   dlg.getViewer()->setFixedFilter(str);
   if (dlg.exec())
   {
-    QVector<Id> vId = dlg.getViewer()->getSelectedIds();
+    QVector<Id> ids = dlg.getViewer()->getSelectedIds();
     QVector<PurchaseElement> v;
-    for (int i = 0; i != vId.size(); ++i)
+    for (int i = 0; i != ids.size(); ++i)
     {
       PurchaseElement e;
-      e.SQL_select_last(m_supplierPicker->getId(), vId.at(i));
+      e.SQL_select_last(m_supplierPicker->getId(), ids.at(i));
       e.m_ammount = 0;
       v.push_back(e);
     }

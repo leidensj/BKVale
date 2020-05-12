@@ -81,7 +81,7 @@ void PurchaseTable::addRowByCode()
   dlg.getViewer()->setFixedFilter(PRODUCT_FILTER_BUY);
   if (dlg.exec())
   {
-    ProductCode c(dlg.getViewer()->firstSelectedId());
+    ProductCode c(dlg.getViewer()->getFirstSelectedId());
     if (c.m_id.isValid())
     {
       Product o;

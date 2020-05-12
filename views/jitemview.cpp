@@ -15,7 +15,7 @@
 #define VIEW_BUTTON "VIEW_BUTTON"
 
 JItemView::JItemView(const QString& tableName, QWidget* parent)
-  : QFrame(parent)
+  : QWidget(parent)
   , m_viewer(nullptr)
   , m_tab(nullptr)
   , m_tabDb(nullptr)
@@ -29,7 +29,6 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 {
   m_btnCreate = new QPushButton;
   m_btnCreate->setFlat(true);
-  m_btnCreate->setText("");
   m_btnCreate->setIconSize(QSize(24, 24));
   m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
   m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
@@ -37,7 +36,6 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   m_btnSave = new QPushButton;
   m_btnSave->setFlat(true);
-  m_btnSave->setText("");
   m_btnSave->setIconSize(QSize(24, 24));
   m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
   m_btnSave->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
@@ -45,7 +43,6 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   m_btnSearch = new QPushButton;
   m_btnSearch->setFlat(true);
-  m_btnSearch->setText("");
   m_btnSearch->setIconSize(QSize(24, 24));
   m_btnSearch->setIcon(QIcon(":/icons/res/search.png"));
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
@@ -90,10 +87,10 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   QRect rect = QApplication::desktop()->availableGeometry(this);
   m_dlgDb->resize(rect.width() * 0.7, rect.height() * 0.7);
 
-  connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(create()));
+  connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(clear()));
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
-  connect(m_viewer, SIGNAL(itemSelectedSignal(const JItemSQL&)), this, SLOT(selectItem(const JItemSQL&)));
-  connect(m_viewer, SIGNAL(itemSelectedSignal(const JItemSQL&)), m_dlgDb, SLOT(accept()));
+  connect(m_viewer, SIGNAL(itemsSelectedSignal()), this, SLOT(setItem()));
+  connect(m_viewer, SIGNAL(itemsSelectedSignal()), m_dlgDb, SLOT(accept()));
   connect(m_viewer, SIGNAL(itemsRemovedSignal(const QVector<Id>&)), this, SLOT(itemsRemoved(const QVector<Id>&)));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
 
@@ -112,26 +109,29 @@ JItemView::~JItemView()
   }
 }
 
-void JItemView::selectItem(const JItemSQL& o)
+void JItemView::setItem()
 {
-  m_id = o.m_id;
-  setItem(o);
-  QString strIcon = o.m_id.isValid()
-                    ? ":/icons/res/saveas.png"
-                    : ":/icons/res/save.png";
-  m_btnSave->setIcon(QIcon(strIcon));
-  if (m_tab->count() > 0)
-    m_tab->setCurrentIndex(0);
-  if (m_wFocus != nullptr)
-    m_wFocus->setFocus();
-  emit itemSelectedSignal();
-
+  auto p = JItemEx::create(m_viewer->getTableName());
+  if (p != nullptr)
+  {
+    clear();
+    p->m_id = m_viewer->getFirstSelectedId();
+    if (p->m_id.isValid())
+      JItemEx::select(*p, this);
+    m_id = p->m_id;
+    setItem(*p);
+    QString strIcon = p->m_id.isValid()
+                      ? ":/icons/res/saveas.png"
+                      : ":/icons/res/save.png";
+    m_btnSave->setIcon(QIcon(strIcon));
+    delete p;
+  }
 }
 
 void JItemView::itemsRemoved(const QVector<Id>& ids)
 {
   if (ids.contains(getId()))
-    create();
+    clear();
 }
 
 bool JItemView::save(Id& id)
@@ -169,12 +169,17 @@ void JItemView::setFocusWidgetOnCreate(QWidget* w)
   m_wFocus = w;
 }
 
-void JItemView::create()
+void JItemView::clear()
 {
   JItemSQL* p = JItemEx::create(m_viewer->getTableName());
   if (p != nullptr)
   {
-    selectItem(*p);
+    setItem(*p);
+    m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
+    if (m_tab->count() > 0)
+      m_tab->setCurrentIndex(0);
+    if (m_wFocus != nullptr)
+      m_wFocus->setFocus();
     delete p;
   }
 }

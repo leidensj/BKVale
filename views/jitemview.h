@@ -1,7 +1,7 @@
 #ifndef JVIEW_H
 #define JVIEW_H
 
-#include <QFrame>
+#include <QWidget>
 #include "items/jitemsql.h"
 #include <QPushButton>
 #include "controls/databaseviewer.h"
@@ -12,7 +12,7 @@ class QTabWidget;
 class QDialog;
 class QHBoxLayout;
 
-class JItemView : public QFrame
+class JItemView : public QWidget
 {
   Q_OBJECT
 
@@ -23,8 +23,8 @@ public:
 
 public slots:
   virtual void getItem(JItemSQL& o) const = 0;
-  virtual void create();
-  virtual void selectItem(const JItemSQL& o);
+  virtual void clear();
+  virtual void setItem();
   virtual bool save(Id& id);
 
 protected slots:

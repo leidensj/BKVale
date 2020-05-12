@@ -74,11 +74,11 @@ public:
   explicit PurchaseView(QWidget *parent = 0);
   ~PurchaseView();
   bool save(Id& id);
+  void setItem();
   void setDate(const QDate& dt);
   QDate getDate() const;
 
 public slots:
-  void selectItem(const JItemSQL& o);
   void getItem(JItemSQL& o) const;
 
 protected slots:

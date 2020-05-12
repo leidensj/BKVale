@@ -46,12 +46,12 @@ public:
                           QWidget *parent = nullptr);
   ~DatabaseViewer();
   QString getTableName() const;
+  QVector<Id> getSelectedIds() const;
+  Id getFirstSelectedId() const;
+  int getRowCount() const;
+  double getSum(int column) const;
   void selectId(const Id& id);
   void selectIds(const QVector<Id>& ids);
-  QVector<Id> selectedIds() const;
-  Id firstSelectedId() const;
-  int rowCount() const;
-  double sum(int column) const;
   QPushButton* addButton(const QString& toolTip, const QIcon& icon, int shortcut = 0);
 
 public slots:

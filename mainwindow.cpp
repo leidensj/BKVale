@@ -304,7 +304,7 @@ void Goiabo::print()
       }
 
       if (bSuccess)
-        m_reminder->create();
+        m_reminder->clear();
 
     } break;
     case Functionality::Calculator:

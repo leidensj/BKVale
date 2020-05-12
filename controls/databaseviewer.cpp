@@ -48,25 +48,22 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   , m_table(nullptr)
   , m_proxyModel(nullptr)
 {
-  m_btnOpen = new QPushButton();
+  m_btnOpen = new QPushButton;
   m_btnOpen->setFlat(true);
-  m_btnOpen->setText("");
   m_btnOpen->setIconSize(QSize(24, 24));
   m_btnOpen->setIcon(QIcon(":/icons/res/open.png"));
   m_btnOpen->setToolTip(tr("Abrir (Ctrl+O)"));
   m_btnOpen->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
 
-  m_btnRemove = new QPushButton();
+  m_btnRemove = new QPushButton;
   m_btnRemove->setFlat(true);
-  m_btnRemove->setText("");
   m_btnRemove->setIconSize(QSize(24, 24));
   m_btnRemove->setToolTip(tr("Remover (Del)"));
   m_btnRemove->setIcon(QIcon(":/icons/res/remove.png"));
   m_btnRemove->setShortcut(QKeySequence(Qt::Key_Delete));
 
-  m_btnRefresh = new QPushButton();
+  m_btnRefresh = new QPushButton;
   m_btnRefresh->setFlat(true);
-  m_btnRefresh->setText("");
   m_btnRefresh->setIconSize(QSize(16, 16));
   m_btnRefresh->setIcon(QIcon(":/icons/res/refresh.png"));
   m_btnRefresh->setToolTip(tr("Atualizar (F5)"));
@@ -88,7 +85,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   m_cbContains->setIcon(QIcon(":/icons/res/center.png"));
   m_cbContains->setToolTip(tr("Procurar por palavras contendo o termo informado"));
 
-  QHBoxLayout* hlayout1 = new QHBoxLayout();
+  QHBoxLayout* hlayout1 = new QHBoxLayout;
   hlayout1->setContentsMargins(0, 0, 0, 0);
   hlayout1->addWidget(m_btnRefresh);
   hlayout1->addWidget(m_edSearch);
@@ -170,7 +167,7 @@ DatabaseViewer::~DatabaseViewer()
 
 }
 
-Id DatabaseViewer::firstSelectedId() const
+Id DatabaseViewer::getFirstSelectedId() const
 {
   QModelIndexList lst = m_table->selectionModel()->selectedRows();
   Id id;
@@ -193,20 +190,6 @@ void DatabaseViewer::selectId(const Id& id)
   selectIds(ids);
 }
 
-QVector<Id> DatabaseViewer::selectedIds() const
-{
-  JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
-  QModelIndexList lst = m_table->selectionModel()->selectedRows();
-  QVector<Id> ids;
-  for (int i = 0; i != lst.size(); ++i)
-  {
-    QModelIndex idx = m_proxyModel->mapToSource(lst.at(i));
-    if (idx.isValid())
-      ids.push_back(Id(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong()));
-  }
-  return ids;
-}
-
 void DatabaseViewer::selectIds(const QVector<Id>& ids)
 {
   m_table->clearSelection();
@@ -219,6 +202,20 @@ void DatabaseViewer::selectIds(const QVector<Id>& ids)
 
   if (ids.size() != 0)
     m_table->setFocus();
+}
+
+QVector<Id> DatabaseViewer::getSelectedIds() const
+{
+  JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
+  QModelIndexList lst = m_table->selectionModel()->selectedRows();
+  QVector<Id> ids;
+  for (int i = 0; i != lst.size(); ++i)
+  {
+    QModelIndex idx = m_proxyModel->mapToSource(lst.at(i));
+    if (idx.isValid())
+      ids.push_back(Id(model->index(idx.row(), SQL_COLID_NUMBER).data(Qt::EditRole).toLongLong()));
+  }
+  return ids;
 }
 
 void DatabaseViewer::refresh()
@@ -258,7 +255,7 @@ void DatabaseViewer::enableControls()
 
 void DatabaseViewer::removeItems()
 {
-  QVector<Id> ids = selectedIds();
+  QVector<Id> ids = getSelectedIds();
   JItemEx::remove(ids, m_tableName, this);
   emit itemsRemovedSignal(ids);
   refresh();
@@ -346,12 +343,12 @@ void DatabaseViewer::emitCurrentRowChangedSignal()
   emit currentRowChangedSignal(m_table->currentIndex().row());
 }
 
-int DatabaseViewer::rowCount() const
+int DatabaseViewer::getRowCount() const
 {
   return m_proxyModel->rowCount();
 }
 
-double DatabaseViewer::sum(int column) const
+double DatabaseViewer::getSum(int column) const
 {
   double sum = 0.0;
   for (int row = 0; row != m_proxyModel->rowCount(); ++row)

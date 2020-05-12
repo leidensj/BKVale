@@ -74,7 +74,7 @@ void ShopWidget::setToday()
 
 ShoppingList ShopWidget::getShoppingList()
 {
-  ShoppingList o(m_viewer->firstSelectedId());
+  ShoppingList o(m_viewer->getFirstSelectedId());
   JItemEx::select(o, this);
   return o;
 }

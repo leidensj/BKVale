@@ -300,7 +300,7 @@ bool BaitaSQL::createTables(QString& error)
                           PURCHASE_ELEMENTS_SQL_COL_AMM " REAL,"
                           PURCHASE_ELEMENTS_SQL_COL_PRI " REAL,"
                           PURCHASE_ELEMENTS_SQL_COL_ISP " BOOLEAN,"
-                          PURCHASE_ELEMENTS_SQL_COL_UNI " TEXT,"
+                          PURCHASE_ELEMENTS_SQL_COL_PUN " TEXT,"
                           PURCHASE_ELEMENTS_SQL_COL_PAM " REAL,"
                           "FOREIGN KEY(" PURCHASE_ELEMENTS_SQL_COL_NID ") REFERENCES "
                           PURCHASE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"

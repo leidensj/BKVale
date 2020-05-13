@@ -64,7 +64,7 @@ bool PurchaseElement::SQL_insert_proc(QSqlQuery& query) const
                 PURCHASE_ELEMENTS_SQL_COL_AMM ","
                 PURCHASE_ELEMENTS_SQL_COL_PRI ","
                 PURCHASE_ELEMENTS_SQL_COL_ISP ","
-                PURCHASE_ELEMENTS_SQL_COL_UNI ","
+                PURCHASE_ELEMENTS_SQL_COL_PUN ","
                 PURCHASE_ELEMENTS_SQL_COL_PAM
                 ") VALUES ("
                 "(:_v01),"
@@ -98,7 +98,7 @@ bool PurchaseElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, 
                 PURCHASE_ELEMENTS_SQL_COL_AMM ","
                 PURCHASE_ELEMENTS_SQL_COL_PRI ","
                 PURCHASE_ELEMENTS_SQL_COL_ISP ","
-                PURCHASE_ELEMENTS_SQL_COL_UNI ","
+                PURCHASE_ELEMENTS_SQL_COL_PUN ","
                 PURCHASE_ELEMENTS_SQL_COL_PAM
                 " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " PURCHASE_ELEMENTS_SQL_COL_NID " = (:_v01)");
@@ -136,7 +136,7 @@ bool PurchaseElement::SQL_select_proc(QSqlQuery& query, QString& error)
                 PURCHASE_ELEMENTS_SQL_COL_AMM ","
                 PURCHASE_ELEMENTS_SQL_COL_PRI ","
                 PURCHASE_ELEMENTS_SQL_COL_ISP ","
-                PURCHASE_ELEMENTS_SQL_COL_UNI ","
+                PURCHASE_ELEMENTS_SQL_COL_PUN ","
                 PURCHASE_ELEMENTS_SQL_COL_PAM
                 " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");

@@ -11,11 +11,11 @@ QString AddressModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SQL_COLID ","
-                   ADDRESS_SQL_COL04 ","
-                   ADDRESS_SQL_COL05 ","
-                   ADDRESS_SQL_COL03 ","
-                   ADDRESS_SQL_COL06 ","
-                   ADDRESS_SQL_COL07
+                   ADDRESS_SQL_COL_STR ","
+                   ADDRESS_SQL_COL_NUM ","
+                   ADDRESS_SQL_COL_NEI ","
+                   ADDRESS_SQL_COL_CIT ","
+                   ADDRESS_SQL_COL_STA
                    " FROM "
                    ADDRESS_SQL_TABLE_NAME);
   return strQuery;

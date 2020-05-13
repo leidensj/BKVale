@@ -81,24 +81,23 @@ QString User::SQL_tableName() const
 bool User::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " USER_SQL_TABLE_NAME " ("
-                USER_SQL_COL01 ","
-                USER_SQL_COL02 ","
-                USER_SQL_COL03 ","
-                USER_SQL_COL04 ","
-                USER_SQL_COL05 ","
-                USER_SQL_COL06 ","
-                USER_SQL_COL07 ","
-                USER_SQL_COL08 ","
-                USER_SQL_COL09 ","
-                USER_SQL_COL10 ","
-                USER_SQL_COL11 ","
-                USER_SQL_COL12 ","
-                USER_SQL_COL13 ","
-                USER_SQL_COL14 ","
-                USER_SQL_COL15 ","
-                USER_SQL_COL16 ","
-                USER_SQL_COL17 ","
-                USER_SQL_COL18 ")"
+                USER_SQL_COL_USE ","
+                USER_SQL_COL_PAS ","
+                USER_SQL_COL_APU ","
+                USER_SQL_COL_ARE ","
+                USER_SQL_COL_ACA ","
+                USER_SQL_COL_ASH ","
+                USER_SQL_COL_AUS ","
+                USER_SQL_COL_APR ","
+                USER_SQL_COL_ASE ","
+                USER_SQL_COL_AFO ","
+                USER_SQL_COL_ACT ","
+                USER_SQL_COL_AIM ","
+                USER_SQL_COL_ASL ","
+                USER_SQL_COL_AEM ","
+                USER_SQL_COL_ASU ","
+                USER_SQL_COL_AST ","
+                USER_SQL_COL_ATI ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -116,8 +115,7 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v14),"
                 "(:_v15),"
                 "(:_v16),"
-                "(:_v17),"
-                "(:_v18))");
+                "(:_v17))");
   query.bindValue(":_v01", m_strUser);
   query.bindValue(":_v02", strEncryptedPassword());
   query.bindValue(":_v03", m_bPurchase);
@@ -130,11 +128,11 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v10", m_bForm);
   query.bindValue(":_v11", m_bCategory);
   query.bindValue(":_v12", m_bImage);
-  query.bindValue(":_v14", m_bShoppingList);
-  query.bindValue(":_v15", m_bEmployee);
-  query.bindValue(":_v16", m_bSupplier);
-  query.bindValue(":_v17", m_bStore);
-  query.bindValue(":_v18", m_bTimeCard);
+  query.bindValue(":_v13", m_bShoppingList);
+  query.bindValue(":_v14", m_bEmployee);
+  query.bindValue(":_v15", m_bSupplier);
+  query.bindValue(":_v16", m_bStore);
+  query.bindValue(":_v17", m_bTimeCard);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -146,25 +144,24 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
 bool User::SQL_update_proc(QSqlQuery& query) const
 {
   QString strQuery("UPDATE " USER_SQL_TABLE_NAME " SET "
-                   USER_SQL_COL01 " = (:_v01),");
+                   USER_SQL_COL_USE " = (:_v01),");
   if (!m_password.isEmpty())
-    strQuery += USER_SQL_COL02 " = (:_v02),";
-  strQuery += USER_SQL_COL03" = (:_v03),"
-              USER_SQL_COL04" = (:_v04),"
-              USER_SQL_COL05" = (:_v05),"
-              USER_SQL_COL06" = (:_v06),"
-              USER_SQL_COL07" = (:_v07),"
-              USER_SQL_COL08" = (:_v08),"
-              USER_SQL_COL09" = (:_v09),"
-              USER_SQL_COL10" = (:_v10),"
-              USER_SQL_COL11" = (:_v11),"
-              USER_SQL_COL12" = (:_v12),"
-              USER_SQL_COL13" = (:_v13),"
-              USER_SQL_COL14" = (:_v14),"
-              USER_SQL_COL15" = (:_v15),"
-              USER_SQL_COL16" = (:_v16),"
-              USER_SQL_COL17" = (:_v17),"
-              USER_SQL_COL18" = (:_v18)"
+    strQuery += USER_SQL_COL_PAS " = (:_v02),";
+  strQuery += USER_SQL_COL_APU " = (:_v03),"
+              USER_SQL_COL_ARE " = (:_v04),"
+              USER_SQL_COL_ACA " = (:_v05),"
+              USER_SQL_COL_ASH " = (:_v06),"
+              USER_SQL_COL_AUS " = (:_v07),"
+              USER_SQL_COL_APR " = (:_v08),"
+              USER_SQL_COL_ASE " = (:_v09),"
+              USER_SQL_COL_AFO " = (:_v10),"
+              USER_SQL_COL_ACT " = (:_v11),"
+              USER_SQL_COL_AIM " = (:_v12),"
+              USER_SQL_COL_ASL " = (:_v13),"
+              USER_SQL_COL_AEM " = (:_v14),"
+              USER_SQL_COL_ASU " = (:_v15),"
+              USER_SQL_COL_AST " = (:_v16),"
+              USER_SQL_COL_ATI " = (:_v17)"
               " WHERE " SQL_COLID " = (:_v00)";
 
   query.prepare(strQuery);
@@ -182,11 +179,11 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v10", m_bForm);
   query.bindValue(":_v11", m_bCategory);
   query.bindValue(":_v12", m_bImage);
-  query.bindValue(":_v14", m_bShoppingList);
-  query.bindValue(":_v15", m_bEmployee);
-  query.bindValue(":_v16", m_bSupplier);
-  query.bindValue(":_v17", m_bStore);
-  query.bindValue(":_v18", m_bTimeCard);
+  query.bindValue(":_v13", m_bShoppingList);
+  query.bindValue(":_v14", m_bEmployee);
+  query.bindValue(":_v15", m_bSupplier);
+  query.bindValue(":_v16", m_bStore);
+  query.bindValue(":_v17", m_bTimeCard);
 
   return query.exec();
 }
@@ -195,24 +192,23 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                USER_SQL_COL01 ","
-                USER_SQL_COL02 ","
-                USER_SQL_COL03 ","
-                USER_SQL_COL04 ","
-                USER_SQL_COL05 ","
-                USER_SQL_COL06 ","
-                USER_SQL_COL07 ","
-                USER_SQL_COL08 ","
-                USER_SQL_COL09 ","
-                USER_SQL_COL10 ","
-                USER_SQL_COL11 ","
-                USER_SQL_COL12 ","
-                USER_SQL_COL13 ","
-                USER_SQL_COL14 ","
-                USER_SQL_COL15 ","
-                USER_SQL_COL16 ","
-                USER_SQL_COL17 ","
-                USER_SQL_COL18
+                USER_SQL_COL_USE ","
+                USER_SQL_COL_PAS ","
+                USER_SQL_COL_APU ","
+                USER_SQL_COL_ARE ","
+                USER_SQL_COL_ACA ","
+                USER_SQL_COL_ASH ","
+                USER_SQL_COL_AUS ","
+                USER_SQL_COL_APR ","
+                USER_SQL_COL_ASE ","
+                USER_SQL_COL_AFO ","
+                USER_SQL_COL_ACT ","
+                USER_SQL_COL_AIM ","
+                USER_SQL_COL_ASL ","
+                USER_SQL_COL_AEM ","
+                USER_SQL_COL_ASU ","
+                USER_SQL_COL_AST ","
+                USER_SQL_COL_ATI
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -234,11 +230,11 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       m_bForm = query.value(9).toBool();
       m_bCategory = query.value(10).toBool();
       m_bImage = query.value(11).toBool();
-      m_bShoppingList = query.value(13).toBool();
-      m_bEmployee = query.value(14).toBool();
-      m_bSupplier = query.value(15).toBool();
-      m_bStore = query.value(16).toBool();
-      m_bTimeCard = query.value(17).toBool();
+      m_bShoppingList = query.value(12).toBool();
+      m_bEmployee = query.value(13).toBool();
+      m_bSupplier = query.value(14).toBool();
+      m_bStore = query.value(15).toBool();
+      m_bTimeCard = query.value(16).toBool();
     }
     else
     {
@@ -264,8 +260,8 @@ bool User::SQL_select_password_proc(QSqlQuery& query, QString& error)
   query.prepare("SELECT "
                 SQL_COLID
                 " FROM " USER_SQL_TABLE_NAME
-                " WHERE " USER_SQL_COL01 " = (:_v01) AND "
-                USER_SQL_COL02 " = (:_v02) LIMIT 1");
+                " WHERE " USER_SQL_COL_USE " = (:_v01) AND "
+                USER_SQL_COL_PAS " = (:_v02) LIMIT 1");
   query.bindValue(":_v01", m_strUser);
   query.bindValue(":_v02", strEncryptedPassword());
   bool bSuccess = query.exec();

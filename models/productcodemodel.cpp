@@ -10,13 +10,13 @@ QString ProductCodeModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." SQL_COLID ","
-                   PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL02 ","
-                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01
+                   PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL_COD ","
+                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM
                    " FROM "
                    PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
                    PRODUCT_SQL_TABLE_NAME
-                   " ON " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL01
+                   " ON " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME "." PRODUCT_CODE_ITEMS_SQL_COL_PID
                    " = " PRODUCT_SQL_TABLE_NAME "." SQL_COLID);
   return strQuery;
 }

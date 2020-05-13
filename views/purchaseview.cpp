@@ -494,7 +494,7 @@ void PurchaseView::showHistory()
               PURCHASE_SQL_TABLE_NAME "." SQL_COLID
               " FROM " PURCHASE_SQL_TABLE_NAME
               " WHERE "
-              PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " = " +
+              PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID " = " +
               m_supplierPicker->getFirstId().str() + "))");
   dlg.getViewer()->setFixedFilter(str);
   if (dlg.exec())

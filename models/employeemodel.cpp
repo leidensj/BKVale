@@ -10,12 +10,12 @@ QString EmployeeModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL03
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_NAM ","
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_ALI
                    " FROM " EMPLOYEE_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
                    FORM_SQL_TABLE_NAME
-                   " ON " EMPLOYEE_SQL_TABLE_NAME "." EMPLOYEE_SQL_COL01 " = "
+                   " ON " EMPLOYEE_SQL_TABLE_NAME "." EMPLOYEE_SQL_COL_FID " = "
                    FORM_SQL_TABLE_NAME "." SQL_COLID);
   return strQuery;
 }

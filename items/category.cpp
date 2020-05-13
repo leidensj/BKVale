@@ -38,8 +38,8 @@ QString Category::SQL_tableName() const
 bool Category::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " CATEGORY_SQL_TABLE_NAME " ("
-                CATEGORY_SQL_COL01 ","
-                CATEGORY_SQL_COL02 ")"
+                CATEGORY_SQL_COL_IID ","
+                CATEGORY_SQL_COL_NAM ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02))");
@@ -57,8 +57,8 @@ bool Category::SQL_insert_proc(QSqlQuery& query) const
 bool Category::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " CATEGORY_SQL_TABLE_NAME " SET "
-                CATEGORY_SQL_COL01 " = (:_v01),"
-                CATEGORY_SQL_COL02 " = (:_v02)"
+                CATEGORY_SQL_COL_IID " = (:_v01),"
+                CATEGORY_SQL_COL_NAM " = (:_v02)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_image.m_id.getIdNull());
@@ -72,8 +72,8 @@ bool Category::SQL_select_proc(QSqlQuery& query, QString& error)
   error.clear();
 
   query.prepare("SELECT "
-                CATEGORY_SQL_COL01 ","
-                CATEGORY_SQL_COL02
+                CATEGORY_SQL_COL_IID ","
+                CATEGORY_SQL_COL_NAM
                 " FROM " CATEGORY_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());

@@ -10,7 +10,7 @@ QString UserModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SQL_COLID ","
-                   USER_SQL_COL01
+                   USER_SQL_COL_USE
                    " FROM "
                    USER_SQL_TABLE_NAME);
   return strQuery;

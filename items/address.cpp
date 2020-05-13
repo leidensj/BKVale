@@ -65,15 +65,15 @@ bool Address::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                ADDRESS_SQL_COL01 ","
-                ADDRESS_SQL_COL02 ","
-                ADDRESS_SQL_COL03 ","
-                ADDRESS_SQL_COL04 ","
-                ADDRESS_SQL_COL05 ","
-                ADDRESS_SQL_COL06 ","
-                ADDRESS_SQL_COL07 ","
-                ADDRESS_SQL_COL08 ","
-                ADDRESS_SQL_COL09
+                ADDRESS_SQL_COL_FID ","
+                ADDRESS_SQL_COL_CEP ","
+                ADDRESS_SQL_COL_NEI ","
+                ADDRESS_SQL_COL_STR ","
+                ADDRESS_SQL_COL_NUM ","
+                ADDRESS_SQL_COL_CIT ","
+                ADDRESS_SQL_COL_STA ","
+                ADDRESS_SQL_COL_COM ","
+                ADDRESS_SQL_COL_REF
                 " FROM " ADDRESS_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());

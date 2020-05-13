@@ -61,10 +61,10 @@ bool PurchaseElement::SQL_insert_proc(QSqlQuery& query) const
   query.prepare("INSERT INTO " PURCHASE_ELEMENTS_SQL_TABLE_NAME " ("
                 PURCHASE_ELEMENTS_SQL_COL_NID ","
                 PURCHASE_ELEMENTS_SQL_COL_PID ","
-                PURCHASE_ELEMENTS_SQL_COL_AMT ","
-                PURCHASE_ELEMENTS_SQL_COL_PRC ","
-                PURCHASE_ELEMENTS_SQL_COL_PCK ","
-                PURCHASE_ELEMENTS_SQL_COL_UNT ","
+                PURCHASE_ELEMENTS_SQL_COL_AMM ","
+                PURCHASE_ELEMENTS_SQL_COL_PRI ","
+                PURCHASE_ELEMENTS_SQL_COL_ISP ","
+                PURCHASE_ELEMENTS_SQL_COL_UNI ","
                 PURCHASE_ELEMENTS_SQL_COL_PAM
                 ") VALUES ("
                 "(:_v01),"
@@ -95,10 +95,10 @@ bool PurchaseElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, 
   query.prepare("SELECT "
                 SQL_COLID ","
                 PURCHASE_ELEMENTS_SQL_COL_PID ","
-                PURCHASE_ELEMENTS_SQL_COL_AMT ","
-                PURCHASE_ELEMENTS_SQL_COL_PRC ","
-                PURCHASE_ELEMENTS_SQL_COL_PCK ","
-                PURCHASE_ELEMENTS_SQL_COL_UNT ","
+                PURCHASE_ELEMENTS_SQL_COL_AMM ","
+                PURCHASE_ELEMENTS_SQL_COL_PRI ","
+                PURCHASE_ELEMENTS_SQL_COL_ISP ","
+                PURCHASE_ELEMENTS_SQL_COL_UNI ","
                 PURCHASE_ELEMENTS_SQL_COL_PAM
                 " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " PURCHASE_ELEMENTS_SQL_COL_NID " = (:_v01)");
@@ -133,10 +133,10 @@ bool PurchaseElement::SQL_select_proc(QSqlQuery& query, QString& error)
   query.prepare("SELECT "
                 PURCHASE_ELEMENTS_SQL_COL_NID ","
                 PURCHASE_ELEMENTS_SQL_COL_PID ","
-                PURCHASE_ELEMENTS_SQL_COL_AMT ","
-                PURCHASE_ELEMENTS_SQL_COL_PRC ","
-                PURCHASE_ELEMENTS_SQL_COL_PCK ","
-                PURCHASE_ELEMENTS_SQL_COL_UNT ","
+                PURCHASE_ELEMENTS_SQL_COL_AMM ","
+                PURCHASE_ELEMENTS_SQL_COL_PRI ","
+                PURCHASE_ELEMENTS_SQL_COL_ISP ","
+                PURCHASE_ELEMENTS_SQL_COL_UNI ","
                 PURCHASE_ELEMENTS_SQL_COL_PAM
                 " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
@@ -183,7 +183,7 @@ void PurchaseElement::SQL_select_last(Id supplierId, Id productId)
                 " INNER JOIN " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                 " ON " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
                 " = " PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID
-                " WHERE " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL
+                " WHERE " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID
                 " = (:_v01)"
                 " AND " PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID
                 " = (:_v02) "

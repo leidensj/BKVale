@@ -166,7 +166,7 @@ QString Purchase::SQL_tableName() const
 
 bool Purchase::SQL_insert_proc(QSqlQuery& query) const
 {
-  bool bSuccess = query.exec("SELECT MAX(" PURCHASE_SQL_COL_NMB ") FROM " PURCHASE_SQL_TABLE_NAME);
+  bool bSuccess = query.exec("SELECT MAX(" PURCHASE_SQL_COL_NUM ") FROM " PURCHASE_SQL_TABLE_NAME);
   if (bSuccess)
   {
     m_number = query.next()
@@ -175,14 +175,14 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
     m_number = m_number > PURCHASE_DEFAULT_NUMBER ? m_number : PURCHASE_DEFAULT_NUMBER;
 
     query.prepare("INSERT INTO " PURCHASE_SQL_TABLE_NAME " ("
-                  PURCHASE_SQL_COL_NMB ","
-                  PURCHASE_SQL_COL_DTE ","
-                  PURCHASE_SQL_COL_SPL ","
+                  PURCHASE_SQL_COL_NUM ","
+                  PURCHASE_SQL_COL_DAT ","
+                  PURCHASE_SQL_COL_SID ","
                   PURCHASE_SQL_COL_OBS ","
-                  PURCHASE_SQL_COL_DSC ","
-                  PURCHASE_SQL_COL_EMP ","
-                  PURCHASE_SQL_COL_MTH ","
-                  PURCHASE_SQL_COL_STR
+                  PURCHASE_SQL_COL_DIS ","
+                  PURCHASE_SQL_COL_EID ","
+                  PURCHASE_SQL_COL_PAY ","
+                  PURCHASE_SQL_COL_TID
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
@@ -224,13 +224,13 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
 bool Purchase::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " PURCHASE_SQL_TABLE_NAME " SET "
-                PURCHASE_SQL_COL_DTE " = (:_v02),"
-                PURCHASE_SQL_COL_SPL " = (:_v03),"
+                PURCHASE_SQL_COL_DAT " = (:_v02),"
+                PURCHASE_SQL_COL_SID " = (:_v03),"
                 PURCHASE_SQL_COL_OBS " = (:_v04),"
-                PURCHASE_SQL_COL_DSC " = (:_v05),"
-                PURCHASE_SQL_COL_EMP " = (:_v06),"
-                PURCHASE_SQL_COL_MTH " = (:_v07),"
-                PURCHASE_SQL_COL_STR " = (:_v08) "
+                PURCHASE_SQL_COL_DIS " = (:_v05),"
+                PURCHASE_SQL_COL_EID " = (:_v06),"
+                PURCHASE_SQL_COL_PAY " = (:_v07),"
+                PURCHASE_SQL_COL_TID " = (:_v08) "
                 "WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v02", m_date);
@@ -270,14 +270,14 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
   clear(false);
   error.clear();
   query.prepare("SELECT "
-                PURCHASE_SQL_COL_NMB ","
-                PURCHASE_SQL_COL_DTE ","
-                PURCHASE_SQL_COL_SPL ","
+                PURCHASE_SQL_COL_NUM ","
+                PURCHASE_SQL_COL_DAT ","
+                PURCHASE_SQL_COL_SID ","
                 PURCHASE_SQL_COL_OBS ","
-                PURCHASE_SQL_COL_DSC ","
-                PURCHASE_SQL_COL_EMP ","
-                PURCHASE_SQL_COL_MTH ","
-                PURCHASE_SQL_COL_STR
+                PURCHASE_SQL_COL_DIS ","
+                PURCHASE_SQL_COL_EID ","
+                PURCHASE_SQL_COL_PAY ","
+                PURCHASE_SQL_COL_TID
                 " FROM " PURCHASE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -351,7 +351,7 @@ bool Purchase::SQL_select_all_supplier_id_items()
                 " LEFT OUTER JOIN " PURCHASE_SQL_TABLE_NAME " ON "
                 PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID
                 " = " PURCHASE_SQL_TABLE_NAME "." SQL_COLID " WHERE "
-                PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " = (:_v00)");
+                PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID " = (:_v00)");
   query.bindValue(":_v00", m_supplier.m_id.get());
   bool bSuccess = query.exec();
 

@@ -10,7 +10,7 @@ QString CategoryModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SQL_COLID ","
-                   CATEGORY_SQL_COL02
+                   CATEGORY_SQL_COL_NAM
                    " FROM "
                    CATEGORY_SQL_TABLE_NAME);
   return strQuery;

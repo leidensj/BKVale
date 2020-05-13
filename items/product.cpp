@@ -72,8 +72,8 @@ QString ProductCode::SQL_tableName() const
 bool ProductCode::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME " ("
-                PRODUCT_CODE_ITEMS_SQL_COL01 ","
-                PRODUCT_CODE_ITEMS_SQL_COL02 ")"
+                PRODUCT_CODE_ITEMS_SQL_COL_PID ","
+                PRODUCT_CODE_ITEMS_SQL_COL_COD ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02))");
@@ -153,13 +153,13 @@ QString Product::SQL_tableName() const
 bool Product::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " PRODUCT_SQL_TABLE_NAME " ("
-                PRODUCT_SQL_COL01 ","
-                PRODUCT_SQL_COL02 ","
-                PRODUCT_SQL_COL03 ","
-                PRODUCT_SQL_COL04 ","
-                PRODUCT_SQL_COL05 ","
-                PRODUCT_SQL_COL06 ","
-                PRODUCT_SQL_COL07 ")"
+                PRODUCT_SQL_COL_NAM ","
+                PRODUCT_SQL_COL_CID ","
+                PRODUCT_SQL_COL_IID ","
+                PRODUCT_SQL_COL_UNI ","
+                PRODUCT_SQL_COL_DET ","
+                PRODUCT_SQL_COL_ATB ","
+                PRODUCT_SQL_COL_ATS ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -181,7 +181,7 @@ bool Product::SQL_insert_proc(QSqlQuery& query) const
   {
     m_id.set(query.lastInsertId().toLongLong());
     query.prepare("DELETE FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
-                  " WHERE " PRODUCT_CODE_ITEMS_SQL_COL01 " = (:_v01)");
+                  " WHERE " PRODUCT_CODE_ITEMS_SQL_COL_PID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     if (bSuccess)
@@ -202,13 +202,13 @@ bool Product::SQL_insert_proc(QSqlQuery& query) const
 bool Product::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
-                PRODUCT_SQL_COL01 " = (:_v01),"
-                PRODUCT_SQL_COL02 " = (:_v02),"
-                PRODUCT_SQL_COL03 " = (:_v03),"
-                PRODUCT_SQL_COL04 " = (:_v04),"
-                PRODUCT_SQL_COL05 " = (:_v05),"
-                PRODUCT_SQL_COL06 " = (:_v06),"
-                PRODUCT_SQL_COL07 " = (:_v07)"
+                PRODUCT_SQL_COL_NAM " = (:_v01),"
+                PRODUCT_SQL_COL_CID " = (:_v02),"
+                PRODUCT_SQL_COL_IID " = (:_v03),"
+                PRODUCT_SQL_COL_UNI " = (:_v04),"
+                PRODUCT_SQL_COL_DET " = (:_v05),"
+                PRODUCT_SQL_COL_ATB " = (:_v06),"
+                PRODUCT_SQL_COL_ATS " = (:_v07)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_name);
@@ -223,7 +223,7 @@ bool Product::SQL_update_proc(QSqlQuery& query) const
   if (bSuccess)
   {
     query.prepare("DELETE FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
-                  " WHERE " PRODUCT_CODE_ITEMS_SQL_COL01 " = (:_v01)");
+                  " WHERE " PRODUCT_CODE_ITEMS_SQL_COL_PID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     if (bSuccess)
@@ -246,13 +246,13 @@ bool Product::SQL_select_proc(QSqlQuery& query, QString& error)
   error.clear();
 
   query.prepare("SELECT "
-                PRODUCT_SQL_COL01 ","
-                PRODUCT_SQL_COL02 ","
-                PRODUCT_SQL_COL03 ","
-                PRODUCT_SQL_COL04 ","
-                PRODUCT_SQL_COL05 ","
-                PRODUCT_SQL_COL06 ","
-                PRODUCT_SQL_COL07
+                PRODUCT_SQL_COL_NAM ","
+                PRODUCT_SQL_COL_CID ","
+                PRODUCT_SQL_COL_IID ","
+                PRODUCT_SQL_COL_UNI ","
+                PRODUCT_SQL_COL_DET ","
+                PRODUCT_SQL_COL_ATB ","
+                PRODUCT_SQL_COL_ATS
                 " FROM " PRODUCT_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -279,9 +279,9 @@ bool Product::SQL_select_proc(QSqlQuery& query, QString& error)
       if (bSuccess)
       {
         query.prepare("SELECT "
-                      PRODUCT_CODE_ITEMS_SQL_COL02
+                      PRODUCT_CODE_ITEMS_SQL_COL_COD
                       " FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
-                      " WHERE " PRODUCT_CODE_ITEMS_SQL_COL01 " = (:_v01)");
+                      " WHERE " PRODUCT_CODE_ITEMS_SQL_COL_PID " = (:_v01)");
         query.bindValue(":_v01", m_id.get());
         bSuccess = query.exec();
         if (bSuccess)
@@ -320,11 +320,11 @@ bool Product::SQL_select_by_code(const ProductCode& code, QString& error)
 
   query.prepare(
         QString("SELECT "
-                PRODUCT_CODE_ITEMS_SQL_COL01
+                PRODUCT_CODE_ITEMS_SQL_COL_PID
                 " FROM " PRODUCT_CODE_ITEMS_SQL_TABLE_NAME
                 " WHERE %1 = (:_v00)").arg(code.m_id.isValid()
                                            ? SQL_COLID
-                                           : PRODUCT_CODE_ITEMS_SQL_COL02));
+                                           : PRODUCT_CODE_ITEMS_SQL_COL_COD));
   if (code.m_id.isValid())
     query.bindValue(":_v00",  code.m_id.get());
   else
@@ -358,7 +358,7 @@ bool Product::SQL_update_unity(const Package& pck, QString& error) const
   QSqlQuery query(db);
 
   query.prepare("UPDATE " PRODUCT_SQL_TABLE_NAME " SET "
-                PRODUCT_SQL_COL04 " = (:_v01)"
+                PRODUCT_SQL_COL_UNI " = (:_v01)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", pck.m_unity);
@@ -367,16 +367,16 @@ bool Product::SQL_update_unity(const Package& pck, QString& error) const
   if (bSuccess && pck.m_ammount != 1.0 && pck.m_ammount != 0.0)
   {
     query.prepare("UPDATE " PURCHASE_ELEMENTS_SQL_TABLE_NAME " SET "
-                  PURCHASE_ELEMENTS_SQL_COL_AMT " = CASE WHEN "
-                  PURCHASE_ELEMENTS_SQL_COL_PCK " = FALSE THEN "
-                  PURCHASE_ELEMENTS_SQL_COL_AMT "/(:_v01)"
-                  " ELSE " PURCHASE_ELEMENTS_SQL_COL_AMT " END,"
-                  PURCHASE_ELEMENTS_SQL_COL_PRC " = CASE WHEN "
-                  PURCHASE_ELEMENTS_SQL_COL_PCK " = FALSE THEN "
-                  PURCHASE_ELEMENTS_SQL_COL_PRC "*(:_v01)"
-                  " ELSE " PURCHASE_ELEMENTS_SQL_COL_PRC " END,"
+                  PURCHASE_ELEMENTS_SQL_COL_AMM " = CASE WHEN "
+                  PURCHASE_ELEMENTS_SQL_COL_ISP " = FALSE THEN "
+                  PURCHASE_ELEMENTS_SQL_COL_AMM "/(:_v01)"
+                  " ELSE " PURCHASE_ELEMENTS_SQL_COL_AMM " END,"
+                  PURCHASE_ELEMENTS_SQL_COL_PRI " = CASE WHEN "
+                  PURCHASE_ELEMENTS_SQL_COL_ISP " = FALSE THEN "
+                  PURCHASE_ELEMENTS_SQL_COL_PRI "*(:_v01)"
+                  " ELSE " PURCHASE_ELEMENTS_SQL_COL_PRI " END,"
                   PURCHASE_ELEMENTS_SQL_COL_PAM " = CASE WHEN "
-                  PURCHASE_ELEMENTS_SQL_COL_PCK " = TRUE THEN "
+                  PURCHASE_ELEMENTS_SQL_COL_ISP " = TRUE THEN "
                   PURCHASE_ELEMENTS_SQL_COL_PAM "/(:_v01)"
                   " ELSE " PURCHASE_ELEMENTS_SQL_COL_PAM " END"
                   " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
@@ -387,19 +387,19 @@ bool Product::SQL_update_unity(const Package& pck, QString& error) const
 
   if (bSuccess && pck.m_ammount != 1.0 && pck.m_ammount != 0.0)
   {
-    query.prepare("UPDATE " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " SET "
-                  SHOPPING_LIST_ITEMS_SQL_AMT " = CASE WHEN "
-                  SHOPPING_LIST_ITEMS_SQL_PCK " = FALSE THEN "
-                  SHOPPING_LIST_ITEMS_SQL_AMT "/(:_v01)"
-                  " ELSE " SHOPPING_LIST_ITEMS_SQL_AMT " END,"
-                  SHOPPING_LIST_ITEMS_SQL_PRC " = CASE WHEN "
-                  SHOPPING_LIST_ITEMS_SQL_PCK " = FALSE THEN "
-                  SHOPPING_LIST_ITEMS_SQL_PRC "*(:_v01)"
-                  " ELSE " SHOPPING_LIST_ITEMS_SQL_PRC " END,"
-                  SHOPPING_LIST_ITEMS_SQL_PAM " = CASE WHEN "
-                  SHOPPING_LIST_ITEMS_SQL_PCK " = TRUE THEN "
-                  SHOPPING_LIST_ITEMS_SQL_PAM "/(:_v01)"
-                  " ELSE " SHOPPING_LIST_ITEMS_SQL_PAM " END"
+    query.prepare("UPDATE " SHOPPING_LIST_ELEMENTS_SQL_TABLE_NAME " SET "
+                  SHOPPING_LIST_ELEMENTS_SQL_AMM " = CASE WHEN "
+                  SHOPPING_LIST_ELEMENTS_SQL_ISP " = FALSE THEN "
+                  SHOPPING_LIST_ELEMENTS_SQL_AMM "/(:_v01)"
+                  " ELSE " SHOPPING_LIST_ELEMENTS_SQL_AMM " END,"
+                  SHOPPING_LIST_ELEMENTS_SQL_PRI " = CASE WHEN "
+                  SHOPPING_LIST_ELEMENTS_SQL_ISP " = FALSE THEN "
+                  SHOPPING_LIST_ELEMENTS_SQL_PRI "*(:_v01)"
+                  " ELSE " SHOPPING_LIST_ELEMENTS_SQL_PRI " END,"
+                  SHOPPING_LIST_ELEMENTS_SQL_PAM " = CASE WHEN "
+                  SHOPPING_LIST_ELEMENTS_SQL_ISP " = TRUE THEN "
+                  SHOPPING_LIST_ELEMENTS_SQL_PAM "/(:_v01)"
+                  " ELSE " SHOPPING_LIST_ELEMENTS_SQL_PAM " END"
                   " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", pck.m_ammount);

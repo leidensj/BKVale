@@ -10,8 +10,8 @@ QString ImageModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SQL_COLID ","
-                   IMAGE_SQL_COL01 ","
-                   IMAGE_SQL_COL02
+                   IMAGE_SQL_COL_NAM ","
+                   IMAGE_SQL_COL_IMA
                    " FROM "
                    IMAGE_SQL_TABLE_NAME);
   return strQuery;

@@ -10,15 +10,15 @@ QString ProductModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    PRODUCT_SQL_TABLE_NAME "." SQL_COLID ","
-                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL01 ","
-                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL04 ","
-                   CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL02
+                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM ","
+                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI ","
+                   CATEGORY_SQL_TABLE_NAME "." CATEGORY_SQL_COL_NAM
                    " FROM "
                    PRODUCT_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
                    CATEGORY_SQL_TABLE_NAME
                    " ON "
-                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL02
+                   PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_CID
                    " = "
                    CATEGORY_SQL_TABLE_NAME "." SQL_COLID);
   return strQuery;

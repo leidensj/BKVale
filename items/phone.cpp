@@ -55,11 +55,11 @@ bool Phone::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                PHONE_SQL_COL01 ","
-                PHONE_SQL_COL02 ","
-                PHONE_SQL_COL03 ","
-                PHONE_SQL_COL04 ","
-                PHONE_SQL_COL05
+                PHONE_SQL_COL_FID ","
+                PHONE_SQL_COL_COU ","
+                PHONE_SQL_COL_COD ","
+                PHONE_SQL_COL_NUM ","
+                PHONE_SQL_COL_NAM
                 " FROM " PHONE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());

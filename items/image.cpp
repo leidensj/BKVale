@@ -39,8 +39,8 @@ QString Image::SQL_tableName() const
 bool Image::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " IMAGE_SQL_TABLE_NAME " ("
-                IMAGE_SQL_COL01 ","
-                IMAGE_SQL_COL02 ")"
+                IMAGE_SQL_COL_NAM ","
+                IMAGE_SQL_COL_IMA ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02))");
@@ -57,8 +57,8 @@ bool Image::SQL_insert_proc(QSqlQuery& query) const
 bool Image::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " IMAGE_SQL_TABLE_NAME " SET "
-                IMAGE_SQL_COL01 " = (:_v01),"
-                IMAGE_SQL_COL02 " = (:_v02)"
+                IMAGE_SQL_COL_NAM " = (:_v01),"
+                IMAGE_SQL_COL_IMA " = (:_v02)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_name);
@@ -70,8 +70,8 @@ bool Image::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                IMAGE_SQL_COL01 ","
-                IMAGE_SQL_COL02
+                IMAGE_SQL_COL_NAM ","
+                IMAGE_SQL_COL_IMA
                 " FROM " IMAGE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());

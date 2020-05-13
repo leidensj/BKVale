@@ -10,12 +10,12 @@ QString SupplierModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SUPPLIER_SQL_TABLE_NAME "." SQL_COLID ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL03
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_NAM ","
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_ALI
                    " FROM " SUPPLIER_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
                    FORM_SQL_TABLE_NAME
-                   " ON " SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL01 " = "
+                   " ON " SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL_FID " = "
                    FORM_SQL_TABLE_NAME "." SQL_COLID);
   return strQuery;
 }

@@ -10,8 +10,8 @@ QString ShoppingListModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SHOPPING_LIST_SQL_TABLE_NAME "." SQL_COLID ","
-                   SHOPPING_LIST_SQL_TABLE_NAME "." SHOPPING_LIST_SQL_COL03 ","
-                   SHOPPING_LIST_SQL_TABLE_NAME "." SHOPPING_LIST_SQL_COL04
+                   SHOPPING_LIST_SQL_TABLE_NAME "." SHOPPING_LIST_SQL_COL_TIT ","
+                   SHOPPING_LIST_SQL_TABLE_NAME "." SHOPPING_LIST_SQL_COL_DES
                    " FROM "
                    SHOPPING_LIST_SQL_TABLE_NAME);
   return strQuery;

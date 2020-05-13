@@ -41,7 +41,7 @@ bool Supplier::SQL_insert_proc(QSqlQuery& query) const
   if (bSuccess)
   {
     query.prepare("INSERT INTO " SUPPLIER_SQL_TABLE_NAME " ("
-                  SUPPLIER_SQL_COL01 ")"
+                  SUPPLIER_SQL_COL_FID ")"
                   " VALUES ("
                   "(:_v01))");
 
@@ -59,7 +59,7 @@ bool Supplier::SQL_update_proc(QSqlQuery& query) const
   if (bSuccess)
   {
     query.prepare("UPDATE " SUPPLIER_SQL_TABLE_NAME " SET "
-                  SUPPLIER_SQL_COL01 " = (:_v01)"
+                  SUPPLIER_SQL_COL_FID " = (:_v01)"
                   " WHERE " SQL_COLID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", m_form.m_id.get());
@@ -72,7 +72,7 @@ bool Supplier::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                SUPPLIER_SQL_COL01
+                SUPPLIER_SQL_COL_FID
                 " FROM " SUPPLIER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -107,7 +107,7 @@ bool Supplier::SQL_remove_proc(QSqlQuery& query) const
 bool Supplier::SQL_select_formid_proc(QSqlQuery& query) const
 {
   query.prepare("SELECT "
-                SUPPLIER_SQL_COL01
+                SUPPLIER_SQL_COL_FID
                 " FROM " SUPPLIER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());

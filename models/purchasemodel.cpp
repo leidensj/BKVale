@@ -11,24 +11,24 @@ QString PurchaseModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    PURCHASE_SQL_TABLE_NAME "." SQL_COLID ","
-                   PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_NMB ","
-                   PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DTE ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL03 ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
-                   "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DSC ")"
+                   PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_NUM ","
+                   PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DAT ","
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_ALI ","
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_NAM ","
+                   "(COALESCE(_TTOTAL._TSUBTOTAL,0) + " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DIS ")"
                    " FROM " PURCHASE_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
                    "(SELECT " PURCHASE_ELEMENTS_SQL_COL_NID ","
-                   "COALESCE(SUM(" PURCHASE_ELEMENTS_SQL_COL_AMT "*" PURCHASE_ELEMENTS_SQL_COL_PRC "), 0) AS _TSUBTOTAL"
+                   "COALESCE(SUM(" PURCHASE_ELEMENTS_SQL_COL_AMM "*" PURCHASE_ELEMENTS_SQL_COL_PRI "), 0) AS _TSUBTOTAL"
                    " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                    " GROUP BY " PURCHASE_ELEMENTS_SQL_COL_NID ") AS _TTOTAL"
                                                      " ON " PURCHASE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." PURCHASE_ELEMENTS_SQL_COL_NID
                    " LEFT OUTER JOIN "
                    SUPPLIER_SQL_TABLE_NAME
-                   " ON " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL "=" SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
+                   " ON " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID "=" SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
                    " LEFT OUTER JOIN "
                    FORM_SQL_TABLE_NAME
-                   " ON " SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL01 " = " FORM_SQL_TABLE_NAME "." SQL_COLID);
+                   " ON " SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL_FID " = " FORM_SQL_TABLE_NAME "." SQL_COLID);
   return strQuery;
 }
 

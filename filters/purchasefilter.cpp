@@ -67,7 +67,7 @@ QString PurchaseFilter::getDateFilter() const
 {
   QString str;
   if (m_dtInt->isChecked())
-    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DTE " BETWEEN '" +
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DAT " BETWEEN '" +
            m_dtInt->getInitialDate().toString(Qt::ISODate) + "' AND '" +
            m_dtInt->getFinalDate().toString(Qt::ISODate) + "' ";
   return str;
@@ -79,7 +79,7 @@ QString PurchaseFilter::getSupplierFilter() const
   Ids ids = m_supplierPicker->getIds();
   if (!ids.isEmpty())
   {
-    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SPL " IN (";
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID " IN (";
     for (auto id : ids)
       str += id.str() + ",";
     str.chop(1);
@@ -112,7 +112,7 @@ QString PurchaseFilter::getStoreFilter() const
   Ids ids = m_storePicker->getIds();
   if (!ids.isEmpty())
   {
-    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_STR
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_TID
                  " IN (";
     for (auto id : ids)
       str += id.str() + ",";
@@ -130,7 +130,7 @@ QString PurchaseFilter::getPaymentFilter() const
       m_cbPaymentCash->isChecked() ||
       m_cbPaymentBonus->isChecked())
   {
-    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_PAY
            " IN (";
     if (m_cbPaymentCredit->isChecked())
       str += QString::number((int)Purchase::PaymentMethod::Credit) + ",";
@@ -143,7 +143,7 @@ QString PurchaseFilter::getPaymentFilter() const
   }
   else
   {
-    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_MTH
+    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_PAY
            " NOT IN (";
     str += QString::number((int)Purchase::PaymentMethod::Credit) + "," +
            QString::number((int)Purchase::PaymentMethod::Cash) + "," +

@@ -65,17 +65,17 @@ QString Form::SQL_tableName() const
 bool Form::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " FORM_SQL_TABLE_NAME " ("
-                FORM_SQL_COL01 ","
-                FORM_SQL_COL02 ","
-                FORM_SQL_COL03 ","
-                FORM_SQL_COL04 ","
-                FORM_SQL_COL05 ","
-                FORM_SQL_COL06 ","
-                FORM_SQL_COL07 ","
-                FORM_SQL_COL08 ","
-                FORM_SQL_COL09 ","
-                FORM_SQL_COL10 ","
-                FORM_SQL_COL11 ")"
+                FORM_SQL_COL_IID ","
+                FORM_SQL_COL_NAM ","
+                FORM_SQL_COL_ALI ","
+                FORM_SQL_COL_EMA ","
+                FORM_SQL_COL_CPF ","
+                FORM_SQL_COL_RGI ","
+                FORM_SQL_COL_DET ","
+                FORM_SQL_COL_BIR ","
+                FORM_SQL_COL_CRE ","
+                FORM_SQL_COL_ISC ","
+                FORM_SQL_COL_HBI ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -108,11 +108,11 @@ bool Form::SQL_insert_proc(QSqlQuery& query) const
     for (int i = 0; i != m_vPhone.size(); ++i)
     {
       query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
-                    PHONE_SQL_COL01 ","
-                    PHONE_SQL_COL02 ","
-                    PHONE_SQL_COL03 ","
-                    PHONE_SQL_COL04 ","
-                    PHONE_SQL_COL05 ")"
+                    PHONE_SQL_COL_FID ","
+                    PHONE_SQL_COL_COU ","
+                    PHONE_SQL_COL_COD ","
+                    PHONE_SQL_COL_NUM ","
+                    PHONE_SQL_COL_NAM ")"
                                     " VALUES ("
                                     "(:_v01),"
                                     "(:_v02),"
@@ -136,15 +136,15 @@ bool Form::SQL_insert_proc(QSqlQuery& query) const
       for (int i = 0; i != m_vAddress.size(); ++i)
       {
         query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
-                      ADDRESS_SQL_COL01 ","
-                      ADDRESS_SQL_COL02 ","
-                      ADDRESS_SQL_COL03 ","
-                      ADDRESS_SQL_COL04 ","
-                      ADDRESS_SQL_COL05 ","
-                      ADDRESS_SQL_COL06 ","
-                      ADDRESS_SQL_COL07 ","
-                      ADDRESS_SQL_COL08 ","
-                      ADDRESS_SQL_COL09 ")"
+                      ADDRESS_SQL_COL_FID ","
+                      ADDRESS_SQL_COL_CEP ","
+                      ADDRESS_SQL_COL_NEI ","
+                      ADDRESS_SQL_COL_STR ","
+                      ADDRESS_SQL_COL_NUM ","
+                      ADDRESS_SQL_COL_CIT ","
+                      ADDRESS_SQL_COL_STA ","
+                      ADDRESS_SQL_COL_COM ","
+                      ADDRESS_SQL_COL_REF ")"
                       " VALUES ("
                       "(:_v01),"
                       "(:_v02),"
@@ -179,17 +179,17 @@ bool Form::SQL_insert_proc(QSqlQuery& query) const
 bool Form::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " FORM_SQL_TABLE_NAME " SET "
-                FORM_SQL_COL01 " = (:_v01),"
-                FORM_SQL_COL02 " = (:_v02),"
-                FORM_SQL_COL03 " = (:_v03),"
-                FORM_SQL_COL04 " = (:_v04),"
-                FORM_SQL_COL05 " = (:_v05),"
-                FORM_SQL_COL06 " = (:_v06),"
-                FORM_SQL_COL07 " = (:_v07),"
-                FORM_SQL_COL08 " = (:_v08),"
-                FORM_SQL_COL09 " = (:_v09),"
-                FORM_SQL_COL10 " = (:_v10),"
-                FORM_SQL_COL11 " = (:_v11)"
+                FORM_SQL_COL_IID " = (:_v01),"
+                FORM_SQL_COL_NAM " = (:_v02),"
+                FORM_SQL_COL_ALI " = (:_v03),"
+                FORM_SQL_COL_EMA " = (:_v04),"
+                FORM_SQL_COL_CPF " = (:_v05),"
+                FORM_SQL_COL_RGI " = (:_v06),"
+                FORM_SQL_COL_DET " = (:_v07),"
+                FORM_SQL_COL_BIR " = (:_v08),"
+                FORM_SQL_COL_CRE " = (:_v09),"
+                FORM_SQL_COL_ISC " = (:_v10),"
+                FORM_SQL_COL_HBI " = (:_v11)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_image.m_id.getIdNull());
@@ -207,14 +207,14 @@ bool Form::SQL_update_proc(QSqlQuery& query) const
 
   if (bSuccess)
   {
-    query.prepare("DELETE FROM " ADDRESS_SQL_TABLE_NAME " WHERE " ADDRESS_SQL_COL01 " = (:_v01)");
+    query.prepare("DELETE FROM " ADDRESS_SQL_TABLE_NAME " WHERE " ADDRESS_SQL_COL_FID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
   }
 
   if (bSuccess)
   {
-    query.prepare("DELETE FROM " PHONE_SQL_TABLE_NAME " WHERE " PHONE_SQL_COL01 " = (:_v01)");
+    query.prepare("DELETE FROM " PHONE_SQL_TABLE_NAME " WHERE " PHONE_SQL_COL_FID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
   }
@@ -224,11 +224,11 @@ bool Form::SQL_update_proc(QSqlQuery& query) const
     for (int i = 0; i != m_vPhone.size(); ++i)
     {
       query.prepare("INSERT INTO " PHONE_SQL_TABLE_NAME " ("
-                    PHONE_SQL_COL01 ","
-                    PHONE_SQL_COL02 ","
-                    PHONE_SQL_COL03 ","
-                    PHONE_SQL_COL04 ","
-                    PHONE_SQL_COL05 ")"
+                    PHONE_SQL_COL_FID ","
+                    PHONE_SQL_COL_COU ","
+                    PHONE_SQL_COL_COD ","
+                    PHONE_SQL_COL_NUM ","
+                    PHONE_SQL_COL_NAM ")"
                     " VALUES ("
                     "(:_v01),"
                     "(:_v02),"
@@ -253,15 +253,15 @@ bool Form::SQL_update_proc(QSqlQuery& query) const
     for (int i = 0; i != m_vAddress.size(); ++i)
     {
       query.prepare("INSERT INTO " ADDRESS_SQL_TABLE_NAME " ("
-                    ADDRESS_SQL_COL01 ","
-                    ADDRESS_SQL_COL02 ","
-                    ADDRESS_SQL_COL03 ","
-                    ADDRESS_SQL_COL04 ","
-                    ADDRESS_SQL_COL05 ","
-                    ADDRESS_SQL_COL06 ","
-                    ADDRESS_SQL_COL07 ","
-                    ADDRESS_SQL_COL08 ","
-                    ADDRESS_SQL_COL09 ")"
+                    ADDRESS_SQL_COL_FID ","
+                    ADDRESS_SQL_COL_CEP ","
+                    ADDRESS_SQL_COL_NEI ","
+                    ADDRESS_SQL_COL_STR ","
+                    ADDRESS_SQL_COL_NUM ","
+                    ADDRESS_SQL_COL_CIT ","
+                    ADDRESS_SQL_COL_STA ","
+                    ADDRESS_SQL_COL_COM ","
+                    ADDRESS_SQL_COL_REF ")"
                     " VALUES ("
                     "(:_v01),"
                     "(:_v02),"
@@ -297,17 +297,17 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
   error.clear();
 
   query.prepare("SELECT "
-                FORM_SQL_COL01 ","
-                FORM_SQL_COL02 ","
-                FORM_SQL_COL03 ","
-                FORM_SQL_COL04 ","
-                FORM_SQL_COL05 ","
-                FORM_SQL_COL06 ","
-                FORM_SQL_COL07 ","
-                FORM_SQL_COL08 ","
-                FORM_SQL_COL09 ","
-                FORM_SQL_COL10 ","
-                FORM_SQL_COL11
+                FORM_SQL_COL_IID ","
+                FORM_SQL_COL_NAM ","
+                FORM_SQL_COL_ALI ","
+                FORM_SQL_COL_EMA ","
+                FORM_SQL_COL_CPF ","
+                FORM_SQL_COL_RGI ","
+                FORM_SQL_COL_DET ","
+                FORM_SQL_COL_BIR ","
+                FORM_SQL_COL_CRE ","
+                FORM_SQL_COL_ISC ","
+                FORM_SQL_COL_HBI
                 " FROM " FORM_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -336,7 +336,7 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
     query.prepare("SELECT "
                   SQL_COLID
                   " FROM " ADDRESS_SQL_TABLE_NAME
-                  " WHERE " ADDRESS_SQL_COL01 " = (:_v01)");
+                  " WHERE " ADDRESS_SQL_COL_FID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     Ids ids;
@@ -358,7 +358,7 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
     query.prepare("SELECT "
                   SQL_COLID
                   " FROM " PHONE_SQL_TABLE_NAME
-                  " WHERE " PHONE_SQL_COL01 " = (:_v01)");
+                  " WHERE " PHONE_SQL_COL_FID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     Ids ids;

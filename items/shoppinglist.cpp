@@ -175,13 +175,13 @@ QString ShoppingList::SQL_tableName() const
 bool ShoppingList::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " SHOPPING_LIST_SQL_TABLE_NAME " ("
-                SHOPPING_LIST_SQL_COL01 ","
-                SHOPPING_LIST_SQL_COL02 ","
-                SHOPPING_LIST_SQL_COL03 ","
-                SHOPPING_LIST_SQL_COL04 ","
-                SHOPPING_LIST_SQL_COL05 ","
-                SHOPPING_LIST_SQL_COL06 ","
-                SHOPPING_LIST_SQL_COL07
+                SHOPPING_LIST_SQL_COL_SID ","
+                SHOPPING_LIST_SQL_COL_IID ","
+                SHOPPING_LIST_SQL_COL_TIT ","
+                SHOPPING_LIST_SQL_COL_DES ","
+                SHOPPING_LIST_SQL_COL_WEE ","
+                SHOPPING_LIST_SQL_COL_MON ","
+                SHOPPING_LIST_SQL_COL_NLI
                 ") VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -206,15 +206,15 @@ bool ShoppingList::SQL_insert_proc(QSqlQuery& query) const
     m_id.set(query.lastInsertId().toLongLong());
     for (int i = 0; i != m_vItem.size(); ++i)
     {
-      query.prepare("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
-                    SHOPPING_LIST_ITEMS_SQL_LID ","
-                    SHOPPING_LIST_ITEMS_SQL_PID ","
-                    SHOPPING_LIST_ITEMS_SQL_AMT ","
-                    SHOPPING_LIST_ITEMS_SQL_PRC ","
-                    SHOPPING_LIST_ITEMS_SQL_PCK ","
-                    SHOPPING_LIST_ITEMS_SQL_UNT ","
-                    SHOPPING_LIST_ITEMS_SQL_PAM ","
-                    SHOPPING_LIST_ITEMS_SQL_SID
+      query.prepare("INSERT INTO " SHOPPING_LIST_ELEMENTS_SQL_TABLE_NAME " ("
+                    SHOPPING_LIST_ELEMENTS_SQL_LID ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PID ","
+                    SHOPPING_LIST_ELEMENTS_SQL_AMM ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PRI ","
+                    SHOPPING_LIST_ELEMENTS_SQL_ISP ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PUN ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PAM ","
+                    SHOPPING_LIST_ELEMENTS_SQL_SID
                     ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
@@ -247,13 +247,13 @@ bool ShoppingList::SQL_insert_proc(QSqlQuery& query) const
 bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " SHOPPING_LIST_SQL_TABLE_NAME " SET "
-                SHOPPING_LIST_SQL_COL01 " = (:_v01),"
-                SHOPPING_LIST_SQL_COL02 " = (:_v02),"
-                SHOPPING_LIST_SQL_COL03 " = (:_v03),"
-                SHOPPING_LIST_SQL_COL04 " = (:_v04),"
-                SHOPPING_LIST_SQL_COL05 " = (:_v05),"
-                SHOPPING_LIST_SQL_COL06 " = (:_v06),"
-                SHOPPING_LIST_SQL_COL07 " = (:_v07) "
+                SHOPPING_LIST_SQL_COL_SID " = (:_v01),"
+                SHOPPING_LIST_SQL_COL_IID " = (:_v02),"
+                SHOPPING_LIST_SQL_COL_TIT " = (:_v03),"
+                SHOPPING_LIST_SQL_COL_DES " = (:_v04),"
+                SHOPPING_LIST_SQL_COL_WEE " = (:_v05),"
+                SHOPPING_LIST_SQL_COL_MON " = (:_v06),"
+                SHOPPING_LIST_SQL_COL_NLI " = (:_v07) "
                 "WHERE " SQL_COLID " = (:_v00)");
 
   query.bindValue(":_v00", m_id.get());
@@ -268,7 +268,7 @@ bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
 
   if (bSuccess)
   {
-    query.prepare("DELETE FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ITEMS_SQL_LID " = (:_v01)");
+    query.prepare("DELETE FROM " SHOPPING_LIST_ELEMENTS_SQL_TABLE_NAME " WHERE " SHOPPING_LIST_ELEMENTS_SQL_LID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
   }
@@ -277,15 +277,15 @@ bool ShoppingList::SQL_update_proc(QSqlQuery& query) const
   {
     for (int i = 0; i != m_vItem.size(); ++i)
     {
-      query.prepare("INSERT INTO " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME " ("
-                    SHOPPING_LIST_ITEMS_SQL_LID ","
-                    SHOPPING_LIST_ITEMS_SQL_PID ","
-                    SHOPPING_LIST_ITEMS_SQL_AMT ","
-                    SHOPPING_LIST_ITEMS_SQL_PRC ","
-                    SHOPPING_LIST_ITEMS_SQL_PCK ","
-                    SHOPPING_LIST_ITEMS_SQL_UNT ","
-                    SHOPPING_LIST_ITEMS_SQL_PAM ","
-                    SHOPPING_LIST_ITEMS_SQL_SID
+      query.prepare("INSERT INTO " SHOPPING_LIST_ELEMENTS_SQL_TABLE_NAME " ("
+                    SHOPPING_LIST_ELEMENTS_SQL_LID ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PID ","
+                    SHOPPING_LIST_ELEMENTS_SQL_AMM ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PRI ","
+                    SHOPPING_LIST_ELEMENTS_SQL_ISP ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PUN ","
+                    SHOPPING_LIST_ELEMENTS_SQL_PAM ","
+                    SHOPPING_LIST_ELEMENTS_SQL_SID
                     ") VALUES ("
                     "(:_v01),"
                     "(:_v02),"
@@ -318,13 +318,13 @@ bool ShoppingList::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                SHOPPING_LIST_SQL_COL01 ","
-                SHOPPING_LIST_SQL_COL02 ","
-                SHOPPING_LIST_SQL_COL03 ","
-                SHOPPING_LIST_SQL_COL04 ","
-                SHOPPING_LIST_SQL_COL05 ","
-                SHOPPING_LIST_SQL_COL06 ","
-                SHOPPING_LIST_SQL_COL07
+                SHOPPING_LIST_SQL_COL_SID ","
+                SHOPPING_LIST_SQL_COL_IID ","
+                SHOPPING_LIST_SQL_COL_TIT ","
+                SHOPPING_LIST_SQL_COL_DES ","
+                SHOPPING_LIST_SQL_COL_WEE ","
+                SHOPPING_LIST_SQL_COL_MON ","
+                SHOPPING_LIST_SQL_COL_NLI
                 " FROM " SHOPPING_LIST_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -353,15 +353,15 @@ bool ShoppingList::SQL_select_proc(QSqlQuery& query, QString& error)
   {
     query.prepare("SELECT "
                   SQL_COLID ","
-                  SHOPPING_LIST_ITEMS_SQL_PID ","
-                  SHOPPING_LIST_ITEMS_SQL_AMT ","
-                  SHOPPING_LIST_ITEMS_SQL_PRC ","
-                  SHOPPING_LIST_ITEMS_SQL_PCK ","
-                  SHOPPING_LIST_ITEMS_SQL_UNT ","
-                  SHOPPING_LIST_ITEMS_SQL_PAM ","
-                  SHOPPING_LIST_ITEMS_SQL_SID
-                  " FROM " SHOPPING_LIST_ITEMS_SQL_TABLE_NAME
-                  " WHERE " SHOPPING_LIST_ITEMS_SQL_LID " = (:_v01)");
+                  SHOPPING_LIST_ELEMENTS_SQL_PID ","
+                  SHOPPING_LIST_ELEMENTS_SQL_AMM ","
+                  SHOPPING_LIST_ELEMENTS_SQL_PRI ","
+                  SHOPPING_LIST_ELEMENTS_SQL_ISP ","
+                  SHOPPING_LIST_ELEMENTS_SQL_PUN ","
+                  SHOPPING_LIST_ELEMENTS_SQL_PAM ","
+                  SHOPPING_LIST_ELEMENTS_SQL_SID
+                  " FROM " SHOPPING_LIST_ELEMENTS_SQL_TABLE_NAME
+                  " WHERE " SHOPPING_LIST_ELEMENTS_SQL_LID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     if (bSuccess)

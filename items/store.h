@@ -20,8 +20,6 @@ struct Store : public JItemSQL
   bool SQL_select_formid_proc(QSqlQuery& query) const;
 
   Form m_form;
-  Address m_address;
-  Phone m_phone;
   QString m_description;
   QVector<Employee> m_vEmployee;
 

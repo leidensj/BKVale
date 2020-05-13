@@ -35,8 +35,8 @@ bool PaymentElement::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " PAYMENT_ELEMENTS_SQL_TABLE_NAME " ("
                 PAYMENT_ELEMENTS_SQL_COL_NID ","
-                PAYMENT_ELEMENTS_SQL_COL_DTE ","
-                PAYMENT_ELEMENTS_SQL_COL_VLE
+                PAYMENT_ELEMENTS_SQL_COL_DAT ","
+                PAYMENT_ELEMENTS_SQL_COL_VAL
                 ") VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -55,8 +55,8 @@ bool PaymentElement::SQL_select_proc(QSqlQuery& query, QString& error)
   error.clear();
   query.prepare("SELECT "
                 PAYMENT_ELEMENTS_SQL_COL_NID ","
-                PAYMENT_ELEMENTS_SQL_COL_DTE ","
-                PAYMENT_ELEMENTS_SQL_COL_VLE
+                PAYMENT_ELEMENTS_SQL_COL_DAT ","
+                PAYMENT_ELEMENTS_SQL_COL_VAL
                 " FROM " PAYMENT_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -87,8 +87,8 @@ bool PaymentElement::SQL_select_by_owner_id_proc(QSqlQuery& query,
   v.clear();
   query.prepare("SELECT "
                 SQL_COLID ","
-                PAYMENT_ELEMENTS_SQL_COL_DTE ","
-                PAYMENT_ELEMENTS_SQL_COL_VLE
+                PAYMENT_ELEMENTS_SQL_COL_DAT ","
+                PAYMENT_ELEMENTS_SQL_COL_VAL
                 " FROM " PAYMENT_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " PAYMENT_ELEMENTS_SQL_COL_NID " = (:_v01)");
   query.bindValue(":_v01", ownerId.get());

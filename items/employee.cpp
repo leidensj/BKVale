@@ -65,10 +65,10 @@ bool Employee::SQL_insert_proc(QSqlQuery& query) const
   if (bSuccess)
   {
     query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
-                  EMPLOYEE_SQL_COL01 ","
-                  EMPLOYEE_SQL_COL02 ","
-                  EMPLOYEE_SQL_COL03 ","
-                  EMPLOYEE_SQL_COL04
+                  EMPLOYEE_SQL_COL_FID ","
+                  EMPLOYEE_SQL_COL_PIN ","
+                  EMPLOYEE_SQL_COL_NED ","
+                  EMPLOYEE_SQL_COL_NRE
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
@@ -85,10 +85,10 @@ bool Employee::SQL_insert_proc(QSqlQuery& query) const
       for (int i = 0; i != m_hours.size(); ++i)
       {
         query.prepare("INSERT INTO " EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
-                      EMPLOYEE_HOURS_SQL_COL01 ","
-                      EMPLOYEE_HOURS_SQL_COL02 ","
-                      EMPLOYEE_HOURS_SQL_COL03 ","
-                      EMPLOYEE_HOURS_SQL_COL04
+                      EMPLOYEE_HOURS_SQL_COL_EID ","
+                      EMPLOYEE_HOURS_SQL_COL_DAY ","
+                      EMPLOYEE_HOURS_SQL_COL_BEG ","
+                      EMPLOYEE_HOURS_SQL_COL_END
                       ") VALUES ("
                       "(:_v01),"
                       "(:_v02),"
@@ -113,10 +113,10 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
   if (bSuccess)
   {
     query.prepare("UPDATE " EMPLOYEE_SQL_TABLE_NAME " SET "
-                  EMPLOYEE_SQL_COL01 " = (:_v01),"
-                  EMPLOYEE_SQL_COL02 " = (:_v02),"
-                  EMPLOYEE_SQL_COL03 " = (:_v03),"
-                  EMPLOYEE_SQL_COL04 " = (:_v04)"
+                  EMPLOYEE_SQL_COL_FID " = (:_v01),"
+                  EMPLOYEE_SQL_COL_PIN " = (:_v02),"
+                  EMPLOYEE_SQL_COL_NED " = (:_v03),"
+                  EMPLOYEE_SQL_COL_NRE " = (:_v04)"
                   " WHERE " SQL_COLID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", m_form.m_id.get());
@@ -128,7 +128,7 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
     if (bSuccess)
     {
       query.prepare("DELETE FROM " EMPLOYEE_HOURS_SQL_TABLE_NAME
-                    " WHERE " EMPLOYEE_HOURS_SQL_COL01 " = (:_v01)");
+                    " WHERE " EMPLOYEE_HOURS_SQL_COL_EID " = (:_v01)");
       query.bindValue(":_v01", m_id.get());
       bSuccess = query.exec();
       if (bSuccess)
@@ -136,10 +136,10 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
         for (int i = 0; i != m_hours.size(); ++i)
         {
           query.prepare("INSERT INTO " EMPLOYEE_HOURS_SQL_TABLE_NAME " ("
-                        EMPLOYEE_HOURS_SQL_COL01 ","
-                        EMPLOYEE_HOURS_SQL_COL02 ","
-                        EMPLOYEE_HOURS_SQL_COL03 ","
-                        EMPLOYEE_HOURS_SQL_COL04
+                        EMPLOYEE_HOURS_SQL_COL_EID ","
+                        EMPLOYEE_HOURS_SQL_COL_DAY ","
+                        EMPLOYEE_HOURS_SQL_COL_BEG ","
+                        EMPLOYEE_HOURS_SQL_COL_END
                         ") VALUES ("
                         "(:_v01),"
                         "(:_v02),"
@@ -163,10 +163,10 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                EMPLOYEE_SQL_COL01 ","
-                EMPLOYEE_SQL_COL02 ","
-                EMPLOYEE_SQL_COL03 ","
-                EMPLOYEE_SQL_COL04
+                EMPLOYEE_SQL_COL_FID ","
+                EMPLOYEE_SQL_COL_PIN ","
+                EMPLOYEE_SQL_COL_NED ","
+                EMPLOYEE_SQL_COL_NRE
                 " FROM " EMPLOYEE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -190,11 +190,11 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
   if (bSuccess)
   {
     query.prepare("SELECT "
-                  EMPLOYEE_HOURS_SQL_COL02 ","
-                  EMPLOYEE_HOURS_SQL_COL03 ","
-                  EMPLOYEE_HOURS_SQL_COL04
+                  EMPLOYEE_HOURS_SQL_COL_DAY ","
+                  EMPLOYEE_HOURS_SQL_COL_BEG ","
+                  EMPLOYEE_HOURS_SQL_COL_END
                   " FROM " EMPLOYEE_HOURS_SQL_TABLE_NAME
-                  " WHERE " EMPLOYEE_HOURS_SQL_COL01 " = (:_v01)");
+                  " WHERE " EMPLOYEE_HOURS_SQL_COL_EID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
     bSuccess = query.exec();
     while (bSuccess && query.next())
@@ -251,7 +251,7 @@ bool Employee::SQL_select_by_pincode_proc(QSqlQuery& query, QString& error)
     query.prepare("SELECT "
                   SQL_COLID
                   " FROM " EMPLOYEE_SQL_TABLE_NAME
-                  " WHERE " EMPLOYEE_SQL_COL02 " = (:_v02) LIMIT 1");
+                  " WHERE " EMPLOYEE_SQL_COL_PIN " = (:_v02) LIMIT 1");
     query.bindValue(":_v02", m_pincode);
     bSuccess = query.exec();
     if (bSuccess)
@@ -275,7 +275,7 @@ bool Employee::SQL_select_by_pincode_proc(QSqlQuery& query, QString& error)
 bool Employee::SQL_select_formid_proc(QSqlQuery& query) const
 {
   query.prepare("SELECT "
-                EMPLOYEE_SQL_COL01
+                EMPLOYEE_SQL_COL_FID
                 " FROM " EMPLOYEE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());

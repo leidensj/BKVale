@@ -10,10 +10,10 @@ QString PhoneModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    SQL_COLID ","
-                   PHONE_SQL_COL02 ","
-                   PHONE_SQL_COL03 ","
-                   PHONE_SQL_COL04 ","
-                   PHONE_SQL_COL05
+                   PHONE_SQL_COL_COU ","
+                   PHONE_SQL_COL_COD ","
+                   PHONE_SQL_COL_NUM ","
+                   PHONE_SQL_COL_NAM
                    " FROM "
                    PHONE_SQL_TABLE_NAME);
   return strQuery;

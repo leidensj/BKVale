@@ -64,7 +64,7 @@ void StoreEmployeesTable::setEmployees(const QVector<Employee>& v)
 void StoreEmployeesTable::updateFilter()
 {
   QString filter = EMPLOYEE_SQL_TABLE_NAME "." SQL_COLID " NOT IN ("
-                   "SELECT " STORE_EMPLOYEES_SQL_TABLE_NAME "." STORE_EMPLOYEES_SQL_COL01
+                   "SELECT " STORE_EMPLOYEES_SQL_TABLE_NAME "." STORE_EMPLOYEES_SQL_COL_EID
                    " FROM " STORE_EMPLOYEES_SQL_TABLE_NAME ")";
   if (rowCount() != 0)
   {

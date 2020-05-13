@@ -61,18 +61,18 @@ QString Reminder::SQL_tableName() const
 bool Reminder::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " REMINDER_SQL_TABLE_NAME " ("
-                REMINDER_SQL_COL01 ","
-                REMINDER_SQL_COL02 ","
-                REMINDER_SQL_COL03 ","
-                REMINDER_SQL_COL04 ","
-                REMINDER_SQL_COL05 ","
-                REMINDER_SQL_COL06 ","
-                REMINDER_SQL_COL07 ","
-                REMINDER_SQL_COL08 ","
-                REMINDER_SQL_COL09 ","
-                REMINDER_SQL_COL10 ","
-                REMINDER_SQL_COL11 ","
-                REMINDER_SQL_COL12
+                REMINDER_SQL_COL_TIT ","
+                REMINDER_SQL_COL_MES ","
+                REMINDER_SQL_COL_FAV ","
+                REMINDER_SQL_COL_CAP ","
+                REMINDER_SQL_COL_SIZ ","
+                REMINDER_SQL_COL_HRI ","
+                REMINDER_SQL_COL_BAR ","
+                REMINDER_SQL_COL_DAT ","
+                REMINDER_SQL_COL_HDA ","
+                REMINDER_SQL_COL_TIM ","
+                REMINDER_SQL_COL_HTI ","
+                REMINDER_SQL_COL_SUB
                 ") VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -108,18 +108,18 @@ bool Reminder::SQL_insert_proc(QSqlQuery& query) const
 bool Reminder::SQL_update_proc(QSqlQuery& query) const
 {
   query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME " SET "
-                REMINDER_SQL_COL01 " = (:_v01),"
-                REMINDER_SQL_COL02 " = (:_v02),"
-                REMINDER_SQL_COL03 " = (:_v03),"
-                REMINDER_SQL_COL04 " = (:_v04),"
-                REMINDER_SQL_COL05 " = (:_v05),"
-                REMINDER_SQL_COL06 " = (:_v06),"
-                REMINDER_SQL_COL07 " = (:_v07),"
-                REMINDER_SQL_COL08 " = (:_v08),"
-                REMINDER_SQL_COL09 " = (:_v09),"
-                REMINDER_SQL_COL10 " = (:_v10),"
-                REMINDER_SQL_COL11 " = (:_v11),"
-                REMINDER_SQL_COL12 " = (:_v12)"
+                REMINDER_SQL_COL_TIT " = (:_v01),"
+                REMINDER_SQL_COL_MES " = (:_v02),"
+                REMINDER_SQL_COL_FAV " = (:_v03),"
+                REMINDER_SQL_COL_CAP " = (:_v04),"
+                REMINDER_SQL_COL_SIZ " = (:_v05),"
+                REMINDER_SQL_COL_HRI " = (:_v06),"
+                REMINDER_SQL_COL_BAR " = (:_v07),"
+                REMINDER_SQL_COL_DAT " = (:_v08),"
+                REMINDER_SQL_COL_HDA " = (:_v09),"
+                REMINDER_SQL_COL_TIM " = (:_v10),"
+                REMINDER_SQL_COL_HTI " = (:_v11),"
+                REMINDER_SQL_COL_SUB " = (:_v12)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_title);
@@ -140,18 +140,18 @@ bool Reminder::SQL_update_proc(QSqlQuery& query) const
 bool Reminder::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   query.prepare("SELECT "
-                REMINDER_SQL_COL01 ","
-                REMINDER_SQL_COL02 ","
-                REMINDER_SQL_COL03 ","
-                REMINDER_SQL_COL04 ","
-                REMINDER_SQL_COL05 ","
-                REMINDER_SQL_COL06 ","
-                REMINDER_SQL_COL07 ","
-                REMINDER_SQL_COL08 ","
-                REMINDER_SQL_COL09 ","
-                REMINDER_SQL_COL10 ","
-                REMINDER_SQL_COL11 ","
-                REMINDER_SQL_COL12
+                REMINDER_SQL_COL_TIT ","
+                REMINDER_SQL_COL_MES ","
+                REMINDER_SQL_COL_FAV ","
+                REMINDER_SQL_COL_CAP ","
+                REMINDER_SQL_COL_SIZ ","
+                REMINDER_SQL_COL_HRI ","
+                REMINDER_SQL_COL_BAR ","
+                REMINDER_SQL_COL_DAT ","
+                REMINDER_SQL_COL_HDA ","
+                REMINDER_SQL_COL_TIM ","
+                REMINDER_SQL_COL_HTI ","
+                REMINDER_SQL_COL_SUB
                 " FROM " REMINDER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -201,7 +201,7 @@ QStringList Reminder::SQL_select_subjects()
     QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
     QSqlQuery query(db);
     query.prepare("SELECT DISTINCT "
-                  REMINDER_SQL_COL12
+                  REMINDER_SQL_COL_SUB
                   " FROM " REMINDER_SQL_TABLE_NAME);
     bool bSuccess = query.exec();
     while (bSuccess && query.next())
@@ -222,7 +222,7 @@ QStringList Reminder::SQL_select_subjects()
    db.transaction();
    QSqlQuery query(db);
    query.prepare("UPDATE " REMINDER_SQL_TABLE_NAME
-                 " SET " REMINDER_SQL_COL03 " = NOT " REMINDER_SQL_COL03
+                 " SET " REMINDER_SQL_COL_FAV " = NOT " REMINDER_SQL_COL_FAV
                  " WHERE " SQL_COLID " = (:_v00)");
    query.bindValue(":_v00", m_id.get());
    bool bSuccess = query.exec();

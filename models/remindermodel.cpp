@@ -15,19 +15,19 @@ QString ReminderModel::getStrQuery()
   return
       "SELECT "
       SQL_COLID ","
-      REMINDER_SQL_COL01 ","
-      REMINDER_SQL_COL02 ","
-      REMINDER_SQL_COL12 ","
-      REMINDER_SQL_COL08 ","
-      REMINDER_SQL_COL10 ","
-      REMINDER_SQL_COL03 ","
-      REMINDER_SQL_COL09 ","
-      REMINDER_SQL_COL11 ","
-      REMINDER_SQL_COL04
+      REMINDER_SQL_COL_TIT ","
+      REMINDER_SQL_COL_MES ","
+      REMINDER_SQL_COL_SUB ","
+      REMINDER_SQL_COL_DAT ","
+      REMINDER_SQL_COL_TIM ","
+      REMINDER_SQL_COL_FAV ","
+      REMINDER_SQL_COL_HDA ","
+      REMINDER_SQL_COL_HTI ","
+      REMINDER_SQL_COL_CAP
       " FROM "
       REMINDER_SQL_TABLE_NAME
       " ORDER BY "
-      REMINDER_SQL_COL03 " DESC";
+      REMINDER_SQL_COL_FAV " DESC";
 }
 
 void ReminderModel::select(QHeaderView* header)

@@ -10,14 +10,14 @@ QString StoreModel::getStrQuery()
 {
   QString strQuery("SELECT "
                    STORE_SQL_TABLE_NAME "." SQL_COLID ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL02 ","
-                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL03 ","
-                   STORE_SQL_TABLE_NAME "." STORE_SQL_COL04
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_NAM ","
+                   FORM_SQL_TABLE_NAME "." FORM_SQL_COL_ALI ","
+                   STORE_SQL_TABLE_NAME "." STORE_SQL_COL_DES
                    " FROM "
                    STORE_SQL_TABLE_NAME
                    " LEFT OUTER JOIN "
                    FORM_SQL_TABLE_NAME
-                   " ON " STORE_SQL_TABLE_NAME "." STORE_SQL_COL01
+                   " ON " STORE_SQL_TABLE_NAME "." STORE_SQL_COL_FID
                    " = " FORM_SQL_TABLE_NAME "." SQL_COLID);
   return strQuery;
 }

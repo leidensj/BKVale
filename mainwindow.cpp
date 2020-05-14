@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "printutils.h"
-#include "controls/pincodedialog.h"
+
 #include "views/productview.h"
 #include "views/categoryview.h"
 #include "views/purchaseview.h"
@@ -10,21 +10,23 @@
 #include "views/reminderview.h"
 #include "views/shoppinglistview.h"
 #include "views/storeview.h"
+#include "views/userview.h"
+#include "views/imageview.h"
+
 #include "controls/report.h"
 #include "controls/calculatorwidget.h"
 #include "controls/shopwidget.h"
-#include "views/userview.h"
-#include "views/imageview.h"
+#include "controls/pincodedialog.h"
 #include "controls/logindialog.h"
 #include "controls/databaseviewer.h"
 #include "controls/timecarddialog.h"
+
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
 #include <QDir>
 #include <QLabel>
 #include <QCloseEvent>
-#include <QInputDialog>
 #include <QMdiSubWindow>
 #include <QTimer>
 

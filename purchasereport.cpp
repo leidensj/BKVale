@@ -231,29 +231,43 @@ QString PurchaseReport::processProduct() const
 
 QString PurchaseReport::processPurchase() const
 {
-  QString strQuery = "SELECT _NOTES._NUMBER AS NUMBER," //0
-                     "_NOTES._DATE AS _DATE," //1
-                     "_NOTES._OBSERVATION AS OBSERVATION," //2
-                     "_NOTES._DISCCOUNT AS DISCCOUNT," //3
-                     "_NOTES._PAYMENT_METHOD AS PAYMENT," //4
-                     "SUPPLIERFORM._NAME AS SUPPLIER," //5
-                     "STOREFORM._NAME AS STORE," //6
-                     "_PRODUCTS._NAME AS PRODUCT," //7
-                     "_PRODUCTS._UNITY AS UNITY," //8
-                     "_NOTE_ITEMS._PRODUCTID AS PRODUCTID," //9
-                     "_NOTE_ITEMS._AMMOUNT AS AMMOUNT," //10
-                     "_NOTE_ITEMS._PRICE AS PRICE," //11
-                     "_NOTE_ITEMS._IS_PACK AS ISPACK," //12
-                     "_NOTE_ITEMS._PACK_UNITY AS PACKUNITY," //13
-                     "_NOTE_ITEMS._PACK_AMMOUNT AS PACKAMMOUNT," //14
-                     "_NOTE_ITEMS._PRICE * _NOTE_ITEMS._AMMOUNT AS SUBTOTAL " //15
-                     "FROM _NOTE_ITEMS "
-                     "FULL JOIN _NOTES ON _NOTE_ITEMS._NOTEID = _NOTES._ID "
-                     "FULL JOIN _SUPPLIERS ON _NOTES._SUPPLIERID = _SUPPLIERS._ID "
-                     "LEFT JOIN _FORMS AS SUPPLIERFORM ON _SUPPLIERS._FORMID = SUPPLIERFORM._ID "
-                     "LEFT JOIN _STORES ON _NOTES._STOREID = _STORES._ID "
-                     "LEFT JOIN _FORMS AS STOREFORM ON _STORES._FORMID = STOREFORM._ID "
-                     "LEFT JOIN _PRODUCTS ON _NOTE_ITEMS._PRODUCTID = _PRODUCTS._ID";
+  QString strQuery = "SELECT " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_NUM " AS NUMBER," //0
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DAT " AS _DATE," //1
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_OBS " AS OBSERVATION," //2
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DIS " AS DISCCOUNT," //3
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_PAY " AS PAYMENT," //4
+                     "SUPPLIERFORM." FORM_SQL_COL_NAM " AS SUPPLIER," //5
+                     "STOREFORM." FORM_SQL_COL_NAM " AS STORE," //6
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //7
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //8
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //9
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //10
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //11
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //12
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //13
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //14
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " * "
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL " //15
+                     "FROM  " PURCHASE_ELEMENTS_SQL_TABLE_NAME
+                     " FULL JOIN " PURCHASE_SQL_TABLE_NAME " ON "
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " = "
+                     PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+                     " FULL JOIN " SUPPLIER_SQL_TABLE_NAME " ON "
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID " = "
+                     SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
+                     " LEFT JOIN " FORM_SQL_TABLE_NAME " AS SUPPLIERFORM ON "
+                     SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL_FID " = "
+                     "SUPPLIERFORM." SQL_COLID
+                     " LEFT JOIN " STORE_SQL_TABLE_NAME " ON "
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_TID " = "
+                     "_STORES." SQL_COLID
+                     " LEFT JOIN " FORM_SQL_TABLE_NAME " AS STOREFORM ON "
+                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL_FID " = "
+                     "STOREFORM." SQL_COLID
+                     " LEFT JOIN " PRODUCT_SQL_TABLE_NAME " ON "
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " = "
+                     PRODUCT_SQL_TABLE_NAME "." SQL_COLID;
+
   if (!getFilter().isEmpty())
     strQuery += " WHERE " + getFilter();
   strQuery += " ORDER BY NUMBER DESC";

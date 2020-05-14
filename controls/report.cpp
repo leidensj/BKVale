@@ -7,6 +7,8 @@
 #include <QLayout>
 #include <QDate>
 #include <QDialog>
+#include <QLabel>
+#include <QProgressBar>
 #include <QDialogButtonBox>
 #include "widgets/pdfgenerator.h"
 #include "purchasereport.h"
@@ -20,6 +22,8 @@ Report::Report(QWidget *parent)
   , m_report(nullptr)
   , m_rptPurchase(nullptr)
   , m_dlgPurchase(nullptr)
+  , m_lblProgress(nullptr)
+  , m_progress(nullptr)
 {
   m_btnPurchase = new QPushButton;
   m_btnPurchase->setFlat(true);
@@ -55,9 +59,21 @@ Report::Report(QWidget *parent)
   ltButton->addWidget(m_btnPurchase);
   ltButton->addWidget(m_btnPdf);
 
+  m_lblProgress = new QLabel(tr("Salvando PDF"));
+  m_lblProgress->hide();
+  m_progress = new QProgressBar;
+  m_progress->setRange(0, 0);
+  m_progress->hide();
+
+  QHBoxLayout* ltProgress = new QHBoxLayout;
+  ltProgress->setContentsMargins(0, 0, 0, 0);
+  ltProgress->addWidget(m_lblProgress);
+  ltProgress->addWidget(m_progress);
+
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(ltButton);
   ltMain->addWidget(m_report);
+  ltMain->addLayout(ltProgress);
   setLayout(ltMain);
 
   connect(m_btnPurchase, SIGNAL(clicked(bool)), this, SLOT(openPurchaseReport()));
@@ -91,7 +107,11 @@ void Report::toPdf()
   if (fileName.isEmpty())
     return;
 
+  m_lblProgress->show();
+  m_progress->show();
   PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), true, true);
+  connect(w, SIGNAL(finished()), m_lblProgress, SLOT(hide()));
+  connect(w, SIGNAL(finished()), m_progress, SLOT(hide()));
   w->generate();
 }
 

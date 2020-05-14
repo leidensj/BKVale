@@ -1,4 +1,4 @@
-#ifndef REPORT_H
+﻿#ifndef REPORT_H
 #define REPORT_H
 
 #include <QWidget>
@@ -7,6 +7,9 @@ class QPushButton;
 class QTextEdit;
 class QDialog;
 class PurchaseReport;
+class QProgressBar;
+class QLabel;
+
 class Report : public QWidget
 {
   Q_OBJECT
@@ -28,6 +31,8 @@ private:
   QTextEdit* m_report;
   PurchaseReport* m_rptPurchase;
   QDialog* m_dlgPurchase;
+  QLabel* m_lblProgress;
+  QProgressBar* m_progress;
 };
 
 #endif // REPORT_H

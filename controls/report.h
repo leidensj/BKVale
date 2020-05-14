@@ -7,8 +7,6 @@ class QPushButton;
 class QTextEdit;
 class QDialog;
 class PurchaseReport;
-class QProgressBar;
-class QLabel;
 
 class Report : public QWidget
 {
@@ -24,15 +22,15 @@ public slots:
 private slots:
   void openPurchaseReport();
   void updateControls();
+  void fontSizeChanged();
 
 private:
   QPushButton* m_btnPurchase;
   QPushButton* m_btnPdf;
+  QPushButton* m_btnFontSize;
   QTextEdit* m_report;
   PurchaseReport* m_rptPurchase;
   QDialog* m_dlgPurchase;
-  QLabel* m_lblProgress;
-  QProgressBar* m_progress;
 };
 
 #endif // REPORT_H

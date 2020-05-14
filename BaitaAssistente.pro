@@ -63,6 +63,8 @@ SOURCES += main.cpp\
     widgets/jlineedit.cpp \
     widgets/jplaintextedit.cpp \
     widgets/jspinbox.cpp \
+  widgets/jstatusmessageinstance.cpp \
+  widgets/jstatusprogressbarinstance.cpp \
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
     items/purchase.cpp \
@@ -164,6 +166,8 @@ HEADERS  += mainwindow.h \
     widgets/jdateedit.h \
     widgets/jplaintextedit.h \
     widgets/jspinbox.h \
+    widgets/jstatusmessageinstance.h \
+    widgets/jstatusprogressbarinstance.h \
     widgets/jtimeedit.h \
     items/jitem.h \
     items/jitemsql.h \

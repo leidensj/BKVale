@@ -21,6 +21,9 @@
 #include "controls/databaseviewer.h"
 #include "controls/timecarddialog.h"
 
+#include "widgets/jstatusprogressbarinstance.h"
+#include "widgets/jstatusmessageinstance.h"
+
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -113,8 +116,19 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   m_statusUserName->setTextFormat(Qt::RichText);
   m_statusTime = new QLabel;
   m_statusTime->setAlignment(Qt::AlignCenter);
+  auto p = JStatusProgressBarInstance::getInstance();
+  auto l = JStatusMessageInstance::getInstance();
+  if (p != nullptr)
+  {
+    p->setMaximumHeight(16);
+    p->setRange(0, 0);
+    p->hide();
+    l->hide();
+  }
   statusBar()->addWidget(m_statusDatabasePath);
   statusBar()->addWidget(m_statusUserName);
+  statusBar()->addWidget(l);
+  statusBar()->addWidget(p);
   statusBar()->addPermanentWidget(m_statusTime);
 
   connect(ui->actionPrint, SIGNAL(triggered(bool)), this, SLOT(print()));

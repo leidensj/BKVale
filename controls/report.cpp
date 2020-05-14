@@ -7,23 +7,24 @@
 #include <QLayout>
 #include <QDate>
 #include <QDialog>
-#include <QLabel>
-#include <QProgressBar>
 #include <QDialogButtonBox>
+#include <QMenu>
 #include "widgets/pdfgenerator.h"
+#include "widgets/jstatusprogressbarinstance.h"
+#include "widgets/jstatusmessageinstance.h"
 #include "purchasereport.h"
 
 #define PURCHASE_REPORT tr("Relatório de Compras")
+#define FONT_SIZE_PROP "fontsize"
 
 Report::Report(QWidget *parent)
   : QWidget(parent)
   , m_btnPurchase(nullptr)
   , m_btnPdf(nullptr)
+  , m_btnFontSize(nullptr)
   , m_report(nullptr)
   , m_rptPurchase(nullptr)
   , m_dlgPurchase(nullptr)
-  , m_lblProgress(nullptr)
-  , m_progress(nullptr)
 {
   m_btnPurchase = new QPushButton;
   m_btnPurchase->setFlat(true);
@@ -39,6 +40,28 @@ Report::Report(QWidget *parent)
 
   m_report = new QTextEdit;
   m_report->setReadOnly(true);
+
+  m_btnFontSize = new QPushButton;
+  m_btnFontSize->setFlat(true);
+  m_btnFontSize->setIconSize(QSize(24, 24));
+  m_btnFontSize->setIcon(QIcon(":/icons/res/text.png"));
+  m_btnFontSize->setToolTip(tr("Fonte"));
+  m_btnFontSize->setMenu(new QMenu);
+  QAction* act = m_btnFontSize->menu()->addAction("6", this, SLOT(fontSizeChanged()));
+  act->setProperty(FONT_SIZE_PROP, 6);
+  act->setCheckable(true);
+  QAction* actdefault = m_btnFontSize->menu()->addAction("8", this, SLOT(fontSizeChanged()));
+  actdefault->setProperty(FONT_SIZE_PROP, 8);
+  actdefault->setCheckable(true);
+  act = m_btnFontSize->menu()->addAction("12", this, SLOT(fontSizeChanged()));
+  act->setProperty(FONT_SIZE_PROP, 12);
+  act->setCheckable(true);
+  act = m_btnFontSize->menu()->addAction("14", this, SLOT(fontSizeChanged()));
+  act->setProperty(FONT_SIZE_PROP, 14);
+  act->setCheckable(true);
+  act = m_btnFontSize->menu()->addAction("16", this, SLOT(fontSizeChanged()));
+  act->setProperty(FONT_SIZE_PROP, 16);
+  act->setCheckable(true);
 
   m_rptPurchase = new PurchaseReport;
   QVBoxLayout *ltPurchase = new QVBoxLayout;
@@ -58,28 +81,35 @@ Report::Report(QWidget *parent)
   ltButton->setAlignment(Qt::AlignLeft);
   ltButton->addWidget(m_btnPurchase);
   ltButton->addWidget(m_btnPdf);
-
-  m_lblProgress = new QLabel(tr("Salvando PDF"));
-  m_lblProgress->hide();
-  m_progress = new QProgressBar;
-  m_progress->setRange(0, 0);
-  m_progress->hide();
-
-  QHBoxLayout* ltProgress = new QHBoxLayout;
-  ltProgress->setContentsMargins(0, 0, 0, 0);
-  ltProgress->addWidget(m_lblProgress);
-  ltProgress->addWidget(m_progress);
+  ltButton->addWidget(m_btnFontSize);
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(ltButton);
   ltMain->addWidget(m_report);
-  ltMain->addLayout(ltProgress);
-  setLayout(ltMain);
 
   connect(m_btnPurchase, SIGNAL(clicked(bool)), this, SLOT(openPurchaseReport()));
   connect(m_btnPdf, SIGNAL(clicked(bool)), this, SLOT(toPdf()));
   connect(btns, SIGNAL(accepted()), m_dlgPurchase, SLOT(accept()));
   connect(btns, SIGNAL(rejected()), m_dlgPurchase, SLOT(reject()));
+
+  setLayout(ltMain);
+  actdefault->trigger();
+}
+
+void Report::fontSizeChanged()
+{
+  if (sender() != nullptr)
+  {
+    int size = sender()->property(FONT_SIZE_PROP).toInt();
+    if (size >= 6 && size <= 16)
+    {
+      for (auto act : m_btnFontSize->menu()->actions())
+        act->setChecked(act == sender());
+      QFont f = m_report->font();
+      f.setPointSize(size);
+      m_report->setFont(f);
+    }
+  }
 }
 
 void Report::print()
@@ -107,17 +137,24 @@ void Report::toPdf()
   if (fileName.isEmpty())
     return;
 
-  m_lblProgress->show();
-  m_progress->show();
   PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), true, true);
-  connect(w, SIGNAL(finished()), m_lblProgress, SLOT(hide()));
-  connect(w, SIGNAL(finished()), m_progress, SLOT(hide()));
+  auto p = JStatusProgressBarInstance::getInstance();
+  auto l = JStatusMessageInstance::getInstance();
+  if (p != nullptr)
+  {
+    p->show();
+    l->show();
+    l->setText(tr("Gerando relatório:"));
+    connect(w, SIGNAL(finished()), p, SLOT(hide()));
+    connect(w, SIGNAL(finished()), l, SLOT(hide()));
+  }
   w->generate();
 }
 
 void Report::updateControls()
 {
   m_btnPdf->setEnabled(!m_report->toHtml().isEmpty());
+  m_btnFontSize->setEnabled(!m_report->toHtml().isEmpty());
 }
 
 void Report::openPurchaseReport()

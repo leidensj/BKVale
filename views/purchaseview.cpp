@@ -13,6 +13,7 @@
 #include <QPlainTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QAction>
 #include <QLabel>
 #include <QLayout>
 #include <QSpinBox>
@@ -22,6 +23,7 @@
 #include <QFormLayout>
 #include <QRadioButton>
 #include <QSettings>
+#include <QToolButton>
 #include <QDialogButtonBox>
 #include "items/jitemex.h"
 
@@ -166,8 +168,6 @@ void PaymentWidget::emitMethodChangedSignal()
 PurchaseView::PurchaseView(QWidget *parent)
   : JItemView(PURCHASE_SQL_TABLE_NAME, parent)
   , m_btnOpenLast(nullptr)
-  , m_btnAddCode(nullptr)
-  , m_btnAddRemove(nullptr)
   , m_snNumber(nullptr)
   , m_dtPicker(nullptr)
   , m_edTotal(nullptr)
@@ -178,7 +178,11 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_wPayment(nullptr)
   , m_teObservation(nullptr)
   , m_filter(nullptr)
-  , m_btnHistory(nullptr)
+  , m_btnAddMenu(nullptr)
+  , m_actAdd(nullptr)
+  , m_actAddCode(nullptr)
+  , m_actAddHistory(nullptr)
+  , m_btnRemove(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -192,26 +196,36 @@ PurchaseView::PurchaseView(QWidget *parent)
 
   m_ltButton->addWidget(m_btnOpenLast);
 
-  m_btnAddCode = new QPushButton;
-  m_btnAddCode->setFlat(true);
-  m_btnAddCode->setText("");
-  m_btnAddCode->setIconSize(QSize(24, 24));
-  m_btnAddCode->setIcon(QIcon(":/icons/res/barcodescan.png"));
-  m_btnAddCode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
-  m_btnAddCode->setToolTip(tr("Adicionar pelo código (Alt+*)"));
+  m_btnAddMenu = new QToolButton;
+  m_btnAddMenu->setIconSize(QSize(24, 24));
+  m_btnAddMenu->setAutoRaise(true);
+  m_btnAddMenu->setAutoFillBackground(false);
+  m_btnAddMenu->setPopupMode(QToolButton::MenuButtonPopup);
 
-  m_btnHistory = new QPushButton;
-  m_btnHistory->setFlat(true);
-  m_btnHistory->setText("");
-  m_btnHistory->setIconSize(QSize(24, 24));
-  m_btnHistory->setIcon(QIcon(":/icons/res/history.png"));
-  m_btnHistory->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Period));
-  m_btnHistory->setToolTip(tr("Adicionar pelo histório (Alt+.)"));
+  m_actAdd = new QAction(QIcon(":/icons/res/additem.png"), tr("Produto"), m_btnAddMenu);
+  m_actAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
+  m_actAdd->setToolTip(tr("Adicionar"));
 
-  m_btnAddRemove = new JAddRemoveButtons;
-  m_btnAddRemove->m_lt->addWidget(m_btnAddCode);
-  m_btnAddRemove->m_lt->addWidget(m_btnHistory);
-  m_table = new PurchaseTable(m_btnAddRemove);
+  m_actAddCode = new QAction(QIcon(":/icons/res/barcodescan.png"), tr("Código"), m_btnAddMenu);
+  m_actAddCode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
+
+  m_actAddHistory = new QAction(QIcon(":/icons/res/history.png"), tr("Histório"), m_btnAddMenu);
+  m_actAddHistory->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Period));
+
+  m_btnAddMenu->addAction(m_actAdd);
+  m_btnAddMenu->addAction(m_actAddCode);
+  m_btnAddMenu->addAction(m_actAddHistory);
+  m_btnAddMenu->setDefaultAction(m_actAdd);
+
+  m_btnRemove = new QPushButton;
+  m_btnRemove->setFlat(true);
+  m_btnRemove->setText("");
+  m_btnRemove->setIconSize(QSize(24, 24));
+  m_btnRemove->setIcon(QIcon(":/icons/res/removeitem.png"));
+  m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
+  m_btnRemove->setToolTip(tr("Remover (Alt+-)"));
+
+  m_table = new PurchaseTable;
   m_table->setLargerSize(true);
 
   QLabel* lblNumber = new QLabel();
@@ -265,7 +279,8 @@ PurchaseView::PurchaseView(QWidget *parent)
   ltCmd->addWidget(lblDate);
   ltCmd->addWidget(m_dtPicker);
   ltCmd->addWidget(line2);
-  ltCmd->addWidget(m_btnAddRemove);
+  ltCmd->addWidget(m_btnAddMenu);
+  ltCmd->addWidget(m_btnRemove);
 
   m_supplierPicker = new DatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
@@ -329,8 +344,11 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_tabDb->addTab(m_filter, QIcon(":/icons/res/filter.png"), tr("Filtro"));
 
   setContentsMargins(9, 9, 9, 9);
-  connect(m_btnAddCode, SIGNAL(clicked(bool)), m_table, SLOT(addRowByCode()));
-  connect(m_btnHistory, SIGNAL(clicked(bool)), this, SLOT(showHistory()));
+  connect(m_actAdd, SIGNAL(triggered(bool)), m_table, SLOT(addRowAndActivate()));
+  connect(m_actAddCode, SIGNAL(triggered(bool)), m_table, SLOT(addRowByCode()));
+  connect(m_actAddHistory, SIGNAL(triggered(bool)), this, SLOT(showHistory()));
+  connect(m_btnRemove, SIGNAL(clicked(bool)), m_table, SLOT(removeItem()));
+  connect(m_table, SIGNAL(changedSignal(bool)), m_btnRemove, SLOT(setEnabled(bool)));
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
@@ -409,7 +427,7 @@ void PurchaseView::updateControls()
   double total = m_table->sum((int)PurchaseTable::Column::SubTotal) + m_edDisccount->getValue();
   m_edTotal->setText(total);
   m_tab->setTabIcon(1, m_wPayment->getIcon());
-  m_btnHistory->setEnabled(m_supplierPicker->getFirstId().isValid());
+  m_actAddHistory->setEnabled(m_supplierPicker->getFirstId().isValid());
 }
 
 bool PurchaseView::save(Id& id)

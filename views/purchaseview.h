@@ -25,11 +25,13 @@ class JDatePicker;
 class QLabel;
 class JLineEdit;
 class QTableWidget;
-class JAddRemoveButtons;
 class PaymentTable;
 class QTableWidgetItem;
 class QRadioButton;
 class PurchaseFilter;
+class QToolButton;
+class QAction;
+class JAddRemoveButtons;
 
 class PaymentWidget : public QWidget
 {
@@ -88,8 +90,6 @@ protected slots:
 private:
   Id m_lastId;
   QPushButton* m_btnOpenLast;
-  QPushButton* m_btnAddCode;
-  JAddRemoveButtons* m_btnAddRemove;
   QSpinBox* m_snNumber;
   JDatePicker* m_dtPicker;
   JExpLineEdit* m_edTotal;
@@ -100,7 +100,11 @@ private:
   PaymentWidget* m_wPayment;
   QPlainTextEdit* m_teObservation;
   PurchaseFilter* m_filter;
-  QPushButton* m_btnHistory;
+  QToolButton* m_btnAddMenu;
+  QAction* m_actAdd;
+  QAction* m_actAddCode;
+  QAction* m_actAddHistory;
+  QPushButton* m_btnRemove;
 
 private slots:
   void supplierChanged();

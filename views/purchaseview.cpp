@@ -206,7 +206,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_actAdd->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Plus));
   m_actAdd->setToolTip(tr("Adicionar"));
 
-  m_actAddCode = new QAction(QIcon(":/icons/res/barcodescan.png"), tr("Código"), m_btnAddMenu);
+  m_actAddCode = new QAction(QIcon(":/icons/res/barcode.png"), tr("Código"), m_btnAddMenu);
   m_actAddCode->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Asterisk));
 
   m_actAddHistory = new QAction(QIcon(":/icons/res/history.png"), tr("Histório"), m_btnAddMenu);

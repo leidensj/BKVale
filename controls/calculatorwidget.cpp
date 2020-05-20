@@ -7,6 +7,7 @@
 #include <QRadioButton>
 #include <QSplitter>
 #include <QMessageBox>
+#include <QAction>
 #include "escpos.h"
 
 #define KEY_CODE "KEY_CODE"
@@ -286,8 +287,14 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_btnPlus->setText("");
   m_btnPlus->setIconSize(QSize(64, 64));
   m_btnPlus->setIcon(QIcon(":/icons/res/calcplus.png"));
-  m_btnPlus->setShortcut(QKeySequence(Qt::Key_Enter));
-  m_btnPlus->setProperty(KEY_CODE, Qt::Key_Enter);
+  m_btnPlus->setShortcut(QKeySequence(Qt::Key_Plus));
+  m_btnPlus->setProperty(KEY_CODE, Qt::Key_Plus);
+
+  auto action = new QAction(this);
+  action->setShortcuts({QKeySequence(Qt::Key_Return), QKeySequence(Qt::Key_Enter) });
+  this->addAction(action);
+  auto button = m_btnPlus;
+  connect(action, &QAction::triggered, [button](){ button->animateClick(); });
 
   QHBoxLayout* hline4 = new QHBoxLayout;
   hline4->addWidget(m_btn0);
@@ -382,7 +389,7 @@ double CalculatorWidget::calculate(double op1, double op2, int button)
 
   switch (button)
   {
-    case Qt::Key_Enter:
+    case Qt::Key_Plus:
       return op1 + op2;
     case Qt::Key_Minus:
       return op1 - op2;

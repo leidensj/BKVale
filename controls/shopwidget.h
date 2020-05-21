@@ -6,8 +6,7 @@
 #include "items/shoppinglist.h"
 
 class DatabaseViewer;
-class QDateEdit;
-class QPushButton;
+class JDatePicker;
 class QLabel;
 class QCheckBox;
 
@@ -21,13 +20,11 @@ public:
 
 private slots:
   void updateControls();
-  void setToday();
   void emitChangedSignal();
   
 private:
   DatabaseViewer* m_viewer;
-  QDateEdit* m_dtDate;
-  QPushButton* m_btnToday;
+  JDatePicker* m_dt;
   QLabel* m_lblWeekDay;
 
 signals:

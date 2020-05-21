@@ -181,7 +181,8 @@ QString PurchaseFilter::getFilter() const
 
 void PurchaseFilter::clear()
 {
-  m_dtInt->year();
+  m_dtInt->setChecked(true);
+  m_dtInt->day();
   m_supplierPicker->clear();
   m_productPicker->clear();
   m_storePicker->clear();

@@ -5,7 +5,8 @@
 #include <QLayout>
 #include <QCalendarWidget>
 #include <QTextCharFormat>
-#include <QPushButton>
+#include <QToolButton>
+#include <QAction>
 
 JDatePicker::JDatePicker(QWidget* parent)
   : QWidget(parent)
@@ -14,19 +15,35 @@ JDatePicker::JDatePicker(QWidget* parent)
   m_dt->setCalendarPopup(true);
   m_dt->setDate(QDate::currentDate());
 
-  m_btn = new QPushButton;
-  m_btn->setFlat(true);
-  m_btn->setText("");
+  m_btn = new QToolButton;
   m_btn->setIconSize(QSize(24, 24));
-  m_btn->setIcon(QIcon(":/icons/res/calendarok.png"));
+  m_btn->setAutoRaise(true);
+  m_btn->setPopupMode(QToolButton::MenuButtonPopup);
+
+  auto actToday = new QAction(QIcon(":/icons/res/calendarok.png"), tr("Hoje"), m_btn);
+  auto actMinusDay = new QAction(QIcon(":/icons/res/calminday.png"), tr("- Dia"), m_btn);
+  auto actPlusDay = new QAction(QIcon(":/icons/res/calplusday.png"), tr("+ Dia"), m_btn);
+  auto actMinusMonth = new QAction(QIcon(":/icons/res/calminmonth.png"), tr("- Mês"), m_btn);
+  auto actPlusMonth = new QAction(QIcon(":/icons/res/calplusmonth.png"), tr("+ Mês"), m_btn);
+  auto actMinusYear = new QAction(QIcon(":/icons/res/calminyear.png"), tr("- Ano"), m_btn);
+  auto actPlusYear = new QAction(QIcon(":/icons/res/calplusyear.png"), tr("+ Ano"), m_btn);
+  m_btn->addActions({actToday, actMinusDay, actPlusDay, actMinusMonth, actPlusMonth, actMinusYear, actPlusYear});
+  m_btn->setDefaultAction(actToday);
 
   QHBoxLayout* lt = new QHBoxLayout;
   lt->setContentsMargins(0, 0, 0, 0);
   lt->addWidget(m_dt);
   lt->addWidget(m_btn);
 
-  connect(m_btn, SIGNAL(clicked(bool)), this, SLOT(setToday()));
-  connect(m_dt, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitDateChangedSignal(const QDate&)));
+  auto dt = m_dt;
+  connect(actToday, &QAction::triggered, [dt](){ dt->setDate(QDate::currentDate()); });
+  connect(actMinusDay, &QAction::triggered, [dt](){ dt->setDate(dt->date().addDays(-1)); });
+  connect(actPlusDay, &QAction::triggered, [dt](){ dt->setDate(dt->date().addDays(1)); });
+  connect(actMinusMonth, &QAction::triggered, [dt](){ dt->setDate(dt->date().addMonths(-1)); });
+  connect(actPlusMonth, &QAction::triggered, [dt](){ dt->setDate(dt->date().addMonths(1)); });
+  connect(actMinusYear, &QAction::triggered, [dt](){ dt->setDate(dt->date().addYears(-1)); });
+  connect(actPlusYear, &QAction::triggered, [dt](){ dt->setDate(dt->date().addYears(1)); });
+  connect(m_dt, &JDateEdit::dateChanged, [this](const QDate& dt) { emit dateChangedSignal(dt); });
   connect(m_dt, SIGNAL(dateChanged(const QDate&)), this, SLOT(checkDate()));
 
   QTimer *timer = new QTimer(this);
@@ -55,11 +72,6 @@ void JDatePicker::checkDate()
                     : tr("Aviso! A data informada não é a de hoje. Usar a data de hoje?"));
 }
 
-void JDatePicker::setToday()
-{
-  m_dt->setDate(QDate::currentDate());
-}
-
 QDate JDatePicker::getDate() const
 {
   return m_dt->date();
@@ -68,9 +80,4 @@ QDate JDatePicker::getDate() const
 void JDatePicker::setDate(const QDate& dt)
 {
   m_dt->setDate(dt);
-}
-
-void JDatePicker::emitDateChangedSignal(const QDate& dt)
-{
-  emit dateChangedSignal(dt);
 }

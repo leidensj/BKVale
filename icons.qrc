@@ -172,5 +172,11 @@
         <file>res/calendarmonth.png</file>
         <file>res/calendarweek.png</file>
         <file>res/calendaryear.png</file>
+        <file>res/calminday.png</file>
+        <file>res/calminmonth.png</file>
+        <file>res/calminyear.png</file>
+        <file>res/calplusday.png</file>
+        <file>res/calplusmonth.png</file>
+        <file>res/calplusyear.png</file>
     </qresource>
 </RCC>

@@ -199,7 +199,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_btnAddMenu = new QToolButton;
   m_btnAddMenu->setIconSize(QSize(24, 24));
   m_btnAddMenu->setAutoRaise(true);
-  m_btnAddMenu->setAutoFillBackground(false);
   m_btnAddMenu->setPopupMode(QToolButton::MenuButtonPopup);
 
   m_actAdd = new QAction(QIcon(":/icons/res/additem.png"), tr("Produto"), m_btnAddMenu);

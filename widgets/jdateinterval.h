@@ -6,7 +6,7 @@
 #include <QGroupBox>
 
 class JDateEdit;
-class QPushButton;
+class QToolButton;
 
 class JDateInterval : public QGroupBox
 {
@@ -23,19 +23,12 @@ public slots:
   void week();
   void day();
 
-private slots:
-  void emitInitialDateChangedSignal(const QDate& dt);
-  void emitFinalDateChangedSignal(const QDate& dt);
-
 signals:
   void initialDateChangedSignal(const QDate& dt);
   void finalDateChangedSignal(const QDate& dt);
 
 private:
-  QPushButton* m_btnYear;
-  QPushButton* m_btnMonth;
-  QPushButton* m_btnWeek;
-  QPushButton* m_btnDay;
+  QToolButton* m_btn;
   JDateEdit* m_dtInit;
   JDateEdit* m_dtFinal;
 };

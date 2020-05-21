@@ -5,7 +5,7 @@
 #include <QDate>
 
 class JDateEdit;
-class QPushButton;
+class QToolButton;
 
 class JDatePicker : public QWidget
 {
@@ -18,14 +18,10 @@ public:
 
 public slots:
   void checkDate();
-  void setToday();
-
-private slots:
-  void emitDateChangedSignal(const QDate& dt);
 
 private:
   JDateEdit* m_dt;
-  QPushButton* m_btn;
+  QToolButton* m_btn;
 
 signals:
   void dateChangedSignal(const QDate& dt);

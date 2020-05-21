@@ -1,38 +1,32 @@
 #include "jdateinterval.h"
 #include "jdateedit.h"
-#include <QPushButton>
+#include <QToolButton>
+#include <QAction>
 #include <QLayout>
 #include <QFormLayout>
 
 JDateInterval::JDateInterval(QWidget *parent)
   : QGroupBox(parent)
-  , m_btnYear(nullptr)
-  , m_btnMonth(nullptr)
-  , m_btnWeek(nullptr)
-  , m_btnDay(nullptr)
+  , m_btn(nullptr)
   , m_dtInit(nullptr)
   , m_dtFinal(nullptr)
 {
-  m_btnYear = new QPushButton;
-  m_btnYear->setFlat(true);
-  m_btnYear->setIconSize(QSize(16, 16));
-  m_btnYear->setIcon(QIcon(":/icons/res/calendaryear.png"));
-  m_btnYear->setToolTip(tr("Este ano"));
-  m_btnMonth = new QPushButton;
-  m_btnMonth->setFlat(true);
-  m_btnMonth->setIconSize(QSize(16, 16));
-  m_btnMonth->setIcon(QIcon(":/icons/res/calendarmonth.png"));
-  m_btnMonth->setToolTip(tr("Este mês"));
-  m_btnWeek = new QPushButton;
-  m_btnWeek->setFlat(true);
-  m_btnWeek->setIconSize(QSize(16, 16));
-  m_btnWeek->setIcon(QIcon(":/icons/res/calendarweek.png"));
-  m_btnWeek->setToolTip(tr("Esta semana"));
-  m_btnDay = new QPushButton;
-  m_btnDay->setFlat(true);
-  m_btnDay->setIconSize(QSize(16, 16));
-  m_btnDay->setIcon(QIcon(":/icons/res/calendarok.png"));
-  m_btnDay->setToolTip(tr("Hoje"));
+  m_btn = new QToolButton;
+  m_btn->setIconSize(QSize(24, 24));
+  m_btn->setAutoRaise(true);
+  m_btn->setPopupMode(QToolButton::MenuButtonPopup);
+
+  auto actDay = new QAction(QIcon(":/icons/res/calendarok.png"), tr("Hoje"), m_btn);
+  auto actWeek = new QAction(QIcon(":/icons/res/calendarweek.png"), tr("Esta semana"), m_btn);
+  auto actMonth = new QAction(QIcon(":/icons/res/calendarmonth.png"), tr("Este mês"), m_btn);
+  auto actYear = new QAction(QIcon(":/icons/res/calendaryear.png"), tr("Este ano"), m_btn);
+  m_btn->addActions({actDay, actWeek, actMonth, actYear });
+  m_btn->setDefaultAction(actDay);
+
+  connect(actDay, SIGNAL(triggered(bool)), this, SLOT(day()));
+  connect(actWeek, SIGNAL(triggered(bool)), this, SLOT(week()));
+  connect(actMonth, SIGNAL(triggered(bool)), this, SLOT(month()));
+  connect(actYear, SIGNAL(triggered(bool)), this, SLOT(year()));
 
   setCheckable(true);
   setTitle(tr("Data"));
@@ -41,42 +35,20 @@ JDateInterval::JDateInterval(QWidget *parent)
   m_dtFinal = new JDateEdit;
   m_dtFinal->setCalendarPopup(true);
 
-  QHBoxLayout* ltButton = new QHBoxLayout;
-  ltButton->setContentsMargins(0, 0, 0, 0);
-  ltButton->setAlignment(Qt::AlignLeft);
-  ltButton->addWidget(m_btnYear);
-  ltButton->addWidget(m_btnMonth);
-  ltButton->addWidget(m_btnWeek);
-  ltButton->addWidget(m_btnDay);
-
   QFormLayout* ltfr = new QFormLayout;
   ltfr->setContentsMargins(0, 0, 0, 0);
   ltfr->addRow(tr("Data inicial:"), m_dtInit);
   ltfr->addRow(tr("Data final:"), m_dtFinal);
 
-  QVBoxLayout* ltMain= new QVBoxLayout;
-  ltMain->addLayout(ltButton);
+  QHBoxLayout* ltMain= new QHBoxLayout;
   ltMain->addLayout(ltfr);
+  ltMain->addWidget(m_btn);
 
-  connect(m_btnYear, SIGNAL(clicked(bool)), this, SLOT(year()));
-  connect(m_btnMonth, SIGNAL(clicked(bool)), this, SLOT(month()));
-  connect(m_btnWeek, SIGNAL(clicked(bool)), this, SLOT(week()));
-  connect(m_btnDay, SIGNAL(clicked(bool)), this, SLOT(day()));
-  connect(m_dtInit, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitInitialDateChangedSignal(const QDate&)));
-  connect(m_dtFinal, SIGNAL(dateChanged(const QDate&)), this, SLOT(emitFinalDateChangedSignal(const QDate&)));
+  connect(m_dtInit, &JDateEdit::dateChanged, [this](const QDate& dt){ emit initialDateChangedSignal(dt); });
+  connect(m_dtFinal, &JDateEdit::dateChanged, [this](const QDate& dt){ emit finalDateChangedSignal(dt); });
 
   day();
   setLayout(ltMain);
-}
-
-void JDateInterval::emitInitialDateChangedSignal(const QDate& dt)
-{
-  emit initialDateChangedSignal(dt);
-}
-
-void JDateInterval::emitFinalDateChangedSignal(const QDate& dt)
-{
-  emit finalDateChangedSignal(dt);
 }
 
 void JDateInterval::year()

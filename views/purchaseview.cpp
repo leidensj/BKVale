@@ -183,6 +183,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_actAddCode(nullptr)
   , m_actAddHistory(nullptr)
   , m_btnRemove(nullptr)
+  , m_lblViewerData(nullptr)
 {
   m_btnSave->setEnabled(false);
   m_btnSave->hide();
@@ -339,6 +340,8 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_tab->addTab(m_wPayment, m_wPayment->getIcon(), tr("Pagamento"));
   m_tab->addTab(frObservation, QIcon(":/icons/res/pencil.png"), tr("Observações"));
 
+  m_lblViewerData = new QLabel;
+  m_viewer->layout()->addWidget(m_lblViewerData);
   m_filter = new PurchaseFilter;
   m_tabDb->addTab(m_filter, QIcon(":/icons/res/filter.png"), tr("Filtro"));
 
@@ -358,6 +361,10 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_edTotal, SIGNAL(valueChanged(double)), m_wPayment, SLOT(setPurchaseTotal(double)));
   connect(m_dtPicker, SIGNAL(dateChangedSignal(const QDate&)), m_wPayment, SLOT(setPurchaseDate(const QDate&)));
   connect(this, SIGNAL(itemSelectedSignal()), SLOT(updateControls()));
+  connect(m_viewer, &DatabaseViewer::refreshSignal,
+          [this](){ m_lblViewerData->setText(tr("Número de compras: %1   Total das compras: %2").arg(
+                                               Data::strInt(m_viewer->getRowCount()),
+                                               Data::strMoney(m_viewer->getSum(5)))); });
 
   setFocusWidgetOnCreate(m_supplierPicker);
   create();

@@ -105,6 +105,7 @@ private:
   QAction* m_actAddCode;
   QAction* m_actAddHistory;
   QPushButton* m_btnRemove;
+  QLabel* m_lblViewerData;
 
 private slots:
   void supplierChanged();

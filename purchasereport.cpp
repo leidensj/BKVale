@@ -178,8 +178,8 @@ QString PurchaseReport::processProduct() const
     {
       currentProduct = query.value(9).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
-                      "<thead><tr><th align=\"left\" colspan=\"6\">%1</th></tr>").arg(query.value(7).toString());
-      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Subtotal</th></tr>";
+                      "<thead><tr><th align=\"left\" colspan=\"7\">%1</th></tr>").arg(query.value(7).toString());
+      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Preço</th><th>Subtotal</th></tr>";
     }
     html += QString(
                 "<tr>"
@@ -187,8 +187,9 @@ QString PurchaseReport::processProduct() const
                 "<td width=\"7%\">%2</td>"
                 "<td width=\"28%\">%3</td>"
                 "<td width=\"28%\">%4</td>"
-                "<td width=\"20%\">%5</td>"
+                "<td width=\"10%\">%5</td>"
                 "<td width=\"10%\">%6</td>"
+                "<td width=\"10%\">%7</td>"
                 "</tr>").arg(query.value(1).toDate().toString("dd/MM/yyyy"),
                              Data::strInt(query.value(0).toLongLong()),
                              query.value(5).toString(),
@@ -196,8 +197,8 @@ QString PurchaseReport::processProduct() const
                              Data::strAmmount(query.value(10).toDouble()) +
                              (query.value(12).toBool()
                               ? query.value(13).toString()
-                              : query.value(8).toString()) +
-                             " x " + Data::strMoney(query.value(11).toDouble()),
+                              : query.value(8).toString()),
+                             Data::strMoney(query.value(11).toDouble()),
                              Data::strMoney(query.value(15).toDouble()));
     currentSubtotal += query.value(15).toDouble();
     double ammount = query.value(10).toDouble();
@@ -304,7 +305,7 @@ QString PurchaseReport::processPurchase() const
       {
         html +=
         "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
-          "<tr><th>Quantidade</th><th>Produto</th><th>Subtotal</th></tr>";
+          "<tr><th>Quantidade</th><th>Preço</th><th>Produto</th><th>Subtotal</th></tr>";
       }
       currentNumber = query.value(0).toInt();
       nPurchases++;
@@ -313,14 +314,15 @@ QString PurchaseReport::processPurchase() const
     {
       html += QString(
       "<tr>"
-        "<td width=\"25%\">%1</td>"
-        "<td width=\"50%\">%2</td>"
-        "<td width=\"25%\">%3</td>"
+        "<td width=\"18%\">%1</td>"
+        "<td width=\"16%\">%2</td>"
+        "<td width=\"50%\">%3</td>"
+        "<td width=\"16%\">%4</td>"
       "</tr>").arg(Data::strAmmount(query.value(10).toDouble()) +
-                    (query.value(12).toBool()
-                    ? query.value(13).toString()
-                    : query.value(8).toString()) +
-                    " x " + Data::strMoney(query.value(11).toDouble()),
+                   (query.value(12).toBool()
+                   ? query.value(13).toString()
+                   : query.value(8).toString()),
+                   Data::strMoney(query.value(11).toDouble()),
                    query.value(7).toString(),
                    Data::strMoney(query.value(15).toDouble()));
       currentSubtotal +=query.value(15).toDouble();

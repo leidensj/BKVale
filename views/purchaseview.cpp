@@ -366,8 +366,8 @@ PurchaseView::PurchaseView(QWidget *parent)
                                                Data::strInt(m_viewer->getRowCount()),
                                                Data::strMoney(m_viewer->getSum(5)))); });
 
-  setFocusWidgetOnCreate(m_supplierPicker);
-  create();
+  setFocusWidgetOnClear(m_supplierPicker);
+  clear();
   updateControls();
 }
 
@@ -464,7 +464,7 @@ bool PurchaseView::save(Id& id)
     }
     id = o.m_id;
     m_lastId = o.m_id;
-    create();
+    clear();
   }
   updateControls();
   return bSuccess;

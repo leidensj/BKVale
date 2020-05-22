@@ -122,7 +122,7 @@ ReminderView::ReminderView(QWidget *parent)
   connect(m_btnPin, SIGNAL(clicked(bool)), this, SLOT(setFavorite()));
 
   updateControls();
-  setFocusWidgetOnCreate(m_edTitle);
+  setFocusWidgetOnClear(m_edTitle);
   create();
 }
 

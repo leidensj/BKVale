@@ -31,7 +31,7 @@ protected slots:
   virtual void setItem(const JItemSQL& o) = 0;
   virtual void itemsRemoved(const Ids& ids);
   virtual void save();
-  void setFocusWidgetOnCreate(QWidget* w);
+  void setFocusWidgetOnClear(QWidget* w);
   void addViewButton(const QString& tableName);
   void viewButtonClicked();
 
@@ -45,7 +45,7 @@ protected:
   QTabWidget* m_tab;
   QTabWidget* m_tabDb;
   QHBoxLayout* m_ltButton;
-  QPushButton* m_btnCreate;
+  QPushButton* m_btnClear;
   QPushButton* m_btnSave;
   QPushButton* m_btnSearch;
   QPushButton* m_btnMore;

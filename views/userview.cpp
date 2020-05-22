@@ -114,7 +114,7 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
 
   connect(m_viewPassword, SIGNAL(toggled(bool)), this, SLOT(viewPassword(bool)));
 
-  setFocusWidgetOnCreate(m_user);
+  setFocusWidgetOnClear(m_user);
   create();
 }
 

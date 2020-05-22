@@ -91,7 +91,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formInfo->m_type->hide();
   m_formInfo->setCompany(false);
 
-  setFocusWidgetOnCreate(m_formInfo->m_edName);
+  setFocusWidgetOnClear(m_formInfo->m_edName);
   create();
 }
 

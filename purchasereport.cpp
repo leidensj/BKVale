@@ -177,7 +177,7 @@ QString PurchaseReport::processProduct() const
     if (currentProduct != query.value(9).toLongLong())
     {
       currentProduct = query.value(9).toLongLong();
-      html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+      html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
                       "<thead><tr><th align=\"left\" colspan=\"6\">%1</th></tr>").arg(query.value(7).toString());
       html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Subtotal</th></tr>";
     }
@@ -303,7 +303,7 @@ QString PurchaseReport::processPurchase() const
       if (bHasProduct)
       {
         html +=
-        "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+        "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
           "<tr><th>Quantidade</th><th>Produto</th><th>Subtotal</th></tr>";
       }
       currentNumber = query.value(0).toInt();
@@ -349,7 +349,7 @@ QString PurchaseReport::processPurchase() const
   } while (query.next());
 
   html += QString(
-  "<br><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: black;\">"
+  "<br><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
     "<tr><th colspan=\"2\">Sumário</th></tr>"
     "<tr><td align=\"center\">Número de compras: %1</td>"
         "<td align=\"center\">Total das compras: %2</td></tr></table></body></html>").arg(Data::strInt(nPurchases),

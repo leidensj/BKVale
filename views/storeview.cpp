@@ -50,7 +50,7 @@ StoreView::StoreView(QWidget* parent)
   m_formInfo->m_lblType->hide();
   m_formInfo->m_type->hide();
 
-  setFocusWidgetOnCreate(m_formInfo->m_edName);
+  setFocusWidgetOnClear(m_formInfo->m_edName);
   create();
 }
 

@@ -22,7 +22,7 @@ ImageView::ImageView(QWidget* parent)
   tabframe->setLayout(tablayout);
 
   m_tab->addTab(tabframe, QIcon(":/icons/res/icon.png"), tr("Imagem"));
-  setFocusWidgetOnCreate(m_edImageName);
+  setFocusWidgetOnClear(m_edImageName);
 }
 
 void ImageView::setItem(const JItemSQL& o)

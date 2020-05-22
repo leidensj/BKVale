@@ -78,7 +78,7 @@ ProductView::ProductView(QWidget* parent)
   m_tab->addTab(tabInfoFrame, QIcon(":/icons/res/item.png"), tr("Produto"));
   m_tab->addTab(tabCodeFrame, QIcon(":/icons/res/barcode.png"), tr("Códigos"));
 
-  setFocusWidgetOnCreate(m_edName);
+  setFocusWidgetOnClear(m_edName);
   create();
 }
 

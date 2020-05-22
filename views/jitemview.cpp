@@ -20,19 +20,19 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   , m_tab(nullptr)
   , m_tabDb(nullptr)
   , m_ltButton(nullptr)
-  , m_btnCreate(nullptr)
+  , m_btnClear(nullptr)
   , m_btnSave(nullptr)
   , m_btnSearch(nullptr)
   , m_btnMore(nullptr)
   , m_dlgDb(nullptr)
   , m_wFocus(nullptr)
 {
-  m_btnCreate = new QPushButton;
-  m_btnCreate->setFlat(true);
-  m_btnCreate->setIconSize(QSize(24, 24));
-  m_btnCreate->setIcon(QIcon(":/icons/res/file.png"));
-  m_btnCreate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-  m_btnCreate->setToolTip(tr("Novo (Ctrl+N)"));
+  m_btnClear = new QPushButton;
+  m_btnClear->setFlat(true);
+  m_btnClear->setIconSize(QSize(24, 24));
+  m_btnClear->setIcon(QIcon(":/icons/res/file.png"));
+  m_btnClear->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
+  m_btnClear->setToolTip(tr("Novo (Ctrl+N)"));
 
   m_btnSave = new QPushButton;
   m_btnSave->setFlat(true);
@@ -50,7 +50,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
   m_ltButton = new QHBoxLayout;
   m_ltButton->setContentsMargins(0, 0, 0, 0);
-  m_ltButton->addWidget(m_btnCreate);
+  m_ltButton->addWidget(m_btnClear);
   m_ltButton->addWidget(m_btnSave);
   m_ltButton->addWidget(m_btnSearch);
   m_ltButton->setAlignment(Qt::AlignLeft);
@@ -87,7 +87,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   QRect rect = QApplication::desktop()->availableGeometry(this);
   m_dlgDb->resize(rect.width() * 0.7, rect.height() * 0.7);
 
-  connect(m_btnCreate, SIGNAL(clicked(bool)), this, SLOT(clear()));
+  connect(m_btnClear, SIGNAL(clicked(bool)), this, SLOT(clear()));
   connect(m_btnSave, SIGNAL(clicked(bool)), this, SLOT(save()));
   connect(m_viewer, SIGNAL(itemsSelectedSignal()), this, SLOT(setItem()));
   connect(m_viewer, SIGNAL(itemsSelectedSignal()), m_dlgDb, SLOT(accept()));
@@ -164,7 +164,7 @@ Id JItemView::getId() const
   return m_id;
 }
 
-void JItemView::setFocusWidgetOnCreate(QWidget* w)
+void JItemView::setFocusWidgetOnClear(QWidget* w)
 {
   m_wFocus = w;
 }

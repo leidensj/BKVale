@@ -27,7 +27,7 @@ SupplierView::SupplierView(QWidget* parent)
   m_formInfo->setCompany(true);
 
   // TODO WHY JLINEEDIT* TO QWIDGET NOT WORKING
-  setFocusWidgetOnCreate(m_formInfo->m_edName);
+  setFocusWidgetOnClear(m_formInfo->m_edName);
   create();
 }
 

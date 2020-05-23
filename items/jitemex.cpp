@@ -291,7 +291,6 @@ void JItemEx::remove(const Ids& ids, const QString& tableName, QWidget* parent)
 
 bool JItemEx::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
 {
-  bool bSuccess = false;
   QString error;
   if (JItemEx::authenticationToInsertUpdate(tableName))
   {
@@ -304,14 +303,15 @@ bool JItemEx::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
       error = QObject::tr("Pincode informado não encontrado.");
     else if (!e.hasPermissionToEdit(tableName))
       error = QObject::tr("Funcionário não possui permissão.");
-
-    bSuccess = error.isEmpty();
+    if (!error.isEmpty())
+    {
+      QMessageBox::warning(parent, QObject::tr("Erro"), error, QMessageBox::Ok);
+      return false;
+    }
     o.setEmployee(e);
   }
 
-  if (bSuccess)
-    bSuccess = o.SQL_insert_update(error);
-
+  bool bSuccess = o.SQL_insert_update(error);
   if (!bSuccess)
     QMessageBox::critical(parent, QObject::tr("Erro"), QObject::tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
 

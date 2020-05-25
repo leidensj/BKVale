@@ -47,8 +47,7 @@ Report::Report(QWidget *parent)
   m_btnFontSize->setIcon(QIcon(":/icons/res/text.png"));
   m_btnFontSize->setToolTip(tr("Fonte"));
   m_btnFontSize->setMenu(new QMenu);
-  QList<int> lst({6, 8, 10, 12, 14, 16});
-  for (auto i : lst)
+  for (int i = 6; i <= 16; i += 2)
   {
     QAction* act = m_btnFontSize->menu()->addAction(QString::number(i), this, SLOT(fontSizeChanged()));
     act->setProperty(FONT_SIZE_PROP, i);

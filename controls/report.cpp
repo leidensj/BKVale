@@ -47,21 +47,15 @@ Report::Report(QWidget *parent)
   m_btnFontSize->setIcon(QIcon(":/icons/res/text.png"));
   m_btnFontSize->setToolTip(tr("Fonte"));
   m_btnFontSize->setMenu(new QMenu);
-  QAction* act = m_btnFontSize->menu()->addAction("6", this, SLOT(fontSizeChanged()));
-  act->setProperty(FONT_SIZE_PROP, 6);
-  act->setCheckable(true);
-  QAction* actdefault = m_btnFontSize->menu()->addAction("8", this, SLOT(fontSizeChanged()));
-  actdefault->setProperty(FONT_SIZE_PROP, 8);
-  actdefault->setCheckable(true);
-  act = m_btnFontSize->menu()->addAction("12", this, SLOT(fontSizeChanged()));
-  act->setProperty(FONT_SIZE_PROP, 12);
-  act->setCheckable(true);
-  act = m_btnFontSize->menu()->addAction("14", this, SLOT(fontSizeChanged()));
-  act->setProperty(FONT_SIZE_PROP, 14);
-  act->setCheckable(true);
-  act = m_btnFontSize->menu()->addAction("16", this, SLOT(fontSizeChanged()));
-  act->setProperty(FONT_SIZE_PROP, 16);
-  act->setCheckable(true);
+  QList<int> lst({6, 8, 10, 12, 14, 16});
+  for (auto i : lst)
+  {
+    QAction* act = m_btnFontSize->menu()->addAction(QString::number(i), this, SLOT(fontSizeChanged()));
+    act->setProperty(FONT_SIZE_PROP, i);
+    act->setCheckable(true);
+    if (i == 8)
+      act->trigger();
+  }
 
   m_rptPurchase = new PurchaseReport;
   QVBoxLayout *ltPurchase = new QVBoxLayout;
@@ -93,7 +87,6 @@ Report::Report(QWidget *parent)
   connect(btns, SIGNAL(rejected()), m_dlgPurchase, SLOT(reject()));
 
   setLayout(ltMain);
-  actdefault->trigger();
 }
 
 void Report::fontSizeChanged()

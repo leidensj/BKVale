@@ -115,7 +115,7 @@ UserView::UserView(Id currentLoggedId, QWidget* parent)
   connect(m_viewPassword, SIGNAL(toggled(bool)), this, SLOT(viewPassword(bool)));
 
   setFocusWidgetOnClear(m_user);
-  create();
+  clear();
 }
 
 void UserView::getItem(JItemSQL& o) const

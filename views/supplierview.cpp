@@ -28,7 +28,7 @@ SupplierView::SupplierView(QWidget* parent)
 
   // TODO WHY JLINEEDIT* TO QWIDGET NOT WORKING
   setFocusWidgetOnClear(m_formInfo->m_edName);
-  create();
+  clear();
 }
 
 void SupplierView::getItem(JItemSQL& o) const

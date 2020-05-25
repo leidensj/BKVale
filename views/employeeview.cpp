@@ -92,7 +92,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formInfo->setCompany(false);
 
   setFocusWidgetOnClear(m_formInfo->m_edName);
-  create();
+  clear();
 }
 
 void EmployeeView::getItem(JItemSQL& o) const

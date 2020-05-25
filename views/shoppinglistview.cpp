@@ -155,7 +155,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
 
   setFocusWidgetOnClear(m_edTitle);
-  create();
+  clear();
 }
 
 void ShoppingListView::updateControls()

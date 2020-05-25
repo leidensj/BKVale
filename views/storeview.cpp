@@ -51,7 +51,7 @@ StoreView::StoreView(QWidget* parent)
   m_formInfo->m_type->hide();
 
   setFocusWidgetOnClear(m_formInfo->m_edName);
-  create();
+  clear();
 }
 
 void StoreView::getItem(JItemSQL& o) const

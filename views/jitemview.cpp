@@ -145,7 +145,7 @@ bool JItemView::save(Id& id)
     bSuccess = JItemEx::save(*p, m_viewer->getTableName(), this);
     if (bSuccess)
     {
-      create();
+      clear();
       id = p->m_id;
     }
     delete p;

@@ -123,7 +123,7 @@ ReminderView::ReminderView(QWidget *parent)
 
   updateControls();
   setFocusWidgetOnClear(m_edTitle);
-  create();
+  clear();
 }
 
 void ReminderView::getItem(JItemSQL& o) const

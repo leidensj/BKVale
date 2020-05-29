@@ -174,6 +174,7 @@ void JItemView::clear()
   JItemSQL* p = JItemEx::create(m_viewer->getTableName());
   if (p != nullptr)
   {
+    m_id = p->m_id;
     setItem(*p);
     m_btnSave->setIcon(QIcon(":/icons/res/save.png"));
     if (m_tab->count() > 0)

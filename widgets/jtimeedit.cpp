@@ -24,7 +24,7 @@ void JTimeEdit::keyPressEvent(QKeyEvent *event)
   }
   else if (event->key() == Qt::Key_Up)
   {
-    if (m_flags && (int)Flags::ArrowsAsTab)
+    if (m_flags & (int)Flags::ArrowsAsTab)
       focusPreviousChild();
     emit keyUpSignal();
   }

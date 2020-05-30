@@ -81,7 +81,7 @@ QString Text::getRegEx(Input input)
 
 QDateTime DateTime::server()
 {
-  QDateTime dt;
+  QDateTime dt(QDateTime::currentDateTime());
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   QSqlQuery query(db);
   query.prepare("SELECT NOW()");

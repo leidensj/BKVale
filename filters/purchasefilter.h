@@ -16,7 +16,7 @@ public:
   virtual QString getFilter() const;
 
 public slots:
-  void clear();
+  virtual void clear();
 
 protected:
   virtual QString getDateFilter() const;

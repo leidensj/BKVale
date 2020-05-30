@@ -123,6 +123,12 @@ QString PurchaseReport::strFilterHtml() const
   return str;
 }
 
+void PurchaseReport::clear()
+{
+  PurchaseFilter::clear();
+  m_dtInt->setChecked(true);
+}
+
 QString PurchaseReport::processProduct() const
 {
   QString strQuery = "SELECT " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_NUM " AS NUMBER," //0

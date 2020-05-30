@@ -16,6 +16,7 @@ public:
 
 public slots:
   QString process() const;
+  virtual void clear();
 
 protected:
   virtual QString getProductFilter() const;

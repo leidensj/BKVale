@@ -254,7 +254,8 @@ QString PurchaseReport::processPurchase() const
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //13
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //14
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " * "
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL " //15
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL," //15
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." SQL_COLID " AS ID," //16
                      "FROM  " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                      " FULL JOIN " PURCHASE_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " = "
@@ -277,7 +278,7 @@ QString PurchaseReport::processPurchase() const
 
   if (!getFilter().isEmpty())
     strQuery += " WHERE " + getFilter();
-  strQuery += " ORDER BY NUMBER DESC";
+  strQuery += " ORDER BY NUMBER DESC, ID ASC";
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   QSqlQuery query(db);
   if (!(query.exec(strQuery) && query.next()))

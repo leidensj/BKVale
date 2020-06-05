@@ -4,9 +4,9 @@
 #include <QSqlQuery>
 #include <QVariant>
 
-QString Data::strMoney(double value)
+QString Data::strMoney(double value, bool bCurrency)
 {
-  return "R$" + QString::number(value, 'f', 2);
+  return QString("%1%2").arg((bCurrency ? "R$" : ""), QString::number(value, 'f', 2));
 }
 
 QString Data::strAmmount(double value)

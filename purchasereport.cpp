@@ -185,7 +185,7 @@ QString PurchaseReport::processProduct() const
       currentProduct = query.value(9).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
                       "<thead><tr><th align=\"left\" colspan=\"7\">%1</th></tr>").arg(query.value(7).toString());
-      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Preço</th><th>Subtotal</th></tr>";
+      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Preço (R$)</th><th>Subtotal (R$)</th></tr>";
     }
     html += QString(
                 "<tr>"
@@ -204,8 +204,8 @@ QString PurchaseReport::processProduct() const
                              (query.value(12).toBool()
                               ? query.value(13).toString()
                               : query.value(8).toString()),
-                             Data::strMoney(query.value(11).toDouble()),
-                             Data::strMoney(query.value(15).toDouble()));
+                             Data::strMoney(query.value(11).toDouble(), false),
+                             Data::strMoney(query.value(15).toDouble(), false));
     currentSubtotal += query.value(15).toDouble();
     double ammount = query.value(10).toDouble();
     if (query.value(12).toBool()) // isPack
@@ -255,7 +255,7 @@ QString PurchaseReport::processPurchase() const
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //14
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " * "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL," //15
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." SQL_COLID " AS ID," //16
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." SQL_COLID " AS ID " //16
                      "FROM  " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                      " FULL JOIN " PURCHASE_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " = "

@@ -16,7 +16,7 @@ enum class Type
   Percentage
 };
 
-QString strMoney(double value);
+QString strMoney(double value, bool bCurrency = true);
 QString strAmmount(double value);
 QString strFmt(double value);
 QString strInt(double value);

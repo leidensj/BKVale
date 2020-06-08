@@ -14,6 +14,8 @@ JDatePicker::JDatePicker(QWidget* parent)
   m_dt = new JDateEdit;
   m_dt->setCalendarPopup(true);
   m_dt->setDate(QDate::currentDate());
+  m_dt->setDisplayFormat("dd/MM/yyyy dddd");
+  m_dt->setLocale(QLocale(QLocale::Portuguese, QLocale::Brazil));
 
   m_btn = new QToolButton;
   m_btn->setIconSize(QSize(24, 24));

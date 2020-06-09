@@ -368,6 +368,7 @@ PurchaseView::PurchaseView(QWidget *parent)
 
   setFocusWidgetOnClear(m_supplierPicker);
   clear();
+  m_viewer->refresh();
   updateControls();
 }
 

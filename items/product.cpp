@@ -364,7 +364,7 @@ bool Product::SQL_update_unity(const Package& pck, QString& error) const
   query.bindValue(":_v01", pck.m_unity);
   bool bSuccess = query.exec();
 
-  if (bSuccess && pck.m_ammount != 1.0 && pck.m_ammount != 0.0)
+  if (bSuccess && pck.m_ammount != 0.0)
   {
     query.prepare("UPDATE " PURCHASE_ELEMENTS_SQL_TABLE_NAME " SET "
                   PURCHASE_ELEMENTS_SQL_COL_AMM " = CASE WHEN "
@@ -383,27 +383,26 @@ bool Product::SQL_update_unity(const Package& pck, QString& error) const
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", pck.m_ammount);
     bSuccess = query.exec();
-  }
-
-  if (bSuccess && pck.m_ammount != 1.0 && pck.m_ammount != 0.0)
-  {
-    query.prepare("UPDATE " SHOPPING_LIST_ELEMENTS_SQL_TABLE_NAME " SET "
-                  SHOPPING_LIST_ELEMENTS_SQL_AMM " = CASE WHEN "
-                  SHOPPING_LIST_ELEMENTS_SQL_ISP " = FALSE THEN "
-                  SHOPPING_LIST_ELEMENTS_SQL_AMM "/(:_v01)"
-                  " ELSE " SHOPPING_LIST_ELEMENTS_SQL_AMM " END,"
-                  SHOPPING_LIST_ELEMENTS_SQL_PRI " = CASE WHEN "
-                  SHOPPING_LIST_ELEMENTS_SQL_ISP " = FALSE THEN "
-                  SHOPPING_LIST_ELEMENTS_SQL_PRI "*(:_v01)"
-                  " ELSE " SHOPPING_LIST_ELEMENTS_SQL_PRI " END,"
-                  SHOPPING_LIST_ELEMENTS_SQL_PAM " = CASE WHEN "
-                  SHOPPING_LIST_ELEMENTS_SQL_ISP " = TRUE THEN "
-                  SHOPPING_LIST_ELEMENTS_SQL_PAM "/(:_v01)"
-                  " ELSE " SHOPPING_LIST_ELEMENTS_SQL_PAM " END"
-                  " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
-    query.bindValue(":_v00", m_id.get());
-    query.bindValue(":_v01", pck.m_ammount);
-    bSuccess = query.exec();
+    if (bSuccess)
+    {
+      query.prepare("UPDATE " SHOPPING_LIST_ELEMENTS_SQL_TABLE_NAME " SET "
+                    SHOPPING_LIST_ELEMENTS_SQL_AMM " = CASE WHEN "
+                    SHOPPING_LIST_ELEMENTS_SQL_ISP " = FALSE THEN "
+                    SHOPPING_LIST_ELEMENTS_SQL_AMM "/(:_v01)"
+                    " ELSE " SHOPPING_LIST_ELEMENTS_SQL_AMM " END,"
+                    SHOPPING_LIST_ELEMENTS_SQL_PRI " = CASE WHEN "
+                    SHOPPING_LIST_ELEMENTS_SQL_ISP " = FALSE THEN "
+                    SHOPPING_LIST_ELEMENTS_SQL_PRI "*(:_v01)"
+                    " ELSE " SHOPPING_LIST_ELEMENTS_SQL_PRI " END,"
+                    SHOPPING_LIST_ELEMENTS_SQL_PAM " = CASE WHEN "
+                    SHOPPING_LIST_ELEMENTS_SQL_ISP " = TRUE THEN "
+                    SHOPPING_LIST_ELEMENTS_SQL_PAM "/(:_v01)"
+                    " ELSE " SHOPPING_LIST_ELEMENTS_SQL_PAM " END"
+                    " WHERE " PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00)");
+      query.bindValue(":_v00", m_id.get());
+      query.bindValue(":_v01", pck.m_ammount);
+      bSuccess = query.exec();
+    }
   }
   return SQL_finish(db, query, bSuccess, error);
 }

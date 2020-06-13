@@ -1,4 +1,5 @@
 #include "purchasemodel.h"
+#include "common.h"
 #include <QDate>
 
 PurchaseModel::PurchaseModel(QObject *parent)
@@ -22,7 +23,7 @@ QString PurchaseModel::getStrQuery()
                    "COALESCE(SUM(" PURCHASE_ELEMENTS_SQL_COL_AMM "*" PURCHASE_ELEMENTS_SQL_COL_PRI "), 0) AS _TSUBTOTAL"
                    " FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                    " GROUP BY " PURCHASE_ELEMENTS_SQL_COL_NID ") AS _TTOTAL"
-                                                     " ON " PURCHASE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." PURCHASE_ELEMENTS_SQL_COL_NID
+                   " ON " PURCHASE_SQL_TABLE_NAME "." SQL_COLID "= _TTOTAL." PURCHASE_ELEMENTS_SQL_COL_NID
                    " LEFT OUTER JOIN "
                    SUPPLIER_SQL_TABLE_NAME
                    " ON " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID "=" SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
@@ -68,7 +69,7 @@ QVariant PurchaseModel::data(const QModelIndex &idx, int role) const
         value = QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 1), role);
     }
     else if (idx.column() == 5)
-      value = "R$ " + QString::number(value.toDouble(), 'f', 2);
+      value = Data::strMoney(value.toDouble());
   }
   return value;
 }

@@ -204,7 +204,7 @@ QString PurchaseReport::processProduct() const
                              Data::strAmmount(query.value(10).toDouble()),
                              (query.value(12).toBool()
                              ? query.value(13).toString() +
-                               " (" + Data::strAmmount(query.value(14).toDouble()) +
+                               " (" + Data::strFmt(query.value(14).toDouble()) +
                                 query.value(8).toString() + ")"
                              : query.value(8).toString()),
                              Data::strMoney(query.value(11).toDouble(), false),
@@ -332,7 +332,7 @@ QString PurchaseReport::processPurchase() const
       "</tr>").arg(Data::strAmmount(query.value(10).toDouble()),
                    (query.value(12).toBool()
                    ? query.value(13).toString() +
-                     " (" + Data::strAmmount(query.value(14).toDouble()) +
+                     " (" + Data::strFmt(query.value(14).toDouble()) +
                       query.value(8).toString() + ")"
                    : query.value(8).toString()),
                    query.value(7).toString(),

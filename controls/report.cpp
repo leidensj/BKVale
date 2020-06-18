@@ -12,6 +12,7 @@
 #include "widgets/pdfgenerator.h"
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
+#include "widgets/findwidget.h"
 #include "purchasereport.h"
 
 #define PURCHASE_REPORT tr("Relatório de Compras")
@@ -25,6 +26,7 @@ Report::Report(QWidget *parent)
   , m_report(nullptr)
   , m_rptPurchase(nullptr)
   , m_dlgPurchase(nullptr)
+  , m_find(nullptr)
 {
   m_btnPurchase = new QPushButton;
   m_btnPurchase->setFlat(true);
@@ -69,6 +71,8 @@ Report::Report(QWidget *parent)
   m_dlgPurchase->setWindowIcon(QIcon(":/icons/res/purchase.png"));
   m_dlgPurchase->setModal(true);
 
+  m_find = new FindWidget;
+
   QHBoxLayout* ltButton = new QHBoxLayout;
   ltButton->setContentsMargins(0, 0, 0, 0);
   ltButton->setAlignment(Qt::AlignLeft);
@@ -78,12 +82,17 @@ Report::Report(QWidget *parent)
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(ltButton);
+  ltMain->addWidget(m_find);
   ltMain->addWidget(m_report);
 
   connect(m_btnPurchase, SIGNAL(clicked(bool)), this, SLOT(openPurchaseReport()));
   connect(m_btnPdf, SIGNAL(clicked(bool)), this, SLOT(toPdf()));
   connect(btns, SIGNAL(accepted()), m_dlgPurchase, SLOT(accept()));
   connect(btns, SIGNAL(rejected()), m_dlgPurchase, SLOT(reject()));
+  connect(m_find, &FindWidget::findSignal, [this](const QString& exp, QTextDocument::FindFlags o)
+  {
+    m_report->find(exp, o);
+  });
 
   setLayout(ltMain);
 }

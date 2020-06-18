@@ -7,6 +7,7 @@ class QPushButton;
 class QTextEdit;
 class QDialog;
 class PurchaseReport;
+class FindWidget;
 
 class Report : public QWidget
 {
@@ -31,6 +32,7 @@ private:
   QTextEdit* m_report;
   PurchaseReport* m_rptPurchase;
   QDialog* m_dlgPurchase;
+  FindWidget* m_find;
 };
 
 #endif // REPORT_H

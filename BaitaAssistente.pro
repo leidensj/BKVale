@@ -54,6 +54,7 @@ SOURCES += main.cpp\
     items/user.cpp \
     items/jitemex.cpp \
   views/jitemview.cpp \
+  widgets/findwidget.cpp \
     widgets/jaddremovebuttons.cpp \
   widgets/jclicklabel.cpp \
     widgets/jdateedit.cpp \
@@ -158,6 +159,7 @@ HEADERS  += mainwindow.h \
     items/user.h \
     items/jitemex.h \
     views/jitemview.h \
+    widgets/findwidget.h \
     widgets/jclicklabel.h \
     widgets/jaddremovebuttons.h \
     widgets/jdateinterval.h \

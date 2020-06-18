@@ -6,7 +6,17 @@
 
 QString Data::strMoney(double value, bool bCurrency)
 {
-  return QString("%1%2").arg((bCurrency ? "R$" : ""), QString::number(value, 'f', 2));
+  QString str(QString::number(value, 'f', 2));
+  QStringList lst = str.split(".");
+  if (lst.size() == 2 && lst.at(0).size() != 0)
+  {
+    int n = lst.at(0).size() / 3 + (lst.at(0).size() % 3 == 0 ? -1 : 0);
+    int size = lst.at(0).size();
+    for (int i = 1; i <= n; ++i)
+      lst[0] = lst[0].insert(size - (i*3), ",");
+    str = lst[0] + "." + lst[1];
+  }
+  return QString("%1%2").arg((bCurrency ? "R$" : ""), str);
 }
 
 QString Data::strAmmount(double value)

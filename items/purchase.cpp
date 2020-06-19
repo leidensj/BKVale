@@ -24,7 +24,7 @@ QString Purchase::st_paymentText(PaymentMethod e)
     case PaymentMethod::Cash:
       return QObject::tr("A vista");
     case PaymentMethod::Bonus:
-      return QObject::tr("Bonus");
+      return QObject::tr("Bonificação");
     default:
       return "";
   }

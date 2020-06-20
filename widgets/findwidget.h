@@ -2,7 +2,7 @@
 #define FINDWIDGET_H
 
 #include <QWidget>
-#include <QTextDocument>
+#include <QTextEdit>
 
 class JLineEdit;
 class QPushButton;
@@ -12,19 +12,18 @@ class FindWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit FindWidget(QWidget* parent = nullptr);
+  explicit FindWidget(QTextEdit* doc, QWidget* parent = nullptr);
+
+private slots:
+  void find();
+  void updateControls();
 
 private:
+  QTextEdit* m_doc;
   JLineEdit* m_edFind;
   QPushButton* m_btnDown;
   QPushButton* m_btnUp;
   QPushButton* m_btnCaseSensitive;
-
-private slots:
-  void emitFindSignal();
-
-signals:
-  void findSignal(const QString &exp, QTextDocument::FindFlags options);
 };
 
 #endif // FINDWIDGET_H

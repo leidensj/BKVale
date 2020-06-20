@@ -21,6 +21,7 @@ protected:
 private:
   const bool m_bToUpper;
   bool m_bArrowsAndEnterAsTab;
+
 signals:
   void enterSignal();
   void keyDownSignal();

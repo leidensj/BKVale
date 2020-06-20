@@ -71,7 +71,7 @@ Report::Report(QWidget *parent)
   m_dlgPurchase->setWindowIcon(QIcon(":/icons/res/purchase.png"));
   m_dlgPurchase->setModal(true);
 
-  m_find = new FindWidget;
+  m_find = new FindWidget(m_report);
 
   QHBoxLayout* ltButton = new QHBoxLayout;
   ltButton->setContentsMargins(0, 0, 0, 0);
@@ -89,10 +89,6 @@ Report::Report(QWidget *parent)
   connect(m_btnPdf, SIGNAL(clicked(bool)), this, SLOT(toPdf()));
   connect(btns, SIGNAL(accepted()), m_dlgPurchase, SLOT(accept()));
   connect(btns, SIGNAL(rejected()), m_dlgPurchase, SLOT(reject()));
-  connect(m_find, &FindWidget::findSignal, [this](const QString& exp, QTextDocument::FindFlags o)
-  {
-    m_report->find(exp, o);
-  });
 
   setLayout(ltMain);
 }

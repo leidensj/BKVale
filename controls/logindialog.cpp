@@ -61,7 +61,7 @@ LoginDialog::LoginDialog(ActiveUser& login,
   lblPassword->setMaximumSize(24, 24);
   lblPassword->setScaledContents(true);
   QLabel* lblDatabase = new QLabel();
-  lblDatabase->setPixmap(QIcon(":/icons/res/databasebackup.png").pixmap(QSize(24, 24)));
+  lblDatabase->setPixmap(QIcon(":/icons/res/server.png").pixmap(QSize(24, 24)));
   lblDatabase->setMinimumSize(24, 24);
   lblDatabase->setMaximumSize(24, 24);
   lblDatabase->setScaledContents(true);

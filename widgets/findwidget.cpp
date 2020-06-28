@@ -33,7 +33,7 @@ FindWidget::FindWidget(QTextEdit* doc, QWidget* parent)
   m_btnCaseSensitive->setIconSize(QSize(16, 16));
   m_btnCaseSensitive->setIcon(QIcon(":/icons/res/uppercase.png"));
   m_btnCaseSensitive->setCheckable(true);
-  m_btnCaseSensitive->setToolTip(tr("Case Sensitive"));
+  m_btnCaseSensitive->setToolTip(tr("Diferenciar maiúsuclas e minúsculas"));
 
   QHBoxLayout* lt = new QHBoxLayout;
   lt->setContentsMargins(0, 0, 0, 0);
@@ -43,11 +43,14 @@ FindWidget::FindWidget(QTextEdit* doc, QWidget* parent)
   lt->addWidget(m_btnCaseSensitive);
   setLayout(lt);
 
+  if (m_doc != nullptr)
+    m_doc->setStyleSheet("selection-color: black; selection-background-color: yellow;");
+
   connect(m_btnDown, SIGNAL(clicked(bool)), this, SLOT(find()));
   connect(m_btnUp, SIGNAL(clicked(bool)), this, SLOT(find()));
   connect(m_btnCaseSensitive, SIGNAL(clicked(bool)), this, SLOT(find()));
   connect(m_edFind, SIGNAL(textChanged(const QString&)), this, SLOT(updateControls()));
-  connect(m_edFind, SIGNAL(enterSignal()), m_btnDown, SLOT(animateClick(int)));
+  connect(m_edFind, SIGNAL(enterSignal()), m_btnDown, SLOT(animateClick()));
   updateControls();
 }
 
@@ -59,8 +62,10 @@ void FindWidget::find()
     o.setFlag(QTextDocument::FindBackward, sender() == m_btnUp);
     o.setFlag(QTextDocument::FindCaseSensitively, m_btnCaseSensitive->isChecked());
     o.setFlag(QTextDocument::FindWholeWords, false);
-    if (m_doc->find(m_edFind->text(), o))
-      m_doc->setFocus();
+    if (!m_doc->find(m_edFind->text(), o))
+    {
+
+    }
   }
 }
 

@@ -178,5 +178,7 @@
         <file>res/calplusday.png</file>
         <file>res/calplusmonth.png</file>
         <file>res/calplusyear.png</file>
+        <file>res/networkcable.png</file>
+        <file>res/server.png</file>
     </qresource>
 </RCC>

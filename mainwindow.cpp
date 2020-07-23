@@ -159,15 +159,11 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
 
   connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
 
-  QTimer *timer = new QTimer(this);
-  connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
-  timer->start(60000);
-
   activateWindow();
   m_settings.load();
-  updateTime();
   updateControls();
   updateStatusBar();
+  updateTime();
 }
 
 Goiabo::~Goiabo()
@@ -389,6 +385,7 @@ void Goiabo::updateTime()
 {
   QDateTime dt = DateTime::server();
   m_statusTime->setText(dt.date().toString("dd/MM/yyyy ") + dt.time().toString("hh:mm"));
+  QTimer::singleShot(10000, this, &Goiabo::updateTime);
 }
 
 void Goiabo::updateControls()

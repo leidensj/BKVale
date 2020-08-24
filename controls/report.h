@@ -22,7 +22,6 @@ public slots:
 
 private slots:
   void openPurchaseReport();
-  void updateControls();
   void fontSizeChanged();
 
 private:

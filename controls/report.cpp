@@ -90,6 +90,8 @@ Report::Report(QWidget *parent)
   connect(btns, SIGNAL(accepted()), m_dlgPurchase, SLOT(accept()));
   connect(btns, SIGNAL(rejected()), m_dlgPurchase, SLOT(reject()));
 
+  m_btnPdf->setEnabled(false);
+  m_btnFontSize->setEnabled(false);
   setLayout(ltMain);
 }
 
@@ -148,15 +150,13 @@ void Report::toPdf()
   w->generate();
 }
 
-void Report::updateControls()
-{
-  m_btnPdf->setEnabled(!m_report->toHtml().isEmpty());
-  m_btnFontSize->setEnabled(!m_report->toHtml().isEmpty());
-}
-
 void Report::openPurchaseReport()
 {
   if (m_dlgPurchase->exec())
-    m_report->setHtml(m_rptPurchase->process());
-  updateControls();
+  {
+    QString html = m_rptPurchase->process();
+    m_report->setHtml(html);
+    m_btnPdf->setEnabled(!html.isEmpty());
+    m_btnFontSize->setEnabled(!html.isEmpty());
+  }
 }

@@ -6,7 +6,7 @@
 #include <QTcpSocket>
 #include "settingsdialog.h"
 #include "databaseutils.h"
-#include "items/activeuser.h"
+#include "items/login.h"
 #include <QMdiArea>
 #include <QPainter>
 
@@ -63,7 +63,7 @@ class Goiabo : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit Goiabo(const ActiveUser& login, QWidget *parent = 0);
+  explicit Goiabo(QWidget *parent = 0);
   ~Goiabo();
 
 protected:
@@ -71,7 +71,6 @@ protected:
 
 private:
   Ui::Goiabo *ui;
-  ActiveUser m_login;
   JMdiArea* m_mdi;
   PurchaseView* m_purchase;
   Report* m_report;
@@ -104,7 +103,7 @@ private slots:
   void openJItemSQLDialog();
   void openSettingsDialog();
   void openLoginDialog();
-  void openActiveUsersDialog();
+  void openLoggedDialog();
   void activateWindow();
   void testTimeAccess();
 };

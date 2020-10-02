@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <databaseutils.h>
-#include "items/activeuser.h"
+#include "items/login.h"
 
 class JLineEdit;
 class QLabel;
@@ -17,8 +17,7 @@ class LoginDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit LoginDialog(ActiveUser& login,
-                       QWidget* parent = 0);
+  explicit LoginDialog(QWidget* parent = 0);
 
 private slots:
   void login();
@@ -30,7 +29,6 @@ protected:
 
 private:
   void updateCapsLock();
-  ActiveUser& m_login;
   JLineEdit* m_user;
   JLineEdit* m_password;
   JLineEdit* m_hostName;

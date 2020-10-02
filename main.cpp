@@ -16,11 +16,10 @@ int main(int argc, char *argv[])
   settings.load();
 
   QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
-  ActiveUser login;
-  LoginDialog l(login);
+  LoginDialog l;
   if (l.exec() == QDialog::Accepted)
   {
-    Goiabo w(login);
+    Goiabo w;
     w.show();
     return a.exec();
   }

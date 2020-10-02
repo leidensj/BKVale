@@ -50,10 +50,9 @@ protected:
   }
 };
 
-Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
+Goiabo::Goiabo(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::Goiabo)
-  , m_login(login)
   , m_purchase(nullptr)
   , m_report(nullptr)
   , m_reminder(nullptr)
@@ -157,7 +156,7 @@ Goiabo::Goiabo(const ActiveUser& login, QWidget *parent)
   connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionSuppliers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
 
-  connect(ui->actionActiveUsers, SIGNAL(triggered(bool)), this, SLOT(openActiveUsersDialog()));
+  connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
 
   activateWindow();
   m_settings.load();
@@ -373,7 +372,8 @@ void Goiabo::updateStatusBar()
   // para adicionar um ícone:
   // "<img src=':/icons/res/16user.png'> " + ...
 
-  m_statusUserName->setText(tr("Usuário: ") + m_login.getUser().m_strUser);
+  Login login(true);
+  m_statusUserName->setText(tr("Usuário: ") + login.getUser().m_strUser);
   m_statusDatabasePath->setText(tr("Banco de dados: ") +
                                 (m_settings.m_databaseHostName.isEmpty() ? "localhost"
                                                                         : m_settings.m_databaseHostName) +
@@ -390,24 +390,22 @@ void Goiabo::updateTime()
 
 void Goiabo::updateControls()
 {
-  const bool bIsSQLOk = QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isValid() &&
-                        QSqlDatabase::database(POSTGRE_CONNECTION_NAME).isOpen();
-  ui->actionSettings->setEnabled(bIsSQLOk && m_login.getUser().m_bSettings);
-  ui->actionLogin->setEnabled(bIsSQLOk);
-  ui->actionUsers->setEnabled(bIsSQLOk && m_login.getUser().m_bUser);
-  ui->actionProducts->setEnabled(bIsSQLOk && m_login.getUser().m_bProduct);
-  ui->actionCategories->setEnabled(bIsSQLOk && m_login.getUser().m_bCategory);
-  ui->actionImages->setEnabled(bIsSQLOk && m_login.getUser().m_bImage);
-  ui->actionShoppingListMgt->setEnabled(bIsSQLOk && m_login.getUser().m_bShoppingList);
-  ui->actionEmployees->setEnabled(bIsSQLOk && m_login.getUser().m_bEmployee);
-  ui->actionSuppliers->setEnabled(bIsSQLOk && m_login.getUser().m_bSupplier);
-  ui->actionStores->setEnabled(bIsSQLOk && m_login.getUser().m_bStore);
-  ui->actionTimeCard->setEnabled(bIsSQLOk && m_login.getUser().m_bTimeCard);
+  Login login(true);
+  ui->actionSettings->setEnabled(login.getUser().m_bSettings);
+  ui->actionUsers->setEnabled(login.getUser().m_bUser);
+  ui->actionProducts->setEnabled(login.getUser().m_bProduct);
+  ui->actionCategories->setEnabled(login.getUser().m_bCategory);
+  ui->actionImages->setEnabled(login.getUser().m_bImage);
+  ui->actionShoppingListMgt->setEnabled(login.getUser().m_bShoppingList);
+  ui->actionEmployees->setEnabled(login.getUser().m_bEmployee);
+  ui->actionSuppliers->setEnabled(login.getUser().m_bSupplier);
+  ui->actionStores->setEnabled(login.getUser().m_bStore);
+  ui->actionTimeCard->setEnabled(login.getUser().m_bTimeCard);
 
-  ui->actionPurchases->setEnabled(bIsSQLOk && m_login.getUser().m_bPurchase);
-  ui->actionReminders->setEnabled(bIsSQLOk && m_login.getUser().m_bReminder);
-  ui->actionCalculator->setEnabled(bIsSQLOk && m_login.getUser().m_bCalculator);
-  ui->actionShoppingList->setEnabled(bIsSQLOk && m_login.getUser().m_bShop);
+  ui->actionPurchases->setEnabled(login.getUser().m_bPurchase);
+  ui->actionReminders->setEnabled(login.getUser().m_bReminder);
+  ui->actionCalculator->setEnabled(login.getUser().m_bCalculator);
+  ui->actionShoppingList->setEnabled(login.getUser().m_bShop);
 
   switch (getCurrentFunctionality())
   {
@@ -460,7 +458,7 @@ void Goiabo::openJItemSQLDialog()
   else if (sender() == ui->actionSuppliers)
     view = new SupplierView;
   else if (sender() == ui->actionUsers)
-    view = new UserView(m_login.getUser().m_id);
+    view = new UserView;
 
   if (view != nullptr)
   {
@@ -480,7 +478,10 @@ void Goiabo::openJItemSQLDialog()
 void Goiabo::openLoginDialog()
 {
   hide();
-  LoginDialog l(m_login);
+  Login login(true);
+  QString error;
+  login.SQL_logout(error);
+  LoginDialog l;
   if (!l.exec())
   {
     QMessageBox::critical(this,
@@ -498,12 +499,12 @@ void Goiabo::openLoginDialog()
 }
 
 
-void Goiabo::openActiveUsersDialog()
+void Goiabo::openLoggedDialog()
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
-  DatabaseViewer* w = new DatabaseViewer(ACTIVE_USERS_SQL_TABLE_NAME, DatabaseViewer::Mode::ReadOnly);
+  DatabaseViewer* w = new DatabaseViewer(LOGIN_SQL_TABLE_NAME, DatabaseViewer::Mode::ReadOnly);
   layout->addWidget(w);
   dlg.setWindowFlags(Qt::Window);
   dlg.setWindowTitle(tr("Usuários Ativos"));

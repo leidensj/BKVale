@@ -463,6 +463,7 @@ bool PurchaseView::save(Id& id)
       QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
       settings.setValue(SETTINGS_PURCHASE_STORE_ID, o.m_store.m_id.get());
     }
+    m_viewer->refresh();
     id = o.m_id;
     m_lastId = o.m_id;
     clear();

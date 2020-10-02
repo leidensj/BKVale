@@ -15,7 +15,7 @@ class UserView : public JItemView
   Q_OBJECT
 
 public:
-  explicit UserView(Id currentLoggedId, QWidget* parent = 0);
+  explicit UserView(QWidget* parent = 0);
 
 
   QString getPassword() const;
@@ -51,7 +51,6 @@ private:
 
   static QString idxToTableName(Idx idx);
 
-  Id m_currentLoggedId;
   bool m_bHasLoggedUserChanged;
   JLineEdit* m_user;
   QLabel* m_lblPasswordMsg;

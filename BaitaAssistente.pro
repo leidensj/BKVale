@@ -29,9 +29,11 @@ SOURCES += main.cpp\
   editors/formeditor.cpp \
   editors/packageeditor.cpp \
   filters/jfilter.cpp \
+  items/login.cpp \
   libraries/qcustomplot.cpp \
   libraries/tinyexpr.c \
         mainwindow.cpp \
+  models/loginmodel.cpp \
   purchasereport.cpp \
   settingsdialog.cpp \
   tables/jtable.cpp \
@@ -39,7 +41,6 @@ SOURCES += main.cpp\
     databaseutils.cpp \
     settings.cpp \
     consumptionchart.cpp \
-    items/activeuser.cpp \
     items/address.cpp \
     items/category.cpp \
     items/employee.cpp \
@@ -98,7 +99,6 @@ SOURCES += main.cpp\
     models/storemodel.cpp \
     models/suppliermodel.cpp \
     models/usermodel.cpp \
-    models/activeusermodel.cpp \
     models/jmodel.cpp \
     models/productcodemodel.cpp \
     items/paymentelement.cpp \
@@ -132,8 +132,10 @@ HEADERS  += mainwindow.h \
     editors/formeditor.h \
     editors/packageeditor.h \
     filters/jfilter.h \
+    items/login.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \
+    models/loginmodel.h \
     purchasereport.h \
     settingsdialog.h \
     tables/jtable.h \
@@ -145,7 +147,6 @@ HEADERS  += mainwindow.h \
     escpos.h \
     timeinterval.h \
     items/address.h \
-    items/activeuser.h \
     items/category.h \
     items/employee.h \
     items/form.h \
@@ -205,7 +206,6 @@ HEADERS  += mainwindow.h \
     models/storemodel.h \
     models/suppliermodel.h \
     models/usermodel.h \
-    models/activeusermodel.h \
     models/jmodel.h \
     models/productcodemodel.h \
     items/paymentelement.h \

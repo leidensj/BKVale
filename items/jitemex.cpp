@@ -13,12 +13,12 @@
 #include "store.h"
 #include "supplier.h"
 #include "employee.h"
-#include "activeuser.h"
+#include "login.h"
 
 #include <QMessageBox>
 #include "controls/pincodedialog.h"
 
-#include "models/activeusermodel.h"
+#include "models/loginmodel.h"
 #include "models/addressmodel.h"
 #include "models/categorymodel.h"
 #include "models/employeemodel.h"
@@ -70,8 +70,8 @@ JItemSQL* JItemEx::create(const QString& tableName)
     return new Employee;
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return new Supplier;
-  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
-    return new ActiveUser;
+  if (tableName == LOGIN_SQL_TABLE_NAME)
+    return new Login;
   if (tableName == ADDRESS_SQL_TABLE_NAME)
     return new Address;
   if (tableName == PHONE_SQL_TABLE_NAME)
@@ -127,7 +127,7 @@ QString JItemEx::text(const QString& tableName)
     return "Funcionário";
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return "Fornecedor";
-  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+  if (tableName == LOGIN_SQL_TABLE_NAME)
     return "Usuários Ativos";
   if (tableName == ADDRESS_SQL_TABLE_NAME)
     return "Endereço";
@@ -162,7 +162,7 @@ QString JItemEx::icon(const QString& tableName)
     return ":/icons/res/employee.png";
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return ":/icons/res/supplier.png";
-  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
+  if (tableName == LOGIN_SQL_TABLE_NAME)
     return ":/icons/res/supplier.png";
   if (tableName == ADDRESS_SQL_TABLE_NAME)
     return ":/icons/res/address.png";
@@ -195,8 +195,8 @@ JModel* JItemEx::model(const QString& tableName, QObject* parent)
     return new EmployeeModel(parent);
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return new SupplierModel(parent);
-  if (tableName == ACTIVE_USERS_SQL_TABLE_NAME)
-    return new ActiveUserModel(parent);
+  if (tableName == LOGIN_SQL_TABLE_NAME)
+    return new LoginModel(parent);
   if (tableName == ADDRESS_SQL_TABLE_NAME)
     return new AddressModel(parent);
   if (tableName == PHONE_SQL_TABLE_NAME)

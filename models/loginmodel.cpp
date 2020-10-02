@@ -1,28 +1,28 @@
-#include "activeusermodel.h"
+#include "loginmodel.h"
 
-ActiveUserModel::ActiveUserModel(QObject *parent)
+LoginModel::LoginModel(QObject *parent)
   : JModel(parent)
 {
 
 }
 
-QString ActiveUserModel::getStrQuery()
+QString LoginModel::getStrQuery()
 {
   return
       "SELECT "
-      ACTIVE_USERS_SQL_TABLE_NAME "." SQL_COLID ","
-      ACTIVE_USERS_SQL_TABLE_NAME "." ACTIVE_USERS_SQL_COL_PID ","
+      LOGIN_SQL_TABLE_NAME "." SQL_COLID ","
+      LOGIN_SQL_TABLE_NAME "." LOGIN_SQL_COL_PID ","
       USER_SQL_TABLE_NAME "." USER_SQL_COL_USE ","
-      ACTIVE_USERS_SQL_TABLE_NAME "." ACTIVE_USERS_SQL_COL_MAC ","
-      ACTIVE_USERS_SQL_TABLE_NAME "." ACTIVE_USERS_SQL_COL_LOG
+      LOGIN_SQL_TABLE_NAME "." LOGIN_SQL_COL_MAC ","
+      LOGIN_SQL_TABLE_NAME "." LOGIN_SQL_COL_LOG
       " FROM "
-      ACTIVE_USERS_SQL_TABLE_NAME " LEFT JOIN "
+      LOGIN_SQL_TABLE_NAME " LEFT JOIN "
       USER_SQL_TABLE_NAME " ON "
-      ACTIVE_USERS_SQL_TABLE_NAME "." ACTIVE_USERS_SQL_COL_UID " = "
+      LOGIN_SQL_TABLE_NAME "." LOGIN_SQL_COL_UID " = "
       USER_SQL_TABLE_NAME "." SQL_COLID;
 }
 
-void ActiveUserModel::select(QHeaderView* header)
+void LoginModel::select(QHeaderView* header)
 {
   JModel::select(getStrQuery());
   setHeaderData(0, Qt::Horizontal, tr("ID"));

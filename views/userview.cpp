@@ -1,5 +1,6 @@
 #include "userview.h"
 #include "items/jitemex.h"
+#include "items/login.h"
 #include "widgets/jlineedit.h"
 #include <QLabel>
 #include <QLayout>
@@ -8,9 +9,8 @@
 #include <QMessageBox>
 #include <QListWidget>
 
-UserView::UserView(Id currentLoggedId, QWidget* parent)
+UserView::UserView(QWidget* parent)
   : JItemView(USER_SQL_TABLE_NAME, parent)
-  , m_currentLoggedId(currentLoggedId)
   , m_bHasLoggedUserChanged(false)
   , m_user(nullptr)
   , m_lblPasswordMsg(nullptr)
@@ -186,8 +186,9 @@ void UserView::itemsRemoved(const Ids& ids)
 
 void UserView::save()
 {
+  Login login(true);
   if (!m_bHasLoggedUserChanged)
-    m_bHasLoggedUserChanged = m_id == m_currentLoggedId;
+    m_bHasLoggedUserChanged = m_id == login.getUser().m_id;
   JItemView::save();
 }
 

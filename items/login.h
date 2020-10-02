@@ -1,14 +1,14 @@
-#ifndef ACTIVEUSER_H
-#define ACTIVEUSER_H
+#ifndef LOGIN_H
+#define LOGIN_H
 
 #include "user.h"
 #include <QTime>
 
-class ActiveUser : public JItemSQL
+class Login : public JItemSQL
 {
 public:
-  ActiveUser();
-  ~ActiveUser();
+  Login(bool bSelectCurrentLogin = false);
+  ~Login();
 
   void clear(bool bClearId = true);
   bool operator != (const JItem& other) const;
@@ -23,7 +23,7 @@ public:
   bool SQL_login(const QString& strUser, const QString& strPassword, QString& error);
   bool SQL_logout(QString& error);
   bool SQL_logout_proc(QSqlQuery& query);
-  bool SQL_select_current_user(QString& error);
+  bool SQL_select_current_login(QString& error);
 
 private:
   User m_user;
@@ -35,4 +35,4 @@ public:
   const User& getUser() const { return m_user; }
 };
 
-#endif // ACTIVEUSER_H
+#endif // LOGIN_H

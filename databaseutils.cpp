@@ -359,13 +359,13 @@ bool BaitaSQL::createTables(QString& error)
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
-    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " ACTIVE_USERS_SQL_TABLE_NAME " ("
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " LOGIN_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          ACTIVE_USERS_SQL_COL_PID " INTEGER,"
-                          ACTIVE_USERS_SQL_COL_UID " INTEGER UNIQUE NOT NULL,"
-                          ACTIVE_USERS_SQL_COL_MAC " TEXT,"
-                          ACTIVE_USERS_SQL_COL_LOG " TIMESTAMP,"
-                          "FOREIGN KEY(" ACTIVE_USERS_SQL_COL_UID ") REFERENCES "
+                          LOGIN_SQL_COL_PID " INTEGER,"
+                          LOGIN_SQL_COL_UID " INTEGER UNIQUE NOT NULL,"
+                          LOGIN_SQL_COL_MAC " TEXT,"
+                          LOGIN_SQL_COL_LOG " TIMESTAMP,"
+                          "FOREIGN KEY(" LOGIN_SQL_COL_UID ") REFERENCES "
                           USER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE NO ACTION);");
 
   if (bSuccess)

@@ -10,7 +10,7 @@
 #include <QDialog>
 #include <QDesktopWidget>
 #include <QApplication>
-#include "items/activeuser.h"
+#include "items/login.h"
 
 #define VIEW_BUTTON "VIEW_BUTTON"
 
@@ -188,35 +188,32 @@ void JItemView::clear()
 void JItemView::addViewButton(const QString& tableName)
 {
   QString error;
-  ActiveUser au;
-  if (au.SQL_select_current_user(error))
+  Login login(true);
+  if (login.getUser().hasPermission(tableName))
   {
-    if (au.getUser().hasPermission(tableName))
+    if (m_btnMore == nullptr)
     {
-      if (m_btnMore == nullptr)
-      {
-        m_btnMore = new QPushButton;
-        m_btnMore->setFlat(true);
-        m_btnMore->setText("");
-        m_btnMore->setIconSize(QSize(24, 24));
-        m_btnMore->setIcon(QIcon(":/icons/res/more.png"));
-        m_btnMore->setToolTip(tr("Mais"));
+      m_btnMore = new QPushButton;
+      m_btnMore->setFlat(true);
+      m_btnMore->setText("");
+      m_btnMore->setIconSize(QSize(24, 24));
+      m_btnMore->setIcon(QIcon(":/icons/res/more.png"));
+      m_btnMore->setToolTip(tr("Mais"));
 
-        QFrame *line = new QFrame;
-        line->setFrameShape(QFrame::VLine);
-        line->setFrameShadow(QFrame::Sunken);
-        m_ltButton->addWidget(line);
-        m_ltButton->addWidget(m_btnMore);
-      }
-
-      if (m_btnMore->menu() == nullptr)
-        m_btnMore->setMenu(new QMenu);
-      QAction* act = m_btnMore->menu()->addAction(QIcon(JItemEx::icon(tableName)),
-                                                  tr("Gerenciar ") + JItemEx::text(tableName),
-                                                  this,
-                                                  SLOT(viewButtonClicked()));
-      act->setProperty(VIEW_BUTTON, tableName);
+      QFrame *line = new QFrame;
+      line->setFrameShape(QFrame::VLine);
+      line->setFrameShadow(QFrame::Sunken);
+      m_ltButton->addWidget(line);
+      m_ltButton->addWidget(m_btnMore);
     }
+
+    if (m_btnMore->menu() == nullptr)
+      m_btnMore->setMenu(new QMenu);
+    QAction* act = m_btnMore->menu()->addAction(QIcon(JItemEx::icon(tableName)),
+                                                tr("Gerenciar ") + JItemEx::text(tableName),
+                                                this,
+                                                SLOT(viewButtonClicked()));
+    act->setProperty(VIEW_BUTTON, tableName);
   }
 }
 

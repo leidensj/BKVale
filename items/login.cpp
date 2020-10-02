@@ -1,50 +1,55 @@
-#include "activeuser.h"
+#include "login.h"
 #include <QHostInfo>
 
-ActiveUser::ActiveUser()
+Login::Login(bool bSelectCurrentLogin)
 {
   clear();
+  if (bSelectCurrentLogin)
+  {
+    QString error;
+    SQL_select_current_login(error);
+  }
 }
 
-ActiveUser::~ActiveUser()
+Login::~Login()
 {
 }
 
-void ActiveUser::clear(bool bClearId)
+void Login::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
   m_user.clear();
 }
 
-bool ActiveUser::operator != (const JItem& other) const
+bool Login::operator != (const JItem& other) const
 {
-  const ActiveUser& another = dynamic_cast<const ActiveUser&>(other);
+  const Login& another = dynamic_cast<const Login&>(other);
   return m_user.m_id != another.m_user.m_id;
 }
 
-bool ActiveUser::operator == (const JItem& other) const
+bool Login::operator == (const JItem& other) const
 {
   return !(*this != other);
 }
 
-bool ActiveUser::isValid() const
+bool Login::isValid() const
 {
   return m_user.m_id.isValid();
 }
 
-QString ActiveUser::SQL_tableName() const
+QString Login::SQL_tableName() const
 {
-  return ACTIVE_USERS_SQL_TABLE_NAME;
+  return LOGIN_SQL_TABLE_NAME;
 }
 
-bool ActiveUser::SQL_insert_proc(QSqlQuery& query) const
+bool Login::SQL_insert_proc(QSqlQuery& query) const
 {
-  query.prepare("INSERT INTO " ACTIVE_USERS_SQL_TABLE_NAME " ("
-                ACTIVE_USERS_SQL_COL_PID ","
-                ACTIVE_USERS_SQL_COL_UID ","
-                ACTIVE_USERS_SQL_COL_MAC ","
-                ACTIVE_USERS_SQL_COL_LOG ")"
+  query.prepare("INSERT INTO " LOGIN_SQL_TABLE_NAME " ("
+                LOGIN_SQL_COL_PID ","
+                LOGIN_SQL_COL_UID ","
+                LOGIN_SQL_COL_MAC ","
+                LOGIN_SQL_COL_LOG ")"
                 " VALUES ("
                 "(SELECT pg_backend_pid()),"
                 "(:_v01),"
@@ -58,13 +63,13 @@ bool ActiveUser::SQL_insert_proc(QSqlQuery& query) const
   return bSuccess;
 }
 
-bool ActiveUser::SQL_update_proc(QSqlQuery& query) const
+bool Login::SQL_update_proc(QSqlQuery& query) const
 {
-  query.prepare("UPDATE " ACTIVE_USERS_SQL_TABLE_NAME " SET "
-                ACTIVE_USERS_SQL_COL_PID " = (SELECT pg_backend_pid()),"
-                ACTIVE_USERS_SQL_COL_UID " = (:_v01),"
-                ACTIVE_USERS_SQL_COL_MAC " = (:_v02),"
-                ACTIVE_USERS_SQL_COL_LOG " = current_timestamp"
+  query.prepare("UPDATE " LOGIN_SQL_TABLE_NAME " SET "
+                LOGIN_SQL_COL_PID " = (SELECT pg_backend_pid()),"
+                LOGIN_SQL_COL_UID " = (:_v01),"
+                LOGIN_SQL_COL_MAC " = (:_v02),"
+                LOGIN_SQL_COL_LOG " = current_timestamp"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_user.m_id.get());
@@ -72,15 +77,15 @@ bool ActiveUser::SQL_update_proc(QSqlQuery& query) const
   return query.exec();
 }
 
-bool ActiveUser::SQL_select_proc(QSqlQuery& query, QString& error)
+bool Login::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
-                ACTIVE_USERS_SQL_COL_PID ","
-                ACTIVE_USERS_SQL_COL_UID ","
-                ACTIVE_USERS_SQL_COL_MAC ","
-                ACTIVE_USERS_SQL_COL_LOG
-                " FROM " ACTIVE_USERS_SQL_TABLE_NAME
+                LOGIN_SQL_COL_PID ","
+                LOGIN_SQL_COL_UID ","
+                LOGIN_SQL_COL_MAC ","
+                LOGIN_SQL_COL_LOG
+                " FROM " LOGIN_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   bool bSuccess = query.exec();
@@ -106,14 +111,14 @@ bool ActiveUser::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool ActiveUser::SQL_remove_proc(QSqlQuery& query) const
+bool Login::SQL_remove_proc(QSqlQuery& query) const
 {
-  query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
+  query.prepare("DELETE FROM " LOGIN_SQL_TABLE_NAME " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
 }
 
-bool ActiveUser::SQL_login(const QString& strUser, const QString& strPassword, QString& error)
+bool Login::SQL_login(const QString& strUser, const QString& strPassword, QString& error)
 {
   error.clear();
 
@@ -134,10 +139,10 @@ bool ActiveUser::SQL_login(const QString& strUser, const QString& strPassword, Q
     bSuccess = SQL_logout_proc(query);
     if (bSuccess)
     {
-      query.prepare("SELECT " ACTIVE_USERS_SQL_COL_MAC
+      query.prepare("SELECT " LOGIN_SQL_COL_MAC
                     " FROM "
-                    ACTIVE_USERS_SQL_TABLE_NAME " WHERE "
-                    ACTIVE_USERS_SQL_COL_UID " = (:v02) LIMIT 1");
+                    LOGIN_SQL_TABLE_NAME " WHERE "
+                    LOGIN_SQL_COL_UID " = (:v02) LIMIT 1");
       query.bindValue(":v02", m_user.m_id.get());
       bSuccess = query.exec();
       if (bSuccess)
@@ -158,7 +163,7 @@ bool ActiveUser::SQL_login(const QString& strUser, const QString& strPassword, Q
   return SQL_finish(db, query, bSuccess, error);
 }
 
-bool ActiveUser::SQL_logout(QString& error)
+bool Login::SQL_logout(QString& error)
 {
   error.clear();
 
@@ -173,22 +178,22 @@ bool ActiveUser::SQL_logout(QString& error)
   return SQL_finish(db, query, bSuccess, error);
 }
 
-bool ActiveUser::SQL_logout_proc(QSqlQuery& query)
+bool Login::SQL_logout_proc(QSqlQuery& query)
 {
-  query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
-                " WHERE " ACTIVE_USERS_SQL_COL_PID " = pg_backend_pid()");
+  query.prepare("DELETE FROM " LOGIN_SQL_TABLE_NAME
+                " WHERE " LOGIN_SQL_COL_PID " = pg_backend_pid()");
   bool bSuccess = query.exec();
   if (bSuccess)
   {
-    query.prepare("DELETE FROM " ACTIVE_USERS_SQL_TABLE_NAME
-                  " WHERE " ACTIVE_USERS_SQL_COL_PID " NOT IN "
+    query.prepare("DELETE FROM " LOGIN_SQL_TABLE_NAME
+                  " WHERE " LOGIN_SQL_COL_PID " NOT IN "
                   "(SELECT pid FROM pg_stat_activity)");
     bSuccess = query.exec();
   }
   return bSuccess;
 }
 
-bool ActiveUser::SQL_select_current_user(QString& error)
+bool Login::SQL_select_current_login(QString& error)
 {
   error.clear();
   if (!SQL_isOpen(error))
@@ -200,8 +205,8 @@ bool ActiveUser::SQL_select_current_user(QString& error)
 
   query.prepare("SELECT "
                 SQL_COLID
-                " FROM " ACTIVE_USERS_SQL_TABLE_NAME
-                " WHERE " ACTIVE_USERS_SQL_COL_PID " IN (SELECT pg_backend_pid())");
+                " FROM " LOGIN_SQL_TABLE_NAME
+                " WHERE " LOGIN_SQL_COL_PID " IN (SELECT pg_backend_pid())");
   bool bSuccess = query.exec();
   if (bSuccess)
   {

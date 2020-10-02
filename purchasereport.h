@@ -6,6 +6,7 @@
 
 class QPushButton;
 class QRadioButton;
+class JSpinBox;
 
 class PurchaseReport : public PurchaseFilter
 {
@@ -25,6 +26,7 @@ private:
   QString strFilterHtml() const;
   QString processPurchase() const;
   QString processProduct() const;
+  QString proccesSupplier() const;
   QRadioButton* m_rdoPurchase;
   QRadioButton* m_rdoProduct;
   QRadioButton* m_rdoSupplier;

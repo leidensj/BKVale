@@ -2,6 +2,7 @@
 #include "items/purchase.h"
 #include "controls/databasepicker.h"
 #include "widgets/jdateinterval.h"
+#include "widgets/jspinbox.h"
 #include <QLayout>
 #include <QFrame>
 #include <QRadioButton>
@@ -53,10 +54,11 @@ QString PurchaseReport::process() const
 {
   if (m_rdoProduct->isChecked())
     return processProduct();
-  return processPurchase();
+  else if (m_rdoSupplier->isChecked())
+    return proccesSupplier();
+  else
+    return processPurchase();
 }
-
-#include "controls/databaseviewer.h"
 
 QString PurchaseReport::strFilterHtml() const
 {
@@ -369,5 +371,106 @@ QString PurchaseReport::processPurchase() const
     "<tr><td align=\"center\">Número de compras: %1</td>"
         "<td align=\"center\">Total das compras: %2</td></tr></table></body></html>").arg(Data::strInt(nPurchases),
                                                                                           Data::strMoney(currentTotal));
+  return html;
+}
+
+QString PurchaseReport::proccesSupplier() const
+{
+  QString strQuery = "SELECT " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_NUM " AS NUMBER," //0
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DAT " AS _DATE," //1
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_OBS " AS OBSERVATION," //2
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DIS " AS DISCCOUNT," //3
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_PAY " AS PAYMENT," //4
+                     "SUPPLIERFORM." FORM_SQL_COL_NAM " AS SUPPLIER," //5
+                     "STOREFORM." FORM_SQL_COL_NAM " AS STORE," //6
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //7
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //8
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //9
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //10
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //11
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //12
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //13
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //14
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " * "
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL," //15
+                     "SUPPLIERFORM." SQL_COLID " AS SUPPLIERID " //16
+                     "FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
+                     " LEFT JOIN " PURCHASE_SQL_TABLE_NAME " ON "
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " = "
+                     PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+                     " FULL JOIN " SUPPLIER_SQL_TABLE_NAME " ON "
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_SID " = "
+                     SUPPLIER_SQL_TABLE_NAME "." SQL_COLID
+                     " LEFT JOIN " FORM_SQL_TABLE_NAME " AS SUPPLIERFORM ON "
+                     SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL_FID " = "
+                     "SUPPLIERFORM." SQL_COLID
+                     " LEFT JOIN " STORE_SQL_TABLE_NAME " ON "
+                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_TID " = "
+                     STORE_SQL_TABLE_NAME "." SQL_COLID
+                     " LEFT JOIN " FORM_SQL_TABLE_NAME " AS STOREFORM ON "
+                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL_FID " = "
+                     "STOREFORM." SQL_COLID
+                     " LEFT JOIN " PRODUCT_SQL_TABLE_NAME " ON "
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " = "
+                     PRODUCT_SQL_TABLE_NAME "." SQL_COLID;
+  if (!getFilter().isEmpty())
+    strQuery += " WHERE " + getFilter();
+  strQuery += " ORDER BY SUPPLIER ASC, _DATE DESC, NUMBER DESC, PRODUCT ASC";
+  QSqlQuery query(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  if (!(query.exec(strQuery) && query.next()))
+    return "";
+
+  QString html("<html><body><h1 align=\"center\">Relatório de Compras</h1>" + strFilterHtml());
+  qlonglong currentSupplier = -1;
+  double currentSubtotal = 0.0;
+  do
+  {
+    if (currentSupplier != query.value(16).toLongLong())
+    {
+      currentSupplier = query.value(16).toLongLong();
+      html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
+                      "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(5).toString());
+      html += "<tr><th>Data</th><th>Número</th><th>Produto</th><th>Loja</th><th>Quantidade</th><th>Unidade</th><th>Preço (R$)</th><th>Subtotal (R$)</th></tr>";
+    }
+    html += QString(
+                "<tr>"
+                "<td width=\"8%\">%1</td>"
+                "<td width=\"8%\">%2</td>"
+                "<td width=\"25%\">%3</td>"
+                "<td width=\"25%\">%4</td>"
+                "<td width=\"8%\" align=\"right\">%5</td>"
+                "<td width=\"10%\">%6</td>"
+                "<td width=\"8%\" align=\"right\">%7</td>"
+                "<td width=\"8%\" align=\"right\">%8</td>"
+                "</tr>").arg(query.value(1).toDate().toString("dd/MM/yyyy"),
+                             Data::strInt(query.value(0).toLongLong()),
+                             query.value(7).toString(),
+                             query.value(6).toString(),
+                             Data::strAmmount(query.value(10).toDouble()),
+                             (query.value(12).toBool()
+                             ? query.value(13).toString() +
+                               " (" + Data::strFmt(query.value(14).toDouble()) +
+                                query.value(8).toString() + ")"
+                             : query.value(8).toString()),
+                             Data::strMoney(query.value(11).toDouble(), false),
+                             Data::strMoney(query.value(15).toDouble(), false));
+    currentSubtotal += query.value(15).toDouble();
+
+    bool bHasNext = query.next();
+    bool bPrintFooter = !bHasNext || currentSupplier != query.value(16).toLongLong();
+    query.previous();
+
+    if (bPrintFooter)
+    {
+      html += "</table><table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">";
+      html += QString(
+                  "<tr><th align=\"right\">Sumário: %1</td></tr>"
+                  "<tr><td align=\"right\">Total: %4</td></tr></table>").arg(query.value(5).toString(),
+                                                                             Data::strMoney(currentSubtotal));
+      currentSubtotal = 0.0;
+    }
+  } while (query.next());
+
+  html += "<hr></body></html>";
   return html;
 }

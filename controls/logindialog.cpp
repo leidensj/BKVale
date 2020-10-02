@@ -31,10 +31,8 @@ namespace
   }
 }
 
-LoginDialog::LoginDialog(ActiveUser& login,
-                         QWidget* parent)
+LoginDialog::LoginDialog(QWidget* parent)
   : QDialog(parent)
-  , m_login(login)
   , m_user(nullptr)
   , m_password(nullptr)
   , m_hostName(nullptr)
@@ -223,7 +221,8 @@ void LoginDialog::login()
   bool bSuccess = BaitaSQL::init(m_hostName->text(), m_port->value(), error);
   if (bSuccess)
   {
-    bSuccess = m_login.SQL_login(m_user->text(), m_password->text(), error);
+    Login login;
+    bSuccess = login.SQL_login(m_user->text(), m_password->text(), error);
     if (bSuccess)
     {
       Settings settings;

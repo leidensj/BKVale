@@ -150,6 +150,9 @@ void Report::toPdf()
   w->generate();
 }
 
+#include <QFile>
+#include <QTextStream>
+
 void Report::openPurchaseReport()
 {
   if (m_dlgPurchase->exec())

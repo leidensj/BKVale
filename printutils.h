@@ -24,8 +24,6 @@ namespace Printer
 
   QString strCmdInit();
   QString strCmdFullCut();
-
-  QByteArray imageToPrintVersion(const QByteArray& arImage);
 }
 
 namespace PurchasePrinter

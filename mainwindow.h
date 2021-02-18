@@ -11,7 +11,7 @@
 #include <QPainter>
 
 namespace Ui {
-class Goiabo;
+class Baita;
 }
 
 class JMdiArea : public QMdiArea
@@ -19,7 +19,7 @@ class JMdiArea : public QMdiArea
 public:
     JMdiArea(QWidget *parent = nullptr)
       : QMdiArea(parent)
-      , m_pixmap(":/icons/res/goiabobanner.png")
+      , m_pixmap(":/icons/res/baitabanner.png")
     {
       setBackground(QBrush(Qt::white));
       QFont f = font();
@@ -58,19 +58,19 @@ class ShopWidget;
 class JMdiSubWindow;
 class Report;
 
-class Goiabo : public QMainWindow
+class Baita : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit Goiabo(QWidget *parent = 0);
-  ~Goiabo();
+  explicit Baita(QWidget *parent = 0);
+  ~Baita();
 
 protected:
   void closeEvent(QCloseEvent* event);
 
 private:
-  Ui::Goiabo *ui;
+  Ui::Baita *ui;
   JMdiArea* m_mdi;
   PurchaseView* m_purchase;
   Report* m_report;

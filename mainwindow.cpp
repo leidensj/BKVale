@@ -50,9 +50,9 @@ protected:
   }
 };
 
-Goiabo::Goiabo(QWidget *parent)
+Baita::Baita(QWidget *parent)
   : QMainWindow(parent)
-  , ui(new Ui::Goiabo)
+  , ui(new Ui::Baita)
   , m_purchase(nullptr)
   , m_report(nullptr)
   , m_reminder(nullptr)
@@ -165,12 +165,12 @@ Goiabo::Goiabo(QWidget *parent)
   updateTime();
 }
 
-Goiabo::~Goiabo()
+Baita::~Baita()
 {
   delete ui;
 }
 
-bool Goiabo::connectPrinter()
+bool Baita::connectPrinter()
 {
   if (m_printerSerial.isOpen())
     m_printerSerial.close();
@@ -234,7 +234,7 @@ bool Goiabo::connectPrinter()
   return bSuccess;
 }
 
-void Goiabo::disconnectPrinter()
+void Baita::disconnectPrinter()
 {
   if (m_printerSerial.isOpen())
       m_printerSerial.close();
@@ -242,7 +242,7 @@ void Goiabo::disconnectPrinter()
     m_printerTCP.close();
 }
 
-Functionality Goiabo::getCurrentFunctionality() const
+Functionality Baita::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
   if (activeWindow == m_purchaseWindow)
@@ -258,7 +258,7 @@ Functionality Goiabo::getCurrentFunctionality() const
   return Functionality::None;
 }
 
-void Goiabo::print()
+void Baita::print()
 {
   switch (getCurrentFunctionality())
   {
@@ -334,7 +334,7 @@ void Goiabo::print()
   }
 }
 
-bool Goiabo::print(const QString& text)
+bool Baita::print(const QString& text)
 {
   bool bSuccess = connectPrinter();
   if (bSuccess)
@@ -357,7 +357,7 @@ bool Goiabo::print(const QString& text)
   return bSuccess;
 }
 
-void Goiabo::openSettingsDialog()
+void Baita::openSettingsDialog()
 {
   SettingsDialog dlg(m_settings);
   if (dlg.exec() == QDialog::Accepted)
@@ -367,7 +367,7 @@ void Goiabo::openSettingsDialog()
   }
 }
 
-void Goiabo::updateStatusBar()
+void Baita::updateStatusBar()
 {
   // para adicionar um ícone:
   // "<img src=':/icons/res/16user.png'> " + ...
@@ -381,14 +381,14 @@ void Goiabo::updateStatusBar()
                                 QString::number(m_settings.m_databasePort));
 }
 
-void Goiabo::updateTime()
+void Baita::updateTime()
 {
   QDateTime dt = DateTime::server();
   m_statusTime->setText(dt.date().toString("dd/MM/yyyy ") + dt.time().toString("hh:mm"));
-  QTimer::singleShot(10000, this, &Goiabo::updateTime);
+  QTimer::singleShot(10000, this, &Baita::updateTime);
 }
 
-void Goiabo::updateControls()
+void Baita::updateControls()
 {
   Login login(true);
   ui->actionSettings->setEnabled(login.getUser().m_bSettings);
@@ -435,12 +435,12 @@ void Goiabo::updateControls()
   }
 }
 
-void Goiabo::showInfo()
+void Baita::showInfo()
 {
 
 }
 
-void Goiabo::openJItemSQLDialog()
+void Baita::openJItemSQLDialog()
 {
   JItemView* view = nullptr;
   if (sender() == ui->actionCategories)
@@ -475,7 +475,7 @@ void Goiabo::openJItemSQLDialog()
   }
 }
 
-void Goiabo::openLoginDialog()
+void Baita::openLoginDialog()
 {
   hide();
   Login login(true);
@@ -499,7 +499,7 @@ void Goiabo::openLoginDialog()
 }
 
 
-void Goiabo::openLoggedDialog()
+void Baita::openLoggedDialog()
 {
   QDialog dlg(this);
   QHBoxLayout *layout = new QHBoxLayout;
@@ -513,7 +513,7 @@ void Goiabo::openLoggedDialog()
   dlg.exec();
 }
 
-void Goiabo::closeEvent(QCloseEvent* event)
+void Baita::closeEvent(QCloseEvent* event)
 {
   if (QMessageBox::question(this,
                             tr("Sair"),
@@ -525,7 +525,7 @@ void Goiabo::closeEvent(QCloseEvent* event)
     event->ignore();
 }
 
-void Goiabo::activateWindow()
+void Baita::activateWindow()
 {
   m_purchaseWindow->hide();
   m_reportWindow->hide();
@@ -560,7 +560,7 @@ void Goiabo::activateWindow()
   updateControls();
 }
 
-void Goiabo::testTimeAccess()
+void Baita::testTimeAccess()
 {
   TimeCardDialog dlg(this);
   dlg.exec();

@@ -44,7 +44,7 @@ LoginDialog::LoginDialog(QWidget* parent)
   , m_btnLogin(nullptr)
 {
   QLabel* lblBaita = new QLabel();
-  lblBaita->setPixmap(QIcon(":/icons/res/goiabobannerlogin.png").pixmap(QSize(187, 64)));
+  lblBaita->setPixmap(QIcon(":/icons/res/baitabannerlogin.png").pixmap(QSize(187, 64)));
   lblBaita->setMinimumSize(187, 64);
   lblBaita->setMaximumSize(187, 64);
   lblBaita->setScaledContents(true);
@@ -192,7 +192,7 @@ LoginDialog::LoginDialog(QWidget* parent)
   connect(m_btnDatabaseOpt, SIGNAL(clicked(bool)), this, SLOT(showDatabaseOpt()));
   connect(m_password, SIGNAL(enterSignal()), this, SLOT(focusLogin()));
 
-  setWindowTitle(tr("Goiabo Login"));
+  setWindowTitle(tr("Baita Login"));
   setWindowIcon(QIcon(":/icons/res/login.png"));
   updateCapsLock();
   setModal(true);

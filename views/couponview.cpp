@@ -1,13 +1,9 @@
-#include "couponview.h"
+#include "categoryview.h"
 #include "widgets/jlineedit.h"
 #include "controls/databasepicker.h"
-#include "widgets/jdoublespinbox.h"
-#include "widgets/jspinbox.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
-#include <QRadioButton>
-#include <QCheckBox>
 
 CategoryView::CategoryView(QWidget* parent)
   : JItemView(CATEGORY_SQL_TABLE_NAME, parent)

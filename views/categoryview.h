@@ -1,19 +1,24 @@
-#ifndef CATEGORYVIEW_H
-#define CATEGORYVIEW_H
+#ifndef COUPONVIEW_H
+#define COUPONVIEW_H
 
-#include "items/category.h"
+#include "items/coupon.h"
 #include "jitemview.h"
 
 class QPushButton;
 class JLineEdit;
 class DatabasePicker;
+class JDatePicker;
+class QDateEdit;
+class JSpinBox;
+class JDoubleSpinBox;
+class QRadioButton;
 
-class CategoryView : public JItemView
+class CouponView : public JItemView
 {
   Q_OBJECT
 
 public:
-  explicit CategoryView(QWidget* parent = 0);
+  explicit CouponView(QWidget* parent = 0);
 
 public slots:
   void getItem(JItemSQL& o) const;
@@ -22,8 +27,15 @@ protected slots:
   void setItem(const JItemSQL& o);
 
 private:
-  JLineEdit* m_edName;
-  DatabasePicker* m_imagePicker;
+  JLineEdit* m_edCode;
+  QDateEdit* m_dtCreation;
+  QCheckBox* m_cbExpiration;
+  JDatePicker* m_dtExpiration;
+  QRadioButton* m_rdoPercentage;
+  QRadioButton* m_rdoValue;
+  QRadioButton* m_rdoProduct;
+  JSpinBox* m_spnPercentage;
+  JDoubleSpinBox* m_spnValue;
 };
 
-#endif // CATEGORYVIEW_H
+#endif // COUPONVIEW_H

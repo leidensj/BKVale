@@ -180,5 +180,6 @@
         <file>res/calplusyear.png</file>
         <file>res/networkcable.png</file>
         <file>res/server.png</file>
+        <file>res/coupon.png</file>
     </qresource>
 </RCC>

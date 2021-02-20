@@ -100,15 +100,6 @@ bool BaitaSQL::init(const QString& hostName,
   return bSuccess;
 }
 
-QDate BaitaSQL::getDate(bool dfltMax)
-{
-  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
-  QSqlQuery query(db);
-  if (query.exec("SELECT current_date") && query.next())
-    return query.value(0).toDate();
-  return QDate::fromJulianDay(dfltMax ? Q_INT64_C(784354017364) : Q_INT64_C(-784350574879));
-}
-
 bool BaitaSQL::createTables(QString& error)
 {
   error.clear();
@@ -367,6 +358,19 @@ bool BaitaSQL::createTables(QString& error)
                           LOGIN_SQL_COL_LOG " TIMESTAMP,"
                           "FOREIGN KEY(" LOGIN_SQL_COL_UID ") REFERENCES "
                           USER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE NO ACTION);");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " COUPON_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          COUPON_SQL_COL_TYP " INTEGER,"
+                          COUPON_SQL_COL_COD " TEXT,"
+                          COUPON_SQL_COL_CDT " DATE,"
+                          COUPON_SQL_COL_RED " BOOLEAN,"
+                          COUPON_SQL_COL_RDT " DATE,"
+                          COUPON_SQL_COL_EXP " BOOLEAN,"
+                          COUPON_SQL_COL_EDT " DATE,"
+                          COUPON_SQL_COL_PCT " INTEGER,"
+                          COUPON_SQL_COL_VAL " REAL)");
 
   if (bSuccess)
   {

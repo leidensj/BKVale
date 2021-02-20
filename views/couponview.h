@@ -26,13 +26,16 @@ public slots:
 protected slots:
   void setItem(const JItemSQL& o);
 
+private slots:
+  void updateControls();
+
 private:
   DatabasePicker* m_imagePicker;
   QCheckBox* m_cbExpiration;
   JDatePicker* m_dtExpiration;
-  QRadioButton* m_rdoPercent;
+  QRadioButton* m_rdoPercentage;
   QRadioButton* m_rdoValue;
-  JSpinBox* m_spnPercent;
+  JSpinBox* m_spnPercentage;
   JDoubleSpinBox* m_spnValue;
 };
 

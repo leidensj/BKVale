@@ -12,6 +12,7 @@
 #include "views/storeview.h"
 #include "views/userview.h"
 #include "views/imageview.h"
+#include "views/couponview.h"
 
 #include "controls/report.h"
 #include "controls/calculatorwidget.h"
@@ -155,6 +156,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionUsers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionSuppliers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionCoupons, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
 
@@ -401,6 +403,7 @@ void Baita::updateControls()
   ui->actionSuppliers->setEnabled(login.getUser().m_bSupplier);
   ui->actionStores->setEnabled(login.getUser().m_bStore);
   ui->actionTimeCard->setEnabled(login.getUser().m_bTimeCard);
+  ui->actionCoupons->setEnabled(true);
 
   ui->actionPurchases->setEnabled(login.getUser().m_bPurchase);
   ui->actionReminders->setEnabled(login.getUser().m_bReminder);
@@ -459,6 +462,8 @@ void Baita::openJItemSQLDialog()
     view = new SupplierView;
   else if (sender() == ui->actionUsers)
     view = new UserView;
+  else if (sender() == ui->actionCoupons)
+    view = new CouponView;
 
   if (view != nullptr)
   {

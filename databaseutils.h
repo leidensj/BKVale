@@ -19,8 +19,6 @@ namespace BaitaSQL
   bool init(const QString& hostName,
             int port,
             QString& error);
-
-  QDate getDate(bool dfltMax);
 }
 
 #endif // DATABASEUTILS_H

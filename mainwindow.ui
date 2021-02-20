@@ -137,6 +137,7 @@
     <addaction name="menuPessoas"/>
     <addaction name="actionProducts"/>
     <addaction name="actionCategories"/>
+    <addaction name="actionCoupons"/>
     <addaction name="actionImages"/>
     <addaction name="actionUsers"/>
     <addaction name="actionShoppingListMgt"/>
@@ -412,6 +413,18 @@
    </property>
    <property name="text">
     <string>Relatórios</string>
+   </property>
+  </action>
+  <action name="actionCoupons">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/coupon.png</normaloff>:/icons/res/coupon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cupons</string>
+   </property>
+   <property name="toolTip">
+    <string>Gerenciar cupons</string>
    </property>
   </action>
  </widget>

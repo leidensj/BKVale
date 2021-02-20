@@ -29,6 +29,7 @@ SOURCES += main.cpp\
   editors/formeditor.cpp \
   editors/packageeditor.cpp \
   filters/jfilter.cpp \
+  items/coupon.cpp \
   items/login.cpp \
   libraries/qcustomplot.cpp \
   libraries/tinyexpr.c \
@@ -54,6 +55,7 @@ SOURCES += main.cpp\
     items/supplier.cpp \
     items/user.cpp \
     items/jitemex.cpp \
+  views/couponview.cpp \
   views/jitemview.cpp \
   widgets/findwidget.cpp \
     widgets/jaddremovebuttons.cpp \
@@ -132,6 +134,7 @@ HEADERS  += mainwindow.h \
     editors/formeditor.h \
     editors/packageeditor.h \
     filters/jfilter.h \
+    items/coupon.h \
     items/login.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \
@@ -159,6 +162,7 @@ HEADERS  += mainwindow.h \
     items/supplier.h \
     items/user.h \
     items/jitemex.h \
+    views/couponview.h \
     views/jitemview.h \
     widgets/findwidget.h \
     widgets/jclicklabel.h \

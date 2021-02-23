@@ -34,6 +34,7 @@ SOURCES += main.cpp\
   libraries/qcustomplot.cpp \
   libraries/tinyexpr.c \
         mainwindow.cpp \
+  models/couponmodel.cpp \
   models/loginmodel.cpp \
   purchasereport.cpp \
   settingsdialog.cpp \
@@ -138,6 +139,7 @@ HEADERS  += mainwindow.h \
     items/login.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \
+    models/couponmodel.h \
     models/loginmodel.h \
     purchasereport.h \
     settingsdialog.h \

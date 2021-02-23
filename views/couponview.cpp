@@ -21,42 +21,25 @@ CouponView::CouponView(QWidget* parent)
   , m_spnPercentage(nullptr)
   , m_spnValue(nullptr)
 {
-  m_cbExpiration = new QCheckBox;
-  QLabel* lblExpiration = new QLabel(tr("Expira em: "));
+  m_cbExpiration = new QCheckBox("Expira em:");
   m_dtExpiration = new JDatePicker;
-  QHBoxLayout* ltExpiration = new QHBoxLayout;
-  ltExpiration->setContentsMargins(0, 0, 0, 0);
-  ltExpiration->setAlignment(Qt::AlignLeft);
-  ltExpiration->addWidget(m_cbExpiration);
-  ltExpiration->addWidget(lblExpiration);
-  ltExpiration->addWidget(m_dtExpiration);
 
-  m_rdoPercentage = new QRadioButton(tr("Porcentagem"));
+  m_rdoPercentage = new QRadioButton(tr("Porcentagem:"));
   m_spnPercentage = new JSpinBox;
   m_spnPercentage->setMinimum(0);
   m_spnPercentage->setMaximum(100);
   m_spnPercentage->setSuffix("%");
-  QHBoxLayout* ltPercentage = new QHBoxLayout;
-  ltPercentage->setContentsMargins(0, 0, 0, 0);
-  ltPercentage->setAlignment(Qt::AlignLeft);
-  ltPercentage->addWidget(m_rdoPercentage);
-  ltPercentage->addWidget(m_spnPercentage);
 
-  m_rdoValue = new QRadioButton(tr("Valor"));
+  m_rdoValue = new QRadioButton(tr("Valor:"));
   m_spnValue = new JDoubleSpinBox;
   m_spnValue->setMinimum(0.0);
   m_spnValue->setPrefix("R$");
-  QHBoxLayout* ltValue = new QHBoxLayout;
-  ltValue->setContentsMargins(0, 0, 0, 0);
-  ltValue->setAlignment(Qt::AlignLeft);
-  ltValue->addWidget(m_rdoValue);
-  ltValue->addWidget(m_spnValue);
 
-  m_rdoPercentage = new QRadioButton;
-  QVBoxLayout* ltMain = new QVBoxLayout;
-  ltMain->addLayout(ltExpiration);
-  ltMain->addLayout(ltPercentage);
-  ltMain->addLayout(ltValue);
+  QFormLayout* ltMain = new QFormLayout;
+  ltMain->addRow(m_rdoPercentage, m_spnPercentage);
+  ltMain->addRow(m_rdoValue, m_spnValue);
+  ltMain->addRow(m_cbExpiration, m_dtExpiration);
+  ltMain->setAlignment(Qt::AlignTop);
 
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(ltMain);

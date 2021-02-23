@@ -32,6 +32,7 @@
 #include "models/storemodel.h"
 #include "models/suppliermodel.h"
 #include "models/usermodel.h"
+#include "models/couponmodel.h"
 
 #include "views/categoryview.h"
 #include "views/employeeview.h"
@@ -43,6 +44,7 @@
 #include "views/storeview.h"
 #include "views/supplierview.h"
 #include "views/userview.h"
+#include "views/couponview.h"
 
 JItemSQL* JItemEx::create(const QString& tableName)
 {
@@ -76,6 +78,8 @@ JItemSQL* JItemEx::create(const QString& tableName)
     return new Address;
   if (tableName == PHONE_SQL_TABLE_NAME)
     return new Phone;
+  if (tableName == COUPON_SQL_TABLE_NAME)
+    return new Coupon;
   return nullptr;
 }
 
@@ -133,6 +137,8 @@ QString JItemEx::text(const QString& tableName)
     return "Endereço";
   if (tableName == PHONE_SQL_TABLE_NAME)
     return "Telefone";
+  if (tableName == COUPON_SQL_TABLE_NAME)
+    return "Cupons";
   return "ERRO: Tabela não encontrada.";
 }
 
@@ -168,6 +174,8 @@ QString JItemEx::icon(const QString& tableName)
     return ":/icons/res/address.png";
   if (tableName == PHONE_SQL_TABLE_NAME)
     return ":/icons/res/phone.png";
+  if (tableName == COUPON_SQL_TABLE_NAME)
+    return ":/icons/res/coupon.png";
   return "";
 }
 
@@ -201,6 +209,8 @@ JModel* JItemEx::model(const QString& tableName, QObject* parent)
     return new AddressModel(parent);
   if (tableName == PHONE_SQL_TABLE_NAME)
     return new PhoneModel(parent);
+  if (tableName == COUPON_SQL_TABLE_NAME)
+    return new CouponModel(parent);
   return nullptr;
 }
 
@@ -224,6 +234,8 @@ JItemView* JItemEx::view(const QString& tableName)
     return new StoreView;
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return new SupplierView;
+  if (tableName == COUPON_SQL_TABLE_NAME)
+    return new CouponView;
   return nullptr;
 }
 

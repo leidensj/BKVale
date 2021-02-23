@@ -163,3 +163,23 @@ bool Coupon::SQL_remove_proc(QSqlQuery& query) const
   query.bindValue(":_v00", m_id.get());
   return query.exec();
 }
+
+QString Coupon::st_strType(Type type)
+{
+  switch (type)
+  {
+    case Type::Percentage:
+      return "Porcentagem";
+    case Type::Value:
+      return "Valor";
+    case Type::Product:
+      return "Produto";
+    default:
+      return "";
+  }
+}
+
+QString Coupon::strType() const
+{
+  return st_strType(m_type);
+}

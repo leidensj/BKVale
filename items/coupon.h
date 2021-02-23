@@ -26,6 +26,9 @@ struct Coupon : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
 
+  static QString st_strType(Type type);
+  QString strType() const;
+
   Type m_type;
   QString m_code;
   QDate m_dtCreation;

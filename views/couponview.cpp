@@ -1,8 +1,6 @@
 #include "couponview.h"
 #include "widgets/jlineedit.h"
 #include "widgets/jdatepicker.h"
-#include "widgets/jspinbox.h"
-#include "widgets/jdoublespinbox.h"
 #include "controls/databasepicker.h"
 #include <QLayout>
 #include <QFormLayout>
@@ -18,15 +16,16 @@ CouponView::CouponView(QWidget* parent)
   , m_dtExpiration(nullptr)
   , m_rdoPercentage(nullptr)
   , m_rdoValue(nullptr)
-  , m_spnPercentage(nullptr)
-  , m_spnValue(nullptr)
+  , m_edPercentage(nullptr)
+  , m_edValue(nullptr)
 {
   m_cbExpiration = new QCheckBox("Expira em:");
   m_dtExpiration = new JDatePicker;
 
   m_rdoPercentage = new QRadioButton(tr("Porcentagem:"));
-  m_spnPercentage = new JSpinBox;
-  m_spnPercentage->setMinimum(0);
+  m_edPercentage = new JExpLineEdit(Data::Type::Integer, false);
+  m_edPercentage->setma
+  m_edPercentage->setMinimum(0);
   m_spnPercentage->setMaximum(100);
   m_spnPercentage->setSuffix("%");
 
@@ -43,9 +42,14 @@ CouponView::CouponView(QWidget* parent)
 
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(ltMain);
-
   m_tab->addTab(tabframe, QIcon(":/icons/res/coupon.png"), tr("Cupom"));
+
+  connect(m_cbExpiration, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+  connect(m_rdoPercentage, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+  connect(m_rdoValue, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+
   clear();
+  updateControls();
 }
 
 void CouponView::getItem(JItemSQL& o) const
@@ -74,6 +78,7 @@ void CouponView::setItem(const JItemSQL& o)
 
 void CouponView::updateControls()
 {
-  m_spnPercentage->setEnabled(m_rdoValue->isChecked());
+  m_dtExpiration->setEnabled(m_cbExpiration->isChecked());
+  m_spnPercentage->setEnabled(m_rdoPercentage->isChecked());
   m_spnValue->setEnabled(m_rdoValue->isChecked());
 }

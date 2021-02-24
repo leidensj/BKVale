@@ -9,9 +9,8 @@ class JLineEdit;
 class DatabasePicker;
 class JDatePicker;
 class JDateEdit;
-class JSpinBox;
-class JDoubleSpinBox;
 class QRadioButton;
+class JExpLineEdit;
 
 class CouponView : public JItemView
 {
@@ -35,8 +34,8 @@ private:
   JDatePicker* m_dtExpiration;
   QRadioButton* m_rdoPercentage;
   QRadioButton* m_rdoValue;
-  JSpinBox* m_spnPercentage;
-  JDoubleSpinBox* m_spnValue;
+  JExpLineEdit* m_edPercentage;
+  JExpLineEdit* m_edValue;
 };
 
 #endif // CATEGORYVIEW_H

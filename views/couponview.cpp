@@ -23,20 +23,17 @@ CouponView::CouponView(QWidget* parent)
   m_dtExpiration = new JDatePicker;
 
   m_rdoPercentage = new QRadioButton(tr("Porcentagem:"));
-  m_edPercentage = new JExpLineEdit(Data::Type::Integer, false);
-  m_edPercentage->setma
-  m_edPercentage->setMinimum(0);
-  m_spnPercentage->setMaximum(100);
-  m_spnPercentage->setSuffix("%");
+  m_edPercentage = new JExpLineEdit(Data::Type::Percentage);
+  m_edPercentage->setMaximum(100.0);
+  m_edPercentage->setMinimum(0.0);
 
   m_rdoValue = new QRadioButton(tr("Valor:"));
-  m_spnValue = new JDoubleSpinBox;
-  m_spnValue->setMinimum(0.0);
-  m_spnValue->setPrefix("R$");
+  m_edValue = new JExpLineEdit(Data::Type::Money);
+  m_edValue->setMinimum(0.0);
 
   QFormLayout* ltMain = new QFormLayout;
-  ltMain->addRow(m_rdoPercentage, m_spnPercentage);
-  ltMain->addRow(m_rdoValue, m_spnValue);
+  ltMain->addRow(m_rdoPercentage, m_edPercentage);
+  ltMain->addRow(m_rdoValue, m_edValue);
   ltMain->addRow(m_cbExpiration, m_dtExpiration);
   ltMain->setAlignment(Qt::AlignTop);
 
@@ -47,9 +44,11 @@ CouponView::CouponView(QWidget* parent)
   connect(m_cbExpiration, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoPercentage, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoValue, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+  connect(m_rdoPercentage, &QRadioButton::clicked, [this]() { m_edPercentage->setFocus(); });
+  connect(m_rdoValue, &QRadioButton::clicked, [this]() { m_edValue->setFocus(); });
 
+  setFocusWidgetOnClear(m_edPercentage);
   clear();
-  updateControls();
 }
 
 void CouponView::getItem(JItemSQL& o) const
@@ -61,8 +60,8 @@ void CouponView::getItem(JItemSQL& o) const
   _o.m_dtCreation = DateTime::server().date();
   _o.m_bExpires = m_cbExpiration->isChecked();
   _o.m_dtExpiration = m_dtExpiration->getDate();
-  _o.m_percentage = m_spnPercentage->value();
-  _o.m_value = m_spnValue->value();
+  _o.m_percentage = m_edPercentage->value();
+  _o.m_value = m_edValue->value();
 }
 
 void CouponView::setItem(const JItemSQL& o)
@@ -72,13 +71,14 @@ void CouponView::setItem(const JItemSQL& o)
   m_rdoValue->setChecked(_o.m_type == Coupon::Type::Value);
   m_cbExpiration->setChecked(_o.m_bExpires);
   m_dtExpiration->setDate(_o.m_dtExpiration);
-  m_spnPercentage->setValue(_o.m_percentage);
-  m_spnValue->setValue(_o.m_value);
+  m_edPercentage->setValue(_o.m_percentage);
+  m_edValue->setValue(_o.m_value);
+  updateControls();
 }
 
 void CouponView::updateControls()
 {
   m_dtExpiration->setEnabled(m_cbExpiration->isChecked());
-  m_spnPercentage->setEnabled(m_rdoPercentage->isChecked());
-  m_spnValue->setEnabled(m_rdoValue->isChecked());
+  m_edPercentage->setEnabled(m_rdoPercentage->isChecked());
+  m_edValue->setEnabled(m_rdoValue->isChecked());
 }

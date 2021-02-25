@@ -12,7 +12,6 @@ class JLineEdit : public QLineEdit
 
 public:
   explicit JLineEdit(Text::Input input, bool bToUpper, QWidget* parent = nullptr);
-  void setTextBlockingSignals(const QString& str);
   void setArrowsAndEnterAsTab(bool b);
 
 protected:
@@ -34,22 +33,26 @@ class JExpLineEdit : public JLineEdit
   Q_OBJECT
 
 public:
-  JExpLineEdit(Data::Type type, bool bToUpper, double defaultValue = 0.0, QWidget* parent = nullptr);
-  double getValue() const;
-  void setText(const QString& text);
-  void setText(double val);
-  QString text() const;
+  JExpLineEdit(Data::Type type, QWidget* parent = nullptr);
+  double value() const;
+  QString strValue() const;
+  void setValue(const QString& value);
+  void setValue(double value);
+  void setMinimum(double value);
+  void setMaximum(double value);
 
 private slots:
-  void evaluate();
+  void evaluate(const QString& value);
 
 signals:
   void valueChanged(double);
 
 private:
   const Data::Type m_dataType;
-  const double m_defaultValue;
+  QString m_currentText;
   double m_currentValue;
+  double m_minimumValue;
+  double m_maximumValue;
 };
 
 #endif // JLINEEDIT_H

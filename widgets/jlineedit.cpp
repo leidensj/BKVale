@@ -1,6 +1,7 @@
 #include "jlineedit.h"
 #include "libraries/tinyexpr.h"
 #include "jregexpvalidator.h"
+#include <limits>
 
 JLineEdit::JLineEdit(Text::Input input, bool bToUpper, QWidget* parent)
   : QLineEdit(parent)
@@ -49,60 +50,71 @@ void JLineEdit::keyPressEvent(QKeyEvent *event)
   }
 }
 
-void JLineEdit::setTextBlockingSignals(const QString& str)
-{
-  blockSignals(true);
-  setText(str);
-  blockSignals(false);
-}
-
-JExpLineEdit::JExpLineEdit(Data::Type type, bool bToUpper, double defaultValue, QWidget* parent)
-  : JLineEdit(Text::Input::All, bToUpper, parent)
+JExpLineEdit::JExpLineEdit(Data::Type type, QWidget* parent)
+  : JLineEdit(Text::Input::All, false, parent)
   , m_dataType(type)
-  , m_defaultValue(defaultValue)
-  , m_currentValue(defaultValue)
+  , m_currentValue(0.0)
+  , m_minimumValue(std::numeric_limits<double>::lowest())
+  , m_maximumValue(std::numeric_limits<double>::max())
 {
-  connect(this, SIGNAL(editingFinished()), this, SLOT(evaluate()));
-  evaluate();
+  connect(this, &JExpLineEdit::editingFinished, [this](){ evaluate(text()); });
+  evaluate("");
 }
 
-double JExpLineEdit::getValue() const
+double JExpLineEdit::value() const
 {
   return m_currentValue;
 }
 
-void JExpLineEdit::evaluate()
+void JExpLineEdit::evaluate(const QString& value)
 {
-  auto stdExp = QLineEdit::text().toStdString();
+  if (m_currentText == value)
+    return;
+
+  auto stdExp = value.toStdString();
   int error = 0;
   double val = te_interp(stdExp.c_str(), &error);
-  if (!error)
+  if (!error && val >= m_minimumValue && val <= m_maximumValue)
   {
     m_currentValue = val;
-    setTextBlockingSignals(Data::str(val, m_dataType));
-    emit valueChanged(m_currentValue);
+    m_currentText = Data::str(val, m_dataType);
+    setText(m_currentText);
   }
+  else
+    m_currentValue = 0.0;
 
-  if (m_currentValue == m_defaultValue)
-    setTextBlockingSignals("");
+  if (m_currentValue == 0.0)
+    m_currentText.clear();
+  setText(m_currentText);
+
+  emit valueChanged(m_currentValue);
 
   QPalette _palette = palette();
-  _palette.setColor(QPalette::ColorRole::Text, m_currentValue >= 0 ? Qt::red : Qt::darkGreen);
+  _palette.setColor(QPalette::ColorRole::Text, m_currentValue >= 0.0 ? Qt::red : Qt::darkGreen);
   setPalette(_palette);
 }
 
-void JExpLineEdit::setText(const QString& text)
+void JExpLineEdit::setValue(const QString& value)
 {
-  QLineEdit::setText(text);
-  evaluate();
+  evaluate(value);
 }
 
-void JExpLineEdit::setText(double val)
+void JExpLineEdit::setValue(double value)
 {
-  setText(QString::number(val));
+  setValue(QString::number(value));
 }
 
-QString JExpLineEdit::text() const
+QString JExpLineEdit::strValue() const
 {
-  return Data::str(getValue(), m_dataType);
+  return Data::str(value(), m_dataType);
+}
+
+void JExpLineEdit::setMinimum(double value)
+{
+  m_minimumValue = value;
+}
+
+void JExpLineEdit::setMaximum(double value)
+{
+  m_maximumValue = value;
 }

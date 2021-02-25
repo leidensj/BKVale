@@ -299,7 +299,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   frHeader->setLayout(ltHeader);
   frHeader->setFixedHeight(frHeader->sizeHint().height());
 
-  m_edTotal = new JExpLineEdit(Data::Type::Money, false);
+  m_edTotal = new JExpLineEdit(Data::Type::Money);
   m_edTotal->setReadOnly(true);
   m_edTotal->setPlaceholderText(tr("TOTAL"));
   m_edTotal->setAlignment(Qt::AlignRight);
@@ -310,7 +310,7 @@ PurchaseView::PurchaseView(QWidget *parent)
     m_edTotal->setFont(font);
   }
 
-  m_edDisccount = new JExpLineEdit(Data::Type::Money, false);
+  m_edDisccount = new JExpLineEdit(Data::Type::Money);
   m_edDisccount->setAlignment(Qt::AlignRight);
   m_edDisccount->setPlaceholderText(tr("Descontos ou acréscimos"));
 
@@ -354,7 +354,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(updateControls()));
   connect(m_btnOpenLast, SIGNAL(clicked(bool)), this, SLOT(lastItemSelected()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(supplierChanged()));
-  connect(m_edDisccount, SIGNAL(editingFinished()), this, SLOT(updateControls()));
+  connect(m_edDisccount, SIGNAL(valueChanged(double)), this, SLOT(updateControls()));
   connect(m_edDisccount, SIGNAL(enterSignal()), m_table, SLOT(setFocus()));
   connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_viewer, SLOT(setDynamicFilter(const QString&)));
   connect(m_wPayment, SIGNAL(methodChangedSignal()), this, SLOT(updateControls()));
@@ -387,7 +387,7 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_paymentMethod = m_wPayment->getPaymentMethod();
   _o.m_vPayment = m_wPayment->getPayments();
   _o.m_observation = m_teObservation->toPlainText();
-  _o.m_disccount = m_edDisccount->getValue();
+  _o.m_disccount = m_edDisccount->value();
   _o.m_store.m_id = m_storePicker->getFirstId();
   m_table->getPurchaseElements(_o.m_vElement);
 }
@@ -411,10 +411,10 @@ void PurchaseView::setItem(const JItemSQL& o)
   m_table->setPurchaseElements(_o.m_vElement);
   m_supplierPicker->addItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);
-  m_edDisccount->setText(_o.m_disccount);
+  m_edDisccount->setValue(_o.m_disccount);
 
   m_wPayment->setPurchaseDate(m_dtPicker->getDate());
-  m_wPayment->setPurchaseTotal(m_edTotal->getValue());
+  m_wPayment->setPurchaseTotal(m_edTotal->value());
   m_wPayment->setPaymentMethod(_o.m_paymentMethod);
   m_wPayment->setPayments(_o.m_vPayment);
   updateControls();
@@ -431,8 +431,8 @@ void PurchaseView::supplierChanged()
 void PurchaseView::updateControls()
 {
   m_btnOpenLast->setEnabled(m_lastId.isValid());
-  double total = m_table->sum((int)PurchaseTable::Column::SubTotal) + m_edDisccount->getValue();
-  m_edTotal->setText(total);
+  double total = m_table->sum((int)PurchaseTable::Column::SubTotal) + m_edDisccount->value();
+  m_edTotal->setValue(total);
   m_tab->setTabIcon(1, m_wPayment->getIcon());
   m_actAddHistory->setEnabled(m_supplierPicker->getFirstId().isValid());
 }

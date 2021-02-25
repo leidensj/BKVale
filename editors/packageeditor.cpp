@@ -26,7 +26,7 @@ PackageEditor::PackageEditor(bool bUnityEditor, QWidget* parent)
   m_edUnity = new JLineEdit(Text::Input::Alphanumeric, true);
   m_edUnity->setMaxLength(PRODUCT_MAX_UNITY_LENGTH);
 
-  m_edAmmount = new JExpLineEdit(Data::Type::Ammount, false);
+  m_edAmmount = new JExpLineEdit(Data::Type::Ammount);
   m_lblUnity = new QLabel;
 
   QHBoxLayout* ltAmmount = new QHBoxLayout;
@@ -67,7 +67,7 @@ void PackageEditor::setPackage(const Package& package,
   if (!m_bUnityEditor)
     m_grpIsPackage->setChecked(package.m_bIsPackage);
   m_edUnity->setText(package.m_unity);
-  m_edAmmount->setText(package.m_ammount);
+  m_edAmmount->setValue(package.m_ammount);
   m_lblUnity->setText(productUnity);
 
 }
@@ -77,7 +77,7 @@ Package PackageEditor::getPackage() const
   Package package;
   package.m_bIsPackage = m_bUnityEditor ? true : m_grpIsPackage->isChecked();
   package.m_unity = m_edUnity->text();
-  package.m_ammount = m_edAmmount->getValue();
+  package.m_ammount = m_edAmmount->value();
   return package;
 }
 
@@ -101,6 +101,6 @@ void PackageEditor::updateControls()
   if (pt != nullptr)
   {
     pt->setEnabled((!m_grpIsPackage->isChecked() && !m_bUnityEditor) ||
-                   (m_edAmmount->getValue() != 0.0 && !m_edUnity->text().isEmpty()));
+                   (m_edAmmount->value() != 0.0 && !m_edUnity->text().isEmpty()));
   }
 }

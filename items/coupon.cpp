@@ -1,9 +1,10 @@
 #include "coupon.h"
 #include <QSqlRecord>
+#include <QRandomGenerator>
 
 Coupon::Coupon(Id id)
 {
-  clear();
+  Coupon::clear();
   m_id = id;
 }
 
@@ -12,7 +13,7 @@ void Coupon::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_type = Type::Percentage;
-  m_code.clear();
+  m_code = st_newCode();
   m_dtCreation = DateTime::server().date();;
   m_bRedeemed = false;
   m_dtRedeemed = m_dtCreation;
@@ -43,7 +44,10 @@ bool Coupon::operator == (const JItem& other) const
 
 bool Coupon::isValid() const
 {
-  return !m_code.isEmpty() && m_bExpires ? DateTime::server().date() <= m_dtExpiration : true;
+  return !m_code.isEmpty() &&
+      m_type == Type::Percentage ? m_percentage > 0.0 && m_percentage <= 100.00 : true &&
+      m_type == Type::Value ? m_value >= 0.0 : true &&
+      m_bExpires ? DateTime::server().date() <= m_dtExpiration : true;
 }
 
 QString Coupon::SQL_tableName() const
@@ -182,4 +186,12 @@ QString Coupon::st_strType(Type type)
 QString Coupon::strType() const
 {
   return st_strType(m_type);
+}
+
+QString Coupon::st_newCode()
+{
+  QString code;
+  for (int i = 0; i != 10; ++i)
+    code += QChar(QRandomGenerator::global()->bounded(65, 91));
+  return code;
 }

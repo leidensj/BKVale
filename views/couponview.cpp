@@ -44,8 +44,8 @@ CouponView::CouponView(QWidget* parent)
   connect(m_cbExpiration, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoPercentage, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoValue, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
-  connect(m_rdoPercentage, &QRadioButton::clicked, [this]() { m_edPercentage->setFocus(); });
-  connect(m_rdoValue, &QRadioButton::clicked, [this]() { m_edValue->setFocus(); });
+  connect(m_rdoPercentage, SIGNAL(clicked(bool)), m_edPercentage, SLOT(setFocus()));
+  connect(m_rdoValue, SIGNAL(clicked(bool)), m_edValue, SLOT(setFocus()));
 
   setFocusWidgetOnClear(m_edPercentage);
   clear();
@@ -81,4 +81,8 @@ void CouponView::updateControls()
   m_dtExpiration->setEnabled(m_cbExpiration->isChecked());
   m_edPercentage->setEnabled(m_rdoPercentage->isChecked());
   m_edValue->setEnabled(m_rdoValue->isChecked());
+  if (!m_rdoPercentage->isChecked())
+    m_edPercentage->setValue(0.0);
+  if (!m_rdoValue->isChecked())
+    m_edValue->setValue(0.0);
 }

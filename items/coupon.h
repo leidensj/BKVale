@@ -29,6 +29,8 @@ struct Coupon : public JItemSQL
   static QString st_strType(Type type);
   QString strType() const;
 
+  static QString st_newCode();
+
   Type m_type;
   QString m_code;
   QDate m_dtCreation;

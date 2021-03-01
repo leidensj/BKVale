@@ -83,6 +83,8 @@ QString Text::getRegEx(Input input)
       return "^[0-9/\\-\\*\\+\\.][^,]*$";
     case Input::ASCII:
       return "[ -~]*";
+    case Input::Alpha:
+      return "^[a-zA-Z]*$";
     case Input::All:
     default:
       return "";

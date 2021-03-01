@@ -17,9 +17,11 @@ QString CouponModel::getStrQuery()
                    COUPON_SQL_COL_CDT ","
                    COUPON_SQL_COL_RED ","
                    COUPON_SQL_COL_EXP ","
-                   COUPON_SQL_COL_EDT
+                   COUPON_SQL_COL_EDT ","
+                   COUPON_SQL_COL_PCT ","
+                   COUPON_SQL_COL_VAL
                    " FROM "
-                   CATEGORY_SQL_TABLE_NAME);
+                   COUPON_SQL_TABLE_NAME);
   return strQuery;
 }
 
@@ -27,13 +29,15 @@ void CouponModel::select(QHeaderView* header)
 {
   JModel::select("");
   setHeaderData(0, Qt::Horizontal, tr("ID"));
-  setHeaderData(1, Qt::Horizontal, tr("Tipo"));
+  setHeaderData(1, Qt::Horizontal, tr("Cupom"));
   setHeaderData(2, Qt::Horizontal, tr("Código"));
   setHeaderData(3, Qt::Horizontal, tr("Data"));
   setHeaderData(4, Qt::Horizontal, tr("Resgatado"));
   setHeaderData(5, Qt::Horizontal, tr("Expirado"));
   setHeaderData(6, Qt::Horizontal, tr("Data de Expiração"));
-  if (header != nullptr && header->count() == 6)
+  setHeaderData(7, Qt::Horizontal, tr("Porcentagem"));
+  setHeaderData(8, Qt::Horizontal, tr("Valor"));
+  if (header != nullptr && header->count() == 9)
   {
     header->hideSection(0);
     header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
@@ -42,6 +46,8 @@ void CouponModel::select(QHeaderView* header)
     header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(5, QHeaderView::ResizeMode::ResizeToContents);
     header->hideSection(6);
+    header->hideSection(7);
+    header->hideSection(8);
   }
 }
 
@@ -53,7 +59,17 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
     switch (idx.column())
     {
       case 1:
-        value = Coupon::st_strType((Coupon::Type)value.toInt());
+        switch ((Coupon::Type)value.toInt())
+        {
+          case Coupon::Type::Percentage:
+            value = Data::strPercentage(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 6), role).toInt());
+            break;
+          case Coupon::Type::Value:
+            value = Data::strMoney(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 7), role).toInt());
+            break;
+          default:
+            break;
+        }
         break;
       case 2:
         break;

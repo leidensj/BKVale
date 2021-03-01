@@ -6,7 +6,6 @@
 
 class QPushButton;
 class JLineEdit;
-class DatabasePicker;
 class JDatePicker;
 class JDateEdit;
 class QRadioButton;
@@ -29,7 +28,7 @@ private slots:
   void updateControls();
 
 private:
-  DatabasePicker* m_imagePicker;
+  JLineEdit* m_edCode;
   QCheckBox* m_cbExpiration;
   JDatePicker* m_dtExpiration;
   QRadioButton* m_rdoPercentage;

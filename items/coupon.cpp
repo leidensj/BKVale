@@ -13,7 +13,7 @@ void Coupon::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_type = Type::Percentage;
-  m_code = st_newCode();
+  m_code.clear();
   m_dtCreation = DateTime::server().date();;
   m_bRedeemed = false;
   m_dtRedeemed = m_dtCreation;

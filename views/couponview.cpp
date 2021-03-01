@@ -11,7 +11,7 @@
 
 CouponView::CouponView(QWidget* parent)
   : JItemView(COUPON_SQL_TABLE_NAME, parent)
-  , m_imagePicker(nullptr)
+  , m_edCode(nullptr)
   , m_cbExpiration(nullptr)
   , m_dtExpiration(nullptr)
   , m_rdoPercentage(nullptr)
@@ -19,6 +19,9 @@ CouponView::CouponView(QWidget* parent)
   , m_edPercentage(nullptr)
   , m_edValue(nullptr)
 {
+  m_edCode = new JLineEdit(Text::Input::Alpha, true);
+  m_edCode->setPlaceholderText(tr("Gerar código automaticamente"));
+
   m_cbExpiration = new QCheckBox("Expira em:");
   m_dtExpiration = new JDatePicker;
 
@@ -32,6 +35,7 @@ CouponView::CouponView(QWidget* parent)
   m_edValue->setMinimum(0.0);
 
   QFormLayout* ltMain = new QFormLayout;
+  ltMain->addRow(tr("Código:"), m_edCode);
   ltMain->addRow(m_rdoPercentage, m_edPercentage);
   ltMain->addRow(m_rdoValue, m_edValue);
   ltMain->addRow(m_cbExpiration, m_dtExpiration);
@@ -56,6 +60,7 @@ void CouponView::getItem(JItemSQL& o) const
   Coupon& _o = dynamic_cast<Coupon&>(o);
   _o.clear(true);
   _o.m_id = m_id;
+  _o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text();
   _o.m_type = m_rdoPercentage->isChecked() ? Coupon::Type::Percentage : Coupon::Type::Value;
   _o.m_dtCreation = DateTime::server().date();
   _o.m_bExpires = m_cbExpiration->isChecked();
@@ -67,6 +72,7 @@ void CouponView::getItem(JItemSQL& o) const
 void CouponView::setItem(const JItemSQL& o)
 {
   const Coupon& _o = static_cast<const Coupon&>(o);
+  m_edCode->setText(_o.m_code);
   m_rdoPercentage->setChecked(_o.m_type == Coupon::Type::Percentage);
   m_rdoValue->setChecked(_o.m_type == Coupon::Type::Value);
   m_cbExpiration->setChecked(_o.m_bExpires);

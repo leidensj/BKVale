@@ -18,7 +18,7 @@ void Coupon::clear(bool bClearId)
   m_bRedeemed = false;
   m_dtRedeemed = m_dtCreation;
   m_bExpires = false;
-  m_dtExpiration = m_dtCreation.addYears(1);
+  m_dtExpiration = m_dtCreation;
   m_percentage = 0;
   m_value = 0.0;
 }

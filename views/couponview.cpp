@@ -18,9 +18,12 @@ CouponView::CouponView(QWidget* parent)
   , m_rdoValue(nullptr)
   , m_edPercentage(nullptr)
   , m_edValue(nullptr)
+  , m_lblRedeemed(nullptr)
 {
   m_edCode = new JLineEdit(Text::Input::Alpha, true);
   m_edCode->setPlaceholderText(tr("Gerar código automaticamente"));
+
+  m_lblRedeemed = new QLabel;
 
   m_cbExpiration = new QCheckBox("Expira em:");
   m_dtExpiration = new JDatePicker;
@@ -40,6 +43,7 @@ CouponView::CouponView(QWidget* parent)
   ltMain->addRow(m_rdoValue, m_edValue);
   ltMain->addRow(m_cbExpiration, m_dtExpiration);
   ltMain->setAlignment(Qt::AlignTop);
+  ltMain->addRow(tr("Resgate:"), m_lblRedeemed);
 
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(ltMain);
@@ -72,6 +76,8 @@ void CouponView::getItem(JItemSQL& o) const
 void CouponView::setItem(const JItemSQL& o)
 {
   const Coupon& _o = static_cast<const Coupon&>(o);
+  m_lblRedeemed->setText(tr("Código resgatado no dia %1").arg(_o.m_dtRedeemed.toString("dd/MM/yyyy")));
+  m_lblRedeemed->setVisible(_o.m_bRedeemed);
   m_edCode->setText(_o.m_code);
   m_rdoPercentage->setChecked(_o.m_type == Coupon::Type::Percentage);
   m_rdoValue->setChecked(_o.m_type == Coupon::Type::Value);
@@ -79,6 +85,8 @@ void CouponView::setItem(const JItemSQL& o)
   m_dtExpiration->setDate(_o.m_dtExpiration);
   m_edPercentage->setValue(_o.m_percentage);
   m_edValue->setValue(_o.m_value);
+  m_tab->setTabEnabled(0, !_o.m_bRedeemed);
+  m_btnSave->setEnabled(!_o.m_bRedeemed);
   updateControls();
 }
 

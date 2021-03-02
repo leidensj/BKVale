@@ -10,6 +10,7 @@ class JDatePicker;
 class JDateEdit;
 class QRadioButton;
 class JExpLineEdit;
+class QLabel;
 
 class CouponView : public JItemView
 {
@@ -28,6 +29,7 @@ private slots:
   void updateControls();
 
 private:
+  QLabel* m_lblRedeemed;
   JLineEdit* m_edCode;
   QCheckBox* m_cbExpiration;
   JDatePicker* m_dtExpiration;

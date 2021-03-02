@@ -70,9 +70,6 @@ Baita::Baita(QWidget *parent)
 {
   ui->setupUi(this);
 
-  QTime time = QTime::currentTime();
-  qsrand((uint)time.msec());
-
   m_mdi = new JMdiArea;
   setCentralWidget(m_mdi);
 

@@ -33,9 +33,9 @@ struct Coupon : public JItemSQL
 
   Type m_type;
   QString m_code;
-  QDate m_dtCreation;
+  QDateTime m_dtCreation;
   bool m_bRedeemed;
-  QDate m_dtRedeemed;
+  QDateTime m_dtRedeemed;
   bool m_bExpires;
   QDate m_dtExpiration;
   int m_percentage;

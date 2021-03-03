@@ -66,7 +66,7 @@ void CouponView::getItem(JItemSQL& o) const
   _o.m_id = m_id;
   _o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text();
   _o.m_type = m_rdoPercentage->isChecked() ? Coupon::Type::Percentage : Coupon::Type::Value;
-  _o.m_dtCreation = DateTime::server().date();
+  _o.m_dtCreation = DateTime::server();
   _o.m_bExpires = m_cbExpiration->isChecked();
   _o.m_dtExpiration = m_dtExpiration->getDate();
   _o.m_percentage = m_edPercentage->value();
@@ -76,7 +76,7 @@ void CouponView::getItem(JItemSQL& o) const
 void CouponView::setItem(const JItemSQL& o)
 {
   const Coupon& _o = static_cast<const Coupon&>(o);
-  m_lblRedeemed->setText(tr("Código resgatado no dia %1").arg(_o.m_dtRedeemed.toString("dd/MM/yyyy")));
+  m_lblRedeemed->setText(tr("Código resgatado no dia %1").arg(_o.m_dtRedeemed.toString("dd/MM/yyyy hh:MM:ss")));
   m_lblRedeemed->setVisible(_o.m_bRedeemed);
   m_edCode->setReadOnly(_o.m_id.isValid());
   m_edCode->setText(_o.m_code);

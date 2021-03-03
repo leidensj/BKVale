@@ -14,11 +14,11 @@ void Coupon::clear(bool bClearId)
     m_id.clear();
   m_type = Type::Percentage;
   m_code.clear();
-  m_dtCreation = DateTime::server().date();;
+  m_dtCreation = DateTime::server();;
   m_bRedeemed = false;
   m_dtRedeemed = m_dtCreation;
   m_bExpires = false;
-  m_dtExpiration = m_dtCreation;
+  m_dtExpiration = m_dtCreation.date();
   m_percentage = 0;
   m_value = 0.0;
 }
@@ -142,9 +142,9 @@ bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_type = (Coupon::Type)query.value(0).toInt();
       m_code = query.value(1).toString();
-      m_dtCreation = query.value(2).toDate();
+      m_dtCreation = query.value(2).toDateTime();
       m_bRedeemed = query.value(3).toBool();
-      m_dtRedeemed = query.value(4).toDate();
+      m_dtRedeemed = query.value(4).toDateTime();
       m_bExpires = query.value(5).toBool();
       m_dtExpiration = query.value(6).toDate();
       m_percentage = query.value(7).toInt();

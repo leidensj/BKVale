@@ -11,6 +11,7 @@
 
 CouponView::CouponView(QWidget* parent)
   : JItemView(COUPON_SQL_TABLE_NAME, parent)
+  , m_lblRedeemed(nullptr)
   , m_edCode(nullptr)
   , m_cbExpiration(nullptr)
   , m_dtExpiration(nullptr)
@@ -18,7 +19,6 @@ CouponView::CouponView(QWidget* parent)
   , m_rdoValue(nullptr)
   , m_edPercentage(nullptr)
   , m_edValue(nullptr)
-  , m_lblRedeemed(nullptr)
 {
   m_edCode = new JLineEdit(Text::Input::Alpha, true);
   m_edCode->setPlaceholderText(tr("Gerar código automaticamente"));
@@ -78,6 +78,7 @@ void CouponView::setItem(const JItemSQL& o)
   const Coupon& _o = static_cast<const Coupon&>(o);
   m_lblRedeemed->setText(tr("Código resgatado no dia %1").arg(_o.m_dtRedeemed.toString("dd/MM/yyyy")));
   m_lblRedeemed->setVisible(_o.m_bRedeemed);
+  m_edCode->setReadOnly(_o.m_id.isValid());
   m_edCode->setText(_o.m_code);
   m_rdoPercentage->setChecked(_o.m_type == Coupon::Type::Percentage);
   m_rdoValue->setChecked(_o.m_type == Coupon::Type::Value);

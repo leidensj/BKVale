@@ -74,17 +74,17 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
       case 2:
         break;
       case 3:
-        value = QDate::fromString(value.toString(), Qt::ISODate).toString("yyyy/MM/dd");
+        value = value.toDateTime().toString("yyyy/MM/dd hh:mm:ss");
         break;
       case 4:
-        value = value.toBool() ? "X" : "";
+        value = value.toBool() ? "Sim" : "";
         break;
       case 5:
       {
         bool bRedeemed = QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() - 1), role).toBool();
         QDate dtExpiration = QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 1), role).toDate();
         bool bExpired = !bRedeemed && DateTime::server().date() > dtExpiration;
-        value = bExpired ? "X" : "";
+        value = bExpired ? "Sim" : "";
       } break;
       case 6:
         break;

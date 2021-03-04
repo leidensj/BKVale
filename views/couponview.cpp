@@ -8,6 +8,7 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QRadioButton>
+#include <QInputDialog>
 
 CouponView::CouponView(QWidget* parent)
   : JItemView(COUPON_SQL_TABLE_NAME, parent)
@@ -64,7 +65,7 @@ void CouponView::getItem(JItemSQL& o) const
   Coupon& _o = dynamic_cast<Coupon&>(o);
   _o.clear(true);
   _o.m_id = m_id;
-  _o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text();
+  _o.m_code = m_edCode->text();
   _o.m_type = m_rdoPercentage->isChecked() ? Coupon::Type::Percentage : Coupon::Type::Value;
   _o.m_dtCreation = DateTime::server();
   _o.m_bExpires = m_cbExpiration->isChecked();
@@ -76,7 +77,7 @@ void CouponView::getItem(JItemSQL& o) const
 void CouponView::setItem(const JItemSQL& o)
 {
   const Coupon& _o = static_cast<const Coupon&>(o);
-  m_lblRedeemed->setText(tr("Código resgatado no dia %1").arg(_o.m_dtRedeemed.toString("dd/MM/yyyy hh:MM:ss")));
+  m_lblRedeemed->setText(tr("Código resgatado no dia %1").arg(_o.m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss")));
   m_lblRedeemed->setVisible(_o.m_bRedeemed);
   m_edCode->setReadOnly(_o.m_id.isValid());
   m_edCode->setText(_o.m_code);
@@ -100,4 +101,29 @@ void CouponView::updateControls()
     m_edPercentage->setValue(0.0);
   if (!m_rdoValue->isChecked())
     m_edValue->setValue(0.0);
+}
+
+bool CouponView::save(Id& id)
+{
+  bool ok = false;
+  int n = QInputDialog::getInt(this, tr("Gerar Cupons"), tr("Informe o número de cupons a serem gerados:"), 0, 1, 9999, 1, &ok);
+  if (ok)
+  {
+    QString lst;
+    Coupon o;
+    getItem(o);
+    for (int i = 0; i != n; ++i)
+    {
+      setItem(o);
+      QString code = m_edCode->text().isEmpty()
+        ? Coupon::st_newCode()
+        : m_edCode->text() + Data::strInt(i + 1);
+      m_edCode->setText(code);
+      if (JItemView::save(id))
+        lst.append(code + "\n");
+    }
+    if (!lst.isEmpty())
+      QInputDialog::getMultiLineText(this, tr("Códigos Gerados"), tr("Lista dos códigos que foram gerados"), lst, &ok);
+  }
+  return true;
 }

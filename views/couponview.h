@@ -11,6 +11,7 @@ class JDateEdit;
 class QRadioButton;
 class JExpLineEdit;
 class QLabel;
+class JSpinBox;
 
 class CouponView : public JItemView
 {
@@ -21,6 +22,7 @@ public:
 
 public slots:
   void getItem(JItemSQL& o) const;
+  bool save(Id& id);
 
 protected slots:
   void setItem(const JItemSQL& o);

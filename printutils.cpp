@@ -3,8 +3,10 @@
 #include <QTime>
 #include <QHostInfo>
 #include <QImage>
+#include <QObject>
 #include <QPixmap>
 #include "escpos.h"
+#include "settings.h"
 
 namespace
 {
@@ -178,40 +180,78 @@ namespace
   }
 }
 
-bool Printer::printByteArray(QIODevice* printer,
-                             QByteArray& data,
-                             QString& error)
+void Printer::disconnect()
 {
-  error.clear();
+  if (m_printerSerial.isOpen())
+      m_printerSerial.close();
+  if (m_printerTCP.isOpen())
+    m_printerTCP.close();
+}
 
-  if (printer == nullptr)
+bool Printer::connect(QString& error)
+{
+  if (m_printerSerial.isOpen())
+    m_printerSerial.close();
+  if (m_printerTCP.isOpen())
+    m_printerTCP.close();
+
+  Settings s;
+  s.load();
+  if (s.m_serialPort.isEmpty() &&
+      s.m_ethernetIP.isEmpty())
   {
-    error = "Erro interno. Contacte o administrador.";
+    error = QObject::tr("É necessário selecionar uma porta serial ou endereço para se conectar à impressora.");
     return false;
   }
 
+  bool ok = true;
+  if (s.m_bIsPrinterEthernet)
+  {
+    m_printerTCP.connectToHost(s.m_ethernetIP, (quint16)s.m_ethernetPort);
+    ok = m_printerTCP.waitForConnected();
+    if (ok)
+      ok = printString(ESC_INIT, error);
+    else
+      error = m_printerTCP.errorString();
+  }
+  else
+  {
+    m_printerSerial.setPortName(s.m_serialPort);
+    ok = m_printerSerial.open(QIODevice::ReadWrite);
+    if (ok)
+    {
+      m_printerSerial.clear();
+      ok = printString(ESC_INIT, error);
+    }
+    else
+      error = m_printerSerial.errorString();
+  }
+  return ok;
+}
+
+bool Printer::printByteArray(QByteArray& data, QString& error)
+{
+  error.clear();
+  Settings s;
+  s.load();
+  QIODevice* printer = s.m_bIsPrinterEthernet ? (QIODevice*)&m_printerTCP : (QIODevice*)&m_printerSerial;
   auto nBytes = printer->write(data);
   if (nBytes != data.size())
-  {
     error = QObject::tr("Erro ao imprimir:\n'%1'.").arg(printer->errorString());
-  }
   else if (!printer->waitForBytesWritten(10000))
     error = QObject::tr("Falha de timeout.");
   else
     return true;
-
   return false;
 }
 
-bool Printer::printString(QIODevice* printer,
-                          bool bIsEthernet,
-                          const QString& msg,
-                          QString& error)
+bool Printer::printString(const QString& msg, QString& error)
 {
   error.clear();
-
+  Settings s;
+  s.load();
   QByteArray data;
-  if (bIsEthernet)
+  if (s.m_bIsPrinterEthernet)
   {
     QDataStream out(&data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_3);
@@ -223,18 +263,16 @@ bool Printer::printString(QIODevice* printer,
   {
     data = msg.toUtf8();
   }
-
-  return printByteArray(printer, data, error);
+  return printByteArray(data, error);
 }
 
-QString Printer::strCmdInit()
+bool Printer::print(const QString& msg, QString& error)
 {
-  return ESC_INIT;
-}
-
-QString Printer::strCmdFullCut()
-{
-  return ESC_FULL_CUT;
+  bool ok = connect(error);
+  if (ok)
+    ok = printString(msg, error);
+  disconnect();
+  return ok;
 }
 
 QString PurchasePrinter::build(const Purchase& o)

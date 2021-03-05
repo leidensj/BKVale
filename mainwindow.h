@@ -78,8 +78,6 @@ private:
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
   ShopWidget* m_shop;
-  QSerialPort m_printerSerial;
-  QTcpSocket m_printerTCP;
   Settings m_settings;
   QLabel* m_statusDatabasePath;
   QLabel* m_statusUserName;
@@ -90,7 +88,6 @@ private:
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
   bool connectPrinter();
-  void disconnectPrinter();
   Functionality getCurrentFunctionality() const;
 
 private slots:

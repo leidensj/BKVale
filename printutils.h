@@ -10,21 +10,19 @@
 #include "items/form.h"
 #include "items/shoppinglist.h"
 
-namespace Printer
+class Printer
 {
+public:
+  bool print(const QString& msg, QString& error);
 
-  bool printByteArray(QIODevice* printer,
-                      QByteArray& data,
-                      QString& error);
-
-  bool printString(QIODevice* printer,
-                   bool bIsEthernet,
-                   const QString& msg,
-                   QString& error);
-
-  QString strCmdInit();
-  QString strCmdFullCut();
-}
+private:
+  bool connect(QString& error);
+  void disconnect();
+  bool printByteArray(QByteArray& data, QString& error);
+  bool printString(const QString& msg, QString& error);
+  QSerialPort m_printerSerial;
+  QTcpSocket m_printerTCP;
+};
 
 namespace PurchasePrinter
 {

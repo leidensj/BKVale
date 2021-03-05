@@ -233,14 +233,6 @@ bool Baita::connectPrinter()
   return bSuccess;
 }
 
-void Baita::disconnectPrinter()
-{
-  if (m_printerSerial.isOpen())
-      m_printerSerial.close();
-  if (m_printerTCP.isOpen())
-    m_printerTCP.close();
-}
-
 Functionality Baita::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();

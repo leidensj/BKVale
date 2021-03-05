@@ -2,6 +2,7 @@
 #include "widgets/jlineedit.h"
 #include "widgets/jdatepicker.h"
 #include "controls/databasepicker.h"
+#include "items/jitemex.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
@@ -105,8 +106,11 @@ void CouponView::updateControls()
 
 bool CouponView::save(Id& id)
 {
-  bool ok = false;
-  int n = QInputDialog::getInt(this, tr("Gerar Cupons"), tr("Informe o número de cupons a serem gerados:"), 0, 1, 9999, 1, &ok);
+  id.clear();
+  bool ok = true;
+  int n = 1;
+  if (!m_id.isValid())
+    n = QInputDialog::getInt(this, tr("Gerar Cupons"), tr("Informe o número de cupons a serem gerados:"), 0, 1, 9999, 1, &ok);
   if (ok)
   {
     QString lst;
@@ -114,14 +118,13 @@ bool CouponView::save(Id& id)
     getItem(o);
     for (int i = 0; i != n; ++i)
     {
-      setItem(o);
-      QString code = m_edCode->text().isEmpty()
-        ? Coupon::st_newCode()
-        : m_edCode->text() + Data::strInt(i + 1);
-      m_edCode->setText(code);
-      if (JItemView::save(id))
-        lst.append(code + "\n");
+      o.m_id.clear();
+      o.m_code.clear();
+      o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + Data::strInt(i + 1);
+      if (JItemEx::save(o, m_viewer->getTableName(), this))
+        lst.append(o.m_code + "\n");
     }
+    clear();
     if (!lst.isEmpty())
       QInputDialog::getMultiLineText(this, tr("Códigos Gerados"), tr("Lista dos códigos que foram gerados"), lst, &ok);
   }

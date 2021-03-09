@@ -12,6 +12,7 @@ class QRadioButton;
 class JExpLineEdit;
 class QLabel;
 class JSpinBox;
+class DatabasePicker;
 
 class CouponView : public JItemView
 {
@@ -39,6 +40,7 @@ private:
   QRadioButton* m_rdoValue;
   JExpLineEdit* m_edPercentage;
   JExpLineEdit* m_edValue;
+  DatabasePicker* m_storePicker;
 };
 
 #endif // CATEGORYVIEW_H

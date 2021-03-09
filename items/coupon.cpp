@@ -21,6 +21,7 @@ void Coupon::clear(bool bClearId)
   m_dtExpiration = m_dtCreation.date();
   m_percentage = 0;
   m_value = 0.0;
+  m_store.clear();
 }
 
 bool Coupon::operator != (const JItem& other) const
@@ -34,7 +35,8 @@ bool Coupon::operator != (const JItem& other) const
          m_bExpires != another.m_bExpires ||
          m_dtExpiration != another.m_dtExpiration ||
          m_percentage != another.m_percentage ||
-         m_value != another.m_value;
+         m_value != another.m_value ||
+         m_store.m_id != another.m_store.m_id;
 }
 
 bool Coupon::operator == (const JItem& other) const
@@ -66,7 +68,8 @@ bool Coupon::SQL_insert_proc(QSqlQuery& query) const
                 COUPON_SQL_COL_EXP ","
                 COUPON_SQL_COL_EDT ","
                 COUPON_SQL_COL_PCT ","
-                COUPON_SQL_COL_VAL
+                COUPON_SQL_COL_VAL ","
+                COUPON_SQL_COL_SID
                 ") VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -76,7 +79,8 @@ bool Coupon::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v06),"
                 "(:_v07),"
                 "(:_v08),"
-                "(:_v09))");
+                "(:_v09),"
+                "(:_v10))");
   query.bindValue(":_v01", (int)m_type);
   query.bindValue(":_v02", m_code);
   query.bindValue(":_v03", m_dtCreation);
@@ -86,6 +90,7 @@ bool Coupon::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_dtExpiration);
   query.bindValue(":_v08", m_percentage);
   query.bindValue(":_v09", m_value);
+  query.bindValue(":_v10", m_store.m_id.getIdNull());
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -104,7 +109,8 @@ bool Coupon::SQL_update_proc(QSqlQuery& query) const
                 COUPON_SQL_COL_EXP " = (:_v06),"
                 COUPON_SQL_COL_EDT " = (:_v07),"
                 COUPON_SQL_COL_PCT " = (:_v08),"
-                COUPON_SQL_COL_VAL " = (:_v09)"
+                COUPON_SQL_COL_VAL " = (:_v09),"
+                COUPON_SQL_COL_SID " = (:_v10)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", (int)m_type);
@@ -116,6 +122,7 @@ bool Coupon::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_dtExpiration);
   query.bindValue(":_v08", m_percentage);
   query.bindValue(":_v09", m_value);
+  query.bindValue(":_v09", m_store.m_id.getIdNull());
   return query.exec();
 }
 
@@ -130,7 +137,8 @@ bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
                 COUPON_SQL_COL_EXP ","
                 COUPON_SQL_COL_EDT ","
                 COUPON_SQL_COL_PCT ","
-                COUPON_SQL_COL_VAL
+                COUPON_SQL_COL_VAL ","
+                COUPON_SQL_COL_SID
                 " FROM " COUPON_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -149,6 +157,7 @@ bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
       m_dtExpiration = query.value(6).toDate();
       m_percentage = query.value(7).toInt();
       m_value = query.value(8).toDouble();
+      m_store.m_id.set(query.value(9).toDouble());
     }
     else
     {
@@ -156,6 +165,9 @@ bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
       bSuccess = false;
     }
   }
+
+  if (bSuccess && m_store.m_id.isValid())
+    bSuccess = m_store.SQL_select_proc(query, error);
 
   return bSuccess;
 }

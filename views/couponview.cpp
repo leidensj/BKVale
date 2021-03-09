@@ -10,6 +10,9 @@
 #include <QLabel>
 #include <QRadioButton>
 #include <QInputDialog>
+#include <QSettings>
+
+#define SETTINGS_COUPON_STORE_ID "coupon/storeid"
 
 CouponView::CouponView(QWidget* parent)
   : JItemView(COUPON_SQL_TABLE_NAME, parent)
@@ -21,6 +24,7 @@ CouponView::CouponView(QWidget* parent)
   , m_rdoValue(nullptr)
   , m_edPercentage(nullptr)
   , m_edValue(nullptr)
+  , m_storePicker(nullptr)
 {
   m_edCode = new JLineEdit(Text::Input::Alpha, true);
   m_edCode->setPlaceholderText(tr("Gerar código automaticamente"));
@@ -39,7 +43,10 @@ CouponView::CouponView(QWidget* parent)
   m_edValue = new JExpLineEdit(Data::Type::Money);
   m_edValue->setMinimum(0.0);
 
+  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
+
   QFormLayout* ltMain = new QFormLayout;
+  ltMain->addRow(JItemEx::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
   ltMain->addRow(tr("Código:"), m_edCode);
   ltMain->addRow(m_rdoPercentage, m_edPercentage);
   ltMain->addRow(m_rdoValue, m_edValue);
@@ -73,6 +80,7 @@ void CouponView::getItem(JItemSQL& o) const
   _o.m_dtExpiration = m_dtExpiration->getDate();
   _o.m_percentage = m_edPercentage->value();
   _o.m_value = m_edValue->value();
+  _o.m_store.m_id = m_storePicker->getFirstId();
 }
 
 void CouponView::setItem(const JItemSQL& o)
@@ -90,6 +98,16 @@ void CouponView::setItem(const JItemSQL& o)
   m_edValue->setValue(_o.m_value);
   m_tab->setTabEnabled(0, !_o.m_bRedeemed);
   m_btnSave->setEnabled(!_o.m_bRedeemed);
+  if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
+  {
+    QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
+    Store store(Id(settings.value(SETTINGS_COUPON_STORE_ID).toLongLong()));
+    QString error;
+    if (store.SQL_select(error))
+      m_storePicker->addItem(store);
+  }
+  else
+    m_storePicker->addItem(_o.m_store);
   updateControls();
 }
 

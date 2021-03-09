@@ -44,30 +44,34 @@ namespace
                       '\xF0', '\xF1', '\xF2', '\xF3', '\xF4', '\xF5', '\xF6', '\xF7',
                       '\xF8', '\xF9', '\xFA', '\xFB', '\xFC', '\xFD', '\xFE', '\xFF' };
 
+  void appendFormInfo(const Form& o, QString& str)
+  {
+    if (!o.m_alias.isEmpty())
+    {
+      str += ESC_EXPAND_ON
+             ESC_ALIGN_CENTER +
+             o.m_alias +
+             ESC_LF
+             ESC_EXPAND_OFF;
+    }
+    str += ESC_ALIGN_CENTER +
+           o.m_name +
+           ESC_LF;
+    if (!o.m_vAddress.isEmpty())
+    {
+      str += o.m_vAddress.at(0).name() +
+             ESC_LF;
+    }
+    if (!o.m_vPhone.isEmpty())
+    {
+      str += o.m_vPhone.at(0).name() +
+             ESC_LF;
+    }
+  }
+
   void purchaseAppendHeader(const Purchase& o, QString& text)
   {
-    if (!o.m_store.m_form.m_alias.isEmpty())
-    {
-      text += ESC_EXPAND_ON
-              ESC_ALIGN_CENTER +
-              o.m_store.m_form.m_alias +
-              ESC_LF
-              ESC_EXPAND_OFF;
-    }
-    text += ESC_ALIGN_CENTER +
-            o.m_store.m_form.m_name +
-            ESC_LF;
-    if (!o.m_store.m_form.m_vAddress.isEmpty())
-    {
-      text += o.m_store.m_form.m_vAddress.at(0).name() +
-              ESC_LF;
-    }
-    if (!o.m_store.m_form.m_vPhone.isEmpty())
-    {
-      text += o.m_store.m_form.m_vPhone.at(0).name() +
-              ESC_LF;
-    }
-
+    appendFormInfo(o.m_store.m_form, text);
     text += ESC_VERT_TAB;
     text += o.m_paymentMethod == Purchase::PaymentMethod::Cash
             ? "PAGAMENTO A VISTA"
@@ -513,6 +517,8 @@ bool Printer::print(const ShoppingList& lst,  bool bPrintCount, QString& error)
 bool Printer::print(const Coupon& o, QString& error)
 {
   QString str;
+  if (o.m_store.isValid())
+    appendFormInfo(o.m_store.m_form, str);
 
   if (!o.m_bRedeemed)
   {

@@ -394,6 +394,9 @@ void PurchaseView::getItem(JItemSQL& o) const
 
 void PurchaseView::setItem(const JItemSQL& o)
 {
+  m_table->removeAllItems();
+  m_supplierPicker->clear();
+  m_storePicker->clear();
   const Purchase& _o = dynamic_cast<const Purchase&>(o);
   if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
   {
@@ -403,10 +406,9 @@ void PurchaseView::setItem(const JItemSQL& o)
     if (store.SQL_select(error))
       m_storePicker->addItem(store);
   }
-  m_table->removeAllItems();
-  m_supplierPicker->clear();
+  else
+    m_storePicker->addItem(_o.m_store);
   m_dtPicker->setDate(_o.m_date);
-
   m_snNumber->setValue(_o.m_number);
   m_table->setPurchaseElements(_o.m_vElement);
   m_supplierPicker->addItem(_o.m_supplier);

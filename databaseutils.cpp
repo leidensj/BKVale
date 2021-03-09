@@ -373,7 +373,11 @@ bool BaitaSQL::createTables(QString& error)
                           COUPON_SQL_COL_EXP " BOOLEAN,"
                           COUPON_SQL_COL_EDT " DATE,"
                           COUPON_SQL_COL_PCT " INTEGER,"
-                          COUPON_SQL_COL_VAL " REAL)");
+                          COUPON_SQL_COL_VAL " REAL,"
+                          COUPON_SQL_COL_SID " INTEGER,"
+                          "FOREIGN KEY(" COUPON_SQL_COL_SID ") REFERENCES "
+                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
 
   if (bSuccess)
   {

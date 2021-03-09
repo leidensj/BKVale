@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "printutils.h"
+#include "printer.h"
 
 #include "views/productview.h"
 #include "views/categoryview.h"
@@ -169,70 +169,6 @@ Baita::~Baita()
   delete ui;
 }
 
-bool Baita::connectPrinter()
-{
-  if (m_printerSerial.isOpen())
-    m_printerSerial.close();
-  if (m_printerTCP.isOpen())
-    m_printerTCP.close();
-
-  if (m_settings.m_serialPort.isEmpty() &&
-      m_settings.m_ethernetIP.isEmpty())
-  {
-    QMessageBox::warning(this,
-                       tr("Porta ou endereço não informado"),
-                       tr("É necessário selecionar uma porta serial "
-                          "ou endereço para se conectar à impressora."),
-                       QMessageBox::Ok);
-    return false;
-  }
-
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  QString error;
-  bool bSuccess = false;
-  if (m_settings.m_bIsPrinterEthernet)
-  {
-    m_printerTCP.connectToHost(m_settings.m_ethernetIP,
-                               (quint16)m_settings.m_ethernetPort);
-    bSuccess = m_printerTCP.waitForConnected();
-    if (bSuccess)
-      bSuccess = Printer::printString(&m_printerTCP,
-                                      m_settings.m_bIsPrinterEthernet,
-                                      Printer::strCmdInit(),
-                                      error);
-    else
-      error = m_printerTCP.errorString();
-  }
-  else
-  {
-    m_printerSerial.setPortName(m_settings.m_serialPort);
-    bSuccess = m_printerSerial.open(QIODevice::ReadWrite);
-    if (bSuccess)
-    {
-      m_printerSerial.clear();
-      bSuccess = Printer::printString(&m_printerSerial,
-                                      m_settings.m_bIsPrinterEthernet,
-                                      Printer::strCmdInit(),
-                                      error);
-    }
-    else
-      error = m_printerSerial.errorString();
-  }
-
-
-  QApplication::restoreOverrideCursor();
-
-  if (!bSuccess)
-  {
-    QMessageBox::critical(this,
-                       tr("Erro"),
-                       tr("O seguinte erro ocorreu ao conectar à impressora:\n"
-                          "'%1'.").arg(error),
-                       QMessageBox::Ok);
-  }
-  return bSuccess;
-}
-
 Functionality Baita::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
@@ -251,6 +187,8 @@ Functionality Baita::getCurrentFunctionality() const
 
 void Baita::print()
 {
+  bool ok = true;
+  QString error;
   switch (getCurrentFunctionality())
   {
     case Functionality::Purchase:
@@ -272,11 +210,8 @@ void Baita::print()
       o.clear(true);
       if (m_purchase->save(o.m_id))
       {
-        QString error;
         if (o.SQL_select(error))
-          print(PurchasePrinter::build(o));
-        else
-          QMessageBox::critical(this, ("Erro ao selecionar item"), error, QMessageBox::Ok);
+          ok = m_printer.print(o, error);
       }
     } break;
     case Functionality::Reminder:
@@ -284,68 +219,43 @@ void Baita::print()
       ReminderPrintDialog dlg(this);
       if (!dlg.exec())
         break;
-
-      bool bSuccess = true;
       Reminder o;
       m_reminder->getItem(o);
       if (dlg.getSave())
       {
         Id id;
-        bSuccess = m_reminder->save(id);
+        ok = m_reminder->save(id);
       }
 
-      if (bSuccess)
+      if (ok)
       {
-        QString str = ReminderPrinter::build(o);
         for (int i = 0; i != dlg.getCopies(); ++i)
         {
-          bSuccess = print(str);
-          if (!bSuccess)
+          ok = m_printer.print(o, error);
+          if (ok)
             break;
         }
       }
 
-      if (bSuccess)
+      if (ok)
         m_reminder->clear();
-
     } break;
     case Functionality::Calculator:
     {
-      print(m_calculator->getFullContent() + Printer::strCmdFullCut());
+      ok = m_printer.print(m_calculator->getFullContent() + Printer::st_strFullCut(), error);
     } break;
     case Functionality::Shop:
     {
       ShopPrintDialog dlg;
       if (dlg.exec())
-        print(ShoppingListPrinter::build(m_shop->getShoppingList(), dlg.getCount()));
+        ok = m_printer.print(m_shop->getShoppingList(), dlg.getCount(), error);
     } break;
     case Functionality::None:
     default:
       break;
   }
-}
-
-bool Baita::print(const QString& text)
-{
-  bool bSuccess = connectPrinter();
-  if (bSuccess)
-  {
-    QIODevice* printer = m_settings.m_bIsPrinterEthernet
-                         ? (QIODevice*)&m_printerTCP
-                         : (QIODevice*)&m_printerSerial;
-
-    QString error;
-    bSuccess = Printer::printString(printer, m_settings.m_bIsPrinterEthernet, text, error);
-    if (!bSuccess)
-    {
-      QMessageBox::critical(this,
-                            tr("Erro"),
-                            tr("Erro '%1' ao imprimir.").arg(error),
-                            QMessageBox::Ok);
-    }
-    disconnectPrinter();
-  }
-  return bSuccess;
+  if (!ok)
+    QMessageBox::critical(this, ("Erro ao imprimir item"), error, QMessageBox::Ok);
 }
 
 void Baita::openSettingsDialog()

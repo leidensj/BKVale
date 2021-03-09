@@ -195,3 +195,16 @@ QString Coupon::st_newCode()
     code += QChar(QRandomGenerator::global()->bounded(65, 91));
   return code;
 }
+
+QString Coupon::strCoupon() const
+{
+  switch (m_type)
+  {
+    case Type::Percentage:
+      return Data::strPercentage(m_percentage);
+    case Type::Value:
+      return Data::strMoney(m_value);
+    default:
+      return "";
+  }
+}

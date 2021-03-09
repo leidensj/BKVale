@@ -1,19 +1,23 @@
-#ifndef PRINTUTILS_H
-#define PRINTUTILS_H
+#ifndef PRINTER_H
+#define PRINTER_H
 
 #include <QtSerialPort>
 #include <QTcpSocket>
 #include <QByteArray>
 #include "items/purchase.h"
 #include "items/reminder.h"
-#include "items/product.h"
-#include "items/form.h"
 #include "items/shoppinglist.h"
+#include "items/coupon.h"
 
 class Printer
 {
 public:
   bool print(const QString& msg, QString& error);
+  bool print(const Purchase& o, QString& error);
+  bool print(const Reminder& o, QString& error);
+  bool print(const ShoppingList& o, bool bPrintCount, QString& error);
+  bool print(const Coupon& o, QString& error);
+  static QString st_strFullCut();
 
 private:
   bool connect(QString& error);
@@ -24,19 +28,4 @@ private:
   QTcpSocket m_printerTCP;
 };
 
-namespace PurchasePrinter
-{
-  QString build(const Purchase& o);
-}
-
-namespace ReminderPrinter
-{
-  QString build(const Reminder& r);
-}
-
-namespace ShoppingListPrinter
-{
-  QString build(const ShoppingList& lst, bool bPrintCount);
-}
-
-#endif // PRINTUTILS_H
+#endif // PRINTER_H

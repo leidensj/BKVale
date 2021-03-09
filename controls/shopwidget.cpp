@@ -1,7 +1,7 @@
 #include "shopwidget.h"
 #include "controls/databaseviewer.h"
 #include "defines.h"
-#include "printutils.h"
+#include "printer.h"
 #include "escpos.h"
 #include "items/jitemex.h"
 #include <QLabel>

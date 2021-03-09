@@ -106,6 +106,7 @@
    <addaction name="actionReminders"/>
    <addaction name="actionCalculator"/>
    <addaction name="actionShoppingList"/>
+   <addaction name="actionRedeem"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -425,6 +426,18 @@
    </property>
    <property name="toolTip">
     <string>Gerenciar cupons</string>
+   </property>
+  </action>
+  <action name="actionRedeem">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/redeem.png</normaloff>:/icons/res/redeem.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resgatar Cupom</string>
+   </property>
+   <property name="toolTip">
+    <string>Resgatar cupom</string>
    </property>
   </action>
  </widget>

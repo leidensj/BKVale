@@ -2,11 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSerialPort>
-#include <QTcpSocket>
 #include "settingsdialog.h"
 #include "databaseutils.h"
 #include "items/login.h"
+#include "printer.h"
 #include <QMdiArea>
 #include <QPainter>
 
@@ -87,7 +86,7 @@ private:
   JMdiSubWindow* m_reminderWindow;
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
-  bool connectPrinter();
+  Printer m_printer;
   Functionality getCurrentFunctionality() const;
 
 private slots:
@@ -96,7 +95,6 @@ private slots:
   void updateTime();
   void showInfo();
   void print();
-  bool print(const QString& text);
   void openJItemSQLDialog();
   void openSettingsDialog();
   void openLoginDialog();

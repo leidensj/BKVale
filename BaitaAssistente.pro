@@ -36,10 +36,10 @@ SOURCES += main.cpp\
         mainwindow.cpp \
   models/couponmodel.cpp \
   models/loginmodel.cpp \
+  printer.cpp \
   purchasereport.cpp \
   settingsdialog.cpp \
   tables/jtable.cpp \
-    printutils.cpp \
     databaseutils.cpp \
     settings.cpp \
     consumptionchart.cpp \
@@ -141,10 +141,10 @@ HEADERS  += mainwindow.h \
     libraries/tinyexpr.h \
     models/couponmodel.h \
     models/loginmodel.h \
+    printer.h \
     purchasereport.h \
     settingsdialog.h \
     tables/jtable.h \
-    printutils.h \
     databaseutils.h \
     settings.h \
     consumptionchart.h \

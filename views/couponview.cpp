@@ -45,7 +45,7 @@ CouponView::CouponView(QWidget* parent)
   ltMain->addRow(m_rdoValue, m_edValue);
   ltMain->addRow(m_cbExpiration, m_dtExpiration);
   ltMain->setAlignment(Qt::AlignTop);
-  ltMain->addRow(tr("Resgate:"), m_lblRedeemed);
+  ltMain->addRow(tr(""), m_lblRedeemed);
 
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(ltMain);

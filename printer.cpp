@@ -1,4 +1,4 @@
-#include "printutils.h"
+#include "printer.h"
 #include <QDate>
 #include <QTime>
 #include <QHostInfo>
@@ -180,6 +180,11 @@ namespace
   }
 }
 
+QString Printer::st_strFullCut()
+{
+  return ESC_FULL_CUT;
+}
+
 void Printer::disconnect()
 {
   if (m_printerSerial.isOpen())
@@ -275,27 +280,27 @@ bool Printer::print(const QString& msg, QString& error)
   return ok;
 }
 
-QString PurchasePrinter::build(const Purchase& o)
+bool Printer::print(const Purchase& o, QString& error)
 {
-  QString text1;
-  purchaseAppendHeader(o, text1);
-  purchaseAppendBody(o, text1);
-  purchaseAppendFooter(o, text1);
+  QString str;
+  purchaseAppendHeader(o, str);
+  purchaseAppendBody(o, str);
+  purchaseAppendFooter(o, str);
   if (o.m_paymentMethod == Purchase::PaymentMethod::Cash)
   {
-    return text1 + ESC_LF ESC_FULL_CUT;
+    str += ESC_LF ESC_FULL_CUT;
   }
   else
   {
-    QString text2(text1);
-    text1 += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
-    text2 += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
-    return text1 + text2;
+    QString strAux(str);
+    str += "1 via" ESC_LF ESC_LF ESC_PARTIAL_CUT;
+    strAux += "2 via" ESC_LF ESC_LF ESC_FULL_CUT;
+    str += strAux;
   }
-  return text1;
+  return print(str, error);
 }
 
-QString ReminderPrinter::build(const Reminder& r)
+bool Printer::print(const Reminder& r, QString& error)
 {
   QString str, title, subject, msg;
 
@@ -391,10 +396,10 @@ QString ReminderPrinter::build(const Reminder& r)
   if (!str.isEmpty())
     str += ESC_LF ESC_LF ESC_FULL_CUT;
 
-  return str;
+  return print(str, error);
 }
 
-QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
+bool Printer::print(const ShoppingList& lst,  bool bPrintCount, QString& error)
 {
   QDateTime dt = DateTime::server();
   QString str;
@@ -502,5 +507,65 @@ QString ShoppingListPrinter::build(const ShoppingList& lst,  bool bPrintCount)
          ESC_VERT_TAB
          ESC_FULL_CUT;
 
-  return str;
+  return print(str, error);
+}
+
+bool Printer::print(const Coupon& o, QString& error)
+{
+  QString str;
+
+  if (!o.m_bRedeemed)
+  {
+    str += ESC_ALIGN_CENTER
+           ESC_EXPAND_ON
+           "CUPOM DE DESCONTO"
+           ESC_EXPAND_OFF
+           ESC_LF
+           ESC_VERT_TAB
+           ESC_ALIGN_LEFT
+           "Utilize o código abaixo para ativar seu desconto:"
+           ESC_LF
+           ESC_ALIGN_CENTER
+           ESC_DOUBLE_FONT_ON +
+           o.m_code +
+           ESC_DOUBLE_FONT_OFF
+           ESC_ALIGN_LEFT
+           ESC_LF
+           ESC_VERT_TAB
+           "Código gerado no dia: " + o.m_dtCreation.toString("dd/MM/yyyy hh:mm:ss") +
+           ESC_LF;
+    if (o.m_bExpires)
+      str += "Código expira em: " + o.m_dtExpiration.toString("dd/MM/yyyy");
+  }
+  else
+  {
+    str += ESC_ALIGN_CENTER
+           ESC_EXPAND_ON
+           "CUPOM DE DESCONTO"
+           ESC_EXPAND_OFF
+           ESC_LF
+           ESC_VERT_TAB
+           ESC_ALIGN_LEFT;
+    switch (o.m_type)
+    {
+      case Coupon::Type::Value:
+      case Coupon::Type::Percentage:
+        str += ESC_ALIGN_LEFT
+               ESC_DOUBLE_FONT_ON +
+               o.strCoupon() +
+               ESC_DOUBLE_FONT_OFF
+               ESC_LF
+               ESC_VERT_TAB
+               ESC_ALIGN_LEFT;
+        break;
+      default:
+        break;
+    }
+    str += ESC_ALIGN_LEFT "Código resgatado no dia: " + o.m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss");
+  }
+  str += ESC_LF
+         ESC_VERT_TAB
+         ESC_FULL_CUT;
+
+  return print(str, error);
 }

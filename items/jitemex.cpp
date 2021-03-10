@@ -14,6 +14,7 @@
 #include "supplier.h"
 #include "employee.h"
 #include "login.h"
+#include "printer.h"
 
 #include <QMessageBox>
 #include "controls/pincodedialog.h"
@@ -328,4 +329,23 @@ bool JItemEx::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
     QMessageBox::critical(parent, QObject::tr("Erro"), QObject::tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
 
   return bSuccess;
+}
+
+bool JItemEx::print(const JItemSQL& o, QVariant* options, QWidget* parent)
+{
+  QString error;
+  bool ok = true;
+  Printer printer;
+  const QString tableName = o.SQL_tableName();
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
+    ok = printer.print(dynamic_cast<const Purchase&>(o), error);
+  else if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    ok = printer.print(dynamic_cast<const ShoppingList&>(o), options != nullptr ? options->toBool() : true, error);
+  else if (tableName == REMINDER_SQL_TABLE_NAME)
+    ok = printer.print(dynamic_cast<const Reminder&>(o), error);
+  else if (tableName == COUPON_SQL_TABLE_NAME)
+    ok = printer.print(dynamic_cast<const Coupon&>(o), error);
+  if (!ok)
+    QMessageBox::critical(parent, QObject::tr("Erro"), QObject::tr("Erro '%1' ao imprimir %2.").arg(error, text(tableName)), QMessageBox::Ok);
+  return ok;
 }

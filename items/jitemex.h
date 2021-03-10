@@ -20,5 +20,6 @@ JItemView* view(const QString& tableName);
 bool select(JItemSQL& o, QWidget* parent = nullptr);
 void remove(const Ids& ids, const QString& tableName, QWidget* parent = nullptr);
 bool save(const JItemSQL& o, const QString& tableName, QWidget* parent = nullptr);
+bool print(const JItemSQL& o, QVariant* options = nullptr, QWidget* parent = nullptr);
 }
 #endif // JItemEx_H

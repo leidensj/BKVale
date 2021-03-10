@@ -517,8 +517,11 @@ bool Printer::print(const ShoppingList& lst,  bool bPrintCount, QString& error)
 bool Printer::print(const Coupon& o, QString& error)
 {
   QString str;
-  if (o.m_store.isValid())
+  if (o.m_store.m_id.isValid())
+  {
     appendFormInfo(o.m_store.m_form, str);
+    str += ESC_LF;
+  }
 
   if (!o.m_bRedeemed)
   {
@@ -529,28 +532,36 @@ bool Printer::print(const Coupon& o, QString& error)
            ESC_LF
            ESC_VERT_TAB
            ESC_ALIGN_LEFT
-           "Utilize o código abaixo para ativar seu desconto:"
+           "Utilize o codigo abaixo para ativar o desconto:"
            ESC_LF
+           ESC_VERT_TAB
            ESC_ALIGN_CENTER
            ESC_DOUBLE_FONT_ON +
            o.m_code +
            ESC_DOUBLE_FONT_OFF
-           ESC_ALIGN_LEFT
            ESC_LF
            ESC_VERT_TAB
-           "Código gerado no dia: " + o.m_dtCreation.toString("dd/MM/yyyy hh:mm:ss") +
+           ESC_ALIGN_LEFT
+           "Emissao:" +
+           o.m_dtCreation.toString("dd/MM/yyyy hh:mm:ss") +
+           " @ " + QHostInfo::localHostName().toUpper() +
            ESC_LF;
     if (o.m_bExpires)
-      str += "Código expira em: " + o.m_dtExpiration.toString("dd/MM/yyyy");
+      str += "Codigo valido ate o dia "
+             ESC_EXPAND_ON +
+             o.m_dtExpiration.toString("dd/MM/yyyy") +
+             ESC_EXPAND_OFF;
   }
   else
   {
     str += ESC_ALIGN_CENTER
            ESC_EXPAND_ON
            "CUPOM DE DESCONTO"
-           ESC_EXPAND_OFF
+           ESC_LF +
+           o.m_code +
            ESC_LF
            ESC_VERT_TAB
+           ESC_EXPAND_OFF
            ESC_ALIGN_LEFT;
     switch (o.m_type)
     {
@@ -567,7 +578,7 @@ bool Printer::print(const Coupon& o, QString& error)
       default:
         break;
     }
-    str += ESC_ALIGN_LEFT "Código resgatado no dia: " + o.m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss");
+    str += ESC_ALIGN_LEFT "Codigo resgatado no dia: " + o.m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss");
   }
   str += ESC_LF
          ESC_VERT_TAB

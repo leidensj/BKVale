@@ -1,4 +1,5 @@
 #include "couponview.h"
+#include "printer.h"
 #include "widgets/jlineedit.h"
 #include "widgets/jdatepicker.h"
 #include "controls/databasepicker.h"
@@ -11,8 +12,27 @@
 #include <QRadioButton>
 #include <QInputDialog>
 #include <QSettings>
+#include <QPlainTextEdit>
+#include <QDialogButtonBox>
 
 #define SETTINGS_COUPON_STORE_ID "coupon/storeid"
+
+CouponConfirmation::CouponConfirmation(const QVector<Coupon>& coupons, QWidget* parent)
+  : QDialog(parent)
+{
+  QPlainTextEdit* teCodes = new QPlainTextEdit;
+  QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No);
+  QVBoxLayout* ltMain = new QVBoxLayout;
+  ltMain->addWidget(new QLabel(tr("Deseja imprimir os códigos gerados?")));
+  ltMain->addWidget(teCodes);
+  ltMain->addWidget(btns);
+  setLayout(ltMain);
+  teCodes->setReadOnly(true);
+  for (const Coupon& o : coupons)
+    teCodes->appendPlainText(o.m_code);
+  connect(btns, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(btns, SIGNAL(rejected()), this, SLOT(reject()));
+}
 
 CouponView::CouponView(QWidget* parent)
   : JItemView(COUPON_SQL_TABLE_NAME, parent)
@@ -98,6 +118,7 @@ void CouponView::setItem(const JItemSQL& o)
   m_edValue->setValue(_o.m_value);
   m_tab->setTabEnabled(0, !_o.m_bRedeemed);
   m_btnSave->setEnabled(!_o.m_bRedeemed);
+  m_storePicker->addItem(_o.m_store);
   if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
   {
     QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
@@ -106,8 +127,6 @@ void CouponView::setItem(const JItemSQL& o)
     if (store.SQL_select(error))
       m_storePicker->addItem(store);
   }
-  else
-    m_storePicker->addItem(_o.m_store);
   updateControls();
 }
 
@@ -131,7 +150,7 @@ bool CouponView::save(Id& id)
     n = QInputDialog::getInt(this, tr("Gerar Cupons"), tr("Informe o número de cupons a serem gerados:"), 0, 1, 9999, 1, &ok);
   if (ok)
   {
-    QString lst;
+    QVector<Coupon> coupons;
     Coupon o;
     getItem(o);
     for (int i = 0; i != n; ++i)
@@ -140,11 +159,18 @@ bool CouponView::save(Id& id)
       o.m_code.clear();
       o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + Data::strInt(i + 1);
       if (JItemEx::save(o, m_viewer->getTableName(), this))
-        lst.append(o.m_code + "\n");
+      {
+        QString error;
+        if (o.m_store.m_id.isValid())
+          o.m_store.SQL_select(error);
+        coupons.append(o);
+      }
     }
     clear();
-    if (!lst.isEmpty())
-      QInputDialog::getMultiLineText(this, tr("Códigos Gerados"), tr("Lista dos códigos que foram gerados"), lst, &ok);
+    CouponConfirmation dlg(coupons, this);
+    if (dlg.exec())
+      for (const Coupon& o : coupons)
+        JItemEx::print(o, nullptr, this);
   }
   return true;
 }

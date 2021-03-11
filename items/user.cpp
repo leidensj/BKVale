@@ -4,7 +4,7 @@
 
 User::User()
 {
-  clear();
+  User::clear();
 }
 
 void User::clear(bool bClearId)
@@ -19,7 +19,6 @@ void User::clear(bool bClearId)
   m_bUser = false;
   m_bProduct = false;
   m_bSettings = false;
-  m_bForm = false;
   m_bEmployee = false;
   m_bSupplier = false;
   m_bCategory = false;
@@ -27,6 +26,7 @@ void User::clear(bool bClearId)
   m_bShoppingList = false;
   m_bStore = false;
   m_bTimeCard = false;
+  m_bCoupon = false;
   m_password.clear();
 }
 
@@ -50,7 +50,6 @@ bool User::operator != (const JItem& other) const
       m_bReminder != another.m_bReminder ||
       m_bCalculator != another.m_bCalculator ||
       m_bShop != another.m_bCalculator ||
-      m_bForm != another.m_bForm ||
       m_bEmployee != another.m_bEmployee ||
       m_bSupplier != another.m_bSupplier ||
       m_bUser != another.m_bUser ||
@@ -60,7 +59,8 @@ bool User::operator != (const JItem& other) const
       m_bImage != another.m_bImage ||
       m_bShoppingList != another.m_bShoppingList ||
       m_bStore != another.m_bStore ||
-      m_bTimeCard != another.m_bTimeCard;
+      m_bTimeCard != another.m_bTimeCard ||
+      m_bCoupon != another.m_bCoupon;
 }
 
 bool User::operator == (const JItem& other) const
@@ -90,14 +90,14 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 USER_SQL_COL_AUS ","
                 USER_SQL_COL_APR ","
                 USER_SQL_COL_ASE ","
-                USER_SQL_COL_AFO ","
                 USER_SQL_COL_ACT ","
                 USER_SQL_COL_AIM ","
                 USER_SQL_COL_ASL ","
                 USER_SQL_COL_AEM ","
                 USER_SQL_COL_ASU ","
                 USER_SQL_COL_AST ","
-                USER_SQL_COL_ATI ")"
+                USER_SQL_COL_ATI ","
+                USER_SQL_COL_ACO ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -125,14 +125,14 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_bUser);
   query.bindValue(":_v08", m_bProduct);
   query.bindValue(":_v09", m_bSettings);
-  query.bindValue(":_v10", m_bForm);
-  query.bindValue(":_v11", m_bCategory);
-  query.bindValue(":_v12", m_bImage);
-  query.bindValue(":_v13", m_bShoppingList);
-  query.bindValue(":_v14", m_bEmployee);
-  query.bindValue(":_v15", m_bSupplier);
-  query.bindValue(":_v16", m_bStore);
-  query.bindValue(":_v17", m_bTimeCard);
+  query.bindValue(":_v10", m_bCategory);
+  query.bindValue(":_v11", m_bImage);
+  query.bindValue(":_v12", m_bShoppingList);
+  query.bindValue(":_v13", m_bEmployee);
+  query.bindValue(":_v14", m_bSupplier);
+  query.bindValue(":_v15", m_bStore);
+  query.bindValue(":_v16", m_bTimeCard);
+  query.bindValue(":_v17", m_bCoupon);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -154,14 +154,14 @@ bool User::SQL_update_proc(QSqlQuery& query) const
               USER_SQL_COL_AUS " = (:_v07),"
               USER_SQL_COL_APR " = (:_v08),"
               USER_SQL_COL_ASE " = (:_v09),"
-              USER_SQL_COL_AFO " = (:_v10),"
-              USER_SQL_COL_ACT " = (:_v11),"
-              USER_SQL_COL_AIM " = (:_v12),"
-              USER_SQL_COL_ASL " = (:_v13),"
-              USER_SQL_COL_AEM " = (:_v14),"
-              USER_SQL_COL_ASU " = (:_v15),"
-              USER_SQL_COL_AST " = (:_v16),"
-              USER_SQL_COL_ATI " = (:_v17)"
+              USER_SQL_COL_ACT " = (:_v10),"
+              USER_SQL_COL_AIM " = (:_v11),"
+              USER_SQL_COL_ASL " = (:_v12),"
+              USER_SQL_COL_AEM " = (:_v13),"
+              USER_SQL_COL_ASU " = (:_v14),"
+              USER_SQL_COL_AST " = (:_v15),"
+              USER_SQL_COL_ATI " = (:_v16)"
+              USER_SQL_COL_ACO " = (:_v17)"
               " WHERE " SQL_COLID " = (:_v00)";
 
   query.prepare(strQuery);
@@ -176,14 +176,14 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_bUser);
   query.bindValue(":_v08", m_bProduct);
   query.bindValue(":_v09", m_bSettings);
-  query.bindValue(":_v10", m_bForm);
-  query.bindValue(":_v11", m_bCategory);
-  query.bindValue(":_v12", m_bImage);
-  query.bindValue(":_v13", m_bShoppingList);
-  query.bindValue(":_v14", m_bEmployee);
-  query.bindValue(":_v15", m_bSupplier);
-  query.bindValue(":_v16", m_bStore);
-  query.bindValue(":_v17", m_bTimeCard);
+  query.bindValue(":_v10", m_bCategory);
+  query.bindValue(":_v11", m_bImage);
+  query.bindValue(":_v12", m_bShoppingList);
+  query.bindValue(":_v13", m_bEmployee);
+  query.bindValue(":_v14", m_bSupplier);
+  query.bindValue(":_v15", m_bStore);
+  query.bindValue(":_v16", m_bTimeCard);
+  query.bindValue(":_v17", m_bCoupon);
 
   return query.exec();
 }
@@ -201,14 +201,14 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
                 USER_SQL_COL_AUS ","
                 USER_SQL_COL_APR ","
                 USER_SQL_COL_ASE ","
-                USER_SQL_COL_AFO ","
                 USER_SQL_COL_ACT ","
                 USER_SQL_COL_AIM ","
                 USER_SQL_COL_ASL ","
                 USER_SQL_COL_AEM ","
                 USER_SQL_COL_ASU ","
                 USER_SQL_COL_AST ","
-                USER_SQL_COL_ATI
+                USER_SQL_COL_ATI ","
+                USER_SQL_COL_ACO
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -227,14 +227,14 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       m_bUser = query.value(6).toBool();
       m_bProduct = query.value(7).toBool();
       m_bSettings = query.value(8).toBool();
-      m_bForm = query.value(9).toBool();
-      m_bCategory = query.value(10).toBool();
-      m_bImage = query.value(11).toBool();
-      m_bShoppingList = query.value(12).toBool();
-      m_bEmployee = query.value(13).toBool();
-      m_bSupplier = query.value(14).toBool();
-      m_bStore = query.value(15).toBool();
-      m_bTimeCard = query.value(16).toBool();
+      m_bCategory = query.value(9).toBool();
+      m_bImage = query.value(10).toBool();
+      m_bShoppingList = query.value(11).toBool();
+      m_bEmployee = query.value(12).toBool();
+      m_bSupplier = query.value(13).toBool();
+      m_bStore = query.value(14).toBool();
+      m_bTimeCard = query.value(15).toBool();
+      m_bCoupon = query.value(16).toBool();
     }
     else
     {
@@ -303,5 +303,7 @@ bool User::hasPermission(const QString& tableName) const
     return m_bEmployee;
   if (tableName == SUPPLIER_SQL_TABLE_NAME)
     return m_bSupplier;
+  if (tableName == COUPON_SQL_TABLE_NAME)
+    return m_bCoupon;
   return false;
 }

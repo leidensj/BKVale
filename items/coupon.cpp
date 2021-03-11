@@ -220,3 +220,57 @@ QString Coupon::strCoupon() const
       return "";
   }
 }
+
+bool Coupon::SQL_redeem(QString& error)
+{
+  error.clear();
+
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                SQL_COLID
+                " FROM " COUPON_SQL_TABLE_NAME
+                " WHERE " COUPON_SQL_COL_COD " = (:_v00)");
+  query.bindValue(":_v00", m_code);
+  bool ok = query.exec();
+
+  if (ok)
+  {
+    if (query.next())
+    {
+      m_id.set(query.value(0).toInt());
+      ok = SQL_select_proc(query, error);
+      if (ok)
+      {
+        if (m_bRedeemed)
+        {
+          ok = false;
+          error = QObject::tr("Código já resgatado no dia %1.").arg(m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss"));
+        }
+        else if (m_bExpires && m_dtExpiration < DateTime::server().date())
+        {
+          ok = false;
+          error = QObject::tr("Código expirou no dia %1.").arg(m_dtExpiration.toString("dd/MM/yyyy"));
+        }
+        else
+        {
+          m_bRedeemed = true;
+          m_dtRedeemed = DateTime::server();
+          ok = SQL_insert_update(error);
+        }
+      }
+
+    }
+    else
+    {
+      error = "Código não encontrado.";
+      ok = false;
+    }
+  }
+  return SQL_finish(db, query, ok, error);
+}

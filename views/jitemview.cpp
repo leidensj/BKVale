@@ -187,7 +187,6 @@ void JItemView::clear()
 
 void JItemView::addViewButton(const QString& tableName)
 {
-  QString error;
   Login login(true);
   if (login.getUser().hasPermission(tableName))
   {

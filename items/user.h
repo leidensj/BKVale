@@ -35,7 +35,6 @@ struct User : public JItemSQL
   bool m_bUser;
   bool m_bProduct;
   bool m_bSettings;
-  bool m_bForm;
   bool m_bEmployee;
   bool m_bSupplier;
   bool m_bCategory;
@@ -43,6 +42,7 @@ struct User : public JItemSQL
   bool m_bShoppingList;
   bool m_bStore;
   bool m_bTimeCard;
+  bool m_bCoupon;
   QString m_password;
 };
 

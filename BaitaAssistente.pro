@@ -15,6 +15,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
   controls/calculatorwidget.cpp \
+  controls/couponredeemer.cpp \
   controls/databasecombobox.cpp \
   controls/databasepicker.cpp \
   controls/databaseselector.cpp \
@@ -121,6 +122,7 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     controls/calculatorwidget.h \
+    controls/couponredeemer.h \
     controls/databasecombobox.h \
     controls/databasepicker.h \
     controls/databaseselector.h \

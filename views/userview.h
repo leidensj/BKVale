@@ -36,7 +36,6 @@ private:
     Category,
     Product,
     Image,
-    Form,
     Employee,
     Supplier,
     Store,
@@ -46,6 +45,7 @@ private:
     ShoppingList,
     Shop,
     TimeCard,
+    Coupon,
     Settings
   };
 

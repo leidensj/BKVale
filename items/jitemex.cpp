@@ -139,7 +139,7 @@ QString JItemEx::text(const QString& tableName)
   if (tableName == PHONE_SQL_TABLE_NAME)
     return "Telefone";
   if (tableName == COUPON_SQL_TABLE_NAME)
-    return "Cupons";
+    return "Cupom";
   return "ERRO: Tabela não encontrada.";
 }
 
@@ -326,7 +326,7 @@ bool JItemEx::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
 
   bool bSuccess = o.SQL_insert_update(error);
   if (!bSuccess)
-    QMessageBox::critical(parent, QObject::tr("Erro"), QObject::tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
+    QMessageBox::critical(parent, QObject::tr("Ops..."), QObject::tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
 
   return bSuccess;
 }
@@ -346,6 +346,6 @@ bool JItemEx::print(const JItemSQL& o, QVariant* options, QWidget* parent)
   else if (tableName == COUPON_SQL_TABLE_NAME)
     ok = printer.print(dynamic_cast<const Coupon&>(o), error);
   if (!ok)
-    QMessageBox::critical(parent, QObject::tr("Erro"), QObject::tr("Erro '%1' ao imprimir %2.").arg(error, text(tableName)), QMessageBox::Ok);
+    QMessageBox::warning(parent, QObject::tr("Aviso"), QObject::tr("O seguinte erro ocorreu ao imprimir %1:\n%2.").arg(text(tableName), error), QMessageBox::Ok);
   return ok;
 }

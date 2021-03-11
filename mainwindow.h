@@ -56,6 +56,7 @@ class CalculatorWidget;
 class ShopWidget;
 class JMdiSubWindow;
 class Report;
+class CouponRedeemer;
 
 class Baita : public QMainWindow
 {
@@ -86,6 +87,7 @@ private:
   JMdiSubWindow* m_reminderWindow;
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
+  CouponRedeemer* m_redeemer;
   Printer m_printer;
   Functionality getCurrentFunctionality() const;
 

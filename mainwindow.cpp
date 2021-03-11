@@ -21,6 +21,7 @@
 #include "controls/logindialog.h"
 #include "controls/databaseviewer.h"
 #include "controls/timecarddialog.h"
+#include "controls/couponredeemer.h"
 
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
@@ -67,6 +68,7 @@ Baita::Baita(QWidget *parent)
   , m_reminderWindow(nullptr)
   , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
+  , m_redeemer(nullptr)
 {
   ui->setupUi(this);
 
@@ -104,6 +106,7 @@ Baita::Baita(QWidget *parent)
   m_shopWindow->setWindowIcon(ui->actionShoppingList->icon());
   m_shopWindow->setWidget(m_shop);
   m_mdi->addSubWindow(m_shopWindow);
+  m_redeemer = new CouponRedeemer(this);
 
   m_statusDatabasePath = new QLabel();
   m_statusDatabasePath->setAlignment(Qt::AlignRight);
@@ -144,6 +147,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
+  connect(ui->actionRedeem, SIGNAL(triggered(bool)), m_redeemer, SLOT(exec()));
 
   connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionShoppingListMgt, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));

@@ -157,7 +157,7 @@ bool CouponView::save(Id& id)
     {
       o.m_id.clear();
       o.m_code.clear();
-      o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + Data::strInt(i + 1);
+      o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
       if (JItemEx::save(o, m_viewer->getTableName(), this))
       {
         QString error;
@@ -169,7 +169,7 @@ bool CouponView::save(Id& id)
     clear();
     CouponConfirmation dlg(coupons, this);
     if (dlg.exec())
-      for (const Coupon& o : coupons)
+      for (auto o : coupons)
         JItemEx::print(o, nullptr, this);
   }
   return true;

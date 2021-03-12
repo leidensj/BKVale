@@ -562,12 +562,15 @@ bool Printer::print(const Coupon& o, QString& error)
            ESC_LF
            ESC_VERT_TAB
            ESC_EXPAND_OFF
-           ESC_ALIGN_LEFT;
+           ESC_ALIGN_LEFT
+           "Parabens! Voce ganhou um desconto de:"
+           ESC_LF
+           ESC_VERT_TAB;
     switch (o.m_type)
     {
       case Coupon::Type::Value:
       case Coupon::Type::Percentage:
-        str += ESC_ALIGN_LEFT
+        str += ESC_ALIGN_CENTER
                ESC_DOUBLE_FONT_ON +
                o.strCoupon() +
                ESC_DOUBLE_FONT_OFF
@@ -578,7 +581,9 @@ bool Printer::print(const Coupon& o, QString& error)
       default:
         break;
     }
-    str += ESC_ALIGN_LEFT "Codigo resgatado no dia: " + o.m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss");
+    str += ESC_ALIGN_LEFT
+           "Resgate: " + o.m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss") +
+           " @ " + QHostInfo::localHostName().toUpper();
   }
   str += ESC_LF
          ESC_VERT_TAB

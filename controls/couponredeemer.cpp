@@ -18,6 +18,7 @@ CouponRedeemer::CouponRedeemer(QWidget* parent)
   f.setPointSize(36);
   f.setBold(true);
   m_edCode->setFont(f);
+  m_edCode->setPlaceholderText(tr("Insira o código"));
   QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Close);
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addWidget(m_edCode);

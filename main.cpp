@@ -6,21 +6,39 @@
 #include <QSqlDatabase>
 #include <QString>
 #include <QObject>
+#include <QCommandLineParser>
 #include "controls/couponredeemer.h"
 
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
 
+  QCoreApplication::setApplicationVersion("2.1");
+
+  QCommandLineParser parser;
+  parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
+
+  QCommandLineOption redeemerOpt("r", "Inicia a versão de resgate de códigos.");
+  parser.addOption(redeemerOpt);
+  QCommandLineOption serverOpt(QStringList() << "s", "Especifíca o servidor do banco de dados.", "server", "");
+  parser.addOption(serverOpt);
+  QCommandLineOption portOpt(QStringList() << "p", "Especifíca a porta do banco de dados.", "port", "5432");
+  parser.addOption(portOpt);
+  parser.process(a);
+
+  bool bRedeemer = parser.isSet(redeemerOpt);
+  QString server = parser.value(serverOpt);
+  int port = parser.value(portOpt).toInt();
+
    QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
-  if (argc == 4 && strcmp(argv[1], "redeemer") == 0)
+  if (bRedeemer)
   {
-    QString server = argv[2] == nullptr ? "localhost" : argv[2];
-    int port = argv[3] == nullptr ? 5432 : QString(argv[3]).toInt();
-    QString error;
+     QString error;
     if (BaitaSQL::open(server, port, error))
     {
       CouponRedeemer w;
+      w.setWindowTitle(QObject::tr("Baita Cupom"));
+      w.setWindowIcon(QIcon(":/icons/res/coupon.png"));
       w.show();
       return a.exec();
     }

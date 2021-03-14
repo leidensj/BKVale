@@ -87,30 +87,30 @@ namespace
     if (0 < o.strNumber().length() && o.strNumber().length() < 256)
     {
       text += ESC_BARCODE_HRI_OFF
-                 ESC_BARCODE_HEIGHT +
-                 QString(decToHex[120]) +
-                 ESC_BARCODE_CODE93 +
-                 QString(decToHex[o.strNumber().length()]) +
-                 o.strNumber() +
-                 ESC_LF;
+              ESC_BARCODE_HEIGHT +
+              QString(decToHex[120]) +
+              ESC_BARCODE_CODE93 +
+              QString(decToHex[o.strNumber().length()]) +
+              o.strNumber() +
+              ESC_LF;
     }
 
     text += ESC_ALIGN_LEFT
-               "Data       "
-               ESC_DOUBLE_FONT_ON +
-               o.strDate() +
-               ESC_DOUBLE_FONT_OFF
-               " " +
-               o.strDayOfWeek() +
-               ESC_LF
-               "Fornecedor "
-               ESC_DOUBLE_FONT_ON +
-               (o.m_supplier.m_id.isValid()
-               ? (o.m_supplier.m_form.strAliasName())
-               : "Nao informado") +
-               ESC_DOUBLE_FONT_OFF
-               ESC_LF
-               ESC_VERT_TAB;
+            "Data       "
+            ESC_DOUBLE_FONT_ON +
+            o.strDate() +
+            ESC_DOUBLE_FONT_OFF
+            " " +
+            o.strDayOfWeek() +
+            ESC_LF
+            "Fornecedor "
+            ESC_DOUBLE_FONT_ON +
+            (o.m_supplier.m_id.isValid()
+            ? (o.m_supplier.m_form.strAliasName())
+            : "Nao informado") +
+            ESC_DOUBLE_FONT_OFF
+            ESC_LF
+            ESC_VERT_TAB;
   }
 
   void purchaseAppendFooter(const Purchase& o, QString& text)
@@ -539,6 +539,13 @@ bool Printer::print(const Coupon& o, QString& error)
            ESC_DOUBLE_FONT_ON +
            o.m_code +
            ESC_DOUBLE_FONT_OFF
+           ESC_LF
+           ESC_BARCODE_HRI_OFF
+           ESC_BARCODE_HEIGHT +
+           QString(decToHex[120]) +
+           ESC_BARCODE_CODE93 +
+           QString(decToHex[o.m_code.length()]) +
+           o.m_code +
            ESC_LF
            ESC_VERT_TAB
            ESC_ALIGN_LEFT

@@ -28,13 +28,13 @@ int main(int argc, char *argv[])
 
   bool bRedeemer = parser.isSet(redeemerOpt);
   QString server = parser.value(serverOpt);
-  int port = parser.value(portOpt).toInt();
+  QString port = parser.value(portOpt);
 
    QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
   if (bRedeemer)
   {
      QString error;
-    if (BaitaSQL::open(server, port, error))
+    if (BaitaSQL::open(server, port.toInt(), error))
     {
       CouponRedeemer w;
       w.setWindowTitle(QObject::tr("Baita Cupom"));
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     {
       QMessageBox::critical(nullptr,
                             QObject::tr("Baita"),
-                            QObject::tr("Erro ao iniciar banco de dados.\nServidor: %1\nPorta: %2\nErro: %3").arg(argv[2], argv[3], error));
+                            QObject::tr("Erro ao iniciar banco de dados.\nServidor: %1\nPorta: %2\nErro: %3").arg(server, port, error));
       return -1;
     }
   }

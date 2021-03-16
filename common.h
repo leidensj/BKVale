@@ -5,6 +5,36 @@
 #include <QRegExp>
 #include <QDateTime>
 
+namespace Functionality
+{
+  enum class Idx : int
+  {
+    User,
+    Category,
+    Product,
+    Image,
+    Employee,
+    Supplier,
+    Store,
+    Purchase,
+    Calculator,
+    Reminder,
+    ShoppingList,
+    Shop,
+    TimeCard,
+    Coupon,
+    Settings,
+    ProductCode,
+    Login,
+    Address,
+    Phone,
+    _END,
+  };
+
+  QString idxToTableName(Idx idx);
+  Idx tableNameToIdx(const QString& tableName);
+}
+
 namespace Data
 {
 enum class Type

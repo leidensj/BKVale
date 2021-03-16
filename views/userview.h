@@ -30,27 +30,6 @@ protected slots:
   void setItem(const JItemSQL& o);
 
 private:
-  enum class Idx : int
-  {
-    User =0,
-    Category,
-    Product,
-    Image,
-    Employee,
-    Supplier,
-    Store,
-    Purchase,
-    Calculator,
-    Reminder,
-    ShoppingList,
-    Shop,
-    TimeCard,
-    Coupon,
-    Settings
-  };
-
-  static QString idxToTableName(Idx idx);
-
   bool m_bHasLoggedUserChanged;
   JLineEdit* m_user;
   QLabel* m_lblPasswordMsg;

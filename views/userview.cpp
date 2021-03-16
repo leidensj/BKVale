@@ -48,36 +48,11 @@ UserView::UserView(QWidget* parent)
   m_viewPassword->setCheckable(true);
 
   m_list = new QListWidget;
-  for (int i = 0; i != (int)Idx::Settings + 1; ++i)
+  for (int i = 0; i != (int)Functionality::Idx::_END; ++i)
   {
     QListWidgetItem* p = new QListWidgetItem;
-    QString strIcon;
-    QString strText;
-    switch (i)
-    {
-      case (int)Idx::Calculator:
-        strIcon = ":/icons/res/calculator.png";
-        strText = "Calculadora";
-        break;
-      case (int)Idx::Shop:
-        strIcon = ":/icons/res/shop.png";
-        strText = "Compras";
-        break;
-      case (int)Idx::TimeCard:
-        strIcon = ":/icons/res/timecard.png";
-        strText = "Livro Ponto";
-        break;
-      case (int)Idx::Settings:
-        strIcon = ":/icons/res/settings.png";
-        strText = "Configurações";
-        break;
-      default:
-        strIcon = JItemEx::icon(idxToTableName((Idx)i));
-        strText = JItemEx::text(idxToTableName((Idx)i));
-        break;
-    }
-    p->setText(strText);
-    p->setIcon(QIcon(strIcon));
+    p->setText(JItemEx::text((Functionality::Idx)i));
+    p->setIcon(QIcon(JItemEx::icon((Functionality::Idx)i)));
     p->setFlags(p->flags() | Qt::ItemIsUserCheckable);
     p->setCheckState(Qt::Unchecked);
     m_list->addItem(p);
@@ -195,35 +170,4 @@ void UserView::save()
 bool UserView::hasLoggedUserChanged() const
 {
   return m_bHasLoggedUserChanged;
-}
-
-QString UserView::idxToTableName(Idx idx)
-{
-  switch (idx)
-  {
-    case Idx::User:
-      return USER_SQL_TABLE_NAME;
-    case Idx::Category:
-      return CATEGORY_SQL_TABLE_NAME;
-    case Idx::Product:
-      return PRODUCT_SQL_TABLE_NAME;
-    case Idx::Image:
-      return IMAGE_SQL_TABLE_NAME;
-    case Idx::Employee:
-      return EMPLOYEE_SQL_TABLE_NAME;
-    case Idx::Supplier:
-      return SUPPLIER_SQL_TABLE_NAME;
-    case Idx::Store:
-      return STORE_SQL_TABLE_NAME;
-    case Idx::Purchase:
-      return PURCHASE_SQL_TABLE_NAME;
-    case Idx::Reminder:
-      return REMINDER_SQL_TABLE_NAME;
-    case Idx::ShoppingList:
-      return SHOPPING_LIST_SQL_TABLE_NAME;
-    case Idx::Coupon:
-      return COUPON_SQL_TABLE_NAME;
-    default:
-      return "";
-  }
 }

@@ -281,29 +281,47 @@ bool User::SQL_select_password_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
+bool User::hasPermission(Functionality::Idx idx) const
+{
+  switch (idx)
+  {
+    case Functionality::Idx::User:
+      return m_bUser;
+    case Functionality::Idx::Category:
+      return m_bCategory;
+    case Functionality::Idx::Product:
+      return m_bProduct;
+    case Functionality::Idx::Image:
+      return m_bImage;
+    case Functionality::Idx::Employee:
+      return m_bEmployee;
+    case Functionality::Idx::Supplier:
+      return m_bSupplier;
+    case Functionality::Idx::Store:
+      return m_bStore;
+    case Functionality::Idx::Purchase:
+      return m_bPurchase;
+    case Functionality::Idx::Calculator:
+      return m_bCalculator;
+    case Functionality::Idx::Reminder:
+      return m_bReminder;
+    case Functionality::Idx::ShoppingList:
+      return m_bShoppingList;
+    case Functionality::Idx::Shop:
+      return m_bShop;
+    case Functionality::Idx::TimeCard:
+      return m_bTimeCard;
+    case Functionality::Idx::Coupon:
+      return m_bCoupon;
+    case Functionality::Idx::Settings:
+      return m_bSettings;
+    case Functionality::Idx::_END:
+    default:
+      return false;
+  }
+}
+
 bool User::hasPermission(const QString& tableName) const
 {
-  if (tableName == IMAGE_SQL_TABLE_NAME)
-    return m_bImage;
-  if (tableName == CATEGORY_SQL_TABLE_NAME)
-    return m_bCategory;
-  if (tableName == STORE_SQL_TABLE_NAME)
-    return m_bStore;
-  if (tableName == PRODUCT_SQL_TABLE_NAME)
-    return m_bProduct;
-  if (tableName == PURCHASE_SQL_TABLE_NAME)
-    return m_bPurchase;
-  if (tableName == USER_SQL_TABLE_NAME)
-    return m_bUser;
-  if (tableName == REMINDER_SQL_TABLE_NAME)
-    return m_bReminder;
-  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-    return m_bShoppingList;
-  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
-    return m_bEmployee;
-  if (tableName == SUPPLIER_SQL_TABLE_NAME)
-    return m_bSupplier;
-  if (tableName == COUPON_SQL_TABLE_NAME)
-    return m_bCoupon;
-  return false;
+  return hasPermission(Functionality::tableNameToIdx(tableName));
 }

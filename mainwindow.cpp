@@ -35,6 +35,8 @@
 #include <QMdiSubWindow>
 #include <QTimer>
 
+#define ACTION_TABLE_NAME_PROPERTY "ACTION_TABLE_NAME_PROPERTY"
+
 class JMdiSubWindow : public QMdiSubWindow
 {
 public:
@@ -130,6 +132,18 @@ Baita::Baita(QWidget *parent)
   statusBar()->addWidget(l);
   statusBar()->addWidget(p);
   statusBar()->addPermanentWidget(m_statusTime);
+
+  ui->actionSettings->setProperty(ACTION_TABLE_NAME_PROPERTY, SETTINGS_SQL_TABLE_NAME);
+  ui->actionUsers->setProperty(ACTION_TABLE_NAME_PROPERTY, USER_SQL_TABLE_NAME);
+  ui->actionProducts->setProperty(ACTION_TABLE_NAME_PROPERTY, PRODUCT_SQL_TABLE_NAME);
+  ui->actionCategories->setProperty(ACTION_TABLE_NAME_PROPERTY, CATEGORY_SQL_TABLE_NAME);
+  ui->actionImages->setProperty(ACTION_TABLE_NAME_PROPERTY, IMAGE_SQL_TABLE_NAME);
+  ui->actionShoppingListMgt->setProperty(ACTION_TABLE_NAME_PROPERTY, SHOPPING_LIST_SQL_TABLE_NAME);
+  ui->actionEmployees->setProperty(ACTION_TABLE_NAME_PROPERTY, EMPLOYEE_SQL_TABLE_NAME);
+  ui->actionSuppliers->setProperty(ACTION_TABLE_NAME_PROPERTY, SUPPLIER_SQL_TABLE_NAME);
+  ui->actionStores->setProperty(ACTION_TABLE_NAME_PROPERTY, STORE_SQL_TABLE_NAME);
+  ui->actionTimeCard->setProperty(ACTION_TABLE_NAME_PROPERTY, TIME_CARD_SQL_TABLE_NAME);
+  ui->actionCoupons->setProperty(ACTION_TABLE_NAME_PROPERTY, SETTINGS_SQL_TABLE_NAME);
 
   connect(ui->actionPrint, SIGNAL(triggered(bool)), this, SLOT(print()));
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
@@ -306,7 +320,7 @@ void Baita::updateControls()
   ui->actionSuppliers->setEnabled(login.getUser().m_bSupplier);
   ui->actionStores->setEnabled(login.getUser().m_bStore);
   ui->actionTimeCard->setEnabled(login.getUser().m_bTimeCard);
-  ui->actionCoupons->setEnabled(true);
+  ui->actionCoupons->setEnabled(login.getUser().m_bCoupon);
 
   ui->actionPurchases->setEnabled(login.getUser().m_bPurchase);
   ui->actionReminders->setEnabled(login.getUser().m_bReminder);

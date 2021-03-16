@@ -106,78 +106,110 @@ bool JItemEx::authenticationToRemove(const QString& tableName)
   return false;
 }
 
+QString JItemEx::text(Functionality::Idx idx)
+{
+  switch (idx)
+  {
+    case Functionality::Idx::User:
+      return "Usuário";
+    case Functionality::Idx::Category:
+      return "Categoria";
+    case Functionality::Idx::Product:
+      return "Produto";
+    case Functionality::Idx::Image:
+      return "Imagem";
+    case Functionality::Idx::Employee:
+      return "Funcionário";
+    case Functionality::Idx::Supplier:
+      return "Fornecedor";
+    case Functionality::Idx::Store:
+      return "Loja";
+    case Functionality::Idx::Purchase:
+      return "Compra";
+    case Functionality::Idx::Calculator:
+      return "Calculadora";
+    case Functionality::Idx::Reminder:
+      return "Lembrete";
+    case Functionality::Idx::ShoppingList:
+      return "Lista de Compras";
+    case Functionality::Idx::Shop:
+      return "Lista de Compras";
+    case Functionality::Idx::TimeCard:
+      return "Livro Ponto";
+    case Functionality::Idx::Coupon:
+      return "Cupom";
+    case Functionality::Idx::Settings:
+      return "Configurações";
+    case Functionality::Idx::Login:
+      return "Usuários Ativos";
+    case Functionality::Idx::ProductCode:
+      return "Código";
+    case Functionality::Idx::Address:
+      return "Endereço";
+    case Functionality::Idx::Phone:
+      return "Telefone";
+    case Functionality::Idx::_END:
+    default:
+      return "ERRO! Item não encontrado";
+  }
+}
+
 QString JItemEx::text(const QString& tableName)
 {
-  if (tableName == IMAGE_SQL_TABLE_NAME)
-    return "Imagem";
-  if (tableName == FORM_SQL_TABLE_NAME)
-    return "Perfil";
-  if (tableName == CATEGORY_SQL_TABLE_NAME)
-    return "Categoria";
-  if (tableName == STORE_SQL_TABLE_NAME)
-    return "Loja";
-  if (tableName == PRODUCT_SQL_TABLE_NAME)
-    return "Produto";
-  if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
-    return "Código";
-  if (tableName == PURCHASE_SQL_TABLE_NAME)
-    return "Compra";
-  if (tableName == USER_SQL_TABLE_NAME)
-    return "Usuário";
-  if (tableName == REMINDER_SQL_TABLE_NAME)
-    return "Lembrete";
-  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-    return "Lista de Compras";
-  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
-    return "Funcionário";
-  if (tableName == SUPPLIER_SQL_TABLE_NAME)
-    return "Fornecedor";
-  if (tableName == LOGIN_SQL_TABLE_NAME)
-    return "Usuários Ativos";
-  if (tableName == ADDRESS_SQL_TABLE_NAME)
-    return "Endereço";
-  if (tableName == PHONE_SQL_TABLE_NAME)
-    return "Telefone";
-  if (tableName == COUPON_SQL_TABLE_NAME)
-    return "Cupom";
-  return "ERRO: Tabela não encontrada.";
+  return text(Functionality::tableNameToIdx(tableName));
+}
+
+QString JItemEx::icon(Functionality::Idx idx)
+{
+  switch (idx)
+  {
+    case Functionality::Idx::User:
+      return ":/icons/res/user.png";
+    case Functionality::Idx::Category:
+      return ":/icons/res/category.png";
+    case Functionality::Idx::Product:
+      return ":/icons/res/item.png";
+    case Functionality::Idx::Image:
+      return ":/icons/res/icon.png";
+    case Functionality::Idx::Employee:
+      return ":/icons/res/employee.png";
+    case Functionality::Idx::Supplier:
+      return ":/icons/res/supplier.png";
+    case Functionality::Idx::Store:
+      return ":/icons/res/store.png";
+    case Functionality::Idx::Purchase:
+      return ":/icons/res/purchase.png";
+    case Functionality::Idx::Calculator:
+      return ":/icons/res/calculator.png";
+    case Functionality::Idx::Reminder:
+      return ":/icons/res/postit.png";
+    case Functionality::Idx::ShoppingList:
+      return ":/icons/res/shopmgt.png";
+    case Functionality::Idx::Shop:
+      return ":/icons/res/shop.png";
+    case Functionality::Idx::TimeCard:
+      return ":/icons/res/timecard.png";
+    case Functionality::Idx::Coupon:
+      return ":/icons/res/coupon.png";
+    case Functionality::Idx::Settings:
+      return ":/icons/res/settings.png";
+    case Functionality::Idx::Login:
+      return ":/icons/res/login.png";
+    case Functionality::Idx::ProductCode:
+      return ":/icons/res/barcode.png";
+    case Functionality::Idx::Address:
+      return ":/icons/res/address.png";
+    case Functionality::Idx::Phone:
+      return ":/icons/res/phone.png";
+    case Functionality::Idx::_END:
+    default:
+      return "ERRO! Item não encontrado";
+  }
 }
 
 QString JItemEx::icon(const QString& tableName)
 {
-  if (tableName == IMAGE_SQL_TABLE_NAME)
-    return ":/icons/res/icon.png";
-  if (tableName == FORM_SQL_TABLE_NAME)
-    return ":/icons/res/resume.png";
-  if (tableName == CATEGORY_SQL_TABLE_NAME)
-    return ":/icons/res/category.png";
-  if (tableName == STORE_SQL_TABLE_NAME)
-    return ":/icons/res/store.png";
-  if (tableName == PRODUCT_SQL_TABLE_NAME)
-    return ":/icons/res/item.png";
-  if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
-    return ":/icons/res/barcode.png";
-  if (tableName == PURCHASE_SQL_TABLE_NAME)
-    return ":/icons/res/purchase.png";
-  if (tableName == USER_SQL_TABLE_NAME)
-    return ":/icons/res/user.png";
-  if (tableName == REMINDER_SQL_TABLE_NAME)
-    return ":/icons/res/postit.png";
-  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-    return ":/icons/res/shopmgt.png";
-  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
-    return ":/icons/res/employee.png";
-  if (tableName == SUPPLIER_SQL_TABLE_NAME)
-    return ":/icons/res/supplier.png";
-  if (tableName == LOGIN_SQL_TABLE_NAME)
-    return ":/icons/res/supplier.png";
-  if (tableName == ADDRESS_SQL_TABLE_NAME)
-    return ":/icons/res/address.png";
-  if (tableName == PHONE_SQL_TABLE_NAME)
-    return ":/icons/res/phone.png";
-  if (tableName == COUPON_SQL_TABLE_NAME)
-    return ":/icons/res/coupon.png";
-  return "";
+  return icon(Functionality::tableNameToIdx(tableName));
 }
 
 JModel* JItemEx::model(const QString& tableName, QObject* parent)

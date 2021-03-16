@@ -89,6 +89,7 @@ private:
   JMdiSubWindow* m_shopWindow;
   CouponRedeemer* m_redeemer;
   Printer m_printer;
+  QVector<QAction*> m_actions;
   Functionality getCurrentFunctionality() const;
 
 private slots:

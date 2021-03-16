@@ -13,6 +13,8 @@ JItemSQL* create(const QString& tableName);
 JItemSQL* create(const QString& tableName, Id id);
 bool authenticationToInsertUpdate(const QString& tableName);
 bool authenticationToRemove(const QString& tableName);
+QString text(Functionality::Idx idx);
+QString icon(Functionality::Idx idx);
 QString text(const QString& tableName);
 QString icon(const QString& tableName);
 JModel* model(const QString& tableName, QObject* parent);

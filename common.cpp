@@ -4,6 +4,81 @@
 #include <QSqlQuery>
 #include <QVariant>
 
+
+QString Functionality::idxToTableName(Idx idx)
+{
+  switch (idx)
+  {
+    case Idx::User:
+      return USER_SQL_TABLE_NAME;
+    case Idx::Category:
+      return CATEGORY_SQL_TABLE_NAME;
+    case Idx::Product:
+      return PRODUCT_SQL_TABLE_NAME;
+    case Idx::Image:
+      return IMAGE_SQL_TABLE_NAME;
+    case Idx::Employee:
+      return EMPLOYEE_SQL_TABLE_NAME;
+    case Idx::Supplier:
+      return SUPPLIER_SQL_TABLE_NAME;
+    case Idx::Store:
+      return STORE_SQL_TABLE_NAME;
+    case Idx::Purchase:
+      return PURCHASE_SQL_TABLE_NAME;
+    case Idx::Reminder:
+      return REMINDER_SQL_TABLE_NAME;
+    case Idx::ShoppingList:
+      return SHOPPING_LIST_SQL_TABLE_NAME;
+    case Idx::Coupon:
+      return COUPON_SQL_TABLE_NAME;
+    case Idx::Phone:
+      return PHONE_SQL_TABLE_NAME;
+    case Idx::Address:
+      return ADDRESS_SQL_TABLE_NAME;
+    case Idx::ProductCode:
+      return PRODUCT_CODE_ITEMS_SQL_TABLE_NAME;
+    case Idx::Login:
+      return LOGIN_SQL_TABLE_NAME;
+    default:
+      return "";
+  }
+}
+
+Functionality::Idx Functionality::tableNameToIdx(const QString& tableName)
+{
+  if (tableName == IMAGE_SQL_TABLE_NAME)
+    return Idx::Image;
+  if (tableName == CATEGORY_SQL_TABLE_NAME)
+    return Idx::Category;
+  if (tableName == STORE_SQL_TABLE_NAME)
+    return Idx::Store;
+  if (tableName == PRODUCT_SQL_TABLE_NAME)
+    return Idx::Product;
+  if (tableName == PURCHASE_SQL_TABLE_NAME)
+    return Idx::Purchase;
+  if (tableName == USER_SQL_TABLE_NAME)
+    return Idx::User;
+  if (tableName == REMINDER_SQL_TABLE_NAME)
+    return Idx::Reminder;
+  if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
+    return Idx::ShoppingList;
+  if (tableName == EMPLOYEE_SQL_TABLE_NAME)
+    return Idx::Employee;
+  if (tableName == SUPPLIER_SQL_TABLE_NAME)
+    return Idx::Supplier;
+  if (tableName == COUPON_SQL_TABLE_NAME)
+    return Idx::Coupon;
+  if (tableName == PHONE_SQL_TABLE_NAME)
+    return Idx::Phone;
+  if (tableName == ADDRESS_SQL_TABLE_NAME)
+    return Idx::Address;
+  if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
+    return Idx::ProductCode;
+  if (tableName == LOGIN_SQL_TABLE_NAME)
+    return Idx::Login;
+  return Idx::_END;
+}
+
 QString Data::strMoney(double value, bool bCurrency)
 {
   QString str(QString::number(value, 'f', 2));

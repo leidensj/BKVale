@@ -28,6 +28,8 @@ namespace Functionality
     Login,
     Address,
     Phone,
+    Report,
+    RedeemCoupon,
     _END,
   };
 

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <QMap>
 #include "jitemsql.h"
 #include "defines.h"
 
@@ -27,24 +28,11 @@ struct User : public JItemSQL
 
   bool hasPermission(const QString& tableName) const;
   bool hasPermission(Functionality::Idx idx) const;
+  void setPermission(Functionality::Idx idx, bool bSet);
 
   QString m_strUser;
-  bool m_bPurchase;
-  bool m_bReminder;
-  bool m_bCalculator;
-  bool m_bShop;
-  bool m_bUser;
-  bool m_bProduct;
-  bool m_bSettings;
-  bool m_bEmployee;
-  bool m_bSupplier;
-  bool m_bCategory;
-  bool m_bImage;
-  bool m_bShoppingList;
-  bool m_bStore;
-  bool m_bTimeCard;
-  bool m_bCoupon;
   QString m_password;
+  QMap<Functionality::Idx, bool> m_permissions;
 };
 
 #endif // USER_H

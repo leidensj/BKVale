@@ -12,28 +12,13 @@ void User::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_strUser.clear();
-  m_bPurchase = false;
-  m_bReminder = false;
-  m_bCalculator = false;
-  m_bShop = false;
-  m_bUser = false;
-  m_bProduct = false;
-  m_bSettings = false;
-  m_bEmployee = false;
-  m_bSupplier = false;
-  m_bCategory = false;
-  m_bImage = false;
-  m_bShoppingList = false;
-  m_bStore = false;
-  m_bTimeCard = false;
-  m_bCoupon = false;
   m_password.clear();
+  m_permissions.clear();
 }
 
 QString User::st_strEncryptedPassword(const QString& strPassword)
 {
-  return QString(QCryptographicHash::hash(strPassword.toUtf8(),
-                                          QCryptographicHash::Md5));
+  return QString(QCryptographicHash::hash(strPassword.toUtf8(), QCryptographicHash::Md5));
 }
 
 QString User::strEncryptedPassword() const
@@ -46,21 +31,7 @@ bool User::operator != (const JItem& other) const
   const User& another = dynamic_cast<const User&>(other);
   return
       m_strUser != another.m_strUser ||
-      m_bPurchase != another.m_bPurchase ||
-      m_bReminder != another.m_bReminder ||
-      m_bCalculator != another.m_bCalculator ||
-      m_bShop != another.m_bCalculator ||
-      m_bEmployee != another.m_bEmployee ||
-      m_bSupplier != another.m_bSupplier ||
-      m_bUser != another.m_bUser ||
-      m_bProduct != another.m_bProduct ||
-      m_bSettings != another.m_bSettings ||
-      m_bCategory != another.m_bCategory ||
-      m_bImage != another.m_bImage ||
-      m_bShoppingList != another.m_bShoppingList ||
-      m_bStore != another.m_bStore ||
-      m_bTimeCard != another.m_bTimeCard ||
-      m_bCoupon != another.m_bCoupon;
+      m_permissions != another.m_permissions;
 }
 
 bool User::operator == (const JItem& other) const
@@ -118,21 +89,21 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v17))");
   query.bindValue(":_v01", m_strUser);
   query.bindValue(":_v02", strEncryptedPassword());
-  query.bindValue(":_v03", m_bPurchase);
-  query.bindValue(":_v04", m_bReminder);
-  query.bindValue(":_v05", m_bCalculator);
-  query.bindValue(":_v06", m_bShop);
-  query.bindValue(":_v07", m_bUser);
-  query.bindValue(":_v08", m_bProduct);
-  query.bindValue(":_v09", m_bSettings);
-  query.bindValue(":_v10", m_bCategory);
-  query.bindValue(":_v11", m_bImage);
-  query.bindValue(":_v12", m_bShoppingList);
-  query.bindValue(":_v13", m_bEmployee);
-  query.bindValue(":_v14", m_bSupplier);
-  query.bindValue(":_v15", m_bStore);
-  query.bindValue(":_v16", m_bTimeCard);
-  query.bindValue(":_v17", m_bCoupon);
+  query.bindValue(":_v03", hasPermission(Functionality::Idx::Purchase));
+  query.bindValue(":_v04", hasPermission(Functionality::Idx::Reminder));
+  query.bindValue(":_v05", hasPermission(Functionality::Idx::Calculator));
+  query.bindValue(":_v06", hasPermission(Functionality::Idx::Shop));
+  query.bindValue(":_v07", hasPermission(Functionality::Idx::User));
+  query.bindValue(":_v08", hasPermission(Functionality::Idx::Product));
+  query.bindValue(":_v09", hasPermission(Functionality::Idx::Settings));
+  query.bindValue(":_v10", hasPermission(Functionality::Idx::Category));
+  query.bindValue(":_v11", hasPermission(Functionality::Idx::Image));
+  query.bindValue(":_v12", hasPermission(Functionality::Idx::ShoppingList));
+  query.bindValue(":_v13", hasPermission(Functionality::Idx::Employee));
+  query.bindValue(":_v14", hasPermission(Functionality::Idx::Supplier));
+  query.bindValue(":_v15", hasPermission(Functionality::Idx::Store));
+  query.bindValue(":_v16", hasPermission(Functionality::Idx::TimeCard));
+  query.bindValue(":_v17", hasPermission(Functionality::Idx::Coupon));
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -169,21 +140,21 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v01", m_strUser);
   if (!m_password.isEmpty())
     query.bindValue(":_v02", strEncryptedPassword());
-  query.bindValue(":_v03", m_bPurchase);
-  query.bindValue(":_v04", m_bReminder);
-  query.bindValue(":_v05", m_bCalculator);
-  query.bindValue(":_v06", m_bShop);
-  query.bindValue(":_v07", m_bUser);
-  query.bindValue(":_v08", m_bProduct);
-  query.bindValue(":_v09", m_bSettings);
-  query.bindValue(":_v10", m_bCategory);
-  query.bindValue(":_v11", m_bImage);
-  query.bindValue(":_v12", m_bShoppingList);
-  query.bindValue(":_v13", m_bEmployee);
-  query.bindValue(":_v14", m_bSupplier);
-  query.bindValue(":_v15", m_bStore);
-  query.bindValue(":_v16", m_bTimeCard);
-  query.bindValue(":_v17", m_bCoupon);
+  query.bindValue(":_v03", hasPermission(Functionality::Idx::Purchase));
+  query.bindValue(":_v04", hasPermission(Functionality::Idx::Reminder));
+  query.bindValue(":_v05", hasPermission(Functionality::Idx::Calculator));
+  query.bindValue(":_v06", hasPermission(Functionality::Idx::Shop));
+  query.bindValue(":_v07", hasPermission(Functionality::Idx::User));
+  query.bindValue(":_v08", hasPermission(Functionality::Idx::Product));
+  query.bindValue(":_v09", hasPermission(Functionality::Idx::Settings));
+  query.bindValue(":_v10", hasPermission(Functionality::Idx::Category));
+  query.bindValue(":_v11", hasPermission(Functionality::Idx::Image));
+  query.bindValue(":_v12", hasPermission(Functionality::Idx::ShoppingList));
+  query.bindValue(":_v13", hasPermission(Functionality::Idx::Employee));
+  query.bindValue(":_v14", hasPermission(Functionality::Idx::Supplier));
+  query.bindValue(":_v15", hasPermission(Functionality::Idx::Store));
+  query.bindValue(":_v16", hasPermission(Functionality::Idx::TimeCard));
+  query.bindValue(":_v17", hasPermission(Functionality::Idx::Coupon));
 
   return query.exec();
 }
@@ -220,21 +191,21 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_strUser = query.value(0).toString();
       query.value(1).toString(); // password nao precisamos
-      m_bPurchase = query.value(2).toBool();
-      m_bReminder = query.value(3).toBool();
-      m_bCalculator = query.value(4).toBool();
-      m_bShop = query.value(5).toBool();
-      m_bUser = query.value(6).toBool();
-      m_bProduct = query.value(7).toBool();
-      m_bSettings = query.value(8).toBool();
-      m_bCategory = query.value(9).toBool();
-      m_bImage = query.value(10).toBool();
-      m_bShoppingList = query.value(11).toBool();
-      m_bEmployee = query.value(12).toBool();
-      m_bSupplier = query.value(13).toBool();
-      m_bStore = query.value(14).toBool();
-      m_bTimeCard = query.value(15).toBool();
-      m_bCoupon = query.value(16).toBool();
+      setPermission(Functionality::Idx::Purchase, query.value(2).toBool());
+      setPermission(Functionality::Idx::Reminder, query.value(3).toBool());
+      setPermission(Functionality::Idx::Calculator, query.value(4).toBool());
+      setPermission(Functionality::Idx::Shop, query.value(5).toBool());
+      setPermission(Functionality::Idx::User, query.value(6).toBool());
+      setPermission(Functionality::Idx::Product, query.value(7).toBool());
+      setPermission(Functionality::Idx::Settings, query.value(8).toBool());
+      setPermission(Functionality::Idx::Category, query.value(9).toBool());
+      setPermission(Functionality::Idx::Image, query.value(10).toBool());
+      setPermission(Functionality::Idx::ShoppingList, query.value(11).toBool());
+      setPermission(Functionality::Idx::Employee, query.value(12).toBool());
+      setPermission(Functionality::Idx::Supplier, query.value(13).toBool());
+      setPermission(Functionality::Idx::Store, query.value(14).toBool());
+      setPermission(Functionality::Idx::TimeCard, query.value(15).toBool());
+      setPermission(Functionality::Idx::Coupon, query.value(16).toBool());
     }
     else
     {
@@ -283,45 +254,16 @@ bool User::SQL_select_password_proc(QSqlQuery& query, QString& error)
 
 bool User::hasPermission(Functionality::Idx idx) const
 {
-  switch (idx)
-  {
-    case Functionality::Idx::User:
-      return m_bUser;
-    case Functionality::Idx::Category:
-      return m_bCategory;
-    case Functionality::Idx::Product:
-      return m_bProduct;
-    case Functionality::Idx::Image:
-      return m_bImage;
-    case Functionality::Idx::Employee:
-      return m_bEmployee;
-    case Functionality::Idx::Supplier:
-      return m_bSupplier;
-    case Functionality::Idx::Store:
-      return m_bStore;
-    case Functionality::Idx::Purchase:
-      return m_bPurchase;
-    case Functionality::Idx::Calculator:
-      return m_bCalculator;
-    case Functionality::Idx::Reminder:
-      return m_bReminder;
-    case Functionality::Idx::ShoppingList:
-      return m_bShoppingList;
-    case Functionality::Idx::Shop:
-      return m_bShop;
-    case Functionality::Idx::TimeCard:
-      return m_bTimeCard;
-    case Functionality::Idx::Coupon:
-      return m_bCoupon;
-    case Functionality::Idx::Settings:
-      return m_bSettings;
-    case Functionality::Idx::_END:
-    default:
-      return false;
-  }
+  return m_permissions.contains(idx) ? m_permissions.value(idx) : false;
+
 }
 
 bool User::hasPermission(const QString& tableName) const
 {
   return hasPermission(Functionality::tableNameToIdx(tableName));
+}
+
+void User::setPermission(Functionality::Idx idx, bool bSet)
+{
+  m_permissions[idx] = bSet;
 }

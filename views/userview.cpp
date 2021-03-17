@@ -56,6 +56,16 @@ UserView::UserView(QWidget* parent)
     p->setFlags(p->flags() | Qt::ItemIsUserCheckable);
     p->setCheckState(Qt::Unchecked);
     m_list->addItem(p);
+    switch((Functionality::Idx)i)
+    {
+      case Functionality::Idx::Phone:
+      case Functionality::Idx::Address:
+      case Functionality::Idx::ProductCode:
+        p->setHidden(true);
+        break;
+      default:
+        break;
+    }
   }
 
   QHBoxLayout* userlayout = new QHBoxLayout;
@@ -100,45 +110,18 @@ void UserView::getItem(JItemSQL& o) const
   _o.m_id = m_id;
   _o.m_strUser = m_user->text();
   _o.m_password = m_password->text();
-  _o.m_bPurchase = m_list->item((int)Idx::Purchase)->checkState() == Qt::Checked ? true : false;
-  _o.m_bReminder = m_list->item((int)Idx::Reminder)->checkState() == Qt::Checked ? true : false;
-  _o.m_bCalculator = m_list->item((int)Idx::Calculator)->checkState() == Qt::Checked ? true : false;
-  _o.m_bShop = m_list->item((int)Idx::Shop)->checkState() == Qt::Checked ? true : false;
-  _o.m_bUser = m_list->item((int)Idx::User)->checkState() == Qt::Checked ? true : false;
-  _o.m_bProduct = m_list->item((int)Idx::Product)->checkState() == Qt::Checked ? true : false;
-  _o.m_bSettings = m_list->item((int)Idx::Settings)->checkState() == Qt::Checked ? true : false;
-  _o.m_bEmployee = m_list->item((int)Idx::Employee)->checkState() == Qt::Checked ? true : false;
-  _o.m_bSupplier = m_list->item((int)Idx::Supplier)->checkState() == Qt::Checked ? true : false;
-  _o.m_bCategory = m_list->item((int)Idx::Category)->checkState() == Qt::Checked ? true : false;
-  _o.m_bImage = m_list->item((int)Idx::Image)->checkState() == Qt::Checked ? true : false;
-  _o.m_bShoppingList = m_list->item((int)Idx::ShoppingList)->checkState() == Qt::Checked ? true : false;
-  _o.m_bStore = m_list->item((int)Idx::Store)->checkState() == Qt::Checked ? true : false;
-  _o.m_bTimeCard = m_list->item((int)Idx::TimeCard)->checkState() == Qt::Checked ? true : false;
-  _o.m_bCoupon = m_list->item((int)Idx::Coupon)->checkState() == Qt::Checked ? true : false;
+  for (int i = 0; i != (int)Functionality::Idx::_END; ++i)
+    _o.setPermission((Functionality::Idx)i, m_list->item(i)->checkState() == Qt::Checked ? true : false);
 }
 
 void UserView::setItem(const JItemSQL& o)
 {
   const User& _o = dynamic_cast<const User&>(o);
-  if (_o.m_id.isValid())
-    m_lblPasswordMsg->show();
+  m_lblPasswordMsg->setVisible(_o.m_id.isValid());
   m_user->setText(_o.m_strUser);
   m_password->setText("");
-  m_list->item((int)Idx::User)->setCheckState(_o.m_bUser ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Category)->setCheckState(_o.m_bCategory ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Product)->setCheckState(_o.m_bProduct ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Image)->setCheckState(_o.m_bImage ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Employee)->setCheckState(_o.m_bEmployee ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Supplier)->setCheckState(_o.m_bSupplier ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Store)->setCheckState(_o.m_bStore ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Purchase)->setCheckState(_o.m_bPurchase ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Calculator)->setCheckState(_o.m_bCalculator ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Reminder)->setCheckState(_o.m_bReminder ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::ShoppingList)->setCheckState(_o.m_bShoppingList ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Shop)->setCheckState(_o.m_bShop ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Settings)->setCheckState(_o.m_bSettings ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::TimeCard)->setCheckState(_o.m_bTimeCard ? Qt::Checked : Qt::Unchecked);
-  m_list->item((int)Idx::Coupon)->setCheckState(_o.m_bCoupon ? Qt::Checked : Qt::Unchecked);
+  for (int i = 0; i != (int)Functionality::Idx::_END; ++i)
+    m_list->item(i)->setCheckState(_o.hasPermission((Functionality::Idx)i) ? Qt::Checked : Qt::Unchecked);
 }
 
 QString UserView::getPassword() const
@@ -148,8 +131,7 @@ QString UserView::getPassword() const
 
 void UserView::viewPassword(bool b)
 {
-  m_password->setEchoMode( b ? QLineEdit::EchoMode::Normal
-                             : QLineEdit::EchoMode::Password);
+  m_password->setEchoMode( b ? QLineEdit::EchoMode::Normal : QLineEdit::EchoMode::Password);
 }
 
 void UserView::itemsRemoved(const Ids& ids)

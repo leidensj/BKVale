@@ -8,6 +8,7 @@
 #include "printer.h"
 #include <QMdiArea>
 #include <QPainter>
+#include <QMap>
 
 namespace Ui {
 class Baita;
@@ -36,16 +37,6 @@ protected:
     }
 private:
     QPixmap m_pixmap;
-};
-
-enum class Functionality : int
-{
-  None = 0,
-  Purchase,
-  Reminder,
-  Calculator,
-  Shop,
-  Report
 };
 
 class QLabel;
@@ -89,8 +80,8 @@ private:
   JMdiSubWindow* m_shopWindow;
   CouponRedeemer* m_redeemer;
   Printer m_printer;
-  QVector<QAction*> m_actions;
-  Functionality getCurrentFunctionality() const;
+  QMap<Functionality::Idx, QAction*> m_actions;
+  Functionality::Idx getCurrentFunctionality() const;
 
 private slots:
   void updateControls();

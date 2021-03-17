@@ -148,6 +148,10 @@ QString JItemEx::text(Functionality::Idx idx)
       return "Endereço";
     case Functionality::Idx::Phone:
       return "Telefone";
+    case Functionality::Idx::Report:
+      return "Relatórios";
+    case Functionality::Idx::RedeemCoupon:
+      return "Resgatar Cupons";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -184,9 +188,9 @@ QString JItemEx::icon(Functionality::Idx idx)
     case Functionality::Idx::Reminder:
       return ":/icons/res/postit.png";
     case Functionality::Idx::ShoppingList:
-      return ":/icons/res/shopmgt.png";
+      return ":/icons/res/shoppinglistmgt.png";
     case Functionality::Idx::Shop:
-      return ":/icons/res/shop.png";
+      return ":/icons/res/shoppinglist.png";
     case Functionality::Idx::TimeCard:
       return ":/icons/res/timecard.png";
     case Functionality::Idx::Coupon:
@@ -194,13 +198,17 @@ QString JItemEx::icon(Functionality::Idx idx)
     case Functionality::Idx::Settings:
       return ":/icons/res/settings.png";
     case Functionality::Idx::Login:
-      return ":/icons/res/login.png";
+      return ":/icons/res/users.png";
     case Functionality::Idx::ProductCode:
       return ":/icons/res/barcode.png";
     case Functionality::Idx::Address:
       return ":/icons/res/address.png";
     case Functionality::Idx::Phone:
       return ":/icons/res/phone.png";
+    case Functionality::Idx::Report:
+      return ":/icons/res/statistics.png";
+    case Functionality::Idx::RedeemCoupon:
+      return ":/icons/res/redeem.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -269,6 +277,8 @@ JItemView* JItemEx::view(const QString& tableName)
     return new SupplierView;
   if (tableName == COUPON_SQL_TABLE_NAME)
     return new CouponView;
+  if (tableName == USER_SQL_TABLE_NAME)
+    return new UserView;
   return nullptr;
 }
 

@@ -26,6 +26,8 @@
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
 
+#include "items/jitemex.h"
+
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QByteArray>
@@ -34,8 +36,6 @@
 #include <QCloseEvent>
 #include <QMdiSubWindow>
 #include <QTimer>
-
-#define ACTION_TABLE_NAME_PROPERTY "ACTION_TABLE_NAME_PROPERTY"
 
 class JMdiSubWindow : public QMdiSubWindow
 {
@@ -133,17 +133,23 @@ Baita::Baita(QWidget *parent)
   statusBar()->addWidget(p);
   statusBar()->addPermanentWidget(m_statusTime);
 
-  ui->actionSettings->setProperty(ACTION_TABLE_NAME_PROPERTY, SETTINGS_SQL_TABLE_NAME);
-  ui->actionUsers->setProperty(ACTION_TABLE_NAME_PROPERTY, USER_SQL_TABLE_NAME);
-  ui->actionProducts->setProperty(ACTION_TABLE_NAME_PROPERTY, PRODUCT_SQL_TABLE_NAME);
-  ui->actionCategories->setProperty(ACTION_TABLE_NAME_PROPERTY, CATEGORY_SQL_TABLE_NAME);
-  ui->actionImages->setProperty(ACTION_TABLE_NAME_PROPERTY, IMAGE_SQL_TABLE_NAME);
-  ui->actionShoppingListMgt->setProperty(ACTION_TABLE_NAME_PROPERTY, SHOPPING_LIST_SQL_TABLE_NAME);
-  ui->actionEmployees->setProperty(ACTION_TABLE_NAME_PROPERTY, EMPLOYEE_SQL_TABLE_NAME);
-  ui->actionSuppliers->setProperty(ACTION_TABLE_NAME_PROPERTY, SUPPLIER_SQL_TABLE_NAME);
-  ui->actionStores->setProperty(ACTION_TABLE_NAME_PROPERTY, STORE_SQL_TABLE_NAME);
-  ui->actionTimeCard->setProperty(ACTION_TABLE_NAME_PROPERTY, TIME_CARD_SQL_TABLE_NAME);
-  ui->actionCoupons->setProperty(ACTION_TABLE_NAME_PROPERTY, SETTINGS_SQL_TABLE_NAME);
+  m_actions[Functionality::Idx::Settings] = ui->actionSettings;
+  m_actions[Functionality::Idx::User] = ui->actionUsers;
+  m_actions[Functionality::Idx::Product] = ui->actionProducts;
+  m_actions[Functionality::Idx::Category] = ui->actionCategories;
+  m_actions[Functionality::Idx::Image] = ui->actionImages;
+  m_actions[Functionality::Idx::ShoppingList] = ui->actionShoppingListMgt;
+  m_actions[Functionality::Idx::Employee] = ui->actionEmployees;
+  m_actions[Functionality::Idx::Supplier] = ui->actionSuppliers;
+  m_actions[Functionality::Idx::Store] = ui->actionStores;
+  m_actions[Functionality::Idx::TimeCard] = ui->actionTimeCard;
+  m_actions[Functionality::Idx::Coupon] = ui->actionCoupons;
+  m_actions[Functionality::Idx::Shop] = ui->actionShoppingList;
+  m_actions[Functionality::Idx::Calculator] = ui->actionCalculator;
+  m_actions[Functionality::Idx::Purchase] = ui->actionPurchases;
+  m_actions[Functionality::Idx::Report] = ui->actionReports;
+  m_actions[Functionality::Idx::Reminder] = ui->actionReminders;
+  m_actions[Functionality::Idx::RedeemCoupon] = ui->actionRedeem;
 
   connect(ui->actionPrint, SIGNAL(triggered(bool)), this, SLOT(print()));
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
@@ -187,20 +193,20 @@ Baita::~Baita()
   delete ui;
 }
 
-Functionality Baita::getCurrentFunctionality() const
+Functionality::Idx Baita::getCurrentFunctionality() const
 {
   QMdiSubWindow* activeWindow = m_mdi->activeSubWindow();
   if (activeWindow == m_purchaseWindow)
-    return Functionality::Purchase;
+    return Functionality::Idx::Purchase;
   if (activeWindow == m_reportWindow)
-    return Functionality::Report;
+    return Functionality::Idx::Report;
   else if (activeWindow == m_reminderWindow)
-    return Functionality::Reminder;
+    return Functionality::Idx::Reminder;
   else if (activeWindow == m_calculatorWindow)
-    return Functionality::Calculator;
+    return Functionality::Idx::Calculator;
   else if (activeWindow == m_shopWindow)
-    return Functionality::Shop;
-  return Functionality::None;
+    return Functionality::Idx::Shop;
+  return Functionality::Idx::_END;
 }
 
 void Baita::print()
@@ -209,7 +215,7 @@ void Baita::print()
   QString error;
   switch (getCurrentFunctionality())
   {
-    case Functionality::Purchase:
+    case Functionality::Idx::Purchase:
     {
       Purchase o;
       m_purchase->getItem(o);
@@ -232,7 +238,7 @@ void Baita::print()
           ok = m_printer.print(o, error);
       }
     } break;
-    case Functionality::Reminder:
+    case Functionality::Idx::Reminder:
     {
       ReminderPrintDialog dlg(this);
       if (!dlg.exec())
@@ -258,17 +264,17 @@ void Baita::print()
       if (ok)
         m_reminder->clear();
     } break;
-    case Functionality::Calculator:
+    case Functionality::Idx::Calculator:
     {
       ok = m_printer.print(m_calculator->getFullContent() + Printer::st_strFullCut(), error);
     } break;
-    case Functionality::Shop:
+    case Functionality::Idx::Shop:
     {
       ShopPrintDialog dlg;
       if (dlg.exec())
         ok = m_printer.print(m_shop->getShoppingList(), dlg.getCount(), error);
     } break;
-    case Functionality::None:
+    case Functionality::Idx::_END:
     default:
       break;
   }
@@ -310,44 +316,34 @@ void Baita::updateTime()
 void Baita::updateControls()
 {
   Login login(true);
-  ui->actionSettings->setEnabled(login.getUser().m_bSettings);
-  ui->actionUsers->setEnabled(login.getUser().m_bUser);
-  ui->actionProducts->setEnabled(login.getUser().m_bProduct);
-  ui->actionCategories->setEnabled(login.getUser().m_bCategory);
-  ui->actionImages->setEnabled(login.getUser().m_bImage);
-  ui->actionShoppingListMgt->setEnabled(login.getUser().m_bShoppingList);
-  ui->actionEmployees->setEnabled(login.getUser().m_bEmployee);
-  ui->actionSuppliers->setEnabled(login.getUser().m_bSupplier);
-  ui->actionStores->setEnabled(login.getUser().m_bStore);
-  ui->actionTimeCard->setEnabled(login.getUser().m_bTimeCard);
-  ui->actionCoupons->setEnabled(login.getUser().m_bCoupon);
-
-  ui->actionPurchases->setEnabled(login.getUser().m_bPurchase);
-  ui->actionReminders->setEnabled(login.getUser().m_bReminder);
-  ui->actionCalculator->setEnabled(login.getUser().m_bCalculator);
-  ui->actionShoppingList->setEnabled(login.getUser().m_bShop);
+  QMapIterator<Functionality::Idx, QAction*> i(m_actions);
+  while (i.hasNext())
+  {
+    i.next();
+    i.value()->setEnabled(login.getUser().hasPermission(i.key()));
+  }
 
   switch (getCurrentFunctionality())
   {
-    case Functionality::Purchase:
+    case Functionality::Idx::Purchase:
     {
       Purchase o;
       m_purchase->getItem(o);
       ui->actionPrint->setEnabled(o.isValid());
     }  break;
-    case Functionality::Report:
+    case Functionality::Idx::Report:
       ui->actionPrint->setEnabled(false);
       break;
-    case Functionality::Reminder:
+    case Functionality::Idx::Reminder:
     {
       Reminder o;
       m_reminder->getItem(o);
       ui->actionPrint->setEnabled(o.isValid());
     } break;
-    case Functionality::Calculator:
+    case Functionality::Idx::Calculator:
       ui->actionPrint->setEnabled(true);
       break;
-    case Functionality::Shop:
+    case Functionality::Idx::Shop:
       ui->actionPrint->setEnabled(m_shop->getShoppingList().m_id.isValid());
       break;
     default:
@@ -363,24 +359,16 @@ void Baita::showInfo()
 void Baita::openJItemSQLDialog()
 {
   JItemView* view = nullptr;
-  if (sender() == ui->actionCategories)
-    view = new CategoryView;
-  else if (sender() == ui->actionEmployees)
-    view = new EmployeeView;
-  else if (sender() == ui->actionImages)
-    view = new ImageView;
-  else if (sender() == ui->actionProducts)
-    view = new ProductView;
-  else if (sender() == ui->actionShoppingListMgt)
-    view = new ShoppingListView;
-  else if (sender() == ui->actionStores)
-    view = new StoreView;
-  else if (sender() == ui->actionSuppliers)
-    view = new SupplierView;
-  else if (sender() == ui->actionUsers)
-    view = new UserView;
-  else if (sender() == ui->actionCoupons)
-    view = new CouponView;
+  QMapIterator<Functionality::Idx, QAction*> i(m_actions);
+  while (i.hasNext())
+  {
+    i.next();
+    if (sender() == i.value())
+    {
+      view = JItemEx::view(Functionality::idxToTableName(i.key()));
+      break;
+    }
+  }
 
   if (view != nullptr)
   {

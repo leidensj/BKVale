@@ -112,6 +112,7 @@ private slots:
   void lastItemSelected();
   void updateControls();
   void showHistory();
+  void print(Purchase& o);
 
 signals:
   void changedSignal();

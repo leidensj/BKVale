@@ -23,6 +23,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   , m_btnClear(nullptr)
   , m_btnSave(nullptr)
   , m_btnSearch(nullptr)
+  , m_btnPrint(nullptr)
   , m_btnMore(nullptr)
   , m_dlgDb(nullptr)
   , m_wFocus(nullptr)
@@ -48,11 +49,23 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnSearch->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
   m_btnSearch->setToolTip(tr("Pesquisar (Ctrl+F)"));
 
+  m_btnPrint = new QPushButton;
+  m_btnPrint->setFlat(true);
+  m_btnPrint->setText("");
+  m_btnPrint->setIconSize(QSize(24, 24));
+  m_btnPrint->setIcon(QIcon(":/icons/res/printer.png"));
+  m_btnPrint->setToolTip(tr("Imprimir ao salvar"));
+  m_btnPrint->setCheckable(true);
+  m_btnPrint->setChecked(true);
+  m_btnPrint->setEnabled(false);
+  m_btnPrint->hide();
+
   m_ltButton = new QHBoxLayout;
   m_ltButton->setContentsMargins(0, 0, 0, 0);
   m_ltButton->addWidget(m_btnClear);
   m_ltButton->addWidget(m_btnSave);
   m_ltButton->addWidget(m_btnSearch);
+  m_ltButton->addWidget(m_btnPrint);
   m_ltButton->setAlignment(Qt::AlignLeft);
 
   m_tab = new QTabWidget;

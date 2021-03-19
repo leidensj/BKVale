@@ -185,8 +185,8 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_btnRemove(nullptr)
   , m_lblViewerData(nullptr)
 {
-  m_btnSave->setEnabled(false);
-  m_btnSave->hide();
+  m_btnPrint->setEnabled(true);
+  m_btnPrint->show();
 
   m_btnOpenLast = new QPushButton;
   m_btnOpenLast->setFlat(true);
@@ -460,6 +460,7 @@ bool PurchaseView::save(Id& id)
   bool bSuccess = JItemEx::save(o, m_viewer->getTableName(), this);
   if (bSuccess)
   {
+    print(o);
     if (o.m_store.m_id.isValid())
     {
       QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
@@ -529,13 +530,33 @@ void PurchaseView::showHistory()
   {
     Ids ids = dlg.getViewer()->getSelectedIds();
     QVector<PurchaseElement> v;
-    for (auto id : ids)
+    for (int i = 0; i != ids.size(); ++i)
     {
       PurchaseElement e;
-      e.SQL_select_last(m_supplierPicker->getFirstId(), id);
+      e.SQL_select_last(m_supplierPicker->getFirstId(), ids.at(i));
       e.m_ammount = 0;
       v.push_back(e);
     }
     m_table->setPurchaseElements(v, false);
   }
+}
+
+void PurchaseView::print(Purchase& o)
+{
+  if (!m_btnPrint->isChecked() || !JItemEx::select(o, this))
+    return;
+
+  if (o.m_date != QDate::currentDate() && !o.m_id.isValid())
+  {
+    if (QMessageBox::question(
+          this,
+          tr("Data"),
+          tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::Yes) == QMessageBox::Yes)
+    {
+       o.m_date = QDate::currentDate();
+    }
+  }
+  JItemEx::print(o, nullptr, this);
 }

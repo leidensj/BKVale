@@ -48,6 +48,7 @@ protected:
   QPushButton* m_btnClear;
   QPushButton* m_btnSave;
   QPushButton* m_btnSearch;
+  QPushButton* m_btnPrint;
   QPushButton* m_btnMore;
 
 private:

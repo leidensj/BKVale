@@ -215,29 +215,6 @@ void Baita::print()
   QString error;
   switch (getCurrentFunctionality())
   {
-    case Functionality::Idx::Purchase:
-    {
-      Purchase o;
-      m_purchase->getItem(o);
-      if (o.m_date != QDate::currentDate() && !o.m_id.isValid())
-      {
-        if (QMessageBox::question(
-              this,
-              tr("Data"),
-              tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
-              QMessageBox::Yes | QMessageBox::No,
-              QMessageBox::Yes) == QMessageBox::Yes)
-        {
-           m_purchase->setDate(QDate::currentDate());
-        }
-      }
-      o.clear(true);
-      if (m_purchase->save(o.m_id))
-      {
-        if (o.SQL_select(error))
-          ok = m_printer.print(o, error);
-      }
-    } break;
     case Functionality::Idx::Reminder:
     {
       ReminderPrintDialog dlg(this);

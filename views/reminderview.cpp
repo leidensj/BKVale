@@ -4,6 +4,7 @@
 #include "widgets/jspinbox.h"
 #include "widgets/jdatepicker.h"
 #include "widgets/jtimeedit.h"
+#include "items/jitemex.h"
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QLayout>
@@ -15,6 +16,7 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QComboBox>
+#include <QInputDialog>
 
 ReminderView::ReminderView(QWidget *parent)
   : JItemView(REMINDER_SQL_TABLE_NAME, parent)
@@ -32,8 +34,9 @@ ReminderView::ReminderView(QWidget *parent)
   , m_cbTime(nullptr)
   , m_btnPin(nullptr)
 {
-  m_btnSave->setEnabled(false);
-  m_btnSave->hide();
+  m_btnPrint->setEnabled(true);
+  m_btnPrint->show();
+  m_btnPrint->setCheckable(false);
   m_edTitle = new JLineEdit(Text::Input::ASCII, false);
   m_edTitle->setPlaceholderText(tr("Título"));
   m_teMessage = new QPlainTextEdit();
@@ -120,6 +123,7 @@ ReminderView::ReminderView(QWidget *parent)
   connect(m_cbDate, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
   connect(m_cbTime, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
   connect(m_btnPin, SIGNAL(clicked(bool)), this, SLOT(setFavorite()));
+  connect(m_btnPrint, SIGNAL(clicked(bool)), this, SLOT(print()));
 
   updateControls();
   setFocusWidgetOnClear(m_edTitle);
@@ -234,10 +238,10 @@ void ReminderView::setFavorite()
   Ids ids(m_viewer->getSelectedIds());
   if (!ids.isEmpty())
   {
-    for (auto id : ids)
+    for (int i = 0; i != ids.size(); ++i)
     {
       QString error;
-      Reminder o(id);
+      Reminder o(ids.at(i));
       o.SQL_toggleFavorite(error);
     }
     m_viewer->refresh();
@@ -245,44 +249,13 @@ void ReminderView::setFavorite()
   }
 }
 
-ReminderPrintDialog::ReminderPrintDialog(QWidget* parent)
-  : QDialog(parent)
-  , m_spnCopies(nullptr)
-  , m_cbSave(nullptr)
+void ReminderView::print()
 {
-  m_spnCopies = new JSpinBox;
-  m_spnCopies->setMinimum(1);
-  m_spnCopies->setMaximum(100);
-  m_spnCopies->setSuffix(tr(" cópias"));
-  m_cbSave = new QCheckBox;
-  m_cbSave->setIcon(QIcon(":/icons/res/save.png"));
-  m_cbSave->setText(tr("Salvar lembrete"));
-  m_cbSave->setChecked(true);
-
-  QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-  connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
-
-  QVBoxLayout* lt = new QVBoxLayout;
-  lt->addWidget(m_spnCopies);
-  lt->addWidget(m_cbSave);
-  lt->addWidget(btn);
-  lt->setSizeConstraint(QLayout::SetFixedSize);
-
-  setWindowTitle(tr("Imprimir"));
-  setWindowIcon(QIcon(":/icons/res/printer.png"));
-
-  setLayout(lt);
-  m_spnCopies->setFocus();
-  m_spnCopies->selectAll();
-}
-
-int ReminderPrintDialog::getCopies() const
-{
-  return m_spnCopies->value();
-}
-
-bool ReminderPrintDialog::getSave() const
-{
-  return m_cbSave->isChecked();
+  Reminder o;
+  getItem(o);
+  bool ok = false;
+  int n = QInputDialog::getInt(this, tr("Imprimir Lembrete"), tr("Número de cópias"), 1, 1, 999, 1, &ok);
+  if (ok)
+    for (int i = 0; i != n; ++i)
+      JItemEx::print(o, nullptr, this);
 }

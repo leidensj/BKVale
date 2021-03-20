@@ -54,7 +54,8 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_btnPrint->setText("");
   m_btnPrint->setIconSize(QSize(24, 24));
   m_btnPrint->setIcon(QIcon(":/icons/res/printer.png"));
-  m_btnPrint->setToolTip(tr("Imprimir ao salvar"));
+  m_btnPrint->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
+  m_btnPrint->setToolTip(tr("Imprimir (Ctrl+P)"));
   m_btnPrint->setCheckable(true);
   m_btnPrint->setChecked(true);
   m_btnPrint->setEnabled(false);

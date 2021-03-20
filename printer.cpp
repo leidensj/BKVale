@@ -8,6 +8,9 @@
 #include "escpos.h"
 #include "settings.h"
 
+QSerialPort Printer::m_printerSerial;
+QTcpSocket Printer::m_printerTCP;
+
 namespace
 {
 

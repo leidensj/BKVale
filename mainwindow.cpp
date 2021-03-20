@@ -215,32 +215,6 @@ void Baita::print()
   QString error;
   switch (getCurrentFunctionality())
   {
-    case Functionality::Idx::Reminder:
-    {
-      ReminderPrintDialog dlg(this);
-      if (!dlg.exec())
-        break;
-      Reminder o;
-      m_reminder->getItem(o);
-      if (dlg.getSave())
-      {
-        Id id;
-        ok = m_reminder->save(id);
-      }
-
-      if (ok)
-      {
-        for (int i = 0; i != dlg.getCopies(); ++i)
-        {
-          ok = m_printer.print(o, error);
-          if (ok)
-            break;
-        }
-      }
-
-      if (ok)
-        m_reminder->clear();
-    } break;
     case Functionality::Idx::Calculator:
     {
       ok = m_printer.print(m_calculator->getFullContent() + Printer::st_strFullCut(), error);

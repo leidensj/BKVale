@@ -24,8 +24,8 @@ private:
   void disconnect();
   bool printByteArray(QByteArray& data, QString& error);
   bool printString(const QString& msg, QString& error);
-  QSerialPort m_printerSerial;
-  QTcpSocket m_printerTCP;
+  static QSerialPort m_printerSerial;
+  static QTcpSocket m_printerTCP;
 };
 
 #endif // PRINTER_H

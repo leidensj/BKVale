@@ -31,6 +31,7 @@ private slots:
   void emitChangedSignal();
   void updateControls();
   void setFavorite();
+  void print();
 
 signals:
   void changedSignal();
@@ -49,20 +50,6 @@ private:
   JTimeEdit* m_time;
   QCheckBox* m_cbTime;
   QPushButton* m_btnPin;
-};
-
-class ReminderPrintDialog : public QDialog
-{
-  Q_OBJECT
-
-public:
-  explicit ReminderPrintDialog(QWidget* parent = nullptr);
-  int getCopies() const;
-  bool getSave() const;
-
-private:
-  JSpinBox* m_spnCopies;
-  QCheckBox* m_cbSave;
 };
 
 #endif // REMINDERVIEW_H

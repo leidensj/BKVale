@@ -5,7 +5,6 @@
 #include "settingsdialog.h"
 #include "databaseutils.h"
 #include "items/login.h"
-#include "printer.h"
 #include <QMdiArea>
 #include <QPainter>
 #include <QMap>
@@ -79,7 +78,6 @@ private:
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
   CouponRedeemer* m_redeemer;
-  Printer m_printer;
   QMap<Functionality::Idx, QAction*> m_actions;
   Functionality::Idx getCurrentFunctionality() const;
 
@@ -88,7 +86,6 @@ private slots:
   void updateStatusBar();
   void updateTime();
   void showInfo();
-  void print();
   void openJItemSQLDialog();
   void openSettingsDialog();
   void openLoginDialog();

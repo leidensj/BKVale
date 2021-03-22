@@ -69,8 +69,6 @@
    <addaction name="actionSuppliers"/>
    <addaction name="actionProducts"/>
    <addaction name="separator"/>
-   <addaction name="actionPrint"/>
-   <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
    <addaction name="actionExit"/>
@@ -114,7 +112,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSistema">
@@ -148,7 +146,6 @@
     <property name="title">
      <string>Impressora</string>
     </property>
-    <addaction name="actionPrint"/>
    </widget>
    <widget class="QMenu" name="menuConfigura_es">
     <property name="title">
@@ -176,18 +173,6 @@
    <addaction name="menuConfigura_es"/>
    <addaction name="menuAjuda"/>
   </widget>
-  <action name="actionPrint">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/printer.png</normaloff>:/icons/res/printer.png</iconset>
-   </property>
-   <property name="text">
-    <string>Imprimir</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+P</string>
-   </property>
-  </action>
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="icons.qrc">

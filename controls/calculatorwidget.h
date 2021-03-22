@@ -14,16 +14,12 @@ class CalculatorWidget : public QFrame
 
 public:
   explicit CalculatorWidget(QWidget* parent = nullptr);
-  QString getFullContent() const;
 
 private slots:
   void buttonClicked();
   void clear();
   void reset();
-  void emitLineSignal(double value, int button);
-
-signals:
-  void lineSignal(const QString& text);
+  void print(double value, int button);
 
 private:
   QPushButton* m_btnPrint;

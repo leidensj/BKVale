@@ -58,7 +58,7 @@ QString ShoppingListItem::strPrice() const
 
 ShoppingList::ShoppingList(Id id)
 {
-  clear();
+  ShoppingList::clear();
   m_id = id;
 }
 

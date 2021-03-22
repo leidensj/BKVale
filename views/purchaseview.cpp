@@ -425,8 +425,6 @@ void PurchaseView::setItem(const JItemSQL& o)
 void PurchaseView::supplierChanged()
 {
   m_table->setSupplierId(m_supplierPicker->getFirstId());
-  /*if (m_supplierPicker->getId().isValid() && !m_table->hasItems() && !m_id.isValid())
-    m_btnAddRemove->m_btnAdd->click();*/
   updateControls();
 }
 
@@ -496,16 +494,6 @@ void PurchaseView::itemsRemoved(const Ids& ids)
   JItemView::itemsRemoved(ids);
   if (ids.contains(m_lastId))
     m_lastId.clear();
-}
-
-void PurchaseView::setDate(const QDate& dt)
-{
-  m_dtPicker->setDate(dt);
-}
-
-QDate PurchaseView::getDate() const
-{
-  return m_dtPicker->getDate();
 }
 
 void PurchaseView::showHistory()

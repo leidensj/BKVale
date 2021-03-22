@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QAction>
 #include "escpos.h"
+#include "printer.h"
 
 #define KEY_CODE "KEY_CODE"
 
@@ -293,8 +294,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   auto action = new QAction(this);
   action->setShortcuts({QKeySequence(Qt::Key_Return), QKeySequence(Qt::Key_Enter) });
   this->addAction(action);
-  auto button = m_btnPlus;
-  connect(action, &QAction::triggered, [button](){ button->animateClick(); });
+  connect(action, SIGNAL(triggered(bool)), m_btnPlus, SLOT(animateClick()));
 
   QHBoxLayout* hline4 = new QHBoxLayout;
   hline4->addWidget(m_btn0);
@@ -402,12 +402,7 @@ double CalculatorWidget::calculate(double op1, double op2, int button)
   }
 }
 
-QString CalculatorWidget::getFullContent() const
-{
-  return m_view->toPlainText();
-}
-
-void CalculatorWidget::emitLineSignal(double value, int button)
+void CalculatorWidget::print(double value, int button)
 {
   QString text = buildPrintContent(value, button);
   m_view->appendPlainText(text);
@@ -416,7 +411,9 @@ void CalculatorWidget::emitLineSignal(double value, int button)
   {
     QString text2 = m_rdoAlignLeft->isChecked() ? ESC_ALIGN_LEFT : ESC_ALIGN_CENTER;
     text2 += ESC_EXPAND_ON + text + ESC_LF ESC_EXPAND_OFF;
-    emit lineSignal(text2);
+    Printer printer;
+    QString error;
+    printer.print(text2, error);
   }
 }
 
@@ -435,13 +432,13 @@ void CalculatorWidget::buttonClicked()
                    !Calculator::isEqual(m_lastButton)
                    ? currentValue : m_lastValue;
     m_total = calculate(m_total, value, button);
-    emitLineSignal(value, button);
+    print(value, button);
     m_edDisplay->setText(QString::number(m_total, 'f').remove(QRegExp("\\.?0*$")));
     m_lastValue = value;
   }
   else if (Calculator::isEqual(button))
   {
-    emitLineSignal(m_total, button);
+    print(m_total, button);
     m_edDisplay->setText(QString::number(m_total, 'f').
                          remove(QRegExp("\\.?0*$")));
   }
@@ -480,5 +477,9 @@ void CalculatorWidget::reset()
   m_lastValue = 0.0;
   m_total = 0.0;
   if (m_btnPrint->isChecked())
-    emit lineSignal(ESC_FULL_CUT);
+  {
+    QString error;
+    Printer printer;
+    printer.print(Printer::st_strFullCut(), error);
+  }
 }

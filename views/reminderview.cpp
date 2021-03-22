@@ -116,9 +116,9 @@ ReminderView::ReminderView(QWidget *parent)
   layout()->setContentsMargins(9, 9, 9, 9);
   m_tab->addTab(fr, QIcon(":/icons/res/postit.png"), tr("Lembrete"));
 
-  connect(m_edTitle, SIGNAL(textEdited(const QString&)), this, SLOT(emitChangedSignal()));
-  connect(m_teMessage, SIGNAL(textChanged()), this, SLOT(emitChangedSignal()));
-  connect(m_edBarcode, SIGNAL(textChanged(const QString&)), this, SLOT(emitChangedSignal()));
+  connect(m_edTitle, SIGNAL(textEdited(const QString&)), this, SLOT(updateControls()));
+  connect(m_teMessage, SIGNAL(textChanged()), this, SLOT(updateControls()));
+  connect(m_edBarcode, SIGNAL(textChanged(const QString&)), this, SLOT(updateControls()));
   connect(m_cbCapitalization, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
   connect(m_cbDate, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
   connect(m_cbTime, SIGNAL(stateChanged(int)), this, SLOT(updateControls()));
@@ -195,11 +195,6 @@ void ReminderView::setItem(const JItemSQL& o)
   updateControls();
 }
 
-void ReminderView::emitChangedSignal()
-{
-  emit changedSignal();
-}
-
 void ReminderView::updateControls()
 {
   m_date->setEnabled(m_cbDate->isChecked());
@@ -231,6 +226,11 @@ void ReminderView::updateControls()
   QFont f3 = m_subject->lineEdit()->font();
   f3.setCapitalization(cap);
   m_subject->lineEdit()->setFont(f3);
+
+  Reminder o;
+  ReminderView::getItem(o);
+  m_btnPrint->setEnabled(o.isValid());
+  m_btnSave->setEnabled(o.isValid());
 }
 
 void ReminderView::setFavorite()

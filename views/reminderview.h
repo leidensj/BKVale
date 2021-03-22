@@ -28,13 +28,9 @@ protected slots:
   void setItem(const JItemSQL& o);
 
 private slots:
-  void emitChangedSignal();
   void updateControls();
   void setFavorite();
   void print();
-
-signals:
-  void changedSignal();
 
 private:
   JLineEdit* m_edTitle;

@@ -77,8 +77,6 @@ public:
   ~PurchaseView();
   bool save(Id& id);
   void setItem();
-  void setDate(const QDate& dt);
-  QDate getDate() const;
 
 public slots:
   void getItem(JItemSQL& o) const;

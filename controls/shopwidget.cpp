@@ -1,32 +1,35 @@
 #include "shopwidget.h"
 #include "controls/databaseviewer.h"
-#include "defines.h"
-#include "printer.h"
-#include "escpos.h"
 #include "items/jitemex.h"
-#include <QLabel>
 #include "widgets/jdatepicker.h"
 #include <QLayout>
-#include <QMessageBox>
 #include <QCheckBox>
-#include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QPushButton>
 
 ShopWidget::ShopWidget(QWidget* parent)
   : QWidget(parent)
   , m_viewer(nullptr)
   , m_dt(nullptr)
-  , m_lblWeekDay(nullptr)
+  , m_btnPrint(nullptr)
 {
   m_viewer = new DatabaseViewer(SHOPPING_LIST_SQL_TABLE_NAME, DatabaseViewer::Mode::ReadOnly);
   m_viewer->layout()->setContentsMargins(0, 0, 0, 0);
   m_dt = new JDatePicker;
-  m_lblWeekDay = new QLabel;
+  m_dt->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+  m_btnPrint = new QPushButton;
+  m_btnPrint->setFlat(true);
+  m_btnPrint->setText("");
+  m_btnPrint->setIconSize(QSize(24, 24));
+  m_btnPrint->setIcon(QIcon(":/icons/res/printer.png"));
+  m_btnPrint->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
+  m_btnPrint->setToolTip(tr("Imprimir (Ctrl+P)"));
 
   QHBoxLayout* headerLayout = new QHBoxLayout;
   headerLayout->setContentsMargins(0, 0, 0, 0);
   headerLayout->setAlignment(Qt::AlignLeft);
+  headerLayout->addWidget(m_btnPrint);
   headerLayout->addWidget(m_dt);
-  headerLayout->addWidget(m_lblWeekDay);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addLayout(headerLayout);
@@ -34,20 +37,24 @@ ShopWidget::ShopWidget(QWidget* parent)
   setLayout(mainLayout);
 
   connect(m_dt, SIGNAL(dateChangedSignal(const QDate&)), this, SLOT(updateControls()));
-  connect(m_dt, SIGNAL(dateChangedSignal(const QDate&)), this, SLOT(emitChangedSignal()));
-  connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(emitChangedSignal()));
+  connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(updateControls()));
+  connect(m_btnPrint, SIGNAL(clicked(bool)), this, SLOT(print()));
   updateControls();
 }
 
 void ShopWidget::updateControls()
 {
-  QDate date = m_dt->getDate();
-  m_lblWeekDay->setText(date.toString("dddd"));
-  QString filter(SHOPPING_LIST_SQL_COL_WEE " LIKE '%" SHOPPING_LIST_SEPARATOR +
-                 QString::number(date.dayOfWeek()) + SHOPPING_LIST_SEPARATOR "%'"
-                 " OR " SHOPPING_LIST_SQL_COL_MON " LIKE '%" SHOPPING_LIST_SEPARATOR +
-                 QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
-  m_viewer->setFixedFilter(filter);
+  if (sender() == m_dt)
+  {
+    QDate date = m_dt->getDate();
+    QString filter(SHOPPING_LIST_SQL_COL_WEE " LIKE '%" SHOPPING_LIST_SEPARATOR +
+                   QString::number(date.dayOfWeek()) + SHOPPING_LIST_SEPARATOR "%'"
+                   " OR " SHOPPING_LIST_SQL_COL_MON " LIKE '%" SHOPPING_LIST_SEPARATOR +
+                   QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
+    m_viewer->setFixedFilter(filter);
+  }
+  auto o = getShoppingList();
+  m_btnPrint->setEnabled(o.m_id.isValid());
 }
 
 ShoppingList ShopWidget::getShoppingList()
@@ -57,36 +64,19 @@ ShoppingList ShopWidget::getShoppingList()
   return o;
 }
 
-void ShopWidget::emitChangedSignal()
+void ShopWidget::print()
 {
-  emit changedSignal();
-}
-
-ShopPrintDialog::ShopPrintDialog(QWidget* parent)
-  : QDialog(parent)
-  , m_cbCount(nullptr)
-{
-  m_cbCount = new QCheckBox;
-  m_cbCount->setText(tr("Imprimir contagem"));
-  m_cbCount->setChecked(true);
-
-  QDialogButtonBox* btn = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-  connect(btn, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(btn, SIGNAL(rejected()), this, SLOT(reject()));
-
-  QVBoxLayout* lt = new QVBoxLayout;
-  lt->addWidget(m_cbCount);
-  lt->addWidget(btn);
-  lt->setSizeConstraint(QLayout::SetFixedSize);
-
-  setWindowTitle(tr("Imprimir"));
-  setWindowIcon(QIcon(":/icons/res/printer.png"));
-
-  setLayout(lt);
-  m_cbCount->setFocus();
-}
-
-bool ShopPrintDialog::getCount() const
-{
-  return m_cbCount->isChecked();
+  int ret = QMessageBox::question(this, tr("Imprimir Lista"), tr("Imprimir contagem?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+  switch (ret)
+  {
+    case QMessageBox::Yes:
+    case QMessageBox::No:
+    {
+      QVariant var(ret == QMessageBox::Yes);
+      JItemEx::print(getShoppingList(), &var, this);
+    } break;
+    case QMessageBox::Cancel:
+    default:
+      return;
+  }
 }

@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QDialog>
 #include <QDesktopWidget>
+#include <QToolButton>
 #include <QApplication>
 #include "items/login.h"
 
@@ -113,14 +114,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 
 JItemView::~JItemView()
 {
-  if (m_btnMore != nullptr)
-  {
-    if (m_btnMore->menu() != nullptr)
-    {
-      delete m_btnMore->menu();
-      m_btnMore->setMenu(nullptr);
-    }
-  }
+
 }
 
 void JItemView::setItem()
@@ -204,15 +198,13 @@ void JItemView::addViewButton(const QString& tableName)
   Login login(true);
   if (login.getUser().hasPermission(tableName))
   {
-    if (m_btnMore == nullptr)
+    bool bFirstButton = m_btnMore == nullptr;
+    if (bFirstButton)
     {
-      m_btnMore = new QPushButton;
-      m_btnMore->setFlat(true);
-      m_btnMore->setText("");
+      m_btnMore = new QToolButton;
       m_btnMore->setIconSize(QSize(24, 24));
-      m_btnMore->setIcon(QIcon(":/icons/res/more.png"));
-      m_btnMore->setToolTip(tr("Mais"));
-
+      m_btnMore->setAutoRaise(true);
+      m_btnMore->setPopupMode(QToolButton::MenuButtonPopup);
       QFrame *line = new QFrame;
       line->setFrameShape(QFrame::VLine);
       line->setFrameShadow(QFrame::Sunken);
@@ -220,13 +212,13 @@ void JItemView::addViewButton(const QString& tableName)
       m_ltButton->addWidget(m_btnMore);
     }
 
-    if (m_btnMore->menu() == nullptr)
-      m_btnMore->setMenu(new QMenu);
-    QAction* act = m_btnMore->menu()->addAction(QIcon(JItemEx::icon(tableName)),
-                                                tr("Gerenciar ") + JItemEx::text(tableName),
-                                                this,
-                                                SLOT(viewButtonClicked()));
+    QAction* act = new QAction(QIcon(JItemEx::icon(tableName)), JItemEx::text(tableName), m_btnMore);
+    act->setToolTip(tr("Gerenciar ") + JItemEx::text(tableName));
     act->setProperty(VIEW_BUTTON, tableName);
+    connect(act, SIGNAL(triggered(bool)), this, SLOT(viewButtonClicked()));
+    m_btnMore->addAction(act);
+    if (bFirstButton)
+      m_btnMore->setDefaultAction(act);
   }
 }
 

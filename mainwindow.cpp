@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "printer.h"
 
 #include "views/productview.h"
 #include "views/categoryview.h"
@@ -151,15 +150,10 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Reminder] = ui->actionReminders;
   m_actions[Functionality::Idx::RedeemCoupon] = ui->actionRedeem;
 
-  connect(ui->actionPrint, SIGNAL(triggered(bool)), this, SLOT(print()));
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(ui->actionInfo, SIGNAL(triggered(bool)), this, SLOT(showInfo()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-  connect(m_report, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-  connect(m_reminder, SIGNAL(changedSignal()), this, SLOT(updateControls()));
-  connect(m_calculator, SIGNAL(lineSignal(const QString&)), this, SLOT(print(const QString&)));
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
-  connect(m_shop, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(close()));
   connect(ui->actionPurchases, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReports, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
@@ -209,30 +203,6 @@ Functionality::Idx Baita::getCurrentFunctionality() const
   return Functionality::Idx::_END;
 }
 
-void Baita::print()
-{
-  bool ok = true;
-  QString error;
-  switch (getCurrentFunctionality())
-  {
-    case Functionality::Idx::Calculator:
-    {
-      ok = m_printer.print(m_calculator->getFullContent() + Printer::st_strFullCut(), error);
-    } break;
-    case Functionality::Idx::Shop:
-    {
-      ShopPrintDialog dlg;
-      if (dlg.exec())
-        ok = m_printer.print(m_shop->getShoppingList(), dlg.getCount(), error);
-    } break;
-    case Functionality::Idx::_END:
-    default:
-      break;
-  }
-  if (!ok)
-    QMessageBox::critical(this, ("Erro ao imprimir item"), error, QMessageBox::Ok);
-}
-
 void Baita::openSettingsDialog()
 {
   SettingsDialog dlg(m_settings);
@@ -272,33 +242,6 @@ void Baita::updateControls()
   {
     i.next();
     i.value()->setEnabled(login.getUser().hasPermission(i.key()));
-  }
-
-  switch (getCurrentFunctionality())
-  {
-    case Functionality::Idx::Purchase:
-    {
-      Purchase o;
-      m_purchase->getItem(o);
-      ui->actionPrint->setEnabled(o.isValid());
-    }  break;
-    case Functionality::Idx::Report:
-      ui->actionPrint->setEnabled(false);
-      break;
-    case Functionality::Idx::Reminder:
-    {
-      Reminder o;
-      m_reminder->getItem(o);
-      ui->actionPrint->setEnabled(o.isValid());
-    } break;
-    case Functionality::Idx::Calculator:
-      ui->actionPrint->setEnabled(true);
-      break;
-    case Functionality::Idx::Shop:
-      ui->actionPrint->setEnabled(m_shop->getShoppingList().m_id.isValid());
-      break;
-    default:
-      break;
   }
 }
 

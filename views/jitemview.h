@@ -11,6 +11,7 @@ class QPushButton;
 class QTabWidget;
 class QDialog;
 class QHBoxLayout;
+class QToolButton;
 
 class JItemView : public QWidget
 {
@@ -49,7 +50,7 @@ protected:
   QPushButton* m_btnSave;
   QPushButton* m_btnSearch;
   QPushButton* m_btnPrint;
-  QPushButton* m_btnMore;
+  QToolButton* m_btnMore;
 
 private:
   QDialog* m_dlgDb;

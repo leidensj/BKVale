@@ -36,6 +36,10 @@ QString CouponElement::strAmmount() const
   return Data::strAmmount(m_ammount);
 }
 
+QString CouponElement::strFmt() const
+{
+  return Data::strFmt(m_ammount);
+}
 
 bool CouponElement::SQL_insert_proc(QSqlQuery& query) const
 {

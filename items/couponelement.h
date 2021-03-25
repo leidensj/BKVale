@@ -20,6 +20,7 @@ struct CouponElement : public JItemElementSQL
   static bool SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId);
 
   QString strAmmount() const;
+  QString strFmt() const;
 
   Product m_product;
   double m_ammount;

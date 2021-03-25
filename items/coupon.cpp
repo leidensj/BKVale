@@ -244,7 +244,9 @@ QString Coupon::strCoupon() const
     {
       QString str;
       for (int i = 0; i != m_elements.size(); ++i)
-        str += m_elements.at(i).strAmmount() + m_elements.at(i).m_product.m_unity + " " + m_elements.at(i).m_product.m_name + "\n";
+        str += m_elements.at(i).strFmt() + m_elements.at(i).m_product.m_unity + " " + m_elements.at(i).m_product.m_name + "\n";
+      if (!str.isEmpty())
+        str.chop(1);
       return str;
     }
     default:

@@ -113,7 +113,12 @@ void CouponView::getItem(JItemSQL& o) const
   _o.clear(true);
   _o.m_id = m_id;
   _o.m_code = m_edCode->text();
-  _o.m_type = m_rdoPercentage->isChecked() ? Coupon::Type::Percentage : Coupon::Type::Value;
+  if (m_rdoPercentage->isChecked())
+    _o.m_type = Coupon::Type::Percentage;
+  else if (m_rdoValue->isChecked())
+    _o.m_type = Coupon::Type::Value;
+  else if (m_rdoProduct->isChecked())
+    _o.m_type = Coupon::Type::Product;
   _o.m_dtCreation = DateTime::server();
   _o.m_bExpires = m_cbExpiration->isChecked();
   _o.m_dtExpiration = m_dtExpiration->getDate();
@@ -132,6 +137,7 @@ void CouponView::setItem(const JItemSQL& o)
   m_edCode->setText(_o.m_code);
   m_rdoPercentage->setChecked(_o.m_type == Coupon::Type::Percentage);
   m_rdoValue->setChecked(_o.m_type == Coupon::Type::Value);
+  m_rdoProduct->setChecked(_o.m_type == Coupon::Type::Product);
   m_cbExpiration->setChecked(_o.m_bExpires);
   m_dtExpiration->setDate(_o.m_dtExpiration);
   m_edPercentage->setValue(_o.m_percentage);

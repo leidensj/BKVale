@@ -67,11 +67,11 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
           case Coupon::Type::Value:
             value = Data::strMoney(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 7), role).toInt());
             break;
+          case Coupon::Type::Product:
+            value = tr("Produtos");
           default:
             break;
         }
-        break;
-      case 2:
         break;
       case 3:
         value = value.toDateTime().toString("yyyy/MM/dd hh:mm:ss");
@@ -86,10 +86,18 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
         bool bExpired = !bRedeemed && DateTime::server().date() > dtExpiration;
         value = bExpired ? "Sim" : "";
       } break;
-      case 6:
-        break;
       default:
         break;
+    }
+  }
+  else if (role == Qt::ToolTipRole)
+  {
+    if (data(idx, Qt::EditRole).toInt() == (int)Coupon::Type::Product)
+    {
+      Coupon o(data(idx.sibling(idx.row(), 0), Qt::EditRole).toLongLong());
+      QString error;
+      o.SQL_select(error);
+      value = o.strCoupon();
     }
   }
   return value;

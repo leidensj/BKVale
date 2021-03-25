@@ -378,6 +378,17 @@ bool BaitaSQL::createTables(QString& error)
                           "FOREIGN KEY(" COUPON_SQL_COL_SID ") REFERENCES "
                           STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " COUPON_ELEMENTS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          COUPON_ELEMENTS_SQL_COL_CID " INTEGER NOT NULL,"
+                          COUPON_ELEMENTS_SQL_COL_PID " INTEGER,"
+                          COUPON_ELEMENTS_SQL_COL_AMM " REAL,"
+                          "FOREIGN KEY(" COUPON_ELEMENTS_SQL_COL_CID ") REFERENCES "
+                          COUPON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" COUPON_ELEMENTS_SQL_COL_PID ") REFERENCES "
+                          COUPON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
 
   if (bSuccess)
   {

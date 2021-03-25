@@ -4,6 +4,7 @@
 #include "widgets/jdatepicker.h"
 #include "controls/databasepicker.h"
 #include "items/jitemex.h"
+#include "tables/coupontable.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
@@ -42,10 +43,15 @@ CouponView::CouponView(QWidget* parent)
   , m_dtExpiration(nullptr)
   , m_rdoPercentage(nullptr)
   , m_rdoValue(nullptr)
+  , m_rdoProduct(nullptr)
   , m_edPercentage(nullptr)
   , m_edValue(nullptr)
   , m_storePicker(nullptr)
+  , m_btnAddRemove(nullptr)
+  , m_table(nullptr)
 {
+  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
+
   m_edCode = new JLineEdit(Text::Input::Alpha, true);
   m_edCode->setPlaceholderText(tr("Gerar código automaticamente"));
 
@@ -63,13 +69,24 @@ CouponView::CouponView(QWidget* parent)
   m_edValue = new JExpLineEdit(Data::Type::Money);
   m_edValue->setMinimum(0.0);
 
-  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
+
+  m_rdoProduct = new QRadioButton(tr("Produto:"));
+  m_btnAddRemove = new JAddRemoveButtons;
+  m_table = new CouponTable(m_btnAddRemove);
+  QWidget* product = new QWidget;
+  QVBoxLayout* ltProduct = new QVBoxLayout;
+  ltProduct->setAlignment(Qt::AlignTop);
+  ltProduct->setContentsMargins(0, 0, 0, 0);
+  ltProduct->addWidget(m_btnAddRemove);
+  ltProduct->addWidget(m_table);
+  product->setLayout(ltProduct);
 
   QFormLayout* ltMain = new QFormLayout;
   ltMain->addRow(JItemEx::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
   ltMain->addRow(tr("Código:"), m_edCode);
   ltMain->addRow(m_rdoPercentage, m_edPercentage);
   ltMain->addRow(m_rdoValue, m_edValue);
+  ltMain->addRow(m_rdoProduct, product);
   ltMain->addRow(m_cbExpiration, m_dtExpiration);
   ltMain->setAlignment(Qt::AlignTop);
   ltMain->addRow(tr(""), m_lblRedeemed);
@@ -81,8 +98,10 @@ CouponView::CouponView(QWidget* parent)
   connect(m_cbExpiration, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoPercentage, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoValue, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
+  connect(m_rdoProduct, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoPercentage, SIGNAL(clicked(bool)), m_edPercentage, SLOT(setFocus()));
   connect(m_rdoValue, SIGNAL(clicked(bool)), m_edValue, SLOT(setFocus()));
+  connect(m_rdoProduct, SIGNAL(clicked(bool)), m_btnAddRemove->m_btnAdd, SLOT(setFocus()));
 
   setFocusWidgetOnClear(m_edPercentage);
   clear();
@@ -101,6 +120,7 @@ void CouponView::getItem(JItemSQL& o) const
   _o.m_percentage = m_edPercentage->value();
   _o.m_value = m_edValue->value();
   _o.m_store.m_id = m_storePicker->getFirstId();
+  m_table->getElements(_o.m_elements);
 }
 
 void CouponView::setItem(const JItemSQL& o)
@@ -119,6 +139,7 @@ void CouponView::setItem(const JItemSQL& o)
   m_tab->setTabEnabled(0, !_o.m_bRedeemed);
   m_btnSave->setEnabled(!_o.m_bRedeemed);
   m_storePicker->addItem(_o.m_store);
+  m_table->setElements(_o.m_elements, true);
   if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
   {
     QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
@@ -139,6 +160,8 @@ void CouponView::updateControls()
     m_edPercentage->setValue(0.0);
   if (!m_rdoValue->isChecked())
     m_edValue->setValue(0.0);
+  m_table->setEnabled(m_rdoProduct->isChecked());
+  m_btnAddRemove->setEnabled(m_rdoProduct->isChecked());
 }
 
 bool CouponView::save(Id& id)
@@ -169,8 +192,8 @@ bool CouponView::save(Id& id)
     clear();
     CouponConfirmation dlg(coupons, this);
     if (dlg.exec())
-      for (auto o : coupons)
-        JItemEx::print(o, nullptr, this);
+      for (int i = 0; i != coupons.size(); ++i)
+        JItemEx::print(coupons.at(i), nullptr, this);
   }
   return true;
 }

@@ -14,6 +14,8 @@ class JExpLineEdit;
 class QLabel;
 class JSpinBox;
 class DatabasePicker;
+class JAddRemoveButtons;
+class CouponTable;
 
 class CouponConfirmation : public QDialog
 {
@@ -47,9 +49,12 @@ private:
   JDatePicker* m_dtExpiration;
   QRadioButton* m_rdoPercentage;
   QRadioButton* m_rdoValue;
+  QRadioButton* m_rdoProduct;
   JExpLineEdit* m_edPercentage;
   JExpLineEdit* m_edValue;
   DatabasePicker* m_storePicker;
+  JAddRemoveButtons* m_btnAddRemove;
+  CouponTable* m_table;
 };
 
 #endif // CATEGORYVIEW_H

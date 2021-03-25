@@ -61,6 +61,7 @@ UserView::UserView(QWidget* parent)
       case Functionality::Idx::Phone:
       case Functionality::Idx::Address:
       case Functionality::Idx::ProductCode:
+      case Functionality::Idx::Login:
         p->setHidden(true);
         break;
       default:

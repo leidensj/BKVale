@@ -31,6 +31,7 @@ SOURCES += main.cpp\
   editors/packageeditor.cpp \
   filters/jfilter.cpp \
   items/coupon.cpp \
+  items/couponelement.cpp \
   items/login.cpp \
   libraries/qcustomplot.cpp \
   libraries/tinyexpr.c \
@@ -40,6 +41,7 @@ SOURCES += main.cpp\
   printer.cpp \
   purchasereport.cpp \
   settingsdialog.cpp \
+  tables/coupontable.cpp \
   tables/jtable.cpp \
     databaseutils.cpp \
     settings.cpp \
@@ -138,6 +140,7 @@ HEADERS  += mainwindow.h \
     editors/packageeditor.h \
     filters/jfilter.h \
     items/coupon.h \
+    items/couponelement.h \
     items/login.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \
@@ -146,6 +149,7 @@ HEADERS  += mainwindow.h \
     printer.h \
     purchasereport.h \
     settingsdialog.h \
+    tables/coupontable.h \
     tables/jtable.h \
     databaseutils.h \
     settings.h \

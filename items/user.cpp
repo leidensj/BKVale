@@ -131,7 +131,7 @@ bool User::SQL_update_proc(QSqlQuery& query) const
               USER_SQL_COL_AEM " = (:_v13),"
               USER_SQL_COL_ASU " = (:_v14),"
               USER_SQL_COL_AST " = (:_v15),"
-              USER_SQL_COL_ATI " = (:_v16)"
+              USER_SQL_COL_ATI " = (:_v16),"
               USER_SQL_COL_ACO " = (:_v17)"
               " WHERE " SQL_COLID " = (:_v00)";
 

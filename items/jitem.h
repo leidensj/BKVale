@@ -16,7 +16,7 @@ public:
   static bool st_isValid(qlonglong id) { return id != INVALID_ID; }
   bool isValid() const { return st_isValid(m_id); }
   void clear() { m_id = INVALID_ID; }
-  void set(qlonglong id) { m_id = id > INVALID_ID ? id: INVALID_ID; }
+  void set(const qlonglong id) { m_id = id > INVALID_ID ? id: INVALID_ID; }
   QString str() const { return QString::number(m_id); }
   qlonglong get() const { return m_id; }
   QVariant getIdNull() const { return isValid() ? m_id : QVariant(QVariant::LongLong); }

@@ -22,6 +22,7 @@ void Coupon::clear(bool bClearId)
   m_percentage = 0;
   m_value = 0.0;
   m_store.clear();
+  m_elements.clear();
 }
 
 bool Coupon::operator != (const JItem& other) const
@@ -36,7 +37,8 @@ bool Coupon::operator != (const JItem& other) const
          m_dtExpiration != another.m_dtExpiration ||
          m_percentage != another.m_percentage ||
          m_value != another.m_value ||
-         m_store.m_id != another.m_store.m_id;
+         m_store.m_id != another.m_store.m_id ||
+         m_elements != another.m_elements;
 }
 
 bool Coupon::operator == (const JItem& other) const
@@ -92,10 +94,18 @@ bool Coupon::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v09", m_value);
   query.bindValue(":_v10", m_store.m_id.getIdNull());
 
-  bool bSuccess = query.exec();
-  if (bSuccess)
+  bool ok = query.exec();
+  if (ok)
+  {
     m_id.set(query.lastInsertId().toLongLong());
-  return bSuccess;
+    for (int i = 0; i != m_elements.size() && ok; ++i)
+    {
+      m_elements[i].m_ownerId = m_id;
+      ok = m_elements.at(i).SQL_insert_proc(query);
+    }
+  }
+
+  return ok;
 }
 
 bool Coupon::SQL_update_proc(QSqlQuery& query) const
@@ -123,7 +133,18 @@ bool Coupon::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v08", m_percentage);
   query.bindValue(":_v09", m_value);
   query.bindValue(":_v09", m_store.m_id.getIdNull());
-  return query.exec();
+
+  bool ok = query.exec();
+  if (ok)
+  {
+    ok = CouponElement::SQL_remove_by_owner_id_proc(query, m_id);
+    for (int i = 0; i != m_elements.size() && ok; ++i)
+    {
+      m_elements[i].m_ownerId = m_id;
+      ok = m_elements.at(i).SQL_insert_proc(query);
+    }
+  }
+  return ok;
 }
 
 bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
@@ -142,9 +163,9 @@ bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
                 " FROM " COUPON_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
-  bool bSuccess = query.exec();
+  bool ok = query.exec();
 
-  if (bSuccess)
+  if (ok)
   {
     if (query.next())
     {
@@ -162,14 +183,17 @@ bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
     else
     {
       error = "Coupom não encontrado.";
-      bSuccess = false;
+      ok = false;
     }
   }
 
-  if (bSuccess && m_store.m_id.isValid())
-    bSuccess = m_store.SQL_select_proc(query, error);
+  if (ok && m_store.m_id.isValid())
+    ok = m_store.SQL_select_proc(query, error);
 
-  return bSuccess;
+  if (ok)
+    ok = CouponElement::SQL_select_by_owner_id_proc(query, m_id, m_elements, error);
+
+  return ok;
 }
 
 bool Coupon::SQL_remove_proc(QSqlQuery& query) const
@@ -216,6 +240,13 @@ QString Coupon::strCoupon() const
       return Data::strPercentage(m_percentage);
     case Type::Value:
       return Data::strMoney(m_value);
+    case Type::Product:
+    {
+      QString str;
+      for (int i = 0; i != m_elements.size(); ++i)
+        str += m_elements.at(i).strAmmount() + m_elements.at(i).m_product.m_unity + " " + m_elements.at(i).m_product.m_name + "\n";
+      return str;
+    }
     default:
       return "";
   }

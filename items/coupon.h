@@ -6,6 +6,7 @@
 #include <QDate>
 #include "jitemsql.h"
 #include "store.h"
+#include "couponelement.h"
 
 struct Coupon : public JItemSQL
 {
@@ -44,6 +45,7 @@ struct Coupon : public JItemSQL
   int m_percentage;
   double m_value;
   Store m_store;
+  QVector<CouponElement> m_elements;
 };
 
 #endif // COUPON_H

@@ -61,20 +61,20 @@ void PaymentTable::addRow()
   setFocus();
 }
 
-void PaymentTable::getPaymentElements(QVector<PaymentElement>& v) const
+void PaymentTable::get(QVector<PaymentPart>& v) const
 {
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
     int row = verticalHeader()->logicalIndex(i);
-    PaymentElement o;
+    PaymentPart o;
     o.m_date = getItem(row, (int)Column::Date)->getValue().toDate();
     o.m_value = getItem(row, (int)Column::Value)->getValue().toDouble();
     v.push_back(o);
   }
 }
 
-void PaymentTable::setPaymentElements(const QVector<PaymentElement>& v)
+void PaymentTable::set(const QVector<PaymentPart>& v)
 {
   removeAllItems();
   for (int i = 0; i != v.size(); ++i)

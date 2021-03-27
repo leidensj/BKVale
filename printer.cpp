@@ -169,20 +169,21 @@ namespace
   void purchaseAppendBody(const Purchase& o, QString& text)
   {
     text += ESC_ALIGN_LEFT;
-    for (int i = 0; i != o.m_vElement.size(); ++i)
+    for (int i = 0; i != o.m_products.size(); ++i)
     {
-      QString item;
+      const auto _o = o.m_products.at(i);
+      QString str;
       {
-        QString itemPt1 = o.m_vElement.at(i).strAmmount();
-        itemPt1 += o.m_vElement.at(i).m_package.strUnity(o.m_vElement.at(i).m_product.m_unity);
-        itemPt1 += " x " + o.m_vElement.at(i).strPrice();
-        QString itemPt2 = o.m_vElement.at(i).strSubtotal();
+        QString itemPt1 = _o.strAmmount();
+        itemPt1 += _o.m_package.strUnity(_o.m_product.m_unity);
+        itemPt1 += " x " + _o.strPrice();
+        QString itemPt2 = _o.strSubtotal();
         const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
         for (int j = 0; j < n; ++j)
           itemPt1 += ".";
-        item = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
+        str = itemPt1 + ESC_STRESS_ON + itemPt2 + ESC_STRESS_OFF;
       }
-      text += o.m_vElement.at(i).m_product.m_name + ESC_LF + item + ESC_LF;
+      text += _o.m_product.m_name + ESC_LF + str + ESC_LF;
     }
   }
 }
@@ -584,6 +585,15 @@ bool Printer::print(const Coupon& o, QString& error)
                ESC_DOUBLE_FONT_ON +
                o.strCoupon() +
                ESC_DOUBLE_FONT_OFF
+               ESC_LF
+               ESC_VERT_TAB
+               ESC_ALIGN_LEFT;
+        break;
+      case Coupon::Type::Product:
+        str += ESC_ALIGN_CENTER
+               ESC_EXPAND_ON +
+               o.strCoupon() +
+               ESC_EXPAND_OFF
                ESC_LF
                ESC_VERT_TAB
                ESC_ALIGN_LEFT;

@@ -1,5 +1,5 @@
 #include "userview.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "items/login.h"
 #include "widgets/jlineedit.h"
 #include <QLabel>
@@ -51,8 +51,8 @@ UserView::UserView(QWidget* parent)
   for (int i = 0; i != (int)Functionality::Idx::_END; ++i)
   {
     QListWidgetItem* p = new QListWidgetItem;
-    p->setText(JItemEx::text((Functionality::Idx)i));
-    p->setIcon(QIcon(JItemEx::icon((Functionality::Idx)i)));
+    p->setText(JItemHelper::text((Functionality::Idx)i));
+    p->setIcon(QIcon(JItemHelper::icon((Functionality::Idx)i)));
     p->setFlags(p->flags() | Qt::ItemIsUserCheckable);
     p->setCheckState(Qt::Unchecked);
     m_list->addItem(p);

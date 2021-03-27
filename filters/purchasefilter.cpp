@@ -1,7 +1,7 @@
 #include "purchasefilter.h"
 #include "controls/databasepicker.h"
 #include "controls/databaseviewer.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "items/purchase.h"
 #include "widgets/jdateinterval.h"
 #include <QFormLayout>
@@ -40,9 +40,9 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
 
   QFormLayout* ltfr = new QFormLayout;
   ltfr->setContentsMargins(0, 0, 0, 0);
-  ltfr->addRow(JItemEx::text(SUPPLIER_SQL_TABLE_NAME) + ":", m_supplierPicker);
-  ltfr->addRow(JItemEx::text(PRODUCT_SQL_TABLE_NAME) + ":", m_productPicker);
-  ltfr->addRow(JItemEx::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
+  ltfr->addRow(JItemHelper::text(SUPPLIER_SQL_TABLE_NAME) + ":", m_supplierPicker);
+  ltfr->addRow(JItemHelper::text(PRODUCT_SQL_TABLE_NAME) + ":", m_productPicker);
+  ltfr->addRow(JItemHelper::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
   ltfr->addRow(tr("Pagamento:"), ltPayment);
 
   QVBoxLayout* ltv = new QVBoxLayout;

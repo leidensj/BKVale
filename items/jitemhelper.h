@@ -1,5 +1,5 @@
-#ifndef JItemEx_H
-#define JItemEx_H
+#ifndef JITEM_HELPER_H
+#define JITEM_HELPER_H
 
 #include "jitemsql.h"
 
@@ -7,7 +7,7 @@ class QObject;
 class JItemView;
 class QWidget;
 
-namespace JItemEx
+namespace JItemHelper
 {
 JItemSQL* create(const QString& tableName);
 JItemSQL* create(const QString& tableName, Id id);
@@ -24,4 +24,4 @@ void remove(const Ids& ids, const QString& tableName, QWidget* parent = nullptr)
 bool save(const JItemSQL& o, const QString& tableName, QWidget* parent = nullptr);
 bool print(const JItemSQL& o, QVariant* options = nullptr, QWidget* parent = nullptr);
 }
-#endif // JItemEx_H
+#endif // JITEM_HELPER_H

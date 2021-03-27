@@ -1,6 +1,6 @@
 #include "couponredeemer.h"
 #include "items/coupon.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "widgets/jlineedit.h"
 #include <QLayout>
 #include <QDialogButtonBox>
@@ -42,7 +42,7 @@ void CouponRedeemer::redeem()
     {
       m_edCode->setText(o.strCoupon());
       m_edCode->selectAll();
-      JItemEx::print(o, nullptr, this);
+      JItemHelper::print(o, nullptr, this);
     }
     else
     {

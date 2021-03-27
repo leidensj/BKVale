@@ -1,6 +1,6 @@
 #include "shopwidget.h"
 #include "controls/databaseviewer.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "widgets/jdatepicker.h"
 #include <QLayout>
 #include <QCheckBox>
@@ -60,7 +60,7 @@ void ShopWidget::updateControls()
 ShoppingList ShopWidget::getShoppingList()
 {
   ShoppingList o(m_viewer->getFirstSelectedId());
-  JItemEx::select(o, this);
+  JItemHelper::select(o, this);
   return o;
 }
 
@@ -73,7 +73,7 @@ void ShopWidget::print()
     case QMessageBox::No:
     {
       QVariant var(ret == QMessageBox::Yes);
-      JItemEx::print(getShoppingList(), &var, this);
+      JItemHelper::print(getShoppingList(), &var, this);
     } break;
     case QMessageBox::Cancel:
     default:

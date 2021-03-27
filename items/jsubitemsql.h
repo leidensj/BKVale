@@ -1,5 +1,5 @@
-#ifndef JITEMELEMENTSQL_H
-#define JITEMELEMENTSQL_H
+#ifndef JSUBITEMSQL_H
+#define JSUBITEMSQL_H
 
 #include "jitem.h"
 #include <QVector>
@@ -7,7 +7,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 
-struct JItemElementSQL : public JItem
+struct JSubItemSQL : public JItem
 {
   mutable Id m_ownerId;
 
@@ -15,4 +15,4 @@ struct JItemElementSQL : public JItem
   virtual bool SQL_select_proc(QSqlQuery& query, QString& error) = 0;
 };
 
-#endif // JITEMELEMENTSQL_H
+#endif

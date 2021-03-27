@@ -14,7 +14,7 @@ class QLineEdit;
 class QSpinBox;
 class QPushButton;
 class QCheckBox;
-class PurchaseTable;
+class PurchaseProductTable;
 class DatabasePicker;
 class QDockWidget;
 class JDatabase;
@@ -48,9 +48,9 @@ class PaymentWidget : public QWidget
 public:
   explicit PaymentWidget(QWidget* parent = nullptr);
   Purchase::PaymentMethod getPaymentMethod() const;
-  QVector<PaymentElement> getPayments() const;
+  QVector<PaymentPart> getPayments() const;
   void setPaymentMethod(Purchase::PaymentMethod o);
-  void setPayments(const QVector<PaymentElement>& v);
+  void setPayments(const QVector<PaymentPart>& v);
   QIcon getIcon() const;
   QString getText() const;
 
@@ -93,7 +93,7 @@ private:
   JExpLineEdit* m_edTotal;
   DatabasePicker* m_supplierPicker;
   DatabasePicker* m_storePicker;
-  PurchaseTable* m_table;
+  PurchaseProductTable* m_table;
   JExpLineEdit* m_edDisccount;
   PaymentWidget* m_wPayment;
   QPlainTextEdit* m_teObservation;

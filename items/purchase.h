@@ -11,8 +11,8 @@
 #include "defines.h"
 #include "jitemsql.h"
 #include "employee.h"
-#include "purchaseelement.h"
-#include "paymentelement.h"
+#include "purchaseproduct.h"
+#include "paymentpart.h"
 #include "store.h"
 
 struct Purchase : public JItemSQL
@@ -59,9 +59,9 @@ struct Purchase : public JItemSQL
   QDate m_date;
   Supplier m_supplier;
   PaymentMethod m_paymentMethod;
-  QVector<PaymentElement> m_vPayment;
+  QVector<PaymentPart> m_payments;
   QString m_observation;
-  QVector<PurchaseElement> m_vElement;
+  QVector<PurchaseProduct> m_products;
   double m_disccount;
   Store m_store;
   mutable Employee m_employee;

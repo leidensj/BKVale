@@ -4,7 +4,7 @@
 #include "widgets/jspinbox.h"
 #include "widgets/jdatepicker.h"
 #include "widgets/jtimeedit.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QLayout>
@@ -257,5 +257,5 @@ void ReminderView::print()
   int n = QInputDialog::getInt(this, tr("Imprimir Lembrete"), tr("Número de cópias"), 1, 1, 999, 1, &ok);
   if (ok)
     for (int i = 0; i != n; ++i)
-      JItemEx::print(o, nullptr, this);
+      JItemHelper::print(o, nullptr, this);
 }

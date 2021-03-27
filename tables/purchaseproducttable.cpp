@@ -1,4 +1,4 @@
-#include "purchasetable.h"
+#include "purchaseproducttable.h"
 #include "databaseutils.h"
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -7,7 +7,7 @@
 #include "tableitems/packageitem.h"
 #include "tableitems/sqlitem.h"
 
-PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
+PurchaseProductTable::PurchaseProductTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)
 {
   setColumnCount(5);
@@ -26,7 +26,7 @@ PurchaseTable::PurchaseTable(JAddRemoveButtons* btns, QWidget* parent)
   connect(this, SIGNAL(changedSignal(int,int)), this, SLOT(update(int,int)));
 }
 
-double PurchaseTable::computePrice(int row) const
+double PurchaseProductTable::computePrice(int row) const
 {
   const double ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
   const double subTotal = getItem(row, (int)Column::SubTotal)->getValue().toDouble();
@@ -34,7 +34,7 @@ double PurchaseTable::computePrice(int row) const
   return price;
 }
 
-double PurchaseTable::computeSubTotal(int row) const
+double PurchaseProductTable::computeSubTotal(int row) const
 {
   const double ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
   const double price = getItem(row, (int)Column::Price)->getValue().toDouble();
@@ -42,7 +42,7 @@ double PurchaseTable::computeSubTotal(int row) const
   return subTotal;
 }
 
-void PurchaseTable::addRow()
+void PurchaseProductTable::addRow()
 {
   insertRow(rowCount());
   int row = rowCount() - 1;
@@ -65,7 +65,7 @@ void PurchaseTable::addRow()
   setFocus();
 }
 
-void PurchaseTable::addRowAndActivate()
+void PurchaseProductTable::addRowAndActivate()
 {
   addRow();
   getItem(rowCount() - 1, (int)Column::Product)->activate();
@@ -75,7 +75,7 @@ void PurchaseTable::addRowAndActivate()
     removeItem();
 }
 
-void PurchaseTable::addRowByCode()
+void PurchaseProductTable::addRowByCode()
 {
   DatabaseSelector dlg(PRODUCT_CODE_ITEMS_SQL_TABLE_NAME, false, this);
   dlg.getViewer()->setFixedFilter(PRODUCT_FILTER_BUY);
@@ -96,13 +96,13 @@ void PurchaseTable::addRowByCode()
   }
 }
 
-void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
+void PurchaseProductTable::get(QVector<PurchaseProduct>& v) const
 {
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
     int row = verticalHeader()->logicalIndex(i);
-    PurchaseElement o;
+    PurchaseProduct o;
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
     o.m_package = PackageItem::st_fromVariant(getItem(row, (int)Column::Package)->getValue());
@@ -112,7 +112,7 @@ void PurchaseTable::getPurchaseElements(QVector<PurchaseElement>& v) const
   }
 }
 
-void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool bClear)
+void PurchaseProductTable::set(const QVector<PurchaseProduct>& v, bool bClear)
 {
   if (bClear)
     removeAllItems();
@@ -127,7 +127,7 @@ void PurchaseTable::setPurchaseElements(const QVector<PurchaseElement>& v, bool 
   }
 }
 
-void PurchaseTable::loadProductInfo(int row)
+void PurchaseProductTable::loadProductInfo(int row)
 {
   Product o;
   o.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
@@ -135,7 +135,7 @@ void PurchaseTable::loadProductInfo(int row)
   {
     QString error;
     o.SQL_select(error);
-    PurchaseElement e;
+    PurchaseProduct e;
     e.SQL_select_last(m_supplierId, o.m_id);
     getItem(row, (int)Column::Price)->setValue(e.m_price);
     dynamic_cast<PackageItem*>(getItem(row, (int)Column::Package))->setProductUnity(o.m_unity);
@@ -143,12 +143,12 @@ void PurchaseTable::loadProductInfo(int row)
   }
 }
 
-void PurchaseTable::setSupplierId(Id id)
+void PurchaseProductTable::setSupplierId(Id id)
 {
   m_supplierId = id;
 }
 
-void PurchaseTable::update(int row, int column)
+void PurchaseProductTable::update(int row, int column)
 {
   blockSignals(true);
   switch ((Column)column)

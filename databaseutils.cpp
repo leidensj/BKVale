@@ -387,8 +387,7 @@ bool BaitaSQL::createTables(QString& error)
                           "FOREIGN KEY(" COUPON_ELEMENTS_SQL_COL_CID ") REFERENCES "
                           COUPON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" COUPON_ELEMENTS_SQL_COL_PID ") REFERENCES "
-                          COUPON_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
   {

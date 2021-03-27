@@ -1,6 +1,6 @@
 #include "jitemview.h"
 #include "controls/databaseviewer.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include <QPushButton>
 #include <QLayout>
 #include <QFormLayout>
@@ -96,8 +96,8 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   ltDlg->addWidget(m_tabDb);
   m_dlgDb->setLayout(ltDlg);
   m_dlgDb->setWindowFlags(Qt::Window);
-  m_dlgDb->setWindowTitle(JItemEx::text(tableName));
-  m_dlgDb->setWindowIcon(QIcon(JItemEx::icon(tableName)));
+  m_dlgDb->setWindowTitle(JItemHelper::text(tableName));
+  m_dlgDb->setWindowIcon(QIcon(JItemHelper::icon(tableName)));
   m_dlgDb->setModal(true);
   QRect rect = QApplication::desktop()->availableGeometry(this);
   m_dlgDb->resize(rect.width() * 0.7, rect.height() * 0.7);
@@ -119,13 +119,13 @@ JItemView::~JItemView()
 
 void JItemView::setItem()
 {
-  auto p = JItemEx::create(m_viewer->getTableName());
+  auto p = JItemHelper::create(m_viewer->getTableName());
   if (p != nullptr)
   {
     clear();
     p->m_id = m_viewer->getFirstSelectedId();
     if (p->m_id.isValid())
-      JItemEx::select(*p, this);
+      JItemHelper::select(*p, this);
     m_id = p->m_id;
     setItem(*p);
     QString strIcon = p->m_id.isValid()
@@ -145,12 +145,12 @@ void JItemView::itemsRemoved(const Ids& ids)
 bool JItemView::save(Id& id)
 {
   id.clear();
-  JItemSQL* p = JItemEx::create(m_viewer->getTableName());
+  JItemSQL* p = JItemHelper::create(m_viewer->getTableName());
   bool bSuccess = false;
   if (p != nullptr)
   {
     getItem(*p);
-    bSuccess = JItemEx::save(*p, m_viewer->getTableName(), this);
+    bSuccess = JItemHelper::save(*p, m_viewer->getTableName(), this);
     if (bSuccess)
     {
       clear();
@@ -179,7 +179,7 @@ void JItemView::setFocusWidgetOnClear(QWidget* w)
 
 void JItemView::clear()
 {
-  JItemSQL* p = JItemEx::create(m_viewer->getTableName());
+  JItemSQL* p = JItemHelper::create(m_viewer->getTableName());
   if (p != nullptr)
   {
     m_id = p->m_id;
@@ -212,8 +212,8 @@ void JItemView::addViewButton(const QString& tableName)
       m_ltButton->addWidget(m_btnMore);
     }
 
-    QAction* act = new QAction(QIcon(JItemEx::icon(tableName)), JItemEx::text(tableName), m_btnMore);
-    act->setToolTip(tr("Gerenciar ") + JItemEx::text(tableName));
+    QAction* act = new QAction(QIcon(JItemHelper::icon(tableName)), JItemHelper::text(tableName), m_btnMore);
+    act->setToolTip(tr("Gerenciar ") + JItemHelper::text(tableName));
     act->setProperty(VIEW_BUTTON, tableName);
     connect(act, SIGNAL(triggered(bool)), this, SLOT(viewButtonClicked()));
     m_btnMore->addAction(act);
@@ -226,15 +226,15 @@ void JItemView::viewButtonClicked()
 {
   QString tableName = sender()->property(VIEW_BUTTON).toString();
   QDialog dlg(this);
-  JItemView* view = JItemEx::view(tableName);
+  JItemView* view = JItemHelper::view(tableName);
   if (view != nullptr)
   {
     QHBoxLayout *lt = new QHBoxLayout;
     dlg.setLayout(lt);
     lt->addWidget(view);
     dlg.setWindowFlags(Qt::Window);
-    dlg.setWindowTitle(tr("Gerenciar ") + JItemEx::text(tableName));
-    dlg.setWindowIcon(QIcon(JItemEx::icon(tableName)));
+    dlg.setWindowTitle(tr("Gerenciar ") + JItemHelper::text(tableName));
+    dlg.setWindowIcon(QIcon(JItemHelper::icon(tableName)));
     dlg.setModal(true);
     dlg.exec();
   }

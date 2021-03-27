@@ -2,7 +2,7 @@
 #include "widgets/jlineedit.h"
 #include "defines.h"
 #include "pincodedialog.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "models/jmodel.h"
 #include <QDate>
 #include <QLayout>
@@ -109,7 +109,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   vlayout1->addWidget(m_table);
   setLayout(vlayout1);
 
-  JModel* model = JItemEx::model(tableName, this);
+  JModel* model = JItemHelper::model(tableName, this);
   if (model == nullptr)
   {
     QMessageBox::critical(this, tr("Erro"), tr("Modelo não implementado"), QMessageBox::Ok);
@@ -249,7 +249,7 @@ void DatabaseViewer::enableControls()
 void DatabaseViewer::removeItems()
 {
   Ids ids = getSelectedIds();
-  JItemEx::remove(ids, m_tableName, this);
+  JItemHelper::remove(ids, m_tableName, this);
   emit itemsRemovedSignal(ids);
   refresh();
 }

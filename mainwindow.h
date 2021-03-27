@@ -85,13 +85,13 @@ private slots:
   void updateControls();
   void updateStatusBar();
   void updateTime();
-  void showInfo();
   void openJItemSQLDialog();
   void openSettingsDialog();
   void openLoginDialog();
   void openLoggedDialog();
   void activateWindow();
   void testTimeAccess();
+  void about();
 };
 
 #endif // MAINWINDOW_H

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "aboutdialog.h"
 
 #include "views/productview.h"
 #include "views/categoryview.h"
@@ -25,7 +26,7 @@
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
 
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 
 #include <QMessageBox>
 #include <QInputDialog>
@@ -151,7 +152,6 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::RedeemCoupon] = ui->actionRedeem;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
-  connect(ui->actionInfo, SIGNAL(triggered(bool)), this, SLOT(showInfo()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(ui->actionLogin, SIGNAL(triggered(bool)), this, SLOT(openLoginDialog()));
   connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(close()));
@@ -174,6 +174,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCoupons, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
+  connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));
 
   activateWindow();
   m_settings.load();
@@ -245,11 +246,6 @@ void Baita::updateControls()
   }
 }
 
-void Baita::showInfo()
-{
-
-}
-
 void Baita::openJItemSQLDialog()
 {
   JItemView* view = nullptr;
@@ -259,7 +255,7 @@ void Baita::openJItemSQLDialog()
     i.next();
     if (sender() == i.value())
     {
-      view = JItemEx::view(Functionality::idxToTableName(i.key()));
+      view = JItemHelper::view(Functionality::idxToTableName(i.key()));
       break;
     }
   }
@@ -367,5 +363,11 @@ void Baita::activateWindow()
 void Baita::testTimeAccess()
 {
   TimeCardDialog dlg(this);
+  dlg.exec();
+}
+
+void Baita::about()
+{
+  AboutDialog dlg;
   dlg.exec();
 }

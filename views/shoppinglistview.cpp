@@ -6,7 +6,7 @@
 #include "widgets/jspinbox.h"
 #include "widgets/jaddremovebuttons.h"
 #include "tables/shoppinglisttable.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "editors/packageeditor.h"
 #include <QSplitter>
 #include <QPlainTextEdit>

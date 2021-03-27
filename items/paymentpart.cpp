@@ -1,11 +1,11 @@
-#include "paymentelement.h"
+#include "paymentpart.h"
 
-PaymentElement::PaymentElement()
+PaymentPart::PaymentPart()
 {
   clear();
 }
 
-void PaymentElement::clear(bool bClearId)
+void PaymentPart::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
@@ -14,24 +14,24 @@ void PaymentElement::clear(bool bClearId)
   m_ownerId.clear();
 }
 
-bool PaymentElement::operator != (const JItem& other) const
+bool PaymentPart::operator != (const JItem& other) const
 {
-  const PaymentElement& another = dynamic_cast<const PaymentElement&>(other);
+  const PaymentPart& another = dynamic_cast<const PaymentPart&>(other);
   return m_value != another.m_value ||
          m_date != another.m_date;
 }
 
-bool PaymentElement::operator == (const JItem& other) const
+bool PaymentPart::operator == (const JItem& other) const
 {
   return !(*this != other);
 }
 
-bool PaymentElement::isValid() const
+bool PaymentPart::isValid() const
 {
   return true;
 }
 
-bool PaymentElement::SQL_insert_proc(QSqlQuery& query) const
+bool PaymentPart::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " PAYMENT_ELEMENTS_SQL_TABLE_NAME " ("
                 PAYMENT_ELEMENTS_SQL_COL_NID ","
@@ -50,7 +50,7 @@ bool PaymentElement::SQL_insert_proc(QSqlQuery& query) const
   return bSuccess;
 }
 
-bool PaymentElement::SQL_select_proc(QSqlQuery& query, QString& error)
+bool PaymentPart::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
@@ -78,9 +78,9 @@ bool PaymentElement::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool PaymentElement::SQL_select_by_owner_id_proc(QSqlQuery& query,
+bool PaymentPart::SQL_select_by_owner_id_proc(QSqlQuery& query,
                                                  Id ownerId,
-                                                 QVector<PaymentElement>& v,
+                                                 QVector<PaymentPart>& v,
                                                  QString& error)
 {
   error.clear();
@@ -97,7 +97,7 @@ bool PaymentElement::SQL_select_by_owner_id_proc(QSqlQuery& query,
   {
     while (query.next())
     {
-      PaymentElement o;
+      PaymentPart o;
       o.m_id.set(query.value(0).toLongLong());
       o.m_date = query.value(1).toDate();
       o.m_value = query.value(2).toDouble();
@@ -108,7 +108,7 @@ bool PaymentElement::SQL_select_by_owner_id_proc(QSqlQuery& query,
   return bSuccess;
 }
 
-bool PaymentElement::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
+bool PaymentPart::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
 {
   query.prepare("DELETE FROM " PAYMENT_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " PAYMENT_ELEMENTS_SQL_COL_NID " = (:_v01)");

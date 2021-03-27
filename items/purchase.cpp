@@ -41,11 +41,11 @@ void Purchase::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_paymentMethod = PaymentMethod::Credit;
-  m_vPayment.clear();
+  m_payments.clear();
   m_number = 0;
   m_supplier.clear();
   m_date = QDate::currentDate();
-  m_vElement.clear();
+  m_products.clear();
   m_observation.clear();
   m_disccount = 0.0;
   m_employee.clear();
@@ -65,8 +65,8 @@ bool Purchase::operator !=(const JItem& other) const
       m_date != another.m_date ||
       m_supplier.m_id != another.m_supplier.m_id ||
       m_paymentMethod != another.m_paymentMethod ||
-      m_vPayment != another.m_vPayment ||
-      m_vElement != another.m_vElement ||
+      m_payments != another.m_payments ||
+      m_products != another.m_products ||
       m_disccount != another.m_disccount ||
       m_store != another.m_store;
 }
@@ -99,16 +99,16 @@ QString Purchase::strDisccount() const
 double Purchase::total() const
 {
   double total = 0.0;
-  for (int i = 0; i != m_vElement.size(); ++i)
-    total += m_vElement.at(i).subtotal();
+  for (int i = 0; i != m_products.size(); ++i)
+    total += m_products.at(i).subtotal();
   return total + m_disccount;
 }
 
 double Purchase::subTotal() const
 {
   double subTotal = 0.0;
-  for (int i = 0; i != m_vElement.size(); ++i)
-    subTotal += m_vElement.at(i).subtotal();
+  for (int i = 0; i != m_products.size(); ++i)
+    subTotal += m_products.at(i).subtotal();
   return subTotal;
 }
 
@@ -127,8 +127,8 @@ bool Purchase::isPaymentValid() const
   if (m_paymentMethod == PaymentMethod::Credit)
   {
     bool bValid = true;
-    for (int i = 0; i != m_vPayment.size() && bValid; ++i)
-      bValid = m_vPayment.at(i).m_date >= m_date;
+    for (int i = 0; i != m_payments.size() && bValid; ++i)
+      bValid = m_payments.at(i).m_date >= m_date;
     return bValid && Data::areEqual(total(), paymentTotal(), Data::Type::Money);
   }
   return true;
@@ -139,8 +139,8 @@ double Purchase::paymentTotal() const
   if (m_paymentMethod == PaymentMethod::Credit)
   {
     double t = 0.0;
-    for (int i = 0; i != m_vPayment.size(); ++i)
-      t += m_vPayment.at(i).m_value;
+    for (int i = 0; i != m_payments.size(); ++i)
+      t += m_payments.at(i).m_value;
     return t;
   }
   return total();
@@ -150,12 +150,12 @@ void Purchase::adjustPayment()
 {
   if (!isPaymentValid())
   {
-    m_vPayment.clear();
+    m_payments.clear();
     m_paymentMethod = PaymentMethod::Credit;
-    PaymentElement o;
+    PaymentPart o;
     o.m_value = total();
     o.m_date = m_date.addMonths(1);
-    m_vPayment.push_back(o);
+    m_payments.push_back(o);
   }
 }
 
@@ -206,15 +206,15 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
   if (bSuccess)
   {
     m_id.set(query.lastInsertId().toLongLong());
-    for (int i = 0; i != m_vElement.size() && bSuccess; ++i)
+    for (int i = 0; i != m_products.size() && bSuccess; ++i)
     {
-      m_vElement[i].m_ownerId = m_id;
-      bSuccess = m_vElement.at(i).SQL_insert_proc(query);
+      m_products[i].m_ownerId = m_id;
+      bSuccess = m_products.at(i).SQL_insert_proc(query);
     }
-    for (int i = 0; i != m_vPayment.size() && bSuccess; ++i)
+    for (int i = 0; i != m_payments.size() && bSuccess; ++i)
     {
-      m_vPayment[i].m_ownerId = m_id;
-      bSuccess = m_vPayment.at(i).SQL_insert_proc(query);
+      m_payments[i].m_ownerId = m_id;
+      bSuccess = m_payments.at(i).SQL_insert_proc(query);
     }
   }
 
@@ -244,21 +244,21 @@ bool Purchase::SQL_update_proc(QSqlQuery& query) const
 
   if (bSuccess)
   {
-    bSuccess = PurchaseElement::SQL_remove_by_owner_id_proc(query, m_id);
-    for (int i = 0; i != m_vElement.size() && bSuccess; ++i)
+    bSuccess = PurchaseProduct::SQL_remove_by_owner_id_proc(query, m_id);
+    for (int i = 0; i != m_products.size() && bSuccess; ++i)
     {
-      m_vElement[i].m_ownerId = m_id;
-      bSuccess = m_vElement.at(i).SQL_insert_proc(query);
+      m_products[i].m_ownerId = m_id;
+      bSuccess = m_products.at(i).SQL_insert_proc(query);
     }
   }
 
   if (bSuccess)
   {
-    bSuccess = PaymentElement::SQL_remove_by_owner_id_proc(query, m_id);
-    for (int i = 0; i != m_vPayment.size(); ++i)
+    bSuccess = PaymentPart::SQL_remove_by_owner_id_proc(query, m_id);
+    for (int i = 0; i != m_payments.size(); ++i)
     {
-      m_vPayment[i].m_ownerId = m_id;
-      bSuccess = m_vPayment.at(i).SQL_insert_proc(query);
+      m_payments[i].m_ownerId = m_id;
+      bSuccess = m_payments.at(i).SQL_insert_proc(query);
     }
   }
 
@@ -304,10 +304,10 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
   }
 
   if (bSuccess)
-    bSuccess = PurchaseElement::SQL_select_by_owner_id_proc(query, m_id, m_vElement, error);
+    bSuccess = PurchaseProduct::SQL_select_by_owner_id_proc(query, m_id, m_products, error);
 
   if (bSuccess)
-    bSuccess = PaymentElement::SQL_select_by_owner_id_proc(query, m_id, m_vPayment, error);
+    bSuccess = PaymentPart::SQL_select_by_owner_id_proc(query, m_id, m_payments, error);
 
   if (bSuccess && m_supplier.m_id.isValid())
     bSuccess = m_supplier.SQL_select_proc(query, error);
@@ -357,12 +357,12 @@ bool Purchase::SQL_select_all_supplier_id_items()
 
   if (bSuccess)
   {
-    m_vElement.clear();
+    m_products.clear();
     while (query.next())
     {
-      PurchaseElement e;
-      e.SQL_select_last(m_supplier.m_id, Id(query.value(0).toLongLong()));
-      m_vElement.push_back(e);
+      PurchaseProduct o;
+      o.SQL_select_last(m_supplier.m_id, Id(query.value(0).toLongLong()));
+      m_products.push_back(o);
     }
   }
 

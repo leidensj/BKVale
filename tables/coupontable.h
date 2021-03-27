@@ -2,7 +2,7 @@
 #define COUPONTABLE_H
 
 #include "jtable.h"
-#include "items/couponelement.h"
+#include "items/couponproduct.h"
 
 class CouponTable : public JTable
 {
@@ -17,8 +17,8 @@ public:
   };
 
   explicit CouponTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
-  void getElements(QVector<CouponElement>& v) const;
-  void setElements(const QVector<CouponElement>& v, bool bClear = true);
+  void get(QVector<CouponProduct>& v) const;
+  void set(const QVector<CouponProduct>& v, bool bClear = true);
 
 public slots:
   void addRow();

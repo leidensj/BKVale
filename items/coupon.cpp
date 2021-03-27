@@ -22,7 +22,7 @@ void Coupon::clear(bool bClearId)
   m_percentage = 0;
   m_value = 0.0;
   m_store.clear();
-  m_elements.clear();
+  m_products.clear();
 }
 
 bool Coupon::operator != (const JItem& other) const
@@ -38,7 +38,7 @@ bool Coupon::operator != (const JItem& other) const
          m_percentage != another.m_percentage ||
          m_value != another.m_value ||
          m_store.m_id != another.m_store.m_id ||
-         m_elements != another.m_elements;
+         m_products != another.m_products;
 }
 
 bool Coupon::operator == (const JItem& other) const
@@ -98,10 +98,10 @@ bool Coupon::SQL_insert_proc(QSqlQuery& query) const
   if (ok)
   {
     m_id.set(query.lastInsertId().toLongLong());
-    for (int i = 0; i != m_elements.size() && ok; ++i)
+    for (int i = 0; i != m_products.size() && ok; ++i)
     {
-      m_elements[i].m_ownerId = m_id;
-      ok = m_elements.at(i).SQL_insert_proc(query);
+      m_products[i].m_ownerId = m_id;
+      ok = m_products.at(i).SQL_insert_proc(query);
     }
   }
 
@@ -137,11 +137,11 @@ bool Coupon::SQL_update_proc(QSqlQuery& query) const
   bool ok = query.exec();
   if (ok)
   {
-    ok = CouponElement::SQL_remove_by_owner_id_proc(query, m_id);
-    for (int i = 0; i != m_elements.size() && ok; ++i)
+    ok = CouponProduct::SQL_remove_by_owner_id_proc(query, m_id);
+    for (int i = 0; i != m_products.size() && ok; ++i)
     {
-      m_elements[i].m_ownerId = m_id;
-      ok = m_elements.at(i).SQL_insert_proc(query);
+      m_products[i].m_ownerId = m_id;
+      ok = m_products.at(i).SQL_insert_proc(query);
     }
   }
   return ok;
@@ -191,7 +191,7 @@ bool Coupon::SQL_select_proc(QSqlQuery& query, QString& error)
     ok = m_store.SQL_select_proc(query, error);
 
   if (ok)
-    ok = CouponElement::SQL_select_by_owner_id_proc(query, m_id, m_elements, error);
+    ok = CouponProduct::SQL_select_by_owner_id_proc(query, m_id, m_products, error);
 
   return ok;
 }
@@ -243,8 +243,8 @@ QString Coupon::strCoupon() const
     case Type::Product:
     {
       QString str;
-      for (int i = 0; i != m_elements.size(); ++i)
-        str += m_elements.at(i).strFmt() + m_elements.at(i).m_product.m_unity + " " + m_elements.at(i).m_product.m_name + "\n";
+      for (int i = 0; i != m_products.size(); ++i)
+        str += m_products.at(i).strFmt() + m_products.at(i).m_product.m_unity + " " + m_products.at(i).m_product.m_name + "\n";
       if (!str.isEmpty())
         str.chop(1);
       return str;

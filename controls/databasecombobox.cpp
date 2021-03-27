@@ -1,5 +1,5 @@
 #include "databasecombobox.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "models/jmodel.h"
 #include <QMessageBox>
 
@@ -8,7 +8,7 @@ DatabaseComboBox::DatabaseComboBox(const QString& tableName,
                                    QWidget* parent)
   : QComboBox(parent)
 {
-  JModel* pModel = JItemEx::model(tableName, this);
+  JModel* pModel = JItemHelper::model(tableName, this);
   if (pModel == nullptr)
   {
     QMessageBox::critical(this, tr("Erro"), tr("Modelo não implementado"), QMessageBox::Ok);

@@ -1,4 +1,4 @@
-#include "jitemex.h"
+#include "jtemhelper.h"
 #include "user.h"
 #include "purchase.h"
 #include "product.h"
@@ -47,7 +47,7 @@
 #include "views/userview.h"
 #include "views/couponview.h"
 
-JItemSQL* JItemEx::create(const QString& tableName)
+JItemSQL* JItemHelper::create(const QString& tableName)
 {
   if (tableName == IMAGE_SQL_TABLE_NAME)
     return new Image;
@@ -84,7 +84,7 @@ JItemSQL* JItemEx::create(const QString& tableName)
   return nullptr;
 }
 
-JItemSQL* JItemEx::create(const QString& tableName, Id id)
+JItemSQL* JItemHelper::create(const QString& tableName, Id id)
 {
   auto pt = create(tableName);
   if (pt != nullptr)
@@ -92,21 +92,21 @@ JItemSQL* JItemEx::create(const QString& tableName, Id id)
   return pt;
 }
 
-bool JItemEx::authenticationToInsertUpdate(const QString& tableName)
+bool JItemHelper::authenticationToInsertUpdate(const QString& tableName)
 {
   if (tableName == PURCHASE_SQL_TABLE_NAME)
     return true;
   return false;
 }
 
-bool JItemEx::authenticationToRemove(const QString& tableName)
+bool JItemHelper::authenticationToRemove(const QString& tableName)
 {
   if (tableName == PURCHASE_SQL_TABLE_NAME)
     return true;
   return false;
 }
 
-QString JItemEx::text(Functionality::Idx idx)
+QString JItemHelper::text(Functionality::Idx idx)
 {
   switch (idx)
   {
@@ -158,12 +158,12 @@ QString JItemEx::text(Functionality::Idx idx)
   }
 }
 
-QString JItemEx::text(const QString& tableName)
+QString JItemHelper::text(const QString& tableName)
 {
   return text(Functionality::tableNameToIdx(tableName));
 }
 
-QString JItemEx::icon(Functionality::Idx idx)
+QString JItemHelper::icon(Functionality::Idx idx)
 {
   switch (idx)
   {
@@ -215,12 +215,12 @@ QString JItemEx::icon(Functionality::Idx idx)
   }
 }
 
-QString JItemEx::icon(const QString& tableName)
+QString JItemHelper::icon(const QString& tableName)
 {
   return icon(Functionality::tableNameToIdx(tableName));
 }
 
-JModel* JItemEx::model(const QString& tableName, QObject* parent)
+JModel* JItemHelper::model(const QString& tableName, QObject* parent)
 {
   if (tableName == IMAGE_SQL_TABLE_NAME)
     return new ImageModel(parent);
@@ -255,7 +255,7 @@ JModel* JItemEx::model(const QString& tableName, QObject* parent)
   return nullptr;
 }
 
-JItemView* JItemEx::view(const QString& tableName)
+JItemView* JItemHelper::view(const QString& tableName)
 {
   if (tableName == CATEGORY_SQL_TABLE_NAME)
     return new CategoryView;
@@ -282,7 +282,7 @@ JItemView* JItemEx::view(const QString& tableName)
   return nullptr;
 }
 
-bool JItemEx::select(JItemSQL& o, QWidget* parent)
+bool JItemHelper::select(JItemSQL& o, QWidget* parent)
 {
   if (!o.m_id.isValid())
     return false;
@@ -299,7 +299,7 @@ bool JItemEx::select(JItemSQL& o, QWidget* parent)
   return bSuccess;
 }
 
-void JItemEx::remove(const Ids& ids, const QString& tableName, QWidget* parent)
+void JItemHelper::remove(const Ids& ids, const QString& tableName, QWidget* parent)
 {
   if (ids.size() == 0)
     return;
@@ -310,7 +310,7 @@ void JItemEx::remove(const Ids& ids, const QString& tableName, QWidget* parent)
                             QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
     return;
 
-  if (JItemEx::authenticationToRemove(tableName))
+  if (JItemHelper::authenticationToRemove(tableName))
   {
     PinCodeDialog w(parent);
     if (!w.exec())
@@ -331,7 +331,7 @@ void JItemEx::remove(const Ids& ids, const QString& tableName, QWidget* parent)
 
   for (auto id : ids)
   {
-    auto p = JItemEx::create(tableName, id);
+    auto p = JItemHelper::create(tableName, id);
     if (p != nullptr)
     {
       QString error;
@@ -344,10 +344,10 @@ void JItemEx::remove(const Ids& ids, const QString& tableName, QWidget* parent)
   }
 }
 
-bool JItemEx::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
+bool JItemHelper::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
 {
   QString error;
-  if (JItemEx::authenticationToInsertUpdate(tableName))
+  if (JItemHelper::authenticationToInsertUpdate(tableName))
   {
     PinCodeDialog w(parent);
     if (!w.exec())
@@ -373,7 +373,7 @@ bool JItemEx::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
   return bSuccess;
 }
 
-bool JItemEx::print(const JItemSQL& o, QVariant* options, QWidget* parent)
+bool JItemHelper::print(const JItemSQL& o, QVariant* options, QWidget* parent)
 {
   QString error;
   bool ok = true;

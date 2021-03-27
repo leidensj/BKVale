@@ -3,7 +3,7 @@
 #include "widgets/jclicklabel.h"
 #include "defines.h"
 #include "databaseviewer.h"
-#include "items/jitemex.h"
+#include "items/Jitemhelper.h"
 #include "imageviewer.h"
 #include "databaseselector.h"
 #include <QDialog>
@@ -25,11 +25,11 @@ DatabasePicker::DatabasePicker(const QString& tableName,
 {
   m_edText = new JLineEdit(Text::Input::All, true);
   m_edText->setReadOnly(true);
-  QIcon searchIcon = QIcon(JItemEx::icon(tableName));
+  QIcon searchIcon = QIcon(JItemHelper::icon(tableName));
   QAction* action = m_edText->addAction(searchIcon.isNull() ? QIcon(":/icons/res/binoculars.png") : searchIcon, QLineEdit::LeadingPosition);
   QAction* action2 = m_edText->addAction(QIcon(":/icons/res/remove.png"), QLineEdit::TrailingPosition);
-  action->setToolTip(tr("Selecionar ") + JItemEx::text(tableName));
-  action2->setToolTip(tr("Remover ") + JItemEx::text(tableName));
+  action->setToolTip(tr("Selecionar ") + JItemHelper::text(tableName));
+  action2->setToolTip(tr("Remover ") + JItemHelper::text(tableName));
 
   m_selector = new DatabaseSelector(tableName, bMultiPicker, this);
 
@@ -69,10 +69,10 @@ void DatabasePicker::setSelectorItems()
   Ids ids(m_selector->getViewer()->getSelectedIds());
   for (auto id : ids)
   {
-    auto p = JItemEx::create(m_selector->getViewer()->getTableName(), id);
+    auto p = JItemHelper::create(m_selector->getViewer()->getTableName(), id);
     if (p != nullptr && p->m_id.isValid())
     {
-      if (JItemEx::select(*p))
+      if (JItemHelper::select(*p))
       {
         addItem(*p);
         bChanged = true;
@@ -179,7 +179,7 @@ const Names& DatabasePicker::getNames() const
 
 QString DatabasePicker::getTableText() const
 {
-  return JItemEx::text(m_selector->getViewer()->getTableName());
+  return JItemHelper::text(m_selector->getViewer()->getTableName());
 }
 
 void DatabasePicker::setPlaceholderText(bool bSet)

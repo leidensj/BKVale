@@ -1,11 +1,11 @@
-#include "couponelement.h"
+#include "couponproduct.h"
 
-CouponElement::CouponElement()
+CouponProduct::CouponProduct()
 {
-  CouponElement::clear();
+  CouponProduct::clear();
 }
 
-void CouponElement::clear(bool bClearId)
+void CouponProduct::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
@@ -13,35 +13,35 @@ void CouponElement::clear(bool bClearId)
   m_ammount = 0.0;
 }
 
-bool CouponElement::isValid() const
+bool CouponProduct::isValid() const
 {
   return m_product.m_id.isValid() && m_ammount >= 0.0;
 }
 
-bool CouponElement::operator !=(const JItem& other) const
+bool CouponProduct::operator !=(const JItem& other) const
 {
-  const CouponElement& another = dynamic_cast<const CouponElement&>(other);
+  const CouponProduct& another = dynamic_cast<const CouponProduct&>(other);
   return
       m_product.m_id != another.m_product.m_id ||
       m_ammount != another.m_ammount;
 }
 
-bool CouponElement::operator ==(const JItem& other) const
+bool CouponProduct::operator ==(const JItem& other) const
 {
   return !(*this != other);
 }
 
-QString CouponElement::strAmmount() const
+QString CouponProduct::strAmmount() const
 {
   return Data::strAmmount(m_ammount);
 }
 
-QString CouponElement::strFmt() const
+QString CouponProduct::strFmt() const
 {
   return Data::strFmt(m_ammount);
 }
 
-bool CouponElement::SQL_insert_proc(QSqlQuery& query) const
+bool CouponProduct::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " COUPON_ELEMENTS_SQL_TABLE_NAME " ("
                 COUPON_ELEMENTS_SQL_COL_CID ","
@@ -61,7 +61,7 @@ bool CouponElement::SQL_insert_proc(QSqlQuery& query) const
   return bSuccess;
 }
 
-bool CouponElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<CouponElement>& v, QString& error)
+bool CouponProduct::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<CouponProduct>& v, QString& error)
 {
   error.clear();
   v.clear();
@@ -80,7 +80,7 @@ bool CouponElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QV
       ids.push_back(query.value(0).toLongLong());
     for (int i = 0; i != ids.size(); ++i)
     {
-      CouponElement o;
+      CouponProduct o;
       o.m_id = ids.at(i);
       if (o.SQL_select_proc(query, error))
         v.push_back(o);
@@ -94,7 +94,7 @@ bool CouponElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QV
   return bSuccess;
 }
 
-bool CouponElement::SQL_select_proc(QSqlQuery& query, QString& error)
+bool CouponProduct::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
@@ -126,7 +126,7 @@ bool CouponElement::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-bool CouponElement::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
+bool CouponProduct::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
 {
   query.prepare("DELETE FROM " COUPON_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " COUPON_ELEMENTS_SQL_COL_CID " = (:_v01)");

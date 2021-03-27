@@ -1,10 +1,10 @@
-#ifndef PURCHASETABLE_H
-#define PURCHASETABLE_H
+#ifndef PURCHASEPRODUCTTABLE_H
+#define PURCHASEPRODUCTTABLE_H
 
 #include "jtable.h"
 #include "items/purchase.h"
 
-class PurchaseTable : public JTable
+class PurchaseProductTable : public JTable
 {
   Q_OBJECT
 
@@ -19,9 +19,9 @@ public:
     SubTotal
   };
 
-  explicit PurchaseTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
-  void getPurchaseElements(QVector<PurchaseElement>& v) const;
-  void setPurchaseElements(const QVector<PurchaseElement>& v, bool bClear = true);
+  explicit PurchaseProductTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
+  void get(QVector<PurchaseProduct>& v) const;
+  void set(const QVector<PurchaseProduct>& v, bool bClear = true);
 
 public slots:
   void addRow();
@@ -39,4 +39,4 @@ protected slots:
   void update(int row, int column);
 };
 
-#endif // PURCHASETABLE_H
+#endif // PURCHASEPRODUCTTABLE_H

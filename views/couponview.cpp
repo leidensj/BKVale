@@ -3,7 +3,7 @@
 #include "widgets/jlineedit.h"
 #include "widgets/jdatepicker.h"
 #include "controls/databasepicker.h"
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 #include "tables/coupontable.h"
 #include <QLayout>
 #include <QFormLayout>
@@ -82,7 +82,7 @@ CouponView::CouponView(QWidget* parent)
   product->setLayout(ltProduct);
 
   QFormLayout* ltMain = new QFormLayout;
-  ltMain->addRow(JItemEx::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
+  ltMain->addRow(JItemHelper::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
   ltMain->addRow(tr("Código:"), m_edCode);
   ltMain->addRow(m_rdoPercentage, m_edPercentage);
   ltMain->addRow(m_rdoValue, m_edValue);
@@ -125,7 +125,7 @@ void CouponView::getItem(JItemSQL& o) const
   _o.m_percentage = m_edPercentage->value();
   _o.m_value = m_edValue->value();
   _o.m_store.m_id = m_storePicker->getFirstId();
-  m_table->getElements(_o.m_elements);
+  m_table->get(_o.m_products);
 }
 
 void CouponView::setItem(const JItemSQL& o)
@@ -145,7 +145,7 @@ void CouponView::setItem(const JItemSQL& o)
   m_tab->setTabEnabled(0, !_o.m_bRedeemed);
   m_btnSave->setEnabled(!_o.m_bRedeemed);
   m_storePicker->addItem(_o.m_store);
-  m_table->setElements(_o.m_elements, true);
+  m_table->set(_o.m_products, true);
   if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
   {
     QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
@@ -187,7 +187,7 @@ bool CouponView::save(Id& id)
       o.m_id.clear();
       o.m_code.clear();
       o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
-      if (JItemEx::save(o, m_viewer->getTableName(), this))
+      if (JItemHelper::save(o, m_viewer->getTableName(), this))
       {
         QString error;
         if (o.m_store.m_id.isValid())
@@ -199,7 +199,7 @@ bool CouponView::save(Id& id)
     CouponConfirmation dlg(coupons, this);
     if (dlg.exec())
       for (int i = 0; i != coupons.size(); ++i)
-        JItemEx::print(coupons.at(i), nullptr, this);
+        JItemHelper::print(coupons.at(i), nullptr, this);
   }
   return true;
 }

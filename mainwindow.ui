@@ -142,11 +142,6 @@
     <addaction name="actionShoppingListMgt"/>
     <addaction name="actionStores"/>
    </widget>
-   <widget class="QMenu" name="menuImpressora">
-    <property name="title">
-     <string>Impressora</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuConfigura_es">
     <property name="title">
      <string>Manutenção</string>
@@ -158,7 +153,7 @@
     <property name="title">
      <string>Ajuda</string>
     </property>
-    <addaction name="actionInfo"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuFerramentas">
     <property name="title">
@@ -169,7 +164,6 @@
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
    <addaction name="menuFerramentas"/>
-   <addaction name="menuImpressora"/>
    <addaction name="menuConfigura_es"/>
    <addaction name="menuAjuda"/>
   </widget>
@@ -182,16 +176,13 @@
     <string>Configurações</string>
    </property>
   </action>
-  <action name="actionInfo">
+  <action name="actionAbout">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/res/about.png</normaloff>:/icons/res/about.png</iconset>
    </property>
    <property name="text">
-    <string>Informações</string>
-   </property>
-   <property name="toolTip">
-    <string>Informações</string>
+    <string>About...</string>
    </property>
   </action>
   <action name="actionProducts">

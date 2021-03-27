@@ -1,11 +1,11 @@
-#include "purchaseelement.h"
+#include "purchaseproduct.h"
 
-PurchaseElement::PurchaseElement()
+PurchaseProduct::PurchaseProduct()
 {
-  clear();
+  PurchaseProduct::clear();
 }
 
-void PurchaseElement::clear(bool bClearId)
+void PurchaseProduct::clear(bool bClearId)
 {
   if (bClearId)
     m_id.clear();
@@ -16,14 +16,14 @@ void PurchaseElement::clear(bool bClearId)
   m_ownerId.clear();
 }
 
-bool PurchaseElement::isValid() const
+bool PurchaseProduct::isValid() const
 {
   return true;
 }
 
-bool PurchaseElement::operator !=(const JItem& other) const
+bool PurchaseProduct::operator !=(const JItem& other) const
 {
-  const PurchaseElement& another = dynamic_cast<const PurchaseElement&>(other);
+  const PurchaseProduct& another = dynamic_cast<const PurchaseProduct&>(other);
   return
       m_product.m_id != another.m_product.m_id ||
       m_ammount != another.m_ammount ||
@@ -31,32 +31,32 @@ bool PurchaseElement::operator !=(const JItem& other) const
       m_package != another.m_package;
 }
 
-bool PurchaseElement::operator ==(const JItem& other) const
+bool PurchaseProduct::operator ==(const JItem& other) const
 {
   return !(*this != other);
 }
 
-double PurchaseElement::subtotal() const
+double PurchaseProduct::subtotal() const
 {
   return m_ammount * m_price;
 }
 
-QString PurchaseElement::strSubtotal() const
+QString PurchaseProduct::strSubtotal() const
 {
   return Data::strMoney(subtotal());
 }
 
-QString PurchaseElement::strAmmount() const
+QString PurchaseProduct::strAmmount() const
 {
   return Data::strAmmount(m_ammount);
 }
 
-QString PurchaseElement::strPrice() const
+QString PurchaseProduct::strPrice() const
 {
   return Data::strMoney(m_price);
 }
 
-bool PurchaseElement::SQL_insert_proc(QSqlQuery& query) const
+bool PurchaseProduct::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " PURCHASE_ELEMENTS_SQL_TABLE_NAME " ("
                 PURCHASE_ELEMENTS_SQL_COL_NID ","
@@ -88,7 +88,7 @@ bool PurchaseElement::SQL_insert_proc(QSqlQuery& query) const
   return bSuccess;
 }
 
-bool PurchaseElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<PurchaseElement>& v, QString& error)
+bool PurchaseProduct::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<PurchaseProduct>& v, QString& error)
 {
   error.clear();
   v.clear();
@@ -108,7 +108,7 @@ bool PurchaseElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, 
   {
     while (query.next())
     {
-      PurchaseElement o;
+      PurchaseProduct o;
       o.m_id.set(query.value(0).toLongLong());
       o.m_product.m_id.set(query.value(1).toLongLong());
       o.m_ammount = query.value(2).toDouble();
@@ -127,7 +127,7 @@ bool PurchaseElement::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, 
   return bSuccess;
 }
 
-bool PurchaseElement::SQL_select_proc(QSqlQuery& query, QString& error)
+bool PurchaseProduct::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
   query.prepare("SELECT "
@@ -167,7 +167,7 @@ bool PurchaseElement::SQL_select_proc(QSqlQuery& query, QString& error)
   return bSuccess;
 }
 
-void PurchaseElement::SQL_select_last(Id supplierId, Id productId)
+void PurchaseProduct::SQL_select_last(Id supplierId, Id productId)
 {
   QString error;
   if (!JItemSQL::SQL_isOpen(error))
@@ -187,7 +187,7 @@ void PurchaseElement::SQL_select_last(Id supplierId, Id productId)
                 " = (:_v01)"
                 " AND " PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID
                 " = (:_v02) "
-                " ORDER BY " PURCHASE_ELEMENTS_SQL_TABLE_NAME "." SQL_COLID
+                " ORDER BY " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DAT
                 " DESC LIMIT 1");
   query.bindValue(":_v01", supplierId.get());
   query.bindValue(":_v02", productId.get());
@@ -202,7 +202,7 @@ void PurchaseElement::SQL_select_last(Id supplierId, Id productId)
   JItemSQL::SQL_finish(db, query, bSuccess, error);
 }
 
-bool PurchaseElement::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
+bool PurchaseProduct::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
 {
   query.prepare("DELETE FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                 " WHERE " PURCHASE_ELEMENTS_SQL_COL_NID " = (:_v01)");

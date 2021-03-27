@@ -1,13 +1,13 @@
-#ifndef COUPONELEMENT_H
-#define COUPONELEMENT_H
+#ifndef COUPONPRODUCT_H
+#define COUPONPRODUCT_H
 
-#include "jitemelementsql.h"
+#include "jsubitemsql.h"
 #include "product.h"
 #include <QVector>
 
-struct CouponElement : public JItemElementSQL
+struct CouponProduct : public JSubItemSQL
 {
-  CouponElement();
+  CouponProduct();
   void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;
@@ -16,7 +16,7 @@ struct CouponElement : public JItemElementSQL
   bool SQL_insert_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
 
-  static bool SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<CouponElement>& v, QString& error);
+  static bool SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<CouponProduct>& v, QString& error);
   static bool SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId);
 
   QString strAmmount() const;
@@ -26,4 +26,4 @@ struct CouponElement : public JItemElementSQL
   double m_ammount;
 };
 
-#endif // PURCHASEELEMENT_H
+#endif // COUPONPRODUCT_H

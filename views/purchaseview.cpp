@@ -1,6 +1,6 @@
 #include "purchaseview.h"
 #include "databaseutils.h"
-#include "tables/purchasetable.h"
+#include "tables/purchaseproducttable.h"
 #include "controls/databasepicker.h"
 #include "controls/databaseviewer.h"
 #include "controls/databaseselector.h"
@@ -25,7 +25,7 @@
 #include <QSettings>
 #include <QToolButton>
 #include <QDialogButtonBox>
-#include "items/jitemex.h"
+#include "items/jitemhelper.h"
 
 #define SETTINGS_PURCHASE_STORE_ID "purchase/storeid"
 
@@ -126,10 +126,10 @@ Purchase::PaymentMethod PaymentWidget::getPaymentMethod() const
   return Purchase::PaymentMethod::Credit;
 }
 
-QVector<PaymentElement> PaymentWidget::getPayments() const
+QVector<PaymentPart> PaymentWidget::getPayments() const
 {
-  QVector<PaymentElement> v;
-  m_tbPayment->getPaymentElements(v);
+  QVector<PaymentPart> v;
+  m_tbPayment->get(v);
   return v;
 }
 
@@ -155,9 +155,9 @@ void PaymentWidget::setPaymentMethod(Purchase::PaymentMethod o)
     m_rdoCredit->setChecked(true);
 }
 
-void PaymentWidget::setPayments(const QVector<PaymentElement>& v)
+void PaymentWidget::setPayments(const QVector<PaymentPart>& v)
 {
-  m_tbPayment->setPaymentElements(v);
+  m_tbPayment->set(v);
 }
 
 void PaymentWidget::emitMethodChangedSignal()
@@ -225,7 +225,7 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_btnRemove->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Minus));
   m_btnRemove->setToolTip(tr("Remover (Alt+-)"));
 
-  m_table = new PurchaseTable;
+  m_table = new PurchaseProductTable;
   m_table->setLargerSize(true);
 
   QLabel* lblNumber = new QLabel();
@@ -385,11 +385,11 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_date = m_dtPicker->getDate();
   _o.m_supplier.m_id = m_supplierPicker->getFirstId();
   _o.m_paymentMethod = m_wPayment->getPaymentMethod();
-  _o.m_vPayment = m_wPayment->getPayments();
+  _o.m_payments = m_wPayment->getPayments();
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->value();
   _o.m_store.m_id = m_storePicker->getFirstId();
-  m_table->getPurchaseElements(_o.m_vElement);
+  m_table->get(_o.m_products);
 }
 
 void PurchaseView::setItem(const JItemSQL& o)
@@ -410,7 +410,7 @@ void PurchaseView::setItem(const JItemSQL& o)
     m_storePicker->addItem(_o.m_store);
   m_dtPicker->setDate(_o.m_date);
   m_snNumber->setValue(_o.m_number);
-  m_table->setPurchaseElements(_o.m_vElement);
+  m_table->set(_o.m_products);
   m_supplierPicker->addItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);
   m_edDisccount->setValue(_o.m_disccount);
@@ -418,7 +418,7 @@ void PurchaseView::setItem(const JItemSQL& o)
   m_wPayment->setPurchaseDate(m_dtPicker->getDate());
   m_wPayment->setPurchaseTotal(m_edTotal->value());
   m_wPayment->setPaymentMethod(_o.m_paymentMethod);
-  m_wPayment->setPayments(_o.m_vPayment);
+  m_wPayment->setPayments(_o.m_payments);
   updateControls();
 }
 
@@ -431,7 +431,7 @@ void PurchaseView::supplierChanged()
 void PurchaseView::updateControls()
 {
   m_btnOpenLast->setEnabled(m_lastId.isValid());
-  double total = m_table->sum((int)PurchaseTable::Column::SubTotal) + m_edDisccount->value();
+  double total = m_table->sum((int)PurchaseProductTable::Column::SubTotal) + m_edDisccount->value();
   m_edTotal->setValue(total);
   m_tab->setTabIcon(1, m_wPayment->getIcon());
   m_actAddHistory->setEnabled(m_supplierPicker->getFirstId().isValid());
@@ -455,7 +455,7 @@ bool PurchaseView::save(Id& id)
     return false;
   }
 
-  bool bSuccess = JItemEx::save(o, m_viewer->getTableName(), this);
+  bool bSuccess = JItemHelper::save(o, m_viewer->getTableName(), this);
   if (bSuccess)
   {
     print(o);
@@ -517,21 +517,21 @@ void PurchaseView::showHistory()
   if (dlg.exec())
   {
     Ids ids = dlg.getViewer()->getSelectedIds();
-    QVector<PurchaseElement> v;
+    QVector<PurchaseProduct> v;
     for (int i = 0; i != ids.size(); ++i)
     {
-      PurchaseElement e;
-      e.SQL_select_last(m_supplierPicker->getFirstId(), ids.at(i));
-      e.m_ammount = 0;
-      v.push_back(e);
+      PurchaseProduct o;
+      o.SQL_select_last(m_supplierPicker->getFirstId(), ids.at(i));
+      o.m_ammount = 0;
+      v.push_back(o);
     }
-    m_table->setPurchaseElements(v, false);
+    m_table->set(v, false);
   }
 }
 
 void PurchaseView::print(Purchase& o)
 {
-  if (!m_btnPrint->isChecked() || !JItemEx::select(o, this))
+  if (!m_btnPrint->isChecked() || !JItemHelper::select(o, this))
     return;
 
   if (o.m_date != QDate::currentDate() && !o.m_id.isValid())
@@ -546,5 +546,5 @@ void PurchaseView::print(Purchase& o)
        o.m_date = QDate::currentDate();
     }
   }
-  JItemEx::print(o, nullptr, this);
+  JItemHelper::print(o, nullptr, this);
 }

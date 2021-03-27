@@ -44,13 +44,13 @@ void CouponTable::addRowAndActivate()
     removeItem();
 }
 
-void CouponTable::getElements(QVector<CouponElement>& v) const
+void CouponTable::get(QVector<CouponProduct>& v) const
 {
   v.clear();
   for (int i = 0; i != rowCount(); ++i)
   {
     int row = verticalHeader()->logicalIndex(i);
-    CouponElement o;
+    CouponProduct o;
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_product.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
     o.m_product.m_name = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Product)->getValue());
@@ -58,7 +58,7 @@ void CouponTable::getElements(QVector<CouponElement>& v) const
   }
 }
 
-void CouponTable::setElements(const QVector<CouponElement>& v, bool bClear)
+void CouponTable::set(const QVector<CouponProduct>& v, bool bClear)
 {
   if (bClear)
     removeAllItems();

@@ -1,13 +1,13 @@
-#ifndef PURCHASEELEMENT_H
-#define PURCHASEELEMENT_H
+#ifndef PURCHASEPRODUCT_H
+#define PURCHASEPRODUCT_H
 
-#include "jitemelementsql.h"
+#include "jsubitemsql.h"
 #include "product.h"
 #include <QVector>
 
-struct PurchaseElement : public JItemElementSQL
+struct PurchaseProduct : public JSubItemSQL
 {
-  PurchaseElement();
+  PurchaseProduct();
   void clear(bool bClearId = true);
   bool isValid() const;
   bool operator !=(const JItem& other) const;
@@ -17,7 +17,7 @@ struct PurchaseElement : public JItemElementSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
 
   void SQL_select_last(Id supplierId, Id productId);
-  static bool SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<PurchaseElement>& v, QString& error);
+  static bool SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<PurchaseProduct>& v, QString& error);
   static bool SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId);
 
   double subtotal() const;
@@ -31,4 +31,4 @@ struct PurchaseElement : public JItemElementSQL
   Package m_package;
 };
 
-#endif // PURCHASEELEMENT_H
+#endif // PURCHASEPRODUCT_H

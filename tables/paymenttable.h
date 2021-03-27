@@ -2,7 +2,7 @@
 #define PAYMENTTABLE_H
 
 #include "jtable.h"
-#include "items/paymentelement.h"
+#include "items/paymentpart.h"
 
 class PaymentTable : public JTable
 {
@@ -16,8 +16,8 @@ public:
   };
 
   explicit PaymentTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
-  void getPaymentElements(QVector<PaymentElement>& v) const;
-  void setPaymentElements(const QVector<PaymentElement>& v);
+  void get(QVector<PaymentPart>& v) const;
+  void set(const QVector<PaymentPart>& v);
   void setPurchaseDate(const QDate& dt);
   QDate getPurchaseDate() const;
   void setPurchaseTotal(double total);

@@ -1,5 +1,5 @@
 #include "databaseselector.h"
-#include "items/jitemex.h"
+#include "items/jitemHelper.h"
 #include <QLayout>
 #include <QLabel>
 
@@ -20,8 +20,8 @@ DatabaseSelector::DatabaseSelector(const QString& tableName,
   setLayout(lt);
   resize(640, 480);
 
-  QString title = tr("Selecionar ") + JItemEx::text(tableName);
-  QString icon = JItemEx::icon(tableName);
+  QString title = tr("Selecionar ") + JItemHelper::text(tableName);
+  QString icon = JItemHelper::icon(tableName);
 
   setWindowTitle(title);
   if (!icon.isEmpty())

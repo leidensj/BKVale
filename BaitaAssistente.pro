@@ -14,6 +14,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
+  aboutdialog.cpp \
   controls/calculatorwidget.cpp \
   controls/couponredeemer.cpp \
   controls/databasecombobox.cpp \
@@ -31,8 +32,11 @@ SOURCES += main.cpp\
   editors/packageeditor.cpp \
   filters/jfilter.cpp \
   items/coupon.cpp \
-  items/couponelement.cpp \
+  items/couponproduct.cpp \
+  items/jitemhelper.cpp \
   items/login.cpp \
+  items/paymentpart.cpp \
+  items/purchaseproduct.cpp \
   libraries/qcustomplot.cpp \
   libraries/tinyexpr.c \
         mainwindow.cpp \
@@ -58,7 +62,7 @@ SOURCES += main.cpp\
     items/store.cpp \
     items/supplier.cpp \
     items/user.cpp \
-    items/jitemex.cpp \
+  tables/purchaseproducttable.cpp \
   views/couponview.cpp \
   views/jitemview.cpp \
   widgets/findwidget.cpp \
@@ -76,7 +80,6 @@ SOURCES += main.cpp\
     widgets/jtimeedit.cpp \
     items/jitemsql.cpp \
     items/purchase.cpp \
-    tables/purchasetable.cpp \
     tables/shoppinglisttable.cpp \
     tables/addresstable.cpp \
     tables/phonetable.cpp \
@@ -92,7 +95,6 @@ SOURCES += main.cpp\
     views/productview.cpp \
     views/userview.cpp \
     filters/purchasefilter.cpp \
-    items/purchaseelement.cpp \
     models/addressmodel.cpp \
     models/categorymodel.cpp \
     models/employeemodel.cpp \
@@ -107,7 +109,6 @@ SOURCES += main.cpp\
     models/usermodel.cpp \
     models/jmodel.cpp \
     models/productcodemodel.cpp \
-    items/paymentelement.cpp \
     common.cpp \
     widgets/jregexpvalidator.cpp \
     tableitems/doubleitem.cpp \
@@ -123,6 +124,7 @@ SOURCES += main.cpp\
   widgets/pdfgenerator.cpp
 
 HEADERS  += mainwindow.h \
+    aboutdialog.h \
     controls/calculatorwidget.h \
     controls/couponredeemer.h \
     controls/databasecombobox.h \
@@ -140,8 +142,12 @@ HEADERS  += mainwindow.h \
     editors/packageeditor.h \
     filters/jfilter.h \
     items/coupon.h \
-    items/couponelement.h \
+    items/couponproduct.h \
+    items/jitemhelper.h \
+    items/jsubitemsql.h \
     items/login.h \
+    items/paymentpart.h \
+    items/purchaseproduct.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \
     models/couponmodel.h \
@@ -156,6 +162,7 @@ HEADERS  += mainwindow.h \
     consumptionchart.h \
     defines.h \
     escpos.h \
+    tables/purchaseproducttable.h \
     timeinterval.h \
     items/address.h \
     items/category.h \
@@ -169,7 +176,6 @@ HEADERS  += mainwindow.h \
     items/shoppinglist.h \
     items/supplier.h \
     items/user.h \
-    items/jitemex.h \
     views/couponview.h \
     views/jitemview.h \
     widgets/findwidget.h \
@@ -189,7 +195,6 @@ HEADERS  += mainwindow.h \
     widgets/jlineedit.h \
     items/purchase.h \
     tables/shoppinglisttable.h \
-    tables/purchasetable.h \
     tables/addresstable.h \
     tables/phonetable.h \
     tables/productcodetable.h \
@@ -204,8 +209,6 @@ HEADERS  += mainwindow.h \
     views/shoppinglistview.h \
     views/userview.h \
     filters/purchasefilter.h \
-    items/jitemelementsql.h \
-    items/purchaseelement.h \
     models/addressmodel.h \
     models/categorymodel.h \
     models/employeemodel.h \
@@ -220,7 +223,6 @@ HEADERS  += mainwindow.h \
     models/usermodel.h \
     models/jmodel.h \
     models/productcodemodel.h \
-    items/paymentelement.h \
     common.h \
     widgets/jregexpvalidator.h \
     tableitems/doubleitem.h \
@@ -237,6 +239,7 @@ HEADERS  += mainwindow.h \
     widgets/pdfgenerator.h
 
 FORMS    += mainwindow.ui \
+  aboutdialog.ui \
   settingsdialog.ui
 
 RESOURCES += \

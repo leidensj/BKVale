@@ -1,4 +1,4 @@
-#include "jtemhelper.h"
+#include "jitemhelper.h"
 #include "user.h"
 #include "purchase.h"
 #include "product.h"

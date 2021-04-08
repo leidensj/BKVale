@@ -390,6 +390,14 @@ bool BaitaSQL::createTables(QString& error)
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRICE_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          PRICE_SQL_COL_PID " INTEGER NOT NULL,"
+                          PRICE_SQL_COL_VAL " INTEGER,"
+                          "FOREIGN KEY(" PRICE_SQL_COL_PID ") REFERENCES "
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
   {
     query.exec("SELECT * FROM " USER_SQL_TABLE_NAME " LIMIT 1");
     if (!query.next())

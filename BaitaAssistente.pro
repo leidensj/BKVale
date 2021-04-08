@@ -36,6 +36,7 @@ SOURCES += main.cpp\
   items/jitemhelper.cpp \
   items/login.cpp \
   items/paymentpart.cpp \
+  items/price.cpp \
   items/purchaseproduct.cpp \
   libraries/qcustomplot.cpp \
   libraries/tinyexpr.c \
@@ -147,6 +148,7 @@ HEADERS  += mainwindow.h \
     items/jsubitemsql.h \
     items/login.h \
     items/paymentpart.h \
+    items/price.h \
     items/purchaseproduct.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \

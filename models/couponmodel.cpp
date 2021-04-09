@@ -65,10 +65,10 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
         switch ((Coupon::Type)value.toInt())
         {
           case Coupon::Type::Percentage:
-            value = Data::strPercentage(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 6), role).toInt());
+            value = Data::strPercentage(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 7), role).toInt());
             break;
           case Coupon::Type::Value:
-            value = Data::strMoney(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 7), role).toInt());
+            value = Data::strMoney(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 8), role).toInt());
             break;
           case Coupon::Type::Product:
             value = tr("Produtos");

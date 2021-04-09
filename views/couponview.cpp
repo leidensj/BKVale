@@ -28,7 +28,6 @@ CouponConfirmation::CouponConfirmation(const QVector<Coupon>& coupons, QWidget* 
   ltMain->addWidget(teCodes);
   ltMain->addWidget(btns);
   setLayout(ltMain);
-  teCodes->setReadOnly(true);
   for (const Coupon& o : coupons)
     teCodes->appendPlainText(o.m_code);
   connect(btns, SIGNAL(accepted()), this, SLOT(accept()));
@@ -184,9 +183,12 @@ bool CouponView::save(Id& id)
     getItem(o);
     for (int i = 0; i != n; ++i)
     {
-      o.m_id.clear();
-      o.m_code.clear();
-      o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
+      if (!m_id.isValid())
+      {
+        o.m_id.clear();
+        o.m_code.clear();
+        o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
+      }
       if (JItemHelper::save(o, m_viewer->getTableName(), this))
       {
         QString error;

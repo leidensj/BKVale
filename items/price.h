@@ -16,6 +16,8 @@ struct Price : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
 
+  static bool SQL_add_prices(QString& error);
+
   double m_value;
   Product m_product;
 };

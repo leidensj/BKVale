@@ -392,7 +392,7 @@ bool BaitaSQL::createTables(QString& error)
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRICE_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          PRICE_SQL_COL_PID " INTEGER NOT NULL,"
+                          PRICE_SQL_COL_PID " INTEGER NOT NULL UNIQUE,"
                           PRICE_SQL_COL_VAL " INTEGER,"
                           "FOREIGN KEY(" PRICE_SQL_COL_PID ") REFERENCES "
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");

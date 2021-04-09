@@ -105,3 +105,22 @@ bool Price::SQL_remove_proc(QSqlQuery& query) const
   query.bindValue(":_v00", m_id.get());
   return query.exec();
 }
+
+bool Price::SQL_add_prices(QString& error)
+{
+  error.clear();
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  error.clear();
+  query.prepare("INSERT INTO " PRICE_SQL_TABLE_NAME
+                " ( " PRICE_SQL_COL_PID "," PRICE_SQL_COL_VAL ") "
+                "SELECT " SQL_COLID ",0 FROM " PRODUCT_SQL_TABLE_NAME " WHERE "
+                SQL_COLID " NOT IN (SELECT _PRODUCTID FROM " PRICE_SQL_TABLE_NAME ")");
+  bool bSuccess = query.exec();
+  return SQL_finish(db, query, bSuccess, error);
+}

@@ -40,6 +40,7 @@ protected slots:
   void setItem(const JItemSQL& o);
 
 private slots:
+  static bool st_saveMultiple(QVector<Coupon>& v, QWidget* parent);
   void updateControls();
 
 private:

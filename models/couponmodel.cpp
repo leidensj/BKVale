@@ -29,28 +29,28 @@ QString CouponModel::getStrQuery()
 void CouponModel::select(QHeaderView* header)
 {
   JModel::select("");
-  setHeaderData(0, Qt::Horizontal, tr("ID"));
-  setHeaderData(1, Qt::Horizontal, tr("Cupom"));
-  setHeaderData(2, Qt::Horizontal, tr("Código"));
-  setHeaderData(3, Qt::Horizontal, tr("Data"));
-  setHeaderData(4, Qt::Horizontal, tr("Resgate"));
-  setHeaderData(5, Qt::Horizontal, tr("Data do Resgate"));
-  setHeaderData(6, Qt::Horizontal, tr("Expiração"));
-  setHeaderData(7, Qt::Horizontal, tr("Data de Expiração"));
-  setHeaderData(8, Qt::Horizontal, tr("Porcentagem"));
-  setHeaderData(9, Qt::Horizontal, tr("Valor"));
+  setHeaderData((int)Column::Id, Qt::Horizontal, tr("ID"));
+  setHeaderData((int)Column::Coupon, Qt::Horizontal, tr("Cupom"));
+  setHeaderData((int)Column::Code, Qt::Horizontal, tr("Código"));
+  setHeaderData((int)Column::Date, Qt::Horizontal, tr("Data"));
+  setHeaderData((int)Column::Redemption, Qt::Horizontal, tr("Resgate"));
+  setHeaderData((int)Column::RedemptionDate, Qt::Horizontal, tr("Data do Resgate"));
+  setHeaderData((int)Column::Expiration, Qt::Horizontal, tr("Expiração"));
+  setHeaderData((int)Column::ExpirationDate, Qt::Horizontal, tr("Data de Expiração"));
+  setHeaderData((int)Column::Percentage, Qt::Horizontal, tr("Porcentagem"));
+  setHeaderData((int)Column::Value, Qt::Horizontal, tr("Valor"));
   if (header != nullptr && header->count() == 10)
   {
-    header->hideSection(0);
-    header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-    header->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
-    header->setSectionResizeMode(3, QHeaderView::ResizeMode::ResizeToContents);
-    header->setSectionResizeMode(4, QHeaderView::ResizeMode::ResizeToContents);
-    header->hideSection(5);
-    header->setSectionResizeMode(6, QHeaderView::ResizeMode::ResizeToContents);
-    header->hideSection(7);
-    header->hideSection(8);
-    header->hideSection(9);
+    header->hideSection((int)Column::Id);
+    header->setSectionResizeMode((int)Column::Coupon, QHeaderView::ResizeMode::ResizeToContents);
+    header->setSectionResizeMode((int)Column::Code, QHeaderView::ResizeMode::Stretch);
+    header->setSectionResizeMode((int)Column::Date, QHeaderView::ResizeMode::ResizeToContents);
+    header->setSectionResizeMode((int)Column::Redemption, QHeaderView::ResizeMode::ResizeToContents);
+    header->hideSection((int)Column::RedemptionDate);
+    header->setSectionResizeMode((int)Column::Expiration, QHeaderView::ResizeMode::ResizeToContents);
+    header->hideSection((int)Column::ExpirationDate);
+    header->hideSection((int)Column::Percentage);
+    header->hideSection((int)Column::Value);
   }
 }
 
@@ -59,16 +59,16 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
   QVariant value = QSqlQueryModel::data(idx, role);
   if (role == Qt::DisplayRole)
   {
-    switch (idx.column())
+    switch ((Column)idx.column())
     {
-      case 1:
+      case Column::Coupon:
         switch ((Coupon::Type)value.toInt())
         {
           case Coupon::Type::Percentage:
-            value = Data::strPercentage(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 7), role).toInt());
+            value = Data::strPercentage(QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::Percentage), role).toInt());
             break;
           case Coupon::Type::Value:
-            value = Data::strMoney(QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 8), role).toInt());
+            value = Data::strMoney(QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::Value), role).toInt());
             break;
           case Coupon::Type::Product:
             value = tr("Produtos");
@@ -76,21 +76,21 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
             break;
         }
         break;
-      case 3:
+      case Column::Date:
         value = value.toDateTime().toString("yyyy/MM/dd hh:mm:ss");
         break;
-      case 4:
+      case Column::Redemption:
       {
-        QDate dtRedemption = QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 1), role).toDate();
+        QDateTime dtRedemption = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::RedemptionDate), role).toDateTime();
         value = value.toBool() ? "Sim " + dtRedemption.toString("yyyy/MM/dd hh:mm:ss") : "";
       } break;
-      case 6:
+      case Column::Expiration:
       {
         bool bExpires = value.toBool();
-        bool bRedeemed = QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() - 1), role).toBool();
-        QDate dtExpiration = QSqlQueryModel::data(idx.sibling(idx.row(), idx.column() + 1), role).toDate();
+        bool bRedeemed = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::Redemption), role).toBool();
+        QDate dtExpiration = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::ExpirationDate), role).toDate();
         bool bExpired = bExpires && !bRedeemed && DateTime::server().date() > dtExpiration;
-        if (!bExpires)
+        if (!bExpires || bRedeemed)
           value = "";
         else
           value = (bExpired ? "Sim " : "Não ") + dtExpiration.toString("yyyy/MM/dd");
@@ -101,12 +101,15 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
   }
   else if (role == Qt::ToolTipRole)
   {
-    if (data(idx, Qt::EditRole).toInt() == (int)Coupon::Type::Product)
+    if (idx.column() == (int)Column::Coupon)
     {
-      Coupon o(data(idx.sibling(idx.row(), 0), Qt::EditRole).toLongLong());
-      QString error;
-      o.SQL_select(error);
-      value = o.strCoupon();
+      if (data(idx, Qt::EditRole).toInt() == (int)Coupon::Type::Product)
+      {
+        Coupon o(data(idx.sibling(idx.row(), (int)Column::Id), Qt::EditRole).toLongLong());
+        QString error;
+        o.SQL_select(error);
+        value = o.strCoupon();
+      }
     }
   }
   return value;

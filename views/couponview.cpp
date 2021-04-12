@@ -15,6 +15,7 @@
 #include <QSettings>
 #include <QPlainTextEdit>
 #include <QDialogButtonBox>
+#include <QProgressDialog>
 
 #define SETTINGS_COUPON_STORE_ID "coupon/storeid"
 
@@ -24,7 +25,7 @@ CouponConfirmation::CouponConfirmation(const QVector<Coupon>& coupons, QWidget* 
   QPlainTextEdit* teCodes = new QPlainTextEdit;
   QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No);
   QVBoxLayout* ltMain = new QVBoxLayout;
-  ltMain->addWidget(new QLabel(tr("Deseja imprimir os códigos gerados?")));
+  ltMain->addWidget(new QLabel(tr("Deseja imprimir os %1 códigos gerados?").arg(coupons.size())));
   ltMain->addWidget(teCodes);
   ltMain->addWidget(btns);
   setLayout(ltMain);
@@ -189,14 +190,9 @@ bool CouponView::save(Id& id)
         o.m_code.clear();
         o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
       }
-      if (JItemHelper::save(o, m_viewer->getTableName(), this))
-      {
-        QString error;
-        if (o.m_store.m_id.isValid())
-          o.m_store.SQL_select(error);
-        coupons.append(o);
-      }
+      coupons.append(o);
     }
+    st_saveMultiple(coupons, this);
     clear();
     CouponConfirmation dlg(coupons, this);
     if (dlg.exec())
@@ -204,4 +200,37 @@ bool CouponView::save(Id& id)
         JItemHelper::print(coupons.at(i), nullptr, this);
   }
   return true;
+}
+
+bool CouponView::st_saveMultiple(QVector<Coupon>& v, QWidget* parent)
+{
+  QString error;
+
+  if (!JItemSQL::SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  const int count = v.count();
+  QProgressDialog bar(tr("Gerando Cupons"), tr("Cancelar"), 0, count, parent);
+  bar.setWindowModality(Qt::WindowModal);
+  for (int i = 0; i != v.size(); ++i)
+  {
+    bar.setValue(i);
+    bool ok = v.at(i).SQL_insert_proc(query);
+    if (!ok)
+      v.remove(i--);
+    else
+      v[i].m_store.SQL_select_proc(query, error);
+    if (bar.wasCanceled())
+    {
+      v.remove(i + 1, v.size() - i - 1);
+      break;
+    }
+  }
+  bar.setValue(count);
+
+  return JItemSQL::SQL_finish(db, query, true, error);
 }

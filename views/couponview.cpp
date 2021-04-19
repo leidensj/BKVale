@@ -49,6 +49,7 @@ CouponView::CouponView(QWidget* parent)
   , m_storePicker(nullptr)
   , m_btnAddRemove(nullptr)
   , m_table(nullptr)
+  , m_lblCount(nullptr)
 {
   m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
 
@@ -95,6 +96,9 @@ CouponView::CouponView(QWidget* parent)
   tabframe->setLayout(ltMain);
   m_tab->addTab(tabframe, QIcon(":/icons/res/coupon.png"), tr("Cupom"));
 
+  m_lblCount = new QLabel;
+  m_viewer->layout()->addWidget(m_lblCount);
+
   connect(m_cbExpiration, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoPercentage, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
   connect(m_rdoValue, SIGNAL(clicked(bool)), this, SLOT(updateControls()));
@@ -102,8 +106,10 @@ CouponView::CouponView(QWidget* parent)
   connect(m_rdoPercentage, SIGNAL(clicked(bool)), m_edPercentage, SLOT(setFocus()));
   connect(m_rdoValue, SIGNAL(clicked(bool)), m_edValue, SLOT(setFocus()));
   connect(m_rdoProduct, SIGNAL(clicked(bool)), m_btnAddRemove->m_btnAdd, SLOT(setFocus()));
+  connect(m_viewer, &DatabaseViewer::refreshSignal, m_lblCount, [=](){ m_lblCount->setText(tr("Número de cupons: %1").arg(m_viewer->getRowCount())); });
 
   setFocusWidgetOnClear(m_edPercentage);
+  m_viewer->refresh();
   clear();
 }
 

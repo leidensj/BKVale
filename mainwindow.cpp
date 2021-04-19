@@ -149,7 +149,7 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Purchase] = ui->actionPurchases;
   m_actions[Functionality::Idx::Report] = ui->actionReports;
   m_actions[Functionality::Idx::Reminder] = ui->actionReminders;
-  m_actions[Functionality::Idx::RedeemCoupon] = ui->actionRedeem;
+  m_actions[Functionality::Idx::CouponRedemption] = ui->actionRedeem;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));

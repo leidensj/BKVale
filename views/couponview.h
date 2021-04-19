@@ -56,6 +56,7 @@ private:
   DatabasePicker* m_storePicker;
   JAddRemoveButtons* m_btnAddRemove;
   CouponTable* m_table;
+  QLabel* m_lblCount;
 };
 
 #endif // CATEGORYVIEW_H

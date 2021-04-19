@@ -22,14 +22,14 @@ namespace Functionality
     ShoppingList,
     Shop,
     TimeCard,
-    Coupon,
     Settings,
+    Report,
+    Coupon,
+    CouponRedemption,
     ProductCode,
     Login,
     Address,
     Phone,
-    Report,
-    RedeemCoupon,
     _END,
   };
 

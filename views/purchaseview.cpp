@@ -443,6 +443,19 @@ bool PurchaseView::save(Id& id)
   Purchase o;
   getItem(o);
 
+  if (o.m_date != DateTime::server().date() && !o.m_id.isValid())
+  {
+    if (QMessageBox::question(
+          this,
+          tr("Data"),
+          tr("A data informada é diferente da data atual.\nDeseja usar a data atual?"),
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::Yes) == QMessageBox::Yes)
+    {
+       o.m_date = DateTime::server().date();
+    }
+  }
+
   // TODO por enquanto corrigimos o pagamento
   o.adjustPayment();
 
@@ -450,7 +463,7 @@ bool PurchaseView::save(Id& id)
   {
     QMessageBox::critical(this,
                           tr("Pagamento inconsistente"),
-                          tr("O valor do pagamento é diferente do valor da nota."),
+                          tr("O valor do pagamento é diferente do valor da compra."),
                           QMessageBox::Ok);
     return false;
   }
@@ -533,18 +546,5 @@ void PurchaseView::print(Purchase& o)
 {
   if (!m_btnPrint->isChecked() || !JItemHelper::select(o, this))
     return;
-
-  if (o.m_date != QDate::currentDate() && !o.m_id.isValid())
-  {
-    if (QMessageBox::question(
-          this,
-          tr("Data"),
-          tr("A data informada é diferente da data de hoje.\nDeseja usar a data de hoje?"),
-          QMessageBox::Yes | QMessageBox::No,
-          QMessageBox::Yes) == QMessageBox::Yes)
-    {
-       o.m_date = QDate::currentDate();
-    }
-  }
   JItemHelper::print(o, nullptr, this);
 }

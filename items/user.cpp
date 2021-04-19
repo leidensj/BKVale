@@ -68,7 +68,9 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 USER_SQL_COL_ASU ","
                 USER_SQL_COL_AST ","
                 USER_SQL_COL_ATI ","
-                USER_SQL_COL_ACO ")"
+                USER_SQL_COL_ACO ","
+                USER_SQL_COL_ACR ","
+                USER_SQL_COL_ART ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -86,7 +88,9 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v14),"
                 "(:_v15),"
                 "(:_v16),"
-                "(:_v17))");
+                "(:_v17),"
+                "(:_v18),"
+                "(:_v19))");
   query.bindValue(":_v01", m_strUser);
   query.bindValue(":_v02", strEncryptedPassword());
   query.bindValue(":_v03", hasPermission(Functionality::Idx::Purchase));
@@ -104,6 +108,8 @@ bool User::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v15", hasPermission(Functionality::Idx::Store));
   query.bindValue(":_v16", hasPermission(Functionality::Idx::TimeCard));
   query.bindValue(":_v17", hasPermission(Functionality::Idx::Coupon));
+  query.bindValue(":_v18", hasPermission(Functionality::Idx::CouponRedemption));
+  query.bindValue(":_v19", hasPermission(Functionality::Idx::Report));
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -132,7 +138,9 @@ bool User::SQL_update_proc(QSqlQuery& query) const
               USER_SQL_COL_ASU " = (:_v14),"
               USER_SQL_COL_AST " = (:_v15),"
               USER_SQL_COL_ATI " = (:_v16),"
-              USER_SQL_COL_ACO " = (:_v17)"
+              USER_SQL_COL_ACO " = (:_v17),"
+              USER_SQL_COL_ACR " = (:_v18),"
+              USER_SQL_COL_ART " = (:_v19)"
               " WHERE " SQL_COLID " = (:_v00)";
 
   query.prepare(strQuery);
@@ -155,6 +163,8 @@ bool User::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v15", hasPermission(Functionality::Idx::Store));
   query.bindValue(":_v16", hasPermission(Functionality::Idx::TimeCard));
   query.bindValue(":_v17", hasPermission(Functionality::Idx::Coupon));
+  query.bindValue(":_v18", hasPermission(Functionality::Idx::CouponRedemption));
+  query.bindValue(":_v19", hasPermission(Functionality::Idx::Report));
 
   return query.exec();
 }
@@ -179,7 +189,9 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
                 USER_SQL_COL_ASU ","
                 USER_SQL_COL_AST ","
                 USER_SQL_COL_ATI ","
-                USER_SQL_COL_ACO
+                USER_SQL_COL_ACO ","
+                USER_SQL_COL_ACR ","
+                USER_SQL_COL_ART
                 " FROM " USER_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -206,6 +218,8 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       setPermission(Functionality::Idx::Store, query.value(14).toBool());
       setPermission(Functionality::Idx::TimeCard, query.value(15).toBool());
       setPermission(Functionality::Idx::Coupon, query.value(16).toBool());
+      setPermission(Functionality::Idx::CouponRedemption, query.value(17).toBool());
+      setPermission(Functionality::Idx::Report, query.value(18).toBool());
     }
     else
     {

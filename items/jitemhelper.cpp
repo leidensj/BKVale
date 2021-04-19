@@ -150,7 +150,7 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Telefone";
     case Functionality::Idx::Report:
       return "Relatórios";
-    case Functionality::Idx::RedeemCoupon:
+    case Functionality::Idx::CouponRedemption:
       return "Resgatar Cupons";
     case Functionality::Idx::_END:
     default:
@@ -207,7 +207,7 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/phone.png";
     case Functionality::Idx::Report:
       return ":/icons/res/statistics.png";
-    case Functionality::Idx::RedeemCoupon:
+    case Functionality::Idx::CouponRedemption:
       return ":/icons/res/redeem.png";
     case Functionality::Idx::_END:
     default:

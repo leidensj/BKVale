@@ -163,7 +163,9 @@ bool BaitaSQL::createTables(QString& error)
                           USER_SQL_COL_ASU " BOOLEAN,"
                           USER_SQL_COL_AST " BOOLEAN,"
                           USER_SQL_COL_ATI " BOOLEAN,"
-                          USER_SQL_COL_ACO " BOOLEAN)");
+                          USER_SQL_COL_ACO " BOOLEAN,"
+                          USER_SQL_COL_ACR " BOOLEAN,"
+                          USER_SQL_COL_ART " BOOLEAN)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
@@ -419,11 +421,13 @@ bool BaitaSQL::createTables(QString& error)
                     USER_SQL_COL_ASU ","
                     USER_SQL_COL_AST ","
                     USER_SQL_COL_ATI ","
-                    USER_SQL_COL_ACO ")"
+                    USER_SQL_COL_ACO ","
+                    USER_SQL_COL_ACR ","
+                    USER_SQL_COL_ART ")"
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
                     ":_password,"
-                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
+                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
       query.prepare(str);
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();

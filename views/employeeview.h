@@ -44,10 +44,10 @@ private:
   FormAddressEditor* m_formAddress;
   JLineEdit* m_edPincode;
   QTreeWidget* m_trPermissions;
-  QTreeWidgetItem* m_triPurchaseEdit;
-  QTreeWidgetItem* m_triPurchaseRemove;
   EmployeeHoursTable* m_tbHours;
   JAddRemoveButtons* m_btnAddRemove;
+
+  void createTreeItem(Functionality::Idx idx, QTreeWidgetItem* parent);
 };
 
 #endif // EMPLOYEEVIEW_H

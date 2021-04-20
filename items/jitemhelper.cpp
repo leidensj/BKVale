@@ -356,7 +356,7 @@ bool JItemHelper::save(const JItemSQL& o, const QString& tableName, QWidget* par
     Employee e = w.getEmployee();
     if (!e.m_id.isValid())
       error = QObject::tr("Pincode informado não encontrado.");
-    else if (!e.hasPermissionToEdit(tableName))
+    else if (!e.hasPermissionToCreateEdit(tableName))
       error = QObject::tr("Funcionário não possui permissão.");
     if (!error.isEmpty())
     {

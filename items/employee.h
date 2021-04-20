@@ -29,14 +29,19 @@ struct Employee : public JItemSQL
 
   Form m_form;
   QString m_pincode;
-  bool m_bPurchaseEdit;
-  bool m_bPurchaseRemove;
+  QMap<Functionality::Idx, bool> m_createEditPermissions;
+  QMap<Functionality::Idx, bool> m_removePermissions;
+
+  bool hasPermissionToCreateEdit(Functionality::Idx idx) const;
+  bool hasPermissionToCreateEdit(const QString& tableName) const;
+  bool hasPermissionToRemove(Functionality::Idx idx) const;
+  bool hasPermissionToRemove(const QString& tableName) const;
+  void setPermissionToCreateEdit(Functionality::Idx idx, bool bSet);
+  void setPermissionToRemove(Functionality::Idx idx, bool bSet);
 
   QString strHours() const;
   QVector<TimeInterval> m_hours;
   QVariant getPincodeNull() const { return !m_pincode.isEmpty() ? m_pincode : QVariant(QVariant::String); }
-  bool hasPermissionToEdit(const QString& tableName) const;
-  bool hasPermissionToRemove(const QString& tableName) const;
 };
 
 #endif

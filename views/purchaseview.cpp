@@ -185,6 +185,9 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_btnRemove(nullptr)
   , m_lblViewerData(nullptr)
 {
+  addViewButton(PRODUCT_SQL_TABLE_NAME);
+  addViewButton(SUPPLIER_SQL_TABLE_NAME);
+
   m_btnPrint->setEnabled(true);
   m_btnPrint->show();
 

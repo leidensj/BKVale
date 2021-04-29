@@ -75,9 +75,7 @@ void BaitaSQL::close()
   db.close();
 }
 
-bool BaitaSQL::init(const QString& hostName,
-                    int port,
-                    QString& error)
+bool BaitaSQL::init(const QString& hostName, int port, QString& error)
 {
   QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
   bool bSuccess = db.isValid();
@@ -240,6 +238,10 @@ bool BaitaSQL::createTables(QString& error)
                           EMPLOYEE_SQL_COL_PIN " TEXT UNIQUE,"
                           EMPLOYEE_SQL_COL_NED " BOOLEAN,"
                           EMPLOYEE_SQL_COL_NRE " BOOLEAN,"
+                          EMPLOYEE_SQL_COL_RED " BOOLEAN,"
+                          EMPLOYEE_SQL_COL_RRE " BOOLEAN,"
+                          EMPLOYEE_SQL_COL_CED " BOOLEAN,"
+                          EMPLOYEE_SQL_COL_CRE " BOOLEAN,"
                           "FOREIGN KEY(" EMPLOYEE_SQL_COL_FID ") REFERENCES "
                           FORM_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 

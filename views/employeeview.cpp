@@ -33,7 +33,7 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_formDetails = new FormDetailsEditor;
   m_formPhone = new FormPhoneEditor;
   m_formAddress= new FormAddressEditor;
-  m_edPincode = new JLineEdit(Text::Input::Alphanumeric, false);
+  m_edPincode = new JLineEdit(Text::Input::Numeric, false);
   m_btnAddRemove = new JAddRemoveButtons;
   m_tbHours = new EmployeeHoursTable(m_btnAddRemove);
 
@@ -51,8 +51,10 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_trPermissions->insertTopLevelItem(0, rootCreateEdit);
   m_trPermissions->insertTopLevelItem(1, rootRemove);
   createTreeItem(Functionality::Idx::Purchase, rootCreateEdit);
+  createTreeItem(Functionality::Idx::Reminder, rootCreateEdit);
   createTreeItem(Functionality::Idx::Coupon, rootCreateEdit);
   createTreeItem(Functionality::Idx::Purchase, rootRemove);
+  createTreeItem(Functionality::Idx::Reminder, rootRemove);
   createTreeItem(Functionality::Idx::Coupon, rootRemove);
   rootCreateEdit->setExpanded(true);
   rootRemove->setExpanded(true);

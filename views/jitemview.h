@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include "controls/databaseviewer.h"
 #include <QTabWidget>
+#include <QDialog>
 
 class QPushButton;
 class QTabWidget;
@@ -21,6 +22,7 @@ public:
   explicit JItemView(const QString& tableName, QWidget* parent = nullptr);
   ~JItemView();
   Id getId() const;
+  QString getTableName() const;
 
 public slots:
   virtual void getItem(JItemSQL& o) const = 0;
@@ -55,6 +57,14 @@ protected:
 private:
   QDialog* m_dlgDb;
   QWidget* m_wFocus;
+};
+
+class JItemViewDialog : public QDialog
+{
+  Q_OBJECT
+
+public:
+  explicit JItemViewDialog(JItemView* view, QWidget* parent = nullptr);
 };
 
 #endif // JVIEW_H

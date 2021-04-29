@@ -52,16 +52,28 @@ bool Employee::SQL_insert_proc(QSqlQuery& query) const
                   EMPLOYEE_SQL_COL_FID ","
                   EMPLOYEE_SQL_COL_PIN ","
                   EMPLOYEE_SQL_COL_NED ","
-                  EMPLOYEE_SQL_COL_NRE
+                  EMPLOYEE_SQL_COL_NRE ","
+                  EMPLOYEE_SQL_COL_RED ","
+                  EMPLOYEE_SQL_COL_RRE ","
+                  EMPLOYEE_SQL_COL_CED ","
+                  EMPLOYEE_SQL_COL_CRE
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
                   "(:_v03),"
-                  "(:_v04))");
+                  "(:_v04),"
+                  "(:_v05),"
+                  "(:_v06),"
+                  "(:_v07),"
+                  "(:_v08))");
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
     query.bindValue(":_v03", hasPermissionToCreateEdit(Functionality::Idx::Purchase));
     query.bindValue(":_v04", hasPermissionToRemove(Functionality::Idx::Purchase));
+    query.bindValue(":_v05", hasPermissionToCreateEdit(Functionality::Idx::Reminder));
+    query.bindValue(":_v06", hasPermissionToRemove(Functionality::Idx::Reminder));
+    query.bindValue(":_v07", hasPermissionToCreateEdit(Functionality::Idx::Coupon));
+    query.bindValue(":_v08", hasPermissionToRemove(Functionality::Idx::Coupon));
     bSuccess = query.exec();
     if (bSuccess)
     {
@@ -100,13 +112,21 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
                   EMPLOYEE_SQL_COL_FID " = (:_v01),"
                   EMPLOYEE_SQL_COL_PIN " = (:_v02),"
                   EMPLOYEE_SQL_COL_NED " = (:_v03),"
-                  EMPLOYEE_SQL_COL_NRE " = (:_v04)"
+                  EMPLOYEE_SQL_COL_NRE " = (:_v04),"
+                  EMPLOYEE_SQL_COL_RED " = (:_v05),"
+                  EMPLOYEE_SQL_COL_RRE " = (:_v06),"
+                  EMPLOYEE_SQL_COL_CED " = (:_v07),"
+                  EMPLOYEE_SQL_COL_CRE " = (:_v08)"
                   " WHERE " SQL_COLID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
     query.bindValue(":_v03", hasPermissionToCreateEdit(Functionality::Idx::Purchase));
     query.bindValue(":_v04", hasPermissionToRemove(Functionality::Idx::Purchase));
+    query.bindValue(":_v05", hasPermissionToCreateEdit(Functionality::Idx::Reminder));
+    query.bindValue(":_v06", hasPermissionToRemove(Functionality::Idx::Reminder));
+    query.bindValue(":_v07", hasPermissionToCreateEdit(Functionality::Idx::Coupon));
+    query.bindValue(":_v08", hasPermissionToRemove(Functionality::Idx::Coupon));
 
     bSuccess = query.exec();
     if (bSuccess)
@@ -150,7 +170,11 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
                 EMPLOYEE_SQL_COL_FID ","
                 EMPLOYEE_SQL_COL_PIN ","
                 EMPLOYEE_SQL_COL_NED ","
-                EMPLOYEE_SQL_COL_NRE
+                EMPLOYEE_SQL_COL_NRE ","
+                EMPLOYEE_SQL_COL_RED ","
+                EMPLOYEE_SQL_COL_RRE ","
+                EMPLOYEE_SQL_COL_CED ","
+                EMPLOYEE_SQL_COL_CRE
                 " FROM " EMPLOYEE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -163,6 +187,10 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
       m_pincode = query.value(1).toString();
       setPermissionToCreateEdit(Functionality::Idx::Purchase, query.value(2).toBool());
       setPermissionToRemove(Functionality::Idx::Purchase, query.value(3).toBool());
+      setPermissionToCreateEdit(Functionality::Idx::Reminder, query.value(4).toBool());
+      setPermissionToRemove(Functionality::Idx::Reminder, query.value(5).toBool());
+      setPermissionToCreateEdit(Functionality::Idx::Coupon, query.value(6).toBool());
+      setPermissionToRemove(Functionality::Idx::Coupon, query.value(7).toBool());
     }
     else
     {

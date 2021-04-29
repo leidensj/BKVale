@@ -259,18 +259,9 @@ void Baita::openJItemSQLDialog()
       break;
     }
   }
-
   if (view != nullptr)
   {
-    auto pt = static_cast<QAction*>(sender());
-    QDialog dlg(this);
-    QHBoxLayout *layout = new QHBoxLayout;
-    dlg.setLayout(layout);
-    layout->addWidget(view);
-    dlg.setWindowFlags(Qt::Window);
-    dlg.setWindowTitle(tr("Gerenciar ") + pt->text());
-    dlg.setWindowIcon(pt->icon());
-    dlg.setModal(true);
+    JItemViewDialog dlg(view, this);
     dlg.exec();
   }
 }

@@ -92,18 +92,18 @@ JItemSQL* JItemHelper::create(const QString& tableName, Id id)
   return pt;
 }
 
-bool JItemHelper::authenticationToInsertUpdate(const QString& tableName)
+bool JItemHelper::authenticationToSave(const QString& tableName)
 {
-  if (tableName == PURCHASE_SQL_TABLE_NAME)
-    return true;
-  return false;
+  return (tableName == PURCHASE_SQL_TABLE_NAME ||
+          tableName == REMINDER_SQL_TABLE_NAME ||
+          tableName == COUPON_SQL_TABLE_NAME);
 }
 
 bool JItemHelper::authenticationToRemove(const QString& tableName)
 {
-  if (tableName == PURCHASE_SQL_TABLE_NAME)
-    return true;
-  return false;
+  return (tableName == PURCHASE_SQL_TABLE_NAME ||
+          tableName == REMINDER_SQL_TABLE_NAME ||
+          tableName == COUPON_SQL_TABLE_NAME);
 }
 
 QString JItemHelper::text(Functionality::Idx idx)
@@ -344,10 +344,10 @@ void JItemHelper::remove(const Ids& ids, const QString& tableName, QWidget* pare
   }
 }
 
-bool JItemHelper::save(const JItemSQL& o, const QString& tableName, QWidget* parent)
+bool JItemHelper::save(const JItemSQL& o, QWidget* parent)
 {
   QString error;
-  if (JItemHelper::authenticationToInsertUpdate(tableName))
+  if (JItemHelper::authenticationToSave(o.SQL_tableName()))
   {
     PinCodeDialog w(parent);
     if (!w.exec())
@@ -356,7 +356,7 @@ bool JItemHelper::save(const JItemSQL& o, const QString& tableName, QWidget* par
     Employee e = w.getEmployee();
     if (!e.m_id.isValid())
       error = QObject::tr("Pincode informado não encontrado.");
-    else if (!e.hasPermissionToCreateEdit(tableName))
+    else if (!e.hasPermissionToCreateEdit(o.SQL_tableName()))
       error = QObject::tr("Funcionário não possui permissão.");
     if (!error.isEmpty())
     {

@@ -23,7 +23,7 @@ public:
   const Names& getNames() const;
   void setPlaceholderText(bool bSet);
   DatabaseViewer* getViewer() const;
-  QString getTableText() const;
+  QString getTableName() const;
 
 public slots:
   void clear();

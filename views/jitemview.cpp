@@ -150,7 +150,7 @@ bool JItemView::save(Id& id)
   if (p != nullptr)
   {
     getItem(*p);
-    bSuccess = JItemHelper::save(*p, m_viewer->getTableName(), this);
+    bSuccess = JItemHelper::save(*p, this);
     if (bSuccess)
     {
       clear();
@@ -225,17 +225,30 @@ void JItemView::addViewButton(const QString& tableName)
 void JItemView::viewButtonClicked()
 {
   QString tableName = sender()->property(VIEW_BUTTON).toString();
-  QDialog dlg(this);
   JItemView* view = JItemHelper::view(tableName);
   if (view != nullptr)
   {
-    QHBoxLayout *lt = new QHBoxLayout;
-    dlg.setLayout(lt);
-    lt->addWidget(view);
-    dlg.setWindowFlags(Qt::Window);
-    dlg.setWindowTitle(tr("Gerenciar ") + JItemHelper::text(tableName));
-    dlg.setWindowIcon(QIcon(JItemHelper::icon(tableName)));
-    dlg.setModal(true);
+    JItemViewDialog dlg(view, this);
     dlg.exec();
+  }
+}
+
+QString JItemView::getTableName() const
+{
+  return m_viewer != nullptr ? m_viewer->getTableName() : "";
+}
+
+JItemViewDialog::JItemViewDialog(JItemView* view, QWidget* parent)
+  : QDialog(parent)
+{
+  if (view != nullptr)
+  {
+    QHBoxLayout *lt = new QHBoxLayout;
+    setLayout(lt);
+    lt->addWidget(view);
+    setWindowFlags(Qt::Window);
+    setWindowTitle(tr("Gerenciar ") + JItemHelper::text(view->getTableName()));
+    setWindowIcon(QIcon(JItemHelper::icon(view->getTableName())));
+    setModal(true);
   }
 }

@@ -67,7 +67,7 @@ void DatabasePicker::setSelectorItems()
   clear();
   bool bChanged = false;
   Ids ids(m_selector->getViewer()->getSelectedIds());
-  for (auto id : ids)
+  for (const Id& id : ids)
   {
     auto p = JItemHelper::create(m_selector->getViewer()->getTableName(), id);
     if (p != nullptr && p->m_id.isValid())
@@ -102,10 +102,10 @@ bool DatabasePicker::addItem(Id id, const QString& name, const QByteArray& arIma
         m_ids.push_back(id);
         m_names.push_back(name);
         QString str, strTooltip;
-        for (auto name : m_names)
+        for (const QString& _name : m_names)
         {
-          str += name + "; ";
-          strTooltip += name + "\n";
+          str += _name + "; ";
+          strTooltip += _name + "\n";
         }
         str.chop(2);
         strTooltip.chop(1);
@@ -177,14 +177,14 @@ const Names& DatabasePicker::getNames() const
   return m_names;
 }
 
-QString DatabasePicker::getTableText() const
+QString DatabasePicker::getTableName() const
 {
-  return JItemHelper::text(m_selector->getViewer()->getTableName());
+  return m_selector->getViewer()->getTableName();
 }
 
 void DatabasePicker::setPlaceholderText(bool bSet)
 {
-  m_edText->setPlaceholderText(bSet ? getTableText() : "");
+  m_edText->setPlaceholderText(bSet ? JItemHelper::text(getTableName()) : "");
 }
 
 void DatabasePicker::showImage()

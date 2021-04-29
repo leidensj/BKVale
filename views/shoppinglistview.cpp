@@ -115,8 +115,8 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   QFormLayout* viewFormLayout = new QFormLayout;
   viewFormLayout->addRow(tr("Título:"), m_edTitle);
-  viewFormLayout->addRow(m_supplierPicker->getTableText() + ":", m_supplierPicker);
-  viewFormLayout->addRow(m_imagePicker->getTableText() + ":", m_imagePicker);
+  viewFormLayout->addRow(JItemHelper::text(m_supplierPicker->getTableName()) + ":", m_supplierPicker);
+  viewFormLayout->addRow(JItemHelper::text(m_imagePicker->getTableName()) + ":", m_imagePicker);
   viewFormLayout->addRow(tr("Linhas:"), m_snLines);
   viewFormLayout->addRow(tr("Descrição:"), m_teDescription);
 

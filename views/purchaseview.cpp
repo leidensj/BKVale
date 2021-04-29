@@ -471,7 +471,7 @@ bool PurchaseView::save(Id& id)
     return false;
   }
 
-  bool bSuccess = JItemHelper::save(o, m_viewer->getTableName(), this);
+  bool bSuccess = JItemHelper::save(o, this);
   if (bSuccess)
   {
     print(o);

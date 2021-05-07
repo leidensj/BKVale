@@ -11,6 +11,8 @@ namespace JItemHelper
 {
 JItemSQL* create(const QString& tableName);
 JItemSQL* create(const QString& tableName, Id id);
+bool authenticateRemove(const QString tableName, QWidget* parent = nullptr);
+bool authenticateSave(const JItemSQL& o, QWidget* parent = nullptr);
 bool authenticationToSave(const QString& tableName);
 bool authenticationToRemove(const QString& tableName);
 QString text(Functionality::Idx idx);

@@ -178,6 +178,10 @@ void CouponView::updateControls()
 
 bool CouponView::save(Id& id)
 {
+  Coupon c;
+  if (!JItemHelper::authenticateSave(c))
+    return false;
+
   id.clear();
   bool ok = true;
   int n = 1;
@@ -192,7 +196,6 @@ bool CouponView::save(Id& id)
     {
       if (!m_id.isValid())
       {
-        o.m_id.clear();
         o.m_code.clear();
         o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
       }

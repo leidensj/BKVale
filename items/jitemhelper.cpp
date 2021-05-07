@@ -299,22 +299,13 @@ bool JItemHelper::select(JItemSQL& o, QWidget* parent)
   return bSuccess;
 }
 
-void JItemHelper::remove(const Ids& ids, const QString& tableName, QWidget* parent)
+bool JItemHelper::authenticateRemove(const QString tableName, QWidget* parent)
 {
-  if (ids.size() == 0)
-    return;
-
-  if (QMessageBox::question(parent,
-                            QObject::tr("Remover itens"),
-                            QObject::tr("Tem certeza que deseja remover os itens selecionados?"),
-                            QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
-    return;
-
   if (JItemHelper::authenticationToRemove(tableName))
   {
     PinCodeDialog w(parent);
     if (!w.exec())
-      return;
+      return false;
 
     QString error;
     Employee e = w.getEmployee();
@@ -325,26 +316,13 @@ void JItemHelper::remove(const Ids& ids, const QString& tableName, QWidget* pare
     if (!error.isEmpty())
     {
       QMessageBox::warning(parent, QObject::tr("Erro"), error, QMessageBox::Ok);
-      return;
+      return false;
     }
   }
-
-  for (auto id : ids)
-  {
-    auto p = JItemHelper::create(tableName, id);
-    if (p != nullptr)
-    {
-      QString error;
-      if (!p->SQL_remove(error))
-        QMessageBox::warning(parent,
-                             QObject::tr("Aviso"),
-                             QObject::tr("Erro ao remover item com id '%1': %2").arg(id.str(), error), QMessageBox::Ok);
-      delete p;
-    }
-  }
+  return true;
 }
 
-bool JItemHelper::save(const JItemSQL& o, QWidget* parent)
+bool JItemHelper::authenticateSave(const JItemSQL& o, QWidget* parent)
 {
   QString error;
   if (JItemHelper::authenticationToSave(o.SQL_tableName()))
@@ -365,7 +343,38 @@ bool JItemHelper::save(const JItemSQL& o, QWidget* parent)
     }
     o.setEmployee(e);
   }
+  return true;
+}
 
+void JItemHelper::remove(const Ids& ids, const QString& tableName, QWidget* parent)
+{
+  if (ids.size() == 0)
+    return;
+
+  if (!authenticateRemove(tableName, parent))
+    return;
+
+  for (auto id : ids)
+  {
+    auto p = JItemHelper::create(tableName, id);
+    if (p != nullptr)
+    {
+      QString error;
+      if (!p->SQL_remove(error))
+        QMessageBox::warning(parent,
+                             QObject::tr("Aviso"),
+                             QObject::tr("Erro ao remover item com id '%1': %2").arg(id.str(), error), QMessageBox::Ok);
+      delete p;
+    }
+  }
+}
+
+bool JItemHelper::save(const JItemSQL& o, QWidget* parent)
+{
+  if (!authenticateSave(o, parent))
+    return false;
+
+  QString error;
   bool bSuccess = o.SQL_insert_update(error);
   if (!bSuccess)
     QMessageBox::critical(parent, QObject::tr("Ops..."), QObject::tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);

@@ -16,6 +16,7 @@ CouponFilter::CouponFilter(QWidget* parent)
   ltMain->setContentsMargins(0, 0, 0, 0);
   ltMain->addWidget(m_cbExpired);
   ltMain->addWidget(m_cbRedeemed);
+  ltMain->setAlignment(Qt::AlignTop);
 
   m_fr->setLayout(ltMain);
 
@@ -44,6 +45,6 @@ QString CouponFilter::getFilter() const
 
 void CouponFilter::clear()
 {
-  m_cbExpired->setChecked(true);
-  m_cbRedeemed->setChecked(true);
+  m_cbExpired->setChecked(false);
+  m_cbRedeemed->setChecked(false);
 }

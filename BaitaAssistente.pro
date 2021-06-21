@@ -30,6 +30,7 @@ SOURCES += main.cpp\
   editors/addresseditor.cpp \
   editors/formeditor.cpp \
   editors/packageeditor.cpp \
+  filters/couponfilter.cpp \
   filters/jfilter.cpp \
   items/coupon.cpp \
   items/couponproduct.cpp \
@@ -141,6 +142,7 @@ HEADERS  += mainwindow.h \
     editors/addresseditor.h \
     editors/formeditor.h \
     editors/packageeditor.h \
+    filters/couponfilter.h \
     filters/jfilter.h \
     items/coupon.h \
     items/couponproduct.h \

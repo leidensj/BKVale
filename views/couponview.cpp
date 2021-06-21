@@ -5,6 +5,7 @@
 #include "controls/databasepicker.h"
 #include "items/jitemhelper.h"
 #include "tables/coupontable.h"
+#include "filters/couponfilter.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
@@ -50,6 +51,7 @@ CouponView::CouponView(QWidget* parent)
   , m_btnAddRemove(nullptr)
   , m_table(nullptr)
   , m_lblCount(nullptr)
+  , m_filter(nullptr)
 {
   m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
 
@@ -69,7 +71,6 @@ CouponView::CouponView(QWidget* parent)
   m_rdoValue = new QRadioButton(tr("Valor:"));
   m_edValue = new JExpLineEdit(Data::Type::Money);
   m_edValue->setMinimum(0.0);
-
 
   m_rdoProduct = new QRadioButton(tr("Produto:"));
   m_btnAddRemove = new JAddRemoveButtons;
@@ -92,6 +93,9 @@ CouponView::CouponView(QWidget* parent)
   ltMain->setAlignment(Qt::AlignTop);
   ltMain->addRow(tr(""), m_lblRedeemed);
 
+  m_filter = new CouponFilter;
+  m_tabDb->addTab(m_filter, QIcon(":/icons/res/filter.png"), tr("Filtro"));
+
   QFrame* tabframe = new QFrame;
   tabframe->setLayout(ltMain);
   m_tab->addTab(tabframe, QIcon(":/icons/res/coupon.png"), tr("Cupom"));
@@ -107,6 +111,7 @@ CouponView::CouponView(QWidget* parent)
   connect(m_rdoValue, SIGNAL(clicked(bool)), m_edValue, SLOT(setFocus()));
   connect(m_rdoProduct, SIGNAL(clicked(bool)), m_btnAddRemove->m_btnAdd, SLOT(setFocus()));
   connect(m_viewer, &DatabaseViewer::refreshSignal, m_lblCount, [=](){ m_lblCount->setText(tr("Número de cupons: %1").arg(m_viewer->getRowCount())); });
+  connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_viewer, SLOT(setDynamicFilter(const QString&)));
 
   setFocusWidgetOnClear(m_edPercentage);
   m_viewer->refresh();

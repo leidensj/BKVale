@@ -16,6 +16,7 @@ class JSpinBox;
 class DatabasePicker;
 class JAddRemoveButtons;
 class CouponTable;
+class CouponFilter;
 
 class CouponConfirmation : public QDialog
 {
@@ -57,6 +58,7 @@ private:
   JAddRemoveButtons* m_btnAddRemove;
   CouponTable* m_table;
   QLabel* m_lblCount;
+  CouponFilter* m_filter;
 };
 
 #endif // CATEGORYVIEW_H

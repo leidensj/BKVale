@@ -81,19 +81,18 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
         break;
       case Column::Redemption:
       {
-        QDateTime dtRedemption = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::RedemptionDate), role).toDateTime();
-        value = value.toBool() ? "Sim " + dtRedemption.toString("yyyy/MM/dd hh:mm:ss") : "";
+          QDateTime dtRedemption = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::RedemptionDate), role).toDateTime();
+          value = value.toBool() ? dtRedemption.toString("yyyy/MM/dd hh:mm:ss") : "";
       } break;
       case Column::Expiration:
       {
         bool bExpires = value.toBool();
         bool bRedeemed = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::Redemption), role).toBool();
         QDate dtExpiration = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::ExpirationDate), role).toDate();
-        bool bExpired = bExpires && !bRedeemed && DateTime::server().date() > dtExpiration;
         if (!bExpires || bRedeemed)
           value = "";
         else
-          value = (bExpired ? "Sim " : "Não ") + dtExpiration.toString("yyyy/MM/dd");
+          value = dtExpiration.toString("yyyy/MM/dd");
       } break;
       default:
         break;
@@ -110,6 +109,24 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
         o.SQL_select(error);
         value = o.strCoupon();
       }
+    }
+  }
+  else if (role == Qt::BackgroundRole)
+  {
+    switch ((Column)idx.column())
+    {
+      case Column::Expiration:
+      case Column::Redemption:
+      {
+        bool bExpires = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::Expiration), Qt::DisplayRole).toBool();
+        bool bRedeemed = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::Redemption), Qt::DisplayRole).toBool();
+        QDate dtExpiration = QSqlQueryModel::data(idx.sibling(idx.row(), (int)Column::ExpirationDate), Qt::DisplayRole).toDate();
+        bool bExpired = bExpires && !bRedeemed && DateTime::server().date() > dtExpiration;
+        if (bExpired)
+          value = QColor(255, 200, 200);
+      } break;
+      default:
+        break;
     }
   }
   return value;

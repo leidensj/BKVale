@@ -10,7 +10,9 @@ CouponFilter::CouponFilter(QWidget* parent)
   , m_cbRedeemed(nullptr)
 {
   m_cbExpired = new QCheckBox(tr("Expirados"));
+  m_cbExpired->setTristate();
   m_cbRedeemed = new QCheckBox(tr("Resgatados"));
+  m_cbRedeemed->setTristate();
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->setContentsMargins(0, 0, 0, 0);
@@ -22,23 +24,29 @@ CouponFilter::CouponFilter(QWidget* parent)
 
   connect(m_cbExpired, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbRedeemed, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
-  clear();
+  CouponFilter::clear();
 }
 
 QString CouponFilter::getFilter() const
 {
   QString strFilter;
-  if (m_cbExpired->isChecked())
+  Qt::CheckState cs = m_cbExpired->checkState();
+  if (cs == Qt::Checked)
     strFilter += COUPON_SQL_COL_RED " = FALSE AND "
                  COUPON_SQL_COL_EXP " = TRUE AND "
                  COUPON_SQL_COL_EDT " < CURRENT_DATE";
+  else if (cs == Qt::PartiallyChecked)
+    strFilter += COUPON_SQL_COL_RED " = TRUE OR "
+                 COUPON_SQL_COL_EXP " = FALSE OR "
+                 COUPON_SQL_COL_EDT " > CURRENT_DATE";
 
-  if (m_cbRedeemed->isChecked())
-  {
-    if (!strFilter.isEmpty())
-      strFilter += " AND ";
+  cs = m_cbRedeemed->checkState();
+  if (cs != Qt::Unchecked && !strFilter.isEmpty())
+    strFilter += " AND ";
+  if (cs == Qt::Checked)
     strFilter += COUPON_SQL_COL_RED " = TRUE";
-  }
+  else if (cs == Qt::PartiallyChecked)
+    strFilter += COUPON_SQL_COL_RED " = FALSE";
 
   return strFilter;
 }

@@ -188,31 +188,41 @@ bool CouponView::save(Id& id)
     return false;
 
   id.clear();
-  bool ok = true;
-  int n = 1;
   if (!m_id.isValid())
-    n = QInputDialog::getInt(this, tr("Gerar Cupons"), tr("Informe o número de cupons a serem gerados:"), 0, 1, 9999, 1, &ok);
-  if (ok)
   {
-    QVector<Coupon> coupons;
+    bool ok = true;
+    int n = QInputDialog::getInt(this, tr("Gerar Cupons"), tr("Informe o número de cupons a serem gerados:"), 0, 1, 9999, 1, &ok);
+    if (ok)
+    {
+      QVector<Coupon> coupons;
+      Coupon o;
+      getItem(o);
+      for (int i = 0; i != n; ++i)
+      {
+        if (!m_id.isValid())
+        {
+          o.m_code.clear();
+          o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
+        }
+        coupons.append(o);
+      }
+      st_saveMultiple(coupons, this);
+      clear();
+      CouponConfirmation dlg(coupons, this);
+      if (dlg.exec())
+        for (int i = 0; i != coupons.size(); ++i)
+          JItemHelper::print(coupons.at(i), nullptr, this);
+    }
+  }
+  else
+  {
     Coupon o;
     getItem(o);
-    for (int i = 0; i != n; ++i)
-    {
-      if (!m_id.isValid())
-      {
-        o.m_code.clear();
-        o.m_code = m_edCode->text().isEmpty() ? Coupon::st_newCode() : m_edCode->text() + (n == 1 ? "" : Data::strInt(i + 1));
-      }
-      coupons.append(o);
-    }
-    st_saveMultiple(coupons, this);
+    QString error;
     clear();
-    CouponConfirmation dlg(coupons, this);
-    if (dlg.exec())
-      for (int i = 0; i != coupons.size(); ++i)
-        JItemHelper::print(coupons.at(i), nullptr, this);
+    return o.SQL_insert_update(error);
   }
+
   return true;
 }
 

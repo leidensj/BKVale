@@ -132,7 +132,7 @@ bool Coupon::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v07", m_dtExpiration);
   query.bindValue(":_v08", m_percentage);
   query.bindValue(":_v09", m_value);
-  query.bindValue(":_v09", m_store.m_id.getIdNull());
+  query.bindValue(":_v10", m_store.m_id.getIdNull());
 
   bool ok = query.exec();
   if (ok)

@@ -20,6 +20,11 @@ bool JItemSQL::SQL_insert_update(QString& error) const
   return SQL_finish(db, query, bSuccess, error);
 }
 
+bool JItemSQL::SQL_insert_update_proc(QSqlQuery& query) const
+{
+  return m_id.isValid() ? SQL_update_proc(query) : SQL_insert_proc(query);
+}
+
 bool JItemSQL::SQL_select(QString& error)
 {
   error.clear();

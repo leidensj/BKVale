@@ -22,6 +22,7 @@ struct JItemSQL : public JItem
   virtual bool SQL_insert_update(QString& error) const;
   virtual bool SQL_select(QString& error);
   virtual bool SQL_remove(QString& error) const;
+  virtual bool SQL_insert_update_proc(QSqlQuery& query) const;
 
   virtual QString name() const { return "Nome não implementado."; }
   virtual QByteArray image() const { return QByteArray(); }

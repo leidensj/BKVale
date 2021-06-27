@@ -440,9 +440,8 @@ void PurchaseView::updateControls()
   m_actAddHistory->setEnabled(m_supplierPicker->getFirstId().isValid());
 }
 
-bool PurchaseView::save(Id& id)
+void PurchaseView::save()
 {
-  id.clear();
   Purchase o;
   getItem(o);
 
@@ -468,7 +467,7 @@ bool PurchaseView::save(Id& id)
                           tr("Pagamento inconsistente"),
                           tr("O valor do pagamento é diferente do valor da compra."),
                           QMessageBox::Ok);
-    return false;
+    return;
   }
 
   bool bSuccess = JItemHelper::save(o, this);
@@ -481,12 +480,10 @@ bool PurchaseView::save(Id& id)
       settings.setValue(SETTINGS_PURCHASE_STORE_ID, o.m_store.m_id.get());
     }
     m_viewer->refresh();
-    id = o.m_id;
     m_lastId = o.m_id;
     clear();
   }
   updateControls();
-  return bSuccess;
 }
 
 void PurchaseView::lastItemSelected()

@@ -28,12 +28,11 @@ public slots:
   virtual void getItem(JItemSQL& o) const = 0;
   virtual void clear();
   virtual void setItem();
-  virtual bool save(Id& id);
+  virtual void save();
 
 protected slots:
   virtual void setItem(const JItemSQL& o) = 0;
   virtual void itemsRemoved(const Ids& ids);
-  virtual void save();
   void setFocusWidgetOnClear(QWidget* w);
   void addViewButton(const QString& tableName);
   void viewButtonClicked();

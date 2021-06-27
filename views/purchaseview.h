@@ -75,7 +75,7 @@ class PurchaseView : public JItemView
 public:
   explicit PurchaseView(QWidget *parent = 0);
   ~PurchaseView();
-  bool save(Id& id);
+  void save();
   void setItem();
 
 public slots:

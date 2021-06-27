@@ -26,7 +26,10 @@ CouponConfirmation::CouponConfirmation(const QVector<Coupon>& coupons, QWidget* 
   QPlainTextEdit* teCodes = new QPlainTextEdit;
   QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No);
   QVBoxLayout* ltMain = new QVBoxLayout;
-  ltMain->addWidget(new QLabel(tr("Deseja imprimir os %1 códigos gerados?").arg(coupons.size())));
+  QString msg = coupons.size() == 1 && coupons.at(0).m_id.isValid()
+                ? tr("Deseja imprimir o cupom atualizado?")
+                : tr("Deseja imprimir os %1 cupons gerados?").arg(coupons.size());
+  ltMain->addWidget(new QLabel(msg));
   ltMain->addWidget(teCodes);
   ltMain->addWidget(btns);
   setLayout(ltMain);
@@ -181,13 +184,12 @@ void CouponView::updateControls()
   m_btnAddRemove->setEnabled(m_rdoProduct->isChecked());
 }
 
-bool CouponView::save(Id& id)
+void CouponView::save()
 {
   Coupon c;
   if (!JItemHelper::authenticateSave(c))
-    return false;
+    return;
 
-  id.clear();
   bool ok = true;
   int n = 1;
   if (!m_id.isValid())
@@ -213,8 +215,6 @@ bool CouponView::save(Id& id)
       for (int i = 0; i != coupons.size(); ++i)
         JItemHelper::print(coupons.at(i), nullptr, this);
   }
-
-  return true;
 }
 
 bool CouponView::st_saveMultiple(QVector<Coupon>& v, QWidget* parent)

@@ -553,7 +553,7 @@ bool Printer::print(const Coupon& o, QString& error)
            ESC_LF
            ESC_VERT_TAB
            ESC_ALIGN_LEFT
-           "Emissao:" +
+           "Emissao: " +
            o.m_dtCreation.toString("dd/MM/yyyy hh:mm:ss") +
            " @ " + QHostInfo::localHostName().toUpper() +
            ESC_LF;

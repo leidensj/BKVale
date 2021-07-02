@@ -1,5 +1,5 @@
 #include "databaseselector.h"
-#include "items/jitemHelper.h"
+#include "items/jitemhelper.h"
 #include <QLayout>
 #include <QLabel>
 

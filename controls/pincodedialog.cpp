@@ -9,105 +9,34 @@
 
 #define BUTTON_CODE "button_code"
 
+namespace
+{
+  QPushButton* createButton(int idx, QWidget* parent)
+  {
+    QPushButton* btn = new QPushButton;
+    btn->setFlat(true);
+    btn->setIconSize(QSize(64, 64));
+    btn->setIcon(QIcon(QString(":/icons/res/calc%1.png").arg(QString::number(idx))));
+    btn->setShortcut(QKeySequence(Qt::Key_0 + idx));
+    btn->setProperty(BUTTON_CODE, Qt::Key_0 + idx);
+    btn->installEventFilter(parent);
+    QObject::connect(btn, SIGNAL(clicked(bool)), parent, SLOT(buttonPressed()));
+    return btn;
+  }
+}
+
 PinCodeDialog::PinCodeDialog(QWidget* parent)
   : QDialog(parent)
   , m_bError(false)
   , m_edPinCode(nullptr)
-  , m_btn0(nullptr)
-  , m_btn1(nullptr)
-  , m_btn2(nullptr)
-  , m_btn3(nullptr)
-  , m_btn4(nullptr)
-  , m_btn5(nullptr)
-  , m_btn6(nullptr)
-  , m_btn7(nullptr)
-  , m_btn8(nullptr)
-  , m_btn9(nullptr)
   , m_btnEnter(nullptr)
   , m_btnClr(nullptr)
 {
   setWindowIcon(QIcon(":/icons/res/employee.png"));
   setWindowTitle(tr("Selecionar Funcionário"));
-  m_btn7 = new QPushButton;
-  m_btn7->setFlat(true);
-  m_btn7->setIconSize(QSize(64, 64));
-  m_btn7->setIcon(QIcon(":/icons/res/calc7.png"));
-  m_btn7->setShortcut(QKeySequence(Qt::Key_7));
-  m_btn7->setProperty(BUTTON_CODE, Qt::Key_7);
 
-  m_btn8 = new QPushButton;
-  m_btn8->setFlat(true);
-  m_btn8->setIconSize(QSize(64, 64));
-  m_btn8->setIcon(QIcon(":/icons/res/calc8.png"));
-  m_btn8->setShortcut(QKeySequence(Qt::Key_8));
-  m_btn8->setProperty(BUTTON_CODE, Qt::Key_8);
-
-  m_btn9 = new QPushButton;
-  m_btn9->setFlat(true);
-  m_btn9->setIconSize(QSize(64, 64));
-  m_btn9->setIcon(QIcon(":/icons/res/calc9.png"));
-  m_btn9->setShortcut(QKeySequence(Qt::Key_9));
-  m_btn9->setProperty(BUTTON_CODE, Qt::Key_9);
-
-  QHBoxLayout* hline1 = new QHBoxLayout;
-  hline1->addWidget(m_btn7);
-  hline1->addWidget(m_btn8);
-  hline1->addWidget(m_btn9);
-  hline1->setContentsMargins(0, 0, 0, 0);
-
-  m_btn4 = new QPushButton;
-  m_btn4->setFlat(true);
-  m_btn4->setIconSize(QSize(64, 64));
-  m_btn4->setIcon(QIcon(":/icons/res/calc4.png"));
-  m_btn4->setShortcut(QKeySequence(Qt::Key_4));
-  m_btn4->setProperty(BUTTON_CODE, Qt::Key_4);
-
-  m_btn5 = new QPushButton;
-  m_btn5->setFlat(true);
-  m_btn5->setIconSize(QSize(64, 64));
-  m_btn5->setIcon(QIcon(":/icons/res/calc5.png"));
-  m_btn5->setShortcut(QKeySequence(Qt::Key_5));
-  m_btn5->setProperty(BUTTON_CODE, Qt::Key_5);
-
-  m_btn6 = new QPushButton;
-  m_btn6->setFlat(true);
-  m_btn6->setIconSize(QSize(64, 64));
-  m_btn6->setIcon(QIcon(":/icons/res/calc6.png"));
-  m_btn6->setShortcut(QKeySequence(Qt::Key_6));
-  m_btn6->setProperty(BUTTON_CODE, Qt::Key_6);
-
-  QHBoxLayout* hline2 = new QHBoxLayout;
-  hline2->addWidget(m_btn4);
-  hline2->addWidget(m_btn5);
-  hline2->addWidget(m_btn6);
-  hline2->setContentsMargins(0, 0, 0, 0);
-
-  m_btn1 = new QPushButton;
-  m_btn1->setFlat(true);
-  m_btn1->setIconSize(QSize(64, 64));
-  m_btn1->setIcon(QIcon(":/icons/res/calc1.png"));
-  m_btn1->setShortcut(QKeySequence(Qt::Key_1));
-  m_btn1->setProperty(BUTTON_CODE, Qt::Key_1);
-
-  m_btn2 = new QPushButton;
-  m_btn2->setFlat(true);
-  m_btn2->setIconSize(QSize(64, 64));
-  m_btn2->setIcon(QIcon(":/icons/res/calc2.png"));
-  m_btn2->setShortcut(QKeySequence(Qt::Key_2));
-  m_btn2->setProperty(BUTTON_CODE, Qt::Key_2);
-
-  m_btn3 = new QPushButton;
-  m_btn3->setFlat(true);
-  m_btn3->setIconSize(QSize(64, 64));
-  m_btn3->setIcon(QIcon(":/icons/res/calc3.png"));
-  m_btn3->setShortcut(QKeySequence(Qt::Key_3));
-  m_btn3->setProperty(BUTTON_CODE, Qt::Key_3);
-
-  QHBoxLayout* hline3 = new QHBoxLayout;
-  hline3->addWidget(m_btn1);
-  hline3->addWidget(m_btn2);
-  hline3->addWidget(m_btn3);
-  hline3->setContentsMargins(0, 0, 0, 0);
+  for (int i = 0; i != 10; ++i)
+    m_btn[i] = createButton(i, this);
 
   m_btnClr = new QPushButton;
   m_btnClr->setFlat(true);
@@ -115,23 +44,37 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
   m_btnClr->setIcon(QIcon(":/icons/res/calcclr.png"));
   m_btnClr->setShortcut(QKeySequence(Qt::Key_Backspace));
   m_btnClr->setProperty(BUTTON_CODE, Qt::Key_Backspace);
-
-  m_btn0 = new QPushButton;
-  m_btn0->setFlat(true);
-  m_btn0->setIconSize(QSize(64, 64));
-  m_btn0->setIcon(QIcon(":/icons/res/calc0.png"));
-  m_btn0->setShortcut(QKeySequence(Qt::Key_0));
-  m_btn0->setProperty(BUTTON_CODE, Qt::Key_0);
+  m_btnClr->installEventFilter(this);
+  QObject::connect(m_btnClr, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
 
   m_btnEnter = new QPushButton;
   m_btnEnter->setFlat(true);
   m_btnEnter->setIconSize(QSize(64, 64));
   m_btnEnter->setIcon(QIcon(":/icons/res/ok.png"));
   m_btnEnter->setProperty(BUTTON_CODE, Qt::Key_Enter);
+  QObject::connect(m_btnEnter, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
+
+  QHBoxLayout* hline1 = new QHBoxLayout;
+  hline1->addWidget(m_btn[7]);
+  hline1->addWidget(m_btn[8]);
+  hline1->addWidget(m_btn[9]);
+  hline1->setContentsMargins(0, 0, 0, 0);
+
+  QHBoxLayout* hline2 = new QHBoxLayout;
+  hline2->addWidget(m_btn[4]);
+  hline2->addWidget(m_btn[5]);
+  hline2->addWidget(m_btn[6]);
+  hline2->setContentsMargins(0, 0, 0, 0);
+
+  QHBoxLayout* hline3 = new QHBoxLayout;
+  hline3->addWidget(m_btn[1]);
+  hline3->addWidget(m_btn[2]);
+  hline3->addWidget(m_btn[3]);
+  hline3->setContentsMargins(0, 0, 0, 0);
 
   QHBoxLayout* hline4 = new QHBoxLayout();
   hline4->addWidget(m_btnClr);
-  hline4->addWidget(m_btn0);
+  hline4->addWidget(m_btn[0]);
   hline4->addWidget(m_btnEnter);
   hline4->setContentsMargins(0, 0, 0, 0);
 
@@ -152,35 +95,9 @@ PinCodeDialog::PinCodeDialog(QWidget* parent)
   vlayoutl->addLayout(hline4);
   vlayoutl->addStretch();
 
+  m_edPinCode->installEventFilter(this);
   setLayout(vlayoutl);
   setFixedSize(vlayoutl->minimumSize());
-
-  m_edPinCode->installEventFilter(this);
-  m_btnClr->installEventFilter(this);
-  m_btn0->installEventFilter(this);
-  m_btn1->installEventFilter(this);
-  m_btn2->installEventFilter(this);
-  m_btn3->installEventFilter(this);
-  m_btn4->installEventFilter(this);
-  m_btn5->installEventFilter(this);
-  m_btn6->installEventFilter(this);
-  m_btn7->installEventFilter(this);
-  m_btn8->installEventFilter(this);
-  m_btn9->installEventFilter(this);
-
-  QObject::connect(m_btnEnter, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn0, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn1, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn2, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn3, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn4, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn5, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn6, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn7, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn8, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btn9, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-  QObject::connect(m_btnClr, SIGNAL(clicked(bool)), this, SLOT(buttonPressed()));
-
 }
 
 void PinCodeDialog::buttonPressed()

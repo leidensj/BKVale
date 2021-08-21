@@ -317,7 +317,7 @@ QString PurchaseReport::processPurchase() const
       {
         html +=
         "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
-          "<tr><th>Quantidade</th><th>Unidade</th><th>Produto</th><th>Preço (R$)</th><th>Subtotal (R$)</th></tr>";
+          "<tr><th>Qte</th><th>Un</th><th>Produto</th><th>Vl Un</th><th>Vl Total</th></tr>";
       }
       currentNumber = query.value(0).toInt();
       nPurchases++;
@@ -430,7 +430,7 @@ QString PurchaseReport::proccesSupplier() const
       currentSupplier = query.value(16).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
                       "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(5).toString());
-      html += "<tr><th>Data</th><th>Número</th><th>Produto</th><th>Loja</th><th>Quantidade</th><th>Unidade</th><th>Preço (R$)</th><th>Subtotal (R$)</th></tr>";
+      html += "<tr><th>Data</th><th>Número</th><th>Produto</th><th>Loja</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
     }
     html += QString(
                 "<tr>"

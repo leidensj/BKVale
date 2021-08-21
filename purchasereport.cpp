@@ -187,7 +187,7 @@ QString PurchaseReport::processProduct() const
       currentProduct = query.value(9).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
                       "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(7).toString());
-      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Quantidade</th><th>Unidade</th><th>Preço (R$)</th><th>Subtotal (R$)</th></tr>";
+      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
     }
     html += QString(
                 "<tr>"

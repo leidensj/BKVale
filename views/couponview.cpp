@@ -219,6 +219,9 @@ void CouponView::save()
 
 bool CouponView::st_saveMultiple(QVector<Coupon>& v, QWidget* parent)
 {
+  if (v.count() == 0)
+    return true;
+
   QString error;
 
   if (!JItemSQL::SQL_isOpen(error))

@@ -3,6 +3,7 @@
 
 #define INVALID_ID 0
 
+#define VERSION "2.1"
 #define SETTINGS_COMPANY_NAME "LEICO"
 #define SETTINGS_APP_NAME     "BaitaAssistente"
 

@@ -136,7 +136,7 @@ void Report::toPdf()
   if (fileName.isEmpty())
     return;
 
-  PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), true, true);
+  PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), true, false);
   auto p = JStatusProgressBarInstance::getInstance();
   auto l = JStatusMessageInstance::getInstance();
   if (p != nullptr)

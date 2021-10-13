@@ -8,15 +8,13 @@ class CouponModel : public JModel
   enum class Column
   {
     Id,
+    Date,
     Coupon,
     Code,
-    Date,
-    Redemption,
-    RedemptionDate,
     Expiration,
-    ExpirationDate,
-    Percentage,
-    Value
+    Expired,
+    Redemption,
+    Redeemed
   };
 public:
   CouponModel(QObject *parent);

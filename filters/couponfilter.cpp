@@ -32,13 +32,9 @@ QString CouponFilter::getFilter() const
   QString strFilter;
   Qt::CheckState cs = m_cbExpired->checkState();
   if (cs == Qt::Checked)
-    strFilter += COUPON_SQL_COL_RED " = FALSE AND "
-                 COUPON_SQL_COL_EXP " = TRUE AND "
-                 COUPON_SQL_COL_EDT " < CURRENT_DATE";
+    strFilter += COUPON_SQL_COL_TEMP_EXP " = TRUE";
   else if (cs == Qt::PartiallyChecked)
-    strFilter += COUPON_SQL_COL_RED " = TRUE OR "
-                 COUPON_SQL_COL_EXP " = FALSE OR "
-                 COUPON_SQL_COL_EDT " > CURRENT_DATE";
+    strFilter += COUPON_SQL_COL_TEMP_EXP " = FALSE";
 
   cs = m_cbRedeemed->checkState();
   if (cs != Qt::Unchecked && !strFilter.isEmpty())

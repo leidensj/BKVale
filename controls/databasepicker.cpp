@@ -3,7 +3,7 @@
 #include "widgets/jclicklabel.h"
 #include "defines.h"
 #include "databaseviewer.h"
-#include "items/Jitemhelper.h"
+#include "items/jitemhelper.h"
 #include "imageviewer.h"
 #include "databaseselector.h"
 #include <QDialog>
@@ -191,7 +191,7 @@ void DatabasePicker::showImage()
 {
   QDialog dlg(this);
   ImageViewer* viewer = new ImageViewer(true);
-  viewer->setImage(m_lblImage->pixmap(Qt::ReturnByValue).toImage());
+  viewer->setImage(m_lblImage->pixmap()->toImage());
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   layout->addWidget(viewer);

@@ -19,6 +19,9 @@ public slots:
 private:
   QCheckBox* m_cbExpired;
   QCheckBox* m_cbRedeemed;
+  QCheckBox* m_cbPercentage;
+  QCheckBox* m_cbValue;
+  QCheckBox* m_cbProduct;
 };
 
 #endif // COUPONFILTER_H

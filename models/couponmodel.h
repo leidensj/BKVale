@@ -8,6 +8,7 @@ class CouponModel : public JModel
   enum class Column
   {
     Id,
+    Type,
     Date,
     Coupon,
     Code,

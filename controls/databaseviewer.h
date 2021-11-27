@@ -65,6 +65,7 @@ private:
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
+  QPushButton* m_btnCopy;
   QHBoxLayout* m_ltButton;
   JLineEdit* m_edSearch;
   QCheckBox* m_cbContains;
@@ -79,6 +80,7 @@ private slots:
   void containsPressed();
   void enableControls();
   void removeItems();
+  void copyItems();
   void focusSearch();
   void emitCurrentRowChangedSignal();
   void emitItemsSelectedSignal();

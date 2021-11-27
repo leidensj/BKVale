@@ -2,7 +2,7 @@
 
 Image::Image()
 {
-  clear();
+  Image::clear();
 }
 
 void Image::clear(bool bClearId)
@@ -11,6 +11,12 @@ void Image::clear(bool bClearId)
     m_id.clear();
   m_name.clear();
   m_image.clear();
+}
+
+void Image::copy(const JItemSQL& other)
+{
+  *this = dynamic_cast<const Image&>(other);
+  m_name = "Cópia de " + m_name;
 }
 
 bool Image::operator !=(const JItem& other) const

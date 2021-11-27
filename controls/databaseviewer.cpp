@@ -43,6 +43,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   , m_btnOpen(nullptr)
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
+  , m_btnCopy(nullptr)
   , m_ltButton(nullptr)
   , m_edSearch(nullptr)
   , m_cbContains(nullptr)
@@ -70,11 +71,19 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   m_btnRefresh->setToolTip(tr("Atualizar (F5)"));
   m_btnRefresh->setShortcut(QKeySequence(Qt::Key_F5));
 
+  m_btnCopy = new QPushButton;
+  m_btnCopy->setFlat(true);
+  m_btnCopy->setIconSize(QSize(24, 24));
+  m_btnCopy->setToolTip(tr("Copiar (Ctrl+C)"));
+  m_btnCopy->setIcon(QIcon(":/icons/res/copy.png"));
+  m_btnCopy->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
+
   m_ltButton = new QHBoxLayout;
   m_ltButton->setContentsMargins(0, 0, 0, 0);
   m_ltButton->setAlignment(Qt::AlignLeft);
   m_ltButton->addWidget(m_btnOpen);
   m_ltButton->addWidget(m_btnRemove);
+  m_ltButton->addWidget(m_btnCopy);
 
   m_edSearch = new JLineEdit(Text::Input::All, true);
   m_edSearch->setArrowsAndEnterAsTab(false);
@@ -138,6 +147,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
     connect(m_btnOpen, SIGNAL(clicked(bool)), this, SLOT(emitItemsSelectedSignal()));
     connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(emitItemsSelectedSignal()));
     connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItems()));
+    connect(m_btnCopy, SIGNAL(clicked(bool)), this, SLOT(copyItems()));
   }
 
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(focusSearch()));
@@ -150,6 +160,8 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
     m_btnOpen->hide();
     m_btnRemove->setEnabled(false);
     m_btnRemove->hide();
+    m_btnCopy->setEnabled(false);
+    m_btnCopy->hide();
     m_edSearch->setFocus();
   }
   searchChanged();
@@ -244,6 +256,7 @@ void DatabaseViewer::enableControls()
   bool bSelected = m_table->currentIndex().isValid();
   m_btnOpen->setEnabled(bSelected);
   m_btnRemove->setEnabled(bSelected);
+  m_btnCopy->setEnabled(bSelected);
 }
 
 void DatabaseViewer::removeItems()
@@ -252,6 +265,14 @@ void DatabaseViewer::removeItems()
   JItemHelper::remove(ids, m_tableName, this);
   emit itemsRemovedSignal(ids);
   refresh();
+}
+
+void DatabaseViewer::copyItems()
+{
+  Ids ids = getSelectedIds();
+  Ids newids = JItemHelper::copy(ids, m_tableName, this);
+  refresh();
+  selectIds(newids);
 }
 
 void DatabaseViewer::searchChanged()

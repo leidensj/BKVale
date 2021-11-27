@@ -24,6 +24,7 @@ struct Image : public JItemSQL
   QString m_name;
   QByteArray m_image;
 
+  void copy(const JItemSQL& other);
   QString name() const { return m_name; }
   QByteArray image() const { return m_image; }
 };

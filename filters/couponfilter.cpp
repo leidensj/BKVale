@@ -1,6 +1,7 @@
 #include "couponfilter.h"
 #include "defines.h"
 #include "items/coupon.h"
+#include "widgets/jdateinterval.h"
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QFrame>
@@ -12,6 +13,8 @@ CouponFilter::CouponFilter(QWidget* parent)
   , m_cbPercentage(nullptr)
   , m_cbValue(nullptr)
   , m_cbProduct(nullptr)
+  , m_dtCreation(nullptr)
+  , m_dtRedemption(nullptr)
 {
   m_cbExpired = new QCheckBox(tr("Expirados"));
   m_cbExpired->setTristate();
@@ -20,6 +23,16 @@ CouponFilter::CouponFilter(QWidget* parent)
   m_cbPercentage = new QCheckBox(tr("Porcentagem"));
   m_cbValue = new QCheckBox(tr("Valor"));
   m_cbProduct = new QCheckBox(tr("Produto"));
+  m_dtCreation = new JDateInterval;
+  m_dtCreation->setTitle(tr("Data de criação"));
+  m_dtCreation->layout()->setContentsMargins(0, 9, 0, 0);
+  m_dtCreation->setFlat(true);
+  m_dtCreation->setChecked(false);
+  m_dtRedemption = new JDateInterval;
+  m_dtRedemption->setTitle(tr("Data de resgate"));
+  m_dtRedemption->layout()->setContentsMargins(0, 9, 0, 0);
+  m_dtRedemption->setFlat(true);
+  m_dtRedemption->setChecked(false);
 
   QHBoxLayout* ltType = new QHBoxLayout;
   ltType->setContentsMargins(0, 0, 0, 0);
@@ -33,6 +46,8 @@ CouponFilter::CouponFilter(QWidget* parent)
   ltMain->addWidget(m_cbExpired);
   ltMain->addWidget(m_cbRedeemed);
   ltMain->addLayout(ltType);
+  ltMain->addWidget(m_dtCreation);
+  ltMain->addWidget(m_dtRedemption);
   ltMain->setAlignment(Qt::AlignTop);
 
   m_fr->setLayout(ltMain);
@@ -99,4 +114,8 @@ void CouponFilter::clear()
   m_cbPercentage->setChecked(true);
   m_cbValue->setChecked(true);
   m_cbProduct->setChecked(true);
+  m_dtCreation->setChecked(false);
+  m_dtCreation->day();
+  m_dtRedemption->setChecked(false);
+  m_dtRedemption->day();
 }

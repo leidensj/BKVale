@@ -4,6 +4,7 @@
 #include "jfilter.h"
 
 class QCheckBox;
+class JDateInterval;
 
 class CouponFilter : public JFilter
 {
@@ -22,6 +23,8 @@ private:
   QCheckBox* m_cbPercentage;
   QCheckBox* m_cbValue;
   QCheckBox* m_cbProduct;
+  JDateInterval* m_dtCreation;
+  JDateInterval* m_dtRedemption;
 };
 
 #endif // COUPONFILTER_H

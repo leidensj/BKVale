@@ -9,6 +9,8 @@ class CouponModel : public JModel
   {
     Id,
     Type,
+    CreationDate,
+    RedemptionDate,
     Date,
     Coupon,
     Code,

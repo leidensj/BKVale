@@ -104,6 +104,26 @@ QString CouponFilter::getFilter() const
            QString::number((int)Coupon::Type::Product) + ") ";
   }
 
+  if (m_dtCreation->isChecked())
+  {
+    if (!str.isEmpty())
+      str += " AND ";
+    str += " " COUPON_SQL_COL_CDT " BETWEEN '" +
+           m_dtCreation->getInitialDate().toString(Qt::ISODate) + "' AND '" +
+           m_dtCreation->getFinalDate().toString(Qt::ISODate) + "' ";
+  }
+
+  if (m_dtRedemption->isChecked())
+  {
+    if (!str.isEmpty())
+      str += " AND ";
+    str += " " COUPON_SQL_COL_RED " = TRUE AND " COUPON_SQL_COL_RDT " BETWEEN '" +
+           m_dtRedemption->getInitialDate().toString(Qt::ISODate) + "' AND '" +
+           m_dtRedemption->getFinalDate().toString(Qt::ISODate) + "' ";
+  }
+
+  return str;
+
   return str;
 }
 

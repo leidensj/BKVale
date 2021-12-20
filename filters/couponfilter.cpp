@@ -57,6 +57,8 @@ CouponFilter::CouponFilter(QWidget* parent)
   connect(m_cbPercentage, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbValue, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbProduct, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_dtCreation, SIGNAL(changedSignal(bool, const QDate&, const QDate&)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_dtRedemption, SIGNAL(changedSignal(bool, const QDate&, const QDate&)), this, SLOT(emitFilterChangedSignal()));
   CouponFilter::clear();
 }
 
@@ -108,7 +110,7 @@ QString CouponFilter::getFilter() const
   {
     if (!str.isEmpty())
       str += " AND ";
-    str += " " COUPON_SQL_COL_CDT " BETWEEN '" +
+    str += " DATE(" COUPON_SQL_COL_CDT ") BETWEEN '" +
            m_dtCreation->getInitialDate().toString(Qt::ISODate) + "' AND '" +
            m_dtCreation->getFinalDate().toString(Qt::ISODate) + "' ";
   }
@@ -117,12 +119,10 @@ QString CouponFilter::getFilter() const
   {
     if (!str.isEmpty())
       str += " AND ";
-    str += " " COUPON_SQL_COL_RED " = TRUE AND " COUPON_SQL_COL_RDT " BETWEEN '" +
+    str += " " COUPON_SQL_COL_RED " = TRUE AND DATE(" COUPON_SQL_COL_RDT ") BETWEEN '" +
            m_dtRedemption->getInitialDate().toString(Qt::ISODate) + "' AND '" +
            m_dtRedemption->getFinalDate().toString(Qt::ISODate) + "' ";
   }
-
-  return str;
 
   return str;
 }
@@ -134,8 +134,8 @@ void CouponFilter::clear()
   m_cbPercentage->setChecked(true);
   m_cbValue->setChecked(true);
   m_cbProduct->setChecked(true);
-  m_dtCreation->setChecked(false);
   m_dtCreation->day();
-  m_dtRedemption->setChecked(false);
+  m_dtCreation->setChecked(false);
   m_dtRedemption->day();
+  m_dtRedemption->setChecked(false);
 }

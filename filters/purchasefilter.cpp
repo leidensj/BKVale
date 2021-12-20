@@ -51,16 +51,14 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   ltv->addLayout(ltfr);
   m_fr->setLayout(ltv);
 
-  connect(m_dtInt, SIGNAL(toggled(bool)), this, SLOT(emitFilterChangedSignal()));
-  connect(m_dtInt, SIGNAL(initialDateChangedSignal(const QDate&)), this, SLOT(emitFilterChangedSignal()));
-  connect(m_dtInt, SIGNAL(finalDateChangedSignal(const QDate&)), this, SLOT(emitFilterChangedSignal()));
+  connect(m_dtInt, SIGNAL(changedSignal(bool, const QDate&, const QDate&)), this, SLOT(emitFilterChangedSignal()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_productPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbPaymentCredit, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbPaymentCash, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbPaymentBonus, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
-  clear();
+  PurchaseFilter::clear();
 }
 
 QString PurchaseFilter::getDateFilter() const

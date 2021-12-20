@@ -24,8 +24,10 @@ public slots:
   void day();
 
 signals:
-  void initialDateChangedSignal(const QDate& dt);
-  void finalDateChangedSignal(const QDate& dt);
+  void changedSignal(bool bChecked,const QDate& dti, const QDate& dtf);
+
+private slots:
+  void emitChangedSignal();
 
 private:
   QToolButton* m_btn;

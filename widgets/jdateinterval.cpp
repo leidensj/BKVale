@@ -44,8 +44,9 @@ JDateInterval::JDateInterval(QWidget *parent)
   ltMain->addLayout(ltfr);
   ltMain->addWidget(m_btn);
 
-  connect(m_dtInit, &JDateEdit::dateChanged, [this](const QDate& dt){ emit initialDateChangedSignal(dt); });
-  connect(m_dtFinal, &JDateEdit::dateChanged, [this](const QDate& dt){ emit finalDateChangedSignal(dt); });
+  connect(m_dtInit, SIGNAL(dateChanged(const QDate)), this, SLOT(emitChangedSignal()));
+  connect(m_dtFinal, SIGNAL(dateChanged(const QDate)), this, SLOT(emitChangedSignal()));
+  connect(this, SIGNAL(clicked(bool)), this, SLOT(emitChangedSignal()));
 
   day();
   setLayout(ltMain);
@@ -93,3 +94,7 @@ QDate JDateInterval::getFinalDate() const
   return m_dtFinal->date();
 }
 
+void JDateInterval::emitChangedSignal()
+{
+  emit changedSignal(isChecked(), m_dtInit->date(), m_dtFinal->date());
+}

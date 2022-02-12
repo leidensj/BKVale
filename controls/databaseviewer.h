@@ -60,12 +60,14 @@ public slots:
   void setFixedFilter(const QString& fixedFilter);
   void setDynamicFilter(const QString& dynamicFilter);
   void clearSearch();
+  void toCSV();
 
 private:
   QPushButton* m_btnOpen;
   QPushButton* m_btnRefresh;
   QPushButton* m_btnRemove;
   QPushButton* m_btnCopy;
+  QPushButton* m_btnCSV;
   QHBoxLayout* m_ltButton;
   JLineEdit* m_edSearch;
   QCheckBox* m_cbContains;

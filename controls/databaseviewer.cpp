@@ -18,6 +18,9 @@
 #include <QLabel>
 #include <QSortFilterProxyModel>
 
+#include <QFileDialog>
+#include <QTextStream>
+
 JEnterSignalTable::JEnterSignalTable(QWidget *parent)
   : QTableView(parent)
 {
@@ -44,6 +47,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   , m_btnRefresh(nullptr)
   , m_btnRemove(nullptr)
   , m_btnCopy(nullptr)
+  , m_btnCSV(nullptr)
   , m_ltButton(nullptr)
   , m_edSearch(nullptr)
   , m_cbContains(nullptr)
@@ -78,12 +82,19 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   m_btnCopy->setIcon(QIcon(":/icons/res/copy.png"));
   m_btnCopy->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
 
+  m_btnCSV = new QPushButton;
+  m_btnCSV->setFlat(true);
+  m_btnCSV->setIconSize(QSize(24, 24));
+  m_btnCSV->setToolTip(tr("Exportar para CSV"));
+  m_btnCSV->setIcon(QIcon(":/icons/res/csv_export.png"));
+
   m_ltButton = new QHBoxLayout;
   m_ltButton->setContentsMargins(0, 0, 0, 0);
   m_ltButton->setAlignment(Qt::AlignLeft);
   m_ltButton->addWidget(m_btnOpen);
   m_ltButton->addWidget(m_btnRemove);
   m_ltButton->addWidget(m_btnCopy);
+  m_ltButton->addWidget(m_btnCSV);
 
   m_edSearch = new JLineEdit(Text::Input::All, true);
   m_edSearch->setArrowsAndEnterAsTab(false);
@@ -140,6 +151,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
   connect(m_edSearch, SIGNAL(keyDownSignal()), this, SLOT(searchEnter()));
   connect(m_cbContains, SIGNAL(clicked(bool)), this, SLOT(containsPressed()));
   connect(m_table->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(searchChanged()));
+  connect(m_btnCSV, SIGNAL(clicked(bool)), this, SLOT(toCSV()));
 
   if (m_mode != Mode::ReadOnly)
   {
@@ -381,4 +393,34 @@ QPushButton* DatabaseViewer::addButton(const QString& toolTip, const QIcon& icon
     btn->setShortcut(QKeySequence(shortcut));
   m_ltButton->addWidget(btn);
   return btn;
+}
+
+void DatabaseViewer::toCSV()
+{
+  QString fileName = QFileDialog::getSaveFileName(this,
+                                                  tr("Salvar arquivo"),
+                                                  JItemHelper::text(getTableName()) +
+                                                  DateTime::server().toString("dd-MM-yyyy hh-mm-ss") +
+                                                  ".csv",
+                                                  tr("CSV (*.csv)"));
+
+  if (fileName.isEmpty())
+    return;
+
+  QFile file(fileName);
+   if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+       return;
+  QTextStream out(&file);
+
+  for (int i = 0; i != m_proxyModel->rowCount(); ++i)
+  {
+    QString line;
+    for (int j = 0; j != m_proxyModel->columnCount(); ++j)
+      line += m_proxyModel->data(m_proxyModel->index(i, j), Qt::DisplayRole).toString() + ";";
+    if (!line.isEmpty())
+    {
+      line.chop(1);
+      out << line + "\n";
+    }
+  }
 }

@@ -181,5 +181,6 @@
         <file>res/networkcable.png</file>
         <file>res/server.png</file>
         <file>res/coupon.png</file>
+        <file>res/csv_export.png</file>
     </qresource>
 </RCC>

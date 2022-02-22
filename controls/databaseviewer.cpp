@@ -18,9 +18,6 @@
 #include <QLabel>
 #include <QSortFilterProxyModel>
 
-#include <QFileDialog>
-#include <QTextStream>
-
 JEnterSignalTable::JEnterSignalTable(QWidget *parent)
   : QTableView(parent)
 {
@@ -260,6 +257,8 @@ void DatabaseViewer::refresh()
   if (m_mode != Mode::Edit)
     m_edSearch->setFocus();
 
+  m_btnCSV->setEnabled(m_proxyModel->rowCount() != 0);
+
   emit refreshSignal();
 }
 
@@ -412,14 +411,25 @@ void DatabaseViewer::toCSV()
        return;
   QTextStream out(&file);
 
+  QString line;
+  for (int j = 0; j != m_proxyModel->columnCount(); ++j)
+    if (!m_table->horizontalHeader()->isSectionHidden(j))
+      line += m_proxyModel->headerData(j, Qt::Horizontal).toString() + ";";
+  if (!line.isEmpty())
+  {
+    line.chop(1);
+    out << line + "\n";
+  }
   for (int i = 0; i != m_proxyModel->rowCount(); ++i)
   {
-    QString line;
+    line.clear();
     for (int j = 0; j != m_proxyModel->columnCount(); ++j)
-      line += m_proxyModel->data(m_proxyModel->index(i, j), Qt::DisplayRole).toString() + ";";
+      if (!m_table->horizontalHeader()->isSectionHidden(j))
+        line += m_proxyModel->data(m_proxyModel->index(i, j), Qt::DisplayRole).toString() + ";";
     if (!line.isEmpty())
     {
       line.chop(1);
+      line.replace("\n", "\t");
       out << line + "\n";
     }
   }

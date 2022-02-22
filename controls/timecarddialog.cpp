@@ -236,7 +236,7 @@ void TimeCardDialog::saveAndAccept()
   PdfGenerator* w = new PdfGenerator(fileName, html, m_cbOpenFile->isChecked(), false);
   auto p = JStatusProgressBarInstance::getInstance();
   auto l = JStatusMessageInstance::getInstance();
-  if (p != nullptr)
+  if (p != nullptr && l != nullptr)
   {
     p->show();
     l->show();

@@ -9,7 +9,7 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QMenu>
-#include "widgets/pdfgenerator.h"
+#include "widgets/filegenerator.h"
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
 #include "widgets/findwidget.h"
@@ -136,22 +136,9 @@ void Report::toPdf()
   if (fileName.isEmpty())
     return;
 
-  PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), true, false);
-  auto p = JStatusProgressBarInstance::getInstance();
-  auto l = JStatusMessageInstance::getInstance();
-  if (p != nullptr)
-  {
-    p->show();
-    l->show();
-    l->setText(tr("Gerando relatório:"));
-    connect(w, SIGNAL(finished()), p, SLOT(hide()));
-    connect(w, SIGNAL(finished()), l, SLOT(hide()));
-  }
+  PdfGenerator* w = new PdfGenerator(fileName, m_report->toHtml(), tr("Gerando relatório:"), true, false);
   w->generate();
 }
-
-#include <QFile>
-#include <QTextStream>
 
 void Report::openPurchaseReport()
 {

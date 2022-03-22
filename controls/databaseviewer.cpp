@@ -4,6 +4,7 @@
 #include "pincodedialog.h"
 #include "items/jitemhelper.h"
 #include "models/jmodel.h"
+#include "widgets/filegenerator.h"
 #include <QDate>
 #include <QLayout>
 #include <QSqlRecord>
@@ -17,6 +18,7 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QSortFilterProxyModel>
+#include <QFileDialog>
 
 JEnterSignalTable::JEnterSignalTable(QWidget *parent)
   : QTableView(parent)
@@ -257,8 +259,6 @@ void DatabaseViewer::refresh()
   if (m_mode != Mode::Edit)
     m_edSearch->setFocus();
 
-  m_btnCSV->setEnabled(m_proxyModel->rowCount() != 0);
-
   emit refreshSignal();
 }
 
@@ -268,6 +268,7 @@ void DatabaseViewer::enableControls()
   m_btnOpen->setEnabled(bSelected);
   m_btnRemove->setEnabled(bSelected);
   m_btnCopy->setEnabled(bSelected);
+  m_btnCSV->setEnabled(m_proxyModel->rowCount() != 0);
 }
 
 void DatabaseViewer::removeItems()
@@ -406,19 +407,14 @@ void DatabaseViewer::toCSV()
   if (fileName.isEmpty())
     return;
 
-  QFile file(fileName);
-   if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-       return;
-  QTextStream out(&file);
-
-  QString line;
+  QString csv, line;
   for (int j = 0; j != m_proxyModel->columnCount(); ++j)
     if (!m_table->horizontalHeader()->isSectionHidden(j))
       line += m_proxyModel->headerData(j, Qt::Horizontal).toString() + ";";
   if (!line.isEmpty())
   {
     line.chop(1);
-    out << line + "\n";
+    csv += line + "\n";
   }
   for (int i = 0; i != m_proxyModel->rowCount(); ++i)
   {
@@ -430,7 +426,10 @@ void DatabaseViewer::toCSV()
     {
       line.chop(1);
       line.replace("\n", "\t");
-      out << line + "\n";
+      csv += line + "\n";
     }
   }
+
+  CsvGenerator* w = new CsvGenerator(fileName, csv, tr("Gerando arquivo csv:"), true);
+  w->generate();
 }

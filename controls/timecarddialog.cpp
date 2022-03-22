@@ -5,9 +5,7 @@
 #include "items/employee.h"
 #include "controls/databasepicker.h"
 #include "widgets/jspinbox.h"
-#include "widgets/pdfgenerator.h"
-#include "widgets/jstatusprogressbarinstance.h"
-#include "widgets/jstatusmessageinstance.h"
+#include "widgets/filegenerator.h"
 #include <QDateEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -233,16 +231,6 @@ void TimeCardDialog::saveAndAccept()
     return;
 
   accept();
-  PdfGenerator* w = new PdfGenerator(fileName, html, m_cbOpenFile->isChecked(), false);
-  auto p = JStatusProgressBarInstance::getInstance();
-  auto l = JStatusMessageInstance::getInstance();
-  if (p != nullptr && l != nullptr)
-  {
-    p->show();
-    l->show();
-    l->setText(tr("Gerando livro ponto:"));
-    connect(w, SIGNAL(finished()), p, SLOT(hide()));
-    connect(w, SIGNAL(finished()), l, SLOT(hide()));
-  }
+  PdfGenerator* w = new PdfGenerator(fileName, html, tr("Gerando livro ponto:"), m_cbOpenFile->isChecked(), false);
   w->generate();
 }

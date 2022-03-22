@@ -67,6 +67,7 @@ SOURCES += main.cpp\
   tables/purchaseproducttable.cpp \
   views/couponview.cpp \
   views/jitemview.cpp \
+  widgets/filegenerator.cpp \
   widgets/findwidget.cpp \
     widgets/jaddremovebuttons.cpp \
   widgets/jclicklabel.cpp \
@@ -122,8 +123,7 @@ SOURCES += main.cpp\
     tableitems/addressitem.cpp \
     tables/paymenttable.cpp \
     tables/employeehourstable.cpp \
-    tables/storeemployeestable.cpp \
-  widgets/pdfgenerator.cpp
+    tables/storeemployeestable.cpp
 
 HEADERS  += mainwindow.h \
     aboutdialog.h \
@@ -182,6 +182,7 @@ HEADERS  += mainwindow.h \
     items/user.h \
     views/couponview.h \
     views/jitemview.h \
+    widgets/filegenerator.h \
     widgets/findwidget.h \
     widgets/jclicklabel.h \
     widgets/jaddremovebuttons.h \
@@ -239,8 +240,7 @@ HEADERS  += mainwindow.h \
     tableitems/addressitem.h \
     tables/paymenttable.h \
     tables/employeehourstable.h \
-    tables/storeemployeestable.h \
-    widgets/pdfgenerator.h
+    tables/storeemployeestable.h
 
 FORMS    += mainwindow.ui \
   aboutdialog.ui \

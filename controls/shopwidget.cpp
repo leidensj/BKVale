@@ -2,16 +2,19 @@
 #include "controls/databaseviewer.h"
 #include "items/jitemhelper.h"
 #include "widgets/jdatepicker.h"
+#include "tables/shoppinglisttable.h"
 #include <QLayout>
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QLabel>
 
 ShopWidget::ShopWidget(QWidget* parent)
   : QWidget(parent)
   , m_viewer(nullptr)
   , m_dt(nullptr)
   , m_btnPrint(nullptr)
+  , m_btnView(nullptr)
 {
   m_viewer = new DatabaseViewer(SHOPPING_LIST_SQL_TABLE_NAME, DatabaseViewer::Mode::ReadOnly);
   m_viewer->layout()->setContentsMargins(0, 0, 0, 0);
@@ -24,11 +27,18 @@ ShopWidget::ShopWidget(QWidget* parent)
   m_btnPrint->setIcon(QIcon(":/icons/res/printer.png"));
   m_btnPrint->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
   m_btnPrint->setToolTip(tr("Imprimir (Ctrl+P)"));
+  m_btnView = new QPushButton;
+  m_btnView->setFlat(true);
+  m_btnView->setText("");
+  m_btnView->setIconSize(QSize(24, 24));
+  m_btnView->setIcon(QIcon(":/icons/res/view.png"));
+  m_btnView->setToolTip(tr("Visualizar"));
 
   QHBoxLayout* headerLayout = new QHBoxLayout;
   headerLayout->setContentsMargins(0, 0, 0, 0);
   headerLayout->setAlignment(Qt::AlignLeft);
   headerLayout->addWidget(m_btnPrint);
+  headerLayout->addWidget(m_btnView);
   headerLayout->addWidget(m_dt);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
@@ -39,6 +49,7 @@ ShopWidget::ShopWidget(QWidget* parent)
   connect(m_dt, SIGNAL(dateChangedSignal(const QDate&)), this, SLOT(updateControls()));
   connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(updateControls()));
   connect(m_btnPrint, SIGNAL(clicked(bool)), this, SLOT(print()));
+  connect(m_btnView, SIGNAL(clicked(bool)), this, SLOT(view()));
   updateControls();
 }
 
@@ -55,6 +66,7 @@ void ShopWidget::updateControls()
   }
   auto o = getShoppingList();
   m_btnPrint->setEnabled(o.m_id.isValid());
+  m_btnView->setEnabled(o.m_id.isValid());
 }
 
 ShoppingList ShopWidget::getShoppingList()
@@ -79,4 +91,31 @@ void ShopWidget::print()
     default:
       return;
   }
+}
+
+void ShopWidget::view()
+{
+  ShoppingList o = getShoppingList();
+  auto table = new ShoppingListTable(nullptr, this);
+  table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  table->setSelectionMode(QAbstractItemView::NoSelection);
+  table->setListElements(o.m_vItem);
+  table->show();
+  table->showSupplierColumn(!o.m_supplier.m_id.isValid());
+
+  QDialog dlg(this);
+  QVBoxLayout *layout = new QVBoxLayout;
+  dlg.setLayout(layout);
+  if (o.m_supplier.m_id.isValid())
+  {
+    QLabel* lblSupplier = new QLabel(tr("Fornecedor: ") + o.m_supplier.m_form.m_name);
+    layout->addWidget(lblSupplier);
+  }
+  layout->addWidget(table);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(JItemHelper::text(Functionality::Idx::Shop) + ": " + o.m_title);
+  dlg.setWindowIcon(QIcon(JItemHelper::icon(Functionality::Idx::Shop)));
+  dlg.setModal(true);
+  dlg.resize(640, 480);
+  dlg.exec();
 }

@@ -131,18 +131,18 @@ JTableItem* JTable::getItem(int row, int column) const
 
 void JTable::activate(QTableWidgetItem* p)
 {
-  if (p != nullptr)
+  if (p != nullptr && editTriggers() != QAbstractItemView::NoEditTriggers)
   {
     JTableItem* p2 = dynamic_cast<JTableItem*>(p);
     p2->activate();
     emitChangedSignal();
     emit changedSignal(p2->row(), p2->column());
-}
+  }
 }
 
 void JTable::erase(QTableWidgetItem* p)
 {
-  if (p != nullptr)
+  if (p != nullptr && editTriggers() != QAbstractItemView::NoEditTriggers)
   {
     JTableItem* p2 = dynamic_cast<JTableItem*>(p);
     p2->erase();

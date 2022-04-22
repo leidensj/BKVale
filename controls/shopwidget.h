@@ -19,11 +19,13 @@ public:
 private slots:
   void updateControls();
   void print();
+  void view();
 
 private:
   DatabaseViewer* m_viewer;
   JDatePicker* m_dt;
   QPushButton* m_btnPrint;
+  QPushButton* m_btnView;
 };
 
 #endif // SHOPVIEW_H

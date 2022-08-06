@@ -46,8 +46,8 @@ ShopWidget::ShopWidget(QWidget* parent)
   mainLayout->addWidget(m_viewer);
   setLayout(mainLayout);
 
-  connect(m_dt, SIGNAL(dateChangedSignal(const QDate&)), this, SLOT(updateControls()));
-  connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(updateControls()));
+  connect(m_dt, SIGNAL(dateChangedSignal(const QDate&)), this, SLOT(updateControls(bool)));
+  connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(updateControls(bool)));
   connect(m_btnPrint, SIGNAL(clicked(bool)), this, SLOT(print()));
   connect(m_btnView, SIGNAL(clicked(bool)), this, SLOT(view()));
   updateControls();
@@ -55,15 +55,12 @@ ShopWidget::ShopWidget(QWidget* parent)
 
 void ShopWidget::updateControls()
 {
-  if (sender() == m_dt)
-  {
-    QDate date = m_dt->getDate();
-    QString filter(SHOPPING_LIST_SQL_COL_WEE " LIKE '%" SHOPPING_LIST_SEPARATOR +
-                   QString::number(date.dayOfWeek()) + SHOPPING_LIST_SEPARATOR "%'"
-                   " OR " SHOPPING_LIST_SQL_COL_MON " LIKE '%" SHOPPING_LIST_SEPARATOR +
-                   QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
-    m_viewer->setFixedFilter(filter);
-  }
+  QDate date = m_dt->getDate();
+  QString filter(SHOPPING_LIST_SQL_COL_WEE " LIKE '%" SHOPPING_LIST_SEPARATOR +
+                 QString::number(date.dayOfWeek()) + SHOPPING_LIST_SEPARATOR "%'"
+                 " OR " SHOPPING_LIST_SQL_COL_MON " LIKE '%" SHOPPING_LIST_SEPARATOR +
+                 QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
+  m_viewer->setFixedFilter(filter);
   auto o = getShoppingList();
   m_btnPrint->setEnabled(o.m_id.isValid());
   m_btnView->setEnabled(o.m_id.isValid());
@@ -101,7 +98,16 @@ void ShopWidget::view()
   table->setSelectionMode(QAbstractItemView::NoSelection);
   table->setListElements(o.m_vItem);
   table->show();
-  table->showSupplierColumn(!o.m_supplier.m_id.isValid());
+  bool bShowSupplierColumn = !o.m_supplier.m_id.isValid();
+  if (bShowSupplierColumn)
+  {
+    bool bReallyNeedToShowSupplierColumn = false;
+    for (int i = 0; i != o.m_vItem.size(); ++i)
+      if (o.m_vItem.at(i).m_supplier.m_id.isValid())
+        bReallyNeedToShowSupplierColumn = true;
+    bShowSupplierColumn = bReallyNeedToShowSupplierColumn;
+  }
+  table->showSupplierColumn(bShowSupplierColumn);
 
   QDialog dlg(this);
   QVBoxLayout *layout = new QVBoxLayout;

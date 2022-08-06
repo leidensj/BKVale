@@ -174,6 +174,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
     m_btnCopy->setEnabled(false);
     m_btnCopy->hide();
     m_edSearch->setFocus();
+    m_btnCSV->hide();
   }
   searchChanged();
 }

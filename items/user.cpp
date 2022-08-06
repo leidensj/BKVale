@@ -281,3 +281,26 @@ void User::setPermission(Functionality::Idx idx, bool bSet)
 {
   m_permissions[idx] = bSet;
 }
+
+bool User::SQL_change_password(const QString& newPassword, QString& error)
+{
+  error.clear();
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+
+  QString strQuery("UPDATE " USER_SQL_TABLE_NAME " SET "
+                   USER_SQL_COL_PAS " = (:_v01)"
+                   " WHERE " SQL_COLID " = (:_v00)");
+
+  query.prepare(strQuery);
+  query.bindValue(":_v00", m_id.get());
+  query.bindValue(":_v01", st_strEncryptedPassword(newPassword));
+
+  bool bSuccess = query.exec();
+  return SQL_finish(db, query, bSuccess, error);
+}

@@ -22,6 +22,7 @@ struct User : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
 
   bool SQL_select_password_proc(QSqlQuery& query, QString& error);
+  bool SQL_change_password(const QString& newPassword, QString& error);
 
   QString strEncryptedPassword() const;
   static QString st_strEncryptedPassword(const QString& strPassword);

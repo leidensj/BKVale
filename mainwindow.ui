@@ -112,6 +112,7 @@
      <string>Manutenção</string>
     </property>
     <addaction name="actionLogged"/>
+    <addaction name="actionPassword"/>
     <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuAjuda">
@@ -403,7 +404,7 @@
      <normaloff>:/icons/res/password.png</normaloff>:/icons/res/password.png</iconset>
    </property>
    <property name="text">
-    <string>Senha</string>
+    <string>Alterar Senha</string>
    </property>
    <property name="toolTip">
     <string>Alterar senha</string>

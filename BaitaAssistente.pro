@@ -16,6 +16,7 @@ TEMPLATE = app
 SOURCES += main.cpp\
   aboutdialog.cpp \
   controls/calculatorwidget.cpp \
+  controls/changepassword.cpp \
   controls/couponredeemer.cpp \
   controls/databasecombobox.cpp \
   controls/databasepicker.cpp \
@@ -128,6 +129,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     aboutdialog.h \
     controls/calculatorwidget.h \
+    controls/changepassword.h \
     controls/couponredeemer.h \
     controls/databasecombobox.h \
     controls/databasepicker.h \

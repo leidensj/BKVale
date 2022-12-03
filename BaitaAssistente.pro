@@ -48,6 +48,7 @@ SOURCES += main.cpp\
   printer.cpp \
   purchasereport.cpp \
   settingsdialog.cpp \
+  tableitems/toggleitem.cpp \
   tables/coupontable.cpp \
   tables/jtable.cpp \
     databaseutils.cpp \
@@ -161,6 +162,7 @@ HEADERS  += mainwindow.h \
     printer.h \
     purchasereport.h \
     settingsdialog.h \
+    tableitems/toggleitem.h \
     tables/coupontable.h \
     tables/jtable.h \
     databaseutils.h \

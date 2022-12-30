@@ -5,6 +5,7 @@ ToggleItem::ToggleItem(Color color,
   : m_color(color)
   , m_text(text)
 {
+  setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
   ToggleItem::setValue(false);
 }
 
@@ -30,6 +31,11 @@ void ToggleItem::setValue(const QVariant& v)
 
 void ToggleItem::evaluate()
 {
+
+}
+
+void ToggleItem::activate()
+{
   bool b = data(Qt::UserRole).toBool();
   setValue(!b);
 }
@@ -37,9 +43,4 @@ void ToggleItem::evaluate()
 void ToggleItem::erase()
 {
   setValue(false);
-}
-
-void ToggleItem::activate()
-{
-
 }

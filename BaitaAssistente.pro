@@ -50,6 +50,7 @@ SOURCES += main.cpp\
   settingsdialog.cpp \
   tableitems/toggleitem.cpp \
   tables/coupontable.cpp \
+  tables/dayofftable.cpp \
   tables/jtable.cpp \
     databaseutils.cpp \
     settings.cpp \
@@ -164,6 +165,7 @@ HEADERS  += mainwindow.h \
     settingsdialog.h \
     tableitems/toggleitem.h \
     tables/coupontable.h \
+    tables/dayofftable.h \
     tables/jtable.h \
     databaseutils.h \
     settings.h \

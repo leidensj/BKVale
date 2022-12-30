@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QThread>
+#include "tables/dayofftable.h"
 
 TimeCardDialog::TimeCardDialog(QWidget* parent)
  : QDialog(parent)
@@ -23,6 +24,7 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
  , m_buttons(nullptr)
  , m_spnExtraPages(nullptr)
  , m_cbOpenFile(nullptr)
+ , m_dayOffTable(nullptr)
 {
   setWindowTitle(tr("Livro Ponto"));
   setWindowIcon(QIcon(":/icons/res/timecard.png"));
@@ -48,9 +50,12 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   formLayout->addRow(tr("Data:"), m_date);
   formLayout->addRow(tr("Páginas extras:"), m_spnExtraPages);
 
+  m_dayOffTable = new DayOffTable;
+
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(formLayout);
   ltMain->addWidget(m_cbOpenFile);
+  ltMain->addWidget(m_dayOffTable);
   ltMain->addWidget(m_buttons);
   setLayout(ltMain);
 
@@ -63,6 +68,15 @@ void TimeCardDialog::updateControls()
   QPushButton* pt = m_buttons->button(QDialogButtonBox::Save);
   if (pt != nullptr)
     pt->setEnabled(m_storePicker->getFirstId().isValid());
+
+  Store o(m_storePicker->getFirstId());
+  QString error;
+  if (!o.m_id.isValid() || !o.SQL_select(error))
+  {
+    m_dayOffTable->clear();
+    return;
+  }
+  m_dayOffTable->setStore(o, m_date->date());
 }
 
 void TimeCardDialog::saveAndAccept()

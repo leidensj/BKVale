@@ -8,6 +8,7 @@ class QDateEdit;
 class QDialogButtonBox;
 class QCheckBox;
 class JSpinBox;
+class DayOffTable;
 
 class TimeCardDialog : public QDialog
 {
@@ -26,6 +27,7 @@ private:
   QDialogButtonBox* m_buttons;
   JSpinBox* m_spnExtraPages;
   QCheckBox* m_cbOpenFile;
+  DayOffTable* m_dayOffTable;
 };
 
 #endif // TIMECARD_H

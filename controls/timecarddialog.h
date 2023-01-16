@@ -9,6 +9,7 @@ class QDialogButtonBox;
 class QCheckBox;
 class JSpinBox;
 class DayOffTable;
+class QLabel;
 
 class TimeCardDialog : public QDialog
 {
@@ -20,6 +21,8 @@ public:
 private slots:
   void saveAndAccept();
   void updateControls();
+  void saveDayOff();
+  void updateMessage();
 
 private:
   DatabasePicker* m_storePicker;
@@ -28,6 +31,9 @@ private:
   JSpinBox* m_spnExtraPages;
   QCheckBox* m_cbOpenFile;
   DayOffTable* m_dayOffTable;
+  QPushButton* m_btnCSV;
+  QPushButton* m_btnComplete;
+  QLabel* m_lblMessage;
 };
 
 #endif // TIMECARD_H

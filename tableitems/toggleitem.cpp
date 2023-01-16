@@ -1,10 +1,11 @@
 #include "toggleitem.h"
 
-ToggleItem::ToggleItem(Color color,
-                       const QString& text)
-  : m_color(color)
-  , m_text(text)
+ToggleItem::ToggleItem(const QString& text, const QColor& foreground, const QColor& background)
+  : m_text(text)
+  , m_foreground(foreground)
+  , m_background(background)
 {
+  setForeground(QBrush(QColor(m_foreground)));
   setFlags(Qt::NoItemFlags | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
   ToggleItem::setValue(false);
 }
@@ -14,19 +15,7 @@ void ToggleItem::setValue(const QVariant& v)
   bool b = v.toBool();
   setData(Qt::UserRole, b);
   setText(b ? m_text : "");
-
-  switch (m_color)
-  {
-    case Color::Background:
-      setBackground(QBrush(QColor(b ? QColor(200, 200, 255) : QColor(Qt::white))));
-      break;
-    case Color::Foreground:
-      setForeground(QBrush(QColor(b ? Qt::blue : Qt::white)));
-      break;
-    case Color::None:
-    default:
-      break;
-  }
+  setBackground(QBrush(QColor(b ? m_background : QColor(Qt::white))));
 }
 
 void ToggleItem::evaluate()

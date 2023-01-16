@@ -46,8 +46,8 @@ ShopWidget::ShopWidget(QWidget* parent)
   mainLayout->addWidget(m_viewer);
   setLayout(mainLayout);
 
-  connect(m_dt, SIGNAL(dateChangedSignal(const QDate&)), this, SLOT(updateControls(bool)));
-  connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(updateControls(bool)));
+  connect(m_dt, SIGNAL(dateChangedSignal(const QDate&)), this, SLOT(updateControls()));
+  connect(m_viewer, SIGNAL(currentRowChangedSignal(int)), this, SLOT(enableControls()));
   connect(m_btnPrint, SIGNAL(clicked(bool)), this, SLOT(print()));
   connect(m_btnView, SIGNAL(clicked(bool)), this, SLOT(view()));
   updateControls();
@@ -61,9 +61,13 @@ void ShopWidget::updateControls()
                  " OR " SHOPPING_LIST_SQL_COL_MON " LIKE '%" SHOPPING_LIST_SEPARATOR +
                  QString::number(date.day()) + SHOPPING_LIST_SEPARATOR "%'");
   m_viewer->setFixedFilter(filter);
-  auto o = getShoppingList();
-  m_btnPrint->setEnabled(o.m_id.isValid());
-  m_btnView->setEnabled(o.m_id.isValid());
+}
+
+void ShopWidget::enableControls()
+{
+  Id id = m_viewer->getFirstSelectedId();
+  m_btnPrint->setEnabled(id.isValid());
+  m_btnView->setEnabled(id.isValid());
 }
 
 ShoppingList ShopWidget::getShoppingList()

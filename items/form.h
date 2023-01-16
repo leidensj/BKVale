@@ -42,6 +42,7 @@ struct Form : public JItemSQL
   bool m_bCompany;
   QVector<Phone> m_vPhone;
   QVector<Address> m_vAddress;
+  bool m_bSex; //false masculino true feminino
 };
 
 #endif

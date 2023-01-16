@@ -84,14 +84,32 @@ void JTable::keyPressEvent(QKeyEvent *event)
   }
   else if (event->key() == Qt::Key_Delete)
   {
-    if (currentIndex().isValid())
-      erase(item(currentIndex().row(), currentIndex().column()));
+      if (selectionMode() == QAbstractItemView::SingleSelection)
+      {
+        if (currentIndex().isValid())
+          erase(item(currentIndex().row(), currentIndex().column()));
+      }
+      else
+      {
+        auto sm = selectionModel()->selectedIndexes();
+        for (int i = 0; i != sm.size(); ++i)
+          erase(item(sm.at(i).row(), sm.at(i).column()));
+      }
     QTableWidget::keyPressEvent(event);
   }
   else if (event->key() == Qt::Key_Space)
   {
-    if (currentIndex().isValid())
-      activate(item(currentIndex().row(), currentIndex().column()));
+    if (selectionMode() == QAbstractItemView::SingleSelection)
+    {
+      if (currentIndex().isValid())
+        activate(item(currentIndex().row(), currentIndex().column()));
+    }
+    else
+    {
+      auto sm = selectionModel()->selectedIndexes();
+      for (int i = 0; i != sm.size(); ++i)
+        activate(item(sm.at(i).row(), sm.at(i).column()));
+    }
     QTableWidget::keyPressEvent(event);
   }
   else
@@ -171,4 +189,10 @@ double JTable::sum(int column) const
       total += getItem(i, column)->getValue().toDouble();
   }
   return total;
+}
+
+void JTable::clearAll()
+{
+  setRowCount(0);
+  setColumnCount(0);
 }

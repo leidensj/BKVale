@@ -18,6 +18,7 @@ public:
 
 private slots:
   void updateControls();
+  void enableControls();
   void print();
   void view();
 

@@ -36,6 +36,10 @@ public:
   QLabel* m_lblCreationDate;
   QLabel* m_lblName;
   QLabel* m_lblAlias;
+  QWidget* m_sex;
+  QLabel* m_lblSex;
+  QRadioButton* m_rdoMale;
+  QRadioButton* m_rdoFemale;
 
 public slots:
   void setCompany(bool b);

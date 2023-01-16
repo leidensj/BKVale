@@ -7,23 +7,16 @@
 class ToggleItem : public JTableItem
 {
 public:
-  enum class Color
-  {
-    None,
-    Background,
-    Foreground
-  };
-
-  ToggleItem(Color color,
-             const QString& text = "");
+  ToggleItem(const QString& text = "", const QColor& foreground = Qt::black, const QColor& background = QColor(200, 200, 255));
   void evaluate();
   void erase();
   void activate();
   void setValue(const QVariant& v);
 
 private:
-  const Color m_color;
   const QString m_text;
+  const QColor m_foreground;
+  const QColor m_background;
 };
 
 #endif // TOGGLEITEM_H

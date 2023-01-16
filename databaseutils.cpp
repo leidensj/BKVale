@@ -194,6 +194,7 @@ bool BaitaSQL::createTables(QString& error)
                           FORM_SQL_COL_CRE " DATE,"
                           FORM_SQL_COL_ISC " BOOLEAN,"
                           FORM_SQL_COL_HBI " BOOLEAN,"
+                          FORM_SQL_COL_SEX " BOOLEAN,"
                           "FOREIGN KEY(" FORM_SQL_COL_IID ") REFERENCES "
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 

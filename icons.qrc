@@ -182,5 +182,6 @@
         <file>res/server.png</file>
         <file>res/coupon.png</file>
         <file>res/csv_export.png</file>
+        <file>res/complete.png</file>
     </qresource>
 </RCC>

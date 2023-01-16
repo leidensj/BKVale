@@ -92,3 +92,27 @@ bool JItemSQL::SQL_finish(QSqlDatabase db,
 
   return bExecSelectResult;
 }
+
+QString JItemSQL::firstName() const
+{
+  QString str = name();
+  if (!str.isEmpty())
+  {
+    auto lst = str.split(" ");
+    str = lst.first();
+  }
+  return str;
+}
+
+QString JItemSQL::firstNameInitials() const
+{
+  QString str = name();
+  if (!str.isEmpty())
+  {
+    auto lst = str.split(" ");
+    str = lst.first();
+    for (int i = 1; i != lst.size(); ++i)
+      str += QString(" ") + lst.at(i).at(0) + ".";
+  }
+  return str;
+}

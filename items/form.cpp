@@ -22,6 +22,7 @@ void Form::clear(bool bClearId)
   m_vPhone.clear();
   m_vAddress.clear();
   m_bBirth = false;
+  m_bSex = false;
 }
 
 bool Form::operator !=(const JItem& other) const
@@ -37,7 +38,8 @@ bool Form::operator !=(const JItem& other) const
             m_bCompany != another.m_bCompany ||
             m_vPhone != another.m_vPhone ||
             m_vAddress != another.m_vAddress ||
-            m_dtBirth != another.m_dtBirth;
+            m_dtBirth != another.m_dtBirth ||
+            m_bSex != another.m_bSex;
   return b;
 }
 
@@ -75,7 +77,8 @@ bool Form::SQL_insert_proc(QSqlQuery& query) const
                 FORM_SQL_COL_BIR ","
                 FORM_SQL_COL_CRE ","
                 FORM_SQL_COL_ISC ","
-                FORM_SQL_COL_HBI ")"
+                FORM_SQL_COL_HBI ","
+                FORM_SQL_COL_SEX ")"
                 " VALUES ("
                 "(:_v01),"
                 "(:_v02),"
@@ -87,7 +90,8 @@ bool Form::SQL_insert_proc(QSqlQuery& query) const
                 "(:_v08),"
                 "(:_v09),"
                 "(:_v10),"
-                "(:_v11))");
+                "(:_v11),"
+                "(:_v12))");
   query.bindValue(":_v01", m_image.m_id.getIdNull());
   query.bindValue(":_v02", m_name);
   query.bindValue(":_v03", m_alias);
@@ -99,6 +103,7 @@ bool Form::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v09", m_dtCreation);
   query.bindValue(":_v10", m_bCompany);
   query.bindValue(":_v11", m_bBirth);
+  query.bindValue(":_v12", m_bSex);
 
   bool bSuccess = query.exec();
   if (bSuccess)
@@ -189,7 +194,8 @@ bool Form::SQL_update_proc(QSqlQuery& query) const
                 FORM_SQL_COL_BIR " = (:_v08),"
                 FORM_SQL_COL_CRE " = (:_v09),"
                 FORM_SQL_COL_ISC " = (:_v10),"
-                FORM_SQL_COL_HBI " = (:_v11)"
+                FORM_SQL_COL_HBI " = (:_v11),"
+                FORM_SQL_COL_SEX " = (:_v12)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_image.m_id.getIdNull());
@@ -203,6 +209,7 @@ bool Form::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v09", m_dtCreation);
   query.bindValue(":_v10", m_bCompany);
   query.bindValue(":_v11", m_bBirth);
+  query.bindValue(":_v12", m_bSex);
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -307,7 +314,8 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
                 FORM_SQL_COL_BIR ","
                 FORM_SQL_COL_CRE ","
                 FORM_SQL_COL_ISC ","
-                FORM_SQL_COL_HBI
+                FORM_SQL_COL_HBI ","
+                FORM_SQL_COL_SEX
                 " FROM " FORM_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -328,6 +336,7 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
       m_dtCreation = query.value(8).toDate();
       m_bCompany = query.value(9).toBool();
       m_bBirth = query.value(10).toBool();
+      m_bSex = query.value(11).toBool();
     }
   }
 

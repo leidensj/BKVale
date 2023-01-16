@@ -20,6 +20,7 @@ public:
   bool isValidCurrentRow() const;
   JTableItem* getItem(int row, int column) const;
   double sum(int column) const;
+  void clearAll();
 
 public slots:
   virtual void removeItem();

@@ -14,7 +14,7 @@
 #include <QLocale>
 #include <QPushButton>
 #include <QCheckBox>
-#include <QThread>
+#include <QLabel>
 #include "tables/dayofftable.h"
 
 TimeCardDialog::TimeCardDialog(QWidget* parent)
@@ -25,7 +25,11 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
  , m_spnExtraPages(nullptr)
  , m_cbOpenFile(nullptr)
  , m_dayOffTable(nullptr)
+ , m_btnCSV(nullptr)
+ , m_btnComplete(nullptr)
+ , m_lblMessage(nullptr)
 {
+  setWindowFlags(Qt::Window);
   setWindowTitle(tr("Livro Ponto"));
   setWindowIcon(QIcon(":/icons/res/timecard.png"));
   m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
@@ -50,17 +54,70 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   formLayout->addRow(tr("Data:"), m_date);
   formLayout->addRow(tr("Páginas extras:"), m_spnExtraPages);
 
+  m_btnCSV = new QPushButton;
+  m_btnCSV->setFlat(true);
+  m_btnCSV->setIconSize(QSize(24, 24));
+  m_btnCSV->setToolTip(tr("Exportar para CSV"));
+  m_btnCSV->setIcon(QIcon(":/icons/res/csv_export.png"));
+
+  m_btnComplete = new QPushButton;
+  m_btnComplete->setFlat(true);
+  m_btnComplete->setIconSize(QSize(24, 24));
+  m_btnComplete->setToolTip(tr("Auto completar"));
+  m_btnComplete->setIcon(QIcon(":/icons/res/complete.png"));
+
+  m_lblMessage = new QLabel;
+
+  QHBoxLayout* ltTable = new QHBoxLayout;
+  ltTable->setAlignment(Qt::AlignLeft);
+  ltTable->addWidget(m_btnCSV);
+  ltTable->addWidget(m_btnComplete);
+  ltTable->addWidget(m_lblMessage);
+
   m_dayOffTable = new DayOffTable;
 
   QVBoxLayout* ltMain = new QVBoxLayout;
   ltMain->addLayout(formLayout);
   ltMain->addWidget(m_cbOpenFile);
+  ltMain->addLayout(ltTable);
   ltMain->addWidget(m_dayOffTable);
   ltMain->addWidget(m_buttons);
   setLayout(ltMain);
 
   connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(m_date, SIGNAL(dateChanged(const QDate&)), this, SLOT(updateControls()));
+  connect(m_btnCSV, SIGNAL(clicked(bool)), this, SLOT(saveDayOff()));
+  connect(m_btnComplete, SIGNAL(clicked(bool)), m_dayOffTable, SLOT(autoComplete()));
+  connect(m_dayOffTable, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem*)), this, SLOT(updateMessage()));
+  connect(m_dayOffTable, SIGNAL(changedSignal(bool)), this, SLOT(updateMessage()));
   updateControls();
+}
+
+void TimeCardDialog::saveDayOff()
+{
+  Store o(m_storePicker->getFirstId());
+  QString error;
+  // TODO
+  if (!o.m_id.isValid() || !o.SQL_select(error))
+    return;
+
+  QDate dt = m_date->date().addDays(-1 * m_date->date().day() + 1);
+  QString fileName = QFileDialog::getSaveFileName(this,
+                                                  tr("Salvar folgas"),
+                                                  "/desktop/folgas_" +
+                                                  dt.toString("yyyy") + "_" +
+                                                  dt.toString("MM") +
+                                                  "_" +
+                                                  o.m_form.strAliasName().replace(" ", "") +
+                                                  ".csv",
+                                                  tr("CSV (*.csv)"));
+  if (fileName.isEmpty())
+    return;
+
+  QString csv = m_dayOffTable->toCSV();
+
+  CsvGenerator* w = new CsvGenerator(fileName, csv, tr("Gerando arquivo csv:"), true);
+  w->generate();
 }
 
 void TimeCardDialog::updateControls()
@@ -68,12 +125,14 @@ void TimeCardDialog::updateControls()
   QPushButton* pt = m_buttons->button(QDialogButtonBox::Save);
   if (pt != nullptr)
     pt->setEnabled(m_storePicker->getFirstId().isValid());
+  m_btnCSV->setEnabled(m_storePicker->getFirstId().isValid());
 
+  m_lblMessage->setText("");
   Store o(m_storePicker->getFirstId());
   QString error;
   if (!o.m_id.isValid() || !o.SQL_select(error))
   {
-    m_dayOffTable->clear();
+    m_dayOffTable->clearAll();
     return;
   }
   m_dayOffTable->setStore(o, m_date->date());
@@ -133,6 +192,8 @@ void TimeCardDialog::saveAndAccept()
 
   QLocale br(QLocale::Portuguese, QLocale::Brazil);
 
+  QVector<QVector<bool>> dayOff;
+  m_dayOffTable->getDayOff(dayOff);
   for (int i = 0; i != o.m_vEmployee.size() + m_spnExtraPages->value(); ++i)
   {
     // 1 - Nome funcionário
@@ -169,23 +230,29 @@ void TimeCardDialog::saveAndAccept()
                      idt.toString("yyyy"));
     dt = idt;
     const int daysInMonth = dt.daysInMonth();
-    for (int i = 0; i != daysInMonth; ++i)
+    for (int j = 0; j != daysInMonth; ++j)
     {
       // - Data dd
       // - Data dddd
       html += QString(
         "<tr>"
          "<td width=\"5%\">%1</td>"
-           "<td width=\"15%\" bgcolor=\"%3\">%2</td>"
-           "<td width=\"30%\"></td>"
-           "<td width=\"5%\"></td>"
-           "<td width=\"5%\"></td>"
-           "<td width=\"30%\"></td>"
-           "<td width=\"5%\"></td>"
-           "<td width=\"5%\"></td>"
+           "<td width=\"15%\" bgcolor=\"%2\">%3</td>"
+           "<td width=\"30%\" align=\"center\">%4</td>"
+           "<td width=\"5%\" align=\"center\">%5</td>"
+           "<td width=\"5%\" align=\"center\">%6</td>"
+           "<td width=\"30%\" align=\"center\">%7</td>"
+           "<td width=\"5%\" align=\"center\">%8</td>"
+           "<td width=\"5%\" align=\"center\">%9</td>"
          "</tr>").arg(dt.toString("dd"),
+                      dt.dayOfWeek() == 7 ? "gray" : "white",
                       br.toString(dt, "dddd"),
-                      dt.dayOfWeek() == 7 ? "gray" : "white");
+                      i < dayOff.size() ? (dayOff.at(i).at(j) ? "FOLGA" : "") : "",
+                      i < dayOff.size() ? (dayOff.at(i).at(j) ? "-" : "") : "",
+                      i < dayOff.size() ? (dayOff.at(i).at(j) ? "-" : "") : "",
+                      i < dayOff.size() ? (dayOff.at(i).at(j) ? "FOLGA" : "") : "",
+                      i < dayOff.size() ? (dayOff.at(i).at(j) ? "-" : "") : "",
+                      i < dayOff.size() ? (dayOff.at(i).at(j) ? "-" : "") : "");
       dt = dt.addDays(1);
     }
 
@@ -195,33 +262,33 @@ void TimeCardDialog::saveAndAccept()
       "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: gray;%1\">"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS NORMAIS</td>"
-      "<td width=\"10%\">(H.N.)</td>"
-      "<td width=\"50%\"></td>"
+      "<td width=\"15%\">(H.N.)</td>"
+      "<td width=\"45%\"></td>"
       "</tr>"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS FALTAS</td>"
-      "<td width=\"10%\">(H.F.)</td>"
-      "<td width=\"50%\"></td>"
+      "<td width=\"15%\">(H.F.)</td>"
+      "<td width=\"45%\"></td>"
       "</tr>"
       "<tr>"
       "<td width=\"40%\">HORAS NOTURNAS</td>"
-      "<td width=\"10%\">(H.Not.)</td>"
-      "<td width=\"50%\"></td>"
+      "<td width=\"15%\">(H.Not.)</td>"
+      "<td width=\"45%\"></td>"
       "</tr>"
       "<tr>"
       "<td width=\"40%\">HORAS ADICIONAIS NOTURNAS</td>"
-      "<td width=\"10%\">(H.Ad.Not.)</td>"
-      "<td width=\"50%\"></td>"
+      "<td width=\"15%\">(H.Ad.Not.)</td>"
+      "<td width=\"45%\"></td>"
       "</tr>"
       "<tr>"
       "<td width=\"40%\">DESCANSO SEMANAL REMUNERADO</td>"
-      "<td width=\"10%\">(D.R.S)</td>"
-      "<td width=\"50%\"></td>"
+      "<td width=\"15%\">(D.R.S)</td>"
+      "<td width=\"45%\"></td>"
       "</tr>"
       "<tr>"
       "<td width=\"40%\">TOTAL DE HORAS EXTRAS 50%</td>"
-      "<td width=\"10%\">(H.E.)</td>"
-      "<td width=\"50%\"></td>"
+      "<td width=\"15%\">(H.E.)</td>"
+      "<td width=\"45%\"></td>"
       "</tr>"
       "</tr>"
       "</table>").arg(i == (o.m_vEmployee.size() + m_spnExtraPages->value() - 1) ? "" : "page-break-after:always;");
@@ -247,4 +314,9 @@ void TimeCardDialog::saveAndAccept()
   accept();
   PdfGenerator* w = new PdfGenerator(fileName, html, tr("Gerando livro ponto:"), m_cbOpenFile->isChecked(), false);
   w->generate();
+}
+
+void TimeCardDialog::updateMessage()
+{
+  m_lblMessage->setText(m_dayOffTable->message());
 }

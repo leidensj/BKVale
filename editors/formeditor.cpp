@@ -28,6 +28,10 @@ FormInfoEditor::FormInfoEditor(QWidget* parent)
   , m_lblCreationDate(nullptr)
   , m_lblName(nullptr)
   , m_lblAlias(nullptr)
+  , m_sex(nullptr)
+  , m_lblSex(nullptr)
+  , m_rdoMale(nullptr)
+  , m_rdoFemale(nullptr)
 {
   m_dtCreationDate = new QDateEdit;
   m_dtCreationDate->setCalendarPopup(true);
@@ -44,7 +48,13 @@ FormInfoEditor::FormInfoEditor(QWidget* parent)
   m_lblName = new QLabel;
   m_lblAlias = new QLabel;
   m_lblCreationDate = new QLabel(tr("Data de criação:"));
+  m_rdoMale = new QRadioButton;
+  m_rdoMale->setText(tr("Masculino"));
+  m_rdoMale->setChecked(true);
+  m_rdoFemale = new QRadioButton;
+  m_rdoFemale->setText(tr("Feminino"));
   m_lblType = new QLabel(tr("Tipo:"));
+  m_lblSex = new QLabel(tr("Sexo:"));
 
   QHBoxLayout* ltType = new QHBoxLayout;
   ltType->setContentsMargins(0, 0, 0, 0);
@@ -55,11 +65,21 @@ FormInfoEditor::FormInfoEditor(QWidget* parent)
   m_type = new QWidget;
   m_type->setLayout(ltType);
 
+  QHBoxLayout* ltSex = new QHBoxLayout;
+  ltSex->setContentsMargins(0, 0, 0, 0);
+  ltSex->addWidget(m_rdoMale);
+  ltSex->addWidget(m_rdoFemale);
+  ltSex->setAlignment(Qt::AlignLeft);
+
+  m_sex = new QWidget;
+  m_sex->setLayout(ltSex);
+
   QFormLayout* lt = new QFormLayout;
   lt->addRow(m_lblCreationDate, m_dtCreationDate);
   lt->addRow(m_lblType, m_type);
   lt->addRow(m_lblName, m_edName);
   lt->addRow(m_lblAlias, m_edAlias);
+  lt->addRow(m_lblSex, m_sex);
 
   connect(m_rdoCompany, SIGNAL(clicked(bool)), this, SLOT(switchUserType()));
   connect(m_rdoPerson, SIGNAL(clicked(bool)), this, SLOT(switchUserType()));
@@ -91,6 +111,8 @@ void FormInfoEditor::setForm(const Form& o)
   m_dtCreationDate->setDate(o.m_dtCreation);
   m_rdoCompany->setChecked(o.m_bCompany);
   m_rdoPerson->setChecked(!o.m_bCompany);
+  m_rdoMale->setChecked(!o.m_bSex);
+  m_rdoFemale->setChecked(o.m_bSex);
   switchUserType();
 }
 
@@ -100,20 +122,15 @@ void FormInfoEditor::fillForm(Form& o) const
   o.m_alias = m_edAlias->text();
   o.m_dtCreation = m_dtCreationDate->date();
   o.m_bCompany = m_rdoCompany->isChecked();
+  o.m_bSex = m_rdoFemale->isChecked();
 }
 
 void FormInfoEditor::switchUserType()
 {
-  if (m_rdoCompany->isChecked())
-  {
-    m_lblName->setText(tr("Razão social:"));
-    m_lblAlias->setText(tr("Nome fantasia:"));
-  }
-  else
-  {
-    m_lblName->setText(tr("Nome:"));
-    m_lblAlias->setText(tr("Apelido:"));
-  }
+  m_lblName->setText(m_rdoCompany->isChecked() ? tr("Razão social:") : tr("Nome:"));
+  m_lblAlias->setText(m_rdoCompany->isChecked() ? tr("Nome fantasia:") : tr("Apelido:"));
+  m_lblSex->setVisible(!m_rdoCompany->isChecked());
+  m_sex->setVisible(!m_rdoCompany->isChecked());
 
   emit userTypeChangedSignal(m_rdoCompany->isChecked());
 }

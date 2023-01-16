@@ -26,6 +26,8 @@ struct JItemSQL : public JItem
 
   virtual void copy(const JItemSQL& other) { *this = other; }
   virtual QString name() const { return "Nome não implementado."; }
+  virtual QString firstName() const;
+  virtual QString firstNameInitials() const;
   virtual QByteArray image() const { return QByteArray(); }
   virtual void setEmployee(const JItemSQL& /*e*/) const { }
 

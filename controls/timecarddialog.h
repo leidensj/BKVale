@@ -22,7 +22,8 @@ private slots:
   void saveAndAccept();
   void updateControls();
   void saveDayOff();
-  void updateMessage();
+  void updateMessageAndSwapButton();
+  void shuffle();
 
 private:
   DatabasePicker* m_storePicker;
@@ -33,6 +34,7 @@ private:
   DayOffTable* m_dayOffTable;
   QPushButton* m_btnCSV;
   QPushButton* m_btnComplete;
+  QPushButton* m_btnSwap;
   QLabel* m_lblMessage;
 };
 

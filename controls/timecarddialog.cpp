@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QLabel>
+#include <QMessageBox>
 #include "tables/dayofftable.h"
 
 TimeCardDialog::TimeCardDialog(QWidget* parent)
@@ -27,6 +28,7 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
  , m_dayOffTable(nullptr)
  , m_btnCSV(nullptr)
  , m_btnComplete(nullptr)
+ , m_btnSwap(nullptr)
  , m_lblMessage(nullptr)
 {
   setWindowFlags(Qt::Window);
@@ -63,8 +65,14 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   m_btnComplete = new QPushButton;
   m_btnComplete->setFlat(true);
   m_btnComplete->setIconSize(QSize(24, 24));
-  m_btnComplete->setToolTip(tr("Auto completar"));
-  m_btnComplete->setIcon(QIcon(":/icons/res/complete.png"));
+  m_btnComplete->setToolTip(tr("Gerar folgas"));
+  m_btnComplete->setIcon(QIcon(":/icons/res/shuffle.png"));
+
+  m_btnSwap = new QPushButton;
+  m_btnSwap->setFlat(true);
+  m_btnSwap->setIconSize(QSize(24, 24));
+  m_btnSwap->setToolTip(tr("Trocar folgas"));
+  m_btnSwap->setIcon(QIcon(":/icons/res/swap.png"));
 
   m_lblMessage = new QLabel;
 
@@ -72,6 +80,7 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   ltTable->setAlignment(Qt::AlignLeft);
   ltTable->addWidget(m_btnCSV);
   ltTable->addWidget(m_btnComplete);
+  ltTable->addWidget(m_btnSwap);
   ltTable->addWidget(m_lblMessage);
 
   m_dayOffTable = new DayOffTable;
@@ -87,10 +96,18 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
   connect(m_date, SIGNAL(dateChanged(const QDate&)), this, SLOT(updateControls()));
   connect(m_btnCSV, SIGNAL(clicked(bool)), this, SLOT(saveDayOff()));
-  connect(m_btnComplete, SIGNAL(clicked(bool)), m_dayOffTable, SLOT(autoComplete()));
-  connect(m_dayOffTable, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem*)), this, SLOT(updateMessage()));
-  connect(m_dayOffTable, SIGNAL(changedSignal(bool)), this, SLOT(updateMessage()));
+  connect(m_btnComplete, SIGNAL(clicked(bool)), this, SLOT(shuffle()));
+  connect(m_btnSwap, SIGNAL(clicked(bool)), m_dayOffTable, SLOT(swapCurrentLine()));
+  connect(m_dayOffTable, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem*)), this, SLOT(updateMessageAndSwapButton()));
+  connect(m_dayOffTable, SIGNAL(changedSignal(bool)), this, SLOT(updateMessageAndSwapButton()));
   updateControls();
+}
+
+void TimeCardDialog::shuffle()
+{
+  int ret = QMessageBox::question(this, tr("Gerar folgas"), tr("Deseja gerar as folgas automaticamente?"), QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+  if (ret == QMessageBox::Yes)
+    m_dayOffTable->shuffle();
 }
 
 void TimeCardDialog::saveDayOff()
@@ -126,6 +143,7 @@ void TimeCardDialog::updateControls()
   if (pt != nullptr)
     pt->setEnabled(m_storePicker->getFirstId().isValid());
   m_btnCSV->setEnabled(m_storePicker->getFirstId().isValid());
+  m_btnComplete->setEnabled(m_storePicker->getFirstId().isValid());
 
   m_lblMessage->setText("");
   Store o(m_storePicker->getFirstId());
@@ -316,7 +334,8 @@ void TimeCardDialog::saveAndAccept()
   w->generate();
 }
 
-void TimeCardDialog::updateMessage()
+void TimeCardDialog::updateMessageAndSwapButton()
 {
+  m_btnSwap->setEnabled(m_dayOffTable->isValidCurrentRow());
   m_lblMessage->setText(m_dayOffTable->message());
 }

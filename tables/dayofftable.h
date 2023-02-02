@@ -19,7 +19,8 @@ public:
 
 public slots:
   void addRow();
-  void autoComplete();
+  void shuffle();
+  void swapCurrentLine();
 
 private:
   QDate m_date;

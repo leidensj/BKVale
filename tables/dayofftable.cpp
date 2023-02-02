@@ -134,7 +134,7 @@ QString DayOffTable::message() const
   return msg1 + msg2;
 }
 
-void DayOffTable::autoComplete()
+void DayOffTable::shuffle()
 {
   QVector<QVector<bool>> v;
   for (int i = 0; i != rowCount(); ++i)
@@ -154,15 +154,10 @@ void DayOffTable::autoComplete()
       // se for mulher, tem dois domingos intercalados e o resto segundas
       bool firstSunday = QRandomGenerator::global()->bounded(1, 3) == 1;
       for (int it = 0; it != sundays.count(); ++it)
-        if (it < mondays.count())
-        {
-          if ((firstSunday && (it == 0 || it == 2)) || (!firstSunday && (it == 1 || it == 3)))
-            dayoff[sundays.at(it)] = true;
-          else
-            dayoff[mondays.at(it)] = true;
-        }
-        else
-          dayoff[mondays.back()] = true;
+        if ((firstSunday && (it == 0 || it == 2 || it == 4)) || (!firstSunday && (it == 1 || it == 3)))
+          dayoff[sundays.at(it)] = true;
+        else if (it < mondays.count())
+          dayoff[mondays.at(it)] = true;
     }
     else
     {
@@ -193,3 +188,73 @@ void DayOffTable::setDayOff(const QVector<QVector<bool>>& v)
     }
   }
 }
+
+/*void DayOffTable::swapCurrentLine()
+{
+  int row = currentRow();
+  if (row >= rowCount())
+    return;
+  for (int j = 0; j != columnCount(); ++j)
+  {
+    auto pt = dynamic_cast<JTableItem*>(item(row, j));
+    if (pt != nullptr)
+    {
+      if (pt->getValue().toBool())
+      {
+        QDate dt(m_date.year(), m_date.month(), j + 1);
+        if ((dt.dayOfWeek() == Qt::Monday) && (j - 1 >= 0))
+        {
+          pt->setValue(false);
+          pt = dynamic_cast<JTableItem*>(item(row, j - 1));
+          if (pt != nullptr)
+            pt->setValue(true);
+        }
+        else if ((dt.dayOfWeek() == Qt::Sunday) && (j + 1 < m_date.daysInMonth()))
+        {
+          pt->setValue(false);
+          pt = dynamic_cast<JTableItem*>(item(row, j + 1));
+          if (pt != nullptr)
+            pt->setValue(true);
+          j++;
+        }
+      }
+    }
+  }
+}*/
+
+void DayOffTable::swapCurrentLine()
+{
+  int row = currentRow();
+  if (row >= rowCount())
+    return;
+
+  QVector<int> v;
+  for (int j = columnCount() - 1; j >= 0; j--)
+  {
+    auto pt = dynamic_cast<JTableItem*>(item(row, j));
+    if (pt != nullptr)
+    {
+      if (pt->getValue().toBool())
+      {
+        pt->setValue(false);
+        if ((j + 7) < columnCount())
+        {
+           pt = dynamic_cast<JTableItem*>(item(row, j + 7));
+           pt->setValue(true);
+        }
+        else
+        {
+           v.push_back(QDate(m_date.year(), m_date.month(), j + 1).dayOfWeek());
+        }
+      }
+    }
+  }
+
+  for (int j = 0; j != 7; ++j)
+    if (j < columnCount() && v.contains(QDate(m_date.year(), m_date.month(), j +1).dayOfWeek()))
+    {
+      auto pt = dynamic_cast<JTableItem*>(item(row, j));
+      pt->setValue(true);
+    }
+}
+

@@ -183,5 +183,7 @@
         <file>res/coupon.png</file>
         <file>res/csv_export.png</file>
         <file>res/complete.png</file>
+        <file>res/swap.png</file>
+        <file>res/shuffle.png</file>
     </qresource>
 </RCC>

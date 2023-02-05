@@ -186,6 +186,36 @@ namespace
       text += _o.m_product.m_name + ESC_LF + str + ESC_LF;
     }
   }
+
+  QString couponContent(const Coupon& o)
+  {
+    QString str;
+    switch (o.m_type)
+    {
+      case Coupon::Type::Value:
+      case Coupon::Type::Percentage:
+        str += ESC_ALIGN_CENTER
+               ESC_DOUBLE_FONT_ON +
+               o.strCoupon() +
+               ESC_DOUBLE_FONT_OFF
+               ESC_LF
+               ESC_VERT_TAB
+               ESC_ALIGN_LEFT;
+        break;
+      case Coupon::Type::Product:
+        str += ESC_ALIGN_CENTER
+               ESC_EXPAND_ON +
+               o.strCoupon() +
+               ESC_EXPAND_OFF
+               ESC_LF
+               ESC_VERT_TAB
+               ESC_ALIGN_LEFT;
+        break;
+      default:
+        break;
+    }
+    return str;
+  }
 }
 
 QString Printer::st_strFullCut()
@@ -518,7 +548,7 @@ bool Printer::print(const ShoppingList& lst,  bool bPrintCount, QString& error)
   return print(str, error);
 }
 
-bool Printer::print(const Coupon& o, QString& error)
+bool Printer::print(const Coupon& o, bool bPrintContent, QString& error)
 {
   QString str;
   if (o.m_store.m_id.isValid())
@@ -551,8 +581,10 @@ bool Printer::print(const Coupon& o, QString& error)
            QString(decToHex[o.m_code.length()]) +
            o.m_code +
            ESC_LF
-           ESC_VERT_TAB
-           ESC_ALIGN_LEFT
+           ESC_VERT_TAB;
+    if (bPrintContent)
+      str += "Esse codigo vale:" ESC_LF + couponContent(o);
+    str += ESC_ALIGN_LEFT
            "Emissao: " +
            o.m_dtCreation.toString("dd/MM/yyyy hh:mm:ss") +
            " @ " + QHostInfo::localHostName().toUpper() +
@@ -576,31 +608,8 @@ bool Printer::print(const Coupon& o, QString& error)
            ESC_ALIGN_LEFT
            "Parabens! Voce ganhou um desconto de:"
            ESC_LF
-           ESC_VERT_TAB;
-    switch (o.m_type)
-    {
-      case Coupon::Type::Value:
-      case Coupon::Type::Percentage:
-        str += ESC_ALIGN_CENTER
-               ESC_DOUBLE_FONT_ON +
-               o.strCoupon() +
-               ESC_DOUBLE_FONT_OFF
-               ESC_LF
-               ESC_VERT_TAB
-               ESC_ALIGN_LEFT;
-        break;
-      case Coupon::Type::Product:
-        str += ESC_ALIGN_CENTER
-               ESC_EXPAND_ON +
-               o.strCoupon() +
-               ESC_EXPAND_OFF
-               ESC_LF
-               ESC_VERT_TAB
-               ESC_ALIGN_LEFT;
-        break;
-      default:
-        break;
-    }
+           ESC_VERT_TAB +
+           couponContent(o);
     str += ESC_ALIGN_LEFT
            "Resgate: " + o.m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss") +
            " @ " + QHostInfo::localHostName().toUpper();

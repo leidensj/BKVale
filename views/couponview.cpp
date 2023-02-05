@@ -22,21 +22,29 @@
 
 CouponConfirmation::CouponConfirmation(const QVector<Coupon>& coupons, QWidget* parent)
   : QDialog(parent)
+  , m_cbPrintContent(nullptr)
 {
   QPlainTextEdit* teCodes = new QPlainTextEdit;
   QDialogButtonBox* btns = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No);
+  m_cbPrintContent = new QCheckBox(tr("Imprimir conteúdo"));
   QVBoxLayout* ltMain = new QVBoxLayout;
   QString msg = coupons.size() == 1 && coupons.at(0).m_id.isValid()
                 ? tr("Deseja imprimir o cupom atualizado?")
                 : tr("Deseja imprimir os %1 cupons gerados?").arg(coupons.size());
   ltMain->addWidget(new QLabel(msg));
   ltMain->addWidget(teCodes);
+  ltMain->addWidget(m_cbPrintContent);
   ltMain->addWidget(btns);
   setLayout(ltMain);
   for (const Coupon& o : coupons)
     teCodes->appendPlainText(o.m_code);
   connect(btns, SIGNAL(accepted()), this, SLOT(accept()));
   connect(btns, SIGNAL(rejected()), this, SLOT(reject()));
+}
+
+bool CouponConfirmation::printContent()
+{
+  return m_cbPrintContent->isChecked();
 }
 
 CouponView::CouponView(QWidget* parent)
@@ -56,6 +64,7 @@ CouponView::CouponView(QWidget* parent)
   , m_lblCount(nullptr)
   , m_filter(nullptr)
 {
+  auto btnPrint = m_viewer->addButton(tr("Imprimir"), QIcon(":/icons/res/printer.png"));
   m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
 
   m_edCode = new JLineEdit(Text::Input::Alpha, true);
@@ -115,7 +124,7 @@ CouponView::CouponView(QWidget* parent)
   connect(m_rdoProduct, SIGNAL(clicked(bool)), m_btnAddRemove->m_btnAdd, SLOT(setFocus()));
   connect(m_viewer, &DatabaseViewer::refreshSignal, m_lblCount, [=](){ m_lblCount->setText(tr("Número de cupons: %1").arg(m_viewer->getRowCount())); });
   connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_viewer, SLOT(setDynamicFilter(const QString&)));
-
+  connect(btnPrint, SIGNAL(clicked()), this, SLOT(print()));
   setFocusWidgetOnClear(m_edPercentage);
   m_viewer->refresh();
   clear();
@@ -212,8 +221,11 @@ void CouponView::save()
     clear();
     CouponConfirmation dlg(coupons, this);
     if (dlg.exec())
+    {
+      QVariant bPrintContent (dlg.printContent());
       for (int i = 0; i != coupons.size(); ++i)
-        JItemHelper::print(coupons.at(i), nullptr, this);
+        JItemHelper::print(coupons.at(i), &bPrintContent, this);
+    }
   }
 }
 
@@ -251,4 +263,26 @@ bool CouponView::st_saveMultiple(QVector<Coupon>& v, QWidget* parent)
   bar.setValue(count);
 
   return JItemSQL::SQL_finish(db, query, true, error);
+}
+
+void CouponView::print()
+{
+  Coupon o;
+  o.m_id = m_viewer->getFirstSelectedId();
+  if (o.m_id.isValid())
+  {
+    QString error;
+    if (o.SQL_select(error))
+    {
+      if (o.m_bRedeemed)
+        QMessageBox::information(this, tr("Cupom"), tr("Cupom já resgatado"), QMessageBox::Ok);
+      else
+      {
+        int ret = QMessageBox::question(this, tr("Cupom"), tr("Deseja imprimir o conteúdo do cupom?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        QVariant bPrintContent(ret == QMessageBox::Yes);
+        JItemHelper::print(o, &bPrintContent, this);
+      }
+
+    }
+  }
 }

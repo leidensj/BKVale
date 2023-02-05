@@ -24,6 +24,10 @@ class CouponConfirmation : public QDialog
 
 public:
   explicit CouponConfirmation(const QVector<Coupon>& coupons, QWidget* parent = 0);
+  bool printContent();
+
+private:
+  QCheckBox* m_cbPrintContent;
 };
 
 class CouponView : public JItemView
@@ -43,6 +47,7 @@ protected slots:
 private slots:
   static bool st_saveMultiple(QVector<Coupon>& v, QWidget* parent);
   void updateControls();
+  void print();
 
 private:
   QLabel* m_lblRedeemed;

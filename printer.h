@@ -16,7 +16,7 @@ public:
   bool print(const Purchase& o, QString& error);
   bool print(const Reminder& o, QString& error);
   bool print(const ShoppingList& o, bool bPrintCount, QString& error);
-  bool print(const Coupon& o, QString& error);
+  bool print(const Coupon& o, bool bPrintContent, QString& error);
   static QString st_strFullCut();
 
 private:

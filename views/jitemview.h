@@ -28,6 +28,8 @@ public slots:
   virtual void getItem(JItemSQL& o) const = 0;
   virtual void clear();
   virtual void setItem();
+  virtual void setItem(const Id& id);
+  virtual void setCopyItem();
   virtual void save();
 
 protected slots:

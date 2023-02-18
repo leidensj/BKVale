@@ -11,7 +11,6 @@ namespace JItemHelper
 {
 JItemSQL* create(const QString& tableName);
 JItemSQL* create(const QString& tableName, Id id);
-JItemSQL* copy(const QString& tableName, Id id);
 bool authenticateRemove(const QString tableName, QWidget* parent = nullptr);
 bool authenticateSave(const JItemSQL& o, QWidget* parent = nullptr);
 bool authenticationToSave(const QString& tableName);
@@ -24,7 +23,6 @@ JModel* model(const QString& tableName, QObject* parent);
 JItemView* view(const QString& tableName);
 bool select(JItemSQL& o, QWidget* parent = nullptr);
 void remove(const Ids& ids, const QString& tableName, QWidget* parent = nullptr);
-Ids copy(const Ids& ids, const QString& tableName, QWidget* parent = nullptr);
 bool save(const JItemSQL& o, QWidget* parent = nullptr);
 bool print(const JItemSQL& o, QVariant* options = nullptr, QWidget* parent = nullptr);
 }

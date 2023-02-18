@@ -489,10 +489,7 @@ void PurchaseView::save()
 void PurchaseView::lastItemSelected()
 {
   if (m_lastId.isValid())
-  {
-    m_viewer->selectId(m_lastId);
-    setItem();
-  }
+    JItemView::setItem(m_lastId);
 }
 
 void PurchaseView::setItem()

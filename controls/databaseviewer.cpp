@@ -158,7 +158,7 @@ DatabaseViewer::DatabaseViewer(const QString& tableName,
     connect(m_btnOpen, SIGNAL(clicked(bool)), this, SLOT(emitItemsSelectedSignal()));
     connect(m_table, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(emitItemsSelectedSignal()));
     connect(m_btnRemove, SIGNAL(clicked(bool)), this, SLOT(removeItems()));
-    connect(m_btnCopy, SIGNAL(clicked(bool)), this, SLOT(copyItems()));
+    connect(m_btnCopy, SIGNAL(clicked(bool)), this, SLOT(emitCopySignal()));
   }
 
   new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(focusSearch()));
@@ -278,14 +278,6 @@ void DatabaseViewer::removeItems()
   JItemHelper::remove(ids, m_tableName, this);
   emit itemsRemovedSignal(ids);
   refresh();
-}
-
-void DatabaseViewer::copyItems()
-{
-  Ids ids = getSelectedIds();
-  Ids newids = JItemHelper::copy(ids, m_tableName, this);
-  refresh();
-  selectIds(newids);
 }
 
 void DatabaseViewer::searchChanged()
@@ -433,4 +425,9 @@ void DatabaseViewer::toCSV()
 
   CsvGenerator* w = new CsvGenerator(fileName, csv, tr("Gerando arquivo csv:"), true);
   w->generate();
+}
+
+void DatabaseViewer::emitCopySignal()
+{
+  emit copySignal();
 }

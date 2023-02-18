@@ -84,19 +84,6 @@ JItemSQL* JItemHelper::create(const QString& tableName)
   return nullptr;
 }
 
-JItemSQL* JItemHelper::copy(const QString& tableName, Id id)
-{
-  auto other = create(tableName, id);
-  if (other != nullptr)
-  {
-    QString error;
-    if (other->SQL_select(error))
-      other->copy(*other);
-    other->m_id.clear();
-  }
-  return other;
-}
-
 JItemSQL* JItemHelper::create(const QString& tableName, Id id)
 {
   auto pt = create(tableName);
@@ -380,33 +367,6 @@ void JItemHelper::remove(const Ids& ids, const QString& tableName, QWidget* pare
       delete p;
     }
   }
-}
-
-Ids JItemHelper::copy(const Ids& ids, const QString& tableName, QWidget* parent)
-{
-  Ids newids;
-  if (ids.size() == 0)
-    return newids;
-
-  //if (!authenticateSave(tableName, parent))
-    //return;
-
-  for (auto id : ids)
-  {
-    auto p = JItemHelper::copy(tableName, id);
-    if (p != nullptr)
-    {
-      QString error;
-      if (!p->SQL_insert_update(error))
-        QMessageBox::warning(parent,
-                             QObject::tr("Aviso"),
-                             QObject::tr("Erro ao remover item com id '%1': %2").arg(id.str(), error), QMessageBox::Ok);
-      else
-        newids.push_back(p->m_id);
-      delete p;
-    }
-  }
-  return newids;
 }
 
 bool JItemHelper::save(const JItemSQL& o, QWidget* parent)

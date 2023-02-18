@@ -82,16 +82,17 @@ private slots:
   void containsPressed();
   void enableControls();
   void removeItems();
-  void copyItems();
   void focusSearch();
   void emitCurrentRowChangedSignal();
   void emitItemsSelectedSignal();
+  void emitCopySignal();
 
 signals:
   void itemsSelectedSignal();
   void itemsRemovedSignal(const Ids& ids);
   void currentRowChangedSignal(int row);
   void refreshSignal();
+  void copySignal();
 };
 
 #endif // DATABASEVIEWER_H

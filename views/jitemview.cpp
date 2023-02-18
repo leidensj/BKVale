@@ -108,6 +108,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   connect(m_viewer, SIGNAL(itemsSelectedSignal()), m_dlgDb, SLOT(accept()));
   connect(m_viewer, SIGNAL(itemsRemovedSignal(const Ids&)), this, SLOT(itemsRemoved(const Ids&)));
   connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
+  connect(m_viewer, SIGNAL(copySignal()), this, SLOT(setCopyItem()));
 
   setMinimumWidth(600);
 }
@@ -133,6 +134,45 @@ void JItemView::setItem()
                       : ":/icons/res/save.png";
     m_btnSave->setIcon(QIcon(strIcon));
     delete p;
+  }
+}
+
+void JItemView::setItem(const Id& id)
+{
+  auto p = JItemHelper::create(m_viewer->getTableName());
+  if (p != nullptr)
+  {
+    clear();
+    p->m_id = id;
+    if (p->m_id.isValid())
+      JItemHelper::select(*p, this);
+    m_id = p->m_id;
+    setItem(*p);
+    QString strIcon = p->m_id.isValid()
+                      ? ":/icons/res/saveas.png"
+                      : ":/icons/res/save.png";
+    m_btnSave->setIcon(QIcon(strIcon));
+    delete p;
+  }
+}
+
+void JItemView::setCopyItem()
+{
+  auto p = JItemHelper::create(m_viewer->getTableName());
+  if (p != nullptr)
+  {
+    clear();
+    p->m_id = m_viewer->getFirstSelectedId();
+    if (p->m_id.isValid())
+      JItemHelper::select(*p, this);
+    p->m_id.clear();
+    m_id.clear();
+    p->name();
+    setItem(*p);
+    QString strIcon = ":/icons/res/save.png";
+    m_btnSave->setIcon(QIcon(strIcon));
+    delete p;
+    m_dlgDb->accept();
   }
 }
 

@@ -47,6 +47,7 @@ class ShopWidget;
 class JMdiSubWindow;
 class Report;
 class CouponRedeemer;
+class InventoryView;
 
 class Baita : public QMainWindow
 {
@@ -68,6 +69,7 @@ private:
   ConsumptionWidget* m_consumption;
   CalculatorWidget* m_calculator;
   ShopWidget* m_shop;
+  InventoryView* m_inventory;
   Settings m_settings;
   QLabel* m_statusDatabasePath;
   QLabel* m_statusUserName;
@@ -77,6 +79,7 @@ private:
   JMdiSubWindow* m_reminderWindow;
   JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
+  JMdiSubWindow* m_inventoryWindow;
   CouponRedeemer* m_redeemer;
   QMap<Functionality::Idx, QAction*> m_actions;
   Functionality::Idx getCurrentFunctionality() const;

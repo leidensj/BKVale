@@ -15,6 +15,7 @@
 #include "employee.h"
 #include "login.h"
 #include "printer.h"
+#include "inventory.h"
 
 #include <QMessageBox>
 #include "controls/pincodedialog.h"
@@ -34,6 +35,7 @@
 #include "models/suppliermodel.h"
 #include "models/usermodel.h"
 #include "models/couponmodel.h"
+#include "models/inventorymodel.h"
 
 #include "views/categoryview.h"
 #include "views/employeeview.h"
@@ -46,6 +48,7 @@
 #include "views/supplierview.h"
 #include "views/userview.h"
 #include "views/couponview.h"
+#include "views/inventoryview.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
@@ -81,6 +84,8 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new Phone;
   if (tableName == COUPON_SQL_TABLE_NAME)
     return new Coupon;
+  if (tableName == INVENTORY_SQL_TABLE_NAME)
+    return new Inventory;
   return nullptr;
 }
 
@@ -152,6 +157,8 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Relatórios";
     case Functionality::Idx::CouponRedemption:
       return "Resgatar Cupons";
+    case Functionality::Idx::Inventory:
+      return "Estoque";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -209,6 +216,8 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/statistics.png";
     case Functionality::Idx::CouponRedemption:
       return ":/icons/res/redeem.png";
+    case Functionality::Idx::Inventory:
+      return ":/icons/res/inventory.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -252,6 +261,8 @@ JModel* JItemHelper::model(const QString& tableName, QObject* parent)
     return new PhoneModel(parent);
   if (tableName == COUPON_SQL_TABLE_NAME)
     return new CouponModel(parent);
+  if (tableName == INVENTORY_SQL_TABLE_NAME)
+    return new InventoryModel(parent);
   return nullptr;
 }
 
@@ -279,6 +290,8 @@ JItemView* JItemHelper::view(const QString& tableName)
     return new CouponView;
   if (tableName == USER_SQL_TABLE_NAME)
     return new UserView;
+  if (tableName == INVENTORY_SQL_TABLE_NAME)
+    return new InventoryView;
   return nullptr;
 }
 

@@ -23,6 +23,7 @@ SOURCES += main.cpp\
   controls/databaseselector.cpp \
   controls/databaseviewer.cpp \
   controls/imageviewer.cpp \
+  controls/inventoryeditor.cpp \
   controls/logindialog.cpp \
   controls/pincodedialog.cpp \
   controls/report.cpp \
@@ -35,6 +36,8 @@ SOURCES += main.cpp\
   filters/jfilter.cpp \
   items/coupon.cpp \
   items/couponproduct.cpp \
+  items/inventory.cpp \
+  items/inventoryproduct.cpp \
   items/jitemhelper.cpp \
   items/login.cpp \
   items/paymentpart.cpp \
@@ -44,6 +47,7 @@ SOURCES += main.cpp\
   libraries/tinyexpr.c \
         mainwindow.cpp \
   models/couponmodel.cpp \
+  models/inventorymodel.cpp \
   models/loginmodel.cpp \
   printer.cpp \
   purchasereport.cpp \
@@ -51,6 +55,7 @@ SOURCES += main.cpp\
   tableitems/toggleitem.cpp \
   tables/coupontable.cpp \
   tables/dayofftable.cpp \
+  tables/inventorytable.cpp \
   tables/jtable.cpp \
     databaseutils.cpp \
     settings.cpp \
@@ -69,6 +74,7 @@ SOURCES += main.cpp\
     items/user.cpp \
   tables/purchaseproducttable.cpp \
   views/couponview.cpp \
+  views/inventoryview.cpp \
   views/jitemview.cpp \
   widgets/filegenerator.cpp \
   widgets/findwidget.cpp \
@@ -138,6 +144,7 @@ HEADERS  += mainwindow.h \
     controls/databaseselector.h \
     controls/databaseviewer.h \
     controls/imageviewer.h \
+    controls/inventoryeditor.h \
     controls/logindialog.h \
     controls/pincodedialog.h \
     controls/report.h \
@@ -150,6 +157,8 @@ HEADERS  += mainwindow.h \
     filters/jfilter.h \
     items/coupon.h \
     items/couponproduct.h \
+    items/inventory.h \
+    items/inventoryproduct.h \
     items/jitemhelper.h \
     items/jsubitemsql.h \
     items/login.h \
@@ -159,6 +168,7 @@ HEADERS  += mainwindow.h \
     libraries/qcustomplot.h \
     libraries/tinyexpr.h \
     models/couponmodel.h \
+    models/inventorymodel.h \
     models/loginmodel.h \
     printer.h \
     purchasereport.h \
@@ -166,6 +176,7 @@ HEADERS  += mainwindow.h \
     tableitems/toggleitem.h \
     tables/coupontable.h \
     tables/dayofftable.h \
+    tables/inventorytable.h \
     tables/jtable.h \
     databaseutils.h \
     settings.h \
@@ -187,6 +198,7 @@ HEADERS  += mainwindow.h \
     items/supplier.h \
     items/user.h \
     views/couponview.h \
+    views/inventoryview.h \
     views/jitemview.h \
     widgets/filegenerator.h \
     widgets/findwidget.h \

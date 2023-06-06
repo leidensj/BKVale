@@ -11,7 +11,6 @@ class DayOffTable : public JTable
 public:
   explicit DayOffTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   void getDayOff(QVector<QVector<bool>>& v) const;
-  void setDayOff(const QVector<QVector<bool>>& v);
   void setStore(const Store& o, const QDate& date);
   void update();
   QString toCSV() const;
@@ -20,7 +19,8 @@ public:
 public slots:
   void addRow();
   void shuffle();
-  void swapCurrentLine();
+  void shuffleRow(int row);
+  void shuffleCurrentRow();
 
 private:
   QDate m_date;

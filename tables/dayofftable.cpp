@@ -136,125 +136,107 @@ QString DayOffTable::message() const
 
 void DayOffTable::shuffle()
 {
-  QVector<QVector<bool>> v;
   for (int i = 0; i != rowCount(); ++i)
-  {
-    QVector<int> sundays, mondays;
-    for (int j = 0; j != m_date.daysInMonth(); ++j)
-    {
-      QDate dt = QDate(m_date.year(), m_date.month(), j);
-        if (dt.dayOfWeek() == Qt::Sunday)
-          sundays.push_back(j - 1);
-        else if (dt.dayOfWeek() == Qt::Monday)
-          mondays.push_back(j - 1);
-    }
-    QVector<bool> dayoff(m_date.daysInMonth(), false);
-    if (m_store.m_vEmployee.at(i).m_form.m_bSex)
-    {
-      // se for mulher, tem dois domingos intercalados e o resto segundas
-      bool firstSunday = QRandomGenerator::global()->bounded(1, 3) == 1;
-      for (int it = 0; it != sundays.count(); ++it)
-        if ((firstSunday && (it == 0 || it == 2 || it == 4)) || (!firstSunday && (it == 1 || it == 3)))
-          dayoff[sundays.at(it)] = true;
-        else if (it < mondays.count())
-          dayoff[mondays.at(it)] = true;
-    }
-    else
-    {
-      // se for homem, tem um domingo e o resto segundas
-      int sunday = QRandomGenerator::global()->bounded(0, 4);
-      for (int it = 0; it != mondays.count(); ++it)
-        if (it == sunday)
-          dayoff[sundays.at(it)] = true;
-        else
-          dayoff[mondays.at(it)] = true;
-    }
-    v.push_back(dayoff);
-  }
-  setDayOff(v);
+    shuffleRow(i);
 }
 
-void DayOffTable::setDayOff(const QVector<QVector<bool>>& v)
+void DayOffTable::shuffleRow(int row)
 {
-  if (v.size() != rowCount())
+  if (row >= rowCount())
     return;
-  for (int i = 0; i != rowCount(); ++i)
+
+  QVector<bool> dayoff(m_date.daysInMonth(), false);
+  if (m_store.m_vEmployee.at(row).m_form.m_bSex)
+  {
+    // se for mulher, tem domingos intercalados com segundas
+    bool firstSunday = QRandomGenerator::global()->bounded(0, 2) == 0;
+    static int lastRow = -1;
+    static bool blastSunday = true;
+    if (lastRow == row)
+      firstSunday = !blastSunday;
+    lastRow = row;
+    blastSunday = firstSunday;
+    for (int ii = 0; ii != dayoff.size(); ++ii)
+    {
+      if ((firstSunday && m_date.addDays(ii).dayOfWeek() == Qt::Sunday) ||
+          (!firstSunday && m_date.addDays(ii).dayOfWeek() == Qt::Monday))
+      {
+        bool offset = firstSunday;
+        while (ii < dayoff.size())
+        {
+          dayoff[ii] = true;
+          ii += offset ? 8 : 6;
+          offset = !offset;
+        }
+        break;
+      }
+    }
+  }
+  else
+  {
+    // TODO
+    // se for homem, tem um domingo e o resto segundas
+    for (int ii = 0; ii != dayoff.size(); ++ii)
+    {
+      if (m_date.addDays(ii).dayOfWeek() == Qt::Monday)
+      {
+        while (ii < dayoff.size())
+        {
+          dayoff[ii] = true;
+          ii += 7;
+        }
+        break;
+      }
+    }
+
+    int nsundays = 0;
+    for (int ii = 0; ii != dayoff.size(); ++ii)
+      if (m_date.addDays(ii).dayOfWeek() == Qt::Sunday)
+        nsundays++;
+
+    for (int ii = 0; ii != dayoff.size(); ++ii)
+    {
+      if (m_date.addDays(ii).dayOfWeek() == Qt::Sunday)
+      {
+        int it = 0;
+        int sunday = QRandomGenerator::global()->bounded(0, nsundays);
+        static int lastRow = -1;
+        static int lastSunday = -1;
+        if (row == lastRow)
+          sunday = lastSunday + 1 >= nsundays ? 0 : lastSunday + 1;
+        lastRow = row;
+        lastSunday = sunday;
+
+        while (ii < dayoff.size())
+        {
+          if (it == sunday)
+          {
+            dayoff[ii] = true;
+            if (ii + 1 < dayoff.size())
+              dayoff[ii + 1] = false;
+            break;
+          }
+          ii += 7;
+          it++;
+        }
+        break;
+      }
+    }
+  }
+
+  if (dayoff.size() == columnCount())
   {
     for (int j = 0; j != columnCount(); ++j)
     {
-      auto it = dynamic_cast<JTableItem*>(item(i, j));
+      auto it = dynamic_cast<JTableItem*>(item(row, j));
       if (it != nullptr)
-        it->setValue(v.at(i).at(j));
+        it->setValue(dayoff.at(j));
     }
   }
 }
 
-/*void DayOffTable::swapCurrentLine()
+void DayOffTable::shuffleCurrentRow()
 {
-  int row = currentRow();
-  if (row >= rowCount())
-    return;
-  for (int j = 0; j != columnCount(); ++j)
-  {
-    auto pt = dynamic_cast<JTableItem*>(item(row, j));
-    if (pt != nullptr)
-    {
-      if (pt->getValue().toBool())
-      {
-        QDate dt(m_date.year(), m_date.month(), j + 1);
-        if ((dt.dayOfWeek() == Qt::Monday) && (j - 1 >= 0))
-        {
-          pt->setValue(false);
-          pt = dynamic_cast<JTableItem*>(item(row, j - 1));
-          if (pt != nullptr)
-            pt->setValue(true);
-        }
-        else if ((dt.dayOfWeek() == Qt::Sunday) && (j + 1 < m_date.daysInMonth()))
-        {
-          pt->setValue(false);
-          pt = dynamic_cast<JTableItem*>(item(row, j + 1));
-          if (pt != nullptr)
-            pt->setValue(true);
-          j++;
-        }
-      }
-    }
-  }
-}*/
-
-void DayOffTable::swapCurrentLine()
-{
-  int row = currentRow();
-  if (row >= rowCount())
-    return;
-
-  QVector<int> v;
-  for (int j = columnCount() - 1; j >= 0; j--)
-  {
-    auto pt = dynamic_cast<JTableItem*>(item(row, j));
-    if (pt != nullptr)
-    {
-      if (pt->getValue().toBool())
-      {
-        pt->setValue(false);
-        if ((j + 7) < columnCount())
-        {
-           pt = dynamic_cast<JTableItem*>(item(row, j + 7));
-           pt->setValue(true);
-        }
-        else
-        {
-           v.push_back(QDate(m_date.year(), m_date.month(), j + 1).dayOfWeek());
-        }
-      }
-    }
-  }
-
-  for (int j = 0; j != 7; ++j)
-    if (j < columnCount() && v.contains(QDate(m_date.year(), m_date.month(), j +1).dayOfWeek()))
-    {
-      auto pt = dynamic_cast<JTableItem*>(item(row, j));
-      pt->setValue(true);
-    }
+  shuffleRow(currentRow());
 }
 

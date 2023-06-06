@@ -67,6 +67,7 @@
    </attribute>
    <addaction name="actionPurchases"/>
    <addaction name="actionReports"/>
+   <addaction name="actionInventory"/>
    <addaction name="actionReminders"/>
    <addaction name="actionCalculator"/>
    <addaction name="actionShoppingList"/>
@@ -408,6 +409,15 @@
    </property>
    <property name="toolTip">
     <string>Alterar senha</string>
+   </property>
+  </action>
+  <action name="actionInventory">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/inventory.png</normaloff>:/icons/res/inventory.png</iconset>
+   </property>
+   <property name="text">
+    <string>Estoque</string>
    </property>
   </action>
  </widget>

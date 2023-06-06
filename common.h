@@ -30,6 +30,7 @@ namespace Functionality
     Login,
     Address,
     Phone,
+    Inventory,
     _END,
   };
 

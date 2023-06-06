@@ -11,6 +11,7 @@ public:
   virtual void activate() = 0;
   virtual void setValue(const QVariant& v) = 0;
   virtual QVariant getValue() const { return data(Qt::UserRole); }
+  void setReadOnly(bool b) { setFlags(b ? (flags() & ~Qt::ItemIsEditable) : (flags() |= Qt::ItemIsEditable )); }
 };
 
 #endif // JTABLEITEM_H

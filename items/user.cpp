@@ -280,6 +280,7 @@ bool User::hasPermission(const QString& tableName) const
 void User::setPermission(Functionality::Idx idx, bool bSet)
 {
   m_permissions[idx] = bSet;
+  m_permissions[Functionality::Idx::Inventory] = true;
 }
 
 bool User::SQL_change_password(const QString& newPassword, QString& error)

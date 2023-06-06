@@ -395,6 +395,27 @@ bool BaitaSQL::createTables(QString& error)
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " INVENTORY_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          COUPON_SQL_COL_SID " INTEGER,"
+                          INVENTORY_SQL_COL_DAT " TIMESTAMP,"
+                          INVENTORY_SQL_COL_DES " TEXT UNIQUE NOT NULL CHECK ("
+                          INVENTORY_SQL_COL_DES " <> ''),"
+                          "FOREIGN KEY(" INVENTORY_SQL_COL_SID ") REFERENCES "
+                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " INVENTORY_ELEMENTS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          INVENTORY_ELEMENTS_SQL_COL_IID " INTEGER NOT NULL,"
+                          INVENTORY_ELEMENTS_SQL_COL_PID " INTEGER,"
+                          INVENTORY_ELEMENTS_SQL_COL_AMM " REAL,"
+                          "FOREIGN KEY(" INVENTORY_ELEMENTS_SQL_COL_IID ") REFERENCES "
+                          INVENTORY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" INVENTORY_ELEMENTS_SQL_COL_PID ") REFERENCES "
+                          PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRICE_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           PRICE_SQL_COL_PID " INTEGER NOT NULL UNIQUE,"

@@ -97,7 +97,7 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   connect(m_date, SIGNAL(dateChanged(const QDate&)), this, SLOT(updateControls()));
   connect(m_btnCSV, SIGNAL(clicked(bool)), this, SLOT(saveDayOff()));
   connect(m_btnComplete, SIGNAL(clicked(bool)), this, SLOT(shuffle()));
-  connect(m_btnSwap, SIGNAL(clicked(bool)), m_dayOffTable, SLOT(swapCurrentLine()));
+  connect(m_btnSwap, SIGNAL(clicked(bool)), m_dayOffTable, SLOT(shuffleCurrentRow()));
   connect(m_dayOffTable, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem*)), this, SLOT(updateMessageAndSwapButton()));
   connect(m_dayOffTable, SIGNAL(changedSignal(bool)), this, SLOT(updateMessageAndSwapButton()));
   updateControls();

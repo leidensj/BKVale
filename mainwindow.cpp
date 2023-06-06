@@ -13,6 +13,7 @@
 #include "views/userview.h"
 #include "views/imageview.h"
 #include "views/couponview.h"
+#include "views/inventoryview.h"
 
 #include "controls/report.h"
 #include "controls/calculatorwidget.h"
@@ -63,6 +64,7 @@ Baita::Baita(QWidget *parent)
   , m_consumption(nullptr)
   , m_calculator(nullptr)
   , m_shop(nullptr)
+  , m_inventory(nullptr)
   , m_statusDatabasePath(nullptr)
   , m_statusUserName(nullptr)
   , m_purchaseWindow(nullptr)
@@ -70,6 +72,7 @@ Baita::Baita(QWidget *parent)
   , m_reminderWindow(nullptr)
   , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
+  , m_inventoryWindow(nullptr)
   , m_redeemer(nullptr)
 {
   ui->setupUi(this);
@@ -82,6 +85,7 @@ Baita::Baita(QWidget *parent)
   m_reminder = new ReminderView;
   m_calculator = new CalculatorWidget;
   m_shop = new ShopWidget;
+  m_inventory = new InventoryView;
 
   m_purchaseWindow = new JMdiSubWindow(this);
   m_purchaseWindow->setWindowTitle(ui->actionPurchases->text());
@@ -108,6 +112,11 @@ Baita::Baita(QWidget *parent)
   m_shopWindow->setWindowIcon(ui->actionShoppingList->icon());
   m_shopWindow->setWidget(m_shop);
   m_mdi->addSubWindow(m_shopWindow);
+  m_inventoryWindow = new JMdiSubWindow(this);
+  m_inventoryWindow->setWindowTitle(ui->actionInventory->text());
+  m_inventoryWindow->setWindowIcon(ui->actionInventory->icon());
+  m_inventoryWindow->setWidget(m_inventory);
+  m_mdi->addSubWindow(m_inventoryWindow);
   m_redeemer = new CouponRedeemer(this);
 
   m_statusDatabasePath = new QLabel();
@@ -150,6 +159,7 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Report] = ui->actionReports;
   m_actions[Functionality::Idx::Reminder] = ui->actionReminders;
   m_actions[Functionality::Idx::CouponRedemption] = ui->actionRedeem;
+  m_actions[Functionality::Idx::Inventory] = ui->actionInventory;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
@@ -160,6 +170,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
+  connect(ui->actionInventory, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
   connect(ui->actionRedeem, SIGNAL(triggered(bool)), m_redeemer, SLOT(exec()));
 
@@ -201,6 +212,8 @@ Functionality::Idx Baita::getCurrentFunctionality() const
     return Functionality::Idx::Calculator;
   else if (activeWindow == m_shopWindow)
     return Functionality::Idx::Shop;
+  else if (activeWindow == m_inventoryWindow)
+    return Functionality::Idx::Inventory;
   return Functionality::Idx::_END;
 }
 
@@ -323,6 +336,7 @@ void Baita::activateWindow()
   m_reminderWindow->hide();
   m_calculatorWindow->hide();
   m_shopWindow->hide();
+  m_inventoryWindow->hide();
   if (sender() == ui->actionPurchases)
   {
     m_purchaseWindow->showMaximized();
@@ -347,6 +361,11 @@ void Baita::activateWindow()
   {
     m_shopWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_shopWindow);
+  }
+  else if (sender() == ui->actionInventory)
+  {
+    m_inventoryWindow->showMaximized();
+    m_mdi->setActiveSubWindow(m_inventoryWindow);
   }
   updateControls();
 }

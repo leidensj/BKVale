@@ -37,6 +37,8 @@ QString Functionality::idxToTableName(Idx idx)
       return ADDRESS_SQL_TABLE_NAME;
     case Idx::ProductCode:
       return PRODUCT_CODE_ITEMS_SQL_TABLE_NAME;
+    case Idx::Inventory:
+      return INVENTORY_SQL_TABLE_NAME;
     case Idx::Login:
       return LOGIN_SQL_TABLE_NAME;
     default:
@@ -74,6 +76,8 @@ Functionality::Idx Functionality::tableNameToIdx(const QString& tableName)
     return Idx::Address;
   if (tableName == PRODUCT_CODE_ITEMS_SQL_TABLE_NAME)
     return Idx::ProductCode;
+  if (tableName == INVENTORY_SQL_TABLE_NAME)
+    return Idx::Inventory;
   if (tableName == LOGIN_SQL_TABLE_NAME)
     return Idx::Login;
   return Idx::_END;

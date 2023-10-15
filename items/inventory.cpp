@@ -143,4 +143,6 @@ static bool SQL_select_inventory(QVector<InventoryProduct>& products, QVector<do
   products.clear();
   purchaseAmmount.clear();
   error.clear();
+
+
 }

@@ -24,6 +24,7 @@ public:
   void setPlaceholderText(bool bSet);
   DatabaseViewer* getViewer() const;
   QString getTableName() const;
+  QString text() const;
 
 public slots:
   void clear();

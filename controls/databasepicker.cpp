@@ -201,3 +201,8 @@ void DatabasePicker::showImage()
   dlg.setModal(true);
   dlg.exec();
 }
+
+QString DatabasePicker::text() const
+{
+  return JItemHelper::text(m_selector->getViewer()->getTableName());
+}

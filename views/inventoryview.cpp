@@ -1,19 +1,26 @@
 #include "inventoryview.h"
 #include "widgets/jlineedit.h"
 #include "controls/databasepicker.h"
+#include "widgets/jaddremovebuttons.h"
+#include "tables/inventorytable.h"
 #include <QLayout>
-#include <QFormLayout>
+#include <QVBoxLayout>
 #include <QMessageBox>
 
 InventoryView::InventoryView(QWidget* parent)
   : JItemView(INVENTORY_SQL_TABLE_NAME, parent)
 {
-  addViewButton(PRODUCT_SQL_TABLE_NAME);
-
-  QFormLayout* ltForm = new QFormLayout;
-
+  //addViewButton(PRODUCT_SQL_TABLE_NAME);
+  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
+  m_storePicker->setPlaceholderText(true);
+  m_btnAddRemove = new JAddRemoveButtons;
+  m_table = new InventoryTable;
+  QVBoxLayout* lt = new QVBoxLayout;
+  lt->addWidget(m_storePicker);
+  lt->addWidget(m_btnAddRemove);
+  lt->addWidget(m_table);
   QFrame* tabframe = new QFrame;
-  tabframe->setLayout(ltForm);
+  tabframe->setLayout(lt);
 
   m_tab->addTab(tabframe, QIcon(":/icons/res/inventory.png"), tr("Estoque"));
   //setFocusWidgetOnClear(m_storePicker);

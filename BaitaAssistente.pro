@@ -23,7 +23,6 @@ SOURCES += main.cpp\
   controls/databaseselector.cpp \
   controls/databaseviewer.cpp \
   controls/imageviewer.cpp \
-  controls/inventoryeditor.cpp \
   controls/logindialog.cpp \
   controls/pincodedialog.cpp \
   controls/report.cpp \
@@ -144,7 +143,6 @@ HEADERS  += mainwindow.h \
     controls/databaseselector.h \
     controls/databaseviewer.h \
     controls/imageviewer.h \
-    controls/inventoryeditor.h \
     controls/logindialog.h \
     controls/pincodedialog.h \
     controls/report.h \

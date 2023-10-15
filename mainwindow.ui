@@ -127,6 +127,7 @@
      <string>Ferramentas</string>
     </property>
     <addaction name="actionTimeCard"/>
+    <addaction name="actionTimeCardControl"/>
     <addaction name="actionRedeem"/>
    </widget>
    <addaction name="menuSistema"/>
@@ -418,6 +419,15 @@
    </property>
    <property name="text">
     <string>Estoque</string>
+   </property>
+  </action>
+  <action name="actionTimeCardControl">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/pen.png</normaloff>:/icons/res/pen.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gerenciar Livro Ponto</string>
    </property>
   </action>
  </widget>

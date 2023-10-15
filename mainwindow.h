@@ -93,7 +93,8 @@ private slots:
   void openLoginDialog();
   void openLoggedDialog();
   void activateWindow();
-  void testTimeAccess();
+  void openTimeCardDialog();
+  void openTimeCardControlDialog();
   void about();
 };
 

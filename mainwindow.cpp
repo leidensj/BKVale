@@ -22,6 +22,7 @@
 #include "controls/logindialog.h"
 #include "controls/databaseviewer.h"
 #include "controls/timecarddialog.h"
+#include "controls/timecardcontroldialog.h"
 #include "controls/couponredeemer.h"
 
 #include "widgets/jstatusprogressbarinstance.h"
@@ -152,6 +153,7 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Supplier] = ui->actionSuppliers;
   m_actions[Functionality::Idx::Store] = ui->actionStores;
   m_actions[Functionality::Idx::TimeCard] = ui->actionTimeCard;
+  m_actions[Functionality::Idx::TimeCardControl] = ui->actionTimeCardControl;
   m_actions[Functionality::Idx::Coupon] = ui->actionCoupons;
   m_actions[Functionality::Idx::Shop] = ui->actionShoppingList;
   m_actions[Functionality::Idx::Calculator] = ui->actionCalculator;
@@ -171,7 +173,8 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionInventory, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
-  connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(testTimeAccess()));
+  connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(openTimeCardDialog()));
+  connect(ui->actionTimeCardControl, SIGNAL(triggered(bool)), this, SLOT(openTimeCardControlDialog()));
   connect(ui->actionRedeem, SIGNAL(triggered(bool)), m_redeemer, SLOT(exec()));
 
   connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
@@ -370,9 +373,15 @@ void Baita::activateWindow()
   updateControls();
 }
 
-void Baita::testTimeAccess()
+void Baita::openTimeCardDialog()
 {
   TimeCardDialog dlg(this);
+  dlg.exec();
+}
+
+void Baita::openTimeCardControlDialog()
+{
+  TimeCardControlDialog dlg(this);
   dlg.exec();
 }
 

@@ -7,6 +7,7 @@ class DatabasePicker;
 class JDateInterval;
 class QDialogButtonBox;
 class QLabel;
+class QComboBox;
 
 class TimeCardControlDialog : public QDialog
 {
@@ -21,7 +22,7 @@ private slots:
 
 private:
   DatabasePicker* m_storePicker;
-  DatabasePicker* m_employeePicker;
+  QComboBox* m_cbEmployee;
   JDateInterval* m_date;
   QDialogButtonBox* m_buttons;
 };

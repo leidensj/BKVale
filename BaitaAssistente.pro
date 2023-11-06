@@ -73,6 +73,7 @@ SOURCES += main.cpp\
     items/supplier.cpp \
     items/user.cpp \
   tables/purchaseproducttable.cpp \
+  tables/timecardcontroltable.cpp \
   views/couponview.cpp \
   views/inventoryview.cpp \
   views/jitemview.cpp \
@@ -184,6 +185,7 @@ HEADERS  += mainwindow.h \
     defines.h \
     escpos.h \
     tables/purchaseproducttable.h \
+    tables/timecardcontroltable.h \
     timeinterval.h \
     items/address.h \
     items/category.h \

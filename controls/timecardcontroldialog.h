@@ -4,10 +4,11 @@
 #include <QDialog>
 
 class DatabasePicker;
-class JDateInterval;
+class QDateEdit;
 class QDialogButtonBox;
 class QLabel;
 class QComboBox;
+class TimeCardControlTable;
 
 class TimeCardControlDialog : public QDialog
 {
@@ -23,7 +24,8 @@ private slots:
 private:
   DatabasePicker* m_storePicker;
   QComboBox* m_cbEmployee;
-  JDateInterval* m_date;
+  QDateEdit* m_date;
+  TimeCardControlTable* m_table;
   QDialogButtonBox* m_buttons;
 };
 

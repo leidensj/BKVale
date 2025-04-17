@@ -187,5 +187,8 @@
         <file>res/shuffle.png</file>
         <file>res/inventory.png</file>
         <file>res/pen.png</file>
+        <file>res/sector.png</file>
+        <file>res/coin.png</file>
+        <file>res/calminweek.png</file>
     </qresource>
 </RCC>

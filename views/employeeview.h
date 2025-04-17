@@ -7,7 +7,6 @@
 
 class QPushButton;
 class JLineEdit;
-class JDatabasePicker;
 class QCheckBox;
 class QTableWidget;
 class QTreeWidgetItem;

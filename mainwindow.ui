@@ -42,13 +42,13 @@
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolMain">
    <property name="focusPolicy">
-    <enum>Qt::NoFocus</enum>
+    <enum>Qt::FocusPolicy::NoFocus</enum>
    </property>
    <property name="windowTitle">
     <string>Funcionalidades</string>
    </property>
    <property name="orientation">
-    <enum>Qt::Vertical</enum>
+    <enum>Qt::Orientation::Vertical</enum>
    </property>
    <property name="iconSize">
     <size>
@@ -57,7 +57,7 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonIconOnly</enum>
+    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>
@@ -78,7 +78,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSistema">
@@ -107,6 +107,8 @@
     <addaction name="actionUsers"/>
     <addaction name="actionShoppingListMgt"/>
     <addaction name="actionStores"/>
+    <addaction name="actionSectors"/>
+    <addaction name="actionCoins"/>
    </widget>
    <widget class="QMenu" name="menuConfigura_es">
     <property name="title">
@@ -428,6 +430,30 @@
    </property>
    <property name="text">
     <string>Gerenciar Livro Ponto</string>
+   </property>
+  </action>
+  <action name="actionSectors">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/sector.png</normaloff>:/icons/res/sector.png</iconset>
+   </property>
+   <property name="text">
+    <string>Setores</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCoins">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/coin.png</normaloff>:/icons/res/coin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Moedas</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

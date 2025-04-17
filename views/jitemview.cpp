@@ -8,7 +8,7 @@
 #include <QSplitter>
 #include <QMenu>
 #include <QDialog>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QToolButton>
 #include <QApplication>
 #include "items/login.h"
@@ -99,7 +99,8 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   m_dlgDb->setWindowTitle(JItemHelper::text(tableName));
   m_dlgDb->setWindowIcon(QIcon(JItemHelper::icon(tableName)));
   m_dlgDb->setModal(true);
-  QRect rect = QApplication::desktop()->availableGeometry(this);
+
+  QRect  rect = QGuiApplication::primaryScreen()->geometry();
   m_dlgDb->resize(rect.width() * 0.7, rect.height() * 0.7);
 
   connect(m_btnClear, SIGNAL(clicked(bool)), this, SLOT(clear()));

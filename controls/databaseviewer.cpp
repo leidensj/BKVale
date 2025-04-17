@@ -287,8 +287,8 @@ void DatabaseViewer::searchChanged()
   QString search = m_edSearch->text();
   if (!m_cbContains->isChecked() && !search.isEmpty())
     search.prepend("\\b");
-  QRegExp regExp(search, Qt::CaseInsensitive, QRegExp::RegExp);
-  m_proxyModel->setFilterRegExp(regExp);
+  QRegularExpression regExp(search, QRegularExpression::CaseInsensitiveOption);
+  m_proxyModel->setFilterRegularExpression(regExp);
 
   if (search.isEmpty())
   {

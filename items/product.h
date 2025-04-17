@@ -7,7 +7,7 @@
 #include "jitemsql.h"
 #include "defines.h"
 #include "category.h"
-#include <QRegExp>
+#include <QRegularExpression>
 
 struct Package
 {

@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QVector>
 #include <QDate>
-#include <QRegExp>
+#include <QRegularExpression>
 #include "supplier.h"
 #include "product.h"
 #include "defines.h"

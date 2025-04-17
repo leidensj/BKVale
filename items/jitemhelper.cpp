@@ -16,6 +16,8 @@
 #include "login.h"
 #include "printer.h"
 #include "inventory.h"
+#include "sector.h"
+#include "coin.h"
 
 #include <QMessageBox>
 #include "controls/pincodedialog.h"
@@ -36,6 +38,8 @@
 #include "models/usermodel.h"
 #include "models/couponmodel.h"
 #include "models/inventorymodel.h"
+#include "models/sectormodel.h"
+#include "models/coinmodel.h"
 
 #include "views/categoryview.h"
 #include "views/employeeview.h"
@@ -49,6 +53,8 @@
 #include "views/userview.h"
 #include "views/couponview.h"
 #include "views/inventoryview.h"
+#include "views/sectorview.h"
+#include "views/coinview.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
@@ -86,6 +92,10 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new Coupon;
   if (tableName == INVENTORY_SQL_TABLE_NAME)
     return new Inventory;
+  if (tableName == SECTOR_SQL_TABLE_NAME)
+    return new Sector;
+  if (tableName == COIN_SQL_TABLE_NAME)
+    return new Coin;
   return nullptr;
 }
 
@@ -161,6 +171,10 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Resgatar Cupons";
     case Functionality::Idx::Inventory:
       return "Estoque";
+    case Functionality::Idx::Sector:
+      return "Setor";
+    case Functionality::Idx::Coin:
+      return "Moeda";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -222,6 +236,10 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/redeem.png";
     case Functionality::Idx::Inventory:
       return ":/icons/res/inventory.png";
+    case Functionality::Idx::Sector:
+      return ":/icons/res/sector.png";
+    case Functionality::Idx::Coin:
+      return ":/icons/res/coin.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -267,6 +285,10 @@ JModel* JItemHelper::model(const QString& tableName, QObject* parent)
     return new CouponModel(parent);
   if (tableName == INVENTORY_SQL_TABLE_NAME)
     return new InventoryModel(parent);
+  if (tableName == SECTOR_SQL_TABLE_NAME)
+    return new SectorModel(parent);
+  if (tableName == COIN_SQL_TABLE_NAME)
+    return new CoinModel(parent);
   return nullptr;
 }
 
@@ -296,6 +318,10 @@ JItemView* JItemHelper::view(const QString& tableName)
     return new UserView;
   if (tableName == INVENTORY_SQL_TABLE_NAME)
     return new InventoryView;
+  if (tableName == SECTOR_SQL_TABLE_NAME)
+    return new SectorView;
+  if (tableName == COIN_SQL_TABLE_NAME)
+    return new CoinView;
   return nullptr;
 }
 

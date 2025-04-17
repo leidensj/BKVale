@@ -9,7 +9,7 @@ JLineEdit::JLineEdit(Text::Input input, bool bToUpper, QWidget* parent)
   , m_bArrowsAndEnterAsTab(true)
 {
   if (input != Text::Input::All)
-    setValidator(new JRegExpValidator(bToUpper, QRegExp(getRegEx(input)), this));
+    setValidator(new JRegExpValidator(bToUpper, QRegularExpression(getRegEx(input)), this));
 }
 
 void JLineEdit::setArrowsAndEnterAsTab(bool b)

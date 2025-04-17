@@ -66,4 +66,4 @@ private:
   CouponFilter* m_filter;
 };
 
-#endif // CATEGORYVIEW_H
+#endif // COUPONVIEW_H

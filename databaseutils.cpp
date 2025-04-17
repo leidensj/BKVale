@@ -126,6 +126,23 @@ bool BaitaSQL::createTables(QString& error)
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " COIN_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          COIN_SQL_COL_IID " INTEGER,"
+                          COIN_SQL_COL_TAX " REAL,"
+                          COIN_SQL_COL_NAM " TEXT NOT NULL UNIQUE,"
+                          "FOREIGN KEY(" COIN_SQL_COL_IID ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SECTOR_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          SECTOR_SQL_COL_IID " INTEGER,"
+                          SECTOR_SQL_COL_NAM " TEXT NOT NULL UNIQUE,"
+                          "FOREIGN KEY(" SECTOR_SQL_COL_IID ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " REMINDER_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           REMINDER_SQL_COL_TIT " TEXT,"

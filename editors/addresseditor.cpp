@@ -138,11 +138,10 @@ AddressEditor::AddressEditor(QWidget* parent)
 void AddressEditor::processPostalCode()
 {
   QDomDocument doc;
-  bool bSuccess = doc.setContent(searchPostalCode(m_edPostalCode->text()));
-  if (bSuccess)
+  if (doc.setContent(searchPostalCode(m_edPostalCode->text())))
   {
     QDomElement root = doc.documentElement();
-    bSuccess = root.tagName() == "result";
+    bool bSuccess = root.tagName() == "result";
     if (bSuccess)
     {
       QDomNodeList nodes = root.childNodes();
@@ -161,8 +160,7 @@ void AddressEditor::processPostalCode()
       }
     }
   }
-
-  if (!bSuccess)
+  else
   {
     QMessageBox::information(this,
                              tr("CEP não encontrado"),

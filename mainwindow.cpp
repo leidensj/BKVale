@@ -14,6 +14,8 @@
 #include "views/imageview.h"
 #include "views/couponview.h"
 #include "views/inventoryview.h"
+#include "views/sectorview.h"
+#include "views/coinview.h"
 
 #include "controls/report.h"
 #include "controls/calculatorwidget.h"
@@ -162,6 +164,8 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Reminder] = ui->actionReminders;
   m_actions[Functionality::Idx::CouponRedemption] = ui->actionRedeem;
   m_actions[Functionality::Idx::Inventory] = ui->actionInventory;
+  m_actions[Functionality::Idx::Sector] = ui->actionSectors;
+  m_actions[Functionality::Idx::Coin] = ui->actionCoins;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
@@ -186,6 +190,8 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionImages, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionSuppliers, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCoupons, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionSectors, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionCoins, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));

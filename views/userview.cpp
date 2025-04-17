@@ -4,7 +4,7 @@
 #include "widgets/jlineedit.h"
 #include <QLabel>
 #include <QLayout>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QListWidget>

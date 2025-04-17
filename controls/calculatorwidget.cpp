@@ -86,7 +86,7 @@ inline QString toStr(int button)
 inline void removeDecimal(QString& strValue)
 {
   if (strValue.contains(Calculator::toStr(Qt::Key_Period)))
-    strValue.remove(QRegExp("^[0]*"));
+    strValue.remove(QRegularExpression("^[0]*"));
   strValue.replace(Calculator::toStr(Qt::Key_Period), "");
 }
 }
@@ -419,7 +419,7 @@ void CalculatorWidget::print(double value, int button)
 
 QString CalculatorWidget::buildPrintContent(double value, int button)
 {
-  return Calculator::toStr(button) + " " + QString::number(value, 'f').remove(QRegExp("\\.?0*$"));
+  return Calculator::toStr(button) + " " + QString::number(value, 'f').remove(QRegularExpression("\\.?0*$"));
 }
 
 void CalculatorWidget::buttonClicked()
@@ -433,14 +433,14 @@ void CalculatorWidget::buttonClicked()
                    ? currentValue : m_lastValue;
     m_total = calculate(m_total, value, button);
     print(value, button);
-    m_edDisplay->setText(QString::number(m_total, 'f').remove(QRegExp("\\.?0*$")));
+    m_edDisplay->setText(QString::number(m_total, 'f').remove(QRegularExpression("\\.?0*$")));
     m_lastValue = value;
   }
   else if (Calculator::isEqual(button))
   {
     print(m_total, button);
     m_edDisplay->setText(QString::number(m_total, 'f').
-                         remove(QRegExp("\\.?0*$")));
+                         remove(QRegularExpression("\\.?0*$")));
   }
   else if (Calculator::isDigit(button))
   {

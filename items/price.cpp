@@ -31,7 +31,7 @@ bool Price::isValid() const
 
 QString Price::SQL_tableName() const
 {
-  return CATEGORY_SQL_TABLE_NAME;
+  return PRICE_SQL_TABLE_NAME;
 }
 
 bool Price::SQL_insert_proc(QSqlQuery& query) const

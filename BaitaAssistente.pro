@@ -34,6 +34,7 @@ SOURCES += main.cpp\
   editors/packageeditor.cpp \
   filters/couponfilter.cpp \
   filters/jfilter.cpp \
+  items/coin.cpp \
   items/coupon.cpp \
   items/couponproduct.cpp \
   items/inventory.cpp \
@@ -43,12 +44,14 @@ SOURCES += main.cpp\
   items/paymentpart.cpp \
   items/price.cpp \
   items/purchaseproduct.cpp \
-  libraries/qcustomplot.cpp \
+  items/sector.cpp \
   libraries/tinyexpr.c \
         mainwindow.cpp \
+  models/coinmodel.cpp \
   models/couponmodel.cpp \
   models/inventorymodel.cpp \
   models/loginmodel.cpp \
+  models/sectormodel.cpp \
   printer.cpp \
   purchasereport.cpp \
   settingsdialog.cpp \
@@ -59,7 +62,6 @@ SOURCES += main.cpp\
   tables/jtable.cpp \
     databaseutils.cpp \
     settings.cpp \
-    consumptionchart.cpp \
     items/address.cpp \
     items/category.cpp \
     items/employee.cpp \
@@ -74,9 +76,11 @@ SOURCES += main.cpp\
     items/user.cpp \
   tables/purchaseproducttable.cpp \
   tables/timecardcontroltable.cpp \
+  views/coinview.cpp \
   views/couponview.cpp \
   views/inventoryview.cpp \
   views/jitemview.cpp \
+  views/sectorview.cpp \
   widgets/filegenerator.cpp \
   widgets/findwidget.cpp \
     widgets/jaddremovebuttons.cpp \
@@ -156,6 +160,7 @@ HEADERS  += mainwindow.h \
     editors/packageeditor.h \
     filters/couponfilter.h \
     filters/jfilter.h \
+    items/coin.h \
     items/coupon.h \
     items/couponproduct.h \
     items/inventory.h \
@@ -166,11 +171,13 @@ HEADERS  += mainwindow.h \
     items/paymentpart.h \
     items/price.h \
     items/purchaseproduct.h \
-    libraries/qcustomplot.h \
+    items/sector.h \
     libraries/tinyexpr.h \
+    models/coinmodel.h \
     models/couponmodel.h \
     models/inventorymodel.h \
     models/loginmodel.h \
+    models/sectormodel.h \
     printer.h \
     purchasereport.h \
     settingsdialog.h \
@@ -181,7 +188,6 @@ HEADERS  += mainwindow.h \
     tables/jtable.h \
     databaseutils.h \
     settings.h \
-    consumptionchart.h \
     defines.h \
     escpos.h \
     tables/purchaseproducttable.h \
@@ -199,9 +205,11 @@ HEADERS  += mainwindow.h \
     items/shoppinglist.h \
     items/supplier.h \
     items/user.h \
+    views/coinview.h \
     views/couponview.h \
     views/inventoryview.h \
     views/jitemview.h \
+    views/sectorview.h \
     widgets/filegenerator.h \
     widgets/findwidget.h \
     widgets/jclicklabel.h \

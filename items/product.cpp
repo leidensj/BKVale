@@ -25,7 +25,7 @@ QString Package::strFormattedUnity(const QString& productUnity) const
   return !m_bIsPackage
       ? productUnity
       : m_unity + " (" +
-        QString::number(m_ammount, 'f', 3).remove(QRegExp("\\.?0*$")) +
+        QString::number(m_ammount, 'f', 3).remove(QRegularExpression("\\.?0*$")) +
         productUnity + ")";
 }
 

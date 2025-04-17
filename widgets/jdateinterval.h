@@ -22,6 +22,10 @@ public slots:
   void month();
   void week();
   void day();
+  void lastYear();
+  void lastWeek();
+  void lastMonth();
+  void yesterday();
 
 signals:
   void changedSignal(bool bChecked,const QDate& dti, const QDate& dtf);

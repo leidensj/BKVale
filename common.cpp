@@ -41,6 +41,10 @@ QString Functionality::idxToTableName(Idx idx)
       return INVENTORY_SQL_TABLE_NAME;
     case Idx::Login:
       return LOGIN_SQL_TABLE_NAME;
+    case Idx::Sector:
+      return SECTOR_SQL_TABLE_NAME;
+    case Idx::Coin:
+      return COIN_SQL_TABLE_NAME;
     default:
       return "";
   }
@@ -80,6 +84,10 @@ Functionality::Idx Functionality::tableNameToIdx(const QString& tableName)
     return Idx::Inventory;
   if (tableName == LOGIN_SQL_TABLE_NAME)
     return Idx::Login;
+  if (tableName == SECTOR_SQL_TABLE_NAME)
+    return Idx::Sector;
+  if (tableName == COIN_SQL_TABLE_NAME)
+    return Idx::Coin;
   return Idx::_END;
 }
 
@@ -105,7 +113,7 @@ QString Data::strAmmount(double value)
 
 QString Data::strFmt(double value)
 {
-  return QString::number(value, 'f').remove(QRegExp("\\.?0*$"));
+  return QString::number(value, 'f').remove(QRegularExpression("\\.?0*$"));
 }
 
 QString Data::strInt(double value)

@@ -7,7 +7,7 @@
 #include <QIcon>
 #include <QLabel>
 #include <QDialogButtonBox>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QPushButton>
 #include <QPropertyAnimation>
 #include "settings.h"

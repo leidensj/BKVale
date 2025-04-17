@@ -118,7 +118,7 @@ void Report::print()
   dlg.setWindowTitle(tr("Imprimir"));
   dlg.setWindowIcon(QIcon(":/icons/res/printer.png"));
   if (m_report->textCursor().hasSelection())
-    dlg.addEnabledOption(QAbstractPrintDialog::PrintSelection);
+    dlg.setOption(QAbstractPrintDialog::PrintSelection);
   if (dlg.exec() != QDialog::Accepted)
     return;
   m_report->print(&printer);

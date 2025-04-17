@@ -227,6 +227,8 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       setPermission(Functionality::Idx::Coupon, query.value(17).toBool());
       setPermission(Functionality::Idx::CouponRedemption, query.value(18).toBool());
       setPermission(Functionality::Idx::Report, query.value(19).toBool());
+      setPermission(Functionality::Idx::Sector, true); // temporario
+      setPermission(Functionality::Idx::Coin, true); // temporario
     }
     else
     {

@@ -3,7 +3,7 @@
 
 #include "defines.h"
 #include "common.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QVariant>
 #include <QVector>
 

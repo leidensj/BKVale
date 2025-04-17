@@ -16,7 +16,7 @@ void TextItem::setValue(const QVariant& v)
 
 void TextItem::evaluate()
 {
-  JRegExpValidator val(m_toUpper, QRegExp(Text::getRegEx(m_input)));
+  JRegExpValidator val(m_toUpper, QRegularExpression(Text::getRegEx(m_input)));
   QString str = m_toUpper ? text().toUpper() : text();
   int pos = str.length();
   bool bValid = val.validate(str, pos) == QValidator::State::Acceptable;

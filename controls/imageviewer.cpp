@@ -256,7 +256,7 @@ void ImageViewer::scaleImage(double factor)
     return;
 
   m_scaleFactor *= factor;
-  m_imageLabel->resize(m_scaleFactor * m_imageLabel->pixmap()->size());
+  m_imageLabel->resize(m_scaleFactor * m_imageLabel->pixmap().size());
 
   adjustScrollBar(m_scrollArea->horizontalScrollBar(), factor);
   adjustScrollBar(m_scrollArea->verticalScrollBar(), factor);
@@ -278,10 +278,10 @@ QByteArray ImageViewer::getCompressedImageAsByteArray() const
   {
     QBuffer buffer(&bArray);
     buffer.open(QIODevice::WriteOnly);
-    if (m_imageLabel->pixmap()->width() > 640)
-      m_imageLabel->pixmap()->scaledToWidth(640).save(&buffer, "PNG");
+    if (m_imageLabel->pixmap().width() > 640)
+      m_imageLabel->pixmap().scaledToWidth(640).save(&buffer, "PNG");
     else
-      m_imageLabel->pixmap()->save(&buffer, "PNG");
+      m_imageLabel->pixmap().save(&buffer, "PNG");
   }
   return bArray;
 }

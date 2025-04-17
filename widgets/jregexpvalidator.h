@@ -1,12 +1,12 @@
 #ifndef JVALIDATOR_H
 #define JVALIDATOR_H
 
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
-class JRegExpValidator: public QRegExpValidator
+class JRegExpValidator: public QRegularExpressionValidator
 {
 public:
-  JRegExpValidator(bool toUpper, const QRegExp & rx, QObject* parent = 0);
+  JRegExpValidator(bool toUpper, const QRegularExpression & rx, QObject* parent = 0);
   State validate(QString& input, int& pos) const override;
 
 private:

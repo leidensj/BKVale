@@ -2,7 +2,7 @@
 #define COMMON_H
 
 #include <QString>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDateTime>
 
 namespace Functionality
@@ -32,6 +32,8 @@ namespace Functionality
     Address,
     Phone,
     Inventory,
+    Sector,
+    Coin,
     _END,
   };
 

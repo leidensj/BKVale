@@ -191,7 +191,7 @@ void DatabasePicker::showImage()
 {
   QDialog dlg(this);
   ImageViewer* viewer = new ImageViewer(true);
-  viewer->setImage(m_lblImage->pixmap()->toImage());
+  viewer->setImage(m_lblImage->pixmap().toImage());
   QHBoxLayout *layout = new QHBoxLayout;
   dlg.setLayout(layout);
   layout->addWidget(viewer);

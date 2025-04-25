@@ -442,6 +442,86 @@ bool BaitaSQL::createTables(QString& error)
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_SQL_COL_NAM " TEXT UNIQUE NOT NULL CHECK ("
+                          CASH_SQL_COL_NAM " <> ''))");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_COINS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_COINS_SQL_COL_OID " INTEGER NOT NULL,"
+                          CASH_COINS_SQL_COL_CID " INTEGER NOT NULL,"
+                          "FOREIGN KEY(" CASH_COINS_SQL_COL_OID ") REFERENCES "
+                          CASH_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" CASH_COINS_SQL_COL_CID ") REFERENCES "
+                          COIN_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_INFO_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_INFO_SQL_COL_OID " INTEGER NOT NULL,"
+                          CASH_INFO_SQL_COL_NAM " TEXT UNIQUE NOT NULL CHECK ("
+                          CASH_INFO_SQL_COL_NAM " <> ''),"
+                          CASH_INFO_SQL_COL_TYP " INTEGER NOT NULL,"
+                          "FOREIGN KEY(" CASH_INFO_SQL_COL_OID ") REFERENCES "
+                          CASH_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_SECTORS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_SECTORS_SQL_COL_OID " INTEGER NOT NULL,"
+                          CASH_SECTORS_SQL_COL_SID " INTEGER NOT NULL,"
+                          "FOREIGN KEY(" CASH_SECTORS_SQL_COL_OID ") REFERENCES "
+                          CASH_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" CASH_SECTORS_SQL_COL_SID ") REFERENCES "
+                          SECTOR_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_CLOSING_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_CLOSING_SQL_COL_CID " INTEGER NOT NULL,"
+                          CASH_CLOSING_SQL_COL_DAT " TIMESTAMP,"
+                          "FOREIGN KEY(" CASH_CLOSING_SQL_COL_CID ") REFERENCES "
+                          CASH_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_CLOSING_COINS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_CLOSING_COINS_SQL_COL_OID " INTEGER NOT NULL,"
+                          CASH_CLOSING_COINS_SQL_COL_CNA " TEXT,"
+                          CASH_CLOSING_COINS_SQL_COL_CTA " REAL,"
+                          CASH_CLOSING_COINS_SQL_COL_CIM " INTEGER,"
+                          CASH_CLOSING_COINS_SQL_COL_VAL " REAL,"
+                          "FOREIGN KEY(" CASH_CLOSING_COINS_SQL_COL_OID ") REFERENCES "
+                          CASH_CLOSING_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" CASH_CLOSING_COINS_SQL_COL_CIM ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_CLOSING_INFOS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_CLOSING_INFOS_SQL_COL_OID " INTEGER NOT NULL,"
+                          CASH_CLOSING_INFOS_SQL_COL_INA " TEXT,"
+                          CASH_CLOSING_INFOS_SQL_COL_ITY " INTEGER,"
+                          CASH_CLOSING_INFOS_SQL_COL_VAL " TEXT,"
+                          "FOREIGN KEY(" CASH_CLOSING_INFOS_SQL_COL_OID ") REFERENCES "
+                          CASH_CLOSING_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_CLOSING_SECTORS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          CASH_CLOSING_SECTORS_SQL_COL_OID " INTEGER NOT NULL,"
+                          CASH_CLOSING_SECTORS_SQL_COL_SNA " TEXT,"
+                          CASH_CLOSING_SECTORS_SQL_COL_SIM " INTEGER,"
+                          CASH_CLOSING_SECTORS_SQL_COL_VAL " REAL,"
+                          CASH_CLOSING_SECTORS_SQL_COL_NVA " INTEGER,"
+                          "FOREIGN KEY(" CASH_CLOSING_SECTORS_SQL_COL_OID ") REFERENCES "
+                          CASH_CLOSING_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" CASH_CLOSING_SECTORS_SQL_COL_SIM ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
   {
     query.exec("SELECT * FROM " USER_SQL_TABLE_NAME " LIMIT 1");
     if (!query.next())

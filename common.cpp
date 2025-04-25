@@ -45,6 +45,10 @@ QString Functionality::idxToTableName(Idx idx)
       return SECTOR_SQL_TABLE_NAME;
     case Idx::Coin:
       return COIN_SQL_TABLE_NAME;
+    case Idx::Cash:
+      return CASH_SQL_TABLE_NAME;
+    case Idx::CashClosing:
+      return CASH_CLOSING_SQL_TABLE_NAME;
     default:
       return "";
   }
@@ -88,6 +92,10 @@ Functionality::Idx Functionality::tableNameToIdx(const QString& tableName)
     return Idx::Sector;
   if (tableName == COIN_SQL_TABLE_NAME)
     return Idx::Coin;
+  if (tableName == CASH_SQL_TABLE_NAME)
+    return Idx::Cash;
+  if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
+    return Idx::CashClosing;
   return Idx::_END;
 }
 

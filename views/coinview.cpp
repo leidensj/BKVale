@@ -1,6 +1,6 @@
 #include "coinview.h"
 #include "widgets/jlineedit.h"
-#include "widgets/jdoublespinbox.h".h"
+#include "widgets/jdoublespinbox.h"
 #include "controls/databasepicker.h"
 #include <QLayout>
 #include <QFormLayout>
@@ -21,6 +21,7 @@ CoinView::CoinView(QWidget* parent)
   m_sbTax = new JDoubleSpinBox();
   m_sbTax->setMinimum(0);
   m_sbTax->setMaximum(100);
+  m_sbTax->setSuffix("%");
 
   m_imagePicker = new DatabasePicker(IMAGE_SQL_TABLE_NAME);
 

@@ -16,6 +16,8 @@
 #include "views/inventoryview.h"
 #include "views/sectorview.h"
 #include "views/coinview.h"
+#include "views/cashview.h"
+#include "views/cashclosingview.h"
 
 #include "controls/report.h"
 #include "controls/calculatorwidget.h"
@@ -166,6 +168,8 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Inventory] = ui->actionInventory;
   m_actions[Functionality::Idx::Sector] = ui->actionSectors;
   m_actions[Functionality::Idx::Coin] = ui->actionCoins;
+  m_actions[Functionality::Idx::Cash] = ui->actionCash;
+  m_actions[Functionality::Idx::CashClosing] = ui->actionCashClosing;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
@@ -192,6 +196,8 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCoupons, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionSectors, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCoins, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionCash, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionCashClosing, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));

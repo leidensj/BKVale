@@ -34,6 +34,8 @@ namespace Functionality
     Inventory,
     Sector,
     Coin,
+    Cash,
+    CashClosing,
     _END,
   };
 

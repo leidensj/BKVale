@@ -34,6 +34,14 @@ SOURCES += main.cpp\
   editors/packageeditor.cpp \
   filters/couponfilter.cpp \
   filters/jfilter.cpp \
+  items/cash.cpp \
+  items/cashclosing.cpp \
+  items/cashclosingcoin.cpp \
+  items/cashclosinginfo.cpp \
+  items/cashclosingsector.cpp \
+  items/cashcoin.cpp \
+  items/cashinfo.cpp \
+  items/cashsector.cpp \
   items/coin.cpp \
   items/coupon.cpp \
   items/couponproduct.cpp \
@@ -47,6 +55,8 @@ SOURCES += main.cpp\
   items/sector.cpp \
   libraries/tinyexpr.c \
         mainwindow.cpp \
+  models/cashclosingmodel.cpp \
+  models/cashmodel.cpp \
   models/coinmodel.cpp \
   models/couponmodel.cpp \
   models/inventorymodel.cpp \
@@ -55,7 +65,12 @@ SOURCES += main.cpp\
   printer.cpp \
   purchasereport.cpp \
   settingsdialog.cpp \
+  tableitems/multitoggleitem.cpp \
   tableitems/toggleitem.cpp \
+  tables/cashclosingcointable.cpp \
+  tables/cashclosinginfotable.cpp \
+  tables/cashclosingsectortable.cpp \
+  tables/cashinfotable.cpp \
   tables/coupontable.cpp \
   tables/dayofftable.cpp \
   tables/inventorytable.cpp \
@@ -76,6 +91,8 @@ SOURCES += main.cpp\
     items/user.cpp \
   tables/purchaseproducttable.cpp \
   tables/timecardcontroltable.cpp \
+  views/cashclosingview.cpp \
+  views/cashview.cpp \
   views/coinview.cpp \
   views/couponview.cpp \
   views/inventoryview.cpp \
@@ -160,6 +177,14 @@ HEADERS  += mainwindow.h \
     editors/packageeditor.h \
     filters/couponfilter.h \
     filters/jfilter.h \
+    items/cash.h \
+    items/cashclosing.h \
+    items/cashclosingcoin.h \
+    items/cashclosinginfo.h \
+    items/cashclosingsector.h \
+    items/cashcoin.h \
+    items/cashinfo.h \
+    items/cashsector.h \
     items/coin.h \
     items/coupon.h \
     items/couponproduct.h \
@@ -173,6 +198,8 @@ HEADERS  += mainwindow.h \
     items/purchaseproduct.h \
     items/sector.h \
     libraries/tinyexpr.h \
+    models/cashclosingmodel.h \
+    models/cashmodel.h \
     models/coinmodel.h \
     models/couponmodel.h \
     models/inventorymodel.h \
@@ -181,7 +208,12 @@ HEADERS  += mainwindow.h \
     printer.h \
     purchasereport.h \
     settingsdialog.h \
+    tableitems/multitoggleitem.h \
     tableitems/toggleitem.h \
+    tables/cashclosingcointable.h \
+    tables/cashclosinginfotable.h \
+    tables/cashclosingsectortable.h \
+    tables/cashinfotable.h \
     tables/coupontable.h \
     tables/dayofftable.h \
     tables/inventorytable.h \
@@ -205,6 +237,8 @@ HEADERS  += mainwindow.h \
     items/shoppinglist.h \
     items/supplier.h \
     items/user.h \
+    views/cashclosingview.h \
+    views/cashview.h \
     views/coinview.h \
     views/couponview.h \
     views/inventoryview.h \

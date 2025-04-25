@@ -11,7 +11,8 @@ public:
   {
     None,
     Background,
-    Foreground
+    Foreground,
+    Foreground2
   };
 
   DoubleItem(Data::Type type,

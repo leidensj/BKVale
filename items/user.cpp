@@ -229,6 +229,8 @@ bool User::SQL_select_proc(QSqlQuery& query, QString& error)
       setPermission(Functionality::Idx::Report, query.value(19).toBool());
       setPermission(Functionality::Idx::Sector, true); // temporario
       setPermission(Functionality::Idx::Coin, true); // temporario
+      setPermission(Functionality::Idx::Cash, true); // temporario
+      setPermission(Functionality::Idx::CashClosing, true); // temporario
     }
     else
     {

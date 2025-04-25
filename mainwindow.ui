@@ -109,6 +109,7 @@
     <addaction name="actionStores"/>
     <addaction name="actionSectors"/>
     <addaction name="actionCoins"/>
+    <addaction name="actionCash"/>
    </widget>
    <widget class="QMenu" name="menuConfigura_es">
     <property name="title">
@@ -131,6 +132,7 @@
     <addaction name="actionTimeCard"/>
     <addaction name="actionTimeCardControl"/>
     <addaction name="actionRedeem"/>
+    <addaction name="actionCashClosing"/>
    </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
@@ -451,6 +453,30 @@
    </property>
    <property name="text">
     <string>Moedas</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCash">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/cashier.png</normaloff>:/icons/res/cashier.png</iconset>
+   </property>
+   <property name="text">
+    <string>Caixas</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCashClosing">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/cashier.png</normaloff>:/icons/res/cashier.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fechamento de Caixa</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

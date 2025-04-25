@@ -18,6 +18,7 @@
 #include "inventory.h"
 #include "sector.h"
 #include "coin.h"
+#include "cashclosing.h"
 
 #include <QMessageBox>
 #include "controls/pincodedialog.h"
@@ -40,6 +41,8 @@
 #include "models/inventorymodel.h"
 #include "models/sectormodel.h"
 #include "models/coinmodel.h"
+#include "models/cashmodel.h"
+#include "models/cashclosingmodel.h"
 
 #include "views/categoryview.h"
 #include "views/employeeview.h"
@@ -55,6 +58,8 @@
 #include "views/inventoryview.h"
 #include "views/sectorview.h"
 #include "views/coinview.h"
+#include "views/cashview.h"
+#include "views/cashclosingview.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
@@ -96,6 +101,10 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new Sector;
   if (tableName == COIN_SQL_TABLE_NAME)
     return new Coin;
+  if (tableName == CASH_SQL_TABLE_NAME)
+    return new Cash;
+  if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
+    return new CashClosing;
   return nullptr;
 }
 
@@ -175,6 +184,10 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Setor";
     case Functionality::Idx::Coin:
       return "Moeda";
+    case Functionality::Idx::Cash:
+      return "Caixa";
+    case Functionality::Idx::CashClosing:
+      return "Fechamento de Caixa";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -240,6 +253,10 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/sector.png";
     case Functionality::Idx::Coin:
       return ":/icons/res/coin.png";
+    case Functionality::Idx::Cash:
+      return ":/icons/res/cashier.png";
+    case Functionality::Idx::CashClosing:
+      return ":/icons/res/cashier.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -289,6 +306,10 @@ JModel* JItemHelper::model(const QString& tableName, QObject* parent)
     return new SectorModel(parent);
   if (tableName == COIN_SQL_TABLE_NAME)
     return new CoinModel(parent);
+  if (tableName == CASH_SQL_TABLE_NAME)
+    return new CashModel(parent);
+  if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
+    return new CashClosingModel(parent);
   return nullptr;
 }
 
@@ -322,6 +343,10 @@ JItemView* JItemHelper::view(const QString& tableName)
     return new SectorView;
   if (tableName == COIN_SQL_TABLE_NAME)
     return new CoinView;
+  if (tableName == CASH_SQL_TABLE_NAME)
+    return new CashView;
+  if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
+    return new CashClosingView;
   return nullptr;
 }
 

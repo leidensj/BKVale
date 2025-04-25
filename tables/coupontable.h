@@ -12,7 +12,7 @@ public:
 
   enum class Column
   {
-    Ammount,
+    Ammount = 0,
     Product
   };
 

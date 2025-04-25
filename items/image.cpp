@@ -1,5 +1,10 @@
 #include "image.h"
 
+#include <QPixmap>
+#include <QByteArray>
+#include <QBuffer>
+#include <QImageReader>
+
 Image::Image()
 {
   Image::clear();
@@ -106,4 +111,19 @@ bool Image::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
+}
+
+QIcon Image::toIcon() const
+{
+    QBuffer buffer;
+    buffer.setData(m_image);
+    buffer.open(QIODevice::ReadOnly);
+
+    QImageReader reader(&buffer);
+    QImage image = reader.read();
+
+    if (!image.isNull())
+      return QIcon(QPixmap::fromImage(image));
+    else
+      return QIcon();
 }

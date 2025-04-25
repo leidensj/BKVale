@@ -1,10 +1,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include <QObject>
-#include <QString>
 #include <QByteArray>
-#include <QVector>
+#include <QIcon>
 #include "defines.h"
 #include "jitemsql.h"
 
@@ -27,6 +25,7 @@ struct Image : public JItemSQL
   void copy(const JItemSQL& other);
   QString name() const { return m_name; }
   QByteArray image() const { return m_image; }
+  QIcon toIcon() const;
 };
 
 #endif // IMAGE_H

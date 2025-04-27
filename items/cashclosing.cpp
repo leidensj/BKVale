@@ -118,7 +118,7 @@ bool CashClosing::SQL_select_proc(QSqlQuery& query, QString& error)
 {
   query.prepare("SELECT "
                 CASH_CLOSING_SQL_COL_CID ", "
-                CASH_CLOSING_SQL_COL_DAT ", "
+                CASH_CLOSING_SQL_COL_DAT
                 " FROM " CASH_CLOSING_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -138,6 +138,8 @@ bool CashClosing::SQL_select_proc(QSqlQuery& query, QString& error)
     }
   }
 
+  if (ok)
+    ok = m_cash.SQL_select_proc(query, error);
   if (ok)
     ok = CashClosingCoin::SQL_select_by_owner_id_proc(query, m_id, m_vcoins, error);
   if (ok)

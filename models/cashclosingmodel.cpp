@@ -11,7 +11,7 @@ CashClosingModel::CashClosingModel(QObject *parent)
 QString CashClosingModel::getStrQuery()
 {
   QString str;
-  str += "SELECT c." CASH_SQL_COL_NAM ", cc." CASH_CLOSING_SQL_COL_DAT " AS CASHCLOSING "
+  str += "SELECT cc." SQL_COLID ", c." CASH_SQL_COL_NAM ", cc." CASH_CLOSING_SQL_COL_DAT " AS CASHCLOSING "
          "FROM " CASH_SQL_TABLE_NAME " AS c "
          "JOIN " CASH_CLOSING_SQL_TABLE_NAME " AS cc ON c." SQL_COLID " = cc." CASH_CLOSING_SQL_COL_CID;
   return str;

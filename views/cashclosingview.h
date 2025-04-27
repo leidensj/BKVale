@@ -4,7 +4,7 @@
 #include "items/cashclosing.h"
 #include "jitemview.h"
 
-class JLineEdit;
+class JExpLineEdit;
 class DatabasePicker;
 class CashClosingCoinTable;
 class CashClosingSectorTable;
@@ -25,12 +25,19 @@ protected slots:
 
 private slots:
   void cashChanged();
+  void update();
 
 private:
   DatabasePicker* m_cashPicker;
   CashClosingCoinTable* m_coinTable;
   CashClosingSectorTable* m_sectorTable;
   CashClosingInfoTable* m_infoTable;
+  JExpLineEdit* m_edSector1;
+  JExpLineEdit* m_edSector2;
+  JExpLineEdit* m_edCoin1;
+  JExpLineEdit* m_edCoin2;
+  JExpLineEdit* m_edDiff1;
+  JExpLineEdit* m_edDiff2;
 };
 
 #endif // CASHCLOSINGVIEW_H

@@ -4,7 +4,6 @@
 #include <QSqlQuery>
 #include <QVariant>
 
-
 QString Functionality::idxToTableName(Idx idx)
 {
   switch (idx)

@@ -75,3 +75,11 @@ void CashClosingCoinTable::set(const QVector<CashClosingCoin>& v, bool bClear)
     getItem(row, (int)Column::Value)->setValue(v.at(i).m_value);
   }
 }
+
+double CashClosingCoinTable::sumWithTaxes()
+{
+  double total = 0.0;
+  for (int i = 0; i != rowCount(); ++i)
+    total += (1.00 - getItem(i, (int)Column::Tax)->getValue().toDouble()/100.00) * getItem(i, (int)Column::Value)->getValue().toDouble();
+  return total;
+}

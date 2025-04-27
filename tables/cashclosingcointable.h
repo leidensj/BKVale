@@ -24,6 +24,7 @@ public:
 public slots:
   void addRow();
   void addRowAndActivate();
+  double sumWithTaxes();
 };
 
 #endif

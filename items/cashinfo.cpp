@@ -10,7 +10,7 @@ void CashInfo::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_name.clear();
-  m_type = Type::Number;
+  m_type = Data::Type::Money;
 }
 
 bool CashInfo::isValid() const
@@ -97,7 +97,7 @@ bool CashInfo::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_ownerId.set(query.value(0).toLongLong());
       m_name = query.value(1).toString();
-      m_type = (Type) query.value(2).toInt();
+      m_type = (Data::Type) query.value(2).toInt();
     }
     else
     {

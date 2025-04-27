@@ -50,8 +50,9 @@ enum class Type
   Integer,
   Money,
   Ammount,
-  Fmt,
-  Percentage
+  Percentage,
+  Text,
+  Fmt
 };
 
 QString strMoney(double value, bool bCurrency = true);

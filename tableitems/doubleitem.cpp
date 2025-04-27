@@ -42,10 +42,10 @@ void DoubleItem::setValue(const QVariant& v)
       setBackground(QBrush(QColor(val == 0.0 ? QColor(255, 200, 200) : QColor(Qt::white))));
       break;
     case Color::Foreground:
-      setForeground(QBrush(QColor(val >= 0 ? Qt::red : Qt::darkGreen)));
+      setForeground(QBrush(QColor(val == 0.0 ? Qt::black : val > 0 ? Qt::red : Qt::darkGreen)));
       break;
     case Color::Foreground2:
-      setForeground(QBrush(QColor(val < 0 ? Qt::red : Qt::darkGreen)));
+      setForeground(QBrush(QColor(val == 0.0 ? Qt::black : val < 0 ? Qt::red : Qt::darkGreen)));
       break;
     case Color::None:
     default:

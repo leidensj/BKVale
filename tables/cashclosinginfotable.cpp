@@ -3,7 +3,6 @@
 #include <QKeyEvent>
 #include "tableitems/textitem.h"
 #include "tableitems/doubleitem.h"
-#include "items/cashinfo.h"
 
 CashClosingInfoTable::CashClosingInfoTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)
@@ -13,8 +12,8 @@ CashClosingInfoTable::CashClosingInfoTable(JAddRemoveButtons* btns, QWidget* par
   headers << "Informação" << "Tipo" << "Valor";
   setHorizontalHeaderLabels(headers);
 
+  horizontalHeader()->hideSection((int)Column::Type);
   horizontalHeader()->setSectionResizeMode((int)Column::Info, QHeaderView::ResizeToContents);
-  horizontalHeader()->setSectionResizeMode((int)Column::Type, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Value, QHeaderView::Stretch);
 }
 
@@ -66,19 +65,22 @@ void CashClosingInfoTable::set(const QVector<CashClosingInfo>& v, bool bClear)
     int row = rowCount() - 1;
     auto it = takeItem(row, (int)Column::Value);
     delete it;
-    switch ((CashInfo::Type)v.at(i).m_itype)
+    switch ((Data::Type)v.at(i).m_itype)
     {
-      case CashInfo::Type::Money:
+      case Data::Type::Money:
         it = new DoubleItem(Data::Type::Money, DoubleItem::Color::None);
         break;
-      case CashInfo::Type::Number:
+      case Data::Type::Integer:
         it = new DoubleItem(Data::Type::Integer, DoubleItem::Color::None);
         break;
-      case CashInfo::Type::Percentage:
+      case Data::Type::Percentage:
         it = new DoubleItem(Data::Type::Percentage, DoubleItem::Color::None);
         break;
+      case Data::Type::Ammount:
+        it = new DoubleItem(Data::Type::Ammount, DoubleItem::Color::None);
+        break;
+      case Data::Type::Text:
       default:
-      case CashInfo::Type::Text:
         it = new TextItem(Text::Input::AlphanumericAndSpaces, true);
         break;
     }

@@ -6,14 +6,6 @@
 
 struct CashInfo : public JSubItemSQL
 {
-  enum class Type
-  {
-    Number =0,
-    Money,
-    Percentage,
-    Text
-  };
-
   CashInfo();
   void clear(bool bClearId = true);
   bool isValid() const;
@@ -27,7 +19,7 @@ struct CashInfo : public JSubItemSQL
   static bool SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId);
 
   QString m_name;
-  Type m_type;
+  Data::Type m_type;
 };
 
 #endif // CASHINFO_H

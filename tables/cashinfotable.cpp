@@ -23,7 +23,7 @@ void CashInfoTable::addRow()
   int row = rowCount() - 1;
 
   auto itName = new TextItem(Text::Input::AlphanumericAndSpaces, true);
-  auto itType = new MultiToggleItem(QStringList() << "Número" << "Dinheiro" << "Porcentagem" << "Texto");
+  auto itType = new MultiToggleItem(QStringList() << "Inteiro" << "Dinheiro" << "Quantidade" << "Porcentagem" << "Texto");
 
   blockSignals(true);
   setItem(row, (int)Column::Name, itName);
@@ -47,7 +47,7 @@ void CashInfoTable::get(QVector<CashInfo>& v) const
     int row = verticalHeader()->logicalIndex(i);
     CashInfo o;
     o.m_name = getItem(row, (int)Column::Name)->getValue().toString();
-    o.m_type = (CashInfo::Type)getItem(row, (int)Column::Type)->getValue().toInt();
+    o.m_type = (Data::Type)getItem(row, (int)Column::Type)->getValue().toInt();
     v.push_back(o);
   }
 }

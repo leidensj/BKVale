@@ -90,7 +90,10 @@ void JExpLineEdit::evaluate(const QString& value)
   emit valueChanged(m_currentValue);
 
   QPalette _palette = palette();
-  _palette.setColor(QPalette::ColorRole::Text, m_currentValue >= 0.0 ? Qt::red : Qt::darkGreen);
+  if (m_bInvertColors)
+    _palette.setColor(QPalette::ColorRole::Text, m_currentValue >= 0.0 ? Qt::darkGreen : Qt::red);
+  else
+    _palette.setColor(QPalette::ColorRole::Text, m_currentValue >= 0.0 ? Qt::red : Qt::darkGreen);
   setPalette(_palette);
 }
 
@@ -117,4 +120,9 @@ void JExpLineEdit::setMinimum(double value)
 void JExpLineEdit::setMaximum(double value)
 {
   m_maximumValue = value;
+}
+
+void JExpLineEdit::setInvertColors(bool b)
+{
+  m_bInvertColors = b;
 }

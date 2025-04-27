@@ -40,6 +40,7 @@ public:
   void setValue(double value);
   void setMinimum(double value);
   void setMaximum(double value);
+  void setInvertColors(bool b);
 
 private slots:
   void evaluate(const QString& value);
@@ -53,6 +54,7 @@ private:
   double m_currentValue;
   double m_minimumValue;
   double m_maximumValue;
+  bool m_bInvertColors;
 };
 
 #endif // JLINEEDIT_H

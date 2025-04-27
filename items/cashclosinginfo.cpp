@@ -48,7 +48,7 @@ bool CashClosingInfo::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v01", m_ownerId.get());
   query.bindValue(":_v02", m_iname);
   query.bindValue(":_v03", m_itype);
-  query.bindValue(":_v04", m_value);
+  query.bindValue(":_v04", m_value.toString());
 
   bool bSuccess = query.exec();
 

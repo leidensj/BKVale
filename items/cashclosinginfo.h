@@ -21,6 +21,7 @@ struct CashClosingInfo : public JSubItemSQL
   QString m_iname;
   int m_itype;
   QVariant m_value;
+  QString strValue() const;
 };
 
 #endif // CASHCLOSINGINFO_H

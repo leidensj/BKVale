@@ -31,6 +31,8 @@ void SettingsDialog::doDataExchange(bool toUI)
     ui->cbSerialPort->setCurrentIndex(ui->cbSerialPort->findText(m_settings.m_serialPort, Qt::MatchExactly));
     ui->edEthernetIP->setText(m_settings.m_ethernetIP);
     ui->sbEthernetPort->setValue(m_settings.m_ethernetPort);
+    ui->rdoEscpos->setChecked(!m_settings.m_bema);
+    ui->rdoBematech->setChecked(m_settings.m_bema);
   }
   else
   {
@@ -38,6 +40,7 @@ void SettingsDialog::doDataExchange(bool toUI)
     m_settings.m_serialPort = ui->cbSerialPort->currentText();
     m_settings.m_ethernetIP = ui->edEthernetIP->text();
     m_settings.m_ethernetPort = ui->sbEthernetPort->value();
+    m_settings.m_bema = ui->rdoBematech->isChecked();
   }
 }
 

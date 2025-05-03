@@ -1,5 +1,5 @@
 #include "cashclosingmodel.h"
-#include "items/cashclosing.h".h"
+#include "items/cashclosing.h"
 #include <QDate>
 
 CashClosingModel::CashClosingModel(QObject *parent)

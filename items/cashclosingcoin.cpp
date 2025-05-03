@@ -141,3 +141,13 @@ bool CashClosingCoin::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
   query.bindValue(":_v01", ownerId.get());
   return query.exec();
 }
+
+double CashClosingCoin::valueWithTaxes() const
+{
+  return m_value * (1 - m_ctax/100);
+}
+
+double CashClosingCoin::taxesDifference() const
+{
+  return m_value - valueWithTaxes();
+}

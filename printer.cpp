@@ -620,3 +620,17 @@ bool Printer::print(const Coupon& o, bool bPrintContent, QString& error)
 
   return print(str, error);
 }
+
+bool Printer::print(const CashClosing& o, QString& error)
+{
+  QString str;
+  str += ESC_INIT ESC_ALIGN_CENTER
+         ESC_EXPAND_ON
+         "FECHAMENTO DE CAIXA"
+         ESC_LF;
+  str += o.m_dt.toString("yyyy/mm/dd HH:mm:ss") +
+         ESC_LF
+         ESC_VERT_TAB
+         ESC_PARTIAL_CUT;
+  return print(str, error);
+}

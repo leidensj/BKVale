@@ -19,6 +19,8 @@ struct CashClosingCoin : public JSubItemSQL
   static bool SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<CashClosingCoin>& v, QString& error);
   static bool SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId);
 
+  double valueWithTaxes() const;
+  double taxesDifference() const;
   QString m_cname;
   double m_ctax;
   Image m_cimage;

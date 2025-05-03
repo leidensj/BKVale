@@ -11,6 +11,7 @@ struct Settings
   bool m_bIsPrinterEthernet;
   QString m_serialPort;
   QString m_ethernetIP;
+  bool m_bema;
   int m_ethernetPort;
   qlonglong m_purchaseStoreId;
 

@@ -5,6 +5,7 @@
 #include "tables/cashclosingcointable.h"
 #include "tables/cashclosingsectortable.h"
 #include "tables/cashclosinginfotable.h"
+#include "escposprinter.h"
 #include <QLabel>
 #include <QLayout>
 #include <QFormLayout>
@@ -113,6 +114,9 @@ CashClosingView::CashClosingView(QWidget* parent)
   tabframe->setLayout(lmain);
   m_tab->addTab(tabframe, QIcon(":/icons/res/cashier.png"), tr("Fechamento de Caixa"));
 
+  m_btnPrint->setEnabled(true);
+  m_btnPrint->show();
+
   connect(m_cashPicker, SIGNAL(changedSignal()), this, SLOT(cashChanged()));
   connect(m_sectorTable, SIGNAL(changedSignal(int, int)), this, SLOT(update()));
   connect(m_coinTable, SIGNAL(changedSignal(int, int)), this, SLOT(update()));
@@ -146,6 +150,25 @@ void CashClosingView::setItem(const JItemSQL& o)
   m_cashPicker->addItem(_o.m_cash);
   m_cashPicker->blockSignals(false);
   update();
+}
+
+void CashClosingView::save()
+{
+  print();
+  JItemView::save();
+}
+
+void CashClosingView::print()
+{
+  if (!m_btnPrint->isChecked())
+    return;
+  CashClosing o;
+  getItem(o);
+  JItemHelper::print(o, nullptr, this);
+  EscPosPrinter printer;
+  QString error;
+  if (printer.connectToPrinter(error))
+    printer.printRawData(o.printVersion());
 }
 
 void CashClosingView::cashChanged()

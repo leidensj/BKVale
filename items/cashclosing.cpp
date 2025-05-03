@@ -1,6 +1,7 @@
 #include "cashclosing.h"
 #include <QSqlRecord>
 #include "common.h"
+#include "escpos.h"
 
 CashClosing::CashClosing(Id id)
 {
@@ -156,4 +157,111 @@ bool CashClosing::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
+}
+
+QByteArray CashClosing::printVersion() const
+{
+  EscPos ep;
+  ep.align(true);
+  ep.doublefont(true);
+  ep.str(QString("Fechamento de Caixa\n%1\n%2\n%3\n").arg(m_cash.m_name, m_dt.toString("dd/MM/yyyy HH:mm:ss")));
+  ep.doublefont(false);
+  ep.align(false);
+  ep.expand(true);
+  ep.str("Vendas\n\n");
+  ep.expand(false);
+  for (auto s : m_vsectors)
+  {
+    ep.bold(true);
+    ep.str(s.m_sname +":\n");
+    ep.bold(false);
+    ep.str("   Financeiro: " + Data::strMoney(s.m_value) + "\n");
+    ep.str("   Fisico: " + Data::strMoney(s.m_nvalue) + "\n\n");
+  }
+  ep.bold(true);
+  ep.str("Total:\n"
+         "   Financeiro: " + Data::strMoney(sumSectorsValue()) + "\n"
+         "   Fisico:     " + Data::strInt(sumSectorsNValue()) + "\n\n");
+  ep.bold(false);
+
+  ep.expand(true);
+  ep.str("Recebimentos\n\n");
+  ep.expand(false);
+  for (auto c : m_vcoins)
+  {
+    ep.bold(true);
+    ep.str(c.m_cname + ":\n");
+    ep.bold(false);
+    ep.str("   Sem taxas:      " + Data::strMoney(c.m_value) + "\n" +
+           "   Com taxas:      " + Data::strMoney(c.valueWithTaxes()) + "\n" +
+           "   Total de taxas: " + Data::strMoney(c.taxesDifference()) + "\n");
+  }
+  ep.bold(true);
+  ep.str("Total:\n"
+         "   Sem taxas:      " + Data::strMoney(sumCoinsValue()) + "\n" +
+         "   Com taxas:      " + Data::strMoney(sumCoinsWithTaxes()) + "\n" +
+         "   Total de taxas: " + Data::strMoney(sumCoinsTaxesDifference()) + "\n\n");
+  ep.bold(false);
+
+  ep.expand(true);
+  ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n"
+         "Diferenca de caixa:\n" + Data::strMoney(diffTax()) + "\n\n");
+  ep.expand(false);
+
+  ep.bold(true);
+  ep.str("Informacoes:\n");
+  ep.bold(false);
+  for (auto i : m_vinfos)
+    ep.str(i.m_iname + ": " + i.strValue() + "\n");
+
+  ep.str("\n\n\n");
+  ep.cut();
+  return ep.m_ba;
+}
+
+double CashClosing::sumSectorsValue() const
+{
+  double sum = 0.0;
+  for (auto s : m_vsectors)
+    sum += s.m_value;
+  return sum;
+}
+
+int CashClosing::sumSectorsNValue() const
+{
+  int sum = 0;
+  for (auto s : m_vsectors)
+    sum += s.m_nvalue;
+  return sum;
+}
+
+double CashClosing::sumCoinsValue() const
+{
+  double sum = 0.0;
+  for (auto c : m_vcoins)
+    sum += c.m_value;
+  return sum;
+}
+
+double CashClosing::sumCoinsWithTaxes() const
+{
+  double sum = 0.0;
+  for (auto c : m_vcoins)
+    sum += c.valueWithTaxes();
+  return sum;
+}
+
+double CashClosing::sumCoinsTaxesDifference() const
+{
+  return sumCoinsValue() - sumCoinsWithTaxes();
+}
+
+double CashClosing::diff() const
+{
+  return sumSectorsValue() - sumCoinsValue();
+}
+
+double CashClosing::diffTax() const
+{
+  return sumSectorsValue() - sumCoinsWithTaxes();
 }

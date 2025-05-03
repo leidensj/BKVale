@@ -32,6 +32,8 @@ SOURCES += main.cpp\
   editors/addresseditor.cpp \
   editors/formeditor.cpp \
   editors/packageeditor.cpp \
+  escpos.cpp \
+  escposprinter.cpp \
   filters/couponfilter.cpp \
   filters/jfilter.cpp \
   items/cash.cpp \
@@ -175,6 +177,8 @@ HEADERS  += mainwindow.h \
     editors/addresseditor.h \
     editors/formeditor.h \
     editors/packageeditor.h \
+    escposexports.h \
+    escposprinter.h \
     filters/couponfilter.h \
     filters/jfilter.h \
     items/cash.h \

@@ -464,6 +464,8 @@ bool JItemHelper::print(const JItemSQL& o, QVariant* options, QWidget* parent)
     ok = printer.print(dynamic_cast<const Reminder&>(o), error);
   else if (tableName == COUPON_SQL_TABLE_NAME)
     ok = printer.print(dynamic_cast<const Coupon&>(o), options != nullptr ? options->toBool() : false, error);
+  else if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
+    ok = printer.print(dynamic_cast<const CashClosing&>(o), error);
   if (!ok)
     QMessageBox::warning(parent, QObject::tr("Aviso"), QObject::tr("O seguinte erro ocorreu ao imprimir %1:\n%2.").arg(text(tableName), error), QMessageBox::Ok);
   return ok;

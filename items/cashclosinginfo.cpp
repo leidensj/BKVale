@@ -124,3 +124,8 @@ bool CashClosingInfo::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
   query.bindValue(":_v01", ownerId.get());
   return query.exec();
 }
+
+QString CashClosingInfo::strValue() const
+{
+  return ((Data::Type)m_itype == Data::Type::Text) ? m_value.toString() : Data::str(m_value.toDouble(), (Data::Type)m_itype);
+}

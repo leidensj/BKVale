@@ -19,6 +19,7 @@ public:
 
 public slots:
   void getItem(JItemSQL& o) const;
+  void save();
 
 protected slots:
   void setItem(const JItemSQL& o);
@@ -26,6 +27,7 @@ protected slots:
 private slots:
   void cashChanged();
   void update();
+  void print();
 
 private:
   DatabasePicker* m_cashPicker;

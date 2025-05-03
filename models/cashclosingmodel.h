@@ -9,7 +9,8 @@ class CashClosingModel : public JModel
   {
     Id,
     Cash,
-    Date
+    Date,
+    Sales
   };
 public:
   CashClosingModel(QObject *parent);

@@ -4,6 +4,7 @@
 #include <QString>
 #include <QObject>
 #include <QDate>
+#include <QByteArray>
 #include "jitemsql.h"
 #include "cash.h"
 #include "cashclosingcoin.h"
@@ -22,6 +23,16 @@ struct CashClosing : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
+
+  QByteArray printVersion() const;
+
+  double sumSectorsValue() const;
+  int sumSectorsNValue() const;
+  double sumCoinsValue() const;
+  double sumCoinsWithTaxes() const;
+  double sumCoinsTaxesDifference() const;
+  double diff() const;
+  double diffTax() const;
 
   Cash m_cash;
   QDateTime m_dt;

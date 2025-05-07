@@ -22,7 +22,7 @@ void CashInfoTable::addRow()
   insertRow(rowCount());
   int row = rowCount() - 1;
 
-  auto itName = new TextItem(Text::Input::AlphanumericAndSpaces, true);
+  auto itName = new TextItem(Text::Input::ASCII, true);
   auto itType = new MultiToggleItem(QStringList() << "Inteiro" << "Dinheiro" << "Quantidade" << "Porcentagem" << "Texto");
 
   blockSignals(true);

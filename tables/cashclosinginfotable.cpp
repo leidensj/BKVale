@@ -22,8 +22,8 @@ void CashClosingInfoTable::addRow()
   insertRow(rowCount());
   int row = rowCount() - 1;
 
-  auto itInfo = new TextItem(Text::Input::AlphanumericAndSpaces, true);
-  auto itType = new TextItem(Text::Input::AlphanumericAndSpaces, true);
+  auto itInfo = new TextItem(Text::Input::All, true);
+  auto itType = new TextItem(Text::Input::All, true);
   auto itValue = new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground2, false, false);
 
   blockSignals(true);
@@ -81,7 +81,7 @@ void CashClosingInfoTable::set(const QVector<CashClosingInfo>& v, bool bClear)
         break;
       case Data::Type::Text:
       default:
-        it = new TextItem(Text::Input::AlphanumericAndSpaces, true);
+        it = new TextItem(Text::Input::ASCII, true);
         break;
     }
 
@@ -95,6 +95,8 @@ void CashClosingInfoTable::set(const QVector<CashClosingInfo>& v, bool bClear)
     auto itt = getItem(row, (int)Column::Type);
     itt->setReadOnly(true);
     itt->setValue(v.at(i).m_itype);
-    getItem(row, (int)Column::Value)->setValue(v.at(i).m_value);
+    auto itv =getItem(row, (int)Column::Value);
+    if (itt->getValue().toInt() != (int)Data::Type::Text || !itv->getValue().toString().isEmpty())
+        itv->setValue(v.at(i).m_value);
   }
 }

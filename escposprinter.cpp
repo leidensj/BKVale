@@ -36,7 +36,10 @@ bool EscPosPrinter::connectToPrinter(QString& error)
   {
     m_tcpSocket = new QTcpSocket(this);
     m_tcpSocket->connectToHost(m_addressOrPath, m_port);
-    return m_tcpSocket->waitForConnected(2000);
+    bool ok = m_tcpSocket->waitForConnected(2000);
+    if (!ok)
+      error = tr("Erro de timeout ao conectar à impressora");
+    return ok;
   }
   else if (m_type == USB)
   {
@@ -45,8 +48,10 @@ bool EscPosPrinter::connectToPrinter(QString& error)
 #else
     m_usbFile = new QFile(m_addressOrPath, this); // ex: "/dev/usb/lp0"
 #endif
-    if (m_usbFile->open(QIODevice::WriteOnly))
-      return true;
+    bool ok = m_usbFile->open(QIODevice::WriteOnly);
+    if (!ok)
+      error = tr("Erro de timeout ao conectar à impressora");
+    return ok;
   }
 
   return false;
@@ -76,21 +81,29 @@ bool EscPosPrinter::isConnected() const
     return false;
 }
 
-bool EscPosPrinter::printRawData(const QByteArray &data)
+bool EscPosPrinter::printRawData(const QByteArray &data, QString& error)
 {
+    error.clear();
     if (!isConnected()) return false;
 
-    if (m_type == Network && m_tcpSocket) {
+    bool ok = true;
+    if (m_type == Network && m_tcpSocket)
+    {
         qint64 written = m_tcpSocket->write(data);
         m_tcpSocket->flush();
-        return written == data.size();
+        ok = written == data.size();
+        if (!ok)
+          error = tr("Erro ao imprimir. Endereço %1 | Porta %2").arg(m_addressOrPath, m_port);
     }
 
-    if (m_type == USB && m_usbFile) {
+    if (m_type == USB && m_usbFile)
+    {
         qint64 written = m_usbFile->write(data);
         m_usbFile->flush();
-        return written == data.size();
+        ok = written == data.size();
+        if (!ok)
+          error = tr("Erro ao imprimir. Porta %1").arg(m_addressOrPath);
     }
 
-    return false;
+    return ok;
 }

@@ -9,7 +9,7 @@ CashClosingSectorTable::CashClosingSectorTable(JAddRemoveButtons* btns, QWidget*
 {
   setColumnCount(3);
   QStringList headers;
-  headers << "Setor" << "Valor Financeiro" << "Valor Físico";
+  headers << "Setor" << "Valor" << "Quantidade";
   setHorizontalHeaderLabels(headers);
 
   horizontalHeader()->setSectionResizeMode((int)Column::Sector, QHeaderView::ResizeToContents);

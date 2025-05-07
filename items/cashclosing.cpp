@@ -164,54 +164,76 @@ QByteArray CashClosing::printVersion() const
   EscPos ep;
   ep.align(true);
   ep.doublefont(true);
-  ep.str(QString("Fechamento de Caixa\n%1\n%2\n%3\n").arg(m_cash.m_name, m_dt.toString("dd/MM/yyyy HH:mm:ss")));
+  ep.str(QString("Fechamento de Caixa\n%1\n%2\n").arg(m_cash.m_name, m_dt.toString("dd/MM/yyyy HH:mm:ss")));
   ep.doublefont(false);
+  ep.align(false);
+
+  ep.align(true);
+  ep.str("\n----------------------------------\n\n");
   ep.align(false);
   ep.expand(true);
   ep.str("Vendas\n\n");
   ep.expand(false);
-  for (auto s : m_vsectors)
+  for (const auto& s : m_vsectors)
   {
     ep.bold(true);
     ep.str(s.m_sname +":\n");
     ep.bold(false);
-    ep.str("   Financeiro: " + Data::strMoney(s.m_value) + "\n");
-    ep.str("   Fisico: " + Data::strMoney(s.m_nvalue) + "\n\n");
+    ep.str("   Valor:      " + Data::strMoney(s.m_value) + "\n");
+    ep.str("   Quantidade: " + Data::strInt(s.m_nvalue) + "\n");
   }
   ep.bold(true);
-  ep.str("Total:\n"
-         "   Financeiro: " + Data::strMoney(sumSectorsValue()) + "\n"
-         "   Fisico:     " + Data::strInt(sumSectorsNValue()) + "\n\n");
+  ep.str("TOTAL:\n"
+         "   Valor:      " + Data::strMoney(sumSectorsValue()) + "\n"
+         "   Quantidade: " + Data::strInt(sumSectorsNValue()) + "\n\n");
   ep.bold(false);
 
+  ep.align(true);
+  ep.str("----------------------------------\n\n");
+  ep.align(false);
   ep.expand(true);
   ep.str("Recebimentos\n\n");
   ep.expand(false);
-  for (auto c : m_vcoins)
+  for (const auto& c : m_vcoins)
   {
+    if (c.m_value == 0.0)
+      continue;
     ep.bold(true);
     ep.str(c.m_cname + ":\n");
     ep.bold(false);
-    ep.str("   Sem taxas:      " + Data::strMoney(c.m_value) + "\n" +
-           "   Com taxas:      " + Data::strMoney(c.valueWithTaxes()) + "\n" +
-           "   Total de taxas: " + Data::strMoney(c.taxesDifference()) + "\n");
+    ep.str("   Valor bruto:   " + Data::strMoney(c.m_value) + "\n");
+    if (c.taxesDifference() != 0)
+    ep.str("   Valor liquido: " + Data::strMoney(c.valueWithTaxes()) + "\n"
+           "   Taxas :        " + Data::strMoney(c.taxesDifference()) + "\n");
   }
   ep.bold(true);
-  ep.str("Total:\n"
-         "   Sem taxas:      " + Data::strMoney(sumCoinsValue()) + "\n" +
-         "   Com taxas:      " + Data::strMoney(sumCoinsWithTaxes()) + "\n" +
-         "   Total de taxas: " + Data::strMoney(sumCoinsTaxesDifference()) + "\n\n");
+  ep.str("TOTAL:\n"
+         "   Valor bruto:      " + Data::strMoney(sumCoinsValue()) + "\n");
+  if (sumCoinsTaxesDifference() != 0)
+  ep.str("   Valor liquido: " + Data::strMoney(sumCoinsWithTaxes()) + "\n"
+         "   Taxas:         " + Data::strMoney(sumCoinsTaxesDifference()) + "\n\n");
+
   ep.bold(false);
 
+  ep.align(true);
+  ep.str("----------------------------------\n\n");
+  ep.align(false);
   ep.expand(true);
-  ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n"
-         "Diferenca de caixa:\n" + Data::strMoney(diffTax()) + "\n\n");
+  ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n");
   ep.expand(false);
+  ep.str("Diferenca entre a vendas e os recebimentos (bruto). Respresenta o que faltou ou sobrou no caixa. Um valor proximo de zero indica que o caixa fechou\n\n");
+  ep.expand(true);
+  ep.str("Diferenca de caixa:\n" + Data::strMoney(diffTax()) + "\n");
+  ep.expand(false);
+  ep.str("Diferenca entre a venda e os recebimentos (liquido), que considera as taxas aplicadas. Representa a quebra de caixa + o valor pago em taxas\n\n");
+  ep.align(true);
+  ep.str("----------------------------------\n\n");
+  ep.align(false);
 
   ep.bold(true);
   ep.str("Informacoes:\n");
   ep.bold(false);
-  for (auto i : m_vinfos)
+  for (const auto& i : m_vinfos)
     ep.str(i.m_iname + ": " + i.strValue() + "\n");
 
   ep.str("\n\n\n");

@@ -23,7 +23,7 @@ public:
     void disconnectPrinter();
     bool isConnected() const;
 
-    bool printRawData(const QByteArray &data);
+    bool printRawData(const QByteArray &data, QString& error);
 
 private:
     PrinterType m_type;

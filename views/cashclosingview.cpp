@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QFormLayout>
+#include <QMessageBox>
 
 CashClosingView::CashClosingView(QWidget* parent)
   : JItemView(CASH_CLOSING_SQL_TABLE_NAME, parent)
@@ -83,13 +84,13 @@ CashClosingView::CashClosingView(QWidget* parent)
 
   auto results1 = new QFormLayout;
   results1->setAlignment(Qt::AlignTop);
-  results1->addRow(tr("Vendas (Financeiro):"),m_edSector1);
-  results1->addRow(tr("Recebimentos sem taxas:"),m_edCoin1);
+  results1->addRow(tr("Vendas (Valor):"),m_edSector1);
+  results1->addRow(tr("Recebimentos (Valor Bruto):"),m_edCoin1);
   results1->addRow(tr("Quebra de Caixa:"),m_edDiff1);
 
   auto results2 = new QFormLayout;
-  results2->addRow(tr("Vendas (Físico):"),m_edSector2);
-  results2->addRow(tr("Recebimentos com taxas:"),m_edCoin2);
+  results2->addRow(tr("Vendas (Quantidade):"),m_edSector2);
+  results2->addRow(tr("Recebimentos (Valor Líquido):"),m_edCoin2);
   results2->addRow(tr("Diferença de caixa:"),m_edDiff2);
 
   auto resulth = new QHBoxLayout;
@@ -149,6 +150,8 @@ void CashClosingView::setItem(const JItemSQL& o)
   m_cashPicker->clear();
   m_cashPicker->addItem(_o.m_cash);
   m_cashPicker->blockSignals(false);
+
+  m_sectorTable->setFocus();
   update();
 }
 
@@ -158,17 +161,34 @@ void CashClosingView::save()
   JItemView::save();
 }
 
-void CashClosingView::print()
+bool CashClosingView::print()
 {
   if (!m_btnPrint->isChecked())
-    return;
+    return true;
   CashClosing o;
   getItem(o);
-  JItemHelper::print(o, nullptr, this);
-  EscPosPrinter printer;
   QString error;
-  if (printer.connectToPrinter(error))
-    printer.printRawData(o.printVersion());
+  bool ok = false;
+  if (m_id.isValid())
+  {
+    o.m_id = m_id;
+    ok = o.SQL_select(error);
+  }
+  else
+    ok = o.m_cash.SQL_select(error);
+
+  if (ok)
+  {
+    EscPosPrinter printer;
+    ok = printer.connectToPrinter(error);
+    if (ok)
+      ok = printer.printRawData(o.printVersion(), error);
+  }
+
+  if (!ok)
+    QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
+
+  return ok;
 }
 
 void CashClosingView::cashChanged()
@@ -179,26 +199,26 @@ void CashClosingView::cashChanged()
   bool ok = o.m_cash.SQL_select(error);
   if (ok)
   {
-    for (int i = 0; i != o.m_cash.m_vsectors.size(); ++i)
+    for (const auto& _o : o.m_cash.m_vsectors)
     {
       CashClosingSector s;
-      s.m_sname = o.m_cash.m_vsectors.at(i).m_sector.m_name;
-      s.m_simage = o.m_cash.m_vsectors.at(i).m_sector.m_image;
+      s.m_sname = _o.m_sector.m_name;
+      s.m_simage = _o.m_sector.m_image;
       o.m_vsectors.push_back(s);
     }
-    for (int i = 0; i != o.m_cash.m_vcoins.size(); ++i)
+    for (const auto& _o : o.m_cash.m_vcoins)
     {
       CashClosingCoin c;
-      c.m_cname = o.m_cash.m_vcoins.at(i).m_coin.m_name;
-      c.m_ctax = o.m_cash.m_vcoins.at(i).m_coin.m_tax;
-      c.m_cimage = o.m_cash.m_vcoins.at(i).m_coin.m_image;
+      c.m_cname = _o.m_coin.m_name;
+      c.m_ctax = _o.m_coin.m_tax;
+      c.m_cimage = _o.m_coin.m_image;
       o.m_vcoins.push_back(c);
     }
-    for (int i = 0; i != o.m_cash.m_vinfos.size(); ++i)
+    for (const auto& _o : o.m_cash.m_vinfos)
     {
       CashClosingInfo nfo;
-      nfo.m_iname = o.m_cash.m_vinfos.at(i).m_name;
-      nfo.m_itype = (int)o.m_cash.m_vinfos.at(i).m_type;
+      nfo.m_iname = _o.m_name;
+      nfo.m_itype = (int)_o.m_type;
       o.m_vinfos.push_back(nfo);
     }
   }
@@ -208,6 +228,7 @@ void CashClosingView::cashChanged()
 
 void CashClosingView::update()
 {
+  m_btnSave->setEnabled(m_cashPicker->getFirstId().isValid());
   m_edSector1->setValue(m_sectorTable->sum((int)CashClosingSectorTable::Column::Value));
   m_edSector2->setValue(m_sectorTable->sum((int)CashClosingSectorTable::Column::NValue));
   m_edCoin1->setValue(m_coinTable->sum((int)CashClosingCoinTable::Column::Value));

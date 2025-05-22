@@ -1,6 +1,8 @@
 #include "coupon.h"
 #include <QSqlRecord>
 #include <QRandomGenerator>
+#include "escpos.h"
+#include <QHostInfo>
 
 Coupon::Coupon(Id id)
 {
@@ -14,7 +16,7 @@ void Coupon::clear(bool bClearId)
     m_id.clear();
   m_type = Type::Percentage;
   m_code.clear();
-  m_dtCreation = DateTime::server();;
+  m_dtCreation = DateTime::server();
   m_bRedeemed = false;
   m_dtRedeemed = m_dtCreation;
   m_bExpires = false;
@@ -306,4 +308,96 @@ bool Coupon::SQL_redeem(QString& error)
     }
   }
   return SQL_finish(db, query, ok, error);
+}
+
+namespace
+{
+void couponContent(EscPos& ep, const Coupon& o)
+{
+  switch (o.m_type)
+  {
+    case Coupon::Type::Value:
+    case Coupon::Type::Percentage:
+      ep.align(true);
+      ep.doublefont(true);
+      ep.str(o.strCoupon());
+      ep.doublefont(false);
+      ep.align();
+      ep.str("\n\n\n");
+      break;
+    case Coupon::Type::Product:
+      ep.align(true);
+      ep.expand(true);
+      ep.str(o.strCoupon());
+      ep.expand(false);
+      ep.align();
+      ep.str("\n\n\n");
+      break;
+    default:
+      break;
+  }
+}
+}
+
+QByteArray Coupon::printVersion(const QVariant& arg) const
+{
+  EscPos ep;
+  if (m_store.m_id.isValid())
+  {
+    ep.align(true);
+    ep.expand(true);
+    ep.str(m_store.m_form.m_alias + "\n");
+    ep.expand(false);
+    ep.str(m_store.m_form.m_name + "\n");
+    if (!m_store.m_form.m_vAddress.isEmpty())
+      ep.str(m_store.m_form.m_vAddress.at(0).name() + "\n");
+    if (!m_store.m_form.m_vPhone.isEmpty())
+      ep.str(m_store.m_form.m_vPhone.at(0).name() + "\n");
+    ep.str("\n");
+  }
+
+  if (!m_bRedeemed)
+  {
+    ep.expand(true);
+    ep.str("CUPOM DE DESCONTO\n\n");
+    ep.expand(false);
+    ep.align();
+    ep.str("Utilize o codigo abaixo para ativar o desconto:\n\n");
+    ep.align(true);
+    ep.doublefont(true);
+    ep.str(m_code + "\n\n");
+    ep.doublefont(false);
+    if (arg.toBool())
+    {
+      ep.str("Esse codigo vale:\n");
+      couponContent(ep, *this);
+    }
+    ep.align();
+    ep.str("Emissao: " + m_dtCreation.toString("dd/MM/yyyy hh:mm:ss") +
+           " @ " + QHostInfo::localHostName().toUpper() + "\n");
+
+    if (m_bExpires)
+    {
+      ep.str("Codigo valido ate o dia ");
+      ep.expand(true);
+      ep.str(m_dtExpiration.toString("dd/MM/yyyy"));
+      ep.expand(false);
+    }
+
+  }
+  else
+  {
+    ep.align(true);
+    ep.expand(true);
+    ep.str("CUPOM DE DESCONTO\n" + m_code + "\n\n\n");
+    ep.expand(false);
+    ep.align();
+    ep.str("Parabens! Voce ganhou um desconto de:\n\n");
+    couponContent(ep, *this);
+    ep.str("Resgate: " + m_dtRedeemed.toString("dd/MM/yyyy hh:mm:ss") +
+           " @ " + QHostInfo::localHostName().toUpper() + "\n");
+  }
+  ep.str("\n\n\n");
+  ep.cut(true);
+  return ep.m_ba;
 }

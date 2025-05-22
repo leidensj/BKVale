@@ -34,6 +34,7 @@ struct Coupon : public JItemSQL
   QString strCoupon() const;
 
   static QString st_newCode();
+  QByteArray printVersion(const QVariant& arg) const;
 
   Type m_type;
   QString m_code;

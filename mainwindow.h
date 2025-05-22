@@ -95,6 +95,7 @@ private slots:
   void activateWindow();
   void openTimeCardDialog();
   void openTimeCardControlDialog();
+  void openCalculator();
   void about();
 };
 

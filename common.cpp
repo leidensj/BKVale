@@ -193,5 +193,5 @@ QDateTime DateTime::server()
   query.prepare("SELECT NOW()");
   if (query.exec() && query.next())
     dt = query.value(0).toDateTime();
-  return dt;
+  return dt.toLocalTime();
 }

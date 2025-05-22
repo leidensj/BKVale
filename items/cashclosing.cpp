@@ -130,7 +130,7 @@ bool CashClosing::SQL_select_proc(QSqlQuery& query, QString& error)
     if (query.next())
     {
       m_cash.m_id.set(query.value(0).toLongLong());
-      m_dt = query.value(1).toDateTime();
+      m_dt = query.value(1).toDateTime().toLocalTime();
     }
     else
     {
@@ -199,19 +199,19 @@ QByteArray CashClosing::printVersion() const
     if (c.m_value == 0.0)
       continue;
     ep.bold(true);
-    ep.str(c.m_cname + ":\n");
+    ep.str(c.m_cname + (c.m_ctax == 0.0 ? ":\n" : (": (" + Data::strPercentage(c.m_ctax) + ")\n")));
     ep.bold(false);
     ep.str("   Valor bruto:   " + Data::strMoney(c.m_value) + "\n");
     if (c.taxesDifference() != 0)
     ep.str("   Valor liquido: " + Data::strMoney(c.valueWithTaxes()) + "\n"
-           "   Taxas :        " + Data::strMoney(c.taxesDifference()) + "\n");
+           "   Taxas:         " + Data::strMoney(c.taxesDifference()) + "\n");
   }
   ep.bold(true);
   ep.str("TOTAL:\n"
          "   Valor bruto:      " + Data::strMoney(sumCoinsValue()) + "\n");
   if (sumCoinsTaxesDifference() != 0)
-  ep.str("   Valor liquido: " + Data::strMoney(sumCoinsWithTaxes()) + "\n"
-         "   Taxas:         " + Data::strMoney(sumCoinsTaxesDifference()) + "\n\n");
+  ep.str("   Valor liquido:    " + Data::strMoney(sumCoinsWithTaxes()) + "\n"
+         "   Taxas:            " + Data::strMoney(sumCoinsTaxesDifference()) + "\n\n");
 
   ep.bold(false);
 
@@ -221,11 +221,11 @@ QByteArray CashClosing::printVersion() const
   ep.expand(true);
   ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n");
   ep.expand(false);
-  ep.str("Diferenca entre a vendas e os recebimentos (bruto). Respresenta o que faltou ou sobrou no caixa. Um valor proximo de zero indica que o caixa fechou\n\n");
+  ep.str("Diferenca entre vendas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa. Um valor proximo de zero indica que o caixa fechou\n\n");
   ep.expand(true);
   ep.str("Diferenca de caixa:\n" + Data::strMoney(diffTax()) + "\n");
   ep.expand(false);
-  ep.str("Diferenca entre a venda e os recebimentos (liquido), que considera as taxas aplicadas. Representa a quebra de caixa + o valor pago em taxas\n\n");
+  ep.str("Diferenca entre venda e recebimentos (liquido). Representa a quebra de caixa + o valor pago em taxas\n\n");
   ep.align(true);
   ep.str("----------------------------------\n\n");
   ep.align(false);
@@ -237,7 +237,7 @@ QByteArray CashClosing::printVersion() const
     ep.str(i.m_iname + ": " + i.strValue() + "\n");
 
   ep.str("\n\n\n");
-  ep.cut();
+  ep.cut(true);
   return ep.m_ba;
 }
 

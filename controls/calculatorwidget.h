@@ -6,7 +6,6 @@
 
 class QLineEdit;
 class QPlainTextEdit;
-class QRadioButton;
 
 class CalculatorWidget : public QFrame
 {
@@ -19,12 +18,12 @@ private slots:
   void buttonClicked();
   void clear();
   void reset();
-  void print(double value, int button);
+  void display(double value, int button);
 
 private:
   QPushButton* m_btnPrint;
-  QRadioButton* m_rdoAlignLeft;
-  QRadioButton* m_rdoAlignCenter;
+  QPushButton* m_btnAlignCenter;
+  QPushButton* m_btnFontSize;
   QPushButton* m_btn0;
   QPushButton* m_btn1;
   QPushButton* m_btn2;
@@ -50,7 +49,6 @@ private:
   double m_lastValue;
   int m_lastButton;
   double calculate(double op1, double op2, int button);
-  QString buildPrintContent(double value, int button);
 };
 
 #endif // CALCULATORWIDGET_H

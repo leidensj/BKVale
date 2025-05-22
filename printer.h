@@ -8,7 +8,6 @@
 #include "items/reminder.h"
 #include "items/shoppinglist.h"
 #include "items/coupon.h"
-#include "items/cashclosing.h"
 
 class Printer
 {
@@ -18,7 +17,6 @@ public:
   bool print(const Reminder& o, QString& error);
   bool print(const ShoppingList& o, bool bPrintCount, QString& error);
   bool print(const Coupon& o, bool bPrintContent, QString& error);
-  bool print(const CashClosing& o, QString& error);
   static QString st_strFullCut();
 
 private:

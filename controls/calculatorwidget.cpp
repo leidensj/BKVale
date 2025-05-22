@@ -4,12 +4,12 @@
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QScrollBar>
-#include <QRadioButton>
 #include <QSplitter>
 #include <QMessageBox>
 #include <QAction>
+#include <QRegularExpression>
 #include "escpos.h"
-#include "printer.h"
+#include "escposprinter.h"
 
 #define KEY_CODE "KEY_CODE"
 
@@ -314,28 +314,31 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_edDisplay->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
 
   m_btnPrint = new QPushButton;
-  m_btnPrint->setText("");
   m_btnPrint->setIconSize(QSize(24, 24));
   m_btnPrint->setIcon(QIcon(":/icons/res/calcprint.png"));
   m_btnPrint->setCheckable(true);
   m_btnPrint->setFlat(true);
   m_btnPrint->setChecked(true);
+  m_btnPrint->setToolTip(tr("Imprimir ao finalizar"));
 
-  m_rdoAlignLeft = new QRadioButton;
-  m_rdoAlignLeft->setText("");
-  m_rdoAlignLeft->setIconSize(QSize(24, 24));
-  m_rdoAlignLeft->setIcon(QIcon(":/icons/res/calcalignleft.png"));
-  m_rdoAlignLeft->setChecked(true);
+  m_btnAlignCenter = new QPushButton;
+  m_btnAlignCenter->setIconSize(QSize(24, 24));
+  m_btnAlignCenter->setIcon(QIcon(":/icons/res/calcaligncenter.png"));
+  m_btnAlignCenter->setCheckable(true);
+  m_btnAlignCenter->setFlat(true);
+  m_btnAlignCenter->setToolTip(tr("Alinhar impressão no centro"));
 
-  m_rdoAlignCenter = new QRadioButton;
-  m_rdoAlignCenter->setText("");
-  m_rdoAlignCenter->setIconSize(QSize(24, 24));
-  m_rdoAlignCenter->setIcon(QIcon(":/icons/res/calcaligncenter.png"));
+  m_btnFontSize = new QPushButton;
+  m_btnFontSize->setIconSize(QSize(24, 24));
+  m_btnFontSize->setIcon(QIcon(":/icons/res/text.png"));
+  m_btnFontSize->setCheckable(true);
+  m_btnFontSize->setFlat(true);
+  m_btnFontSize->setToolTip(tr("Aumentar o tamanho da fonte de impressão"));
 
   QHBoxLayout* hlineCmd = new QHBoxLayout;
   hlineCmd->addWidget(m_btnPrint);
-  hlineCmd->addWidget(m_rdoAlignLeft);
-  hlineCmd->addWidget(m_rdoAlignCenter);
+  hlineCmd->addWidget(m_btnAlignCenter);
+  hlineCmd->addWidget(m_btnFontSize);
   hlineCmd->setAlignment(Qt::AlignLeft);
   hlineCmd->setContentsMargins(0, 0, 0, 0);
 
@@ -351,6 +354,9 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
 
   m_view = new QPlainTextEdit;
   m_view->setReadOnly(true);
+  f = m_view->font();
+  f.setPointSize(18);
+  m_view->setFont(f);
 
   QHBoxLayout* hlayout = new QHBoxLayout;
   hlayout->addLayout(vlayoutl);
@@ -402,24 +408,11 @@ double CalculatorWidget::calculate(double op1, double op2, int button)
   }
 }
 
-void CalculatorWidget::print(double value, int button)
+void CalculatorWidget::display(double value, int button)
 {
-  QString text = buildPrintContent(value, button);
+  QString text = Calculator::toStr(button) + " " + QString::number(value, 'f').remove(QRegularExpression("\\.?0*$"));
   m_view->appendPlainText(text);
   m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
-  if (m_btnPrint->isChecked())
-  {
-    QString text2 = m_rdoAlignLeft->isChecked() ? ESC_ALIGN_LEFT : ESC_ALIGN_CENTER;
-    text2 += ESC_EXPAND_ON + text + ESC_LF ESC_EXPAND_OFF;
-    Printer printer;
-    QString error;
-    printer.print(text2, error);
-  }
-}
-
-QString CalculatorWidget::buildPrintContent(double value, int button)
-{
-  return Calculator::toStr(button) + " " + QString::number(value, 'f').remove(QRegularExpression("\\.?0*$"));
 }
 
 void CalculatorWidget::buttonClicked()
@@ -432,13 +425,13 @@ void CalculatorWidget::buttonClicked()
                    !Calculator::isEqual(m_lastButton)
                    ? currentValue : m_lastValue;
     m_total = calculate(m_total, value, button);
-    print(value, button);
+    display(value, button);
     m_edDisplay->setText(QString::number(m_total, 'f').remove(QRegularExpression("\\.?0*$")));
     m_lastValue = value;
   }
   else if (Calculator::isEqual(button))
   {
-    print(m_total, button);
+    display(m_total, button);
     m_edDisplay->setText(QString::number(m_total, 'f').
                          remove(QRegularExpression("\\.?0*$")));
   }
@@ -472,14 +465,24 @@ void CalculatorWidget::clear()
 
 void CalculatorWidget::reset()
 {
+  if (m_btnPrint->isChecked() && m_view->toPlainText() != "0")
+  {
+    EscPos ep;
+    ep.align(m_btnAlignCenter->isChecked());
+    if (m_btnFontSize->isChecked())
+      ep.doublefont(true);
+    else
+      ep.expand(true);
+    ep.str(m_view->toPlainText() + "\n\n\n");
+    ep.cut();
+    QString error;
+    EscPosPrinter printer;
+    bool ok = printer.connectToPrinter(error);
+    if (ok)
+      ok = printer.printRawData(ep.m_ba, error);
+  }
   m_edDisplay->setText("0");
   m_view->setPlainText("0");
   m_lastValue = 0.0;
   m_total = 0.0;
-  if (m_btnPrint->isChecked())
-  {
-    QString error;
-    Printer printer;
-    printer.print(Printer::st_strFullCut(), error);
-  }
 }

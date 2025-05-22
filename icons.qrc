@@ -190,5 +190,6 @@
         <file>res/sector.png</file>
         <file>res/coin.png</file>
         <file>res/calminweek.png</file>
+        <file>res/postit2.png</file>
     </qresource>
 </RCC>

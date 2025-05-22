@@ -15,6 +15,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
   aboutdialog.cpp \
+  controls/calculator.cpp \
+  controls/calculatorbutton.cpp \
   controls/calculatorwidget.cpp \
   controls/changepassword.cpp \
   controls/couponredeemer.cpp \
@@ -25,6 +27,7 @@ SOURCES += main.cpp\
   controls/imageviewer.cpp \
   controls/logindialog.cpp \
   controls/pincodedialog.cpp \
+  controls/postitdialog.cpp \
   controls/report.cpp \
   controls/shopwidget.cpp \
   controls/timecardcontroldialog.cpp \
@@ -160,6 +163,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     aboutdialog.h \
+    controls/calculator.h \
+    controls/calculatorbutton.h \
     controls/calculatorwidget.h \
     controls/changepassword.h \
     controls/couponredeemer.h \
@@ -170,6 +175,7 @@ HEADERS  += mainwindow.h \
     controls/imageviewer.h \
     controls/logindialog.h \
     controls/pincodedialog.h \
+    controls/postitdialog.h \
     controls/report.h \
     controls/shopwidget.h \
     controls/timecardcontroldialog.h \

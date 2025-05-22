@@ -6,6 +6,7 @@
 #include "items/jitemhelper.h"
 #include "tables/coupontable.h"
 #include "filters/couponfilter.h"
+#include "escposprinter.h"
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
@@ -223,8 +224,20 @@ void CouponView::save()
     if (dlg.exec())
     {
       QVariant bPrintContent (dlg.printContent());
-      for (int i = 0; i != coupons.size(); ++i)
-        JItemHelper::print(coupons.at(i), &bPrintContent, this);
+      EscPosPrinter printer;
+      QString error;
+      ok = printer.connectToPrinter(error);
+      if (ok)
+      {
+        for (int i = 0; i != coupons.size(); ++i)
+        {
+          ok = printer.printRawData(coupons.at(i).printVersion(bPrintContent), error);
+          if (!ok)
+            QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
+        }
+      }
+      else
+        QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
     }
   }
 }
@@ -271,6 +284,7 @@ void CouponView::print()
   o.m_id = m_viewer->getFirstSelectedId();
   if (o.m_id.isValid())
   {
+    bool ok = true;
     QString error;
     if (o.SQL_select(error))
     {
@@ -280,9 +294,13 @@ void CouponView::print()
       {
         int ret = QMessageBox::question(this, tr("Cupom"), tr("Deseja imprimir o conteúdo do cupom?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         QVariant bPrintContent(ret == QMessageBox::Yes);
-        JItemHelper::print(o, &bPrintContent, this);
-      }
-
+        EscPosPrinter printer;
+        ok = printer.connectToPrinter(error);
+        if (ok)
+          ok = printer.printRawData(o.printVersion(bPrintContent), error);
+       }
     }
+    if (!ok)
+          QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
   }
 }

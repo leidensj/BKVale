@@ -28,6 +28,7 @@
 #include "controls/timecarddialog.h"
 #include "controls/timecardcontroldialog.h"
 #include "controls/couponredeemer.h"
+#include "controls/calculator.h"
 
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
@@ -198,6 +199,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCoins, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCash, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCashClosing, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionCalculator2, SIGNAL(triggered(bool)), this, SLOT(openCalculator()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));
@@ -394,6 +396,20 @@ void Baita::openTimeCardDialog()
 void Baita::openTimeCardControlDialog()
 {
   TimeCardControlDialog dlg(this);
+  dlg.exec();
+}
+
+void Baita::openCalculator()
+{
+  Calculator* calc = new Calculator;
+  QDialog dlg(this);
+  QHBoxLayout *l = new QHBoxLayout;
+  dlg.setLayout(l);
+  l->addWidget(calc);
+  dlg.setWindowFlags(Qt::Window);
+  dlg.setWindowTitle(tr("Calculadora"));
+  dlg.setWindowIcon(QIcon(":/icons/res/calculator.png"));
+  dlg.setModal(true);
   dlg.exec();
 }
 

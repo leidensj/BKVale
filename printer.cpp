@@ -129,7 +129,7 @@ namespace
       text += ESC_EXPAND_OFF ESC_LF;
     }
 
-    QDateTime dt = DateTime::server();
+    QDateTime dt = DateTime::server().toLocalTime();
 
     if (!o.m_observation.isEmpty())
       text += ESC_LF ESC_EXPAND_ON "Observacoes: " ESC_EXPAND_OFF + o.m_observation + ESC_LF;
@@ -618,19 +618,5 @@ bool Printer::print(const Coupon& o, bool bPrintContent, QString& error)
          ESC_VERT_TAB
          ESC_FULL_CUT;
 
-  return print(str, error);
-}
-
-bool Printer::print(const CashClosing& o, QString& error)
-{
-  QString str;
-  str += ESC_INIT ESC_ALIGN_CENTER
-         ESC_EXPAND_ON
-         "FECHAMENTO DE CAIXA"
-         ESC_LF;
-  str += o.m_dt.toString("yyyy/mm/dd HH:mm:ss") +
-         ESC_LF
-         ESC_VERT_TAB
-         ESC_PARTIAL_CUT;
   return print(str, error);
 }

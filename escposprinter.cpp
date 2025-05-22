@@ -84,7 +84,8 @@ bool EscPosPrinter::isConnected() const
 bool EscPosPrinter::printRawData(const QByteArray &data, QString& error)
 {
     error.clear();
-    if (!isConnected()) return false;
+    if (!isConnected())
+      return false;
 
     bool ok = true;
     if (m_type == Network && m_tcpSocket)
@@ -95,8 +96,7 @@ bool EscPosPrinter::printRawData(const QByteArray &data, QString& error)
         if (!ok)
           error = tr("Erro ao imprimir. Endereço %1 | Porta %2").arg(m_addressOrPath, m_port);
     }
-
-    if (m_type == USB && m_usbFile)
+    else if (m_type == USB && m_usbFile)
     {
         qint64 written = m_usbFile->write(data);
         m_usbFile->flush();

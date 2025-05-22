@@ -184,6 +184,11 @@ DatabaseViewer::~DatabaseViewer()
 
 }
 
+void DatabaseViewer::setSortRole(int role)
+{
+  m_proxyModel->setSortRole(role);
+}
+
 Id DatabaseViewer::getFirstSelectedId() const
 {
   QModelIndexList lst = m_table->selectionModel()->selectedRows();

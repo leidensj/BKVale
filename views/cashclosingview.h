@@ -28,9 +28,12 @@ private slots:
   void cashChanged();
   void update();
   bool print();
+  void showCalculator();
+  void showPostit();
 
 private:
   DatabasePicker* m_cashPicker;
+  JLineEdit* m_dt;
   CashClosingCoinTable* m_coinTable;
   CashClosingSectorTable* m_sectorTable;
   CashClosingInfoTable* m_infoTable;
@@ -40,6 +43,8 @@ private:
   JExpLineEdit* m_edCoin2;
   JExpLineEdit* m_edDiff1;
   JExpLineEdit* m_edDiff2;
+  QPushButton* m_btnCalc;
+  QPushButton* m_btnPostit;
 };
 
 #endif // CASHCLOSINGVIEW_H

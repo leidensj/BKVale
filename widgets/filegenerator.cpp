@@ -62,9 +62,12 @@ void PdfGenerator::work()
   printer.setOutputFormat(QPrinter::PdfFormat);
   printer.setPageSize(QPageSize::A4);
   printer.setOutputFileName(m_fileName);
+  QSizeF rect;
+  rect.setWidth(printer.width()*1.1);
+  rect.setHeight(printer.height()*1.1);
   if (!(m_flags & 0x2))
-    doc.setPageSize(printer.pageRect(QPrinter::Millimeter).size()); // This is necessary if you want to hide the page number
-  printer.setPageMargins(QMarginsF(0, 0, 0, 0));
+    doc.setPageSize(rect); // This is necessary if you want to hide the page number
+  printer.setPageMargins(QMarginsF(10, 10, 10, 10));
   doc.print(&printer);
   if (m_flags & 0x1)
     QDesktopServices::openUrl(QUrl(m_fileName, QUrl::TolerantMode));

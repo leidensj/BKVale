@@ -5,6 +5,8 @@
 #include "tables/cashclosingcointable.h"
 #include "tables/cashclosingsectortable.h"
 #include "tables/cashclosinginfotable.h"
+#include "controls/calculatorwidget.h"
+#include "controls/postitdialog.h"
 #include "escposprinter.h"
 #include <QLabel>
 #include <QLayout>
@@ -14,6 +16,7 @@
 CashClosingView::CashClosingView(QWidget* parent)
   : JItemView(CASH_CLOSING_SQL_TABLE_NAME, parent)
   , m_cashPicker(nullptr)
+  , m_dt(nullptr)
   , m_coinTable(nullptr)
   , m_sectorTable(nullptr)
   , m_infoTable(nullptr)
@@ -23,9 +26,16 @@ CashClosingView::CashClosingView(QWidget* parent)
   , m_edCoin2(nullptr)
   , m_edDiff1(nullptr)
   , m_edDiff2(nullptr)
+  , m_btnCalc(nullptr)
+  , m_btnPostit(nullptr)
 {
+  m_viewer->setSortRole(Qt::EditRole);
   m_cashPicker = new DatabasePicker(CASH_SQL_TABLE_NAME);
   m_cashPicker->setPlaceholderText(true);
+  m_dt = new JLineEdit(Text::Input::All, false);
+  m_dt->setReadOnly(true);
+  m_dt->setPlaceholderText(tr("Horário"));
+  m_dt->hide();
   m_coinTable = new CashClosingCoinTable;
   m_sectorTable = new CashClosingSectorTable;
   m_infoTable = new CashClosingInfoTable;
@@ -49,6 +59,14 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edDiff2->setInvertColors(true);
   m_edDiff1->setToolTip(tr("Valor próximo de 0 indica que o caixa fechou."));
   m_edDiff2->setToolTip(tr("Diferença entre vendas e recebimentos, contando a quebra de caixa e a diferença das taxas."));
+  m_btnCalc = new QPushButton(QIcon(":/icons/res/calculator.png"), "");
+  m_btnCalc->setFlat(true);
+  m_btnCalc->setIconSize(QSize(24, 24));
+  m_ltButton->addWidget(m_btnCalc);
+  m_btnPostit = new QPushButton(QIcon(":/icons/res/postit2.png"), "");
+  m_btnPostit->setFlat(true);
+  m_btnPostit->setIconSize(QSize(24, 24));
+  m_ltButton->addWidget(m_btnPostit);
 
   QLabel* cash = new QLabel(tr("Caixa"));
   QLabel* sector = new QLabel(tr("Vendas"));
@@ -108,6 +126,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   auto lmain = new QVBoxLayout;
   lmain->addWidget(cash);
   lmain->addWidget(m_cashPicker);
+  lmain->addWidget(m_dt);
   lmain->addLayout(ltables1);
   lmain->addLayout(ltables2);
 
@@ -121,6 +140,8 @@ CashClosingView::CashClosingView(QWidget* parent)
   connect(m_cashPicker, SIGNAL(changedSignal()), this, SLOT(cashChanged()));
   connect(m_sectorTable, SIGNAL(changedSignal(int, int)), this, SLOT(update()));
   connect(m_coinTable, SIGNAL(changedSignal(int, int)), this, SLOT(update()));
+  connect(m_btnCalc, SIGNAL(clicked(bool)), this, SLOT(showCalculator()));
+  connect(m_btnPostit, SIGNAL(clicked(bool)), this, SLOT(showPostit()));
 
   setFocusWidgetOnClear(m_cashPicker);
   m_viewer->refresh();
@@ -132,7 +153,8 @@ void CashClosingView::getItem(JItemSQL& o) const
   CashClosing& _o = dynamic_cast<CashClosing&>(o);
   _o.clear(true);
   _o.m_id = m_id;
-  _o.m_cash.m_id= m_cashPicker->getFirstId();
+  _o.m_cash.m_id = m_cashPicker->getFirstId();
+  _o.m_dt = QDateTime::fromString(m_dt->text(), "dd/MM/yyyy hh:mm:ss");
   m_coinTable->get(_o.m_vcoins);
   m_sectorTable->get(_o.m_vsectors);
   m_infoTable->get(_o.m_vinfos);
@@ -144,6 +166,8 @@ void CashClosingView::setItem(const JItemSQL& o)
   m_sectorTable->set(_o.m_vsectors);
   m_coinTable->set(_o.m_vcoins);
   m_infoTable->set(_o.m_vinfos);
+  m_dt->setText(_o.m_dt.toString("dd/MM/yyyy hh:mm:ss"));
+  m_dt->setVisible(_o.m_id.isValid());
 
   m_cashPicker->blockSignals(true);
   m_cashPicker->setEnabled(!_o.m_id.isValid());
@@ -235,4 +259,24 @@ void CashClosingView::update()
   m_edCoin2->setValue(m_coinTable->sumWithTaxes());
   m_edDiff1->setValue(m_edCoin1->value() - m_edSector1->value());
   m_edDiff2->setValue(m_edCoin2->value() - m_edSector1->value());
+}
+
+void CashClosingView::showCalculator()
+{
+  auto calc = new CalculatorWidget;
+  QDialog dlg(this);
+  QHBoxLayout *l = new QHBoxLayout;
+  dlg.setLayout(l);
+  l->addWidget(calc);
+  dlg.setWindowFlags(Qt::Dialog);
+  dlg.setWindowTitle(tr("Calculadora"));
+  dlg.setWindowIcon(QIcon(":/icons/res/calculator.png"));
+  dlg.setModal(true);
+  dlg.exec();
+}
+
+void CashClosingView::showPostit()
+{
+  PostItDialog postit;
+  postit.exec();
 }

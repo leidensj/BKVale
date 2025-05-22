@@ -130,9 +130,9 @@
      <string>Ferramentas</string>
     </property>
     <addaction name="actionTimeCard"/>
-    <addaction name="actionTimeCardControl"/>
     <addaction name="actionRedeem"/>
     <addaction name="actionCashClosing"/>
+    <addaction name="actionCalculator2"/>
    </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
@@ -425,15 +425,6 @@
     <string>Estoque</string>
    </property>
   </action>
-  <action name="actionTimeCardControl">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/pen.png</normaloff>:/icons/res/pen.png</iconset>
-   </property>
-   <property name="text">
-    <string>Gerenciar Livro Ponto</string>
-   </property>
-  </action>
   <action name="actionSectors">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -477,6 +468,18 @@
    </property>
    <property name="text">
     <string>Fechamento de Caixa</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCalculator2">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/calculator.png</normaloff>:/icons/res/calculator.png</iconset>
+   </property>
+   <property name="text">
+    <string>Calculadora</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

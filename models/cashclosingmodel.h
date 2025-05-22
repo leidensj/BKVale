@@ -8,9 +8,14 @@ class CashClosingModel : public JModel
   enum class Column
   {
     Id,
-    Cash,
     Date,
-    Sales
+    Cash,
+    Sales,
+    Gross,
+    Net,
+    Tax,
+    Discrepancy,
+    Difference
   };
 public:
   CashClosingModel(QObject *parent);

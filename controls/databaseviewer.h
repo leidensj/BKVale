@@ -61,6 +61,7 @@ public slots:
   void setDynamicFilter(const QString& dynamicFilter);
   void clearSearch();
   void toCSV();
+  void setSortRole(int role = Qt::DisplayRole);
 
 private:
   QPushButton* m_btnOpen;

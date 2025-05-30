@@ -20,15 +20,13 @@
 #include "views/cashclosingview.h"
 
 #include "controls/report.h"
-#include "controls/calculatorwidget.h"
+#include "controls/calculatordialog.h"
 #include "controls/shopwidget.h"
 #include "controls/pincodedialog.h"
 #include "controls/logindialog.h"
 #include "controls/databaseviewer.h"
 #include "controls/timecarddialog.h"
-#include "controls/timecardcontroldialog.h"
 #include "controls/couponredeemer.h"
-#include "controls/calculator.h"
 
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
@@ -68,7 +66,6 @@ Baita::Baita(QWidget *parent)
   , m_report(nullptr)
   , m_reminder(nullptr)
   , m_consumption(nullptr)
-  , m_calculator(nullptr)
   , m_shop(nullptr)
   , m_inventory(nullptr)
   , m_statusDatabasePath(nullptr)
@@ -76,7 +73,6 @@ Baita::Baita(QWidget *parent)
   , m_purchaseWindow(nullptr)
   , m_reportWindow(nullptr)
   , m_reminderWindow(nullptr)
-  , m_calculatorWindow(nullptr)
   , m_shopWindow(nullptr)
   , m_inventoryWindow(nullptr)
   , m_redeemer(nullptr)
@@ -89,7 +85,6 @@ Baita::Baita(QWidget *parent)
   m_purchase = new PurchaseView;
   m_report = new Report;
   m_reminder = new ReminderView;
-  m_calculator = new CalculatorWidget;
   m_shop = new ShopWidget;
   m_inventory = new InventoryView;
 
@@ -108,11 +103,6 @@ Baita::Baita(QWidget *parent)
   m_reminderWindow->setWindowIcon(ui->actionReminders->icon());
   m_reminderWindow->setWidget(m_reminder);
   m_mdi->addSubWindow(m_reminderWindow);
-  m_calculatorWindow = new JMdiSubWindow(this);
-  m_calculatorWindow->setWindowTitle(ui->actionCalculator->text());
-  m_calculatorWindow->setWindowIcon(ui->actionCalculator->icon());
-  m_calculatorWindow->setWidget(m_calculator);
-  m_mdi->addSubWindow(m_calculatorWindow);
   m_shopWindow = new JMdiSubWindow(this);
   m_shopWindow->setWindowTitle(ui->actionShoppingList->text());
   m_shopWindow->setWindowIcon(ui->actionShoppingList->icon());
@@ -158,7 +148,6 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Supplier] = ui->actionSuppliers;
   m_actions[Functionality::Idx::Store] = ui->actionStores;
   m_actions[Functionality::Idx::TimeCard] = ui->actionTimeCard;
-  m_actions[Functionality::Idx::TimeCardControl] = ui->actionTimeCardControl;
   m_actions[Functionality::Idx::Coupon] = ui->actionCoupons;
   m_actions[Functionality::Idx::Shop] = ui->actionShoppingList;
   m_actions[Functionality::Idx::Calculator] = ui->actionCalculator;
@@ -179,11 +168,9 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionPurchases, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReports, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionReminders, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
-  connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionShoppingList, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionInventory, SIGNAL(triggered(bool)), this, SLOT(activateWindow()));
   connect(ui->actionTimeCard, SIGNAL(triggered(bool)), this, SLOT(openTimeCardDialog()));
-  connect(ui->actionTimeCardControl, SIGNAL(triggered(bool)), this, SLOT(openTimeCardControlDialog()));
   connect(ui->actionRedeem, SIGNAL(triggered(bool)), m_redeemer, SLOT(exec()));
 
   connect(ui->actionEmployees, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
@@ -199,7 +186,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCoins, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCash, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCashClosing, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
-  connect(ui->actionCalculator2, SIGNAL(triggered(bool)), this, SLOT(openCalculator()));
+  connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(openCalculatorDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));
@@ -225,8 +212,6 @@ Functionality::Idx Baita::getCurrentFunctionality() const
     return Functionality::Idx::Report;
   else if (activeWindow == m_reminderWindow)
     return Functionality::Idx::Reminder;
-  else if (activeWindow == m_calculatorWindow)
-    return Functionality::Idx::Calculator;
   else if (activeWindow == m_shopWindow)
     return Functionality::Idx::Shop;
   else if (activeWindow == m_inventoryWindow)
@@ -351,7 +336,6 @@ void Baita::activateWindow()
   m_purchaseWindow->hide();
   m_reportWindow->hide();
   m_reminderWindow->hide();
-  m_calculatorWindow->hide();
   m_shopWindow->hide();
   m_inventoryWindow->hide();
   if (sender() == ui->actionPurchases)
@@ -368,11 +352,6 @@ void Baita::activateWindow()
   {
     m_reminderWindow->showMaximized();
     m_mdi->setActiveSubWindow(m_reminderWindow);
-  }
-  else if (sender() == ui->actionCalculator)
-  {
-    m_calculatorWindow->showMaximized();
-    m_mdi->setActiveSubWindow(m_calculatorWindow);
   }
   else if (sender() == ui->actionShoppingList)
   {
@@ -393,23 +372,9 @@ void Baita::openTimeCardDialog()
   dlg.exec();
 }
 
-void Baita::openTimeCardControlDialog()
+void Baita::openCalculatorDialog()
 {
-  TimeCardControlDialog dlg(this);
-  dlg.exec();
-}
-
-void Baita::openCalculator()
-{
-  Calculator* calc = new Calculator;
-  QDialog dlg(this);
-  QHBoxLayout *l = new QHBoxLayout;
-  dlg.setLayout(l);
-  l->addWidget(calc);
-  dlg.setWindowFlags(Qt::Window);
-  dlg.setWindowTitle(tr("Calculadora"));
-  dlg.setWindowIcon(QIcon(":/icons/res/calculator.png"));
-  dlg.setModal(true);
+  CalculatorDialog dlg(this);
   dlg.exec();
 }
 

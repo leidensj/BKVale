@@ -22,7 +22,6 @@ namespace Functionality
     ShoppingList,
     Shop,
     TimeCard,
-    TimeCardControl,
     Settings,
     Report,
     Coupon,

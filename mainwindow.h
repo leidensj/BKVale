@@ -67,7 +67,6 @@ private:
   Report* m_report;
   ReminderView* m_reminder;
   ConsumptionWidget* m_consumption;
-  CalculatorWidget* m_calculator;
   ShopWidget* m_shop;
   InventoryView* m_inventory;
   Settings m_settings;
@@ -77,7 +76,6 @@ private:
   JMdiSubWindow* m_purchaseWindow;
   JMdiSubWindow* m_reportWindow;
   JMdiSubWindow* m_reminderWindow;
-  JMdiSubWindow* m_calculatorWindow;
   JMdiSubWindow* m_shopWindow;
   JMdiSubWindow* m_inventoryWindow;
   CouponRedeemer* m_redeemer;
@@ -94,8 +92,7 @@ private slots:
   void openLoggedDialog();
   void activateWindow();
   void openTimeCardDialog();
-  void openTimeCardControlDialog();
-  void openCalculator();
+  void openCalculatorDialog();
   void about();
 };
 

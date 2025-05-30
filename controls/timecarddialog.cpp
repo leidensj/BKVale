@@ -38,7 +38,7 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   m_date = new QDateEdit(QDate::currentDate());
   m_date->setDisplayFormat("MMMM yyyy");
 
-  m_buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+  m_buttons = new QDialogButtonBox(QDialogButtonBox::Save);
 
   m_spnExtraPages = new JSpinBox;
   m_spnExtraPages->setMinimum(0);
@@ -49,7 +49,6 @@ TimeCardDialog::TimeCardDialog(QWidget* parent)
   m_cbOpenFile->setCheckState(Qt::Checked);
 
   connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveAndAccept()));
-  connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
   QFormLayout* formLayout = new QFormLayout;
   formLayout->addRow(tr("Loja:"), m_storePicker);
@@ -338,4 +337,16 @@ void TimeCardDialog::updateMessageAndSwapButton()
 {
   m_btnSwap->setEnabled(m_dayOffTable->isValidCurrentRow());
   m_lblMessage->setText(m_dayOffTable->message());
+}
+
+void TimeCardDialog::closeEvent(QCloseEvent* event)
+{
+  if (QMessageBox::question(this,
+                            tr("Sair"),
+                            tr("Tem certeza que deseja sair? Qualquer progresso não salvo será perdido."),
+                            QMessageBox::Yes,
+                            QMessageBox::No) == QMessageBox::Yes)
+    QDialog::closeEvent(event);
+  else
+    event->ignore();
 }

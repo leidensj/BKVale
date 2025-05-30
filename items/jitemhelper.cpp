@@ -160,8 +160,6 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Lista de Compras";
     case Functionality::Idx::TimeCard:
       return "Livro Ponto";
-    case Functionality::Idx::TimeCardControl:
-      return "Gerenciar Livro Ponto";
     case Functionality::Idx::Coupon:
       return "Cupom";
     case Functionality::Idx::Settings:
@@ -229,8 +227,6 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/shoppinglist.png";
     case Functionality::Idx::TimeCard:
       return ":/icons/res/timecard.png";
-    case Functionality::Idx::TimeCardControl:
-      return ":/icons/res/pen.png";
     case Functionality::Idx::Coupon:
       return ":/icons/res/coupon.png";
     case Functionality::Idx::Settings:

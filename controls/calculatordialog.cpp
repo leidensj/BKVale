@@ -1,4 +1,4 @@
-#include "calculatorwidget.h"
+#include "calculatordialog.h"
 #include <QLayout>
 #include <QLineEdit>
 #include <QPlainTextEdit>
@@ -7,6 +7,7 @@
 #include <QSplitter>
 #include <QMessageBox>
 #include <QAction>
+#include <QPushButton>
 #include <QRegularExpression>
 #include "escpos.h"
 #include "escposprinter.h"
@@ -91,8 +92,8 @@ inline void removeDecimal(QString& strValue)
 }
 }
 
-CalculatorWidget::CalculatorWidget(QWidget* parent)
-  : QFrame(parent)
+CalculatorDialog::CalculatorDialog(QWidget* parent)
+  : QDialog(parent)
   , m_btn0(nullptr)
   , m_btn1(nullptr)
   , m_btn2(nullptr)
@@ -117,6 +118,9 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   , m_lastValue(0.0)
   , m_lastButton(Qt::Key_Standby)
 {
+  setWindowTitle(tr("Calculadora"));
+  setWindowIcon(QIcon(":/icons/res/calculator.png"));
+
   m_btnCls = new QPushButton;
   m_btnCls->setFlat(true);
   m_btnCls->setText("");
@@ -388,7 +392,7 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
   m_view->setPlainText("0");
 }
 
-double CalculatorWidget::calculate(double op1, double op2, int button)
+double CalculatorDialog::calculate(double op1, double op2, int button)
 {
   if (!Calculator::isOP(button))
     return 0.0;
@@ -408,14 +412,14 @@ double CalculatorWidget::calculate(double op1, double op2, int button)
   }
 }
 
-void CalculatorWidget::display(double value, int button)
+void CalculatorDialog::display(double value, int button)
 {
   QString text = Calculator::toStr(button) + " " + QString::number(value, 'f').remove(QRegularExpression("\\.?0*$"));
   m_view->appendPlainText(text);
   m_view->verticalScrollBar()->setValue(m_view->verticalScrollBar()->maximum());
 }
 
-void CalculatorWidget::buttonClicked()
+void CalculatorDialog::buttonClicked()
 {
   int button = sender()->property(KEY_CODE).toInt();
   if (Calculator::isOP(button))
@@ -458,12 +462,12 @@ void CalculatorWidget::buttonClicked()
   m_lastButton = button;
 }
 
-void CalculatorWidget::clear()
+void CalculatorDialog::clear()
 {
   m_edDisplay->setText("");
 }
 
-void CalculatorWidget::reset()
+void CalculatorDialog::reset()
 {
   if (m_btnPrint->isChecked() && m_view->toPlainText() != "0")
   {

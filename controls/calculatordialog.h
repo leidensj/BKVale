@@ -1,18 +1,18 @@
-#ifndef CALCULATORWIDGET_H
-#define CALCULATORWIDGET_H
+#ifndef CALCULATORDIALOG_H
+#define CALCULATORDIALOG_H
 
-#include <QFrame>
-#include <QPushButton>
+#include <QDialog>
 
 class QLineEdit;
 class QPlainTextEdit;
+class QPushButton;
 
-class CalculatorWidget : public QFrame
+class CalculatorDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit CalculatorWidget(QWidget* parent = nullptr);
+  explicit CalculatorDialog(QWidget* parent = nullptr);
 
 private slots:
   void buttonClicked();
@@ -51,4 +51,4 @@ private:
   double calculate(double op1, double op2, int button);
 };
 
-#endif // CALCULATORWIDGET_H
+#endif // CALCULATORDIALOG_H

@@ -15,9 +15,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
   aboutdialog.cpp \
-  controls/calculator.cpp \
   controls/calculatorbutton.cpp \
-  controls/calculatorwidget.cpp \
+  controls/calculatordialog.cpp \
   controls/changepassword.cpp \
   controls/couponredeemer.cpp \
   controls/databasecombobox.cpp \
@@ -30,7 +29,6 @@ SOURCES += main.cpp\
   controls/postitdialog.cpp \
   controls/report.cpp \
   controls/shopwidget.cpp \
-  controls/timecardcontroldialog.cpp \
   controls/timecarddialog.cpp \
   editors/addresseditor.cpp \
   editors/formeditor.cpp \
@@ -95,7 +93,6 @@ SOURCES += main.cpp\
     items/supplier.cpp \
     items/user.cpp \
   tables/purchaseproducttable.cpp \
-  tables/timecardcontroltable.cpp \
   views/cashclosingview.cpp \
   views/cashview.cpp \
   views/coinview.cpp \
@@ -163,9 +160,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     aboutdialog.h \
-    controls/calculator.h \
     controls/calculatorbutton.h \
-    controls/calculatorwidget.h \
+    controls/calculatordialog.h \
     controls/changepassword.h \
     controls/couponredeemer.h \
     controls/databasecombobox.h \
@@ -178,7 +174,6 @@ HEADERS  += mainwindow.h \
     controls/postitdialog.h \
     controls/report.h \
     controls/shopwidget.h \
-    controls/timecardcontroldialog.h \
     controls/timecarddialog.h \
     editors/addresseditor.h \
     editors/formeditor.h \
@@ -233,7 +228,6 @@ HEADERS  += mainwindow.h \
     defines.h \
     escpos.h \
     tables/purchaseproducttable.h \
-    tables/timecardcontroltable.h \
     timeinterval.h \
     items/address.h \
     items/category.h \

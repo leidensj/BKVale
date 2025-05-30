@@ -137,18 +137,30 @@ QString DayOffTable::message() const
 void DayOffTable::shuffle()
 {
   for (int i = 0; i != rowCount(); ++i)
+  {
+    for (int j = 0; j != rowCount(); ++j)
+    {
+      auto it = dynamic_cast<JTableItem*>(item(i, j));
+      if (it != nullptr)
+        it->setValue(false);
+    }
+  }
+
+  for (int i = 0; i != rowCount(); ++i)
     shuffleRow(i);
 }
 
-void DayOffTable::shuffleRow(int row)
+void DayOffTable::shuffleRowV2(const int row)
 {
+  // se for mulher, tem domingos intercalados com segundas
+  // se for homem, tem um domingo e o resto segundas
   if (row >= rowCount())
     return;
 
   QVector<bool> dayoff(m_date.daysInMonth(), false);
   if (m_store.m_vEmployee.at(row).m_form.m_bSex)
   {
-    // se for mulher, tem domingos intercalados com segundas
+
     bool firstSunday = QRandomGenerator::global()->bounded(0, 2) == 0;
     static int lastRow = -1;
     static bool blastSunday = true;
@@ -174,8 +186,6 @@ void DayOffTable::shuffleRow(int row)
   }
   else
   {
-    // TODO
-    // se for homem, tem um domingo e o resto segundas
     for (int ii = 0; ii != dayoff.size(); ++ii)
     {
       if (m_date.addDays(ii).dayOfWeek() == Qt::Monday)
@@ -232,6 +242,71 @@ void DayOffTable::shuffleRow(int row)
       if (it != nullptr)
         it->setValue(dayoff.at(j));
     }
+  }
+}
+
+void DayOffTable::shuffleRow(const int row)
+{
+  // Homens uma folga no domingo por mês
+  // Mulheres duas folgas nos domingos intercaladas no mês
+  // Ninguém pode ficar com mais de 6 dias sem folga
+
+  if (row >= rowCount())
+    return;
+
+  for (int j = 0; j != rowCount(); ++j)
+  {
+    auto it = dynamic_cast<JTableItem*>(item(row, j));
+    if (it != nullptr)
+      it->setValue(false);
+  }
+
+  QVector<int> sundays;
+  QVector<int> dayoff;
+  for (int i = 0; i != m_date.daysInMonth(); ++i)
+  {
+    if (m_date.addDays(i).dayOfWeek() == Qt::Sunday)
+      sundays.push_back(i);
+  }
+
+  QVector<bool> sundaysoff(sundays.size(), false);
+  if (m_store.m_vEmployee.at(row).m_form.m_bSex)
+  {
+    bool evenSundays = QRandomGenerator::global()->bounded(0, 2) == 0;
+    for (int i = evenSundays ? 0 : 1; i < sundays.size(); i += 2)
+      sundaysoff[i] = true;
+  }
+  else
+  {
+    sundaysoff[QRandomGenerator::global()->bounded(0, sundays.size())] = true;
+  }
+
+
+  for(int i = 0; i != sundays.size(); ++i)
+  {
+    int lowest = sundays.at(i) + 1;
+    int highest = 0;
+    if (sundaysoff.at(i) || dayoff.empty())
+      highest = sundays.at(i) + 7;
+    else
+      highest = dayoff.last() + 7;
+    if (highest >= m_date.daysInMonth())
+      highest = m_date.daysInMonth();
+    if (lowest < highest)
+      dayoff.push_back(QRandomGenerator::global()->bounded(lowest, highest));
+    else if (lowest == highest)
+      dayoff.push_back(lowest);
+  }
+
+  for (int i = 0; i != sundays.size(); ++i)
+    if (sundaysoff.at(i))
+      dayoff.push_back(sundays.at(i));
+
+  for (int i = 0; i != dayoff.size(); ++i)
+  {
+    auto it = dynamic_cast<JTableItem*>(item(row, dayoff.at(i)));
+    if (it != nullptr)
+      it->setValue(true);
   }
 }
 

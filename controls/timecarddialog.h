@@ -25,6 +25,9 @@ private slots:
   void updateMessageAndSwapButton();
   void shuffle();
 
+protected:
+  void closeEvent(QCloseEvent* event);
+
 private:
   DatabasePicker* m_storePicker;
   QDateEdit* m_date;

@@ -103,7 +103,7 @@
           <item>
            <widget class="QRadioButton" name="rdoEscpos">
             <property name="text">
-             <string>ESCPOS</string>
+             <string>EscPos</string>
             </property>
             <property name="checked">
              <bool>true</bool>

@@ -5,7 +5,7 @@
 #include "tables/cashclosingcointable.h"
 #include "tables/cashclosingsectortable.h"
 #include "tables/cashclosinginfotable.h"
-#include "controls/calculatorwidget.h"
+#include "controls/calculatordialog.h"
 #include "controls/postitdialog.h"
 #include "escposprinter.h"
 #include <QLabel>
@@ -263,15 +263,7 @@ void CashClosingView::update()
 
 void CashClosingView::showCalculator()
 {
-  auto calc = new CalculatorWidget;
-  QDialog dlg(this);
-  QHBoxLayout *l = new QHBoxLayout;
-  dlg.setLayout(l);
-  l->addWidget(calc);
-  dlg.setWindowFlags(Qt::Dialog);
-  dlg.setWindowTitle(tr("Calculadora"));
-  dlg.setWindowIcon(QIcon(":/icons/res/calculator.png"));
-  dlg.setModal(true);
+  CalculatorDialog dlg(this);
   dlg.exec();
 }
 

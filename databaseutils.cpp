@@ -178,7 +178,6 @@ bool BaitaSQL::createTables(QString& error)
                           USER_SQL_COL_ASU " BOOLEAN,"
                           USER_SQL_COL_AST " BOOLEAN,"
                           USER_SQL_COL_ATI " BOOLEAN,"
-                          USER_SQL_COL_ATC " BOOLEAN,"
                           USER_SQL_COL_ACO " BOOLEAN,"
                           USER_SQL_COL_ACR " BOOLEAN,"
                           USER_SQL_COL_ART " BOOLEAN)");

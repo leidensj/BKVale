@@ -69,7 +69,6 @@
    <addaction name="actionReports"/>
    <addaction name="actionInventory"/>
    <addaction name="actionReminders"/>
-   <addaction name="actionCalculator"/>
    <addaction name="actionShoppingList"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -132,7 +131,7 @@
     <addaction name="actionTimeCard"/>
     <addaction name="actionRedeem"/>
     <addaction name="actionCashClosing"/>
-    <addaction name="actionCalculator2"/>
+    <addaction name="actionCalculator"/>
    </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
@@ -468,18 +467,6 @@
    </property>
    <property name="text">
     <string>Fechamento de Caixa</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-  </action>
-  <action name="actionCalculator2">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/calculator.png</normaloff>:/icons/res/calculator.png</iconset>
-   </property>
-   <property name="text">
-    <string>Calculadora</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

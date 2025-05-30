@@ -19,7 +19,8 @@ public:
 public slots:
   void addRow();
   void shuffle();
-  void shuffleRow(int row);
+  void shuffleRow(const int row);
+  void shuffleRowV2(const int row);
   void shuffleCurrentRow();
 
 private:

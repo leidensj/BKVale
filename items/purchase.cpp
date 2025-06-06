@@ -395,17 +395,20 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
   ep.doublefont(true);
   ep.str(strNumber() + "\n\n");
   ep.doublefont(false);
-  ep.align();
-  ep.str("Data       ");
+  ep.str("Data ");
   ep.doublefont(true);
   ep.str(strDate());
   ep.doublefont(false);
   ep.str(" " + strDayOfWeek() + "\n");
-  ep.str("Fornecedor ");
   ep.doublefont(true);
   ep.str(m_supplier.m_id.isValid() ? m_supplier.m_form.strAliasName() : "Nao informado");
   ep.doublefont(false);
+<<<<<<< HEAD
   ep.str("\n\n");
+=======
+  ep.str("\nFornecedor\n\n");
+  ep.align();
+>>>>>>> 3cd240ca8989307f33b1073e94e4305d7a45fb21
   for (const auto& _o :  m_products)
   {
     ep.str(_o.m_product.m_name + "\n");
@@ -423,7 +426,7 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
       ep.bold(false);
     }
   }
-  ep.str("\n\n");
+  ep.str("\n");
 
   if (m_disccount != 0)
   {
@@ -461,7 +464,7 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
     else
       ep.str("fornecedor");
   }
-  ep.str("\n\n\n");
+  ep.str("\n\n");
   ep.cut();
   return ep.m_ba;
 }

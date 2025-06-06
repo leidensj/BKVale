@@ -42,7 +42,7 @@ void CouponRedeemer::redeem()
     {
       m_edCode->setText(o.strCoupon());
       m_edCode->selectAll();
-      JItemHelper::print(o, nullptr, this);
+      JItemHelper::print(o, 0, this);
     }
     else
     {

@@ -185,10 +185,10 @@ void CashClosingView::save()
   JItemView::save();
 }
 
-bool CashClosingView::print()
+void CashClosingView::print()
 {
   if (!m_btnPrint->isChecked())
-    return true;
+    return;
   CashClosing o;
   getItem(o);
   QString error;
@@ -201,18 +201,7 @@ bool CashClosingView::print()
   else
     ok = o.m_cash.SQL_select(error);
 
-  if (ok)
-  {
-    EscPosPrinter printer;
-    ok = printer.connectToPrinter(error);
-    if (ok)
-      ok = printer.printRawData(o.printVersion(), error);
-  }
-
-  if (!ok)
-    QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
-
-  return ok;
+  JItemHelper::print(o, 0, this);
 }
 
 void CashClosingView::cashChanged()

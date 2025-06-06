@@ -1,5 +1,4 @@
 #include "couponview.h"
-#include "printer.h"
 #include "widgets/jlineedit.h"
 #include "widgets/jdatepicker.h"
 #include "controls/databasepicker.h"
@@ -224,20 +223,8 @@ void CouponView::save()
     if (dlg.exec())
     {
       QVariant bPrintContent (dlg.printContent());
-      EscPosPrinter printer;
-      QString error;
-      ok = printer.connectToPrinter(error);
-      if (ok)
-      {
-        for (int i = 0; i != coupons.size(); ++i)
-        {
-          ok = printer.printRawData(coupons.at(i).printVersion(bPrintContent), error);
-          if (!ok)
-            QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
-        }
-      }
-      else
-        QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
+      for (int i = 0; i != coupons.size(); ++i)
+        JItemHelper::print(coupons.at(i), bPrintContent, this);
     }
   }
 }

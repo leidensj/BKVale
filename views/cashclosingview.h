@@ -27,7 +27,7 @@ protected slots:
 private slots:
   void cashChanged();
   void update();
-  bool print();
+  void print();
   void showCalculator();
   void showPostit();
 

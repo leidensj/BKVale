@@ -544,13 +544,7 @@ void PurchaseView::print(Purchase& o)
 {
   if (!m_btnPrint->isChecked() || !JItemHelper::select(o, this))
     return;
-  EscPosPrinter printer;
-  QString error;
-  bool ok = printer.connectToPrinter(error);
-  if (ok)
-    ok = printer.printRawData(o.printVersion(0), error);
-  if (ok && o.m_paymentMethod == Purchase::PaymentMethod::Credit)
-    ok = printer.printRawData(o.printVersion(0), error);
-  if (!ok)
-    QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
+  JItemHelper::print(o, 0, this);
+  if (o.m_paymentMethod == Purchase::PaymentMethod::Credit)
+    JItemHelper::print(o, 0, this);
 }

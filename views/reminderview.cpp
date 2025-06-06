@@ -255,7 +255,7 @@ void ReminderView::print()
   getItem(o);
   bool ok = false;
   int n = QInputDialog::getInt(this, tr("Imprimir Lembrete"), tr("Número de cópias"), 1, 1, 999, 1, &ok);
-  if (ok)
+  /*if (ok)
     for (int i = 0; i != n; ++i)
-      JItemHelper::print(o, nullptr, this);
+      JItemHelper::print(o, nullptr, this);*/
 }

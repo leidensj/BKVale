@@ -15,6 +15,7 @@
 #include "employee.h"
 #include "login.h"
 #include "printer.h"
+#include "escposprinter.h"
 #include "inventory.h"
 #include "sector.h"
 #include "coin.h"
@@ -446,21 +447,14 @@ bool JItemHelper::save(const JItemSQL& o, QWidget* parent)
   return bSuccess;
 }
 
-bool JItemHelper::print(const JItemSQL& o, QVariant* options, QWidget* parent)
+bool JItemHelper::print(const JItemSQL& o, const QVariant& arg, QWidget* parent)
 {
   QString error;
-  bool ok = true;
-  Printer printer;
-  const QString tableName = o.SQL_tableName();
-  if (tableName == PURCHASE_SQL_TABLE_NAME)
-    ok = printer.print(dynamic_cast<const Purchase&>(o), error);
-  else if (tableName == SHOPPING_LIST_SQL_TABLE_NAME)
-    ok = printer.print(dynamic_cast<const ShoppingList&>(o), options != nullptr ? options->toBool() : true, error);
-  else if (tableName == REMINDER_SQL_TABLE_NAME)
-    ok = printer.print(dynamic_cast<const Reminder&>(o), error);
-  else if (tableName == COUPON_SQL_TABLE_NAME)
-    ok = printer.print(dynamic_cast<const Coupon&>(o), options != nullptr ? options->toBool() : false, error);
+  EscPosPrinter printer;
+  bool ok = printer.connectToPrinter(error);
+  if (ok)
+    ok = printer.printRawData(o.printVersion(arg), error);
   if (!ok)
-    QMessageBox::warning(parent, QObject::tr("Aviso"), QObject::tr("O seguinte erro ocorreu ao imprimir %1:\n%2.").arg(text(tableName), error), QMessageBox::Ok);
+    QMessageBox::warning(parent, QObject::tr("Erro ao imprimir"), QObject::tr("O seguinte erro ocorreu ao imprimir %1:\n%2.").arg(text(o.SQL_tableName()), error), QMessageBox::Ok);
   return ok;
 }

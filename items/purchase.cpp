@@ -387,25 +387,24 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
       ep.str(m_store.m_form.m_vAddress.at(0).name() + "\n");
     if (!m_store.m_form.m_vPhone.isEmpty())
       ep.str(m_store.m_form.m_vPhone.at(0).name() + "\n");
-    ep.str("\n\n");
+    ep.str("\n");
   }
   ep.str(m_paymentMethod == Purchase::PaymentMethod::Cash ?
-        "PAGAMENTO A VISTA\n\n\n" :
-        "ORDEM DE RECEBIMENTO\nDE MERCADORIA\n\n\n");
+        "PAGAMENTO A VISTA\n\n" :
+        "ORDEM DE RECEBIMENTO\nDE MERCADORIA\n\n");
   ep.doublefont(true);
-  ep.str(strNumber() + "\n\n\n");
+  ep.str(strNumber() + "\n\n");
   ep.doublefont(false);
-  ep.align();
-  ep.str("Data       ");
+  ep.str("Data ");
   ep.doublefont(true);
   ep.str(strDate());
   ep.doublefont(false);
   ep.str(" " + strDayOfWeek() + "\n");
-  ep.str("Fornecedor ");
   ep.doublefont(true);
   ep.str(m_supplier.m_id.isValid() ? m_supplier.m_form.strAliasName() : "Nao informado");
   ep.doublefont(false);
-  ep.str("\n\n\n");
+  ep.str("\nFornecedor\n\n");
+  ep.align();
   for (const auto& _o :  m_products)
   {
     ep.str(_o.m_product.m_name + "\n");
@@ -423,7 +422,7 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
       ep.bold(false);
     }
   }
-  ep.str("\n\n");
+  ep.str("\n");
 
   if (m_disccount != 0)
   {
@@ -443,7 +442,7 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
     ep.expand(true);
     ep.str("Observacoes: ");
     ep.expand(false);
-    ep.str(m_observation + "\n");
+    ep.str(m_observation + "\n\n");
   }
 
   ep.align(true);
@@ -461,7 +460,7 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
     else
       ep.str("fornecedor");
   }
-  ep.str("\n\n\n");
+  ep.str("\n\n");
   ep.cut();
   return ep.m_ba;
 }

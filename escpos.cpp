@@ -15,7 +15,7 @@ void EscPos::str(const QString& str) { m_ba.append(str.toLocal8Bit()); }
 void EscPos::bold(bool b) { m_bema ? boldBEMA(b) : boldESCPOS(b); }
 void EscPos::doublefont(bool b) { m_bema ? doublefontBEMA(b) : doublefontESCPOS(b); }
 void EscPos::align(bool center) { m_bema ? alignBEMA(center) : alignESCPOS(center); }
-void EscPos::cut(bool partial) { m_bema ? cutBEMA(partial) : cutESCPOS(partial); }
+void EscPos::cut(bool partial) { str("\n\n"); m_bema ? cutBEMA(partial) : cutESCPOS(partial); }
 void EscPos::expand(bool b) { m_bema ? expandBEMA(b) : expandESCPOS(b); }
 void EscPos::tab() { m_bema ? tabBEMA() : tabBEMA();}
 

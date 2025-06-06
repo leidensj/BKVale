@@ -301,6 +301,6 @@ void CouponView::print()
        }
     }
     if (!ok)
-          QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
+      QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
   }
 }

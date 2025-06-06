@@ -3,6 +3,7 @@
 #include "items/jitemhelper.h"
 #include "widgets/jdatepicker.h"
 #include "tables/shoppinglisttable.h"
+#include "escposprinter.h"
 #include <QLayout>
 #include <QCheckBox>
 #include <QMessageBox>
@@ -86,7 +87,13 @@ void ShopWidget::print()
     case QMessageBox::No:
     {
       QVariant var(ret == QMessageBox::Yes);
-      JItemHelper::print(getShoppingList(), &var, this);
+        EscPosPrinter printer;
+      QString error;
+        bool ok = printer.connectToPrinter(error);
+      if (ok)
+        ok = printer.printRawData(getShoppingList().printVersion(var), error);
+      if (!ok)
+        QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
     } break;
     case QMessageBox::Cancel:
     default:

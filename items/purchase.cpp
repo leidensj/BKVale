@@ -1,4 +1,8 @@
 #include "purchase.h"
+#include "escpos.h"
+#include "QHostInfo"
+
+//todo tirar o qhostinfo e passar nos args
 
 QIcon Purchase::st_paymentIcon(PaymentMethod e)
 {
@@ -367,4 +371,97 @@ bool Purchase::SQL_select_all_supplier_id_items()
   }
 
   return SQL_finish(db, query, bSuccess, error);
+}
+
+QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
+{
+  EscPos ep;
+  if (m_store.m_id.isValid())
+  {
+    ep.align(true);
+    ep.expand(true);
+    ep.str(m_store.m_form.m_alias + "\n");
+    ep.expand(false);
+    ep.str(m_store.m_form.m_name + "\n");
+    if (!m_store.m_form.m_vAddress.isEmpty())
+      ep.str(m_store.m_form.m_vAddress.at(0).name() + "\n");
+    if (!m_store.m_form.m_vPhone.isEmpty())
+      ep.str(m_store.m_form.m_vPhone.at(0).name() + "\n");
+    ep.str("\n\n");
+  }
+  ep.str(m_paymentMethod == Purchase::PaymentMethod::Cash ?
+        "PAGAMENTO A VISTA\n\n\n" :
+        "ORDEM DE RECEBIMENTO\nDE MERCADORIA\n\n\n");
+  ep.doublefont(true);
+  ep.str(strNumber() + "\n\n\n");
+  ep.doublefont(false);
+  ep.align();
+  ep.str("Data       ");
+  ep.doublefont(true);
+  ep.str(strDate());
+  ep.doublefont(false);
+  ep.str(" " + strDayOfWeek() + "\n");
+  ep.str("Fornecedor ");
+  ep.doublefont(true);
+  ep.str(m_supplier.m_id.isValid() ? m_supplier.m_form.strAliasName() : "Nao informado");
+  ep.doublefont(false);
+  ep.str("\n\n\n");
+  for (const auto& _o :  m_products)
+  {
+    ep.str(_o.m_product.m_name + "\n");
+    {
+      QString itemPt1 = _o.strAmmount();
+      itemPt1 += _o.m_package.strUnity(_o.m_product.m_unity);
+      itemPt1 += " x " + _o.strPrice();
+      QString itemPt2 = _o.strSubtotal();
+      const int n = TABLE_WIDTH - (itemPt1.length() + itemPt2.length());
+      for (int j = 0; j < n; ++j)
+        itemPt1 += ".";
+      ep.str(itemPt1);
+      ep.bold(true);
+      ep.str(itemPt2 + "\n");
+      ep.bold(false);
+    }
+  }
+  ep.str("\n\n");
+
+  if (m_disccount != 0)
+  {
+    ep.expand(true);
+    ep.str("\nSubtotal:  " + strSubTotal() + "\n");
+    if (m_disccount > 0)
+      ep.str("Acrescimo: " + strDisccount() + "\n\n");
+    else if(m_disccount < 0)
+      ep.str("Desconto:  " + strDisccount() + "\n\n");
+    ep.expand(false);
+  }
+
+  QDateTime dt = DateTime::server().toLocalTime();
+
+  if (!m_observation.isEmpty())
+  {
+    ep.expand(true);
+    ep.str("Observacoes: ");
+    ep.expand(false);
+    ep.str(m_observation + "\n");
+  }
+
+  ep.align(true);
+  ep.doublefont(true);
+  ep.str("TOTAL " + strTotal());
+  ep.doublefont(false);
+  ep.str("\nEmissao: " + dt.date().toString("dd/MM/yyyy ") + dt.time().toString("hh:mm:ss") + " @ " + QHostInfo::localHostName().toUpper() + "\n\n\n");
+  ep.str("________________________________\nAssinatura " + m_employee.m_form.strAliasName() + "\n");
+
+  if (m_paymentMethod == Purchase::PaymentMethod::Cash)
+  {
+    ep.str("\n\n________________________________\nAssinatura ");
+    if (m_supplier.m_id.isValid())
+      ep.str(m_supplier.m_form.strAliasName());
+    else
+      ep.str("fornecedor");
+  }
+  ep.str("\n\n\n");
+  ep.cut();
+  return ep.m_ba;
 }

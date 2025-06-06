@@ -44,6 +44,7 @@ struct ShoppingList : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
+  QByteArray printVersion(const QVariant& arg) const;
 
   void setWeekDays(const QString& strWeekDays);
   void setMonthDays(const QString& strMonthDays);

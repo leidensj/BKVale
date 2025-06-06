@@ -1,4 +1,5 @@
 #include "shoppinglist.h"
+#include "escpos.h"
 
 ShoppingListItem::ShoppingListItem()
 {
@@ -412,4 +413,105 @@ bool ShoppingList::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
+}
+
+QByteArray ShoppingList::printVersion(const QVariant& arg) const
+{
+  EscPos ep;
+  QDateTime dt = DateTime::server().toLocalTime();
+  ep.expand(true);
+  ep.align(true);
+  ep.str("LISTA DE COMPRAS\n");
+  ep.expand(false);
+  ep.doublefont(true);
+  ep.str(m_title + "\n");
+  ep.doublefont(false);
+  ep.expand(true);
+  ep.str(dt.date().toString("dd/MM/yyyy") + "\n");
+  ep.expand(false);
+  ep.str(dt.date().toString("dddd") + "\n\n\n");
+  ep.align();
+  if (!m_description.isEmpty())
+  {
+    ep.expand(true);
+    ep.str("Descricao: ");
+    ep.expand(false);
+    ep.str(m_description + "\n");
+  }
+
+  if (m_supplier.m_id.isValid())
+  {
+    ep.str("\n\n\n");
+    ep.align(true);
+    ep.str("Fornecedor: ");
+    ep.expand(true);
+    ep.str(m_supplier.m_form.strAliasName() + "\n");
+    ep.expand(false);
+    ep.align(false);
+
+  }
+
+  ep.str("\n");
+  if (m_vItem.size() != 0 && arg.toBool())
+  {
+    ep.align(false);
+    ep.doublefont(true);
+    ep.str("[ EST ][ COM ][ REC ]\n");
+    ep.doublefont(false);
+  }
+
+  Id lastSupplier, supplier;
+  for (int i = 0; i != m_vItem.size(); ++i)
+  {
+    supplier = m_vItem.at(i).m_supplier.m_id;
+    bool bPrintSupplier = ((!lastSupplier.isValid() && supplier.isValid()) ||
+                          (lastSupplier.isValid() && supplier.isValid() && lastSupplier != supplier)) &&
+                          !m_supplier.m_id.isValid();
+    bool bPrintSeparator = ((lastSupplier.isValid() && !supplier.isValid()) ||
+                           (lastSupplier.isValid() && supplier.isValid() && lastSupplier != supplier)) &&
+                            !m_supplier.m_id.isValid();
+    lastSupplier = supplier;
+
+    if (bPrintSeparator)
+      ep.str(TABLE_FULL_LINE "\n");
+
+    if (bPrintSupplier && !bPrintSeparator)
+      ep.str(TABLE_FULL_LINE "\n");
+
+    if (bPrintSupplier)
+    {
+      ep.align(true);
+      ep.str("Fornecedor: " + m_vItem.at(i).m_supplier.m_form.strAliasName() + "\n");
+      ep.align(false);
+    }
+    ep.bold(true);
+    ep.str(m_vItem.at(i).m_product.m_name + "\n");
+    ep.bold(false);
+
+    if (m_vItem.at(i).m_price != 0.0)
+      ep.str("Preco: " + m_vItem.at(i).strPrice() + "\n");
+
+    if (arg.toBool())
+    {
+      ep.doublefont(true);
+      ep.str("[     ][     ]");
+      if (m_vItem.at(i).m_ammount != 0.0)
+        ep.str("[" + Data::strFmt(m_vItem.at(i).m_ammount) +
+               m_vItem.at(i).m_package.strUnity(m_vItem.at(i).m_product.m_unity) + "]");
+      ep.doublefont(false);
+      ep.str("\n");
+    }
+  }
+  ep.align(false);
+
+  if (m_nLines > 0)
+  {
+    for (int i = 0; i != m_nLines; ++i)
+      ep.str("\n\n\n" TABLE_FULL_LINE "\n");
+  }
+
+  ep.str("\n\n\n");
+  ep.cut();
+
+  return ep.m_ba;
 }

@@ -39,6 +39,7 @@ struct Purchase : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
   bool SQL_select_all_supplier_id_items();
+  QByteArray printVersion(const QVariant& arg) const;
 
   void setEmployee(const JItemSQL& e) const;
 

@@ -26,12 +26,12 @@
 #define ESC_EXPAND_ON       "\x1b\x57\x31"
 #define ESC_EXPAND_OFF      "\x1b\x57\x30"
 
-#define ESC_BOLD_OFF        "\x1b\x45\x00"
-#define ESC_BOLD_ON         "\x1b\x45\x01"
+#define ESC_BOLD_OFF        "\x1B\x45\x00"
+#define ESC_BOLD_ON         "\x1B\x45\x01"
 #define ESC_DOUBLEFONT_ON   "\x1D\x21\x11"
 #define ESC_DOUBLEFONT_OFF  "\x1D\x21\x00"
-#define ESC_ALIGNLEFT       "\x1D\x21\x00"
-#define ESC_ALIGNCENTER     "\x1D\x21\x01"
+#define ESC_ALIGNLEFT       "\x1B\x61\x00"
+#define ESC_ALIGNCENTER     "\x1B\x61\x01"
 #define ESC_FULLCUT         "\x1D\x56\x00"
 #define ESC_PARTIALCUT      "\x1D\x56\x01"
 

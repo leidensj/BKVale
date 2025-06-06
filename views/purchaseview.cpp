@@ -10,6 +10,7 @@
 #include "widgets/jdatepicker.h"
 #include "filters/purchasefilter.h"
 #include "tables/paymenttable.h"
+#include "escposprinter.h"
 #include <QPlainTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
@@ -543,5 +544,13 @@ void PurchaseView::print(Purchase& o)
 {
   if (!m_btnPrint->isChecked() || !JItemHelper::select(o, this))
     return;
-  JItemHelper::print(o, nullptr, this);
+  EscPosPrinter printer;
+  QString error;
+  bool ok = printer.connectToPrinter(error);
+  if (ok)
+    ok = printer.printRawData(o.printVersion(0), error);
+  if (ok && o.m_paymentMethod == Purchase::PaymentMethod::Credit)
+    ok = printer.printRawData(o.printVersion(0), error);
+  if (!ok)
+    QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
 }

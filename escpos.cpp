@@ -23,7 +23,7 @@ void EscPos::boldESCPOS(bool b) { b ? m_ba.append(ESC_BOLD_ON, 3) : m_ba.append(
 void EscPos::doublefontESCPOS(bool b) { b ? m_ba.append(ESC_DOUBLEFONT_ON, 3) : m_ba.append(ESC_DOUBLEFONT_OFF, 3); }
 void EscPos::alignESCPOS(bool center) { center ? m_ba.append(ESC_ALIGNCENTER, 3) : m_ba.append(ESC_ALIGNLEFT, 3); }
 void EscPos::cutESCPOS(bool partial) { partial ? m_ba.append(ESC_PARTIALCUT, 3) : m_ba.append(ESC_FULLCUT, 3); }
-void EscPos::expandESCPOS(bool b) { /*TODO*/ }
+void EscPos::expandESCPOS(bool b) { b ? m_ba.append(ESC_EXPANDON, 3) :  m_ba.append(ESC_EXPANDOFF, 3); }
 
 void EscPos::boldBEMA(bool b) { b ? m_ba.append(ESC_STRESS_ON, 2) : m_ba.append(ESC_STRESS_OFF, 2); }
 void EscPos::doublefontBEMA(bool b) { b ? m_ba.append(ESC_DOUBLE_FONT_ON, 6) : m_ba.append(ESC_DOUBLE_FONT_OFF, 6); }

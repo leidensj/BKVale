@@ -403,12 +403,8 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
   ep.doublefont(true);
   ep.str(m_supplier.m_id.isValid() ? m_supplier.m_form.strAliasName() : "Nao informado");
   ep.doublefont(false);
-<<<<<<< HEAD
-  ep.str("\n\n");
-=======
   ep.str("\nFornecedor\n\n");
   ep.align();
->>>>>>> 3cd240ca8989307f33b1073e94e4305d7a45fb21
   for (const auto& _o :  m_products)
   {
     ep.str(_o.m_product.m_name + "\n");

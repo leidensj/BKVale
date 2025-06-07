@@ -34,6 +34,8 @@
 #define ESC_ALIGNCENTER     "\x1B\x61\x01"
 #define ESC_FULLCUT         "\x1D\x56\x00"
 #define ESC_PARTIALCUT      "\x1D\x56\x01"
+#define ESC_EXPANDON        "\x1D\x21\x11"
+#define ESC_EXPANDOFF       "\x1D\x21\x00"
 
 //GS H
 #define ESC_BARCODE_HRI_OFF "\x1d\x48\x00"

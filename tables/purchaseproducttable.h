@@ -22,6 +22,7 @@ public:
   explicit PurchaseProductTable(JAddRemoveButtons* btns = nullptr, QWidget* parent = nullptr);
   void get(QVector<PurchaseProduct>& v) const;
   void set(const QVector<PurchaseProduct>& v, bool bClear = true);
+  void setNewPurchase(bool b);
 
 public slots:
   void addRow();
@@ -34,6 +35,8 @@ private:
   double computeSubTotal(int row) const;
   void loadProductInfo(int row);
   Id m_supplierId;
+  bool m_isNewPurchase;
+  const int PreviousPriceRole;
 
 protected slots:
   void update(int row, int column);

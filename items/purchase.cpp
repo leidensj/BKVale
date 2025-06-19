@@ -373,6 +373,54 @@ bool Purchase::SQL_select_all_supplier_id_items()
   return SQL_finish(db, query, bSuccess, error);
 }
 
+bool Purchase::SQL_last_purchase_that_contains_productid(Id pId)
+{
+  QString error;
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  error.clear();
+  query.prepare("SELECT "
+                PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+                " FROM " PURCHASE_SQL_TABLE_NAME
+                " LEFT JOIN " PURCHASE_ELEMENTS_SQL_TABLE_NAME " ON "
+                PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+                " = " PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " WHERE "
+                PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " = (:_v00) "
+                "ORDER BY " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DAT " DESC LIMIT 1");
+  query.bindValue(":_v00", pId.get());
+  bool bSuccess = query.exec();
+
+  if (bSuccess)
+  {
+    if (query.next())
+    {
+      m_id.set(query.value(0).toLongLong());
+      bSuccess = SQL_select_proc(query, error);
+    }
+  }
+
+  return SQL_finish(db, query, bSuccess, error);
+}
+
+PurchaseProduct Purchase::findProduct(Id pId) const
+{
+  PurchaseProduct o;
+  for (int i = 0; i != m_products.size(); ++i)
+  {
+    if (pId == m_products.at(i).m_product.m_id)
+    {
+      o = m_products.at(i);
+      break;
+    }
+  }
+  return o;
+}
+
 QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
 {
   EscPos ep;

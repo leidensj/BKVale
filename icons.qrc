@@ -191,5 +191,7 @@
         <file>res/coin.png</file>
         <file>res/calminweek.png</file>
         <file>res/postit2.png</file>
+        <file>res/upred.png</file>
+        <file>res/downgreen.png</file>
     </qresource>
 </RCC>

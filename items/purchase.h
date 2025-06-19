@@ -39,6 +39,7 @@ struct Purchase : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
   bool SQL_select_all_supplier_id_items();
+  bool SQL_last_purchase_that_contains_productid(Id pId);
   QByteArray printVersion(const QVariant& arg) const;
 
   void setEmployee(const JItemSQL& e) const;
@@ -53,6 +54,7 @@ struct Purchase : public JItemSQL
   QString strSubTotal() const;
   bool isPaymentValid() const;
   double paymentTotal() const;
+  PurchaseProduct findProduct(Id pId) const;
 
   void adjustPayment();
 

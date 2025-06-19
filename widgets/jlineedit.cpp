@@ -56,6 +56,7 @@ JExpLineEdit::JExpLineEdit(Data::Type type, QWidget* parent)
   , m_currentValue(0.0)
   , m_minimumValue(std::numeric_limits<double>::lowest())
   , m_maximumValue(std::numeric_limits<double>::max())
+  , m_bInvertColors(false)
 {
   connect(this, &JExpLineEdit::editingFinished, [this](){ evaluate(text()); });
   evaluate("");

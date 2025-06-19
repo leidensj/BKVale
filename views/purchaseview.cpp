@@ -414,6 +414,7 @@ void PurchaseView::setItem(const JItemSQL& o)
     m_storePicker->addItem(_o.m_store);
   m_dtPicker->setDate(_o.m_date);
   m_snNumber->setValue(_o.m_number);
+  m_table->setNewPurchase(!_o.m_id.isValid());
   m_table->set(_o.m_products);
   m_supplierPicker->addItem(_o.m_supplier);
   m_teObservation->setPlainText(_o.m_observation);

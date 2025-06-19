@@ -202,6 +202,39 @@ void PurchaseProduct::SQL_select_last(Id supplierId, Id productId)
   JItemSQL::SQL_finish(db, query, bSuccess, error);
 }
 
+void PurchaseProduct::SQL_select_last(Id productId)
+{
+  QString error;
+  if (!JItemSQL::SQL_isOpen(error))
+    return;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                PURCHASE_ELEMENTS_SQL_TABLE_NAME "." SQL_COLID
+                " FROM " PURCHASE_SQL_TABLE_NAME
+                " INNER JOIN " PURCHASE_ELEMENTS_SQL_TABLE_NAME
+                " ON " PURCHASE_SQL_TABLE_NAME "." SQL_COLID
+                " = " PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID
+                " WHERE " PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID
+                " = (:_v01) "
+                " ORDER BY " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DAT
+                ", " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_NUM
+                " DESC LIMIT 1");
+  query.bindValue(":_v01", productId.get());
+  bool bSuccess = query.exec();
+
+  if (bSuccess && query.next())
+  {
+    m_id.set(query.value(0).toLongLong());
+    bSuccess = SQL_select_proc(query, error);
+  }
+
+  JItemSQL::SQL_finish(db, query, bSuccess, error);
+}
+
 bool PurchaseProduct::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)
 {
   query.prepare("DELETE FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME

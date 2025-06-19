@@ -9,6 +9,8 @@
 
 PurchaseProductTable::PurchaseProductTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)
+  , m_isNewPurchase(true)
+  , PreviousPriceRole(Qt::UserRole + 1)
 {
   setColumnCount(5);
   QStringList headers;
@@ -69,9 +71,7 @@ void PurchaseProductTable::addRowAndActivate()
 {
   addRow();
   getItem(rowCount() - 1, (int)Column::Product)->activate();
-  if (SQLItem::st_idFromVariant(getItem(rowCount() - 1, (int)Column::Product)->getValue()).isValid())
-    loadProductInfo(rowCount() - 1);
-  else
+  if (!SQLItem::st_idFromVariant(getItem(rowCount() - 1, (int)Column::Product)->getValue()).isValid())
     removeItem();
 }
 
@@ -90,7 +90,6 @@ void PurchaseProductTable::addRowByCode()
       {
         addRow();
         getItem(rowCount() - 1, (int)Column::Product)->setValue(SQLItem::st_toVariant(o));
-        loadProductInfo(rowCount() - 1);
       }
     }
   }
@@ -129,17 +128,38 @@ void PurchaseProductTable::set(const QVector<PurchaseProduct>& v, bool bClear)
 
 void PurchaseProductTable::loadProductInfo(int row)
 {
+  if (!m_isNewPurchase)
+    return;
+
   Product o;
   o.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
   if (o.m_id.isValid())
   {
     QString error;
     o.SQL_select(error);
-    PurchaseProduct e;
-    e.SQL_select_last(m_supplierId, o.m_id);
-    getItem(row, (int)Column::Price)->setValue(e.m_price);
+    PurchaseProduct lastSupplierProduct;
+    PurchaseProduct lastProduct;
+    lastSupplierProduct.SQL_select_last(m_supplierId, o.m_id);
+    Purchase lastPurchase;
+    lastPurchase.SQL_last_purchase_that_contains_productid(o.m_id);
+    lastProduct = lastPurchase.findProduct(o.m_id);
+    if (lastPurchase.m_id.isValid() && lastProduct.m_id.isValid())
+    {
+      double price = lastProduct.m_price;
+      QString strPckPrice;
+      if (lastProduct.m_package.m_bIsPackage)
+      {
+        strPckPrice = "\n" + Data::strMoney(price) + " / " + lastProduct.m_package.strFormattedUnity(lastProduct.m_product.m_unity);
+        price = lastProduct.m_price / lastProduct.m_package.m_ammount;
+      }
+      getItem(row, (int)Column::Price)->setData(PreviousPriceRole, price);
+      QString tt = tr("Última compra\nFornecedor: %1\nData: %2\nValor: %3%4").arg(lastPurchase.m_supplier.name(), lastPurchase.strDate(), Data::strMoney(price) + " / " + lastProduct.m_product.m_unity, strPckPrice);
+      getItem(row, (int)Column::Price)->setToolTip(tt);
+    }
+    getItem(row, (int)Column::Price)->setValue(lastSupplierProduct.m_price);
     dynamic_cast<PackageItem*>(getItem(row, (int)Column::Package))->setProductUnity(o.m_unity);
-    getItem(row, (int)Column::Package)->setValue(PackageItem::st_toVariant(e.m_package));
+    getItem(row, (int)Column::Package)->setValue(PackageItem::st_toVariant(lastSupplierProduct.m_package));
+    update(row, (int)Column::Price);
   }
 }
 
@@ -153,14 +173,38 @@ void PurchaseProductTable::update(int row, int column)
   blockSignals(true);
   switch ((Column)column)
   {
+    case Column::Package:
     case Column::Ammount:
     case Column::Price:
       getItem(row, (int)Column::SubTotal)->setValue(computeSubTotal(row));
+      if (m_isNewPurchase)
+      {
+        double oldPrice = getItem(row, (int)Column::Price)->data(PreviousPriceRole).toDouble();
+        if (oldPrice != 0)
+        {
+          Package pck = PackageItem::st_fromVariant(getItem(row, (int)Column::Package)->getValue());
+          auto priceItem = getItem(row, (int)Column::Price);
+          double price = priceItem->getValue().toDouble();
+          if (pck.m_bIsPackage)
+            price = price / pck.m_ammount;
+          if (!Data::areEqual(price, oldPrice, Data::Type::Money))
+          {
+            if (oldPrice < price)
+              priceItem->setIcon(QIcon(":/icons/res/upred.png"));
+            else
+              priceItem->setIcon(QIcon(":/icons/res/downgreen.png"));
+          }
+          else
+            priceItem->setIcon(QIcon(":/icons/res/calcequal.png"));
+        }
+
+      }
       break;
     case Column::SubTotal:
+    {
       getItem(row, (int)Column::Price)->setValue(computePrice(row));
       getItem(row, (int)Column::SubTotal)->setValue(computeSubTotal(row));
-      break;
+    } break;
     case Column::Product:
       loadProductInfo(row);
     default:
@@ -168,5 +212,10 @@ void PurchaseProductTable::update(int row, int column)
   }
 
   blockSignals(false);
-  emitChangedSignal();
+  //emitChangedSignal();
+}
+
+void PurchaseProductTable::setNewPurchase(bool b)
+{
+  m_isNewPurchase = b;
 }

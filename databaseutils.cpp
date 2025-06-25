@@ -163,24 +163,16 @@ bool BaitaSQL::createTables(QString& error)
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           USER_SQL_COL_USE " TEXT NOT NULL UNIQUE CHECK ("
                           USER_SQL_COL_USE " <> ''),"
-                          USER_SQL_COL_PAS " TEXT NOT NULL,"
-                          USER_SQL_COL_APU " BOOLEAN,"
-                          USER_SQL_COL_ARE " BOOLEAN,"
-                          USER_SQL_COL_ACA " BOOLEAN,"
-                          USER_SQL_COL_ASH " BOOLEAN,"
-                          USER_SQL_COL_AUS " BOOLEAN,"
-                          USER_SQL_COL_APR " BOOLEAN,"
-                          USER_SQL_COL_ASE " BOOLEAN,"
-                          USER_SQL_COL_ACT " BOOLEAN,"
-                          USER_SQL_COL_AIM " BOOLEAN,"
-                          USER_SQL_COL_ASL " BOOLEAN,"
-                          USER_SQL_COL_AEM " BOOLEAN,"
-                          USER_SQL_COL_ASU " BOOLEAN,"
-                          USER_SQL_COL_AST " BOOLEAN,"
-                          USER_SQL_COL_ATI " BOOLEAN,"
-                          USER_SQL_COL_ACO " BOOLEAN,"
-                          USER_SQL_COL_ACR " BOOLEAN,"
-                          USER_SQL_COL_ART " BOOLEAN)");
+                          USER_SQL_COL_PAS " TEXT NOT NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_PERMISSIONS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          USER_PERMISSIONS_SQL_COL_OID " INTEGER NOT NULL,"
+                          USER_PERMISSIONS_SQL_COL_FUN " INTEGER,"
+                          USER_PERMISSIONS_SQL_COL_ACC " BOOLEAN,"
+                          "FOREIGN KEY(" USER_PERMISSIONS_SQL_COL_OID ") REFERENCES "
+                          USER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
   bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PRODUCT_SQL_TABLE_NAME " ("
@@ -527,31 +519,23 @@ bool BaitaSQL::createTables(QString& error)
     {
       QString str = "INSERT INTO " USER_SQL_TABLE_NAME " ("
                     USER_SQL_COL_USE ","
-                    USER_SQL_COL_PAS ","
-                    USER_SQL_COL_APU ","
-                    USER_SQL_COL_ARE ","
-                    USER_SQL_COL_ACA ","
-                    USER_SQL_COL_ASH ","
-                    USER_SQL_COL_AUS ","
-                    USER_SQL_COL_APR ","
-                    USER_SQL_COL_ASE ","
-                    USER_SQL_COL_ACT ","
-                    USER_SQL_COL_AIM ","
-                    USER_SQL_COL_ASL ","
-                    USER_SQL_COL_AEM ","
-                    USER_SQL_COL_ASU ","
-                    USER_SQL_COL_AST ","
-                    USER_SQL_COL_ATI ","
-                    USER_SQL_COL_ACO ","
-                    USER_SQL_COL_ACR ","
-                    USER_SQL_COL_ART ")"
+                    USER_SQL_COL_PAS ")"
                     " VALUES ('"
                     USER_SQL_DEFAULT_NAME "',"
-                    ":_password,"
-                    "TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);";
+                    ":_password);";
       query.prepare(str);
       query.bindValue(":_password", User::st_strEncryptedPassword(USER_SQL_DEFAULT_PASSWORD));
       bSuccess = query.exec();
+      if (bSuccess)
+      {
+        str = "INSERT INTO " USER_PERMISSIONS_SQL_TABLE_NAME " ("
+              USER_PERMISSIONS_SQL_COL_OID ","
+              USER_PERMISSIONS_SQL_COL_FUN ","
+              USER_PERMISSIONS_SQL_COL_ACC ")"
+              " VALUES (1,0,TRUE);";
+        query.prepare(str);
+        bSuccess = query.exec();
+      }
     }
   }
 

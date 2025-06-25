@@ -56,6 +56,7 @@ SOURCES += main.cpp\
   items/price.cpp \
   items/purchaseproduct.cpp \
   items/sector.cpp \
+  items/userpermission.cpp \
   libraries/tinyexpr.c \
         mainwindow.cpp \
   models/cashclosingmodel.cpp \
@@ -202,6 +203,7 @@ HEADERS  += mainwindow.h \
     items/price.h \
     items/purchaseproduct.h \
     items/sector.h \
+    items/userpermission.h \
     libraries/tinyexpr.h \
     models/cashclosingmodel.h \
     models/cashmodel.h \

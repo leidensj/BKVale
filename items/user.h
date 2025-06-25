@@ -7,6 +7,7 @@
 #include <QMap>
 #include "jitemsql.h"
 #include "defines.h"
+#include "userpermission.h"
 
 struct User : public JItemSQL
 {
@@ -33,7 +34,7 @@ struct User : public JItemSQL
 
   QString m_strUser;
   QString m_password;
-  QMap<Functionality::Idx, bool> m_permissions;
+  QVector<UserPermission> m_permissions;
 };
 
 #endif // USER_H

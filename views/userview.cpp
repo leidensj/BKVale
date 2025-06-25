@@ -50,24 +50,29 @@ UserView::UserView(QWidget* parent)
   m_list = new QListWidget;
   for (int i = 0; i != (int)Functionality::Idx::_END; ++i)
   {
-    QListWidgetItem* p = new QListWidgetItem;
-    p->setText(JItemHelper::text((Functionality::Idx)i));
-    p->setIcon(QIcon(JItemHelper::icon((Functionality::Idx)i)));
-    p->setFlags(p->flags() | Qt::ItemIsUserCheckable);
-    p->setCheckState(Qt::Unchecked);
-    m_list->addItem(p);
+    bool bAddItem = true;
     switch((Functionality::Idx)i)
     {
       case Functionality::Idx::Phone:
       case Functionality::Idx::Address:
       case Functionality::Idx::ProductCode:
       case Functionality::Idx::Login:
-        p->setHidden(true);
+        bAddItem = false;
         break;
       default:
         break;
     }
+    if (!bAddItem)
+      continue;
+    QListWidgetItem* p = new QListWidgetItem;
+    p->setText(JItemHelper::text((Functionality::Idx)i));
+    p->setIcon(QIcon(JItemHelper::icon((Functionality::Idx)i)));
+    p->setFlags(p->flags() | Qt::ItemIsUserCheckable);
+    p->setCheckState(Qt::Unchecked);
+    p->setData(Qt::UserRole, i);
+    m_list->addItem(p);
   }
+  m_list->sortItems();
 
   QHBoxLayout* userlayout = new QHBoxLayout;
   userlayout->setContentsMargins(0, 0, 0, 0);
@@ -111,8 +116,11 @@ void UserView::getItem(JItemSQL& o) const
   _o.m_id = m_id;
   _o.m_strUser = m_user->text();
   _o.m_password = m_password->text();
-  for (int i = 0; i != (int)Functionality::Idx::_END; ++i)
-    _o.setPermission((Functionality::Idx)i, m_list->item(i)->checkState() == Qt::Checked ? true : false);
+  for (int i = 0; i != m_list->count(); ++i)
+  {
+    auto p = m_list->item(i);
+    _o.setPermission((Functionality::Idx)p->data(Qt::UserRole).toInt(), p->checkState() == Qt::Checked ? true : false);
+  }
 }
 
 void UserView::setItem(const JItemSQL& o)
@@ -121,8 +129,11 @@ void UserView::setItem(const JItemSQL& o)
   m_lblPasswordMsg->setVisible(_o.m_id.isValid());
   m_user->setText(_o.m_strUser);
   m_password->setText("");
-  for (int i = 0; i != (int)Functionality::Idx::_END; ++i)
-    m_list->item(i)->setCheckState(_o.hasPermission((Functionality::Idx)i) ? Qt::Checked : Qt::Unchecked);
+  for (int i = 0; i != m_list->count(); ++i)
+  {
+    auto p = m_list->item(i);
+    p->setCheckState(_o.hasPermission((Functionality::Idx)p->data(Qt::UserRole).toInt()) ? Qt::Checked : Qt::Unchecked);
+  }
 }
 
 QString UserView::getPassword() const
@@ -132,7 +143,7 @@ QString UserView::getPassword() const
 
 void UserView::viewPassword(bool b)
 {
-  m_password->setEchoMode( b ? QLineEdit::EchoMode::Normal : QLineEdit::EchoMode::Password);
+  m_password->setEchoMode(b ? QLineEdit::EchoMode::Normal : QLineEdit::EchoMode::Password);
 }
 
 void UserView::itemsRemoved(const Ids& ids)

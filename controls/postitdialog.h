@@ -6,6 +6,7 @@
 class JLineEdit;
 class QPlainTextEdit;
 class QPushButton;
+class QCheckBox;
 
 class PostItDialog : public QDialog
 {
@@ -17,6 +18,7 @@ public:
 private slots:
   void print();
   void create();
+  void updateSize(Qt::CheckState ck);
 
 private:
   JLineEdit* m_title;
@@ -24,6 +26,9 @@ private:
   QPlainTextEdit* m_text;
   QPushButton* m_btnPrint;
   QPushButton* m_btnNew;
+  QCheckBox* m_cbTitleSize;
+  QCheckBox* m_cbSubtitleSize;
+  QCheckBox* m_cbTextSize;
 };
 
 #endif // POSTITDIALOG_H

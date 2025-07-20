@@ -11,6 +11,7 @@
 #include <QRegularExpression>
 #include "escpos.h"
 #include "escposprinter.h"
+#include "items/jitemhelper.h"
 
 #define KEY_CODE "KEY_CODE"
 
@@ -118,8 +119,8 @@ CalculatorDialog::CalculatorDialog(QWidget* parent)
   , m_lastValue(0.0)
   , m_lastButton(Qt::Key_Standby)
 {
-  setWindowTitle(tr("Calculadora"));
-  setWindowIcon(QIcon(":/icons/res/calculator.png"));
+  setWindowTitle(JItemHelper::text(Functionality::Idx::Calculator));
+  setWindowIcon(QIcon(JItemHelper::icon(Functionality::Idx::Calculator)));
 
   m_btnCls = new QPushButton;
   m_btnCls->setFlat(true);

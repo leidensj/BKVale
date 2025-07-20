@@ -3,6 +3,10 @@
 
 #include <QString>
 
+#define PRINTER_MODEL_NONE 0x0
+#define PRINTER_MODEL_BEMATECH4200TH 0x1
+#define PRINTER_MODEL_ELGINI9 0x2
+
 struct Settings
 {
   Settings();
@@ -11,7 +15,7 @@ struct Settings
   bool m_bIsPrinterEthernet;
   QString m_serialPort;
   QString m_ethernetIP;
-  bool m_bema;
+  int m_printerModel;
   int m_ethernetPort;
   qlonglong m_purchaseStoreId;
 

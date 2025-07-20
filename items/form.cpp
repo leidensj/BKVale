@@ -352,7 +352,7 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
     while (bSuccess && query.next())
       ids.push_back(Id(query.value(0).toLongLong()));
 
-    for (auto id : ids)
+    for (const auto& id : ids)
     {
       Address o(id);
       bSuccess = o.SQL_select_proc(query, error);
@@ -374,7 +374,7 @@ bool Form::SQL_select_proc(QSqlQuery& query, QString& error)
     while (bSuccess && query.next())
       ids.push_back(Id(query.value(0).toLongLong()));
 
-    for (auto id : ids)
+    for (const auto& id : ids)
     {
       Phone o(id);
       bSuccess = o.SQL_select_proc(query, error);

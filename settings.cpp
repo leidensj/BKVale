@@ -8,7 +8,7 @@
 #define SERIAL_PORT            "serial/port"
 #define ETHERNET_IP            "ethernet/ip"
 #define ETHERNET_PORT          "ethernet/port"
-#define PRINTER_TYPE            "printer/type"
+#define PRINTER_MODEL          "printer/model"
 
 #define DEFAULT_DATABASE_PORT 5432
 
@@ -25,7 +25,7 @@ void Settings::clear()
   m_serialPort.clear();
   m_ethernetIP.clear();
   m_ethernetPort = 9100;
-  m_bema = false;
+  m_printerModel = PRINTER_MODEL_NONE;
 }
 
 void Settings::save() const
@@ -37,7 +37,7 @@ void Settings::save() const
   settings.setValue(SERIAL_PORT, m_serialPort);
   settings.setValue(ETHERNET_IP, m_ethernetIP);
   settings.setValue(ETHERNET_PORT, m_ethernetPort);
-  settings.setValue(PRINTER_TYPE, m_bema);
+  settings.setValue(PRINTER_MODEL, m_printerModel);
 }
 
 void Settings::load()
@@ -49,5 +49,5 @@ void Settings::load()
   m_serialPort = settings.value(SERIAL_PORT).toString();
   m_ethernetIP = settings.value(ETHERNET_IP).toString();
   m_ethernetPort = settings.value(ETHERNET_PORT, 9100).toInt();
-  m_bema = settings.value(PRINTER_TYPE, false).toBool();
+  m_printerModel = settings.value(PRINTER_MODEL, PRINTER_MODEL_NONE).toInt();
 }

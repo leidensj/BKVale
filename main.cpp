@@ -14,9 +14,10 @@
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
-
   QCoreApplication::setApplicationVersion("2.1");
 
+  QLocale br(QLocale::Portuguese, QLocale::Brazil);
+  QLocale::setDefault(br);
   QCommandLineParser parser;
   parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
 

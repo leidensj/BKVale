@@ -87,7 +87,7 @@ QString Purchase::strDate() const
 
 QString Purchase::strDayOfWeek() const
 {
-  return m_date.toString("dddd");
+  return DateTime::strWeekDay(m_date);
 }
 
 QString Purchase::strNumber() const

@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include "widgets/jlineedit.h"
+#include "items/jitemhelper.h"
 #include "escposprinter.h"
 #include "escpos.h"
 
@@ -20,8 +21,8 @@ PostItDialog::PostItDialog(QWidget* parent)
  , m_cbTextSize(nullptr)
 {
   setWindowFlags(Qt::Window);
-  setWindowTitle(tr("Post It"));
-  setWindowIcon(QIcon(":/icons/res/postit2.png"));
+  setWindowTitle(JItemHelper::text(Functionality::Idx::PostIt));
+  setWindowIcon(QIcon(JItemHelper::icon(Functionality::Idx::PostIt)));
 
   m_title = new JLineEdit(Text::Input::ASCII, false);
   m_title->setPlaceholderText(tr("Título"));

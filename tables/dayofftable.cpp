@@ -27,7 +27,7 @@ void DayOffTable::update()
   setColumnCount(m_date.daysInMonth());
   QStringList headers;
   for (int i = 0; i != m_date.daysInMonth(); ++i)
-    headers << QString::number(i + 1) + " " + m_date.addDays(i).toString("dddd");
+    headers << QString::number(i + 1) + " " + DateTime::strWeekDay(m_date.addDays(i));
   setHorizontalHeaderLabels(headers);
   headers.clear();
   for (int i = 0; i != m_store.m_vEmployee.size(); ++i)

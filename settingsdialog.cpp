@@ -31,8 +31,8 @@ void SettingsDialog::doDataExchange(bool toUI)
     ui->cbSerialPort->setCurrentIndex(ui->cbSerialPort->findText(m_settings.m_serialPort, Qt::MatchExactly));
     ui->edEthernetIP->setText(m_settings.m_ethernetIP);
     ui->sbEthernetPort->setValue(m_settings.m_ethernetPort);
-    ui->rdoEscpos->setChecked(!m_settings.m_bema);
-    ui->rdoBematech->setChecked(m_settings.m_bema);
+    ui->rdoElginI9->setChecked(m_settings.m_printerModel == PRINTER_MODEL_ELGINI9);
+    ui->rdoBema4200TH->setChecked(m_settings.m_printerModel == PRINTER_MODEL_BEMATECH4200TH);
   }
   else
   {
@@ -40,7 +40,7 @@ void SettingsDialog::doDataExchange(bool toUI)
     m_settings.m_serialPort = ui->cbSerialPort->currentText();
     m_settings.m_ethernetIP = ui->edEthernetIP->text();
     m_settings.m_ethernetPort = ui->sbEthernetPort->value();
-    m_settings.m_bema = ui->rdoBematech->isChecked();
+    m_settings.m_printerModel = ui->rdoBema4200TH->isChecked() ? PRINTER_MODEL_BEMATECH4200TH : PRINTER_MODEL_ELGINI9;
   }
 }
 

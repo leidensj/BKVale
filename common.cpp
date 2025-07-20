@@ -189,3 +189,9 @@ QDateTime DateTime::server()
     dt = query.value(0).toDateTime();
   return dt.toLocalTime();
 }
+
+QString DateTime::strWeekDay(const QDate& dt)
+{
+  QLocale br(QLocale::Portuguese, QLocale::Brazil);
+  return br.toString(dt, "dddd");
+}

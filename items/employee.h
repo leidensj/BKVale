@@ -3,6 +3,7 @@
 
 #include "form.h"
 #include "timeinterval.h"
+#include "employeepermission.h"
 #include <QVector>
 
 struct Employee : public JItemSQL
@@ -26,21 +27,26 @@ struct Employee : public JItemSQL
 
   QString name() const { return m_form.name(); }
   QByteArray image() const { return m_form.m_image.m_image; }
+  QString strHours() const;
+
+  bool hasPermissionToCreate(Functionality::Idx idx) const;
+  bool hasPermissionToEdit(Functionality::Idx idx) const;
+  bool hasPermissionToRemove(Functionality::Idx idx) const;
+  bool hasPermissionToCreate(const QString& tableName) const;
+  bool hasPermissionToEdit(const QString& tableName) const;
+  bool hasPermissionToRemove(const QString& tableName) const;
+
+  void setPermissionToCreate(Functionality::Idx idx, bool bSet);
+  void setPermissionToEdit(Functionality::Idx idx, bool bSet);
+  void setPermissionToRemove(Functionality::Idx idx, bool bSet);
+  void setPermissionToCreate(const QString& tableName, bool bSet);
+  void setPermissionToEdit(const QString& tableName, bool bSet);
+  void setPermissionToRemove(const QString& tableName, bool bSet);
 
   Form m_form;
   QString m_pincode;
-  QMap<Functionality::Idx, bool> m_createEditPermissions;
-  QMap<Functionality::Idx, bool> m_removePermissions;
-
-  bool hasPermissionToCreateEdit(Functionality::Idx idx) const;
-  bool hasPermissionToCreateEdit(const QString& tableName) const;
-  bool hasPermissionToRemove(Functionality::Idx idx) const;
-  bool hasPermissionToRemove(const QString& tableName) const;
-  void setPermissionToCreateEdit(Functionality::Idx idx, bool bSet);
-  void setPermissionToRemove(Functionality::Idx idx, bool bSet);
-
-  QString strHours() const;
   QVector<TimeInterval> m_hours;
+  QVector<EmployeePermission> m_permissions;
   QVariant getPincodeNull() const { return !m_pincode.isEmpty() ? m_pincode : QVariant(QVariant::String); }
 };
 

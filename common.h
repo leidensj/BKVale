@@ -35,6 +35,7 @@ namespace Functionality
     Coin,
     Cash,
     CashClosing,
+    PostIt,
     _END,
   };
 
@@ -81,5 +82,6 @@ QString getRegEx(Input input);
 
 namespace DateTime {
 QDateTime server();
+QString strWeekDay(const QDate& dt);
 }
 #endif // COMMON_H

@@ -187,6 +187,8 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Caixa";
     case Functionality::Idx::CashClosing:
       return "Fechamento de Caixa";
+    case Functionality::Idx::PostIt:
+      return "Post It";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -254,6 +256,8 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/cashier.png";
     case Functionality::Idx::CashClosing:
       return ":/icons/res/cashier.png";
+    case Functionality::Idx::PostIt:
+      return ":/icons/res/postit2.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -399,7 +403,7 @@ bool JItemHelper::authenticateSave(const JItemSQL& o, QWidget* parent)
     Employee e = w.getEmployee();
     if (!e.m_id.isValid())
       error = QObject::tr("Pincode informado não encontrado.");
-    else if (!e.hasPermissionToCreateEdit(o.SQL_tableName()))
+    else if (!e.hasPermissionToCreate(o.SQL_tableName()))
       error = QObject::tr("Funcionário não possui permissão.");
     if (!error.isEmpty())
     {
@@ -419,7 +423,7 @@ void JItemHelper::remove(const Ids& ids, const QString& tableName, QWidget* pare
   if (!authenticateRemove(tableName, parent))
     return;
 
-  for (auto id : ids)
+  for (const auto& id : ids)
   {
     auto p = JItemHelper::create(tableName, id);
     if (p != nullptr)

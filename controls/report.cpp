@@ -102,7 +102,7 @@ void Report::fontSizeChanged()
     int size = sender()->property(FONT_SIZE_PROP).toInt();
     if (size >= 6 && size <= 16)
     {
-      for (auto act : m_btnFontSize->menu()->actions())
+      for (auto& act : m_btnFontSize->menu()->actions())
         act->setChecked(act == sender());
       QFont f = m_report->font();
       f.setPointSize(size);

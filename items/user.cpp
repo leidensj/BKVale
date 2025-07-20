@@ -185,7 +185,7 @@ bool User::hasPermission(const QString& tableName) const
 
 void User::setPermission(Functionality::Idx idx, bool bSet)
 {
-  for (auto up : m_permissions)
+  for (auto& up : m_permissions)
   {
     if (up.m_func == idx)
     {

@@ -2,22 +2,9 @@
 #include "ui_mainwindow.h"
 #include "aboutdialog.h"
 
-//#include "views/productview.h"
-//#include "views/categoryview.h"
 #include "views/purchaseview.h"
-//#include "views/employeeview.h"
-//#include "views/supplierview.h"
 #include "views/reminderview.h"
-//#include "views/shoppinglistview.h"
-//#include "views/storeview.h"
-//#include "views/userview.h"
-//#include "views/imageview.h"
-//#include "views/couponview.h"
 #include "views/inventoryview.h"
-//#include "views/sectorview.h"
-//#include "views/coinview.h"
-//#include "views/cashview.h"
-//#include "views/cashclosingview.h"
 
 #include "controls/report.h"
 #include "controls/calculatordialog.h"
@@ -27,6 +14,7 @@
 #include "controls/databaseviewer.h"
 #include "controls/timecarddialog.h"
 #include "controls/couponredeemer.h"
+#include "controls/postitdialog.h"
 
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
@@ -160,6 +148,7 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Coin] = ui->actionCoins;
   m_actions[Functionality::Idx::Cash] = ui->actionCash;
   m_actions[Functionality::Idx::CashClosing] = ui->actionCashClosing;
+  m_actions[Functionality::Idx::PostIt] = ui->actionPostIt;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
@@ -187,6 +176,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCash, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCashClosing, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(openCalculatorDialog()));
+  connect(ui->actionPostIt, SIGNAL(triggered(bool)), this, SLOT(openPostItDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));
@@ -375,6 +365,12 @@ void Baita::openTimeCardDialog()
 void Baita::openCalculatorDialog()
 {
   CalculatorDialog dlg(this);
+  dlg.exec();
+}
+
+void Baita::openPostItDialog()
+{
+  PostItDialog dlg(this);
   dlg.exec();
 }
 

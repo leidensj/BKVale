@@ -265,6 +265,26 @@ bool BaitaSQL::createTables(QString& error)
                           EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " EMPLOYEE_PERMISSIONS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          EMPLOYEE_PERMISSIONS_SQL_COL_OID " INTEGER NOT NULL,"
+                          EMPLOYEE_PERMISSIONS_SQL_COL_FUN " INTEGER,"
+                          EMPLOYEE_PERMISSIONS_SQL_COL_CRE " BOOLEAN,"
+                          EMPLOYEE_PERMISSIONS_SQL_COL_EDI " BOOLEAN,"
+                          EMPLOYEE_PERMISSIONS_SQL_COL_REM " BOOLEAN,"
+                          "FOREIGN KEY(" EMPLOYEE_PERMISSIONS_SQL_COL_OID ") REFERENCES "
+                          EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " USER_PERMISSIONS_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          USER_PERMISSIONS_SQL_COL_OID " INTEGER NOT NULL,"
+                          USER_PERMISSIONS_SQL_COL_FUN " INTEGER,"
+                          USER_PERMISSIONS_SQL_COL_ACC " BOOLEAN,"
+                          "FOREIGN KEY(" USER_PERMISSIONS_SQL_COL_OID ") REFERENCES "
+                          USER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SUPPLIER_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           SUPPLIER_SQL_COL_FID " INTEGER NOT NULL UNIQUE,"

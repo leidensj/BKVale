@@ -40,23 +40,32 @@ EmployeeView::EmployeeView(QWidget* parent)
   m_trPermissions = new QTreeWidget;
   m_trPermissions->setColumnCount(1);
   m_trPermissions->header()->setVisible(false);
-  auto rootCreateEdit = new QTreeWidgetItem;
-  rootCreateEdit->setText(0, tr("Criar/editar"));
-  rootCreateEdit->setIcon(0, QIcon(":/icons/res/file.png"));
-  rootCreateEdit->setFlags(rootCreateEdit->flags() | Qt::ItemIsAutoTristate);
+  auto rootCreate = new QTreeWidgetItem;
+  rootCreate->setText(0, tr("Criar"));
+  rootCreate->setIcon(0, QIcon(":/icons/res/save.png"));
+  rootCreate->setFlags(rootCreate->flags() | Qt::ItemIsAutoTristate);
+  auto rootEdit = new QTreeWidgetItem;
+  rootEdit->setText(0, tr("Editar"));
+  rootEdit->setIcon(0, QIcon(":/icons/res/saveas.png"));
+  rootEdit->setFlags(rootEdit->flags() | Qt::ItemIsAutoTristate);
   auto rootRemove = new QTreeWidgetItem;
   rootRemove->setText(0, tr("Remover"));
   rootRemove->setIcon(0, QIcon(":/icons/res/remove.png"));
   rootRemove->setFlags(rootRemove->flags() | Qt::ItemIsAutoTristate);
-  m_trPermissions->insertTopLevelItem(0, rootCreateEdit);
-  m_trPermissions->insertTopLevelItem(1, rootRemove);
-  createTreeItem(Functionality::Idx::Purchase, rootCreateEdit);
-  createTreeItem(Functionality::Idx::Reminder, rootCreateEdit);
-  createTreeItem(Functionality::Idx::Coupon, rootCreateEdit);
+  m_trPermissions->insertTopLevelItem(0, rootCreate);
+  m_trPermissions->insertTopLevelItem(1, rootEdit);
+  m_trPermissions->insertTopLevelItem(2, rootRemove);
+  createTreeItem(Functionality::Idx::Purchase, rootCreate);
+  createTreeItem(Functionality::Idx::Reminder, rootCreate);
+  createTreeItem(Functionality::Idx::Coupon, rootCreate);
+  createTreeItem(Functionality::Idx::Purchase, rootEdit);
+  createTreeItem(Functionality::Idx::Reminder, rootEdit);
+  createTreeItem(Functionality::Idx::Coupon, rootEdit);
   createTreeItem(Functionality::Idx::Purchase, rootRemove);
   createTreeItem(Functionality::Idx::Reminder, rootRemove);
   createTreeItem(Functionality::Idx::Coupon, rootRemove);
-  rootCreateEdit->setExpanded(true);
+  rootCreate->setExpanded(true);
+  rootEdit->setExpanded(true);
   rootRemove->setExpanded(true);
 
   QHBoxLayout* ltPincode = new QHBoxLayout;
@@ -120,10 +129,13 @@ void EmployeeView::getItem(JItemSQL& o) const
   m_formPhone->fillForm(_o.m_form);
   m_formAddress->fillForm(_o.m_form);
   _o.m_pincode = m_edPincode->text();
-  auto ptCreateEdit = m_trPermissions->topLevelItem(0);
-  for (int i = 0; i != ptCreateEdit->childCount(); ++i)
-    _o.setPermissionToCreateEdit((Functionality::Idx)ptCreateEdit->child(i)->data(0, Qt::UserRole).toInt(), ptCreateEdit->child(i)->checkState(0) == Qt::Checked);
-  auto ptRemove = m_trPermissions->topLevelItem(1);
+  auto ptCreate = m_trPermissions->topLevelItem(0);
+  for (int i = 0; i != ptCreate->childCount(); ++i)
+    _o.setPermissionToCreate((Functionality::Idx)ptCreate->child(i)->data(0, Qt::UserRole).toInt(), ptCreate->child(i)->checkState(0) == Qt::Checked);
+  auto ptEdit = m_trPermissions->topLevelItem(1);
+  for (int i = 0; i != ptEdit->childCount(); ++i)
+    _o.setPermissionToEdit((Functionality::Idx)ptEdit->child(i)->data(0, Qt::UserRole).toInt(), ptEdit->child(i)->checkState(0) == Qt::Checked);
+  auto ptRemove = m_trPermissions->topLevelItem(2);
   for (int i = 0; i != ptRemove->childCount(); ++i)
     _o.setPermissionToRemove((Functionality::Idx)ptRemove->child(i)->data(0, Qt::UserRole).toInt(), ptRemove->child(i)->checkState(0) == Qt::Checked);
   m_tbHours->getHours(_o.m_hours);
@@ -148,26 +160,27 @@ void EmployeeView::setItem(const JItemSQL& o)
   }
 
   {
-    auto ptCreateEdit = m_trPermissions->topLevelItem(0);
-    QMapIterator<Functionality::Idx, bool> i(_o.m_createEditPermissions);
-    while (i.hasNext())
+    auto ptCreate = m_trPermissions->topLevelItem(0);
+    for (int j = 0; j != ptCreate->childCount(); ++j)
     {
-      i.next();
-      for (int j = 0; j != ptCreateEdit->childCount(); ++j)
-        if (ptCreateEdit->child(j)->data(0, Qt::UserRole).toInt() == (int)i.key())
-          ptCreateEdit->child(j)->setCheckState(0, i.value() ? Qt::Checked : Qt::Unchecked);
+      bool b = _o.hasPermissionToCreate((Functionality::Idx)ptCreate->child(j)->data(0, Qt::UserRole).toInt());
+      ptCreate->child(j)->setCheckState(0, b ? Qt::Checked : Qt::Unchecked);
     }
   }
 
   {
-    auto ptRemove = m_trPermissions->topLevelItem(1);
-    QMapIterator<Functionality::Idx, bool> i(_o.m_removePermissions);
-    while (i.hasNext())
+    auto ptEdit = m_trPermissions->topLevelItem(1);
+    for (int j = 0; j != ptEdit->childCount(); ++j)
     {
-      i.next();
-      for (int j = 0; j != ptRemove->childCount(); ++j)
-        if (ptRemove->child(j)->data(0, Qt::UserRole).toInt() == (int)i.key())
-          ptRemove->child(j)->setCheckState(0, i.value() ? Qt::Checked : Qt::Unchecked);
+      bool b = _o.hasPermissionToEdit((Functionality::Idx)ptEdit->child(j)->data(0, Qt::UserRole).toInt());
+      ptEdit->child(j)->setCheckState(0, b ? Qt::Checked : Qt::Unchecked);
     }
+  }
+
+  auto ptRemove = m_trPermissions->topLevelItem(2);
+  for (int j = 0; j != ptRemove->childCount(); ++j)
+  {
+    bool b = _o.hasPermissionToRemove((Functionality::Idx)ptRemove->child(j)->data(0, Qt::UserRole).toInt());
+    ptRemove->child(j)->setCheckState(0, b ? Qt::Checked : Qt::Unchecked);
   }
 }

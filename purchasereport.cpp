@@ -42,7 +42,7 @@ QString PurchaseReport::getProductFilter() const
   if (!ids.isEmpty())
   {
     str += " _NOTE_ITEMS._PRODUCTID IN (";
-    for (auto id : ids)
+    for (const auto& id : ids)
       str += id.str() + ",";
     str.chop(1);
     str += ") ";
@@ -76,7 +76,7 @@ QString PurchaseReport::strFilterHtml() const
   aux.clear();
   if (!vs.isEmpty())
   {
-    for (auto it : vs)
+    for (const auto& it : vs)
       aux += it + "; ";
     aux.chop(2);
   }
@@ -88,7 +88,7 @@ QString PurchaseReport::strFilterHtml() const
   aux.clear();
   if (!vp.isEmpty())
   {
-    for (auto it : vp)
+    for (const auto& it : vp)
       aux += it + "; ";
     aux.chop(2);
   }
@@ -100,7 +100,7 @@ QString PurchaseReport::strFilterHtml() const
   aux.clear();
   if (!vst.isEmpty())
   {
-    for (auto it :vst)
+    for (const auto& it :vst)
       aux += it + "; ";
     aux.chop(2);
   }

@@ -93,6 +93,7 @@ private slots:
   void activateWindow();
   void openTimeCardDialog();
   void openCalculatorDialog();
+  void openPostItDialog();
   void about();
 };
 

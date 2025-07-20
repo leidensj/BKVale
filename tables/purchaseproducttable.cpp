@@ -120,6 +120,7 @@ void PurchaseProductTable::set(const QVector<PurchaseProduct>& v, bool bClear)
     addRow();
     int row = rowCount() - 1;
     getItem(row, (int)Column::Product)->setValue(SQLItem::st_toVariant(v.at(i).m_product));
+    dynamic_cast<PackageItem*>(getItem(row, (int)Column::Package))->setProductUnity(v.at(i).m_product.m_unity);
     getItem(row, (int)Column::Package)->setValue(PackageItem::st_toVariant(v.at(i).m_package));
     getItem(row, (int)Column::Ammount)->setValue(v.at(i).m_ammount);
     getItem(row, (int)Column::Price)->setValue(v.at(i).m_price);
@@ -128,15 +129,19 @@ void PurchaseProductTable::set(const QVector<PurchaseProduct>& v, bool bClear)
 
 void PurchaseProductTable::loadProductInfo(int row)
 {
-  if (!m_isNewPurchase)
-    return;
 
   Product o;
   o.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
-  if (o.m_id.isValid())
+  QString error;
+  if (!o.m_id.isValid() || !o.SQL_select(error))
+    return;
+
+  if (!m_isNewPurchase)
   {
-    QString error;
-    o.SQL_select(error);
+    dynamic_cast<PackageItem*>(getItem(row, (int)Column::Package))->setProductUnity(o.m_unity);
+  }
+  else
+  {
     PurchaseProduct lastSupplierProduct;
     PurchaseProduct lastProduct;
     lastSupplierProduct.SQL_select_last(m_supplierId, o.m_id);
@@ -177,33 +182,12 @@ void PurchaseProductTable::update(int row, int column)
     case Column::Ammount:
     case Column::Price:
       getItem(row, (int)Column::SubTotal)->setValue(computeSubTotal(row));
-      if (m_isNewPurchase)
-      {
-        double oldPrice = getItem(row, (int)Column::Price)->data(PreviousPriceRole).toDouble();
-        if (oldPrice != 0)
-        {
-          Package pck = PackageItem::st_fromVariant(getItem(row, (int)Column::Package)->getValue());
-          auto priceItem = getItem(row, (int)Column::Price);
-          double price = priceItem->getValue().toDouble();
-          if (pck.m_bIsPackage)
-            price = price / pck.m_ammount;
-          if (!Data::areEqual(price, oldPrice, Data::Type::Money))
-          {
-            if (oldPrice < price)
-              priceItem->setIcon(QIcon(":/icons/res/upred.png"));
-            else
-              priceItem->setIcon(QIcon(":/icons/res/downgreen.png"));
-          }
-          else
-            priceItem->setIcon(QIcon(":/icons/res/calcequal.png"));
-        }
-
-      }
       break;
     case Column::SubTotal:
     {
       getItem(row, (int)Column::Price)->setValue(computePrice(row));
       getItem(row, (int)Column::SubTotal)->setValue(computeSubTotal(row));
+      update(row, (int)Column::Price);
     } break;
     case Column::Product:
       loadProductInfo(row);
@@ -211,8 +195,28 @@ void PurchaseProductTable::update(int row, int column)
       break;
   }
 
+  if (m_isNewPurchase)
+  {
+    double oldPrice = getItem(row, (int)Column::Price)->data(PreviousPriceRole).toDouble();
+    if (oldPrice != 0)
+    {
+      Package pck = PackageItem::st_fromVariant(getItem(row, (int)Column::Package)->getValue());
+      auto priceItem = getItem(row, (int)Column::Price);
+      double price = priceItem->getValue().toDouble();
+      if (pck.m_bIsPackage)
+        price = price / pck.m_ammount;
+      if (!Data::areEqual(price, oldPrice, Data::Type::Money))
+      {
+        if (oldPrice < price)
+          priceItem->setIcon(QIcon(":/icons/res/upred.png"));
+        else
+          priceItem->setIcon(QIcon(":/icons/res/downgreen.png"));
+      }
+      else
+        priceItem->setIcon(QIcon(":/icons/res/calcequal.png"));
+    }
+  }
   blockSignals(false);
-  //emitChangedSignal();
 }
 
 void PurchaseProductTable::setNewPurchase(bool b)

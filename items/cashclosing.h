@@ -24,7 +24,7 @@ struct CashClosing : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
 
-  QByteArray printVersion() const;
+  QByteArray printVersion(const QVariant& arg) const;
 
   double sumSectorsValue() const;
   int sumSectorsNValue() const;

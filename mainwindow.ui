@@ -132,6 +132,7 @@
     <addaction name="actionRedeem"/>
     <addaction name="actionCashClosing"/>
     <addaction name="actionCalculator"/>
+    <addaction name="actionPostIt"/>
    </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
@@ -467,6 +468,18 @@
    </property>
    <property name="text">
     <string>Fechamento de Caixa</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionPostIt">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/postit2.png</normaloff>:/icons/res/postit2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Post It</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

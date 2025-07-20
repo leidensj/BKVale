@@ -12,8 +12,7 @@ void Employee::clear(bool bClearId)
   m_form.clear(bClearId);
   m_pincode.clear();
   m_hours.clear();
-  m_createEditPermissions.clear();
-  m_removePermissions.clear();
+  m_permissions.clear();
 }
 
 bool Employee::operator !=(const JItem& other) const
@@ -21,8 +20,7 @@ bool Employee::operator !=(const JItem& other) const
   const Employee& another = dynamic_cast<const Employee&>(other);
   bool b =  m_form.m_id != another.m_form.m_id ||
             m_pincode != another.m_pincode ||
-            m_createEditPermissions != another.m_createEditPermissions ||
-            m_removePermissions != another.m_removePermissions ||
+            m_permissions != another.m_permissions ||
             m_hours != another.m_hours;
   return b;
 }
@@ -45,37 +43,19 @@ QString Employee::SQL_tableName() const
 
 bool Employee::SQL_insert_proc(QSqlQuery& query) const
 {
-  bool bSuccess = m_form.SQL_insert_proc(query);
-  if (bSuccess)
+  bool ok = m_form.SQL_insert_proc(query);
+  if (ok)
   {
     query.prepare("INSERT INTO " EMPLOYEE_SQL_TABLE_NAME " ("
                   EMPLOYEE_SQL_COL_FID ","
-                  EMPLOYEE_SQL_COL_PIN ","
-                  EMPLOYEE_SQL_COL_NED ","
-                  EMPLOYEE_SQL_COL_NRE ","
-                  EMPLOYEE_SQL_COL_RED ","
-                  EMPLOYEE_SQL_COL_RRE ","
-                  EMPLOYEE_SQL_COL_CED ","
-                  EMPLOYEE_SQL_COL_CRE
+                  EMPLOYEE_SQL_COL_PIN
                   ") VALUES ("
                   "(:_v01),"
-                  "(:_v02),"
-                  "(:_v03),"
-                  "(:_v04),"
-                  "(:_v05),"
-                  "(:_v06),"
-                  "(:_v07),"
-                  "(:_v08))");
+                  "(:_v02))");
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
-    query.bindValue(":_v03", hasPermissionToCreateEdit(Functionality::Idx::Purchase));
-    query.bindValue(":_v04", hasPermissionToRemove(Functionality::Idx::Purchase));
-    query.bindValue(":_v05", hasPermissionToCreateEdit(Functionality::Idx::Reminder));
-    query.bindValue(":_v06", hasPermissionToRemove(Functionality::Idx::Reminder));
-    query.bindValue(":_v07", hasPermissionToCreateEdit(Functionality::Idx::Coupon));
-    query.bindValue(":_v08", hasPermissionToRemove(Functionality::Idx::Coupon));
-    bSuccess = query.exec();
-    if (bSuccess)
+    ok = query.exec();
+    if (ok)
     {
       m_id.set(query.lastInsertId().toLongLong());
       for (int i = 0; i != m_hours.size(); ++i)
@@ -94,48 +74,44 @@ bool Employee::SQL_insert_proc(QSqlQuery& query) const
         query.bindValue(":_v02", m_hours.at(i).m_day);
         query.bindValue(":_v03", m_hours.at(i).m_tmBegin);
         query.bindValue(":_v04", m_hours.at(i).m_tmEnd);
-        bSuccess = query.exec();
-        if (!bSuccess)
+        ok = query.exec();
+        if (!ok)
           break;
       }
     }
+    if (ok)
+    {
+      for (int i = 0; i != m_permissions.size() && ok; ++i)
+      {
+        m_permissions[i].m_ownerId = m_id;
+        ok = m_permissions.at(i).SQL_insert_proc(query);
+      }
+    }
   }
-  return bSuccess;
+  return ok;
 }
 
 bool Employee::SQL_update_proc(QSqlQuery& query) const
 {
-  bool bSuccess = m_form.SQL_update_proc(query);
-  if (bSuccess)
+  bool ok = m_form.SQL_update_proc(query);
+  if (ok)
   {
     query.prepare("UPDATE " EMPLOYEE_SQL_TABLE_NAME " SET "
                   EMPLOYEE_SQL_COL_FID " = (:_v01),"
-                  EMPLOYEE_SQL_COL_PIN " = (:_v02),"
-                  EMPLOYEE_SQL_COL_NED " = (:_v03),"
-                  EMPLOYEE_SQL_COL_NRE " = (:_v04),"
-                  EMPLOYEE_SQL_COL_RED " = (:_v05),"
-                  EMPLOYEE_SQL_COL_RRE " = (:_v06),"
-                  EMPLOYEE_SQL_COL_CED " = (:_v07),"
-                  EMPLOYEE_SQL_COL_CRE " = (:_v08)"
+                  EMPLOYEE_SQL_COL_PIN " = (:_v02)"
                   " WHERE " SQL_COLID " = (:_v00)");
     query.bindValue(":_v00", m_id.get());
     query.bindValue(":_v01", m_form.m_id.get());
     query.bindValue(":_v02", getPincodeNull());
-    query.bindValue(":_v03", hasPermissionToCreateEdit(Functionality::Idx::Purchase));
-    query.bindValue(":_v04", hasPermissionToRemove(Functionality::Idx::Purchase));
-    query.bindValue(":_v05", hasPermissionToCreateEdit(Functionality::Idx::Reminder));
-    query.bindValue(":_v06", hasPermissionToRemove(Functionality::Idx::Reminder));
-    query.bindValue(":_v07", hasPermissionToCreateEdit(Functionality::Idx::Coupon));
-    query.bindValue(":_v08", hasPermissionToRemove(Functionality::Idx::Coupon));
 
-    bSuccess = query.exec();
-    if (bSuccess)
+    ok = query.exec();
+    if (ok)
     {
       query.prepare("DELETE FROM " EMPLOYEE_HOURS_SQL_TABLE_NAME
                     " WHERE " EMPLOYEE_HOURS_SQL_COL_EID " = (:_v01)");
       query.bindValue(":_v01", m_id.get());
-      bSuccess = query.exec();
-      if (bSuccess)
+      ok = query.exec();
+      if (ok)
       {
         for (int i = 0; i != m_hours.size(); ++i)
         {
@@ -153,14 +129,24 @@ bool Employee::SQL_update_proc(QSqlQuery& query) const
           query.bindValue(":_v02", m_hours.at(i).m_day);
           query.bindValue(":_v03", m_hours.at(i).m_tmBegin);
           query.bindValue(":_v04", m_hours.at(i).m_tmEnd);
-          bSuccess = query.exec();
-          if (!bSuccess)
+          ok = query.exec();
+          if (!ok)
             break;
         }
       }
     }
+
+    if (ok)
+    {
+      ok = EmployeePermission::SQL_remove_by_owner_id_proc(query, m_id);
+      for (int i = 0; i != m_permissions.size() && ok; ++i)
+      {
+        m_permissions[i].m_ownerId = m_id;
+        ok = m_permissions.at(i).SQL_insert_proc(query);
+      }
+    }
   }
-  return bSuccess;
+  return ok;
 }
 
 bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
@@ -168,38 +154,27 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
   error.clear();
   query.prepare("SELECT "
                 EMPLOYEE_SQL_COL_FID ","
-                EMPLOYEE_SQL_COL_PIN ","
-                EMPLOYEE_SQL_COL_NED ","
-                EMPLOYEE_SQL_COL_NRE ","
-                EMPLOYEE_SQL_COL_RED ","
-                EMPLOYEE_SQL_COL_RRE ","
-                EMPLOYEE_SQL_COL_CED ","
-                EMPLOYEE_SQL_COL_CRE
+                EMPLOYEE_SQL_COL_PIN
                 " FROM " EMPLOYEE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
-  bool bSuccess = query.exec();
-  if (bSuccess)
+  bool ok = query.exec();
+  if (ok)
   {
     if (query.next())
     {
       m_form.m_id.set(query.value(0).toLongLong());
       m_pincode = query.value(1).toString();
-      setPermissionToCreateEdit(Functionality::Idx::Purchase, query.value(2).toBool());
-      setPermissionToRemove(Functionality::Idx::Purchase, query.value(3).toBool());
-      setPermissionToCreateEdit(Functionality::Idx::Reminder, query.value(4).toBool());
-      setPermissionToRemove(Functionality::Idx::Reminder, query.value(5).toBool());
-      setPermissionToCreateEdit(Functionality::Idx::Coupon, query.value(6).toBool());
-      setPermissionToRemove(Functionality::Idx::Coupon, query.value(7).toBool());
+
     }
     else
     {
       error = "Funcionário não encontrado.";
-      bSuccess = false;
+      ok = false;
     }
   }
 
-  if (bSuccess)
+  if (ok)
   {
     query.prepare("SELECT "
                   EMPLOYEE_HOURS_SQL_COL_DAY ","
@@ -208,8 +183,8 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
                   " FROM " EMPLOYEE_HOURS_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_HOURS_SQL_COL_EID " = (:_v01)");
     query.bindValue(":_v01", m_id.get());
-    bSuccess = query.exec();
-    while (bSuccess && query.next())
+    ok = query.exec();
+    while (ok && query.next())
     {
       TimeInterval h;
       h.m_day = query.value(0).toInt();
@@ -219,18 +194,21 @@ bool Employee::SQL_select_proc(QSqlQuery& query, QString& error)
     }
   }
 
-  if (bSuccess)
-    bSuccess = m_form.SQL_select_proc(query, error);
+  if (ok)
+    ok = m_form.SQL_select_proc(query, error);
 
-  return bSuccess;
+  if (ok)
+    ok = EmployeePermission::SQL_select_by_owner_id_proc(query, m_id, m_permissions, error);
+
+  return ok;
 }
 
 bool Employee::SQL_remove_proc(QSqlQuery& query) const
 {
-  bool bSuccess = SQL_select_formid_proc(query);
-  if (bSuccess)
-    bSuccess = m_form.SQL_remove_proc(query);
-  return bSuccess;
+  bool ok = SQL_select_formid_proc(query);
+  if (ok)
+    ok = m_form.SQL_remove_proc(query);
+  return ok;
 }
 
 bool Employee::SQL_select_by_pincode(QString& error)
@@ -242,8 +220,8 @@ bool Employee::SQL_select_by_pincode(QString& error)
   db.transaction();
   QSqlQuery query(db);
 
-  bool bSuccess = SQL_select_by_pincode_proc(query, error);
-  return SQL_finish(db, query, bSuccess, error);
+  bool ok = SQL_select_by_pincode_proc(query, error);
+  return SQL_finish(db, query, ok, error);
 }
 
 
@@ -251,37 +229,37 @@ bool Employee::SQL_select_by_pincode_proc(QSqlQuery& query, QString& error)
 {
   error.clear();
 
-  bool bSuccess = true;
+  bool ok = true;
   if (m_pincode.isEmpty())
   {
     error = "PIN nulo";
-    bSuccess = false;
+    ok = false;
   }
 
-  if (bSuccess)
+  if (ok)
   {
     query.prepare("SELECT "
                   SQL_COLID
                   " FROM " EMPLOYEE_SQL_TABLE_NAME
                   " WHERE " EMPLOYEE_SQL_COL_PIN " = (:_v02) LIMIT 1");
     query.bindValue(":_v02", m_pincode);
-    bSuccess = query.exec();
-    if (bSuccess)
+    ok = query.exec();
+    if (ok)
     {
       if (query.next())
       {
         m_id.set(query.value(0).toLongLong());
-        bSuccess = SQL_select_proc(query, error);
+        ok = SQL_select_proc(query, error);
       }
       else
       {
         error = "PIN inválido";
-        bSuccess = false;
+        ok = false;
       }
     }
   }
 
-  return bSuccess;
+  return ok;
 }
 
 bool Employee::SQL_select_formid_proc(QSqlQuery& query) const
@@ -291,10 +269,10 @@ bool Employee::SQL_select_formid_proc(QSqlQuery& query) const
                 " FROM " EMPLOYEE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
-  bool bSuccess = query.exec();
-  if (bSuccess && query.next())
+  bool ok = query.exec();
+  if (ok && query.next())
     m_form.m_id.set(query.value(0).toLongLong());
-  return bSuccess;
+  return ok;
 }
 
 QString Employee::strHours() const
@@ -307,19 +285,44 @@ QString Employee::strHours() const
   return str;
 }
 
-bool Employee::hasPermissionToCreateEdit(Functionality::Idx idx) const
+bool Employee::hasPermissionToCreate(Functionality::Idx idx) const
 {
-  return m_createEditPermissions.contains(idx) ? m_createEditPermissions.value(idx) : false;
+  for (const auto& up : m_permissions)
+  {
+    if (up.m_func == idx)
+      return up.m_bHasAccessToCreate;
+  }
+  return false;
 }
 
-bool Employee::hasPermissionToCreateEdit(const QString& tableName) const
+bool Employee::hasPermissionToCreate(const QString& tableName) const
 {
-  return hasPermissionToCreateEdit(Functionality::tableNameToIdx(tableName));
+  return hasPermissionToCreate(Functionality::tableNameToIdx(tableName));
+}
+
+bool Employee::hasPermissionToEdit(Functionality::Idx idx) const
+{
+  for (const auto& up : m_permissions)
+  {
+    if (up.m_func == idx)
+      return up.m_bHasAccessToEdit;
+  }
+  return false;
+}
+
+bool Employee::hasPermissionToEdit(const QString& tableName) const
+{
+  return hasPermissionToEdit(Functionality::tableNameToIdx(tableName));
 }
 
 bool Employee::hasPermissionToRemove(Functionality::Idx idx) const
 {
-  return m_removePermissions.contains(idx) ? m_removePermissions.value(idx) : false;
+  for (const auto& up : m_permissions)
+  {
+    if (up.m_func == idx)
+      return up.m_bHasAccessToRemove;
+  }
+  return false;
 }
 
 bool Employee::hasPermissionToRemove(const QString& tableName) const
@@ -327,12 +330,65 @@ bool Employee::hasPermissionToRemove(const QString& tableName) const
   return hasPermissionToRemove(Functionality::tableNameToIdx(tableName));
 }
 
-void Employee::setPermissionToCreateEdit(Functionality::Idx idx, bool bSet)
+void Employee::setPermissionToCreate(Functionality::Idx idx, bool bSet)
 {
-  m_createEditPermissions[idx] = bSet;
+  for (auto& ep : m_permissions)
+  {
+    if (ep.m_func == idx)
+    {
+      ep.m_bHasAccessToCreate = bSet;
+      return;
+    }
+  }
+  EmployeePermission ep;
+  ep.m_func = idx;
+  ep.m_bHasAccessToCreate = bSet;
+  m_permissions.push_back(ep);
+}
+
+void Employee::setPermissionToEdit(Functionality::Idx idx, bool bSet)
+{
+  for (auto& ep : m_permissions)
+  {
+    if (ep.m_func == idx)
+    {
+      ep.m_bHasAccessToEdit = bSet;
+      return;
+    }
+  }
+  EmployeePermission ep;
+  ep.m_func = idx;
+  ep.m_bHasAccessToEdit = bSet;
+  m_permissions.push_back(ep);
 }
 
 void Employee::setPermissionToRemove(Functionality::Idx idx, bool bSet)
 {
-  m_removePermissions[idx] = bSet;
+  for (auto& ep : m_permissions)
+  {
+    if (ep.m_func == idx)
+    {
+      ep.m_bHasAccessToRemove = bSet;
+      return;
+    }
+  }
+  EmployeePermission ep;
+  ep.m_func = idx;
+  ep.m_bHasAccessToRemove = bSet;
+  m_permissions.push_back(ep);
+}
+
+void Employee::setPermissionToCreate(const QString& tableName, bool bSet)
+{
+  setPermissionToCreate(Functionality::tableNameToIdx(tableName), bSet);
+}
+
+void Employee::setPermissionToEdit(const QString& tableName, bool bSet)
+{
+  setPermissionToEdit(Functionality::tableNameToIdx(tableName), bSet);
+}
+
+void Employee::setPermissionToRemove(const QString& tableName, bool bSet)
+{
+  setPermissionToRemove(Functionality::tableNameToIdx(tableName), bSet);
 }

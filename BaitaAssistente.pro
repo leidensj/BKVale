@@ -48,6 +48,7 @@ SOURCES += main.cpp\
   items/coin.cpp \
   items/coupon.cpp \
   items/couponproduct.cpp \
+  items/employeepermission.cpp \
   items/inventory.cpp \
   items/inventoryproduct.cpp \
   items/jitemhelper.cpp \
@@ -194,6 +195,7 @@ HEADERS  += mainwindow.h \
     items/coin.h \
     items/coupon.h \
     items/couponproduct.h \
+    items/employeepermission.h \
     items/inventory.h \
     items/inventoryproduct.h \
     items/jitemhelper.h \

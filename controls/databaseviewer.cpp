@@ -215,7 +215,7 @@ void DatabaseViewer::selectId(const Id& id)
 void DatabaseViewer::selectIds(const Ids& ids)
 {
   m_table->clearSelection();
-  for (auto id : ids)
+  for (const auto& id : ids)
   {
     QModelIndexList lst = m_proxyModel->match(m_proxyModel->index(0, 0), Qt::EditRole, id.get(), 1, Qt::MatchExactly);
     if (lst.size() != 0)
@@ -231,7 +231,7 @@ Ids DatabaseViewer::getSelectedIds() const
   JModel* model = dynamic_cast<JModel*>(m_proxyModel->sourceModel());
   QModelIndexList lst = m_table->selectionModel()->selectedRows();
   Ids ids;
-  for (auto i : lst)
+  for (const auto& i : lst)
   {
     QModelIndex idx = m_proxyModel->mapToSource(i);
     if (idx.isValid())

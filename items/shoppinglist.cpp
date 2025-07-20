@@ -429,7 +429,7 @@ QByteArray ShoppingList::printVersion(const QVariant& arg) const
   ep.expand(true);
   ep.str(dt.date().toString("dd/MM/yyyy") + "\n");
   ep.expand(false);
-  ep.str(dt.date().toString("dddd") + "\n\n\n");
+  ep.str(DateTime::strWeekDay(dt.date()) + "\n\n\n");
   ep.align();
   if (!m_description.isEmpty())
   {

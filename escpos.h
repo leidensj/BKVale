@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QByteArray>
+#include "settings.h"
 
 #define ESC                 "\x1b"
 #define ESC_ALIGN_CENTER    "\x1b\x61\x31"
@@ -14,11 +15,9 @@
 #define ESC_LF              "\n"
 #define ESC_VERT_TAB        "\x1b\x4a\x40"
 
-//ESC @
-#define ESC_INIT            "\x1b\x40"
+#define ESC_INIT            "\x1b\x40" //ESC @
 #define ESC_DOUBLE_FONT_ON  "\x1b\x64\x31\x1b\x57\x31"
 #define ESC_DOUBLE_FONT_OFF "\x1b\x64\x30\x1b\x57\x30"
-#define ESC_STX             "\x02"
 #define ESC_PORTUGUESE      "\x1b\x74\x08"
 #define ESC_CODEPAGE850     "\x1b\x74\x02"
 #define ESC_REVERSE_ON      "\x1b\x7d\x31"
@@ -67,7 +66,6 @@ public:
   void align(bool center = false);
   void cut(bool partial = false);
   void expand(bool b);
-  void tab();
 
 private:
   void init();
@@ -84,7 +82,7 @@ private:
   void expandBEMA(bool b);
   void tabBEMA();
 
-  bool m_bema;
+  int m_printerModel;
 };
 
 #endif // ESC_H

@@ -159,7 +159,7 @@ bool CashClosing::SQL_remove_proc(QSqlQuery& query) const
   return query.exec();
 }
 
-QByteArray CashClosing::printVersion() const
+QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
 {
   EscPos ep;
   ep.align(true);
@@ -244,7 +244,7 @@ QByteArray CashClosing::printVersion() const
 double CashClosing::sumSectorsValue() const
 {
   double sum = 0.0;
-  for (auto s : m_vsectors)
+  for (const auto& s : m_vsectors)
     sum += s.m_value;
   return sum;
 }
@@ -252,7 +252,7 @@ double CashClosing::sumSectorsValue() const
 int CashClosing::sumSectorsNValue() const
 {
   int sum = 0;
-  for (auto s : m_vsectors)
+  for (const auto& s : m_vsectors)
     sum += s.m_nvalue;
   return sum;
 }
@@ -260,7 +260,7 @@ int CashClosing::sumSectorsNValue() const
 double CashClosing::sumCoinsValue() const
 {
   double sum = 0.0;
-  for (auto c : m_vcoins)
+  for (const auto& c : m_vcoins)
     sum += c.m_value;
   return sum;
 }
@@ -268,7 +268,7 @@ double CashClosing::sumCoinsValue() const
 double CashClosing::sumCoinsWithTaxes() const
 {
   double sum = 0.0;
-  for (auto c : m_vcoins)
+  for (const auto& c : m_vcoins)
     sum += c.valueWithTaxes();
   return sum;
 }

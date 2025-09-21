@@ -189,6 +189,8 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Fechamento de Caixa";
     case Functionality::Idx::PostIt:
       return "Post It";
+    case Functionality::Idx::Charmometer:
+      return "Encantômetro";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -258,6 +260,8 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/cashier.png";
     case Functionality::Idx::PostIt:
       return ":/icons/res/postit2.png";
+    case Functionality::Idx::Charmometer:
+      return ":/icons/res/poll.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";

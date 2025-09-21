@@ -94,6 +94,7 @@ private slots:
   void openTimeCardDialog();
   void openCalculatorDialog();
   void openPostItDialog();
+  void openCharmometerDialog();
   void about();
 };
 

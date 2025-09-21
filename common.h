@@ -36,6 +36,7 @@ namespace Functionality
     Cash,
     CashClosing,
     PostIt,
+    Charmometer,
     _END,
   };
 

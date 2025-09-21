@@ -169,11 +169,11 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   ep.align(false);
 
   ep.align(true);
-  ep.str("\n----------------------------------\n\n");
-  ep.align(false);
+  ep.str("----------------------------------\n");
   ep.expand(true);
-  ep.str("Vendas\n\n");
+  ep.str("Vendas\n");
   ep.expand(false);
+  ep.align(false);
   for (const auto& s : m_vsectors)
   {
     ep.bold(true);
@@ -185,15 +185,15 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   ep.bold(true);
   ep.str("TOTAL:\n"
          "   Valor:      " + Data::strMoney(sumSectorsValue()) + "\n"
-         "   Quantidade: " + Data::strInt(sumSectorsNValue()) + "\n\n");
+         "   Quantidade: " + Data::strInt(sumSectorsNValue()) + "\n");
   ep.bold(false);
 
   ep.align(true);
-  ep.str("----------------------------------\n\n");
-  ep.align(false);
+  ep.str("----------------------------------\n");
   ep.expand(true);
-  ep.str("Recebimentos\n\n");
+  ep.str("Recebimentos\n");
   ep.expand(false);
+  ep.align(false);
   for (const auto& c : m_vcoins)
   {
     if (c.m_value == 0.0)
@@ -203,31 +203,25 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
     ep.bold(false);
     ep.str("   Valor bruto:   " + Data::strMoney(c.m_value) + "\n");
     if (c.taxesDifference() != 0)
-    ep.str("   Valor liquido: " + Data::strMoney(c.valueWithTaxes()) + "\n"
-           "   Taxas:         " + Data::strMoney(c.taxesDifference()) + "\n");
+    ep.str("   Taxas:         " + Data::strMoney(c.taxesDifference()*-1) + "\n"
+           "   Valor liquido: " + Data::strMoney(c.valueWithTaxes()) + "\n");
   }
   ep.bold(true);
   ep.str("TOTAL:\n"
-         "   Valor bruto:      " + Data::strMoney(sumCoinsValue()) + "\n");
+         "   Valor bruto:   " + Data::strMoney(sumCoinsValue()) + "\n");
   if (sumCoinsTaxesDifference() != 0)
-  ep.str("   Valor liquido:    " + Data::strMoney(sumCoinsWithTaxes()) + "\n"
-         "   Taxas:            " + Data::strMoney(sumCoinsTaxesDifference()) + "\n\n");
+  ep.str("   Taxas:         " + Data::strMoney(sumCoinsTaxesDifference()*-1) + "\n"
+         "   Valor liquido: " + Data::strMoney(sumCoinsWithTaxes()) + "\n\n");
 
   ep.bold(false);
 
   ep.align(true);
-  ep.str("----------------------------------\n\n");
-  ep.align(false);
+  ep.str("----------------------------------\n");
   ep.expand(true);
-  ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n");
-  ep.expand(false);
-  ep.str("Diferenca entre vendas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa. Um valor proximo de zero indica que o caixa fechou\n\n");
-  ep.expand(true);
+  ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n\n");
   ep.str("Diferenca de caixa:\n" + Data::strMoney(diffTax()) + "\n");
   ep.expand(false);
-  ep.str("Diferenca entre venda e recebimentos (liquido). Representa a quebra de caixa + o valor pago em taxas\n\n");
-  ep.align(true);
-  ep.str("----------------------------------\n\n");
+  ep.str("----------------------------------\n");
   ep.align(false);
 
   ep.bold(true);
@@ -236,7 +230,6 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   for (const auto& i : m_vinfos)
     ep.str(i.m_iname + ": " + i.strValue() + "\n");
 
-  ep.str("\n\n\n");
   ep.cut(true);
   return ep.m_ba;
 }
@@ -280,10 +273,10 @@ double CashClosing::sumCoinsTaxesDifference() const
 
 double CashClosing::diff() const
 {
-  return sumSectorsValue() - sumCoinsValue();
+  return sumCoinsValue() - sumSectorsValue();
 }
 
 double CashClosing::diffTax() const
 {
-  return sumSectorsValue() - sumCoinsWithTaxes();
+  return sumCoinsWithTaxes() - sumSectorsValue();
 }

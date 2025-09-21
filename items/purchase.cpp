@@ -497,18 +497,23 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
   ep.doublefont(true);
   ep.str("TOTAL " + strTotal());
   ep.doublefont(false);
-  ep.str("\nEmissao: " + dt.date().toString("dd/MM/yyyy ") + dt.time().toString("hh:mm:ss") + " @ " + QHostInfo::localHostName().toUpper() + "\n\n\n");
-  ep.str("________________________________\nAssinatura " + m_employee.m_form.strAliasName() + "\n");
+  ep.str("\nEmissao: " + dt.date().toString("dd/MM/yyyy ") + dt.time().toString("hh:mm:ss") + " @ " + QHostInfo::localHostName().toUpper() + "\n");
+  ep.str("Funcionario: ");
+  ep.bold(true);
+  ep.str(m_employee.m_form.strAliasName() + "\n");
+  ep.bold(false);
 
   if (m_paymentMethod == Purchase::PaymentMethod::Cash)
   {
-    ep.str("\n\n________________________________\nAssinatura ");
+    ep.str("\n\n________________________________\n");
+    ep.bold(true);
     if (m_supplier.m_id.isValid())
       ep.str(m_supplier.m_form.strAliasName());
     else
       ep.str("fornecedor");
+    ep.bold(false);
   }
-  ep.str("\n\n");
+  ep.str("\n");
   ep.cut();
   return ep.m_ba;
 }

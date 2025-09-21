@@ -193,5 +193,6 @@
         <file>res/postit2.png</file>
         <file>res/upred.png</file>
         <file>res/downgreen.png</file>
+        <file>res/poll.png</file>
     </qresource>
 </RCC>

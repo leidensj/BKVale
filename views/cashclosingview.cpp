@@ -57,8 +57,8 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edCoin2->setInvertColors(true);
   m_edDiff1->setInvertColors(true);
   m_edDiff2->setInvertColors(true);
-  m_edDiff1->setToolTip(tr("Valor próximo de 0 indica que o caixa fechou."));
-  m_edDiff2->setToolTip(tr("Diferença entre vendas e recebimentos, contando a quebra de caixa e a diferença das taxas."));
+  m_edDiff1->setToolTip(tr("Diferença entre vendas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa. Um valor próximo de zero indica que o caixa fechou."));
+  m_edDiff2->setToolTip(tr("Diferença entre venda e recebimentos (líquido). Representa a quebra de caixa + o valor pago em taxas."));
   m_btnCalc = new QPushButton(QIcon(":/icons/res/calculator.png"), "");
   m_btnCalc->setFlat(true);
   m_btnCalc->setIconSize(QSize(24, 24));
@@ -181,27 +181,23 @@ void CashClosingView::setItem(const JItemSQL& o)
 
 void CashClosingView::save()
 {
-  print();
-  JItemView::save();
-}
-
-void CashClosingView::print()
-{
-  if (!m_btnPrint->isChecked())
-    return;
   CashClosing o;
   getItem(o);
   QString error;
-  bool ok = false;
-  if (m_id.isValid())
+  const Id id = m_id;
+  if (id.isValid())
   {
-    o.m_id = m_id;
-    ok = o.SQL_select(error);
+    JItemView::save();
+    o.m_id = id;
+    o.SQL_select(error);
   }
   else
-    ok = o.m_cash.SQL_select(error);
-
-  JItemHelper::print(o, 0, this);
+  {
+    JItemView::save();
+    o.m_cash.SQL_select(error);
+  }
+  if (m_btnPrint->isChecked())
+    JItemHelper::print(o, 0, this);
 }
 
 void CashClosingView::cashChanged()

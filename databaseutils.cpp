@@ -472,7 +472,7 @@ bool BaitaSQL::createTables(QString& error)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_INFO_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           CASH_INFO_SQL_COL_OID " INTEGER NOT NULL,"
-                          CASH_INFO_SQL_COL_NAM " TEXT UNIQUE NOT NULL CHECK ("
+                          CASH_INFO_SQL_COL_NAM " TEXT NOT NULL CHECK ("
                           CASH_INFO_SQL_COL_NAM " <> ''),"
                           CASH_INFO_SQL_COL_TYP " INTEGER NOT NULL,"
                           "FOREIGN KEY(" CASH_INFO_SQL_COL_OID ") REFERENCES "

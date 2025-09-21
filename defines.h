@@ -235,7 +235,6 @@
 #define COUPON_SQL_COL_SID "_STOREID"
 
 #define COUPON_SQL_TABLE_NAME_TEMP "__coupons"
-#define COUPON_SQL_COL_TEMP_CDT "__creation_timestamp"
 #define COUPON_SQL_COL_TEMP_CPN "__coupon"
 #define COUPON_SQL_COL_TEMP_EDT "__expiration"
 #define COUPON_SQL_COL_TEMP_EXP "__expired"

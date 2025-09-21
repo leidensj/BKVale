@@ -16,7 +16,6 @@ QString CouponModel::getStrQuery()
          COUPON_SQL_COL_TYP ", "
          COUPON_SQL_COL_CDT ", "
          COUPON_SQL_COL_RDT ", "
-         "TO_CHAR(" COUPON_SQL_COL_CDT ", 'YYYY/MM/DD hh:mm:ss') AS " COUPON_SQL_COL_TEMP_CDT ", "
          "CASE " COUPON_SQL_COL_TYP " WHEN 0 THEN TO_CHAR(" COUPON_SQL_COL_PCT ", '999,999.99%') "
                     "WHEN 1 THEN TO_CHAR(" COUPON_SQL_COL_VAL ", 'R$999,999.99') "
                     "ELSE 'Produtos' END AS " COUPON_SQL_COL_TEMP_CPN " ,"
@@ -36,9 +35,8 @@ void CouponModel::select(QHeaderView* header)
   JModel::select("");
   setHeaderData((int)Column::Id, Qt::Horizontal, tr("ID"));
   setHeaderData((int)Column::Type, Qt::Horizontal, tr("Tipo"));
-  setHeaderData((int)Column::CreationDate, Qt::Horizontal, tr("Data Criação"));
+  setHeaderData((int)Column::CreationDate, Qt::Horizontal, tr("Data"));
   setHeaderData((int)Column::RedemptionDate, Qt::Horizontal, tr("Data Resgate"));
-  setHeaderData((int)Column::Date, Qt::Horizontal, tr("Data"));
   setHeaderData((int)Column::Coupon, Qt::Horizontal, tr("Cupom"));
   setHeaderData((int)Column::Code, Qt::Horizontal, tr("Código"));
   setHeaderData((int)Column::Expiration, Qt::Horizontal, tr("Expiração"));
@@ -48,12 +46,11 @@ void CouponModel::select(QHeaderView* header)
 
   header->hideSection((int)Column::Id);
   header->hideSection((int)Column::Type);
-  header->hideSection((int)Column::CreationDate);
   header->hideSection((int)Column::RedemptionDate);
   header->hideSection((int)Column::Expired);
   header->hideSection((int)Column::Redeemed);
   header->setSectionResizeMode((int)Column::Coupon, QHeaderView::ResizeMode::ResizeToContents);
-  header->setSectionResizeMode((int)Column::Date, QHeaderView::ResizeMode::ResizeToContents);
+  header->setSectionResizeMode((int)Column::CreationDate, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::Code, QHeaderView::ResizeMode::Stretch);
   header->setSectionResizeMode((int)Column::Redemption, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::Expiration, QHeaderView::ResizeMode::ResizeToContents);
@@ -71,5 +68,7 @@ QVariant CouponModel::data(const QModelIndex &idx, int role) const
       else if (bExpired)
         value = QColor(255, 200, 200);
   }
+  else if (role == Qt::DisplayRole && idx.column() == (int)Column::CreationDate)
+    value = value.toDateTime().toLocalTime();
   return value;
 }

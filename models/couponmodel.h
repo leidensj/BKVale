@@ -11,7 +11,6 @@ class CouponModel : public JModel
     Type,
     CreationDate,
     RedemptionDate,
-    Date,
     Coupon,
     Code,
     Expiration,

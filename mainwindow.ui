@@ -133,6 +133,7 @@
     <addaction name="actionCashClosing"/>
     <addaction name="actionCalculator"/>
     <addaction name="actionPostIt"/>
+    <addaction name="actionCharmometer"/>
    </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
@@ -480,6 +481,18 @@
    </property>
    <property name="text">
     <string>Post It</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCharmometer">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/poll.png</normaloff>:/icons/res/poll.png</iconset>
+   </property>
+   <property name="text">
+    <string>Encantômetro</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

@@ -35,10 +35,10 @@ void EscPos::bold(bool b)
   switch (m_printerModel)
   {
     case PRINTER_MODEL_ELGINI9:
-      b ? m_ba.append(ESC_STRESS_ON, 2) : m_ba.append(ESC_STRESS_OFF, 2);
+      b ? m_ba.append(ESC_BOLD_ON, 3) : m_ba.append(ESC_BOLD_OFF, 3);
       break;
     case PRINTER_MODEL_BEMATECH4200TH:
-      b ? m_ba.append(ESC_BOLD_ON, 3) : m_ba.append(ESC_BOLD_OFF, 3);
+      b ? m_ba.append(ESC_STRESS_ON, 2) : m_ba.append(ESC_STRESS_OFF, 2);
       break;
     case PRINTER_MODEL_NONE:
     default:

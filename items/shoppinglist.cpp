@@ -418,7 +418,7 @@ bool ShoppingList::SQL_remove_proc(QSqlQuery& query) const
 QByteArray ShoppingList::printVersion(const QVariant& arg) const
 {
   EscPos ep;
-  QDateTime dt = DateTime::server().toLocalTime();
+  QDateTime dt = DateTime::server();
   ep.expand(true);
   ep.align(true);
   ep.str("LISTA DE COMPRAS\n");
@@ -429,29 +429,26 @@ QByteArray ShoppingList::printVersion(const QVariant& arg) const
   ep.expand(true);
   ep.str(dt.date().toString("dd/MM/yyyy") + "\n");
   ep.expand(false);
-  ep.str(DateTime::strWeekDay(dt.date()) + "\n\n\n");
+  ep.str(DateTime::strWeekDay(dt.date()) + "\n\n");
   ep.align();
   if (!m_description.isEmpty())
   {
     ep.expand(true);
-    ep.str("Descricao: ");
+    ep.str("Descricao:\n");
     ep.expand(false);
-    ep.str(m_description + "\n");
+    ep.str(m_description + "\n\n");
   }
 
   if (m_supplier.m_id.isValid())
   {
-    ep.str("\n\n\n");
     ep.align(true);
     ep.str("Fornecedor: ");
     ep.expand(true);
     ep.str(m_supplier.m_form.strAliasName() + "\n");
     ep.expand(false);
     ep.align(false);
-
   }
 
-  ep.str("\n");
   if (m_vItem.size() != 0 && arg.toBool())
   {
     ep.align(false);

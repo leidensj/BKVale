@@ -15,7 +15,6 @@
 #include "controls/timecarddialog.h"
 #include "controls/couponredeemer.h"
 #include "controls/postitdialog.h"
-#include "controls/charmometer.h"
 
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
@@ -150,7 +149,7 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::Cash] = ui->actionCash;
   m_actions[Functionality::Idx::CashClosing] = ui->actionCashClosing;
   m_actions[Functionality::Idx::PostIt] = ui->actionPostIt;
-  m_actions[Functionality::Idx::Charmometer] = ui->actionCharmometer;
+  m_actions[Functionality::Idx::Salary] = ui->actionSalaries;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
@@ -179,7 +178,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCashClosing, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(openCalculatorDialog()));
   connect(ui->actionPostIt, SIGNAL(triggered(bool)), this, SLOT(openPostItDialog()));
-  connect(ui->actionCharmometer, SIGNAL(triggered(bool)), this, SLOT(openCharmometerDialog()));
+  connect(ui->actionSalaries, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));
@@ -374,12 +373,6 @@ void Baita::openCalculatorDialog()
 void Baita::openPostItDialog()
 {
   PostItDialog dlg(this);
-  dlg.exec();
-}
-
-void Baita::openCharmometerDialog()
-{
-  Charmometer dlg(this);
   dlg.exec();
 }
 

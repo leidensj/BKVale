@@ -96,6 +96,7 @@
       <string>Pessoas</string>
      </property>
      <addaction name="actionEmployees"/>
+     <addaction name="actionSalaries"/>
      <addaction name="actionSuppliers"/>
     </widget>
     <addaction name="menuPessoas"/>
@@ -133,7 +134,6 @@
     <addaction name="actionCashClosing"/>
     <addaction name="actionCalculator"/>
     <addaction name="actionPostIt"/>
-    <addaction name="actionCharmometer"/>
    </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
@@ -486,13 +486,13 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="actionCharmometer">
+  <action name="actionSalaries">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/res/poll.png</normaloff>:/icons/res/poll.png</iconset>
+     <normaloff>:/icons/res/salary.png</normaloff>:/icons/res/salary.png</iconset>
    </property>
    <property name="text">
-    <string>Encantômetro</string>
+    <string>Salários</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

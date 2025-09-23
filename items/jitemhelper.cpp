@@ -20,6 +20,7 @@
 #include "sector.h"
 #include "coin.h"
 #include "cashclosing.h"
+#include "salary.h"
 
 #include <QMessageBox>
 #include "controls/pincodedialog.h"
@@ -44,6 +45,7 @@
 #include "models/coinmodel.h"
 #include "models/cashmodel.h"
 #include "models/cashclosingmodel.h"
+#include "models/salarymodel.h"
 
 #include "views/categoryview.h"
 #include "views/employeeview.h"
@@ -61,6 +63,7 @@
 #include "views/coinview.h"
 #include "views/cashview.h"
 #include "views/cashclosingview.h"
+#include "views/salaryview.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
@@ -106,6 +109,8 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new Cash;
   if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
     return new CashClosing;
+  if (tableName == SALARY_SQL_TABLE_NAME)
+    return new Salary;
   return nullptr;
 }
 
@@ -189,8 +194,8 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Fechamento de Caixa";
     case Functionality::Idx::PostIt:
       return "Post It";
-    case Functionality::Idx::Charmometer:
-      return "Encantômetro";
+    case Functionality::Idx::Salary:
+      return "Salário";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -260,8 +265,8 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/cashier.png";
     case Functionality::Idx::PostIt:
       return ":/icons/res/postit2.png";
-    case Functionality::Idx::Charmometer:
-      return ":/icons/res/poll.png";
+    case Functionality::Idx::Salary:
+      return ":/icons/res/salary.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -315,6 +320,8 @@ JModel* JItemHelper::model(const QString& tableName, QObject* parent)
     return new CashModel(parent);
   if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
     return new CashClosingModel(parent);
+if (tableName == SALARY_SQL_TABLE_NAME)
+    return new SalaryModel(parent);
   return nullptr;
 }
 
@@ -352,6 +359,8 @@ JItemView* JItemHelper::view(const QString& tableName)
     return new CashView;
   if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
     return new CashClosingView;
+  if (tableName == SALARY_SQL_TABLE_NAME)
+    return new SalaryView;
   return nullptr;
 }
 

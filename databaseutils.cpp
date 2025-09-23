@@ -533,6 +533,25 @@ bool BaitaSQL::createTables(QString& error)
                           IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SALARY_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          SALARY_SQL_COL_IID " INTEGER,"
+                          SALARY_SQL_COL_NAM " TEXT NOT NULL UNIQUE,"
+                          "FOREIGN KEY(" SALARY_SQL_COL_IID ") REFERENCES "
+                          IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SALARY_EMPLOYEE_SQL_TABLE_NAME " ("
+                          SQL_COLID " SERIAL PRIMARY KEY,"
+                          SALARY_EMPLOYEE_SQL_COL_SID " INTEGER NOT NULL,"
+                          SALARY_EMPLOYEE_SQL_COL_EID " INTEGER NOT NULL,"
+                          SALARY_EMPLOYEE_SQL_COL_SAL " REAL,"
+                          "FOREIGN KEY(" SALARY_EMPLOYEE_SQL_COL_SID ") REFERENCES "
+                          SALARY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
+                          "FOREIGN KEY(" SALARY_EMPLOYEE_SQL_COL_EID ") REFERENCES "
+                          EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
   {
     query.exec("SELECT * FROM " USER_SQL_TABLE_NAME " LIMIT 1");
     if (!query.next())

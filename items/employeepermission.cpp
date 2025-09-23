@@ -54,11 +54,11 @@ bool EmployeePermission::SQL_insert_proc(QSqlQuery& query) const
   query.bindValue(":_v03", m_bHasAccessToCreate);
   query.bindValue(":_v04", m_bHasAccessToEdit);
   query.bindValue(":_v05", m_bHasAccessToRemove);
-  bool bSuccess = query.exec();
+  bool ok = query.exec();
 
-  if (bSuccess)
+  if (ok)
     m_id.set(query.lastInsertId().toLongLong());
-  return bSuccess;
+  return ok;
 }
 
 bool EmployeePermission::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector<EmployeePermission>& v, QString& error)
@@ -74,8 +74,8 @@ bool EmployeePermission::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerI
                 " FROM " EMPLOYEE_PERMISSIONS_SQL_TABLE_NAME
                 " WHERE " EMPLOYEE_PERMISSIONS_SQL_COL_OID " = (:_v01)");
   query.bindValue(":_v01", ownerId.get());
-  bool bSuccess = query.exec();
-  if (bSuccess)
+  bool ok = query.exec();
+  if (ok)
   {
     Ids ids;
     while (query.next())
@@ -89,7 +89,7 @@ bool EmployeePermission::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerI
     }
   }
 
-  return bSuccess;
+  return ok;
 }
 
 bool EmployeePermission::SQL_select_proc(QSqlQuery& query, QString& error)
@@ -104,8 +104,8 @@ bool EmployeePermission::SQL_select_proc(QSqlQuery& query, QString& error)
                 " FROM " EMPLOYEE_PERMISSIONS_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
-  bool bSuccess = query.exec();
-  if (bSuccess)
+  bool ok = query.exec();
+  if (ok)
   {
     if (query.next())
     {
@@ -118,11 +118,11 @@ bool EmployeePermission::SQL_select_proc(QSqlQuery& query, QString& error)
     else
     {
       error = "Permissão do funcionário não encontrada.";
-      bSuccess = false;
+      ok = false;
     }
   }
 
-  return bSuccess;
+  return ok;
 }
 
 bool EmployeePermission::SQL_remove_by_owner_id_proc(QSqlQuery& query, Id ownerId)

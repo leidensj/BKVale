@@ -48,6 +48,8 @@ QString Functionality::idxToTableName(Idx idx)
       return CASH_SQL_TABLE_NAME;
     case Idx::CashClosing:
       return CASH_CLOSING_SQL_TABLE_NAME;
+    case Idx::Salary:
+      return SALARY_SQL_TABLE_NAME;
     default:
       return "";
   }
@@ -95,6 +97,8 @@ Functionality::Idx Functionality::tableNameToIdx(const QString& tableName)
     return Idx::Cash;
   if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
     return Idx::CashClosing;
+  if (tableName == SALARY_SQL_TABLE_NAME)
+    return Idx::Salary;
   return Idx::_END;
 }
 

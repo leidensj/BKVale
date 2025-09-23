@@ -17,7 +17,6 @@ SOURCES += main.cpp\
   aboutdialog.cpp \
   controls/calculatordialog.cpp \
   controls/changepassword.cpp \
-  controls/charmometer.cpp \
   controls/couponredeemer.cpp \
   controls/databasecombobox.cpp \
   controls/databasepicker.cpp \
@@ -56,6 +55,8 @@ SOURCES += main.cpp\
   items/paymentpart.cpp \
   items/price.cpp \
   items/purchaseproduct.cpp \
+  items/salary.cpp \
+  items/salaryemployee.cpp \
   items/sector.cpp \
   items/userpermission.cpp \
   libraries/tinyexpr.c \
@@ -66,6 +67,7 @@ SOURCES += main.cpp\
   models/couponmodel.cpp \
   models/inventorymodel.cpp \
   models/loginmodel.cpp \
+  models/salarymodel.cpp \
   models/sectormodel.cpp \
   printer.cpp \
   purchasereport.cpp \
@@ -101,6 +103,7 @@ SOURCES += main.cpp\
   views/couponview.cpp \
   views/inventoryview.cpp \
   views/jitemview.cpp \
+  views/salaryview.cpp \
   views/sectorview.cpp \
   widgets/filegenerator.cpp \
   widgets/findwidget.cpp \
@@ -164,7 +167,6 @@ HEADERS  += mainwindow.h \
     aboutdialog.h \
     controls/calculatordialog.h \
     controls/changepassword.h \
-    controls/charmometer.h \
     controls/couponredeemer.h \
     controls/databasecombobox.h \
     controls/databasepicker.h \
@@ -204,6 +206,8 @@ HEADERS  += mainwindow.h \
     items/paymentpart.h \
     items/price.h \
     items/purchaseproduct.h \
+    items/salary.h \
+    items/salaryemployee.h \
     items/sector.h \
     items/userpermission.h \
     libraries/tinyexpr.h \
@@ -213,6 +217,7 @@ HEADERS  += mainwindow.h \
     models/couponmodel.h \
     models/inventorymodel.h \
     models/loginmodel.h \
+    models/salarymodel.h \
     models/sectormodel.h \
     printer.h \
     purchasereport.h \
@@ -251,6 +256,7 @@ HEADERS  += mainwindow.h \
     views/couponview.h \
     views/inventoryview.h \
     views/jitemview.h \
+    views/salaryview.h \
     views/sectorview.h \
     widgets/filegenerator.h \
     widgets/findwidget.h \

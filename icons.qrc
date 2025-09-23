@@ -194,5 +194,6 @@
         <file>res/upred.png</file>
         <file>res/downgreen.png</file>
         <file>res/poll.png</file>
+        <file>res/salary.png</file>
     </qresource>
 </RCC>

@@ -18,6 +18,7 @@ struct ShoppingListItem : public JItem
   void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
+  bool operator <(const JItem& other) const;
   bool isValid() const;
 
   double subtotal() const;

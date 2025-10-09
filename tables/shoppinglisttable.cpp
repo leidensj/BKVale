@@ -60,9 +60,11 @@ void ShoppingListTable::getListElements(QVector<ShoppingListItem>& v) const
     ShoppingListItem o;
     o.m_package = PackageItem::st_fromVariant(getItem(row, (int)Column::Package)->getValue());
     o.m_product.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Product)->getValue());
+    o.m_product.m_name = getItem(row, (int)Column::Product)->text();
     o.m_ammount = getItem(row, (int)Column::Ammount)->getValue().toDouble();
     o.m_price = getItem(row, (int)Column::Price)->getValue().toDouble();
     o.m_supplier.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Supplier)->getValue());
+    o.m_supplier.m_form.m_name = getItem(row, (int)Column::Supplier)->text();
     v.push_back(o);
   }
 }

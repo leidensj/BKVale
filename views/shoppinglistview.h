@@ -29,6 +29,7 @@ protected slots:
 
 private slots:
   void updateControls();
+  void sort();
 
 private:
   JLineEdit* m_edTitle;

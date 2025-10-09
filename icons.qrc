@@ -195,5 +195,6 @@
         <file>res/downgreen.png</file>
         <file>res/poll.png</file>
         <file>res/salary.png</file>
+        <file>res/sortaz.png</file>
     </qresource>
 </RCC>

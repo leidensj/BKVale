@@ -134,6 +134,11 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 
   m_btns = new JAddRemoveButtons;
   m_table = new ShoppingListTable(m_btns);
+  auto btnSort = new QPushButton(QIcon(":/icons/res/sortaz.png"), "");
+  btnSort->setFlat(true);
+  btnSort->setIconSize(QSize(24, 24));
+  m_btns->m_lt->addWidget(btnSort);
+
 
   QVBoxLayout* ltTable = new QVBoxLayout;
   ltTable->addWidget(m_btns);
@@ -153,6 +158,7 @@ ShoppingListView::ShoppingListView(QWidget* parent)
   m_tab->addTab(tabCalendar, QIcon(":/icons/res/calendar.png"), tr("Calendário"));
 
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(updateControls()));
+  connect(btnSort, SIGNAL(clicked(bool)), this, SLOT(sort()));
 
   setFocusWidgetOnClear(m_edTitle);
   clear();
@@ -161,6 +167,14 @@ ShoppingListView::ShoppingListView(QWidget* parent)
 void ShoppingListView::updateControls()
 {
   m_table->showSupplierColumn(!m_supplierPicker->getFirstId().isValid());
+}
+
+void ShoppingListView::sort()
+{
+  QVector<ShoppingListItem> v;
+  m_table->getListElements(v);
+  std::sort(v.begin(), v.end());
+  m_table->setListElements(v);
 }
 
 void ShoppingListView::setItem(const JItemSQL& o)

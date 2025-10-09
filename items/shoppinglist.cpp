@@ -3,7 +3,7 @@
 
 ShoppingListItem::ShoppingListItem()
 {
-  clear();
+  ShoppingListItem::clear();
 }
 
 void ShoppingListItem::clear(bool bClearId)
@@ -30,6 +30,19 @@ bool ShoppingListItem::operator !=(const JItem& other) const
 bool ShoppingListItem::operator ==(const JItem& other) const
 {
   return !(*this != other);
+}
+
+bool ShoppingListItem::operator <(const JItem& other) const
+{
+  const ShoppingListItem& o = dynamic_cast<const ShoppingListItem&>(other);
+  if (m_supplier.name().isEmpty() && o.m_supplier.name().isEmpty())
+    return m_product.name() < o.m_product.name();
+  else if (m_supplier.name().isEmpty())
+    return true;
+  else if (o.m_supplier.name().isEmpty())
+    return false;
+  else
+    return m_supplier.name() < o.m_supplier.name();
 }
 
 bool ShoppingListItem::isValid() const

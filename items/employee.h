@@ -21,6 +21,7 @@ struct Employee : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
 
+  static bool SQL_select_all(QVector<Employee>& v, QString& error);
   bool SQL_select_by_pincode(QString& error);
   bool SQL_select_by_pincode_proc(QSqlQuery& query, QString& error);
   bool SQL_select_formid_proc(QSqlQuery& query) const;

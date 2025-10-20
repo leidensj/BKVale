@@ -7,6 +7,7 @@
 class QPushButton;
 class JLineEdit;
 class DatabasePicker;
+class SalaryEmployeesTable;
 
 class SalaryView : public JItemView
 {
@@ -24,6 +25,7 @@ protected slots:
 private:
   JLineEdit* m_edName;
   DatabasePicker* m_imagePicker;
+  SalaryEmployeesTable* m_table;
 };
 
 #endif // SALARYVIEW_H

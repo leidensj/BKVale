@@ -5,6 +5,13 @@ SalaryEmployee::SalaryEmployee()
   SalaryEmployee::clear();
 }
 
+SalaryEmployee::SalaryEmployee(const Employee e)
+ : m_employee(e)
+ , m_salary(0.0)
+{
+
+}
+
 void SalaryEmployee::clear(bool bClearId)
 {
   if (bClearId)
@@ -29,6 +36,12 @@ bool SalaryEmployee::operator !=(const JItem& other) const
 bool SalaryEmployee::operator ==(const JItem& other) const
 {
   return !(*this != other);
+}
+
+bool SalaryEmployee::operator <(const JItem& other) const
+{
+  const SalaryEmployee& o = dynamic_cast<const SalaryEmployee&>(other);
+  return m_employee.m_form.m_name <o.m_employee.m_form.m_name;
 }
 
 bool SalaryEmployee::SQL_insert_proc(QSqlQuery& query) const

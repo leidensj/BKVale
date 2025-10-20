@@ -13,6 +13,8 @@ class QObject;
 struct JItemSQL : public JItem
 {
   virtual ~JItemSQL();
+  bool operator ==(const JItemSQL& other) const;
+  bool operator !=(const JItemSQL& other) const;
   virtual QString SQL_tableName() const = 0;
   virtual bool SQL_insert_proc(QSqlQuery& query) const = 0;
   virtual bool SQL_update_proc(QSqlQuery& query) const  = 0;

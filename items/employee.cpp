@@ -392,3 +392,40 @@ void Employee::setPermissionToRemove(const QString& tableName, bool bSet)
 {
   setPermissionToRemove(Functionality::tableNameToIdx(tableName), bSet);
 }
+
+bool Employee::SQL_select_all(QVector<Employee>& v, QString& error)
+{
+  v.clear();
+  error.clear();
+
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                SQL_COLID
+                " FROM " EMPLOYEE_SQL_TABLE_NAME);
+
+  bool ok = query.exec();
+  if (ok)
+  {
+    while (query.next())
+    {
+      Employee o;
+      o.m_id.set(query.value(0).toLongLong());
+      ok = o.SQL_select(error);
+      if (ok)
+        v.push_back(o);
+      else
+        break;
+    }
+  }
+
+  if (!ok)
+    v.clear();
+
+  return SQL_finish(db, query, ok, error);
+}

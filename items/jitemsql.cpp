@@ -5,6 +5,16 @@ JItemSQL::~JItemSQL()
 
 }
 
+bool JItemSQL::operator ==(const JItemSQL& other) const
+{
+  return m_id == other.m_id;
+}
+
+bool JItemSQL::operator !=(const JItemSQL& other) const
+{
+  return !(*this == other);
+}
+
 bool JItemSQL::SQL_insert_update(QString& error) const
 {
   error.clear();

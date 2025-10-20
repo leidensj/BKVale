@@ -97,6 +97,7 @@ SOURCES += main.cpp\
     items/supplier.cpp \
     items/user.cpp \
   tables/purchaseproducttable.cpp \
+  tables/salaryemployeestable.cpp \
   views/cashclosingview.cpp \
   views/cashview.cpp \
   views/coinview.cpp \
@@ -237,6 +238,7 @@ HEADERS  += mainwindow.h \
     defines.h \
     escpos.h \
     tables/purchaseproducttable.h \
+    tables/salaryemployeestable.h \
     timeinterval.h \
     items/address.h \
     items/category.h \

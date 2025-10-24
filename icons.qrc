@@ -196,5 +196,7 @@
         <file>res/poll.png</file>
         <file>res/salary.png</file>
         <file>res/sortaz.png</file>
+        <file>res/salarycalc.png</file>
+        <file>res/salaryformula.png</file>
     </qresource>
 </RCC>

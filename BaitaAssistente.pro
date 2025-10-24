@@ -57,6 +57,7 @@ SOURCES += main.cpp\
   items/purchaseproduct.cpp \
   items/salary.cpp \
   items/salaryemployee.cpp \
+  items/salaryformula.cpp \
   items/sector.cpp \
   items/userpermission.cpp \
   libraries/tinyexpr.c \
@@ -67,6 +68,7 @@ SOURCES += main.cpp\
   models/couponmodel.cpp \
   models/inventorymodel.cpp \
   models/loginmodel.cpp \
+  models/salaryformulamodel.cpp \
   models/salarymodel.cpp \
   models/sectormodel.cpp \
   printer.cpp \
@@ -104,6 +106,7 @@ SOURCES += main.cpp\
   views/couponview.cpp \
   views/inventoryview.cpp \
   views/jitemview.cpp \
+  views/salaryformulaview.cpp \
   views/salaryview.cpp \
   views/sectorview.cpp \
   widgets/filegenerator.cpp \
@@ -209,6 +212,7 @@ HEADERS  += mainwindow.h \
     items/purchaseproduct.h \
     items/salary.h \
     items/salaryemployee.h \
+    items/salaryformula.h \
     items/sector.h \
     items/userpermission.h \
     libraries/tinyexpr.h \
@@ -218,6 +222,7 @@ HEADERS  += mainwindow.h \
     models/couponmodel.h \
     models/inventorymodel.h \
     models/loginmodel.h \
+    models/salaryformulamodel.h \
     models/salarymodel.h \
     models/sectormodel.h \
     printer.h \
@@ -258,6 +263,7 @@ HEADERS  += mainwindow.h \
     views/couponview.h \
     views/inventoryview.h \
     views/jitemview.h \
+    views/salaryformulaview.h \
     views/salaryview.h \
     views/sectorview.h \
     widgets/filegenerator.h \

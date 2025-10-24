@@ -150,6 +150,7 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::CashClosing] = ui->actionCashClosing;
   m_actions[Functionality::Idx::PostIt] = ui->actionPostIt;
   m_actions[Functionality::Idx::Salary] = ui->actionSalaries;
+  m_actions[Functionality::Idx::SalaryFormula] = ui->actionSalaryFormula;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
@@ -179,6 +180,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionCalculator, SIGNAL(triggered(bool)), this, SLOT(openCalculatorDialog()));
   connect(ui->actionPostIt, SIGNAL(triggered(bool)), this, SLOT(openPostItDialog()));
   connect(ui->actionSalaries, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionSalaryFormula, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));

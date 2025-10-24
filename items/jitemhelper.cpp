@@ -21,6 +21,7 @@
 #include "coin.h"
 #include "cashclosing.h"
 #include "salary.h"
+#include "salaryformula.h"
 
 #include <QMessageBox>
 #include "controls/pincodedialog.h"
@@ -46,6 +47,7 @@
 #include "models/cashmodel.h"
 #include "models/cashclosingmodel.h"
 #include "models/salarymodel.h"
+#include "models/salaryformulamodel.h"
 
 #include "views/categoryview.h"
 #include "views/employeeview.h"
@@ -64,6 +66,7 @@
 #include "views/cashview.h"
 #include "views/cashclosingview.h"
 #include "views/salaryview.h"
+#include "views/salaryformulaview.h"
 
 JItemSQL* JItemHelper::create(const QString& tableName)
 {
@@ -111,6 +114,8 @@ JItemSQL* JItemHelper::create(const QString& tableName)
     return new CashClosing;
   if (tableName == SALARY_SQL_TABLE_NAME)
     return new Salary;
+if (tableName == SALARY_FORMULA_SQL_TABLE_NAME)
+    return new SalaryFormula;
   return nullptr;
 }
 
@@ -196,6 +201,8 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Post It";
     case Functionality::Idx::Salary:
       return "Salário";
+    case Functionality::Idx::SalaryFormula:
+      return "Fórmula de Salário";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -267,6 +274,8 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/postit2.png";
     case Functionality::Idx::Salary:
       return ":/icons/res/salary.png";
+    case Functionality::Idx::SalaryFormula:
+      return ":/icons/res/salaryformula.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -320,8 +329,10 @@ JModel* JItemHelper::model(const QString& tableName, QObject* parent)
     return new CashModel(parent);
   if (tableName == CASH_CLOSING_SQL_TABLE_NAME)
     return new CashClosingModel(parent);
-if (tableName == SALARY_SQL_TABLE_NAME)
+  if (tableName == SALARY_SQL_TABLE_NAME)
     return new SalaryModel(parent);
+  if (tableName == SALARY_FORMULA_SQL_TABLE_NAME)
+    return new SalaryFormulaModel(parent);
   return nullptr;
 }
 
@@ -361,6 +372,8 @@ JItemView* JItemHelper::view(const QString& tableName)
     return new CashClosingView;
   if (tableName == SALARY_SQL_TABLE_NAME)
     return new SalaryView;
+  if (tableName == SALARY_FORMULA_SQL_TABLE_NAME)
+    return new SalaryFormulaView;
   return nullptr;
 }
 

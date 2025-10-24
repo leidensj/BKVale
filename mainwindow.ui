@@ -95,9 +95,16 @@
      <property name="title">
       <string>Pessoas</string>
      </property>
+     <widget class="QMenu" name="menuSal_rios">
+      <property name="title">
+       <string>Salários</string>
+      </property>
+      <addaction name="actionSalaries"/>
+      <addaction name="actionSalaryFormula"/>
+     </widget>
      <addaction name="actionEmployees"/>
-     <addaction name="actionSalaries"/>
      <addaction name="actionSuppliers"/>
+     <addaction name="menuSal_rios"/>
     </widget>
     <addaction name="menuPessoas"/>
     <addaction name="actionProducts"/>
@@ -493,6 +500,18 @@
    </property>
    <property name="text">
     <string>Salários</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSalaryFormula">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/salaryformula.png</normaloff>:/icons/res/salaryformula.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fórmula de Salários</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

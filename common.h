@@ -37,6 +37,7 @@ namespace Functionality
     CashClosing,
     PostIt,
     Salary,
+    SalaryFormula,
     _END,
   };
 

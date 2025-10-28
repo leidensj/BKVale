@@ -86,11 +86,14 @@ void SalaryCalculator::calculate()
     for (int i = 0; i != vname.size(); ++i)
       formula.replace(vname.at(i), Data::strFmt(vvalue.at(i)));
 
-  qDebug() << "DIAS " << m_dti->date().daysTo(m_dtf->date());
-  qDebug() << "HORAS " << m_dti->dateTime().secsTo(m_dtf->dateTime())/3600;
-  qDebug() << "MINUTOS " << m_dti->dateTime().secsTo(m_dtf->dateTime())/60;
-
   formula.replace("DIAS", Data::strFmt(m_dti->date().daysTo(m_dtf->date())));
-  formula.replace("HORAS", Data::strFmt(m_dti->dateTime().secsTo(m_dtf->dateTime())/3600));
-  formula.replace("MINUTOS", Data::strFmt(m_dti->dateTime().secsTo(m_dtf->dateTime())/60));
+  formula.replace("HORAS", Data::strFmt(double(m_dti->dateTime().secsTo(m_dtf->dateTime()))/3600));
+  formula.replace("MINUTOS", Data::strFmt(double(m_dti->dateTime().secsTo(m_dtf->dateTime()))/60));
+
+  qDebug() << "DIAS " << double(m_dti->dateTime().daysTo(m_dtf->date()));
+  qDebug() << "HORAS " << double(m_dti->dateTime().secsTo(m_dtf->dateTime())/3600);
+  qDebug() << "MINUTOS " << double(m_dti->dateTime().secsTo(m_dtf->dateTime())/60);
+  qDebug() << "FORMULA " << formula;
+
+  m_result->setValue(formula);
 }

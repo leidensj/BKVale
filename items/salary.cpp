@@ -75,7 +75,7 @@ bool Salary::SQL_update_proc(QSqlQuery& query) const
 
   if (ok)
   {
-    ok = EmployeePermission::SQL_remove_by_owner_id_proc(query, m_id);
+    ok = SalaryEmployee::SQL_remove_by_owner_id_proc(query, m_id);
     for (int i = 0; i != m_vse.size() && ok; ++i)
     {
       m_vse[i].m_ownerId = m_id;
@@ -127,4 +127,46 @@ bool Salary::SQL_remove_proc(QSqlQuery& query) const
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   return query.exec();
+}
+
+bool Salary::SQL_select_all_employee_salaries(const Id& employeeId, QVector<QString>& vname, QVector<double>& vvalue, QString& error)
+{
+  vname.clear();
+  vvalue.clear();
+  error.clear();
+
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  db.transaction();
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                SALARY_SQL_COL_NAM ","
+                SALARY_EMPLOYEE_SQL_COL_SAL
+                " FROM " SALARY_SQL_TABLE_NAME " LEFT JOIN "
+                SALARY_EMPLOYEE_SQL_TABLE_NAME " ON "
+                SALARY_SQL_TABLE_NAME "." SQL_COLID " = "
+                SALARY_EMPLOYEE_SQL_TABLE_NAME "." SALARY_EMPLOYEE_SQL_COL_SID " WHERE "
+                SALARY_EMPLOYEE_SQL_COL_EID " = (:_v00)");
+
+  query.bindValue(":_v00", employeeId.get());
+  bool ok = query.exec();
+  if (ok)
+  {
+    while (query.next())
+    {
+      vname.push_back(query.value(0).toString());
+      vvalue.push_back(query.value(1).toDouble());
+    }
+  }
+
+  if (!ok)
+  {
+    vname.clear();
+    vvalue.clear();
+  }
+
+  return SQL_finish(db, query, ok, error);
 }

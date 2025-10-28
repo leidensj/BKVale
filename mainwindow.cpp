@@ -15,6 +15,7 @@
 #include "controls/timecarddialog.h"
 #include "controls/couponredeemer.h"
 #include "controls/postitdialog.h"
+#include "controls/salarycalculator.h"
 
 #include "widgets/jstatusprogressbarinstance.h"
 #include "widgets/jstatusmessageinstance.h"
@@ -151,6 +152,7 @@ Baita::Baita(QWidget *parent)
   m_actions[Functionality::Idx::PostIt] = ui->actionPostIt;
   m_actions[Functionality::Idx::Salary] = ui->actionSalaries;
   m_actions[Functionality::Idx::SalaryFormula] = ui->actionSalaryFormula;
+  m_actions[Functionality::Idx::SalaryCalculator] = ui->actionSalaryCalculator;
 
   connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(openSettingsDialog()));
   connect(m_purchase, SIGNAL(changedSignal()), this, SLOT(updateControls()));
@@ -181,6 +183,7 @@ Baita::Baita(QWidget *parent)
   connect(ui->actionPostIt, SIGNAL(triggered(bool)), this, SLOT(openPostItDialog()));
   connect(ui->actionSalaries, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
   connect(ui->actionSalaryFormula, SIGNAL(triggered(bool)), this, SLOT(openJItemSQLDialog()));
+  connect(ui->actionSalaryCalculator, SIGNAL(triggered(bool)), this, SLOT(openSalaryCalculatorDialog()));
 
   connect(ui->actionLogged, SIGNAL(triggered(bool)), this, SLOT(openLoggedDialog()));
   connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));
@@ -375,6 +378,12 @@ void Baita::openCalculatorDialog()
 void Baita::openPostItDialog()
 {
   PostItDialog dlg(this);
+  dlg.exec();
+}
+
+void Baita::openSalaryCalculatorDialog()
+{
+  SalaryCalculator dlg(this);
   dlg.exec();
 }
 

@@ -58,28 +58,38 @@ void SalaryView::setItem(const JItemSQL& o)
   m_imagePicker->addItem(_o.m_image);
   m_table->set(_o.m_vse);
 
-  QVector<Employee> v;
+  Ids ids;
   QString error;
-  bool ok = Employee::SQL_select_all(v, error);
+  bool ok = Employee::SQL_select_all(ids, error);
   if (!ok)
   {
     QMessageBox::critical(this, tr("Erro"), tr("Erro ao buscar funcionários, por favor tente novamente.\n%1").arg(error), QMessageBox::Ok);
     return;
   }
 
-  for (int i = 0; i != v.size(); ++i)
+  for (int i = 0; i != ids.size(); ++i)
   {
     bool bfound = false;
     for (int j = 0; j != _o.m_vse.size(); ++j)
     {
-      if (v.at(i).m_id == _o.m_vse.at(j).m_employee.m_id)
+      if (ids.at(i) == _o.m_vse.at(j).m_employee.m_id)
       {
         bfound = true;
         break;
       }
     }
     if (!bfound)
-      m_table->addRow(v.at(i));
+    {
+      SalaryEmployee se;
+      se.m_employee.m_id = ids.at(i);
+      ok = se.m_employee.SQL_select(error);
+      if (!ok)
+      {
+        QMessageBox::critical(this, tr("Erro"), tr("Erro ao buscar funcionário, por favor tente novamente.\n%1").arg(error), QMessageBox::Ok);
+        continue;
+      }
+      m_table->addRow(se);
+    }
   }
   m_table->order();
 }

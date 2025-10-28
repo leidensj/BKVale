@@ -38,6 +38,7 @@ namespace Functionality
     PostIt,
     Salary,
     SalaryFormula,
+    SalaryCalculator,
     _END,
   };
 

@@ -556,6 +556,7 @@ bool BaitaSQL::createTables(QString& error)
                           SALARY_EMPLOYEE_SQL_COL_SID " INTEGER NOT NULL,"
                           SALARY_EMPLOYEE_SQL_COL_EID " INTEGER NOT NULL,"
                           SALARY_EMPLOYEE_SQL_COL_SAL " REAL,"
+                          "UNIQUE (" SALARY_EMPLOYEE_SQL_COL_SID "," SALARY_EMPLOYEE_SQL_COL_EID"),"
                           "FOREIGN KEY(" SALARY_EMPLOYEE_SQL_COL_SID ") REFERENCES "
                           SALARY_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE,"
                           "FOREIGN KEY(" SALARY_EMPLOYEE_SQL_COL_EID ") REFERENCES "

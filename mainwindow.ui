@@ -141,6 +141,7 @@
     <addaction name="actionCashClosing"/>
     <addaction name="actionCalculator"/>
     <addaction name="actionPostIt"/>
+    <addaction name="actionSalaryCalculator"/>
    </widget>
    <addaction name="menuSistema"/>
    <addaction name="menuCadastros"/>
@@ -512,6 +513,18 @@
    </property>
    <property name="text">
     <string>Fórmula de Salários</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSalaryCalculator">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/res/salarycalc.png</normaloff>:/icons/res/salarycalc.png</iconset>
+   </property>
+   <property name="text">
+    <string>Caculadora de Salário</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

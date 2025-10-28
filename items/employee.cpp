@@ -393,9 +393,9 @@ void Employee::setPermissionToRemove(const QString& tableName, bool bSet)
   setPermissionToRemove(Functionality::tableNameToIdx(tableName), bSet);
 }
 
-bool Employee::SQL_select_all(QVector<Employee>& v, QString& error)
+bool Employee::SQL_select_all(Ids& ids, QString& error)
 {
-  v.clear();
+  ids.clear();
   error.clear();
 
   if (!SQL_isOpen(error))
@@ -411,21 +411,11 @@ bool Employee::SQL_select_all(QVector<Employee>& v, QString& error)
 
   bool ok = query.exec();
   if (ok)
-  {
     while (query.next())
-    {
-      Employee o;
-      o.m_id.set(query.value(0).toLongLong());
-      ok = o.SQL_select(error);
-      if (ok)
-        v.push_back(o);
-      else
-        break;
-    }
-  }
+      ids.push_back(query.value(0).toLongLong());
 
   if (!ok)
-    v.clear();
+    ids.clear();
 
   return SQL_finish(db, query, ok, error);
 }

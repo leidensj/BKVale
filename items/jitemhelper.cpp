@@ -203,6 +203,8 @@ QString JItemHelper::text(Functionality::Idx idx)
       return "Salário";
     case Functionality::Idx::SalaryFormula:
       return "Fórmula de Salário";
+    case Functionality::Idx::SalaryCalculator:
+      return "Calculadora de Salário";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";
@@ -276,6 +278,8 @@ QString JItemHelper::icon(Functionality::Idx idx)
       return ":/icons/res/salary.png";
     case Functionality::Idx::SalaryFormula:
       return ":/icons/res/salaryformula.png";
+    case Functionality::Idx::SalaryCalculator:
+      return ":/icons/res/salarycalc.png";
     case Functionality::Idx::_END:
     default:
       return "ERRO! Item não encontrado";

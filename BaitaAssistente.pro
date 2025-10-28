@@ -27,6 +27,7 @@ SOURCES += main.cpp\
   controls/pincodedialog.cpp \
   controls/postitdialog.cpp \
   controls/report.cpp \
+  controls/salarycalculator.cpp \
   controls/shopwidget.cpp \
   controls/timecarddialog.cpp \
   editors/addresseditor.cpp \
@@ -181,6 +182,7 @@ HEADERS  += mainwindow.h \
     controls/pincodedialog.h \
     controls/postitdialog.h \
     controls/report.h \
+    controls/salarycalculator.h \
     controls/shopwidget.h \
     controls/timecarddialog.h \
     editors/addresseditor.h \

@@ -79,14 +79,16 @@ void EscPos::align(bool center)
 
 void EscPos::cut(bool partial)
 {
+  doublefont(false);
+  expand(false);
+  align(false);
+  str("\n\n");
   switch (m_printerModel)
   {
     case PRINTER_MODEL_ELGINI9:
-      str("\n\n");
       partial ? m_ba.append(ESC_PARTIALCUT, 3) : m_ba.append(ESC_FULLCUT, 3);
       break;
     case PRINTER_MODEL_BEMATECH4200TH:
-      str("\n\n");
       partial ? m_ba.append(ESC_PARTIAL_CUT, 2) : m_ba.append(ESC_FULL_CUT, 2);
       break;
     case PRINTER_MODEL_NONE:

@@ -122,6 +122,7 @@ bool DatabasePicker::addItem(Id id, const QString& name, const QByteArray& arIma
     m_ids.clear();
     m_names.clear();
     m_ids.push_back(id);
+    m_names.push_back(name);
     m_edText->setText(name);
     if (!arImage.isEmpty() && ! arImage.isNull())
     {

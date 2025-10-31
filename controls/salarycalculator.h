@@ -7,6 +7,7 @@ class DatabasePicker;
 class QDateTimeEdit;
 class JExpLineEdit;
 class QPushButton;
+class QLabel;
 
 class SalaryCalculator : public QDialog
 {
@@ -16,16 +17,21 @@ public:
   explicit SalaryCalculator(QWidget* parent = nullptr);
 
 private slots:
+  void update();
   void calculate();
-  void displayError(const QString& error);
+  void print();
 
 private:
   DatabasePicker* m_employee;
   DatabasePicker* m_formula;
   QDateTimeEdit* m_dti;
   QDateTimeEdit* m_dtf;
+  QLabel* m_minutes;
+  QLabel* m_hours;
+  QLabel* m_days;
   JExpLineEdit* m_result;
   QPushButton* m_calculate;
+  QPushButton* m_print;
 };
 
 #endif // SALARYCALCULATOR_H

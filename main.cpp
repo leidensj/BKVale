@@ -10,6 +10,7 @@
 #include "controls/couponredeemer.h"
 #include "views/cashclosingview.h"
 #include "views/jitemview.h"
+#include "controls/salarycalculator.h"
 
 int main(int argc, char *argv[])
 {
@@ -25,6 +26,8 @@ int main(int argc, char *argv[])
   parser.addOption(redeemerOpt);
   QCommandLineOption cashclosingOpt("c", "Inicia a versão de fechamento de caixa.");
   parser.addOption(cashclosingOpt);
+  QCommandLineOption salaryOpt("sal", "Inicia a versão de calculo de salários.");
+  parser.addOption(salaryOpt);
   QCommandLineOption serverOpt(QStringList() << "s", "Especifíca o servidor do banco de dados.", "server", "");
   parser.addOption(serverOpt);
   QCommandLineOption portOpt(QStringList() << "p", "Especifíca a porta do banco de dados.", "port", "5432");
@@ -33,11 +36,12 @@ int main(int argc, char *argv[])
 
   bool bRedeemer = parser.isSet(redeemerOpt);
   bool bCashclosing = parser.isSet(cashclosingOpt);
+  bool bSalary = parser.isSet(salaryOpt);
   QString server = parser.value(serverOpt);
   QString port = parser.value(portOpt);
 
    QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
-  if (bRedeemer || bCashclosing)
+  if (bRedeemer || bCashclosing || bSalary)
   {
      QString error;
      Settings s;
@@ -70,6 +74,14 @@ int main(int argc, char *argv[])
         f.setPointSize(14);
         w.setFont(f);
         w.showMaximized();
+        return a.exec();
+      }
+      else if (bSalary)
+      {
+        SalaryCalculator w;
+        w.setWindowTitle(QObject::tr("Calculadora de Salários"));
+        w.setWindowIcon(QIcon(":/icons/res/salarycalc.png"));
+        w.show();
         return a.exec();
       }
     }

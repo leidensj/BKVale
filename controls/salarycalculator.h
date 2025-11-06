@@ -8,6 +8,7 @@ class QDateTimeEdit;
 class JExpLineEdit;
 class QPushButton;
 class QLabel;
+class SalaryCalculatorTable;
 
 class SalaryCalculator : public QDialog
 {
@@ -26,10 +27,7 @@ private:
   DatabasePicker* m_formula;
   QDateTimeEdit* m_dti;
   QDateTimeEdit* m_dtf;
-  QLabel* m_minutes;
-  QLabel* m_hours;
-  QLabel* m_days;
-  JExpLineEdit* m_result;
+  SalaryCalculatorTable* m_table;
   QPushButton* m_calculate;
   QPushButton* m_print;
 };

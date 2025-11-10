@@ -129,7 +129,7 @@ bool Salary::SQL_remove_proc(QSqlQuery& query) const
   return query.exec();
 }
 
-bool Salary::SQL_select_all_employee_salaries(const Id& employeeId, QVector<QString>& vname, QVector<double>& vvalue, QString& error)
+bool Salary::SQL_select_all_employee_salaries(const Id& employeeId, Names& vname, Values& vvalue, QString& error)
 {
   vname.clear();
   vvalue.clear();

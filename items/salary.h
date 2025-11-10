@@ -17,7 +17,7 @@ struct Salary : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
-  static bool SQL_select_all_employee_salaries(const Id& employeeId, QVector<QString>& vname, QVector<double>& vvalue, QString& error);
+  static bool SQL_select_all_employee_salaries(const Id& employeeId, Names& vname, Values& vvalue, QString& error);
 
   QString m_name;
   Image m_image;

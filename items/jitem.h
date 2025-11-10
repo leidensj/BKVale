@@ -37,5 +37,6 @@ struct JItem
 
 typedef QVector<Id> Ids;
 typedef QVector<QString> Names;
+typedef QVector<double> Values;
 
 #endif // JITEM_H

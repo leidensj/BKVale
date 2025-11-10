@@ -19,7 +19,8 @@ public:
 
 private slots:
   void update();
-  void calculate();
+  void process();
+  void calculate(int row, int column);
   void print();
 
 private:

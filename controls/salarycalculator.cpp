@@ -49,7 +49,6 @@ SalaryCalculator::SalaryCalculator(QWidget* parent)
   m_print->setIcon(QIcon(":/icons/res/printer.png"));
   m_print->setFlat(true);
   m_print->setToolTip(tr("Imprimir"));
-  m_print->setCheckable(true);
 
   auto form = new QFormLayout;
   form->addRow(tr("Fórmula:"), m_formula);
@@ -67,12 +66,13 @@ SalaryCalculator::SalaryCalculator(QWidget* parent)
   vbox->addWidget(m_table);
   setLayout(vbox);
 
-  connect(m_calculate, SIGNAL(clicked(bool)), this, SLOT(calculate()));
+  connect(m_calculate, SIGNAL(clicked(bool)), this, SLOT(process()));
+  connect(m_print, SIGNAL(clicked(bool)), this, SLOT(print()));
   connect(m_employee, SIGNAL(changedSignal()), this, SLOT(update()));
   connect(m_formula, SIGNAL(changedSignal()), this, SLOT(update()));
   connect(m_dti, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(update()));
   connect(m_dtf, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(update()));
-  connect(m_table, SIGNAL(changedSignal(bool)), this, SLOT(update()));
+  connect(m_table, SIGNAL(changedSignal(int, int)), this, SLOT(calculate(int,int)));
   update();
 }
 
@@ -82,57 +82,80 @@ void SalaryCalculator::update()
   m_calculate->setEnabled(ok);
 }
 
-void SalaryCalculator::calculate()
+void SalaryCalculator::process()
 {
   Ids eids = m_employee->getIds();
-  QString error;
-  QVector<Employee> ve;
-  for (const auto& id : eids)
-  {
-    Employee e;
-    e.m_id = id;
-    if (e.SQL_select(error))
-      ve.push_back(e);
-  }
+  Names enames = m_employee->getNames();
+  if (eids.size() != enames.size())
+    return;
 
+  QString error;
   SalaryFormula sf;
   sf.m_id = m_formula->getFirstId();
   sf.SQL_select(error);
 
-  QVector<SalaryCalculatorResult> vscr;
-  for (auto& e : ve)
+  QVector<SalaryCalculatorResult> v;
+  for (int i = 0; i != eids.size(); ++i)
   {
-    QVector<QString> vname;
-    QVector<double> vvalue;
-    Salary::SQL_select_all_employee_salaries(e.m_id, vname, vvalue, error);
-    QString formula = sf.m_formula;
-    if (vname.size() == vvalue.size())
-      for (int i = 0; i != vname.size(); ++i)
-        formula.replace(vname.at(i), Data::strFmt(vvalue.at(i)));
-    formula.replace("DIAS", Data::strFmt(m_dti->date().daysTo(m_dtf->date())));
-    formula.replace("HORAS", Data::strFmt(double(m_dti->dateTime().secsTo(m_dtf->dateTime()))/3600.0));
-    formula.replace("MINUTOS", Data::strFmt(double(m_dti->dateTime().secsTo(m_dtf->dateTime()))/60.0));
-    SalaryCalculatorResult scr;
-    scr.name = e.name();
-    scr.value = formula;
-    vscr.push_back(scr);
+    SalaryCalculatorResult o;
+    o.id = eids.at(i).get();
+    o.name = enames.at(i);
+    o.dtBegin = m_dti->date();
+    o.tmBegin = m_dti->time();
+    o.dtEnd = m_dtf->date();
+    o.tmEnd = m_dtf->time();
+    v.push_back(o);
   }
-  m_table->set(vscr);
-  if (m_print->isChecked())
-    print();
+  m_table->set(v);
+}
+
+void SalaryCalculator::calculate(int row, int /*column*/)
+{
+  if (!m_table->isValidRow(row))
+    return;
+
+  QString error;
+  SalaryFormula sf;
+  sf.m_id = m_formula->getFirstId();
+  sf.SQL_select(error);
+
+  SalaryCalculatorResult o;
+  m_table->get(row, o);
+  if (QDateTime(o.dtBegin, o.tmBegin) > QDateTime(o.dtEnd, o.tmEnd))
+  {
+    o.value = "0";
+    m_table->set(row, o);
+    return;
+  }
+
+  Names snames;
+  Values svalues;
+  Salary::SQL_select_all_employee_salaries(o.id, snames, svalues, error);
+  QString formula = sf.m_formula;
+  if (snames.size() == svalues.size())
+    for (int i = 0; i != snames.size(); ++i)
+      formula.replace(snames.at(i), Data::strFmt(svalues.at(i)));
+  formula.replace("DIAS", Data::strFmt(o.dtBegin.daysTo(o.dtEnd)));
+  formula.replace("HORAS", Data::strFmt(QDateTime(o.dtBegin, o.tmBegin).secsTo(QDateTime(o.dtEnd, o.tmEnd))/3600.0));
+  formula.replace("MINUTOS", Data::strFmt(QDateTime(o.dtBegin, o.tmBegin).secsTo(QDateTime(o.dtEnd, o.tmEnd))/60.0));
+  o.value = formula;
+  m_table->set(row, o);
 }
 
 void SalaryCalculator::print()
 {
+  if (!m_table->hasItems())
+    return;
+
   EscPos ep;
-  QVector<SalaryCalculatorResult> vsre;
-  m_table->get(vsre);
-  for (auto& r : vsre)
+  QVector<SalaryCalculatorResult> v;
+  m_table->get(v);
+  for (auto& o : v)
   {
     ep.align(true);
     ep.str(tr("Funcionário\n"));
     ep.expand(true);
-    ep.str(r.name);
+    ep.str(o.name);
     ep.expand(false);
     ep.str(tr("\n\nFórmula de Salario\n"));
     ep.expand(true);
@@ -140,18 +163,17 @@ void SalaryCalculator::print()
     ep.expand(false);
     ep.str(tr("\n\nInício: "));
     ep.bold(true);
-    ep.str(m_dti->dateTime().toString("dd/MM/yyyy HH:mm"));
+    ep.str(QDateTime(o.dtBegin, o.tmBegin).toString("dd/MM/yyyy HH:mm"));
     ep.bold(false);
     ep.str(tr("\nFim: "));
     ep.bold(true);
-    ep.str(m_dtf->dateTime().toString("dd/MM/yyyy HH:mm"));
+    ep.str(QDateTime(o.dtEnd, o.tmEnd).toString("dd/MM/yyyy HH:mm"));
     ep.bold(false);
     ep.str(tr("\n\nResultado\n"));
     ep.doublefont(true);
-    ep.str(r.value);
+    ep.str(o.value);
     ep.cut(true);
   }
-
 
   EscPosPrinter printer;
   QString error;

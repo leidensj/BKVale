@@ -98,8 +98,10 @@ void SalaryCalculator::process()
   for (int i = 0; i != eids.size(); ++i)
   {
     SalaryCalculatorResult o;
-    o.id = eids.at(i).get();
-    o.name = enames.at(i);
+    o.eid = eids.at(i).get();
+    o.ename = enames.at(i);
+    o.sid = sf.m_id.get();
+    o.sname = sf.m_name;
     o.dtBegin = m_dti->date();
     o.tmBegin = m_dti->time();
     o.dtEnd = m_dtf->date();
@@ -130,7 +132,7 @@ void SalaryCalculator::calculate(int row, int /*column*/)
 
   Names snames;
   Values svalues;
-  Salary::SQL_select_all_employee_salaries(o.id, snames, svalues, error);
+  Salary::SQL_select_all_employee_salaries(o.eid, snames, svalues, error);
   QString formula = sf.m_formula;
   if (snames.size() == svalues.size())
     for (int i = 0; i != snames.size(); ++i)
@@ -155,7 +157,7 @@ void SalaryCalculator::print()
     ep.align(true);
     ep.str(tr("Funcionário\n"));
     ep.expand(true);
-    ep.str(o.name);
+    ep.str(o.ename);
     ep.expand(false);
     ep.str(tr("\n\nFórmula de Salario\n"));
     ep.expand(true);

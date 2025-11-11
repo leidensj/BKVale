@@ -7,8 +7,10 @@
 
 struct SalaryCalculatorResult
 {
-  qlonglong id;
-  QString name;
+  qlonglong eid;
+  QString ename;
+  qlonglong sid;
+  QString sname;
   QDate dtBegin;
   QTime tmBegin;
   QDate dtEnd;
@@ -16,8 +18,10 @@ struct SalaryCalculatorResult
   QString value;
   void clear ()
   {
-    id = 0;
-    name.clear();
+    eid = 0;
+    ename.clear();
+    sid = 0;
+    sname.clear();
     dtBegin = QDate::currentDate();
     tmBegin = QTime::currentTime();
     dtEnd = QDate::currentDate();
@@ -35,6 +39,7 @@ public:
   enum class Column
   {
     Name,
+    Formula,
     DateBegin,
     TimeBegin,
     DateEnd,

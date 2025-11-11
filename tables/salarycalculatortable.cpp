@@ -5,18 +5,18 @@
 #include "tableitems/doubleitem.h"
 #include "tableitems/dateitem.h"
 #include "tableitems/timeitem.h"
-
-#define ID_ROLE 0x0141
+#include "tableitems/sqlitem.h"
 
 SalaryCalculatorTable::SalaryCalculatorTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)
 {
-  setColumnCount(6);
+  setColumnCount(7);
   QStringList headers;
-  headers << "Nome" << "Data Início" << "Hora Início" << "Data Fim" << "Hora Fim" << "Valor";
+  headers << "Nome" << "Fórmula" << "Data Início" << "Hora Início" << "Data Fim" << "Hora Fim" << "Valor";
   setHorizontalHeaderLabels(headers);
 
   horizontalHeader()->setSectionResizeMode((int)Column::Name, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)Column::Formula, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)Column::DateBegin, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::TimeBegin, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::DateEnd, QHeaderView::ResizeToContents);
@@ -29,7 +29,8 @@ void SalaryCalculatorTable::addRow()
   insertRow(rowCount());
   int row = rowCount() - 1;
 
-  auto itName = new TextItem(Text::Input::ASCII, true);
+  auto itName = new SQLItem(EMPLOYEE_SQL_TABLE_NAME);
+  auto itFormula = new SQLItem(SALARY_FORMULA_SQL_TABLE_NAME);
   auto itDtBegin = new DateItem(QDate::currentDate());
   auto itTmBegin = new TimeItem(QTime::currentTime());
   auto itDtEnd = new DateItem(QDate::currentDate());
@@ -38,6 +39,7 @@ void SalaryCalculatorTable::addRow()
 
   JTable::blockSignals(true);
   setItem(row, (int)Column::Name, itName);
+  setItem(row, (int)Column::Formula, itFormula);
   setItem(row, (int)Column::DateBegin, itDtBegin);
   setItem(row, (int)Column::TimeBegin, itTmBegin);
   setItem(row, (int)Column::DateEnd, itDtEnd);
@@ -62,8 +64,10 @@ void SalaryCalculatorTable::get(int row, SalaryCalculatorResult& o) const
   if (!isValidRow(row))
     return;
   row = verticalHeader()->logicalIndex(row);
-  o.id = getItem(row, (int)Column::Name)->data(ID_ROLE).toLongLong();
-  o.name = getItem(row, (int)Column::Name)->getValue().toString();
+  o.eid = SQLItem::st_idFromVariant(getItem(row, (int)Column::Name)->getValue()).get();
+  o.ename = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Name)->getValue());
+  o.sid = SQLItem::st_idFromVariant(getItem(row, (int)Column::Formula)->getValue()).get();
+  o.sname = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Formula)->getValue());
   o.dtBegin = getItem(row, (int)Column::DateBegin)->getValue().toDate();
   o.tmBegin = getItem(row, (int)Column::TimeBegin)->getValue().toTime();
   o.dtEnd = getItem(row, (int)Column::DateEnd)->getValue().toDate();
@@ -89,8 +93,9 @@ void SalaryCalculatorTable::set(int row, const SalaryCalculatorResult& o)
 
   blockSignals(true);
   row = verticalHeader()->logicalIndex(row);
-  getItem(row, (int)Column::Name)->setData(ID_ROLE, o.id);
-  getItem(row, (int)Column::Name)->setValue(o.name);
+
+  getItem(row, (int)Column::Name)->setValue(SQLItem::st_toVariant(Id(o.eid), o.ename));
+  getItem(row, (int)Column::Formula)->setValue(SQLItem::st_toVariant(Id(o.sid), o.sname));
   getItem(row, (int)Column::DateBegin)->setValue(o.dtBegin);
   getItem(row, (int)Column::TimeBegin)->setValue(o.tmBegin);
   getItem(row, (int)Column::DateEnd)->setValue(o.dtEnd);

@@ -12,6 +12,7 @@ CashClosingSectorTable::CashClosingSectorTable(JAddRemoveButtons* btns, QWidget*
   headers << "Setor" << "Valor" << "Quantidade";
   setHorizontalHeaderLabels(headers);
 
+  horizontalHeader()->hideSection((int)Column::NValue);
   horizontalHeader()->setSectionResizeMode((int)Column::Sector, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Value, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)Column::NValue, QHeaderView::Stretch);
@@ -23,9 +24,8 @@ void CashClosingSectorTable::addRow()
   int row = rowCount() - 1;
 
   auto itSector = new TextItem(Text::Input::AlphanumericAndSpaces, true);
-  auto itValue = new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground2, false, false);
-  auto itNValue = new DoubleItem(Data::Type::Integer, DoubleItem::Color::Foreground2, false, false);
-
+  auto itValue = new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground, false, false);
+  auto itNValue = new DoubleItem(Data::Type::Integer, DoubleItem::Color::Foreground, false, false);
 
   blockSignals(true);
   setItem(row, (int)Column::Sector, itSector);

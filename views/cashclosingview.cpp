@@ -20,10 +20,13 @@ CashClosingView::CashClosingView(QWidget* parent)
   , m_coinTable(nullptr)
   , m_sectorTable(nullptr)
   , m_infoTable(nullptr)
-  , m_edSector1(nullptr)
-  , m_edSector2(nullptr)
-  , m_edCoin1(nullptr)
-  , m_edCoin2(nullptr)
+  , m_edDebit(nullptr)
+  , m_edCredit(nullptr)
+  , m_edComission(nullptr)
+  , m_edSector(nullptr)
+  , m_edCoin(nullptr)
+  , m_edTotal(nullptr)
+  , m_edProfit(nullptr)
   , m_edDiff1(nullptr)
   , m_edDiff2(nullptr)
   , m_btnCalc(nullptr)
@@ -39,26 +42,30 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_coinTable = new CashClosingCoinTable;
   m_sectorTable = new CashClosingSectorTable;
   m_infoTable = new CashClosingInfoTable;
-  m_edSector1 = new JExpLineEdit(Data::Type::Money);
-  m_edSector2 = new JExpLineEdit(Data::Type::Integer);
-  m_edCoin1 = new JExpLineEdit(Data::Type::Money);
-  m_edCoin2 = new JExpLineEdit(Data::Type::Money);
+  m_edSector = new JExpLineEdit(Data::Type::Money);
+  m_edCoin = new JExpLineEdit(Data::Type::Money);
+  m_edTotal = new JExpLineEdit(Data::Type::Money);
+  m_edProfit = new JExpLineEdit(Data::Type::Money);
   m_edDiff1 = new JExpLineEdit(Data::Type::Money);
   m_edDiff2 = new JExpLineEdit(Data::Type::Money);
-  m_edSector1->setReadOnly(true);
-  m_edSector2->setReadOnly(true);
-  m_edCoin1->setReadOnly(true);
-  m_edCoin2->setReadOnly(true);
+  m_edDebit = new JExpLineEdit(Data::Type::Money);
+  m_edCredit = new JExpLineEdit(Data::Type::Money);
+  m_edComission = new JExpLineEdit(Data::Type::Money);
+  m_edSector->setReadOnly(true);
+  m_edCoin->setReadOnly(true);
+  m_edTotal->setReadOnly(true);
+  m_edProfit->setReadOnly(true);
   m_edDiff1->setReadOnly(true);
   m_edDiff2->setReadOnly(true);
-  m_edSector1->setInvertColors(true);
-  m_edSector2->setInvertColors(true);
-  m_edCoin1->setInvertColors(true);
-  m_edCoin2->setInvertColors(true);
+  m_edDebit->setInvertColors(true);
+  m_edTotal->setInvertColors(true);
+  m_edProfit->setInvertColors(true);
+  m_edSector->setInvertColors(true);
   m_edDiff1->setInvertColors(true);
   m_edDiff2->setInvertColors(true);
-  m_edDiff1->setToolTip(tr("Diferença entre vendas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa. Um valor próximo de zero indica que o caixa fechou."));
-  m_edDiff2->setToolTip(tr("Diferença entre venda e recebimentos (líquido). Representa a quebra de caixa + o valor pago em taxas."));
+  m_edTotal->setToolTip(tr("Total das entradas descontando as taxas."));
+  m_edDiff1->setToolTip(tr("Diferença entre entradas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa. Um valor próximo de zero indica que o caixa fechou."));
+  m_edDiff2->setToolTip(tr("Diferença entre entradas e recebimentos (líquido). Representa a quebra de caixa + o valor pago em taxas."));
   m_btnCalc = new QPushButton(QIcon(":/icons/res/calculator.png"), "");
   m_btnCalc->setFlat(true);
   m_btnCalc->setIconSize(QSize(24, 24));
@@ -69,7 +76,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_ltButton->addWidget(m_btnPostit);
 
   QLabel* cash = new QLabel(tr("Caixa"));
-  QLabel* sector = new QLabel(tr("Vendas"));
+  QLabel* sector = new QLabel(tr("Entradas"));
   QLabel* coin = new QLabel(tr("Recebimentos"));
   QLabel* info = new QLabel(tr("Informações"));
   QLabel* summary = new QLabel(tr("Resumo"));
@@ -96,19 +103,30 @@ CashClosingView::CashClosingView(QWidget* parent)
   ltables1->addLayout(lsector);
   ltables1->addLayout(lcoin);
 
+  auto ldebit = new QFormLayout;
+  ldebit->addRow(tr("Assinadas:"), m_edDebit);
+  auto lcredit = new QFormLayout;
+  lcredit->addRow(tr("Créditos:"), m_edCredit);
+  auto lcomission = new QFormLayout;
+  lcomission->addRow(tr("Comissões"), m_edComission);
+  auto lextras = new QHBoxLayout;
+  lextras->addLayout(ldebit);
+  lextras->addLayout(lcredit);
+  lextras->addLayout(lcomission);
+
   auto linfo = new QVBoxLayout;
   linfo->addWidget(info);
   linfo->addWidget(m_infoTable);
 
   auto results1 = new QFormLayout;
   results1->setAlignment(Qt::AlignTop);
-  results1->addRow(tr("Vendas (Valor):"),m_edSector1);
-  results1->addRow(tr("Recebimentos (Valor Bruto):"),m_edCoin1);
+  results1->addRow(tr("Entradas:"),m_edSector);
+  results1->addRow(tr("Recebimentos:"),m_edCoin);
   results1->addRow(tr("Quebra de Caixa:"),m_edDiff1);
 
   auto results2 = new QFormLayout;
-  results2->addRow(tr("Vendas (Quantidade):"),m_edSector2);
-  results2->addRow(tr("Recebimentos (Valor Líquido):"),m_edCoin2);
+  results2->addRow(tr("Total:"),m_edTotal);
+  results2->addRow(tr("Venda Real:"),m_edProfit);
   results2->addRow(tr("Diferença de caixa:"),m_edDiff2);
 
   auto resulth = new QHBoxLayout;
@@ -128,6 +146,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   lmain->addWidget(m_cashPicker);
   lmain->addWidget(m_dt);
   lmain->addLayout(ltables1);
+  lmain->addLayout(lextras);
   lmain->addLayout(ltables2);
 
   QFrame* tabframe = new QFrame;
@@ -140,6 +159,9 @@ CashClosingView::CashClosingView(QWidget* parent)
   connect(m_cashPicker, SIGNAL(changedSignal()), this, SLOT(cashChanged()));
   connect(m_sectorTable, SIGNAL(changedSignal(int, int)), this, SLOT(update()));
   connect(m_coinTable, SIGNAL(changedSignal(int, int)), this, SLOT(update()));
+  connect(m_edDebit, SIGNAL(valueChanged(double)), this, SLOT(update()));
+  connect(m_edCredit, SIGNAL(valueChanged(double)), this, SLOT(update()));
+  connect(m_edComission, SIGNAL(valueChanged(double)), this, SLOT(update()));
   connect(m_btnCalc, SIGNAL(clicked(bool)), this, SLOT(showCalculator()));
   connect(m_btnPostit, SIGNAL(clicked(bool)), this, SLOT(showPostit()));
 
@@ -158,6 +180,9 @@ void CashClosingView::getItem(JItemSQL& o) const
   m_coinTable->get(_o.m_vcoins);
   m_sectorTable->get(_o.m_vsectors);
   m_infoTable->get(_o.m_vinfos);
+  _o.m_debit = m_edDebit->value();
+  _o.m_credit = m_edCredit->value();
+  _o.m_comission = m_edComission->value();
 }
 
 void CashClosingView::setItem(const JItemSQL& o)
@@ -174,6 +199,10 @@ void CashClosingView::setItem(const JItemSQL& o)
   m_cashPicker->clear();
   m_cashPicker->addItem(_o.m_cash);
   m_cashPicker->blockSignals(false);
+
+  m_edDebit->setValue(_o.m_debit);
+  m_edCredit->setValue(_o.m_credit);
+  m_edComission->setValue(_o.m_comission);
 
   m_sectorTable->setFocus();
   update();
@@ -238,12 +267,12 @@ void CashClosingView::cashChanged()
 void CashClosingView::update()
 {
   m_btnSave->setEnabled(m_cashPicker->getFirstId().isValid());
-  m_edSector1->setValue(m_sectorTable->sum((int)CashClosingSectorTable::Column::Value));
-  m_edSector2->setValue(m_sectorTable->sum((int)CashClosingSectorTable::Column::NValue));
-  m_edCoin1->setValue(m_coinTable->sum((int)CashClosingCoinTable::Column::Value));
-  m_edCoin2->setValue(m_coinTable->sumWithTaxes());
-  m_edDiff1->setValue(m_edCoin1->value() - m_edSector1->value());
-  m_edDiff2->setValue(m_edCoin2->value() - m_edSector1->value());
+  m_edSector->setValue(m_sectorTable->sum((int)CashClosingSectorTable::Column::Value));
+  m_edCoin->setValue(m_coinTable->sum((int)CashClosingCoinTable::Column::Value));
+  m_edTotal->setValue(m_coinTable->sumWithTaxes());
+  m_edProfit->setValue(m_coinTable->sumWithTaxes() + m_edDebit->value() - m_edCredit->value() - m_edComission->value());
+  m_edDiff1->setValue(m_edCoin->value() - m_edSector->value());
+  m_edDiff2->setValue(m_edTotal->value() - m_edSector->value());
 }
 
 void CashClosingView::showCalculator()

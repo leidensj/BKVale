@@ -36,10 +36,13 @@ private:
   CashClosingCoinTable* m_coinTable;
   CashClosingSectorTable* m_sectorTable;
   CashClosingInfoTable* m_infoTable;
-  JExpLineEdit* m_edSector1;
-  JExpLineEdit* m_edSector2;
-  JExpLineEdit* m_edCoin1;
-  JExpLineEdit* m_edCoin2;
+  JExpLineEdit* m_edDebit;
+  JExpLineEdit* m_edCredit;
+  JExpLineEdit* m_edComission;
+  JExpLineEdit* m_edSector;
+  JExpLineEdit* m_edCoin;
+  JExpLineEdit* m_edTotal;
+  JExpLineEdit* m_edProfit;
   JExpLineEdit* m_edDiff1;
   JExpLineEdit* m_edDiff2;
   QPushButton* m_btnCalc;

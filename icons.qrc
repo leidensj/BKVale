@@ -198,5 +198,6 @@
         <file>res/sortaz.png</file>
         <file>res/salarycalc.png</file>
         <file>res/salaryformula.png</file>
+        <file>res/addmitem.png</file>
     </qresource>
 </RCC>

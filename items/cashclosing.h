@@ -39,6 +39,9 @@ struct CashClosing : public JItemSQL
   QVector<CashClosingCoin> m_vcoins;
   QVector<CashClosingSector> m_vsectors;
   QVector<CashClosingInfo> m_vinfos;
+  double m_debit;
+  double m_credit;
+  double m_comission;
 };
 
 #endif // CASHCLOSING_H

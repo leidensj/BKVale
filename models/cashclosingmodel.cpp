@@ -24,7 +24,7 @@ void CashClosingModel::select(QHeaderView* header)
   setHeaderData((int)Column::Id, Qt::Horizontal, tr("ID"));
   setHeaderData((int)Column::Date, Qt::Horizontal, tr("Data"));
   setHeaderData((int)Column::Cash, Qt::Horizontal, tr("Caixa"));
-  setHeaderData((int)Column::Sales, Qt::Horizontal, tr("Vendas"));
+  setHeaderData((int)Column::Sales, Qt::Horizontal, tr("Entradas"));
   setHeaderData((int)Column::Gross, Qt::Horizontal, tr("Bruto"));
   setHeaderData((int)Column::Net, Qt::Horizontal, tr("Líquido"));
   setHeaderData((int)Column::Tax, Qt::Horizontal, tr("Taxas"));

@@ -6,22 +6,26 @@
 #include "tableitems/dateitem.h"
 #include "tableitems/timeitem.h"
 #include "tableitems/sqlitem.h"
+#include "items/salaryformula.h"
+#include "items/salary.h"
 
 SalaryCalculatorTable::SalaryCalculatorTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)
 {
   setColumnCount(7);
   QStringList headers;
-  headers << "Nome" << "Fórmula" << "Data Início" << "Hora Início" << "Data Fim" << "Hora Fim" << "Valor";
+  headers << "Fórmula" << "Nome"  << "Data Início" << "Hora Início" << "Data Fim" << "Hora Fim" << "Valor";
   setHorizontalHeaderLabels(headers);
 
-  horizontalHeader()->setSectionResizeMode((int)Column::Name, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)Column::Formula, QHeaderView::Stretch);
+  horizontalHeader()->setSectionResizeMode((int)Column::Employee, QHeaderView::Stretch);
   horizontalHeader()->setSectionResizeMode((int)Column::DateBegin, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::TimeBegin, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::DateEnd, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::TimeEnd, QHeaderView::ResizeToContents);
   horizontalHeader()->setSectionResizeMode((int)Column::Value, QHeaderView::Stretch);
+
+  connect(this, SIGNAL(changedSignal(int,int)), this, SLOT(update(int,int)));
 }
 
 void SalaryCalculatorTable::addRow()
@@ -29,95 +33,120 @@ void SalaryCalculatorTable::addRow()
   insertRow(rowCount());
   int row = rowCount() - 1;
 
-  auto itName = new SQLItem(EMPLOYEE_SQL_TABLE_NAME);
+  auto itEmployee = new SQLItem(EMPLOYEE_SQL_TABLE_NAME);
   auto itFormula = new SQLItem(SALARY_FORMULA_SQL_TABLE_NAME);
   auto itDtBegin = new DateItem(QDate::currentDate());
-  auto itTmBegin = new TimeItem(QTime::currentTime());
+  QTime ct = QTime::currentTime();
+  auto itTmBegin = new TimeItem(QTime(ct.hour(), ct.minute()));
   auto itDtEnd = new DateItem(QDate::currentDate());
-  auto itTmEnd = new TimeItem(QTime::currentTime());
+  auto itTmEnd = new TimeItem(QTime(ct.hour(), ct.minute()));
   auto itValue = new DoubleItem(Data::Type::Money, DoubleItem::Color::Foreground2, false, false);
 
   JTable::blockSignals(true);
-  setItem(row, (int)Column::Name, itName);
+  setItem(row, (int)Column::Employee, itEmployee);
   setItem(row, (int)Column::Formula, itFormula);
   setItem(row, (int)Column::DateBegin, itDtBegin);
   setItem(row, (int)Column::TimeBegin, itTmBegin);
   setItem(row, (int)Column::DateEnd, itDtEnd);
   setItem(row, (int)Column::TimeEnd, itTmEnd);
   setItem(row, (int)Column::Value, itValue);
-  itName->setReadOnly(true);
   itValue->setReadOnly(true);
   JTable::blockSignals(false);
 
-  setCurrentItem(itName);
+  setCurrentItem(itEmployee);
   setFocus();
+}
+
+void SalaryCalculatorTable::addRow(const qlonglong fid, const QString& fname, const qlonglong eid, const QString& ename, const QDateTime& begin, const QDateTime& end)
+{
+  addRow();
+  int row = rowCount() - 1;
+  blockSignals(true);
+  getItem(row, (int)Column::Formula)->setValue(SQLItem::st_toVariant(fid, fname));
+  getItem(row, (int)Column::Employee)->setValue(SQLItem::st_toVariant(eid, ename));
+  getItem(row, (int)Column::DateBegin)->setValue(begin.date());
+  getItem(row, (int)Column::TimeBegin)->setValue(begin.time());
+  getItem(row, (int)Column::DateEnd)->setValue(end.date());
+  getItem(row, (int)Column::TimeEnd)->setValue(end.time());
+  blockSignals(false);
+  update(row, 0);
 }
 
 void SalaryCalculatorTable::addRowAndActivate()
 {
   addRow();
+  int row = rowCount() - 1;
+  getItem(row, (int)Column::Formula)->activate();
+  getItem(row, (int)Column::Employee)->activate();
 }
 
-void SalaryCalculatorTable::get(int row, SalaryCalculatorResult& o) const
+void SalaryCalculatorTable::update(int row, int /*column*/)
 {
-  o.clear();
   if (!isValidRow(row))
     return;
-  row = verticalHeader()->logicalIndex(row);
-  o.eid = SQLItem::st_idFromVariant(getItem(row, (int)Column::Name)->getValue()).get();
-  o.ename = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Name)->getValue());
-  o.sid = SQLItem::st_idFromVariant(getItem(row, (int)Column::Formula)->getValue()).get();
-  o.sname = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Formula)->getValue());
-  o.dtBegin = getItem(row, (int)Column::DateBegin)->getValue().toDate();
-  o.tmBegin = getItem(row, (int)Column::TimeBegin)->getValue().toTime();
-  o.dtEnd = getItem(row, (int)Column::DateEnd)->getValue().toDate();
-  o.tmEnd = getItem(row, (int)Column::TimeEnd)->getValue().toTime();
-  o.value = getItem(row, (int)Column::Value)->text();
-}
 
-void SalaryCalculatorTable::get(QVector<SalaryCalculatorResult>& v) const
-{
-  v.clear();
-  for (int i = 0; i != rowCount(); ++i)
+  QDateTime begin(getItem(row, (int)Column::DateBegin)->getValue().toDate(), getItem(row, (int)Column::TimeBegin)->getValue().toTime());
+  QDateTime end(getItem(row, (int)Column::DateEnd)->getValue().toDate(), getItem(row, (int)Column::TimeEnd)->getValue().toTime());
+  auto it = getItem(row, (int)Column::Value);
+
+  if (end < begin)
   {
-    SalaryCalculatorResult o;
-    get(i, o);
-    v.push_back(o);
+    blockSignals(true);
+    it->setValue(0);
+    it->setToolTip(tr("Data e hora iniciais maiores que as finais."));
+    blockSignals(false);
   }
-}
 
-void SalaryCalculatorTable::set(int row, const SalaryCalculatorResult& o)
-{
-  if (!isValidRow(row))
-    return;
+  QString error;
+  SalaryFormula sf;
+  sf.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Formula)->getValue());
+  sf.SQL_select(error);
 
+  Names snames;
+  Values svalues;
+  Employee e;
+  e.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Employee)->getValue());
+  Salary::SQL_select_all_employee_salaries(e.m_id, snames, svalues, error);
+  QString formula = sf.m_formula;
+  if (snames.size() == svalues.size())
+    for (int i = 0; i != snames.size(); ++i)
+      formula.replace(snames.at(i), Data::strFmt(svalues.at(i)));
+  formula.replace("DIAS", Data::strFmt(begin.daysTo(end)));
+  formula.replace("HORAS", Data::strFmt(begin.secsTo(end)/3600.0));
+  formula.replace("MINUTOS", Data::strFmt(begin.secsTo(end)/60.0));
   blockSignals(true);
-  row = verticalHeader()->logicalIndex(row);
-
-  getItem(row, (int)Column::Name)->setValue(SQLItem::st_toVariant(Id(o.eid), o.ename));
-  getItem(row, (int)Column::Formula)->setValue(SQLItem::st_toVariant(Id(o.sid), o.sname));
-  getItem(row, (int)Column::DateBegin)->setValue(o.dtBegin);
-  getItem(row, (int)Column::TimeBegin)->setValue(o.tmBegin);
-  getItem(row, (int)Column::DateEnd)->setValue(o.dtEnd);
-  getItem(row, (int)Column::TimeEnd)->setValue(o.tmEnd);
-  getItem(row, (int)Column::Value)->setToolTip(o.value);
-  getItem(row, (int)Column::Value)->setText(o.value);
-  getItem(row, (int)Column::Value)->evaluate();
+  it->setToolTip(formula);
+  it->setText(formula);
+  it->evaluate();
   blockSignals(false);
 
   double d = sum((int)Column::Value);
   horizontalHeaderItem((int)Column::Value)->setText(tr("Valor %1").arg(Data::strMoney(d)));
 }
 
-void SalaryCalculatorTable::set(const QVector<SalaryCalculatorResult>& v, bool bClear)
+void SalaryCalculatorTable::row(int row, QString& fname, QString& ename, QDateTime& begin, QDateTime& end, double& value) const
 {
-  if (bClear)
-    removeAllItems();
-  for (int i = 0; i != v.size(); ++i)
+  fname.clear();
+  ename.clear();
+  value = 0.0;
+  if (!isValidRow(row))
+    return;
+  fname = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Formula)->getValue());
+  ename = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Employee)->getValue());
+  begin = QDateTime(getItem(row, (int)Column::DateBegin)->getValue().toDate(), getItem(row, (int)Column::TimeBegin)->getValue().toTime());
+  end = QDateTime(getItem(row, (int)Column::DateEnd)->getValue().toDate(), getItem(row, (int)Column::TimeEnd)->getValue().toTime());
+  value = getItem(row, (int)Column::Value)->getValue().toDouble();
+}
+
+bool SalaryCalculatorTable::isValidCurrentItem() const
+{
+  int row = currentRow();
+  bool ok = isValidRow(row);
+  if (ok)
   {
-    addRow();
-    int row = rowCount() - 1;
-    set(row, v.at(i));
-    emit changedSignal(row, 0);
+    ok = SQLItem::st_idFromVariant(getItem(row, (int)Column::Formula)->getValue()).isValid();
+    if (ok)
+      ok = SQLItem::st_idFromVariant(getItem(row, (int)Column::Employee)->getValue()).isValid();
   }
+  return ok;
 }

@@ -493,6 +493,9 @@ bool BaitaSQL::createTables(QString& error)
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           CASH_CLOSING_SQL_COL_CID " INTEGER NOT NULL,"
                           CASH_CLOSING_SQL_COL_DAT " TIMESTAMP,"
+                          CASH_CLOSING_SQL_COL_CRE " REAL,"
+                          CASH_CLOSING_SQL_COL_DEB " REAL,"
+                          CASH_CLOSING_SQL_COL_COM " REAL,"
                           "FOREIGN KEY(" CASH_CLOSING_SQL_COL_CID ") REFERENCES "
                           CASH_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 

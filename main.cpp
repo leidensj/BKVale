@@ -81,7 +81,6 @@ int main(int argc, char *argv[])
         SalaryCalculator w;
         w.setWindowTitle(QObject::tr("Calculadora de Salários"));
         w.setWindowIcon(QIcon(":/icons/res/salarycalc.png"));
-        w.show();
         auto f = w.font();
         f.setPointSize(14);
         w.setFont(f);

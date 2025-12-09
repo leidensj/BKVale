@@ -27,7 +27,9 @@ CashClosingView::CashClosingView(QWidget* parent)
   , m_edSector(nullptr)
   , m_edCoin(nullptr)
   , m_edTotal(nullptr)
-  , m_edProfit(nullptr)
+  , m_edRealTotal(nullptr)
+  , m_edSales(nullptr)
+  , m_edCards(nullptr)
   , m_edDiff1(nullptr)
   , m_edDiff2(nullptr)
   , m_btnCalc(nullptr)
@@ -47,7 +49,9 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edSector = new JExpLineEdit(Data::Type::Money);
   m_edCoin = new JExpLineEdit(Data::Type::Money);
   m_edTotal = new JExpLineEdit(Data::Type::Money);
-  m_edProfit = new JExpLineEdit(Data::Type::Money);
+  m_edRealTotal = new JExpLineEdit(Data::Type::Money);
+  m_edSales = new JExpLineEdit(Data::Type::Money);
+  m_edCards = new JExpLineEdit(Data::Type::Money);
   m_edDiff1 = new JExpLineEdit(Data::Type::Money);
   m_edDiff2 = new JExpLineEdit(Data::Type::Money);
   m_edDebit = new JExpLineEdit(Data::Type::Money);
@@ -56,16 +60,22 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edSector->setReadOnly(true);
   m_edCoin->setReadOnly(true);
   m_edTotal->setReadOnly(true);
-  m_edProfit->setReadOnly(true);
+  m_edRealTotal->setReadOnly(true);
+  m_edSales->setReadOnly(true);
   m_edDiff1->setReadOnly(true);
   m_edDiff2->setReadOnly(true);
   m_edDebit->setInvertColors(true);
   m_edTotal->setInvertColors(true);
-  m_edProfit->setInvertColors(true);
+  m_edRealTotal->setInvertColors(true);
+  m_edSales->setInvertColors(true);
+  m_edCards->setInvertColors(true);
   m_edCoin->setInvertColors(true);
   m_edDiff1->setInvertColors(true);
   m_edDiff2->setInvertColors(true);
-  m_edTotal->setToolTip(tr("Total das entradas descontando as taxas."));
+  m_edTotal->setToolTip(tr("Total dos recebimentos descontando as taxas."));
+  m_edRealTotal->setToolTip(tr("Total dos recebimentos descontando as taxas e comissões."));
+  m_edSales->setToolTip(tr("Total dos recebimentos descontando as taxas mais as assinadas, menos os créditos e comissões."));
+  m_edCards->setToolTip(tr("Total bruto recebido em meios digitais de pagamentos que envolvem taxas."));
   m_edDiff1->setToolTip(tr("Diferença entre entradas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa. Um valor próximo de zero indica que o caixa fechou."));
   m_edDiff2->setToolTip(tr("Diferença entre entradas e recebimentos (líquido). Representa a quebra de caixa + o valor pago em taxas."));
   m_btnCalc = new QPushButton(QIcon(":/icons/res/calculator.png"), "");
@@ -125,14 +135,16 @@ CashClosingView::CashClosingView(QWidget* parent)
 
   auto results1 = new QFormLayout;
   results1->setAlignment(Qt::AlignTop);
-  results1->addRow(tr("Entradas:"),m_edSector);
-  results1->addRow(tr("Recebimentos:"),m_edCoin);
-  results1->addRow(tr("Quebra de Caixa:"),m_edDiff1);
+  results1->addRow(tr("Entradas:"), m_edSector);
+  results1->addRow(tr("Recebimentos:"), m_edCoin);
+  results1->addRow(tr("Diferença de caixa:"), m_edDiff2);
+  results1->addRow(tr("Quebra de Caixa:"), m_edDiff1);
 
   auto results2 = new QFormLayout;
-  results2->addRow(tr("Total:"),m_edTotal);
-  results2->addRow(tr("Venda Real:"),m_edProfit);
-  results2->addRow(tr("Diferença de caixa:"),m_edDiff2);
+  results2->addRow(tr("Total:"), m_edTotal);
+  results2->addRow(tr("Total Real:"), m_edRealTotal);
+  results2->addRow(tr("Venda Real:"), m_edSales);
+  results2->addRow(tr("Cartão:"), m_edCards);
 
   auto resulth = new QHBoxLayout;
   resulth->addLayout(results1);
@@ -276,7 +288,9 @@ void CashClosingView::update()
   m_edSector->setValue(m_sectorTable->sum((int)CashClosingSectorTable::Column::Value));
   m_edCoin->setValue(m_coinTable->sum((int)CashClosingCoinTable::Column::Value));
   m_edTotal->setValue(m_coinTable->sumWithTaxes());
-  m_edProfit->setValue(m_coinTable->sumWithTaxes() + m_edDebit->value() - m_edCredit->value() - m_edComission->value());
+  m_edRealTotal->setValue(m_coinTable->sumWithTaxes() - m_edComission->value());
+  m_edSales->setValue(m_coinTable->sumWithTaxes() + m_edDebit->value() - m_edCredit->value() - m_edComission->value());
+  m_edCards->setValue(m_coinTable->cards());
   m_edDiff1->setValue(m_edCoin->value() - m_edSector->value());
   m_edDiff2->setValue(m_edTotal->value() - m_edSector->value());
 }

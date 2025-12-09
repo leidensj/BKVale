@@ -25,6 +25,7 @@ public slots:
   void addRow();
   void addRowAndActivate();
   double sumWithTaxes();
+  double cards();
 };
 
 #endif

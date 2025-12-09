@@ -43,7 +43,9 @@ private:
   JExpLineEdit* m_edSector;
   JExpLineEdit* m_edCoin;
   JExpLineEdit* m_edTotal;
-  JExpLineEdit* m_edProfit;
+  JExpLineEdit* m_edRealTotal;
+  JExpLineEdit* m_edSales;
+  JExpLineEdit* m_edCards;
   JExpLineEdit* m_edDiff1;
   JExpLineEdit* m_edDiff2;
   QPushButton* m_btnCalc;

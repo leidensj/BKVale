@@ -83,3 +83,12 @@ double CashClosingCoinTable::sumWithTaxes()
     total += (1.00 - getItem(i, (int)Column::Tax)->getValue().toDouble()/100.00) * getItem(i, (int)Column::Value)->getValue().toDouble();
   return total;
 }
+
+double CashClosingCoinTable::cards()
+{
+  double total = 0.0;
+  for (int i = 0; i != rowCount(); ++i)
+    if (getItem(i, (int)Column::Tax)->getValue().toDouble() != 0.0)
+    total += getItem(i, (int)Column::Value)->getValue().toDouble();
+  return total;
+}

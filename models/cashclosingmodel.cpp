@@ -11,7 +11,7 @@ CashClosingModel::CashClosingModel(QObject *parent)
 QString CashClosingModel::getStrQuery()
 {
   QString str;
-  str += "SELECT cc._id, cc._date, c._name, s.svalue as sales, cc._debit, cc._credit, cc._comission, co.covalue as gross, ROUND(co.cofvalue::numeric,2) as net, ROUND(co.tax::numeric,2) as tax, ROUND((co.cofvalue + cc._debit - cc._credit - cc._comission)::numeric,2) as realsales, ROUND((co.cofvalue - s.svalue)::numeric,2) as difference, ROUND((co.covalue - s.svalue)::numeric,2) as discrepancy, co.sumcards FROM "
+  str += "SELECT cc._id, cc._date, c._name, s.svalue as sales, cc._debit, cc._credit, cc._comission, co.covalue as gross, ROUND(co.cofvalue::numeric,2) as net, ROUND(co.tax::numeric,2) as tax, ROUND((co.cofvalue - cc._comission)::numeric,2) as realtotal, ROUND((co.cofvalue + cc._debit - cc._credit - cc._comission)::numeric,2) as realsales, ROUND((co.cofvalue - s.svalue)::numeric,2) as difference, ROUND((co.covalue - s.svalue)::numeric,2) as discrepancy, co.sumcards FROM "
          "_CASH_CLOSINGS AS cc LEFT JOIN _CASH AS c on cc._CASHID = c._id "
          "LEFT JOIN (SELECT _CASHCLOSINGID as ccid, SUM(_VALUE) as svalue FROM _CASH_CLOSING_SECTORS GROUP BY ccid) AS s on s.ccid = cc._id "
          "LEFT JOIN (SELECT _CASHCLOSINGID as ccid, SUM(_VALUE) as covalue, SUM(_VALUE*(1-_COINTAX/100)) as cofvalue, SUM(_VALUE - _VALUE*(1-_COINTAX/100)) as tax, SUM(CASE WHEN _COINTAX <> 0 THEN _VALUE ELSE 0 END) AS sumcards FROM _CASH_CLOSING_COINS GROUP BY ccid) AS co on co.ccid = cc._id";
@@ -28,9 +28,10 @@ void CashClosingModel::select(QHeaderView* header)
   setHeaderData((int)Column::Debit, Qt::Horizontal, tr("Assinadas"));
   setHeaderData((int)Column::Credit, Qt::Horizontal, tr("Créditos"));
   setHeaderData((int)Column::Comission, Qt::Horizontal, tr("Comissões"));
-  setHeaderData((int)Column::Gross, Qt::Horizontal, tr("Bruto"));
-  setHeaderData((int)Column::Net, Qt::Horizontal, tr("Líquido"));
+  setHeaderData((int)Column::TotalGross, Qt::Horizontal, tr("Total Bruto"));
+  setHeaderData((int)Column::TotalNet, Qt::Horizontal, tr("Total Líquido"));
   setHeaderData((int)Column::Tax, Qt::Horizontal, tr("Taxas"));
+  setHeaderData((int)Column::RealTotal, Qt::Horizontal, tr("Total Real"));
   setHeaderData((int)Column::RealSales, Qt::Horizontal, tr("Venda Real"));
   setHeaderData((int)Column::Difference, Qt::Horizontal, tr("Diferença"));
   setHeaderData((int)Column::Discrepancy, Qt::Horizontal, tr("Quebra"));
@@ -43,9 +44,10 @@ void CashClosingModel::select(QHeaderView* header)
   header->setSectionResizeMode((int)Column::Debit, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::Credit, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::Comission, QHeaderView::ResizeMode::ResizeToContents);
-  header->setSectionResizeMode((int)Column::Gross, QHeaderView::ResizeMode::ResizeToContents);
-  header->setSectionResizeMode((int)Column::Net, QHeaderView::ResizeMode::ResizeToContents);
+  header->setSectionResizeMode((int)Column::TotalGross, QHeaderView::ResizeMode::ResizeToContents);
+  header->setSectionResizeMode((int)Column::TotalNet, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::Tax, QHeaderView::ResizeMode::ResizeToContents);
+  header->setSectionResizeMode((int)Column::RealTotal, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::RealSales, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::Difference, QHeaderView::ResizeMode::ResizeToContents);
   header->setSectionResizeMode((int)Column::Discrepancy, QHeaderView::ResizeMode::ResizeToContents);

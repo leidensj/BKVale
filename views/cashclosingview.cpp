@@ -7,6 +7,7 @@
 #include "tables/cashclosinginfotable.h"
 #include "controls/calculatordialog.h"
 #include "controls/postitdialog.h"
+#include "filters/cashclosingfilter.h"
 #include "escposprinter.h"
 #include <QLabel>
 #include <QLayout>
@@ -31,6 +32,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   , m_edDiff2(nullptr)
   , m_btnCalc(nullptr)
   , m_btnPostit(nullptr)
+  , m_filter(nullptr)
 {
   m_viewer->setSortRole(Qt::EditRole);
   m_cashPicker = new DatabasePicker(CASH_SQL_TABLE_NAME);
@@ -60,7 +62,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edDebit->setInvertColors(true);
   m_edTotal->setInvertColors(true);
   m_edProfit->setInvertColors(true);
-  m_edSector->setInvertColors(true);
+  m_edCoin->setInvertColors(true);
   m_edDiff1->setInvertColors(true);
   m_edDiff2->setInvertColors(true);
   m_edTotal->setToolTip(tr("Total das entradas descontando as taxas."));
@@ -74,6 +76,9 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_btnPostit->setFlat(true);
   m_btnPostit->setIconSize(QSize(24, 24));
   m_ltButton->addWidget(m_btnPostit);
+
+  m_filter = new CashClosingFilter;
+  m_tabDb->addTab(m_filter, QIcon(":/icons/res/filter.png"), tr("Filtro"));
 
   QLabel* cash = new QLabel(tr("Caixa"));
   QLabel* sector = new QLabel(tr("Entradas"));
@@ -164,6 +169,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   connect(m_edComission, SIGNAL(valueChanged(double)), this, SLOT(update()));
   connect(m_btnCalc, SIGNAL(clicked(bool)), this, SLOT(showCalculator()));
   connect(m_btnPostit, SIGNAL(clicked(bool)), this, SLOT(showPostit()));
+  connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_viewer, SLOT(setDynamicFilter(const QString&)));
 
   setFocusWidgetOnClear(m_cashPicker);
   m_viewer->refresh();

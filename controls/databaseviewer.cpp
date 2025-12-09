@@ -19,6 +19,7 @@
 #include <QLabel>
 #include <QSortFilterProxyModel>
 #include <QFileDialog>
+#include <QStyledItemDelegate>
 
 JEnterSignalTable::JEnterSignalTable(QWidget *parent)
   : QTableView(parent)
@@ -398,7 +399,7 @@ void DatabaseViewer::toCSV()
   QString fileName = QFileDialog::getSaveFileName(this,
                                                   tr("Salvar arquivo"),
                                                   JItemHelper::text(getTableName()) +
-                                                  DateTime::server().toString("dd-MM-yyyy hh-mm-ss") +
+                                                  DateTime::server().toString(" dd-MM-yyyy hh-mm-ss") +
                                                   ".csv",
                                                   tr("CSV (*.csv)"));
 
@@ -419,7 +420,18 @@ void DatabaseViewer::toCSV()
     line.clear();
     for (int j = 0; j != m_proxyModel->columnCount(); ++j)
       if (!m_table->horizontalHeader()->isSectionHidden(j))
-        line += m_proxyModel->data(m_proxyModel->index(i, j), Qt::DisplayRole).toString() + ";";
+      {
+        QModelIndex idx = m_proxyModel->index(i, j);
+        auto *delegate = qobject_cast<QStyledItemDelegate*>(m_table->itemDelegate(idx));
+        if (delegate != nullptr)
+        {
+          QVariant value = idx.data(Qt::DisplayRole);
+          // Locale usado pela view (importante!)
+          QLocale locale = m_table->locale();
+          // displayText() gera exatamente o texto da tela
+          line += delegate->displayText(value, locale) + ";";
+        }
+      }
     if (!line.isEmpty())
     {
       line.chop(1);

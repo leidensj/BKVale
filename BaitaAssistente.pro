@@ -35,6 +35,7 @@ SOURCES += main.cpp\
   editors/packageeditor.cpp \
   escpos.cpp \
   escposprinter.cpp \
+  filters/cashclosingfilter.cpp \
   filters/couponfilter.cpp \
   filters/jfilter.cpp \
   items/cash.cpp \
@@ -118,6 +119,7 @@ SOURCES += main.cpp\
     widgets/jdateedit.cpp \
   widgets/jdateinterval.cpp \
     widgets/jdatepicker.cpp \
+  widgets/jdatetimeinterval.cpp \
     widgets/jdoublespinbox.cpp \
     widgets/jlineedit.cpp \
     widgets/jplaintextedit.cpp \
@@ -191,6 +193,7 @@ HEADERS  += mainwindow.h \
     editors/packageeditor.h \
     escposexports.h \
     escposprinter.h \
+    filters/cashclosingfilter.h \
     filters/couponfilter.h \
     filters/jfilter.h \
     items/cash.h \
@@ -276,6 +279,7 @@ HEADERS  += mainwindow.h \
     widgets/jaddremovebuttons.h \
     widgets/jdateinterval.h \
     widgets/jdatepicker.h \
+    widgets/jdatetimeinterval.h \
     widgets/jdoublespinbox.h \
     widgets/jdateedit.h \
     widgets/jplaintextedit.h \

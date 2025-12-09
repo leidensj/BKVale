@@ -11,11 +11,16 @@ class CashClosingModel : public JModel
     Date,
     Cash,
     Sales,
+    Debit,
+    Credit,
+    Comission,
     Gross,
     Net,
     Tax,
+    RealSales,
+    Difference,
     Discrepancy,
-    Difference
+    Cards
   };
 public:
   CashClosingModel(QObject *parent);

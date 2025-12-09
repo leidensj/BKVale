@@ -256,9 +256,11 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   ep.str("Créditos:\n" + Data::strMoney(m_credit) + "\n\n");
   ep.str("Comissões:\n" + Data::strMoney(m_comission) + "\n\n");
   ep.str("Total:\n" + Data::strMoney(sumCoinsWithTaxes()) + "\n\n");
+  ep.str("Total Real:\n" + Data::strMoney(sumCoinsWithTaxes() - m_comission) + "\n\n");
   ep.str("Venda Real:\n" + Data::strMoney(sumCoinsWithTaxes() + m_debit - m_credit - m_comission) + "\n\n");
   ep.str("Diferenca de caixa:\n" + Data::strMoney(diffTax()) + "\n\n");
   ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n\n");
+  ep.str("Cartão:\n" + Data::strMoney(sumCards()) + "\n\n");
   ep.expand(false);
   ep.str("----------------------------------\n");
   ep.align(false);
@@ -318,4 +320,13 @@ double CashClosing::diff() const
 double CashClosing::diffTax() const
 {
   return sumCoinsWithTaxes() - sumSectorsValue();
+}
+
+double CashClosing::sumCards() const
+{
+  double sum = 0.0;
+  for (const auto& c : m_vcoins)
+    if (c.m_ctax != 0.0)
+      sum += c.m_value;
+  return sum;
 }

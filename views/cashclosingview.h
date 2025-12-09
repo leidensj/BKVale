@@ -9,6 +9,7 @@ class DatabasePicker;
 class CashClosingCoinTable;
 class CashClosingSectorTable;
 class CashClosingInfoTable;
+class CashClosingFilter;
 
 class CashClosingView : public JItemView
 {
@@ -47,6 +48,7 @@ private:
   JExpLineEdit* m_edDiff2;
   QPushButton* m_btnCalc;
   QPushButton* m_btnPostit;
+  CashClosingFilter* m_filter;
 };
 
 #endif // CASHCLOSINGVIEW_H

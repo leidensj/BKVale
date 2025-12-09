@@ -89,6 +89,8 @@ void CsvGenerator::work()
    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
        return;
   QTextStream out(&file);
+  out.setEncoding(QStringConverter::Utf8);
+  out.setGenerateByteOrderMark(true);
   out << m_text;
   if (m_flags & 0x1)
     QDesktopServices::openUrl(QUrl(m_fileName, QUrl::TolerantMode));

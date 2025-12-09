@@ -33,6 +33,7 @@ struct CashClosing : public JItemSQL
   double sumCoinsTaxesDifference() const;
   double diff() const;
   double diffTax() const;
+  double sumCards() const;
 
   Cash m_cash;
   QDateTime m_dt;

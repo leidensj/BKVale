@@ -8,6 +8,7 @@
 #include "controls/calculatordialog.h"
 #include "controls/postitdialog.h"
 #include "filters/cashclosingfilter.h"
+#include <QMessageBox>
 #include "escposprinter.h"
 #include <QLabel>
 #include <QLayout>
@@ -69,6 +70,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edRealTotal->setInvertColors(true);
   m_edSales->setInvertColors(true);
   m_edCards->setInvertColors(true);
+  m_edCards->setReadOnly(true);
   m_edCoin->setInvertColors(true);
   m_edDiff1->setInvertColors(true);
   m_edDiff2->setInvertColors(true);
@@ -76,8 +78,8 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edRealTotal->setToolTip(tr("Total dos recebimentos descontando as taxas e comissões."));
   m_edSales->setToolTip(tr("Total dos recebimentos descontando as taxas mais as assinadas, menos os créditos e comissões."));
   m_edCards->setToolTip(tr("Total bruto recebido em meios digitais de pagamentos que envolvem taxas."));
-  m_edDiff1->setToolTip(tr("Diferença entre entradas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa. Um valor próximo de zero indica que o caixa fechou."));
-  m_edDiff2->setToolTip(tr("Diferença entre entradas e recebimentos (líquido). Representa a quebra de caixa + o valor pago em taxas."));
+  m_edDiff1->setToolTip(tr("Diferença entre entradas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa."));
+  m_edDiff2->setToolTip(tr("Diferença entre entradas e recebimentos (líquido). Representa a quebra de caixa mais o valor pago em taxas."));
   m_btnCalc = new QPushButton(QIcon(":/icons/res/calculator.png"), "");
   m_btnCalc->setFlat(true);
   m_btnCalc->setIconSize(QSize(24, 24));
@@ -123,7 +125,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   auto lcredit = new QFormLayout;
   lcredit->addRow(tr("Créditos:"), m_edCredit);
   auto lcomission = new QFormLayout;
-  lcomission->addRow(tr("Comissões"), m_edComission);
+  lcomission->addRow(tr("Comissões:"), m_edComission);
   auto lextras = new QHBoxLayout;
   lextras->addLayout(ldebit);
   lextras->addLayout(lcredit);
@@ -138,7 +140,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   results1->addRow(tr("Entradas:"), m_edSector);
   results1->addRow(tr("Recebimentos:"), m_edCoin);
   results1->addRow(tr("Diferença de caixa:"), m_edDiff2);
-  results1->addRow(tr("Quebra de Caixa:"), m_edDiff1);
+  results1->addRow(tr("Quebra de caixa:"), m_edDiff1);
 
   auto results2 = new QFormLayout;
   results2->addRow(tr("Total:"), m_edTotal);
@@ -228,6 +230,19 @@ void CashClosingView::setItem(const JItemSQL& o)
 
 void CashClosingView::save()
 {
+  if (m_edDebit->value() == 0.0 || m_edCredit->value() == 0.0 || m_edComission->value() == 0.0)
+  {
+    QString msg(tr("Os seguintes campos não foram informados:\n\n"));
+    if (m_edDebit->value() == 0.0)
+      msg += tr("ASINADAS\n");
+    if (m_edCredit->value() == 0.0)
+      msg += tr("CRÉDITOS\n");
+    if (m_edComission->value() == 0.0)
+      msg += tr("COMISSÕES\n");
+    msg += tr("\nDeseja continuar mesmo assim?");
+    if (QMessageBox::question(this, tr("Atenção"), msg, QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+      return;
+  }
   CashClosing o;
   getItem(o);
   QString error;
@@ -255,14 +270,14 @@ void CashClosingView::cashChanged()
   bool ok = o.m_cash.SQL_select(error);
   if (ok)
   {
-    for (const auto& _o : o.m_cash.m_vsectors)
+    for (const auto& _o : std::as_const(o.m_cash.m_vsectors))
     {
       CashClosingSector s;
       s.m_sname = _o.m_sector.m_name;
       s.m_simage = _o.m_sector.m_image;
       o.m_vsectors.push_back(s);
     }
-    for (const auto& _o : o.m_cash.m_vcoins)
+    for (const auto& _o : std::as_const(o.m_cash.m_vcoins))
     {
       CashClosingCoin c;
       c.m_cname = _o.m_coin.m_name;
@@ -270,7 +285,7 @@ void CashClosingView::cashChanged()
       c.m_cimage = _o.m_coin.m_image;
       o.m_vcoins.push_back(c);
     }
-    for (const auto& _o : o.m_cash.m_vinfos)
+    for (const auto& _o : std::as_const(o.m_cash.m_vinfos))
     {
       CashClosingInfo nfo;
       nfo.m_iname = _o.m_name;

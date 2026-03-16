@@ -23,6 +23,7 @@ public slots:
 
 protected slots:
   void setItem(const JItemSQL& o);
+  void sort();
 
 private:
   Id m_formId;

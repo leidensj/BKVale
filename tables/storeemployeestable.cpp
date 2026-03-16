@@ -47,6 +47,7 @@ void StoreEmployeesTable::getEmployees(QVector<Employee>& v) const
     int row = verticalHeader()->logicalIndex(i);
     Employee o;
     o.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Employee)->getValue());
+    o.m_form.m_name = SQLItem::st_nameFromVariant(getItem(row, (int)Column::Employee)->getValue());
     v.push_back(o);
   }
 }

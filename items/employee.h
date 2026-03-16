@@ -12,6 +12,7 @@ struct Employee : public JItemSQL
   void clear(bool bClearId = true);
   bool operator !=(const JItem& other) const;
   bool operator ==(const JItem& other) const;
+  bool operator <(const JItem& other) const;
   bool isValid() const;
   QString strAliasName() const;
 

@@ -57,9 +57,15 @@ JExpLineEdit::JExpLineEdit(Data::Type type, QWidget* parent)
   , m_minimumValue(std::numeric_limits<double>::lowest())
   , m_maximumValue(std::numeric_limits<double>::max())
   , m_bInvertColors(false)
+  , m_bSetEmptyTextWhen0(true)
 {
   connect(this, &JExpLineEdit::editingFinished, [this](){ evaluate(text()); });
   evaluate("");
+}
+
+void JExpLineEdit::setEmptyTextWhen0(bool b)
+{
+  m_bSetEmptyTextWhen0 = b;
 }
 
 double JExpLineEdit::value() const
@@ -72,7 +78,9 @@ void JExpLineEdit::evaluate(const QString& value)
   if (m_currentText == value)
     return;
 
-  auto stdExp = value.toStdString();
+  QString fmtvalue = value;
+  fmtvalue = fmtvalue.replace(",", ".");
+  auto stdExp = fmtvalue.toStdString();
   int error = 0;
   double val = te_interp(stdExp.c_str(), &error);
   if (!error && val >= m_minimumValue && val <= m_maximumValue)
@@ -84,7 +92,7 @@ void JExpLineEdit::evaluate(const QString& value)
   else
     m_currentValue = 0.0;
 
-  if (m_currentValue == 0.0)
+  if (m_currentValue == 0.0 && m_bSetEmptyTextWhen0)
     m_currentText.clear();
   setText(m_currentText);
 

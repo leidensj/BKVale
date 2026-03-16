@@ -55,7 +55,8 @@ void DoubleItem::setValue(const QVariant& v)
 
 void DoubleItem::evaluate()
 {
-  auto stdExp = text().toStdString();
+  QString str = text().replace(",", ".");
+  auto stdExp = str.toStdString();
   int error = 0;
   double val = te_interp(stdExp.c_str(), &error);
   bool bValid = !error;

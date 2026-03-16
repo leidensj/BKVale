@@ -10,6 +10,7 @@
 #include <QRadioButton>
 #include <QLabel>
 #include <QDateEdit>
+#include <QMessageBox>
 
 StoreView::StoreView(QWidget* parent)
   : JItemView(STORE_SQL_TABLE_NAME, parent)
@@ -30,6 +31,13 @@ StoreView::StoreView(QWidget* parent)
   m_btnAddRemove = new JAddRemoveButtons;
   m_tbEmployee = new StoreEmployeesTable(m_btnAddRemove);
 
+  auto btnSort = new QPushButton;
+  btnSort->setIcon(QIcon(":/icons/res/sortaz.png"));
+  btnSort->setIconSize(QSize(24, 24));
+  btnSort->setFlat(true);
+  btnSort->setToolTip(tr("Ordenar por ordem alfabética"));
+  m_btnAddRemove->m_lt->addWidget(btnSort);
+
   QVBoxLayout* ltTable = new QVBoxLayout;
   ltTable->addWidget(m_btnAddRemove);
   ltTable->addWidget(m_tbEmployee);
@@ -44,6 +52,7 @@ StoreView::StoreView(QWidget* parent)
   m_tab->addTab(frTable, QIcon(":/icons/res/employee.png"), tr("Funcionários"));
 
   connect(m_formInfo, SIGNAL(userTypeChangedSignal(bool)), m_formDetails, SLOT(switchUserType(bool)));
+  connect(btnSort, SIGNAL(clicked(bool)), this, SLOT(sort()));
 
   m_formInfo->m_lblCreationDate->hide();
   m_formInfo->m_dtCreationDate->hide();
@@ -77,4 +86,14 @@ void StoreView::setItem(const JItemSQL& o)
   m_formPhone->setForm(_o.m_form);
   m_formAddress->setForm(_o.m_form);
   m_tbEmployee->setEmployees(_o.m_vEmployee);
+}
+
+void StoreView::sort()
+{
+  if (QMessageBox::question(this, tr("Ordenar"), tr("Tem certeza que deseja ordenar os funcionários por ordem alfabética?"), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+    return;
+  QVector<Employee> v;
+  m_tbEmployee->getEmployees(v);
+  std::sort(v.begin(), v.end());
+  m_tbEmployee->setEmployees(v);
 }

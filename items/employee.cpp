@@ -30,6 +30,12 @@ bool Employee::operator ==(const JItem& other) const
   return !(*this != other);
 }
 
+bool Employee::operator <(const JItem& other) const
+{
+  const Employee& o = dynamic_cast<const Employee&>(other);
+  return name() < o.name();
+}
+
 bool Employee::isValid() const
 {
   bool b = m_form.m_id.isValid();

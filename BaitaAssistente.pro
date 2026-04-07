@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport sql network xml quick qml quickcontrols2 virtualkeyboard
+QT       += core gui serialport sql network xml quick qml quickcontrols2
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport

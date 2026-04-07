@@ -453,6 +453,14 @@ bool BaitaSQL::createTables(QString& error)
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
+      bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHIFT_SQL_TABLE_NAME " ("
+                            SQL_COLID " SERIAL PRIMARY KEY,"
+                            SHIFT_SQL_COL_IID " INTEGER,"
+                            SHIFT_SQL_COL_NAM " TEXT NOT NULL UNIQUE,"
+                            "FOREIGN KEY(" SHIFT_SQL_COL_IID ") REFERENCES "
+                            IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+
+  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           CASH_SQL_COL_NAM " TEXT UNIQUE NOT NULL CHECK ("

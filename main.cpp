@@ -14,6 +14,7 @@
 
 int main(int argc, char *argv[])
 {
+  //qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
   QApplication a(argc, argv);
   QCoreApplication::setApplicationVersion("2.1");
 
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
   QString server = parser.value(serverOpt);
   QString port = parser.value(portOpt);
 
-   QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
+  QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
   if (bRedeemer || bCashclosing || bSalary)
   {
      QString error;

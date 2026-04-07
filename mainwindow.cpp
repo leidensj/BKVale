@@ -387,8 +387,35 @@ void Baita::openSalaryCalculatorDialog()
   dlg.exec();
 }
 
+
+#include <QQmlApplicationEngine>
+#include <QQuickWindow>
+
 void Baita::about()
 {
-  AboutDialog dlg;
-  dlg.exec();
+  /*AboutDialog dlg;
+  dlg.exec();*/
+
+  QQmlApplicationEngine engine;
+  engine.load(QUrl(QStringLiteral("qrc:/prize.qml")));
+
+  if (engine.rootObjects().isEmpty())
+    return;
+
+  QQuickWindow *window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+  if (window)
+  {
+    window->setModality(Qt::ApplicationModal);
+    QEventLoop loop;
+    connect(window, &QQuickWindow::visibleChanged, &loop, [&loop](bool visible)
+    {
+      if (!visible)
+        loop.quit();
+    });
+
+    window->show();
+    this->setEnabled(false);
+    loop.exec();
+    this->setEnabled(true);
+  }
 }

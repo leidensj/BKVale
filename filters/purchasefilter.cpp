@@ -12,7 +12,6 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   , m_dtInt(nullptr)
   , m_supplierPicker(nullptr)
   , m_productPicker(nullptr)
-  , m_storePicker(nullptr)
   , m_cbPaymentCredit(nullptr)
   , m_cbPaymentCash(nullptr)
   , m_cbPaymentBonus(nullptr)
@@ -23,7 +22,6 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   m_supplierPicker = new DatabasePicker(SUPPLIER_SQL_TABLE_NAME, true);
   m_productPicker = new DatabasePicker(PRODUCT_SQL_TABLE_NAME, true);
   m_productPicker->getViewer()->setFixedFilter(PRODUCT_FILTER_BUY);
-  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME, true);
   m_cbPaymentCredit = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Credit));
   m_cbPaymentCash = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Cash));
   m_cbPaymentBonus = new QCheckBox(Purchase::st_paymentText(Purchase::PaymentMethod::Bonus));
@@ -42,7 +40,6 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   ltfr->setContentsMargins(0, 0, 0, 0);
   ltfr->addRow(JItemHelper::text(SUPPLIER_SQL_TABLE_NAME) + ":", m_supplierPicker);
   ltfr->addRow(JItemHelper::text(PRODUCT_SQL_TABLE_NAME) + ":", m_productPicker);
-  ltfr->addRow(JItemHelper::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
   ltfr->addRow(tr("Pagamento:"), ltPayment);
 
   QVBoxLayout* ltv = new QVBoxLayout;
@@ -54,7 +51,6 @@ PurchaseFilter::PurchaseFilter(QWidget* parent)
   connect(m_dtInt, SIGNAL(changedSignal(bool, const QDate&, const QDate&)), this, SLOT(emitFilterChangedSignal()));
   connect(m_supplierPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_productPicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
-  connect(m_storePicker, SIGNAL(changedSignal()), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbPaymentCredit, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbPaymentCash, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
   connect(m_cbPaymentBonus, SIGNAL(clicked(bool)), this, SLOT(emitFilterChangedSignal()));
@@ -104,22 +100,6 @@ QString PurchaseFilter::getProductFilter() const
   return str;
 }
 
-QString PurchaseFilter::getStoreFilter() const
-{
-  QString str;
-  Ids ids = m_storePicker->getIds();
-  if (!ids.isEmpty())
-  {
-    str += " " PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_TID
-                 " IN (";
-    for (const auto& id : ids)
-      str += id.str() + ",";
-    str.chop(1);
-    str += ") ";
-  }
-  return str;
-}
-
 QString PurchaseFilter::getPaymentFilter() const
 {
   QString str;
@@ -164,11 +144,6 @@ QString PurchaseFilter::getFilter() const
     strFilter += " AND ";
   strFilter += str;
 
-  str = getStoreFilter();
-  if (!str.isEmpty() && !strFilter.isEmpty())
-    strFilter += " AND ";
-  strFilter += str;
-
   str = getPaymentFilter();
   if (!str.isEmpty() && !strFilter.isEmpty())
     strFilter += " AND ";
@@ -183,7 +158,6 @@ void PurchaseFilter::clear()
   m_dtInt->day();
   m_supplierPicker->clear();
   m_productPicker->clear();
-  m_storePicker->clear();
   m_cbPaymentCredit->setChecked(true);
   m_cbPaymentCash->setChecked(true);
   m_cbPaymentBonus->setChecked(true);

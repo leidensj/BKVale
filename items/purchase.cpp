@@ -53,7 +53,6 @@ void Purchase::clear(bool bClearId)
   m_observation.clear();
   m_disccount = 0.0;
   m_employee.clear();
-  m_store.clear();
 }
 
 bool Purchase::isValid() const
@@ -71,8 +70,7 @@ bool Purchase::operator !=(const JItem& other) const
       m_paymentMethod != another.m_paymentMethod ||
       m_payments != another.m_payments ||
       m_products != another.m_products ||
-      m_disccount != another.m_disccount ||
-      m_store != another.m_store;
+      m_disccount != another.m_disccount;
 }
 
 bool Purchase::operator ==(const JItem& other) const
@@ -185,8 +183,7 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
                   PURCHASE_SQL_COL_OBS ","
                   PURCHASE_SQL_COL_DIS ","
                   PURCHASE_SQL_COL_EID ","
-                  PURCHASE_SQL_COL_PAY ","
-                  PURCHASE_SQL_COL_TID
+                  PURCHASE_SQL_COL_PAY
                   ") VALUES ("
                   "(:_v01),"
                   "(:_v02),"
@@ -194,8 +191,7 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
                   "(:_v04),"
                   "(:_v05),"
                   "(:_v06),"
-                  "(:_v07),"
-                  "(:_v08))");
+                  "(:_v07))");
     query.bindValue(":_v01", m_number);
     query.bindValue(":_v02", m_date);
     query.bindValue(":_v03", m_supplier.m_id.getIdNull());
@@ -203,7 +199,6 @@ bool Purchase::SQL_insert_proc(QSqlQuery& query) const
     query.bindValue(":_v05", m_disccount);
     query.bindValue(":_v06", m_employee.m_id.getIdNull());
     query.bindValue(":_v07", (int)m_paymentMethod);
-    query.bindValue(":_v08", m_store.m_id.getIdNull());
     bSuccess = query.exec();
   }
 
@@ -233,9 +228,8 @@ bool Purchase::SQL_update_proc(QSqlQuery& query) const
                 PURCHASE_SQL_COL_OBS " = (:_v04),"
                 PURCHASE_SQL_COL_DIS " = (:_v05),"
                 PURCHASE_SQL_COL_EID " = (:_v06),"
-                PURCHASE_SQL_COL_PAY " = (:_v07),"
-                PURCHASE_SQL_COL_TID " = (:_v08) "
-                "WHERE " SQL_COLID " = (:_v00)");
+                PURCHASE_SQL_COL_PAY " = (:_v07)"
+                " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v02", m_date);
   query.bindValue(":_v03", m_supplier.m_id.getIdNull());
@@ -243,7 +237,6 @@ bool Purchase::SQL_update_proc(QSqlQuery& query) const
   query.bindValue(":_v05", m_disccount);
   query.bindValue(":_v06", m_employee.m_id.getIdNull());
   query.bindValue(":_v07", (int)m_paymentMethod);
-  query.bindValue(":_v08", m_store.m_id.getIdNull());
   bool bSuccess = query.exec();
 
   if (bSuccess)
@@ -280,8 +273,7 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
                 PURCHASE_SQL_COL_OBS ","
                 PURCHASE_SQL_COL_DIS ","
                 PURCHASE_SQL_COL_EID ","
-                PURCHASE_SQL_COL_PAY ","
-                PURCHASE_SQL_COL_TID
+                PURCHASE_SQL_COL_PAY
                 " FROM " PURCHASE_SQL_TABLE_NAME
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
@@ -298,7 +290,6 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
       m_disccount = query.value(4).toDouble();
       m_employee.m_id.set(query.value(5).toDouble());
       m_paymentMethod = (PaymentMethod)query.value(6).toInt();
-      m_store.m_id.set(query.value(7).toLongLong());
     }
     else
     {
@@ -318,9 +309,6 @@ bool Purchase::SQL_select_proc(QSqlQuery& query, QString& error)
 
   if (bSuccess && m_employee.m_id.isValid())
     bSuccess = m_employee.SQL_select_proc(query, error);
-
-  if (bSuccess && m_store.m_id.isValid())
-    bSuccess = m_store.SQL_select_proc(query, error);
 
   return bSuccess;
 }
@@ -424,7 +412,8 @@ PurchaseProduct Purchase::findProduct(Id pId) const
 QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
 {
   EscPos ep;
-  if (m_store.m_id.isValid())
+  // TODO IMPRIMIR LOJA
+  /*if (m_store.m_id.isValid())
   {
     ep.align(true);
     ep.expand(true);
@@ -436,7 +425,7 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
     if (!m_store.m_form.m_vPhone.isEmpty())
       ep.str(m_store.m_form.m_vPhone.at(0).name() + "\n");
     ep.str("\n");
-  }
+  }*/
   ep.str(m_paymentMethod == Purchase::PaymentMethod::Cash ?
         "PAGAMENTO A VISTA\n\n" :
         "ORDEM DE RECEBIMENTO\nDE MERCADORIA\n\n");

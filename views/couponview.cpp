@@ -1,7 +1,6 @@
 #include "couponview.h"
 #include "widgets/jlineedit.h"
 #include "widgets/jdatepicker.h"
-#include "controls/databasepicker.h"
 #include "items/jitemhelper.h"
 #include "tables/coupontable.h"
 #include "filters/couponfilter.h"
@@ -17,8 +16,6 @@
 #include <QPlainTextEdit>
 #include <QDialogButtonBox>
 #include <QProgressDialog>
-
-#define SETTINGS_COUPON_STORE_ID "coupon/storeid"
 
 CouponConfirmation::CouponConfirmation(const QVector<Coupon>& coupons, QWidget* parent)
   : QDialog(parent)
@@ -58,14 +55,12 @@ CouponView::CouponView(QWidget* parent)
   , m_rdoProduct(nullptr)
   , m_edPercentage(nullptr)
   , m_edValue(nullptr)
-  , m_storePicker(nullptr)
   , m_btnAddRemove(nullptr)
   , m_table(nullptr)
   , m_lblCount(nullptr)
   , m_filter(nullptr)
 {
   auto btnPrint = m_viewer->addButton(tr("Imprimir"), QIcon(":/icons/res/printer.png"));
-  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
 
   m_edCode = new JLineEdit(Text::Input::Alpha, true);
   m_edCode->setPlaceholderText(tr("Gerar código automaticamente"));
@@ -96,7 +91,6 @@ CouponView::CouponView(QWidget* parent)
   product->setLayout(ltProduct);
 
   QFormLayout* ltMain = new QFormLayout;
-  ltMain->addRow(JItemHelper::text(STORE_SQL_TABLE_NAME) + ":", m_storePicker);
   ltMain->addRow(tr("Código:"), m_edCode);
   ltMain->addRow(m_rdoPercentage, m_edPercentage);
   ltMain->addRow(m_rdoValue, m_edValue);
@@ -147,7 +141,6 @@ void CouponView::getItem(JItemSQL& o) const
   _o.m_dtExpiration = m_dtExpiration->getDate();
   _o.m_percentage = m_edPercentage->value();
   _o.m_value = m_edValue->value();
-  _o.m_store.m_id = m_storePicker->getFirstId();
   m_table->get(_o.m_products);
 }
 
@@ -167,16 +160,7 @@ void CouponView::setItem(const JItemSQL& o)
   m_edValue->setValue(_o.m_value);
   m_tab->setTabEnabled(0, !_o.m_bRedeemed);
   m_btnSave->setEnabled(!_o.m_bRedeemed);
-  m_storePicker->addItem(_o.m_store);
   m_table->set(_o.m_products, true);
-  if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
-  {
-    QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
-    Store store(Id(settings.value(SETTINGS_COUPON_STORE_ID).toLongLong()));
-    QString error;
-    if (store.SQL_select(error))
-      m_storePicker->addItem(store);
-  }
   updateControls();
 }
 
@@ -252,8 +236,6 @@ bool CouponView::st_saveMultiple(QVector<Coupon>& v, QWidget* parent)
     bool ok = v.at(i).SQL_insert_update_proc(query);
     if (!ok)
       v.remove(i--);
-    else
-      v[i].m_store.SQL_select_proc(query, error);
     if (bar.wasCanceled())
     {
       v.remove(i + 1, v.size() - i - 1);

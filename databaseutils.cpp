@@ -311,13 +311,10 @@ bool BaitaSQL::createTables(QString& error)
                         PURCHASE_SQL_COL_DIS " REAL,"
                         PURCHASE_SQL_COL_EID " INTEGER,"
                         PURCHASE_SQL_COL_PAY " INTEGER NOT NULL,"
-                        PURCHASE_SQL_COL_TID " INTEGER NOT NULL,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_SID ") REFERENCES "
                         SUPPLIER_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
                         "FOREIGN KEY(" PURCHASE_SQL_COL_EID ") REFERENCES "
-                        EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL,"
-                        "FOREIGN KEY(" PURCHASE_SQL_COL_TID ") REFERENCES "
-                        STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+                        EMPLOYEE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " PURCHASE_ELEMENTS_SQL_TABLE_NAME " ("
@@ -407,10 +404,7 @@ bool BaitaSQL::createTables(QString& error)
                           COUPON_SQL_COL_EXP " BOOLEAN,"
                           COUPON_SQL_COL_EDT " DATE,"
                           COUPON_SQL_COL_PCT " INTEGER,"
-                          COUPON_SQL_COL_VAL " REAL,"
-                          COUPON_SQL_COL_SID " INTEGER,"
-                          "FOREIGN KEY(" COUPON_SQL_COL_SID ") REFERENCES "
-                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                          COUPON_SQL_COL_VAL " REAL)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " COUPON_ELEMENTS_SQL_TABLE_NAME " ("
@@ -426,12 +420,9 @@ bool BaitaSQL::createTables(QString& error)
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " INVENTORY_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
-                          COUPON_SQL_COL_SID " INTEGER,"
                           INVENTORY_SQL_COL_DAT " TIMESTAMP,"
                           INVENTORY_SQL_COL_DES " TEXT UNIQUE NOT NULL CHECK ("
-                          INVENTORY_SQL_COL_DES " <> ''),"
-                          "FOREIGN KEY(" INVENTORY_SQL_COL_SID ") REFERENCES "
-                          STORE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
+                          INVENTORY_SQL_COL_DES " <> ''))");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " INVENTORY_ELEMENTS_SQL_TABLE_NAME " ("

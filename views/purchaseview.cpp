@@ -28,8 +28,6 @@
 #include <QDialogButtonBox>
 #include "items/jitemhelper.h"
 
-#define SETTINGS_PURCHASE_STORE_ID "purchase/storeid"
-
 PaymentWidget::PaymentWidget(QWidget* parent)
   : QWidget(parent)
   , m_rdoCash(nullptr)
@@ -173,7 +171,6 @@ PurchaseView::PurchaseView(QWidget *parent)
   , m_dtPicker(nullptr)
   , m_edTotal(nullptr)
   , m_supplierPicker(nullptr)
-  , m_storePicker(nullptr)
   , m_table(nullptr)
   , m_edDisccount(nullptr)
   , m_wPayment(nullptr)
@@ -289,12 +286,8 @@ PurchaseView::PurchaseView(QWidget *parent)
   m_supplierPicker = new DatabasePicker(SUPPLIER_SQL_TABLE_NAME);
   m_supplierPicker->setPlaceholderText(true);
 
-  m_storePicker = new DatabasePicker(STORE_SQL_TABLE_NAME);
-  m_storePicker->setPlaceholderText(true);
-
   QVBoxLayout* ltHeader = new QVBoxLayout;
   ltHeader->addLayout(ltCmd);
-  ltHeader->addWidget(m_storePicker);
   ltHeader->addWidget(m_supplierPicker);
 
   QFrame* frHeader = new QFrame();
@@ -392,7 +385,6 @@ void PurchaseView::getItem(JItemSQL& o) const
   _o.m_payments = m_wPayment->getPayments();
   _o.m_observation = m_teObservation->toPlainText();
   _o.m_disccount = m_edDisccount->value();
-  _o.m_store.m_id = m_storePicker->getFirstId();
   m_table->get(_o.m_products);
 }
 
@@ -400,18 +392,7 @@ void PurchaseView::setItem(const JItemSQL& o)
 {
   m_table->removeAllItems();
   m_supplierPicker->clear();
-  m_storePicker->clear();
   const Purchase& _o = dynamic_cast<const Purchase&>(o);
-  if (!_o.m_id.isValid() && !_o.m_store.m_id.isValid())
-  {
-    QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
-    Store store(Id(settings.value(SETTINGS_PURCHASE_STORE_ID).toLongLong()));
-    QString error;
-    if (store.SQL_select(error))
-      m_storePicker->addItem(store);
-  }
-  else
-    m_storePicker->addItem(_o.m_store);
   m_dtPicker->setDate(_o.m_date);
   m_snNumber->setValue(_o.m_number);
   m_table->setNewPurchase(!_o.m_id.isValid());
@@ -476,11 +457,6 @@ void PurchaseView::save()
   if (bSuccess)
   {
     print(o);
-    if (o.m_store.m_id.isValid())
-    {
-      QSettings settings(SETTINGS_COMPANY_NAME, SETTINGS_APP_NAME);
-      settings.setValue(SETTINGS_PURCHASE_STORE_ID, o.m_store.m_id.get());
-    }
     m_viewer->refresh();
     m_lastId = o.m_id;
     clear();

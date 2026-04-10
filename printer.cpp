@@ -74,7 +74,8 @@ namespace
 
   void purchaseAppendHeader(const Purchase& o, QString& text)
   {
-    appendFormInfo(o.m_store.m_form, text);
+    // TODO Imprimir loja
+    //appendFormInfo(o.m_store.m_form, text);
     text += ESC_VERT_TAB;
     text += o.m_paymentMethod == Purchase::PaymentMethod::Cash
             ? "PAGAMENTO A VISTA"
@@ -551,11 +552,12 @@ bool Printer::print(const ShoppingList& lst,  bool bPrintCount, QString& error)
 bool Printer::print(const Coupon& o, bool bPrintContent, QString& error)
 {
   QString str;
-  if (o.m_store.m_id.isValid())
+  //TODO IMPRIMIR LOJA
+  /*if (o.m_store.m_id.isValid())
   {
     appendFormInfo(o.m_store.m_form, str);
     str += ESC_LF;
-  }
+  }*/
 
   if (!o.m_bRedeemed)
   {

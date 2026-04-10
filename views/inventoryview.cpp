@@ -1,5 +1,4 @@
 #include "inventoryview.h"
-#include "widgets/jlineedit.h"
 #include "controls/databasepicker.h"
 #include "widgets/jaddremovebuttons.h"
 #include "tables/inventorytable.h"

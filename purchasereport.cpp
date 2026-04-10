@@ -2,7 +2,6 @@
 #include "items/purchase.h"
 #include "controls/databasepicker.h"
 #include "widgets/jdateinterval.h"
-#include "widgets/jspinbox.h"
 #include <QLayout>
 #include <QFrame>
 #include <QRadioButton>
@@ -96,18 +95,6 @@ QString PurchaseReport::strFilterHtml() const
     aux = tr("não especificado");
   str += QString("<tr><td>Produto: %1</td></tr>").arg(aux);
 
-  auto vst = m_storePicker->getNames();
-  aux.clear();
-  if (!vst.isEmpty())
-  {
-    for (const auto& it :vst)
-      aux += it + "; ";
-    aux.chop(2);
-  }
-  else
-    aux = tr("não especificado");
-  str += QString("<tr><td>Loja: %1</td></tr>").arg(aux);
-
   aux.clear();
   if (!m_cbPaymentCredit->isChecked() && !m_cbPaymentCash->isChecked() && !m_cbPaymentBonus->isChecked())
     aux = tr("não especificado");
@@ -139,17 +126,16 @@ QString PurchaseReport::processProduct() const
                      PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DIS " AS DISCCOUNT," //3
                      PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_PAY " AS PAYMENT," //4
                      "SUPPLIERFORM." FORM_SQL_COL_NAM " AS SUPPLIER," //5
-                     "STOREFORM." FORM_SQL_COL_NAM " AS STORE," //6
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //7
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //8
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //9
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //10
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //11
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //12
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //13
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //14
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //6
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //7
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //8
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //9
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //10
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //11
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //12
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //13
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " * "
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL " //15
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL " //14
                      "FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                      " LEFT JOIN " PURCHASE_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " = "
@@ -160,12 +146,6 @@ QString PurchaseReport::processProduct() const
                      " LEFT JOIN " FORM_SQL_TABLE_NAME " AS SUPPLIERFORM ON "
                      SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL_FID " = "
                      "SUPPLIERFORM." SQL_COLID
-                     " LEFT JOIN " STORE_SQL_TABLE_NAME " ON "
-                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_TID " = "
-                     STORE_SQL_TABLE_NAME "." SQL_COLID
-                     " LEFT JOIN " FORM_SQL_TABLE_NAME " AS STOREFORM ON "
-                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL_FID " = "
-                     "STOREFORM." SQL_COLID
                      " LEFT JOIN " PRODUCT_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " = "
                      PRODUCT_SQL_TABLE_NAME "." SQL_COLID;
@@ -182,39 +162,37 @@ QString PurchaseReport::processProduct() const
   double currentAmmount = 0.0;
   do
   {
-    if (currentProduct != query.value(9).toLongLong())
+    if (currentProduct != query.value(8).toLongLong())
     {
-      currentProduct = query.value(9).toLongLong();
+      currentProduct = query.value(8).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
-                      "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(7).toString());
+                      "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(6).toString());
       html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
     }
     html += QString(
                 "<tr>"
                 "<td width=\"8%\">%1</td>"
                 "<td width=\"8%\">%2</td>"
-                "<td width=\"25%\">%3</td>"
-                "<td width=\"25%\">%4</td>"
-                "<td width=\"8%\" align=\"right\">%5</td>"
-                "<td width=\"10%\">%6</td>"
+                "<td width=\"50%\">%3</td>"
+                "<td width=\"8%\" align=\"right\">%4</td>"
+                "<td width=\"10%\">%5</td>"
+                "<td width=\"8%\" align=\"right\">%6</td>"
                 "<td width=\"8%\" align=\"right\">%7</td>"
-                "<td width=\"8%\" align=\"right\">%8</td>"
                 "</tr>").arg(query.value(1).toDate().toString("dd/MM/yyyy"),
                              Data::strInt(query.value(0).toLongLong()),
                              query.value(5).toString(),
-                             query.value(6).toString(),
-                             Data::strAmmount(query.value(10).toDouble()),
-                             (query.value(12).toBool()
-                             ? query.value(13).toString() +
-                               " (" + Data::strFmt(query.value(14).toDouble()) +
-                                query.value(8).toString() + ")"
-                             : query.value(8).toString()),
-                             Data::strMoney(query.value(11).toDouble(), false),
-                             Data::strMoney(query.value(15).toDouble(), false));
-    currentSubtotal += query.value(15).toDouble();
-    double ammount = query.value(10).toDouble();
-    if (query.value(12).toBool()) // isPack
-      ammount *= query.value(14).toDouble();
+                             Data::strAmmount(query.value(9).toDouble()),
+                             (query.value(11).toBool()
+                             ? query.value(12).toString() +
+                               " (" + Data::strFmt(query.value(13).toDouble()) +
+                                query.value(7).toString() + ")"
+                             : query.value(7).toString()),
+                             Data::strMoney(query.value(10).toDouble(), false),
+                             Data::strMoney(query.value(14).toDouble(), false));
+    currentSubtotal += query.value(14).toDouble();
+    double ammount = query.value(9).toDouble();
+    if (query.value(11).toBool()) // isPack
+      ammount *= query.value(13).toDouble();
     currentAmmount += ammount;
 
     bool bHasNext = query.next();
@@ -228,8 +206,8 @@ QString PurchaseReport::processProduct() const
                   "<tr><th align=\"right\">Sumário: %1</td></tr>"
                   "<tr><td align=\"right\">Quantidade: %2</td></tr>"
                   "<tr><td align=\"right\">Média de preço: %3</td></tr>"
-                  "<tr><td align=\"right\">Total: %4</td></tr></table>").arg(query.value(7).toString(),
-                                                                             Data::strAmmount(currentAmmount) + query.value(8).toString(),
+                  "<tr><td align=\"right\">Total: %4</td></tr></table>").arg(query.value(6).toString(),
+                                                                             Data::strAmmount(currentAmmount) + query.value(7).toString(),
                                                                              Data::strMoney(currentSubtotal / currentAmmount),
                                                                              Data::strMoney(currentSubtotal));
       currentSubtotal = 0.0;
@@ -249,18 +227,17 @@ QString PurchaseReport::processPurchase() const
                      PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DIS " AS DISCCOUNT," //3
                      PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_PAY " AS PAYMENT," //4
                      "SUPPLIERFORM." FORM_SQL_COL_NAM " AS SUPPLIER," //5
-                     "STOREFORM." FORM_SQL_COL_NAM " AS STORE," //6
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //7
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //8
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //9
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //10
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //11
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //12
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //13
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //14
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //6
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //7
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //8
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //9
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //10
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //11
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //12
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //13
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " * "
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL," //15
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." SQL_COLID " AS ID " //16
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL," //14
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." SQL_COLID " AS ID " //15
                      "FROM  " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                      " FULL JOIN " PURCHASE_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " = "
@@ -271,12 +248,6 @@ QString PurchaseReport::processPurchase() const
                      " LEFT JOIN " FORM_SQL_TABLE_NAME " AS SUPPLIERFORM ON "
                      SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL_FID " = "
                      "SUPPLIERFORM." SQL_COLID
-                     " LEFT JOIN " STORE_SQL_TABLE_NAME " ON "
-                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_TID " = "
-                     "_STORES." SQL_COLID
-                     " LEFT JOIN " FORM_SQL_TABLE_NAME " AS STOREFORM ON "
-                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL_FID " = "
-                     "STOREFORM." SQL_COLID
                      " LEFT JOIN " PRODUCT_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " = "
                      PRODUCT_SQL_TABLE_NAME "." SQL_COLID;
@@ -297,7 +268,7 @@ QString PurchaseReport::processPurchase() const
 
   do
   {
-    const bool bHasProduct = query.value(9).toInt() != 0 || query.value(15).toDouble() != 0.0;
+    const bool bHasProduct = query.value(8).toInt() != 0 || query.value(14).toDouble() != 0.0;
     if (currentNumber != query.value(0).toInt())
     {
       html += QString(
@@ -306,13 +277,11 @@ QString PurchaseReport::processPurchase() const
         "<td width=\"30%\">Data: %2</td>"
         "<td width=\"40%\">Pagamento: %3</td></tr></table>"
       "<table cellspacing=\"0\" cellpadding=\"1\" align=\"center\" width=\"100%\">"
-        "<tr><td width=\"50%\">Fornecedor: %4</td>"
-            "<td width=\"50%\">Loja: %5</td></tr>"
+        "<tr><td width=\"100%\">Fornecedor: %4</td></tr>"
       "</table>").arg(Data::strInt(query.value(0).toInt()),
                       query.value(1).toDate().toString("dd/MM/yyyy dddd"),
                       Purchase::st_paymentText((Purchase::PaymentMethod)query.value(4).toInt()),
-                      query.value(5).toString(),
-                      query.value(6).toString());
+                      query.value(5).toString());
       if (bHasProduct)
       {
         html +=
@@ -331,16 +300,16 @@ QString PurchaseReport::processPurchase() const
         "<td width=\"50%\">%3</td>"
         "<td width=\"10%\" align=\"right\">%4</td>"
         "<td width=\"15%\" align=\"right\">%5</td>"
-      "</tr>").arg(Data::strAmmount(query.value(10).toDouble()),
-                   (query.value(12).toBool()
-                   ? query.value(13).toString() +
-                     " (" + Data::strFmt(query.value(14).toDouble()) +
-                      query.value(8).toString() + ")"
-                   : query.value(8).toString()),
-                   query.value(7).toString(),
-                   Data::strMoney(query.value(11).toDouble(), false),
-                   Data::strMoney(query.value(15).toDouble(), false));
-      currentSubtotal +=query.value(15).toDouble();
+      "</tr>").arg(Data::strAmmount(query.value(9).toDouble()),
+                   (query.value(11).toBool()
+                   ? query.value(12).toString() +
+                     " (" + Data::strFmt(query.value(13).toDouble()) +
+                      query.value(7).toString() + ")"
+                   : query.value(7).toString()),
+                   query.value(6).toString(),
+                   Data::strMoney(query.value(10).toDouble(), false),
+                   Data::strMoney(query.value(14).toDouble(), false));
+      currentSubtotal +=query.value(14).toDouble();
     }
 
     bool bPrintFooter = !query.next();
@@ -382,18 +351,17 @@ QString PurchaseReport::proccesSupplier() const
                      PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_DIS " AS DISCCOUNT," //3
                      PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_PAY " AS PAYMENT," //4
                      "SUPPLIERFORM." FORM_SQL_COL_NAM " AS SUPPLIER," //5
-                     "STOREFORM." FORM_SQL_COL_NAM " AS STORE," //6
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //7
-                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //8
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //9
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //10
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //11
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //12
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //13
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //14
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_NAM " AS PRODUCT," //6
+                     PRODUCT_SQL_TABLE_NAME "." PRODUCT_SQL_COL_UNI " AS UNITY," //7
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " AS PRODUCTID," //8
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS AMMOUNT," //9
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " AS PRICE," //10
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_ISP " AS ISPACK," //11
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PUN " AS PACKUNITY," //12
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PAM " AS PACKAMMOUNT," //13
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PRI " * "
-                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL," //15
-                     "SUPPLIERFORM." SQL_COLID " AS SUPPLIERID " //16
+                     PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_AMM " AS SUBTOTAL," //14
+                     "SUPPLIERFORM." SQL_COLID " AS SUPPLIERID " //15
                      "FROM " PURCHASE_ELEMENTS_SQL_TABLE_NAME
                      " LEFT JOIN " PURCHASE_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_NID " = "
@@ -404,12 +372,6 @@ QString PurchaseReport::proccesSupplier() const
                      " LEFT JOIN " FORM_SQL_TABLE_NAME " AS SUPPLIERFORM ON "
                      SUPPLIER_SQL_TABLE_NAME "." SUPPLIER_SQL_COL_FID " = "
                      "SUPPLIERFORM." SQL_COLID
-                     " LEFT JOIN " STORE_SQL_TABLE_NAME " ON "
-                     PURCHASE_SQL_TABLE_NAME "." PURCHASE_SQL_COL_TID " = "
-                     STORE_SQL_TABLE_NAME "." SQL_COLID
-                     " LEFT JOIN " FORM_SQL_TABLE_NAME " AS STOREFORM ON "
-                     STORE_SQL_TABLE_NAME "." STORE_SQL_COL_FID " = "
-                     "STOREFORM." SQL_COLID
                      " LEFT JOIN " PRODUCT_SQL_TABLE_NAME " ON "
                      PURCHASE_ELEMENTS_SQL_TABLE_NAME "." PURCHASE_ELEMENTS_SQL_COL_PID " = "
                      PRODUCT_SQL_TABLE_NAME "." SQL_COLID;
@@ -425,9 +387,9 @@ QString PurchaseReport::proccesSupplier() const
   double currentSubtotal = 0.0;
   do
   {
-    if (currentSupplier != query.value(16).toLongLong())
+    if (currentSupplier != query.value(15).toLongLong())
     {
-      currentSupplier = query.value(16).toLongLong();
+      currentSupplier = query.value(15).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
                       "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(5).toString());
       html += "<tr><th>Data</th><th>Número</th><th>Produto</th><th>Loja</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
@@ -436,25 +398,23 @@ QString PurchaseReport::proccesSupplier() const
                 "<tr>"
                 "<td width=\"8%\">%1</td>"
                 "<td width=\"8%\">%2</td>"
-                "<td width=\"25%\">%3</td>"
-                "<td width=\"25%\">%4</td>"
-                "<td width=\"8%\" align=\"right\">%5</td>"
-                "<td width=\"10%\">%6</td>"
+                "<td width=\"50%\">%3</td>"
+                "<td width=\"8%\" align=\"right\">%4</td>"
+                "<td width=\"10%\">%5</td>"
+                "<td width=\"8%\" align=\"right\">%6</td>"
                 "<td width=\"8%\" align=\"right\">%7</td>"
-                "<td width=\"8%\" align=\"right\">%8</td>"
                 "</tr>").arg(query.value(1).toDate().toString("dd/MM/yyyy"),
                              Data::strInt(query.value(0).toLongLong()),
-                             query.value(7).toString(),
                              query.value(6).toString(),
-                             Data::strAmmount(query.value(10).toDouble()),
-                             (query.value(12).toBool()
-                             ? query.value(13).toString() +
-                               " (" + Data::strFmt(query.value(14).toDouble()) +
-                                query.value(8).toString() + ")"
-                             : query.value(8).toString()),
-                             Data::strMoney(query.value(11).toDouble(), false),
-                             Data::strMoney(query.value(15).toDouble(), false));
-    currentSubtotal += query.value(15).toDouble();
+                             Data::strAmmount(query.value(9).toDouble()),
+                             (query.value(11).toBool()
+                             ? query.value(12).toString() +
+                               " (" + Data::strFmt(query.value(13).toDouble()) +
+                                query.value(7).toString() + ")"
+                             : query.value(7).toString()),
+                             Data::strMoney(query.value(10).toDouble(), false),
+                             Data::strMoney(query.value(14).toDouble(), false));
+    currentSubtotal += query.value(14).toDouble();
 
     bool bHasNext = query.next();
     bool bPrintFooter = !bHasNext || currentSupplier != query.value(16).toLongLong();

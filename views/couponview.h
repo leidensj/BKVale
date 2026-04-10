@@ -13,7 +13,6 @@ class QRadioButton;
 class JExpLineEdit;
 class QLabel;
 class JSpinBox;
-class DatabasePicker;
 class JAddRemoveButtons;
 class CouponTable;
 class CouponFilter;
@@ -59,7 +58,6 @@ private:
   QRadioButton* m_rdoProduct;
   JExpLineEdit* m_edPercentage;
   JExpLineEdit* m_edValue;
-  DatabasePicker* m_storePicker;
   JAddRemoveButtons* m_btnAddRemove;
   CouponTable* m_table;
   QLabel* m_lblCount;

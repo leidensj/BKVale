@@ -7,13 +7,10 @@
 #include <QDate>
 #include <QIcon>
 #include "supplier.h"
-#include "product.h"
-#include "defines.h"
 #include "jitemsql.h"
 #include "employee.h"
 #include "purchaseproduct.h"
 #include "paymentpart.h"
-#include "store.h"
 
 struct Purchase : public JItemSQL
 {
@@ -66,7 +63,6 @@ struct Purchase : public JItemSQL
   QString m_observation;
   QVector<PurchaseProduct> m_products;
   double m_disccount;
-  Store m_store;
   mutable Employee m_employee;
 };
 

@@ -2,7 +2,6 @@
 #define INVENTORY_H
 
 #include "inventoryproduct.h"
-#include "store.h"
 
 struct Inventory : public JItemSQL
 {
@@ -17,7 +16,6 @@ struct Inventory : public JItemSQL
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
 
-  Store m_store;
   QDateTime m_dt;
   QString m_description;
   QVector<InventoryProduct> m_products;

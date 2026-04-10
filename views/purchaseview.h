@@ -92,7 +92,6 @@ private:
   JDatePicker* m_dtPicker;
   JExpLineEdit* m_edTotal;
   DatabasePicker* m_supplierPicker;
-  DatabasePicker* m_storePicker;
   PurchaseProductTable* m_table;
   JExpLineEdit* m_edDisccount;
   PaymentWidget* m_wPayment;

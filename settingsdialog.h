@@ -8,6 +8,8 @@ namespace Ui {
 class SettingsDialog;
 }
 
+class DatabasePicker;
+
 class SettingsDialog : public QDialog
 {
   Q_OBJECT
@@ -21,6 +23,7 @@ private:
   Settings m_settings;
   Ui::SettingsDialog *ui;
   void doDataExchange(bool toUI);
+  DatabasePicker* m_store;
 
 private slots:
   void refreshAvailablePorts();

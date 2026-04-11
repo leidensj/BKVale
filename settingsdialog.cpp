@@ -1,6 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include "defines.h"
+#include "controls/databasepicker.h"
 #include <QSerialPortInfo>
 #include <QPushButton>
 #include <QFileDialog>
@@ -9,8 +10,18 @@ SettingsDialog::SettingsDialog(const Settings& settings, QWidget *parent)
   : QDialog(parent)
   , m_settings(settings)
   , ui(new Ui::SettingsDialog)
+  , m_store(nullptr)
 {
   ui->setupUi(this);
+  m_store = new DatabasePicker(STORE_SQL_TABLE_NAME);
+  auto pt = ui->tabWidget->widget(1);
+  if (pt != nullptr)
+  {
+      auto pt2 = pt->layout();
+      if (pt2 != nullptr)
+          pt2->addWidget(m_store);
+  }
+  ui->tabWidget->widget(1)->layout()->addWidget(m_store);
 
   connect(this, SIGNAL(accepted()), this, SLOT(update()));
   refreshAvailablePorts();

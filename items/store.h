@@ -18,6 +18,7 @@ struct Store : public JItemSQL
   bool SQL_remove_proc(QSqlQuery& query) const;
 
   bool SQL_select_formid_proc(QSqlQuery& query) const;
+  static void st_SQL_select_default(Store& o);
 
   Form m_form;
   QString m_description;

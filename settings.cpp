@@ -9,6 +9,8 @@
 #define ETHERNET_IP            "ethernet/ip"
 #define ETHERNET_PORT          "ethernet/port"
 #define PRINTER_MODEL          "printer/model"
+#define DEFAULT_STORE_ID       "store/id"
+#define DEFAULT_STORE_NAME     "store/name"
 
 #define DEFAULT_DATABASE_PORT 5432
 
@@ -26,6 +28,8 @@ void Settings::clear()
   m_ethernetIP.clear();
   m_ethernetPort = 9100;
   m_printerModel = PRINTER_MODEL_NONE;
+  m_storeId = 0;
+  m_storeName.clear();
 }
 
 void Settings::save() const
@@ -38,6 +42,8 @@ void Settings::save() const
   settings.setValue(ETHERNET_IP, m_ethernetIP);
   settings.setValue(ETHERNET_PORT, m_ethernetPort);
   settings.setValue(PRINTER_MODEL, m_printerModel);
+  settings.setValue(DEFAULT_STORE_ID, m_storeId);
+  settings.setValue(DEFAULT_STORE_NAME, m_storeName);
 }
 
 void Settings::load()
@@ -50,4 +56,6 @@ void Settings::load()
   m_ethernetIP = settings.value(ETHERNET_IP).toString();
   m_ethernetPort = settings.value(ETHERNET_PORT, 9100).toInt();
   m_printerModel = settings.value(PRINTER_MODEL, PRINTER_MODEL_NONE).toInt();
+  m_storeId = settings.value(DEFAULT_STORE_ID, 0).toLongLong();
+  m_storeName = settings.value(DEFAULT_STORE_NAME).toString();
 }

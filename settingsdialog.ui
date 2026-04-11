@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>276</width>
+    <width>409</width>
     <height>448</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
       <enum>QTabWidget::TabShape::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -219,18 +219,22 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="store">
+     <widget class="QWidget" name="preferences">
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
       <attribute name="icon">
        <iconset resource="icons.qrc">
-        <normaloff>:/icons/res/store.png</normaloff>:/icons/res/store.png</iconset>
+        <normaloff>:/icons/res/process.png</normaloff>:/icons/res/process.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>Loja</string>
+       <string>Preferências</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5"/>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <layout class="QFormLayout" name="ltPreferences"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

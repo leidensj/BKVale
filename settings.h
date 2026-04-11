@@ -17,7 +17,8 @@ struct Settings
   QString m_ethernetIP;
   int m_printerModel;
   int m_ethernetPort;
-  qlonglong m_purchaseStoreId;
+  qlonglong m_storeId;
+  QString m_storeName;
 
   void clear();
   void save() const;

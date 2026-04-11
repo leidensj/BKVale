@@ -14,14 +14,7 @@ SettingsDialog::SettingsDialog(const Settings& settings, QWidget *parent)
 {
   ui->setupUi(this);
   m_store = new DatabasePicker(STORE_SQL_TABLE_NAME);
-  auto pt = ui->tabWidget->widget(1);
-  if (pt != nullptr)
-  {
-      auto pt2 = pt->layout();
-      if (pt2 != nullptr)
-          pt2->addWidget(m_store);
-  }
-  ui->tabWidget->widget(1)->layout()->addWidget(m_store);
+  ui->ltPreferences->addRow(tr("Loja padrão:"), m_store);
 
   connect(this, SIGNAL(accepted()), this, SLOT(update()));
   refreshAvailablePorts();
@@ -44,6 +37,7 @@ void SettingsDialog::doDataExchange(bool toUI)
     ui->sbEthernetPort->setValue(m_settings.m_ethernetPort);
     ui->rdoElginI9->setChecked(m_settings.m_printerModel == PRINTER_MODEL_ELGINI9);
     ui->rdoBema4200TH->setChecked(m_settings.m_printerModel == PRINTER_MODEL_BEMATECH4200TH);
+    m_store->addItem(m_settings.m_storeId, m_settings.m_storeName, QByteArray());
   }
   else
   {
@@ -52,6 +46,8 @@ void SettingsDialog::doDataExchange(bool toUI)
     m_settings.m_ethernetIP = ui->edEthernetIP->text();
     m_settings.m_ethernetPort = ui->sbEthernetPort->value();
     m_settings.m_printerModel = ui->rdoBema4200TH->isChecked() ? PRINTER_MODEL_BEMATECH4200TH : PRINTER_MODEL_ELGINI9;
+    m_settings.m_storeId = m_store->getFirstId().get();
+    m_settings.m_storeName = m_store->getFirstName();
   }
 }
 

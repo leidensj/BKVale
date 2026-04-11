@@ -1,6 +1,7 @@
 #include "purchase.h"
 #include "escpos.h"
 #include "QHostInfo"
+#include "items/store.h"
 
 //todo tirar o qhostinfo e passar nos args
 
@@ -413,20 +414,21 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
 {
   EscPos ep;
   ep.align(true);
-  // TODO IMPRIMIR LOJA
-  /*if (m_store.m_id.isValid())
+  Store store;
+  Store::st_SQL_select_default(store);
+  if (store.m_id.isValid())
   {
     ep.align(true);
     ep.expand(true);
-    ep.str(m_store.m_form.m_alias + "\n");
+    ep.str(store.m_form.m_alias + "\n");
     ep.expand(false);
-    ep.str(m_store.m_form.m_name + "\n");
-    if (!m_store.m_form.m_vAddress.isEmpty())
-      ep.str(m_store.m_form.m_vAddress.at(0).name() + "\n");
-    if (!m_store.m_form.m_vPhone.isEmpty())
-      ep.str(m_store.m_form.m_vPhone.at(0).name() + "\n");
+    ep.str(store.m_form.m_name + "\n");
+    if (!store.m_form.m_vAddress.isEmpty())
+      ep.str(store.m_form.m_vAddress.at(0).name() + "\n");
+    if (!store.m_form.m_vPhone.isEmpty())
+      ep.str(store.m_form.m_vPhone.at(0).name() + "\n");
     ep.str("\n");
-  }*/
+  }
   ep.str(m_paymentMethod == Purchase::PaymentMethod::Cash ?
         "PAGAMENTO A VISTA\n\n" :
         "ORDEM DE RECEBIMENTO\nDE MERCADORIA\n\n");

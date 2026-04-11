@@ -1,8 +1,9 @@
 #include "store.h"
+#include "settings.h"
 
 Store::Store(Id id)
 {
-  clear();
+  Store::clear();
   m_id = id;
 }
 
@@ -184,4 +185,14 @@ bool Store::SQL_select_formid_proc(QSqlQuery& query) const
   if (bSuccess && query.next())
     m_form.m_id = query.value(0).toLongLong();
   return bSuccess;
+}
+
+void Store::st_SQL_select_default(Store& o)
+{
+  Settings s;
+  s.load();
+  o.clear();
+  o.m_id = s.m_storeId;
+  QString error;
+  o.SQL_select(error);
 }

@@ -330,6 +330,7 @@ void couponContent(EscPos& ep, const Coupon& o)
 QByteArray Coupon::printVersion(const QVariant& arg) const
 {
   EscPos ep;
+  ep.align(true);
     // TODO pegar dados da loja
   /*if (m_store.m_id.isValid())
   {

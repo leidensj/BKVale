@@ -36,7 +36,7 @@ QString Purchase::st_paymentText(PaymentMethod e)
 
 Purchase::Purchase(Id id)
 {
-  clear();
+  Purchase::clear();
   m_id = id;
 }
 
@@ -412,6 +412,7 @@ PurchaseProduct Purchase::findProduct(Id pId) const
 QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
 {
   EscPos ep;
+  ep.align(true);
   // TODO IMPRIMIR LOJA
   /*if (m_store.m_id.isValid())
   {

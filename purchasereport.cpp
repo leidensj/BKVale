@@ -166,8 +166,8 @@ QString PurchaseReport::processProduct() const
     {
       currentProduct = query.value(8).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
-                      "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(6).toString());
-      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Loja</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
+                      "<tr><th align=\"left\" colspan=\"7\">%1</th></tr>").arg(query.value(6).toString());
+      html += "<tr><th>Data</th><th>Número</th><th>Fornecedor</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
     }
     html += QString(
                 "<tr>"
@@ -196,7 +196,7 @@ QString PurchaseReport::processProduct() const
     currentAmmount += ammount;
 
     bool bHasNext = query.next();
-    bool bPrintFooter = !bHasNext || currentProduct != query.value(9).toLongLong();
+    bool bPrintFooter = !bHasNext || currentProduct != query.value(8).toLongLong();
     query.previous();
 
     if (bPrintFooter)
@@ -325,7 +325,7 @@ QString PurchaseReport::processPurchase() const
       if (query.value(3).toDouble() != 0.0)
       {
         html += QString("<tr><td align=\"right\">Subtotal: %1</td></tr>").arg(Data::strMoney(currentSubtotal));
-        html += QString("<tr><td align=\"right\">Desconto: %1</td></tr>").arg(Data::strMoney(query.value(3).toDouble()));
+        html += QString("<tr><td align=\"right\">Desconto/Acréscimo: %1</td></tr>").arg(Data::strMoney(query.value(3).toDouble()));
       }
       double total = currentSubtotal + query.value(3).toDouble();
       html += QString("<tr><td align=\"right\">TOTAL: %1</td></tr></table><hr>").arg(Data::strMoney(total));
@@ -391,8 +391,8 @@ QString PurchaseReport::proccesSupplier() const
     {
       currentSupplier = query.value(15).toLongLong();
       html += QString("<br><table cellspacing=\"0\" cellpadding=\"3\" align=\"center\" width=\"100%\" style=\"border-width: 1px;border-style: solid;border-color: lightgray;\">"
-                      "<tr><th align=\"left\" colspan=\"8\">%1</th></tr>").arg(query.value(5).toString());
-      html += "<tr><th>Data</th><th>Número</th><th>Produto</th><th>Loja</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
+                      "<tr><th align=\"left\" colspan=\"7\">%1</th></tr>").arg(query.value(5).toString());
+      html += "<tr><th>Data</th><th>Número</th><th>Produto</th><th>Qte</th><th>Un</th><th>Vl Un</th><th>Vl Total</th></tr>";
     }
     html += QString(
                 "<tr>"
@@ -417,7 +417,7 @@ QString PurchaseReport::proccesSupplier() const
     currentSubtotal += query.value(14).toDouble();
 
     bool bHasNext = query.next();
-    bool bPrintFooter = !bHasNext || currentSupplier != query.value(16).toLongLong();
+    bool bPrintFooter = !bHasNext || currentSupplier != query.value(15).toLongLong();
     query.previous();
 
     if (bPrintFooter)

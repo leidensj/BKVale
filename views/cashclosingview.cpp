@@ -244,25 +244,30 @@ void CashClosingView::save()
     msg += tr("\nDeseja continuar mesmo assim?");
     if (QMessageBox::question(this, tr("Atenção"), msg, QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
       return;
-    QDialog dlg(this);
-    auto lbl = new QLabel(tr("O caixa corresponde a qual dia da semana?"));
-    auto cb = new QComboBox;
-    cb->addItems(QStringList() << "SEGUNDA" << "TERÇA" << "QUARTA" << "QUINTA" << "SEXTA" << "SÁBADO" << "DOMINGO");
-    int h = QTime::currentTime().hour();
-    int offset = 0 <= h && h <= 6 ? -1 : 0;
-    cb->setCurrentIndex(QDate::currentDate().addDays(offset).dayOfWeek() - 1);
-    auto box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-    connect(box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
-    QVBoxLayout* lt = new QVBoxLayout;
-    lt->setAlignment(Qt::AlignTop);
-    lt->addWidget(lbl);
-    lt->addWidget(cb);
-    lt->addWidget(box);
-    dlg.setLayout(lt);
-    if (dlg.exec() != QDialogButtonBox::Ok)
-      return;
   }
+
+  QDialog dlg(this);
+  auto lbl = new QLabel(tr("O caixa corresponde a qual dia da semana?"));
+  auto cb = new QComboBox;
+  cb->addItems(QStringList() << "SEGUNDA" << "TERÇA" << "QUARTA" << "QUINTA" << "SEXTA" << "SÁBADO" << "DOMINGO");
+  int h = QTime::currentTime().hour();
+  int offset = 0 <= h && h <= 6 ? -1 : 0;
+  cb->setCurrentIndex(QDate::currentDate().addDays(offset).dayOfWeek() - 1);
+  auto box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+  connect(box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+  QVBoxLayout* lt = new QVBoxLayout;
+  lt->setAlignment(Qt::AlignTop);
+  lt->addWidget(lbl);
+  lt->addWidget(cb);
+  lt->addWidget(box);
+  dlg.setLayout(lt);
+  if (dlg.exec() != QDialogButtonBox::Ok)
+      return;
+  QDate dt = QDate::currentDate();
+  while (dt.dayOfWeek() != (cb->currentIndex() + 1))
+    dt = dt.addDays(-1);
+
   CashClosing o;
   getItem(o);
   QString error;

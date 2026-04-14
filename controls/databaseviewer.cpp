@@ -190,6 +190,11 @@ void DatabaseViewer::setSortRole(int role)
   m_proxyModel->setSortRole(role);
 }
 
+void DatabaseViewer::setSortOrder(Qt::SortOrder order)
+{
+  m_proxyModel->sort(m_proxyModel->filterKeyColumn(), order);
+}
+
 Id DatabaseViewer::getFirstSelectedId() const
 {
   QModelIndexList lst = m_table->selectionModel()->selectedRows();

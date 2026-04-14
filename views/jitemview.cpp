@@ -108,7 +108,7 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
   connect(m_viewer, SIGNAL(itemsSelectedSignal()), this, SLOT(setItem()));
   connect(m_viewer, SIGNAL(itemsSelectedSignal()), m_dlgDb, SLOT(accept()));
   connect(m_viewer, SIGNAL(itemsRemovedSignal(const Ids&)), this, SLOT(itemsRemoved(const Ids&)));
-  connect(m_btnSearch, SIGNAL(clicked(bool)), m_dlgDb, SLOT(exec()));
+  connect(m_btnSearch, SIGNAL(clicked(bool)), this, SLOT(search()));
   connect(m_viewer, SIGNAL(copySignal()), this, SLOT(setCopyItem()));
 
   setMinimumWidth(600);
@@ -117,6 +117,12 @@ JItemView::JItemView(const QString& tableName, QWidget* parent)
 JItemView::~JItemView()
 {
 
+}
+
+void JItemView::search()
+{
+  m_viewer->refresh();
+  m_dlgDb->exec();
 }
 
 void JItemView::setItem()

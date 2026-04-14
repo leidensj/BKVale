@@ -418,7 +418,6 @@ QByteArray Purchase::printVersion(const QVariant& /*arg*/) const
   Store::st_SQL_select_default(store);
   if (store.m_id.isValid())
   {
-    ep.align(true);
     ep.expand(true);
     ep.str(store.m_form.m_alias + "\n");
     ep.expand(false);

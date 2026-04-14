@@ -14,6 +14,7 @@
 #include <QLayout>
 #include <QFormLayout>
 #include <QMessageBox>
+#include <QComboBox>
 
 CashClosingView::CashClosingView(QWidget* parent)
   : JItemView(CASH_CLOSING_SQL_TABLE_NAME, parent)
@@ -187,6 +188,7 @@ CashClosingView::CashClosingView(QWidget* parent)
 
   setFocusWidgetOnClear(m_cashPicker);
   m_viewer->refresh();
+  m_viewer->setSortOrder(Qt::DescendingOrder);
   clear();
 }
 
@@ -241,6 +243,24 @@ void CashClosingView::save()
       msg += tr("COMISSÕES\n");
     msg += tr("\nDeseja continuar mesmo assim?");
     if (QMessageBox::question(this, tr("Atenção"), msg, QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+      return;
+    QDialog dlg(this);
+    auto lbl = new QLabel(tr("O caixa corresponde a qual dia da semana?"));
+    auto cb = new QComboBox;
+    cb->addItems(QStringList() << "SEGUNDA" << "TERÇA" << "QUARTA" << "QUINTA" << "SEXTA" << "SÁBADO" << "DOMINGO");
+    int h = QTime::currentTime().hour();
+    int offset = 0 <= h && h <= 6 ? -1 : 0;
+    cb->setCurrentIndex(QDate::currentDate().addDays(offset).dayOfWeek() - 1);
+    auto box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    connect(box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    QVBoxLayout* lt = new QVBoxLayout;
+    lt->setAlignment(Qt::AlignTop);
+    lt->addWidget(lbl);
+    lt->addWidget(cb);
+    lt->addWidget(box);
+    dlg.setLayout(lt);
+    if (dlg.exec() != QDialogButtonBox::Ok)
       return;
   }
   CashClosing o;

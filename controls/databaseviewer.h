@@ -62,6 +62,7 @@ public slots:
   void clearSearch();
   void toCSV();
   void setSortRole(int role = Qt::DisplayRole);
+  void setSortOrder(Qt::SortOrder order);
 
 private:
   QPushButton* m_btnOpen;

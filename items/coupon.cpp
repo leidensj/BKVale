@@ -2,6 +2,7 @@
 #include <QSqlRecord>
 #include <QRandomGenerator>
 #include "escpos.h"
+#include "items/store.h"
 #include <QHostInfo>
 
 Coupon::Coupon(Id id)
@@ -331,20 +332,22 @@ QByteArray Coupon::printVersion(const QVariant& arg) const
 {
   EscPos ep;
   ep.align(true);
-    // TODO pegar dados da loja
-  /*if (m_store.m_id.isValid())
+  ep.align(true);
+  Store store;
+  Store::st_SQL_select_default(store);
+  if (store.m_id.isValid())
   {
-    ep.align(true);
-    ep.expand(true);
-    ep.str(m_store.m_form.m_alias + "\n");
-    ep.expand(false);
-    ep.str(m_store.m_form.m_name + "\n");
-    if (!m_store.m_form.m_vAddress.isEmpty())
-      ep.str(m_store.m_form.m_vAddress.at(0).name() + "\n");
-    if (!m_store.m_form.m_vPhone.isEmpty())
-      ep.str(m_store.m_form.m_vPhone.at(0).name() + "\n");
-    ep.str("\n");
-  }*/
+      ep.align(true);
+      ep.expand(true);
+      ep.str(store.m_form.m_alias + "\n");
+      ep.expand(false);
+      ep.str(store.m_form.m_name + "\n");
+      if (!store.m_form.m_vAddress.isEmpty())
+          ep.str(store.m_form.m_vAddress.at(0).name() + "\n");
+      if (!store.m_form.m_vPhone.isEmpty())
+          ep.str(store.m_form.m_vPhone.at(0).name() + "\n");
+      ep.str("\n");
+  }
 
   if (!m_bRedeemed)
   {

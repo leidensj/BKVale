@@ -31,6 +31,7 @@ public slots:
   virtual void setItem(const Id& id);
   virtual void setCopyItem();
   virtual void save();
+  void search();
 
 protected slots:
   virtual void setItem(const JItemSQL& o) = 0;

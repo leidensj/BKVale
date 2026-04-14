@@ -28,6 +28,8 @@ CashClosingFilter::CashClosingFilter(QWidget* parent)
   CashClosingFilter::clear();
 }
 
+#include <qdebug.h>
+
 QString CashClosingFilter::getFilter() const
 {
   QString str;
@@ -42,13 +44,15 @@ QString CashClosingFilter::getFilter() const
     str += ") ";
   }
 
+  qDebug() << m_dt->getInitialDateTime().toUTC().toString(Qt::ISODate);
+
   if (m_dt->isChecked())
   {
     if (!str.isEmpty())
       str += " AND ";
     str += CASH_CLOSING_SQL_COL_DAT " BETWEEN '" +
-           m_dt->getInitialDateTime().toString(Qt::ISODate) + "' AND '" +
-           m_dt->getFinalDateTime().toString(Qt::ISODate) + "' ";
+           m_dt->getInitialDateTime().toUTC().toString(Qt::ISODate) + "' AND '" +
+           m_dt->getFinalDateTime().toUTC().toString(Qt::ISODate) + "' ";
   }
 
   return str;

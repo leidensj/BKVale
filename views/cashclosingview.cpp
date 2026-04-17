@@ -8,8 +8,9 @@
 #include "controls/calculatordialog.h"
 #include "controls/postitdialog.h"
 #include "filters/cashclosingfilter.h"
+#include "widgets/jdatepicker.h"
 #include <QMessageBox>
-#include "escposprinter.h"
+#include "items/cashclosing.h"
 #include <QLabel>
 #include <QLayout>
 #include <QFormLayout>
@@ -19,6 +20,7 @@
 CashClosingView::CashClosingView(QWidget* parent)
   : JItemView(CASH_CLOSING_SQL_TABLE_NAME, parent)
   , m_cashPicker(nullptr)
+  , m_day(nullptr)
   , m_dt(nullptr)
   , m_coinTable(nullptr)
   , m_sectorTable(nullptr)
@@ -41,6 +43,10 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_viewer->setSortRole(Qt::EditRole);
   m_cashPicker = new DatabasePicker(CASH_SQL_TABLE_NAME);
   m_cashPicker->setPlaceholderText(true);
+  m_day = new JDatePicker;
+  m_day->setDisplayFormat("dddd dd/MM/yyyy");
+  m_day->setEmphasis();
+  m_day->showCalendar(false);
   m_dt = new JLineEdit(Text::Input::All, false);
   m_dt->setReadOnly(true);
   m_dt->setPlaceholderText(tr("Horário"));
@@ -164,6 +170,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   auto lmain = new QVBoxLayout;
   lmain->addWidget(cash);
   lmain->addWidget(m_cashPicker);
+  lmain->addWidget(m_day);
   lmain->addWidget(m_dt);
   lmain->addLayout(ltables1);
   lmain->addLayout(lextras);

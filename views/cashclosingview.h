@@ -1,7 +1,6 @@
 #ifndef CASHCLOSINGVIEW_H
 #define CASHCLOSINGVIEW_H
 
-#include "items/cashclosing.h"
 #include "jitemview.h"
 
 class JExpLineEdit;
@@ -10,6 +9,7 @@ class CashClosingCoinTable;
 class CashClosingSectorTable;
 class CashClosingInfoTable;
 class CashClosingFilter;
+class JDatePicker;
 
 class CashClosingView : public JItemView
 {
@@ -33,6 +33,7 @@ private slots:
 
 private:
   DatabasePicker* m_cashPicker;
+  JDatePicker* m_day;
   JLineEdit* m_dt;
   CashClosingCoinTable* m_coinTable;
   CashClosingSectorTable* m_sectorTable;

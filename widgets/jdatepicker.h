@@ -15,6 +15,9 @@ public:
   explicit JDatePicker(QWidget* parent = nullptr);
   QDate getDate() const;
   void setDate(const QDate& dt);
+  void setDisplayFormat(const QString& format);
+  void setEmphasis();
+  void showCalendar(bool b);
 
 public slots:
   void checkDate();

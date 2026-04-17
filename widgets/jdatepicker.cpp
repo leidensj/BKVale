@@ -31,6 +31,7 @@ JDatePicker::JDatePicker(QWidget* parent)
   auto actPlusYear = new QAction(QIcon(":/icons/res/calplusyear.png"), tr("+ Ano"), m_btn);
   m_btn->addActions({actToday, actMinusDay, actPlusDay, actMinusMonth, actPlusMonth, actMinusYear, actPlusYear});
   m_btn->setDefaultAction(actToday);
+  m_btn->setIcon(QIcon(":/icons/res/calendar.png"));
 
   QHBoxLayout* lt = new QHBoxLayout;
   lt->setContentsMargins(0, 0, 0, 0);
@@ -58,20 +59,23 @@ JDatePicker::JDatePicker(QWidget* parent)
 
 void JDatePicker::checkDate()
 {
-  QTextCharFormat fmt;
-  m_dt->calendarWidget()->setDateTextFormat(QDate::currentDate().addDays(-1), fmt);
-  fmt.setForeground(Qt::darkGreen);
-  fmt.setFontWeight(QFont::ExtraBold);
-  fmt.setFontUnderline(true);
-  fmt.setFontOverline(true);
-  m_dt->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
+  if (m_dt->calendarWidget() != nullptr)
+  {
+    QTextCharFormat fmt;
+    m_dt->calendarWidget()->setDateTextFormat(QDate::currentDate().addDays(-1), fmt);
+    fmt.setForeground(Qt::darkGreen);
+    fmt.setFontWeight(QFont::ExtraBold);
+    fmt.setFontUnderline(true);
+    fmt.setFontOverline(true);
+    m_dt->calendarWidget()->setDateTextFormat(QDate::currentDate(), fmt);
 
-  m_btn->setIcon(QIcon(m_dt->date() == QDate::currentDate()
-                       ? ":/icons/res/calendarok.png"
-                       : ":/icons/res/calendarwarning.png"));
-  m_btn->setToolTip(m_dt->date() == QDate::currentDate()
-                    ? tr("A data informada é a data de hoje.")
-                    : tr("Aviso! A data informada não é a de hoje. Usar a data de hoje?"));
+    m_btn->setIcon(QIcon(m_dt->date() == QDate::currentDate()
+                               ? ":/icons/res/calendarok.png"
+                               : ":/icons/res/calendarwarning.png"));
+    m_btn->setToolTip(m_dt->date() == QDate::currentDate()
+                           ? tr("A data informada é a data de hoje.")
+                           : tr("Aviso! A data informada não é a de hoje. Usar a data de hoje?"));
+  }
 }
 
 QDate JDatePicker::getDate() const
@@ -82,4 +86,27 @@ QDate JDatePicker::getDate() const
 void JDatePicker::setDate(const QDate& dt)
 {
   m_dt->setDate(dt);
+}
+
+void JDatePicker::setDisplayFormat(const QString& format)
+{
+  m_dt->setDisplayFormat(format);
+}
+
+void JDatePicker::setEmphasis()
+{
+  QFont font = m_dt->font();
+  font.setBold(true);
+  font.setCapitalization(QFont::AllUppercase);
+  QPalette palette = m_dt->palette();
+  palette.setColor(QPalette::ColorRole::Text, Qt::red);
+  m_dt->setFont(font);
+  m_dt->setPalette(palette);
+}
+
+void JDatePicker::showCalendar(bool b)
+{
+  m_dt->setCalendarPopup(b);
+  if (!b)
+    m_btn->setIcon(QIcon(":/icons/res/calendar.png"));
 }

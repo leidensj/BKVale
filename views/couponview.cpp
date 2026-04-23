@@ -207,8 +207,10 @@ void CouponView::save()
     if (dlg.exec())
     {
       QVariant bPrintContent (dlg.printContent());
+      QByteArray ar;
       for (int i = 0; i != coupons.size(); ++i)
-        JItemHelper::print(coupons.at(i), bPrintContent, this);
+        ar.append(coupons.at(i).printVersion(bPrintContent));
+      JItemHelper::print(ar, this);
     }
   }
 }
@@ -262,14 +264,70 @@ void CouponView::print()
       else
       {
         int ret = QMessageBox::question(this, tr("Cupom"), tr("Deseja imprimir o conteúdo do cupom?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        QVariant bPrintContent(ret == QMessageBox::Yes);
-        EscPosPrinter printer;
-        ok = printer.connectToPrinter(error);
-        if (ok)
-          ok = printer.printRawData(o.printVersion(bPrintContent), error);
+        JItemHelper::print(o, QVariant(ret == QMessageBox::Yes), this);
+        savePDF(o);
        }
     }
     if (!ok)
       QMessageBox::warning(this, tr("Erro ao imprimir"), error, QMessageBox::Ok);
   }
+}
+
+#include "items/store.h"
+#include <QFileDialog>
+#include "widgets/filegenerator.h"
+
+void CouponView::savePDF(const Coupon& o)
+{
+  QString error;
+  if (!o.m_id.isValid())
+    return;
+
+  QString html;
+  Store store;
+  Store::st_SQL_select_default(store);
+  Address address;
+  if (!store.m_form.m_vAddress.isEmpty())
+    address = store.m_form.m_vAddress.at(0);
+
+
+  html = QString(
+             "<html>"
+             "<body>"
+             "<table align=\"center\" width=\"100%\" height=\"100%\">"
+             "<tr><td align=\"center\" style=\"padding:80px;font-size:48pt;\"><font face=\"verdana\">%1</font></td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:36pt;\">Cupom de Desconto</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:32pt;\">%2</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:32pt;\">%3</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:20pt;\">%4</td></tr>"
+             "<tr><td align=\"center\" style=\"padding-top:100px;font-size:18pt;\">%5</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:14pt;\">%6</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:14pt;\">%7</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:14pt;\">%8</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:14pt;\">%9</td></tr>"
+             "</table>").arg(store.m_form.strAliasName(),
+                   store.m_form.m_name,
+                   o.m_code,
+                   o.strCoupon(),
+                   o.m_bExpires ? "Código válido até: " + o.m_dtExpiration.toString("dd/MM/yyyy") : "Código sem data de expiração",
+                   store.m_form.m_CPF_CNPJ.isEmpty() ? "" : "CNPJ: " + store.m_form.m_CPF_CNPJ,
+                   address.m_street.isEmpty() ? "" : address.m_street + ", " + QString::number(address.m_number),
+                   address.m_cep.isEmpty() ? "" : "CEP: " + address.m_cep,
+                   address.m_city.isEmpty() ? "" : address.m_city + " " + address.getBRState().m_abv);
+  html +=
+      "</body>"
+      "</html>";
+
+  QString fileName = QFileDialog::getSaveFileName(this,
+                                                   tr("Salvar cupom"),
+                                                   "/desktop/cupom_" +
+                                                       o.m_code +
+                                                       ".pdf",
+                                                   tr("PDF (*.pdf)"));
+
+  if (fileName.isEmpty())
+    return;
+
+  PdfGenerator* w = new PdfGenerator(fileName, html, tr("Gerando cupom:"), true, false);
+  w->generate();
 }

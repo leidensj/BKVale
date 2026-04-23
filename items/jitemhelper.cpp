@@ -492,3 +492,15 @@ bool JItemHelper::print(const JItemSQL& o, const QVariant& arg, QWidget* parent)
     QMessageBox::warning(parent, QObject::tr("Erro ao imprimir"), QObject::tr("O seguinte erro ocorreu ao imprimir %1:\n%2.").arg(text(o.SQL_tableName()), error), QMessageBox::Ok);
   return ok;
 }
+
+bool JItemHelper::print(const QByteArray& ar, QWidget* parent)
+{
+  QString error;
+  EscPosPrinter printer;
+  bool ok = printer.connectToPrinter(error);
+  if (ok)
+    ok = printer.printRawData(ar, error);
+  if (!ok)
+    QMessageBox::warning(parent, QObject::tr("Erro ao imprimir"), QObject::tr("O seguinte erro ocorreu ao imprimir:\n%1.").arg(error), QMessageBox::Ok);
+  return ok;
+}

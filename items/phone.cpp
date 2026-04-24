@@ -93,7 +93,7 @@ bool Phone::SQL_remove_proc(QSqlQuery& /*query*/) const
 QString Phone::strFormattedPhone() const
 {
   if (m_number.isEmpty())
-    return "";
+    return "Telefone não cadastrado.";
 
   return
     "+" +

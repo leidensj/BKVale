@@ -47,7 +47,7 @@ private slots:
   static bool st_saveMultiple(QVector<Coupon>& v, QWidget* parent);
   void updateControls();
   void print();
-  void savePDF(const Coupon& o);
+  void savePDF();
 
 private:
   QLabel* m_lblRedeemed;

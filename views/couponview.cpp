@@ -16,6 +16,9 @@
 #include <QPlainTextEdit>
 #include <QDialogButtonBox>
 #include <QProgressDialog>
+#include "items/store.h"
+#include <QFileDialog>
+#include "widgets/filegenerator.h"
 
 CouponConfirmation::CouponConfirmation(const QVector<Coupon>& coupons, QWidget* parent)
   : QDialog(parent)
@@ -61,6 +64,7 @@ CouponView::CouponView(QWidget* parent)
   , m_filter(nullptr)
 {
   auto btnPrint = m_viewer->addButton(tr("Imprimir"), QIcon(":/icons/res/printer.png"));
+  auto btnPDF = m_viewer->addButton(tr("Exportar para PDF"), QIcon(":/icons/res/pdf.png"));
 
   m_edCode = new JLineEdit(Text::Input::Alpha, true);
   m_edCode->setPlaceholderText(tr("Gerar código automaticamente"));
@@ -119,6 +123,7 @@ CouponView::CouponView(QWidget* parent)
   connect(m_viewer, &DatabaseViewer::refreshSignal, m_lblCount, [=](){ m_lblCount->setText(tr("Número de cupons: %1").arg(m_viewer->getRowCount())); });
   connect(m_filter, SIGNAL(filterChangedSignal(const QString&)), m_viewer, SLOT(setDynamicFilter(const QString&)));
   connect(btnPrint, SIGNAL(clicked()), this, SLOT(print()));
+  connect(btnPDF, SIGNAL(clicked()), this, SLOT(savePDF()));
   setFocusWidgetOnClear(m_edPercentage);
   m_viewer->refresh();
   clear();
@@ -265,7 +270,6 @@ void CouponView::print()
       {
         int ret = QMessageBox::question(this, tr("Cupom"), tr("Deseja imprimir o conteúdo do cupom?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         JItemHelper::print(o, QVariant(ret == QMessageBox::Yes), this);
-        savePDF(o);
        }
     }
     if (!ok)
@@ -273,15 +277,29 @@ void CouponView::print()
   }
 }
 
-#include "items/store.h"
-#include <QFileDialog>
-#include "widgets/filegenerator.h"
-
-void CouponView::savePDF(const Coupon& o)
+void CouponView::savePDF()
 {
-  QString error;
-  if (!o.m_id.isValid())
+  Coupon o;
+  o.m_id = m_viewer->getFirstSelectedId();
+  bool ok = o.m_id.isValid();
+  if (ok)
+  {
+    QString error;
+    ok = o.SQL_select(error);
+    if (ok)
+    {
+      if (o.m_bRedeemed)
+      {
+        QMessageBox::information(this, tr("Cupom"), tr("Cupom já resgatado"), QMessageBox::Ok);
+        return;
+      }
+    }
+  }
+  if (!ok)
+  {
+    QMessageBox::information(this, tr("Cupom"), tr("Erro ao buscar cupom."), QMessageBox::Ok);
     return;
+  }
 
   QString html;
   Store store;
@@ -289,31 +307,30 @@ void CouponView::savePDF(const Coupon& o)
   Address address;
   if (!store.m_form.m_vAddress.isEmpty())
     address = store.m_form.m_vAddress.at(0);
-
+  Phone phone;
+  if (!store.m_form.m_vPhone.isEmpty())
+    phone = store.m_form.m_vPhone.at(0);
 
   html = QString(
              "<html>"
              "<body>"
              "<table align=\"center\" width=\"100%\" height=\"100%\">"
              "<tr><td align=\"center\" style=\"padding:80px;font-size:48pt;\"><font face=\"verdana\">%1</font></td></tr>"
-             "<tr><td align=\"center\" style=\"font-size:36pt;\">Cupom de Desconto</td></tr>"
-             "<tr><td align=\"center\" style=\"font-size:32pt;\">%2</td></tr>"
+             "<tr><td align=\"center\" style=\"padding-top:80px;font-size:32pt;\">Cupom de Desconto</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:48pt;\">%2</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:32pt;\">%3</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:20pt;\">%4</td></tr>"
-             "<tr><td align=\"center\" style=\"padding-top:100px;font-size:18pt;\">%5</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:12pt;\">presente o código no caixa para obter o desconto</td></tr>"
+             "<tr><td align=\"center\" style=\"padding-top:80px;font-size:14pt;\">%5</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:14pt;\">%6</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:14pt;\">%7</td></tr>"
-             "<tr><td align=\"center\" style=\"font-size:14pt;\">%8</td></tr>"
-             "<tr><td align=\"center\" style=\"font-size:14pt;\">%9</td></tr>"
              "</table>").arg(store.m_form.strAliasName(),
-                   store.m_form.m_name,
                    o.m_code,
                    o.strCoupon(),
                    o.m_bExpires ? "Código válido até: " + o.m_dtExpiration.toString("dd/MM/yyyy") : "Código sem data de expiração",
-                   store.m_form.m_CPF_CNPJ.isEmpty() ? "" : "CNPJ: " + store.m_form.m_CPF_CNPJ,
-                   address.m_street.isEmpty() ? "" : address.m_street + ", " + QString::number(address.m_number),
-                   address.m_cep.isEmpty() ? "" : "CEP: " + address.m_cep,
-                   address.m_city.isEmpty() ? "" : address.m_city + " " + address.getBRState().m_abv);
+                   store.m_form.m_name,
+                   address.name(),
+                   phone.name());
   html +=
       "</body>"
       "</html>";

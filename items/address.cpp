@@ -250,5 +250,7 @@ QString Address::name() const
     str += m_city;
   if (!str.isEmpty())
     str += " " + getBRState().m_abv;
+  if (str.isEmpty())
+    str = "Endereço não cadastrado.";
   return str;
 }

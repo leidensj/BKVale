@@ -46,7 +46,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_day = new JDatePicker;
   m_day->setDisplayFormat("dddd dd/MM/yyyy");
   m_day->setEmphasis();
-  m_day->showCalendar(false);
+  m_day->setMaximumDate(QDate::currentDate());
   m_dt = new JLineEdit(Text::Input::All, false);
   m_dt->setReadOnly(true);
   m_dt->setPlaceholderText(tr("Horário"));
@@ -81,12 +81,12 @@ CashClosingView::CashClosingView(QWidget* parent)
   m_edCoin->setInvertColors(true);
   m_edDiff1->setInvertColors(true);
   m_edDiff2->setInvertColors(true);
-  m_edTotal->setToolTip(tr("Total dos recebimentos descontando as taxas."));
-  m_edRealTotal->setToolTip(tr("Total dos recebimentos descontando as taxas e comissões."));
-  m_edSales->setToolTip(tr("Total dos recebimentos descontando as taxas mais as assinadas, menos os créditos e comissões."));
-  m_edCards->setToolTip(tr("Total bruto recebido em meios digitais de pagamentos que envolvem taxas."));
-  m_edDiff1->setToolTip(tr("Diferença entre entradas e recebimentos (bruto). Representa o que faltou ou sobrou no caixa."));
-  m_edDiff2->setToolTip(tr("Diferença entre entradas e recebimentos (líquido). Representa a quebra de caixa mais o valor pago em taxas."));
+  m_edTotal->setToolTip(tr("Bordero - Taxas"));
+  m_edRealTotal->setToolTip(tr("Total - Comissões"));
+  m_edSales->setToolTip(tr("Total + Assinadas - (Créditos + Comissões)"));
+  m_edCards->setToolTip(tr("Soma das moedas do Bordero que possuem taxas "));
+  m_edDiff1->setToolTip(tr("Entradas - Bordero"));
+  m_edDiff2->setToolTip(tr("Entradas - Total"));
   m_btnCalc = new QPushButton(QIcon(":/icons/res/calculator.png"), "");
   m_btnCalc->setFlat(true);
   m_btnCalc->setIconSize(QSize(24, 24));
@@ -101,7 +101,7 @@ CashClosingView::CashClosingView(QWidget* parent)
 
   QLabel* cash = new QLabel(tr("Caixa"));
   QLabel* sector = new QLabel(tr("Entradas"));
-  QLabel* coin = new QLabel(tr("Recebimentos"));
+  QLabel* coin = new QLabel(tr("Bordero"));
   QLabel* info = new QLabel(tr("Informações"));
   QLabel* summary = new QLabel(tr("Resumo"));
   QFont font = cash->font();
@@ -145,7 +145,7 @@ CashClosingView::CashClosingView(QWidget* parent)
   auto results1 = new QFormLayout;
   results1->setAlignment(Qt::AlignTop);
   results1->addRow(tr("Entradas:"), m_edSector);
-  results1->addRow(tr("Recebimentos:"), m_edCoin);
+  results1->addRow(tr("Bordero:"), m_edCoin);
   results1->addRow(tr("Diferença de caixa:"), m_edDiff2);
   results1->addRow(tr("Quebra de caixa:"), m_edDiff1);
 
@@ -206,6 +206,7 @@ void CashClosingView::getItem(JItemSQL& o) const
   _o.m_id = m_id;
   _o.m_cash.m_id = m_cashPicker->getFirstId();
   _o.m_dt = QDateTime::fromString(m_dt->text(), "dd/MM/yyyy hh:mm:ss");
+  _o.m_day = m_day->getDate();
   m_coinTable->get(_o.m_vcoins);
   m_sectorTable->get(_o.m_vsectors);
   m_infoTable->get(_o.m_vinfos);
@@ -229,6 +230,8 @@ void CashClosingView::setItem(const JItemSQL& o)
   m_cashPicker->addItem(_o.m_cash);
   m_cashPicker->blockSignals(false);
 
+  m_day->setDate(_o.m_day);
+
   m_edDebit->setValue(_o.m_debit);
   m_edCredit->setValue(_o.m_credit);
   m_edComission->setValue(_o.m_comission);
@@ -237,8 +240,27 @@ void CashClosingView::setItem(const JItemSQL& o)
   update();
 }
 
-void CashClosingView::save()
+bool CashClosingView::save()
 {
+  Cash c(m_cashPicker->getFirstId());
+  QString error;
+  if (c.m_id.isValid() && c.SQL_select(error))
+  {
+    QString msg;
+    if (c.m_bDebit && m_edDebit->value() == 0.0)
+      msg = tr("O campo ASSINADAS é obrigatório para o caixa %1").arg(c.m_name);
+    else if (c.m_bCredit && m_edCredit->value() == 0.0)
+      msg = tr("O campo CRÉDITOS é obrigatório para o caixa %1").arg(c.m_name);
+     else if (c.m_bComission && m_edComission->value() == 0.0)
+      msg = tr("O campo COMISSÕES é obrigatório para o caixa %1").arg(c.m_name);
+
+    if (!msg.isEmpty())
+    {
+      QMessageBox::critical(this, tr("Atenção"), msg, QMessageBox::Ok);
+      return false;
+    }
+  }
+
   if (m_edDebit->value() == 0.0 || m_edCredit->value() == 0.0 || m_edComission->value() == 0.0)
   {
     QString msg(tr("Os seguintes campos não foram informados:\n\n"));
@@ -250,48 +272,28 @@ void CashClosingView::save()
       msg += tr("COMISSÕES\n");
     msg += tr("\nDeseja continuar mesmo assim?");
     if (QMessageBox::question(this, tr("Atenção"), msg, QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-      return;
+      return false;
   }
-
-  QDialog dlg(this);
-  auto lbl = new QLabel(tr("O caixa corresponde a qual dia da semana?"));
-  auto cb = new QComboBox;
-  cb->addItems(QStringList() << "SEGUNDA" << "TERÇA" << "QUARTA" << "QUINTA" << "SEXTA" << "SÁBADO" << "DOMINGO");
-  int h = QTime::currentTime().hour();
-  int offset = 0 <= h && h <= 6 ? -1 : 0;
-  cb->setCurrentIndex(QDate::currentDate().addDays(offset).dayOfWeek() - 1);
-  auto box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-  connect(box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-  connect(box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
-  QVBoxLayout* lt = new QVBoxLayout;
-  lt->setAlignment(Qt::AlignTop);
-  lt->addWidget(lbl);
-  lt->addWidget(cb);
-  lt->addWidget(box);
-  dlg.setLayout(lt);
-  if (dlg.exec() != QDialogButtonBox::Ok)
-      return;
-  QDate dt = QDate::currentDate();
-  while (dt.dayOfWeek() != (cb->currentIndex() + 1))
-    dt = dt.addDays(-1);
 
   CashClosing o;
   getItem(o);
-  QString error;
   const Id id = m_id;
+  bool ok = false;
   if (id.isValid())
   {
-    JItemView::save();
+    ok = JItemView::save();
     o.m_id = id;
     o.SQL_select(error);
   }
   else
   {
-    JItemView::save();
-    o.m_cash.SQL_select(error);
+    ok = JItemView::save();
+    o.m_cash = c;
   }
-  if (m_btnPrint->isChecked())
+  if (ok)
+  if (m_btnPrint->isChecked() && ok)
     JItemHelper::print(o, 0, this);
+  return ok;
 }
 
 void CashClosingView::cashChanged()

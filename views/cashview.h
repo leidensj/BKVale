@@ -7,7 +7,9 @@
 class JLineEdit;
 class DatabasePicker;
 class CashInfoTable;
+class CashSummaryTable;
 class JAddRemoveButtons;
+class QCheckBox;
 
 class CashView : public JItemView
 {
@@ -27,7 +29,11 @@ private:
   DatabasePicker* m_sectorPicker;
   DatabasePicker* m_coinPicker;
   CashInfoTable* m_infoTable;
+  CashSummaryTable* m_summaryTable;
   JAddRemoveButtons* m_btnAddRemove;
+  QCheckBox* m_cbDebit;
+  QCheckBox* m_cbCredit;
+  QCheckBox* m_cbComission;
 };
 
 #endif // CASHVIEW_H

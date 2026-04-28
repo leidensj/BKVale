@@ -46,6 +46,7 @@ SOURCES += main.cpp\
   items/cashcoin.cpp \
   items/cashinfo.cpp \
   items/cashsector.cpp \
+  items/cashsummary.cpp \
   items/coin.cpp \
   items/coupon.cpp \
   items/couponproduct.cpp \
@@ -82,6 +83,7 @@ SOURCES += main.cpp\
   tables/cashclosinginfotable.cpp \
   tables/cashclosingsectortable.cpp \
   tables/cashinfotable.cpp \
+  tables/cashsummarytable.cpp \
   tables/coupontable.cpp \
   tables/dayofftable.cpp \
   tables/inventorytable.cpp \
@@ -204,6 +206,7 @@ HEADERS  += mainwindow.h \
     items/cashcoin.h \
     items/cashinfo.h \
     items/cashsector.h \
+    items/cashsummary.h \
     items/coin.h \
     items/coupon.h \
     items/couponproduct.h \
@@ -240,6 +243,7 @@ HEADERS  += mainwindow.h \
     tables/cashclosinginfotable.h \
     tables/cashclosingsectortable.h \
     tables/cashinfotable.h \
+    tables/cashsummarytable.h \
     tables/coupontable.h \
     tables/dayofftable.h \
     tables/inventorytable.h \

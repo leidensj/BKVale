@@ -14,7 +14,11 @@ void CashClosing::clear(bool bClearId)
   if (bClearId)
     m_id.clear();
   m_cash.clear();
-  m_dt = DateTime::server();
+  QDateTime dt = DateTime::server();
+  m_dt = dt;
+  m_day = dt.date();
+  if (0 <= dt.time().hour() && dt.time().hour() <= 7)
+    m_day = m_day.addDays(-1);
   m_vcoins.clear();
   m_vsectors.clear();
   m_vinfos.clear();
@@ -50,25 +54,73 @@ QString CashClosing::SQL_tableName() const
   return CASH_CLOSING_SQL_TABLE_NAME;
 }
 
+bool CashClosing::SQL_insert_update(QString& error) const
+{
+  // só insere/atualiza se já não tem um mesmo caixa no mesmo dia
+  error.clear();
+
+  if (!SQL_isOpen(error))
+    return false;
+
+  QSqlDatabase db(QSqlDatabase::database(POSTGRE_CONNECTION_NAME));
+  QSqlQuery query(db);
+
+  query.prepare("SELECT "
+                 CASH_SQL_TABLE_NAME "." CASH_SQL_COL_NAM ", "
+                 CASH_CLOSING_SQL_TABLE_NAME "." CASH_CLOSING_SQL_COL_DAY ", "
+                 CASH_CLOSING_SQL_TABLE_NAME "." SQL_COLID
+                 " FROM " CASH_CLOSING_SQL_TABLE_NAME " LEFT JOIN "
+                 CASH_SQL_TABLE_NAME " ON "
+                 CASH_CLOSING_SQL_TABLE_NAME ". " CASH_CLOSING_SQL_COL_CID " = "
+                 CASH_SQL_TABLE_NAME "." SQL_COLID
+                 " WHERE " CASH_SQL_TABLE_NAME "." SQL_COLID " = (:_v00) AND "
+                 CASH_CLOSING_SQL_TABLE_NAME "." CASH_CLOSING_SQL_COL_DAY " = (:_v01)");
+
+  query.bindValue(":_v00", m_cash.m_id.get());
+  query.bindValue(":_v01", m_day);
+  bool ok = false;
+  if (query.exec())
+  {
+    if (query.next())
+    {
+      if (m_id.isValid() && (query.value(2).toLongLong() == m_id.get()))
+        ok = true;
+      else
+        error = QString("Já existe um caixa %1 para o dia %2.\nSe precisa alterar o caixa, editar o caixa existente.").arg(query.value(0).toString(), query.value(1).toDate().toString("dd/MM/yyyy"));
+    }
+    else
+      ok = true;
+  }
+  else
+    error = query.lastError().text();
+
+  if (ok)
+    ok = JItemSQL::SQL_insert_update(error);
+  return ok;
+}
+
 bool CashClosing::SQL_insert_proc(QSqlQuery& query) const
 {
   query.prepare("INSERT INTO " CASH_CLOSING_SQL_TABLE_NAME " ("
                 CASH_CLOSING_SQL_COL_CID ", "
                 CASH_CLOSING_SQL_COL_DAT ", "
+                CASH_CLOSING_SQL_COL_DAY ", "
                 CASH_CLOSING_SQL_COL_DEB ", "
                 CASH_CLOSING_SQL_COL_CRE ", "
                 CASH_CLOSING_SQL_COL_COM
                 ") VALUES ("
-                "(:_v01) ,"
-                "(:_v02) ,"
-                "(:_v03) ,"
-                "(:_v04) ,"
-                "(:_v05))");
+                "(:_v01), "
+                "(:_v02), "
+                "(:_v03), "
+                "(:_v04), "
+                "(:_v05), "
+                "(:_v06))");
   query.bindValue(":_v01", m_cash.m_id.get());
   query.bindValue(":_v02", m_dt);
-  query.bindValue(":_v03", m_debit);
-  query.bindValue(":_v04", m_credit);
-  query.bindValue(":_v05", m_comission);
+  query.bindValue(":_v03", m_day);
+  query.bindValue(":_v04", m_debit);
+  query.bindValue(":_v05", m_credit);
+  query.bindValue(":_v06", m_comission);
 
   bool ok = query.exec();
   if (ok)
@@ -98,16 +150,18 @@ bool CashClosing::SQL_update_proc(QSqlQuery& query) const
   query.prepare("UPDATE " CASH_CLOSING_SQL_TABLE_NAME " SET "
                 CASH_CLOSING_SQL_COL_CID " = (:_v01),"
                 CASH_CLOSING_SQL_COL_DAT " = (:_v02),"
-                CASH_CLOSING_SQL_COL_DEB " = (:_v03),"
-                CASH_CLOSING_SQL_COL_CRE " = (:_v04),"
-                CASH_CLOSING_SQL_COL_COM " = (:_v05)"
+                CASH_CLOSING_SQL_COL_DAY " = (:_v03),"
+                CASH_CLOSING_SQL_COL_DEB " = (:_v04),"
+                CASH_CLOSING_SQL_COL_CRE " = (:_v05),"
+                CASH_CLOSING_SQL_COL_COM " = (:_v06)"
                 " WHERE " SQL_COLID " = (:_v00)");
   query.bindValue(":_v00", m_id.get());
   query.bindValue(":_v01", m_cash.m_id.get());
   query.bindValue(":_v02", m_dt);
-  query.bindValue(":_v03", m_debit);
-  query.bindValue(":_v04", m_credit);
-  query.bindValue(":_v05", m_comission);
+  query.bindValue(":_v03", m_day);
+  query.bindValue(":_v04", m_debit);
+  query.bindValue(":_v05", m_credit);
+  query.bindValue(":_v06", m_comission);
 
   bool ok = query.exec();
   if (ok)
@@ -141,6 +195,7 @@ bool CashClosing::SQL_select_proc(QSqlQuery& query, QString& error)
   query.prepare("SELECT "
                 CASH_CLOSING_SQL_COL_CID ", "
                 CASH_CLOSING_SQL_COL_DAT ", "
+                CASH_CLOSING_SQL_COL_DAY ", "
                 CASH_CLOSING_SQL_COL_DEB ", "
                 CASH_CLOSING_SQL_COL_CRE ", "
                 CASH_CLOSING_SQL_COL_COM
@@ -155,9 +210,10 @@ bool CashClosing::SQL_select_proc(QSqlQuery& query, QString& error)
     {
       m_cash.m_id.set(query.value(0).toLongLong());
       m_dt = query.value(1).toDateTime().toLocalTime();
-      m_debit = query.value(2).toDouble();
-      m_credit = query.value(3).toDouble();
-      m_comission = query.value(4).toDouble();
+      m_day = query.value(2).toDate();
+      m_debit = query.value(3).toDouble();
+      m_credit = query.value(4).toDouble();
+      m_comission = query.value(5).toDouble();
     }
     else
     {
@@ -191,8 +247,9 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   EscPos ep;
   ep.align(true);
   ep.doublefont(true);
-  ep.str(QString("Fechamento de Caixa\n%1\n%2\n").arg(m_cash.m_name, m_dt.toString("dd/MM/yyyy HH:mm:ss")));
+  ep.str(QString("Fechamento de Caixa\n%1\n%2\n").arg(m_cash.m_name, QLocale(QLocale::Portuguese, QLocale::Brazil).toString(m_day, "dddd dd/MM/yyyy")));
   ep.doublefont(false);
+  ep.str(m_dt.toString("dd/MM/yyyy HH:mm:ss\n"));
   ep.align(false);
 
   ep.align(true);
@@ -213,13 +270,13 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   }
   ep.bold(true);
   ep.str("TOTAL:\n"
-         "   Valor:         " + Data::strMoney(sumSectorsValue()) + "\n");
+         "   Valor:         " + Data::strMoney(calculate(CashSummary::Item::Sales)) + "\n");
   ep.bold(false);
 
   ep.align(true);
   ep.str("----------------------------------\n");
   ep.expand(true);
-  ep.str("Recebimentos\n");
+  ep.str("Bordero\n");
   ep.expand(false);
   ep.align(false);
   for (const auto& c : m_vcoins)
@@ -240,10 +297,10 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   }
   ep.bold(true);
   ep.str("TOTAL:\n"
-         "   Valor bruto:   " + Data::strMoney(sumCoinsValue()) + "\n");
-  if (sumCoinsTaxesDifference() != 0)
-  ep.str("   Taxas:         " + Data::strMoney(sumCoinsTaxesDifference()*-1) + "\n"
-         "   Valor liquido: " + Data::strMoney(sumCoinsWithTaxes()) + "\n\n");
+          "   Valor bruto:   " + Data::strMoney(calculate(CashSummary::Item::TotalGross)) + "\n");
+  if (calculate(CashSummary::Item::Tax) != 0)
+  ep.str("   Taxas:         " + Data::strMoney(calculate(CashSummary::Item::Tax)*-1) + "\n"
+         "   Valor liquido: " + Data::strMoney(calculate(CashSummary::Item::TotalNet)) + "\n\n");
 
   ep.bold(false);
 
@@ -251,16 +308,9 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   ep.str("----------------------------------\n");
   ep.str("Resumo\n\n");
   ep.expand(true);
-  ep.str("Entradas:\n" + Data::strMoney(sumSectorsValue()) + "\n\n");
-  ep.str("Assinadas:\n" + Data::strMoney(m_debit) + "\n\n");
-  ep.str("Créditos:\n" + Data::strMoney(m_credit) + "\n\n");
-  ep.str("Comissões:\n" + Data::strMoney(m_comission) + "\n\n");
-  ep.str("Total:\n" + Data::strMoney(sumCoinsWithTaxes()) + "\n\n");
-  ep.str("Total Real:\n" + Data::strMoney(sumCoinsWithTaxes() - m_comission) + "\n\n");
-  ep.str("Venda Real:\n" + Data::strMoney(sumCoinsWithTaxes() + m_debit - m_credit - m_comission) + "\n\n");
-  ep.str("Diferenca de caixa:\n" + Data::strMoney(diffTax()) + "\n\n");
-  ep.str("Quebra de caixa:\n" + Data::strMoney(diff()) + "\n\n");
-  ep.str("Cartão:\n" + Data::strMoney(sumCards()) + "\n\n");
+  for (int i = 0; i != m_cash.m_vsummary.size(); ++i)
+    if (m_cash.m_vsummary.at(i).m_bShow)
+      ep.str(QString("%1:\n%2\n\n").arg(m_cash.m_vsummary.at(i).itemToText(), Data::strMoney(calculate(m_cash.m_vsummary.at(i).m_item))));
   ep.expand(false);
   ep.str("----------------------------------\n");
   ep.align(false);
@@ -275,58 +325,57 @@ QByteArray CashClosing::printVersion(const QVariant& /*arg*/) const
   return ep.m_ba;
 }
 
-double CashClosing::sumSectorsValue() const
+double CashClosing::calculate(CashSummary::Item item) const
 {
-  double sum = 0.0;
-  for (const auto& s : m_vsectors)
-    sum += s.m_value;
-  return sum;
-}
-
-int CashClosing::sumSectorsNValue() const
-{
-  int sum = 0;
-  for (const auto& s : m_vsectors)
-    sum += s.m_nvalue;
-  return sum;
-}
-
-double CashClosing::sumCoinsValue() const
-{
-  double sum = 0.0;
-  for (const auto& c : m_vcoins)
-    sum += c.m_value;
-  return sum;
-}
-
-double CashClosing::sumCoinsWithTaxes() const
-{
-  double sum = 0.0;
-  for (const auto& c : m_vcoins)
-    sum += c.valueWithTaxes();
-  return sum;
-}
-
-double CashClosing::sumCoinsTaxesDifference() const
-{
-  return sumCoinsValue() - sumCoinsWithTaxes();
-}
-
-double CashClosing::diff() const
-{
-  return sumCoinsValue() - sumSectorsValue();
-}
-
-double CashClosing::diffTax() const
-{
-  return sumCoinsWithTaxes() - sumSectorsValue();
-}
-
-double CashClosing::sumCards() const
-{
-  double sum = 0.0;
-  for (const auto& c : m_vcoins)
-    if (c.m_ctax != 0.0)
-      sum += c.m_value;
-  return sum;
+  switch (item)
+  {
+    case CashSummary::Item::Sales:
+    {
+        double sum = 0.0;
+        for (const auto& s : m_vsectors)
+          sum += s.m_value;
+        return sum;
+    }
+    case CashSummary::Item::Debit:
+      return m_debit;
+    case CashSummary::Item::Credit:
+      return m_credit;
+    case CashSummary::Item::Comission:
+      return m_comission;
+    case CashSummary::Item::TotalGross:
+    {
+      double sum = 0.0;
+      for (const auto& c : m_vcoins)
+        sum += c.m_value;
+      return sum;
+    }
+    case CashSummary::Item::TotalNet:
+    {
+      double sum = 0.0;
+      for (const auto& c : m_vcoins)
+        sum += c.valueWithTaxes();
+      return sum;
+    }
+    case CashSummary::Item::Tax:
+      return calculate(CashSummary::Item::TotalGross) - calculate(CashSummary::Item::TotalNet);
+    case CashSummary::Item::RealTotal:
+      return calculate(CashSummary::Item::TotalNet) - m_comission;
+    case CashSummary::Item::RealSales:
+      return calculate(CashSummary::Item::TotalNet) + m_debit - m_credit - m_comission;
+    case CashSummary::Item::Difference:
+      return calculate(CashSummary::Item::TotalNet) - calculate(CashSummary::Item::Sales);
+    case CashSummary::Item::Discrepancy:
+      return calculate(CashSummary::Item::TotalGross) - calculate(CashSummary::Item::Sales);
+    case CashSummary::Item::Cards:
+    {
+      double sum = 0.0;
+      for (const auto& c : m_vcoins)
+        if (c.m_ctax != 0.0)
+          sum += c.m_value;
+      return sum;
+    }
+    case CashSummary::Item::NONE:
+    default:
+      return 0.0;
+  }
 }

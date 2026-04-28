@@ -18,6 +18,8 @@ public:
   void setDisplayFormat(const QString& format);
   void setEmphasis();
   void showCalendar(bool b);
+  void setMaximumDate(const QDate& dt);
+  void setMinimumDate(const QDate& dt);
 
 public slots:
   void checkDate();

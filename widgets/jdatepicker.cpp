@@ -110,3 +110,14 @@ void JDatePicker::showCalendar(bool b)
   if (!b)
     m_btn->setIcon(QIcon(":/icons/res/calendar.png"));
 }
+
+void JDatePicker::setMaximumDate(const QDate& dt)
+{
+  m_dt->setMaximumDate(dt);
+}
+
+void JDatePicker::setMinimumDate(const QDate& dt)
+{
+  m_dt->setMinimumDate(dt);
+}
+

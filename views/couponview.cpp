@@ -182,11 +182,11 @@ void CouponView::updateControls()
   m_btnAddRemove->setEnabled(m_rdoProduct->isChecked());
 }
 
-void CouponView::save()
+bool CouponView::save()
 {
   Coupon c;
   if (!JItemHelper::authenticateSave(c))
-    return;
+    return false;
 
   bool ok = true;
   int n = 1;
@@ -206,18 +206,22 @@ void CouponView::save()
       }
       coupons.append(o);
     }
-    st_saveMultiple(coupons, this);
+    ok = st_saveMultiple(coupons, this);
     clear();
-    CouponConfirmation dlg(coupons, this);
-    if (dlg.exec())
+    if (ok)
     {
-      QVariant bPrintContent (dlg.printContent());
-      QByteArray ar;
-      for (int i = 0; i != coupons.size(); ++i)
-        ar.append(coupons.at(i).printVersion(bPrintContent));
-      JItemHelper::print(ar, this);
+      CouponConfirmation dlg(coupons, this);
+      if (dlg.exec())
+      {
+        QVariant bPrintContent (dlg.printContent());
+        QByteArray ar;
+        for (int i = 0; i != coupons.size(); ++i)
+          ar.append(coupons.at(i).printVersion(bPrintContent));
+        JItemHelper::print(ar, this);
+      }
     }
   }
+  return ok;
 }
 
 bool CouponView::st_saveMultiple(QVector<Coupon>& v, QWidget* parent)
@@ -315,12 +319,12 @@ void CouponView::savePDF()
              "<html>"
              "<body>"
              "<table align=\"center\" width=\"100%\" height=\"100%\">"
-             "<tr><td align=\"center\" style=\"padding:80px;font-size:48pt;\"><font face=\"verdana\">%1</font></td></tr>"
+             "<tr><td align=\"center\" style=\"padding:80px;font-size:48pt;\">%1</td></tr>"
              "<tr><td align=\"center\" style=\"padding-top:80px;font-size:32pt;\">Cupom de Desconto</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:48pt;\">%2</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:32pt;\">%3</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:20pt;\">%4</td></tr>"
-             "<tr><td align=\"center\" style=\"font-size:12pt;\">presente o código no caixa para obter o desconto</td></tr>"
+             "<tr><td align=\"center\" style=\"font-size:12pt;\">Apresente o código no caixa para obter o desconto</td></tr>"
              "<tr><td align=\"center\" style=\"padding-top:80px;font-size:14pt;\">%5</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:14pt;\">%6</td></tr>"
              "<tr><td align=\"center\" style=\"font-size:14pt;\">%7</td></tr>"

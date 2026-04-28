@@ -8,6 +8,7 @@ class CashClosingModel : public JModel
   enum class Column
   {
     Id,
+    Day,
     Date,
     Cash,
     Sales,

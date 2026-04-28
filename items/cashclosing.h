@@ -23,20 +23,16 @@ struct CashClosing : public JItemSQL
   bool SQL_update_proc(QSqlQuery& query) const;
   bool SQL_select_proc(QSqlQuery& query, QString& error);
   bool SQL_remove_proc(QSqlQuery& query) const;
+  bool SQL_insert_update(QString& error) const;
+
+  bool SQL_isCashClosingValid(QString& error);
 
   QByteArray printVersion(const QVariant& arg) const;
-
-  double sumSectorsValue() const;
-  int sumSectorsNValue() const;
-  double sumCoinsValue() const;
-  double sumCoinsWithTaxes() const;
-  double sumCoinsTaxesDifference() const;
-  double diff() const;
-  double diffTax() const;
-  double sumCards() const;
+  double calculate(CashSummary::Item item) const;
 
   Cash m_cash;
   QDateTime m_dt;
+  QDate m_day;
   QVector<CashClosingCoin> m_vcoins;
   QVector<CashClosingSector> m_vsectors;
   QVector<CashClosingInfo> m_vinfos;

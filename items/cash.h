@@ -8,6 +8,7 @@
 #include "cashcoin.h"
 #include "cashsector.h"
 #include "cashinfo.h"
+#include "cashsummary.h"
 
 struct Cash : public JItemSQL
 {
@@ -26,7 +27,11 @@ struct Cash : public JItemSQL
   QVector<CashCoin> m_vcoins;
   QVector<CashSector> m_vsectors;
   QVector<CashInfo> m_vinfos;
+  QVector<CashSummary> m_vsummary;
   QString name() const { return m_name; }
+  bool m_bDebit;
+  bool m_bCredit;
+  bool m_bComission;
 };
 
 #endif // CASH_H

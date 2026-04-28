@@ -3,6 +3,8 @@
 
 #include <QTableWidgetItem>
 
+#define JTABLEITEMCUSTOMDATA 0x200
+
 class JTableItem : public QTableWidgetItem
 {
 public:
@@ -12,6 +14,8 @@ public:
   virtual void setValue(const QVariant& v) = 0;
   virtual QVariant getValue() const { return data(Qt::UserRole); }
   void setReadOnly(bool b) { setFlags(b ? (flags() & ~Qt::ItemIsEditable) : (flags() |= Qt::ItemIsEditable )); }
+  void setCustomData(const QVariant var) { setData(JTABLEITEMCUSTOMDATA, var); }
+  QVariant getCustomData() const { return data(JTABLEITEMCUSTOMDATA); }
 };
 
 #endif // JTABLEITEM_H

@@ -476,7 +476,7 @@ bool JItemHelper::save(const JItemSQL& o, QWidget* parent)
   QString error;
   bool bSuccess = o.SQL_insert_update(error);
   if (!bSuccess)
-    QMessageBox::critical(parent, QObject::tr("Ops..."), QObject::tr("Erro '%1' ao salvar o item.").arg(error), QMessageBox::Ok);
+    QMessageBox::critical(parent, QObject::tr("Ops..."), QObject::tr("Erro ao salvar %1:\n%2").arg(text(o.SQL_tableName()), error), QMessageBox::Ok);
 
   return bSuccess;
 }

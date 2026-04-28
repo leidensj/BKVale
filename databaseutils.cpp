@@ -444,18 +444,13 @@ bool BaitaSQL::createTables(QString& error)
                           PRODUCT_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
-      bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " SHIFT_SQL_TABLE_NAME " ("
-                            SQL_COLID " SERIAL PRIMARY KEY,"
-                            SHIFT_SQL_COL_IID " INTEGER,"
-                            SHIFT_SQL_COL_NAM " TEXT NOT NULL UNIQUE,"
-                            "FOREIGN KEY(" SHIFT_SQL_COL_IID ") REFERENCES "
-                            IMAGE_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE SET NULL)");
-
-  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           CASH_SQL_COL_NAM " TEXT UNIQUE NOT NULL CHECK ("
-                          CASH_SQL_COL_NAM " <> ''))");
+                          CASH_SQL_COL_NAM " <> ''),"
+                          CASH_SQL_COL_DEB " BOOLEAN,"
+                          CASH_SQL_COL_CRE " BOOLEAN,"
+                          CASH_SQL_COL_COM " BOOLEAN)");
 
   if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_COINS_SQL_TABLE_NAME " ("
@@ -478,6 +473,15 @@ bool BaitaSQL::createTables(QString& error)
                           CASH_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
 
   if (bSuccess)
+    bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_SUMMARY_SQL_TABLE_NAME " ("
+                           SQL_COLID " SERIAL PRIMARY KEY,"
+                           CASH_SUMMARY_SQL_COL_OID " INTEGER NOT NULL,"
+                           CASH_SUMMARY_SQL_COL_ITE " INTEGER,"
+                           CASH_SUMMARY_SQL_COL_SHO " BOOLEAN,"
+                           "FOREIGN KEY(" CASH_SUMMARY_SQL_COL_OID ") REFERENCES "
+                           CASH_SQL_TABLE_NAME "(" SQL_COLID ") ON DELETE CASCADE)");
+
+  if (bSuccess)
     bSuccess = query.exec("CREATE TABLE IF NOT EXISTS " CASH_SECTORS_SQL_TABLE_NAME " ("
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           CASH_SECTORS_SQL_COL_OID " INTEGER NOT NULL,"
@@ -492,6 +496,7 @@ bool BaitaSQL::createTables(QString& error)
                           SQL_COLID " SERIAL PRIMARY KEY,"
                           CASH_CLOSING_SQL_COL_CID " INTEGER NOT NULL,"
                           CASH_CLOSING_SQL_COL_DAT " TIMESTAMP,"
+                          CASH_CLOSING_SQL_COL_DAY " DATE,"
                           CASH_CLOSING_SQL_COL_CRE " REAL,"
                           CASH_CLOSING_SQL_COL_DEB " REAL,"
                           CASH_CLOSING_SQL_COL_COM " REAL,"

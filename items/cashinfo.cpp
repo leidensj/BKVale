@@ -56,9 +56,7 @@ bool CashInfo::SQL_select_by_owner_id_proc(QSqlQuery& query, Id ownerId, QVector
   error.clear();
   v.clear();
   query.prepare("SELECT "
-                SQL_COLID ","
-                CASH_INFO_SQL_COL_NAM ","
-                CASH_INFO_SQL_COL_TYP
+                SQL_COLID
                 " FROM " CASH_INFO_SQL_TABLE_NAME
                 " WHERE " CASH_INFO_SQL_COL_OID " = (:_v01)");
   query.bindValue(":_v01", ownerId.get());

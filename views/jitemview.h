@@ -30,7 +30,7 @@ public slots:
   virtual void setItem();
   virtual void setItem(const Id& id);
   virtual void setCopyItem();
-  virtual void save();
+  virtual bool save();
   void search();
 
 protected slots:

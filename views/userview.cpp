@@ -153,12 +153,12 @@ void UserView::itemsRemoved(const Ids& ids)
   JItemView::itemsRemoved(ids);
 }
 
-void UserView::save()
+bool UserView::save()
 {
   Login login(true);
   if (!m_bHasLoggedUserChanged)
     m_bHasLoggedUserChanged = m_id == login.getUser().m_id;
-  JItemView::save();
+  return JItemView::save();
 }
 
 bool UserView::hasLoggedUserChanged() const

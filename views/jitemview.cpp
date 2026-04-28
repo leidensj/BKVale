@@ -189,18 +189,21 @@ void JItemView::itemsRemoved(const Ids& ids)
     clear();
 }
 
-void JItemView::save()
+bool JItemView::save()
 {
   JItemSQL* p = JItemHelper::create(m_viewer->getTableName());
-  bool bSuccess = false;
+  bool ok = false;
   if (p != nullptr)
   {
     getItem(*p);
-    bSuccess = JItemHelper::save(*p, this);
-    if (bSuccess)
+    ok = JItemHelper::save(*p, this);
+    if (ok)
       clear();
     delete p;
   }
+  if (ok)
+    m_viewer->refresh();
+  return ok;
 }
 
 Id JItemView::getId() const

@@ -38,7 +38,7 @@ public:
 
 public slots:
   void getItem(JItemSQL& o) const;
-  void save();
+  bool save();
 
 protected slots:
   void setItem(const JItemSQL& o);

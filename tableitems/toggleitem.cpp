@@ -15,7 +15,7 @@ void ToggleItem::setValue(const QVariant& v)
   bool b = v.toBool();
   setData(Qt::UserRole, b);
   setText(b ? m_text : "");
-  setBackground(QBrush(QColor(b ? m_background : QColor(Qt::white))));
+  setBackground(b ? QBrush(m_background) : QBrush());
 }
 
 void ToggleItem::evaluate()

@@ -17,7 +17,7 @@ void CashClosing::clear(bool bClearId)
   QDateTime dt = DateTime::server();
   m_dt = dt;
   m_day = dt.date();
-  if (0 <= dt.time().hour() && dt.time().hour() <= 7)
+  if (0 <= dt.time().hour() && dt.time().hour() <= 12)
     m_day = m_day.addDays(-1);
   m_vcoins.clear();
   m_vsectors.clear();

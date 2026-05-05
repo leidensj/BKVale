@@ -4,7 +4,7 @@ TimeItem::TimeItem(const QTime& defaultTime)
   : m_defaultTime(defaultTime)
 {
   setToolTip(QObject::tr("Hora e minutos hh:mm"));
-  setValue(m_defaultTime);
+  TimeItem::setValue(m_defaultTime);
 }
 
 void TimeItem::setValue(const QVariant& v)

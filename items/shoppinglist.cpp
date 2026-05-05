@@ -42,7 +42,7 @@ bool ShoppingListItem::operator <(const JItem& other) const
   else if (o.m_supplier.name().isEmpty())
     return false;
   else
-    return m_supplier.name() < o.m_supplier.name();
+    return m_product.name() < o.m_product.name();
 }
 
 bool ShoppingListItem::isValid() const

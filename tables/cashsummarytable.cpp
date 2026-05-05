@@ -2,7 +2,7 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include "tableitems/textitem.h"
-#include "tableitems/multitoggleitem.h"
+#include "tableitems/toggleitem.h"
 
 CashSummaryTable::CashSummaryTable(JAddRemoveButtons* btns, QWidget* parent)
   : JTable(btns, parent)
@@ -22,7 +22,7 @@ void CashSummaryTable::addRow()
   int row = rowCount() - 1;
 
   auto itName = new TextItem(Text::Input::All, false);
-  auto itStatus = new MultiToggleItem(QStringList() << "Ocultar" << "Exibir");
+  auto itStatus = new ToggleItem(tr("Exibir"), Qt::black, QColor(200, 255, 200));
   itName->setReadOnly(true);
 
   blockSignals(true);

@@ -14,7 +14,7 @@ DoubleItem::DoubleItem(Data::Type type,
   , m_prefix(prefix)
   , m_sufix(sufix)
 {
-  setValue(0.0);
+  DoubleItem::setValue(0.0);
   if (m_bCheckable)
   {
     setFlags(flags() | Qt::ItemIsUserCheckable);
@@ -39,7 +39,7 @@ void DoubleItem::setValue(const QVariant& v)
   switch (m_color)
   {
     case Color::Background:
-      setBackground(QBrush(QColor(val == 0.0 ? QColor(255, 200, 200) : QColor(Qt::white))));
+      setBackground(val == 0.0 ? QBrush(QColor(255, 200, 200)) : QBrush());
       break;
     case Color::Foreground:
       setForeground(QBrush(QColor(val == 0.0 ? Qt::black : val > 0 ? Qt::red : Qt::darkGreen)));

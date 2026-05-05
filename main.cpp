@@ -7,15 +7,19 @@
 #include <QString>
 #include <QObject>
 #include <QCommandLineParser>
+#include <QStyleFactory>
+#include <QLayout>
 #include "controls/couponredeemer.h"
 #include "views/cashclosingview.h"
 #include "views/jitemview.h"
 #include "controls/salarycalculator.h"
+#include "controls/shopwidget.h"
 
 int main(int argc, char *argv[])
 {
   //qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
-  QApplication a(argc, argv);
+  QApplication::setStyle(QStyleFactory::create("Fusion"));
+  QApplication a(argc, argv);  
   QCoreApplication::setApplicationVersion("2.1");
 
   QLocale br(QLocale::Portuguese, QLocale::Brazil);
@@ -29,6 +33,8 @@ int main(int argc, char *argv[])
   parser.addOption(cashclosingOpt);
   QCommandLineOption salaryOpt("sal", "Inicia a versão de calculo de salários.");
   parser.addOption(salaryOpt);
+  QCommandLineOption shoppingListOpt("slist", "Inicia a versão de lista de compras.");
+  parser.addOption(shoppingListOpt);
   QCommandLineOption serverOpt(QStringList() << "s", "Especifíca o servidor do banco de dados.", "server", "");
   parser.addOption(serverOpt);
   QCommandLineOption portOpt(QStringList() << "p", "Especifíca a porta do banco de dados.", "port", "5432");
@@ -38,11 +44,12 @@ int main(int argc, char *argv[])
   bool bRedeemer = parser.isSet(redeemerOpt);
   bool bCashclosing = parser.isSet(cashclosingOpt);
   bool bSalary = parser.isSet(salaryOpt);
+  bool bShoppingList = parser.isSet(shoppingListOpt);
   QString server = parser.value(serverOpt);
   QString port = parser.value(portOpt);
 
   QSqlDatabase::addDatabase("QPSQL", POSTGRE_CONNECTION_NAME);
-  if (bRedeemer || bCashclosing || bSalary)
+  if (bRedeemer || bCashclosing || bSalary || bShoppingList)
   {
      QString error;
      Settings s;
@@ -86,6 +93,22 @@ int main(int argc, char *argv[])
         f.setPointSize(14);
         w.setFont(f);
         w.showMaximized();
+        return a.exec();
+      }
+      else if (bShoppingList)
+      {
+        QDialog dlg;
+        QHBoxLayout *l = new QHBoxLayout;
+        dlg.setLayout(l);
+        auto p = new ShopWidget;
+        l->addWidget(p);
+        dlg.setWindowFlags(Qt::Window);
+        dlg.setWindowTitle(QObject::tr("Lista de Compras"));
+        dlg.setWindowIcon(QIcon(":/icons/res/shoppinglist.png"));
+        auto f = dlg.font();
+        f.setPointSize(14);
+        dlg.setFont(f);
+        dlg.showMaximized();
         return a.exec();
       }
     }

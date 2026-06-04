@@ -20,7 +20,6 @@ public:
       : QMdiArea(parent)
       , m_pixmap(":/icons/res/baitabanner.png")
     {
-      setBackground(QBrush(Qt::white));
       QFont f = font();
       f.setPointSize(12);
       setFont(f);

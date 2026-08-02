@@ -58,12 +58,16 @@ EmployeeView::EmployeeView(QWidget* parent)
   createTreeItem(Functionality::Idx::Purchase, rootCreate);
   createTreeItem(Functionality::Idx::Reminder, rootCreate);
   createTreeItem(Functionality::Idx::Coupon, rootCreate);
+  createTreeItem(Functionality::Idx::ShoppingList, rootCreate);
   createTreeItem(Functionality::Idx::Purchase, rootEdit);
   createTreeItem(Functionality::Idx::Reminder, rootEdit);
   createTreeItem(Functionality::Idx::Coupon, rootEdit);
+  createTreeItem(Functionality::Idx::ShoppingList, rootEdit);
   createTreeItem(Functionality::Idx::Purchase, rootRemove);
   createTreeItem(Functionality::Idx::Reminder, rootRemove);
   createTreeItem(Functionality::Idx::Coupon, rootRemove);
+  createTreeItem(Functionality::Idx::ShoppingList, rootRemove);
+  createTreeItem(Functionality::Idx::CashClosing, rootRemove);
   rootCreate->setExpanded(true);
   rootEdit->setExpanded(true);
   rootRemove->setExpanded(true);

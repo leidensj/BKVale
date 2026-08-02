@@ -28,6 +28,7 @@ private slots:
   void update(int row, int column);
 
 public slots:
+  void removeItem(); //solucao temporaria por causa dos sinais
   void addRow();
   void addRow(const qlonglong fid, const QString& fname, const qlonglong eid, const QString& ename, const QDateTime& begin, const QDateTime& end);
   void addRowAndActivate();

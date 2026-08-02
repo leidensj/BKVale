@@ -72,6 +72,12 @@ void SalaryCalculatorTable::addRow(const qlonglong fid, const QString& fname, co
   update(row, 0);
 }
 
+void SalaryCalculatorTable::removeItem()
+{
+  JTable::removeItem();
+  update(-1, -1);
+}
+
 void SalaryCalculatorTable::addRowAndActivate()
 {
   addRow();
@@ -82,44 +88,43 @@ void SalaryCalculatorTable::addRowAndActivate()
 
 void SalaryCalculatorTable::update(int row, int /*column*/)
 {
-  if (!isValidRow(row))
-    return;
-
-  QDateTime begin(getItem(row, (int)Column::DateBegin)->getValue().toDate(), getItem(row, (int)Column::TimeBegin)->getValue().toTime());
-  QDateTime end(getItem(row, (int)Column::DateEnd)->getValue().toDate(), getItem(row, (int)Column::TimeEnd)->getValue().toTime());
-  auto it = getItem(row, (int)Column::Value);
-
-  if (end < begin)
+  if (isValidRow(row))
   {
+    QDateTime begin(getItem(row, (int)Column::DateBegin)->getValue().toDate(), getItem(row, (int)Column::TimeBegin)->getValue().toTime());
+    QDateTime end(getItem(row, (int)Column::DateEnd)->getValue().toDate(), getItem(row, (int)Column::TimeEnd)->getValue().toTime());
+    auto it = getItem(row, (int)Column::Value);
+
+    if (end < begin)
+      {
+        blockSignals(true);
+        it->setValue(0);
+        it->setToolTip(tr("Data e hora iniciais maiores que as finais."));
+        blockSignals(false);
+      }
+
+    QString error;
+    SalaryFormula sf;
+    sf.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Formula)->getValue());
+    sf.SQL_select(error);
+
+    Names snames;
+    Values svalues;
+    Employee e;
+    e.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Employee)->getValue());
+    Salary::SQL_select_all_employee_salaries(e.m_id, snames, svalues, error);
+    QString formula = sf.m_formula;
+    if (snames.size() == svalues.size())
+      for (int i = 0; i != snames.size(); ++i)
+        formula.replace(snames.at(i), Data::strFmt(svalues.at(i)));
+    formula.replace("DIAS", Data::strFmt(begin.daysTo(end)));
+    formula.replace("HORAS", Data::strFmt(begin.secsTo(end)/3600.0));
+    formula.replace("MINUTOS", Data::strFmt(begin.secsTo(end)/60.0));
     blockSignals(true);
-    it->setValue(0);
-    it->setToolTip(tr("Data e hora iniciais maiores que as finais."));
+    it->setToolTip(formula);
+    it->setText(formula);
+    it->evaluate();
     blockSignals(false);
   }
-
-  QString error;
-  SalaryFormula sf;
-  sf.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Formula)->getValue());
-  sf.SQL_select(error);
-
-  Names snames;
-  Values svalues;
-  Employee e;
-  e.m_id = SQLItem::st_idFromVariant(getItem(row, (int)Column::Employee)->getValue());
-  Salary::SQL_select_all_employee_salaries(e.m_id, snames, svalues, error);
-  QString formula = sf.m_formula;
-  if (snames.size() == svalues.size())
-    for (int i = 0; i != snames.size(); ++i)
-      formula.replace(snames.at(i), Data::strFmt(svalues.at(i)));
-  formula.replace("DIAS", Data::strFmt(begin.daysTo(end)));
-  formula.replace("HORAS", Data::strFmt(begin.secsTo(end)/3600.0));
-  formula.replace("MINUTOS", Data::strFmt(begin.secsTo(end)/60.0));
-  blockSignals(true);
-  it->setToolTip(formula);
-  it->setText(formula);
-  it->evaluate();
-  blockSignals(false);
-
   double d = sum((int)Column::Value);
   horizontalHeaderItem((int)Column::Value)->setText(tr("Valor %1").arg(Data::strMoney(d)));
 }

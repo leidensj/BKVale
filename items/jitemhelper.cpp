@@ -131,14 +131,17 @@ bool JItemHelper::authenticationToSave(const QString& tableName)
 {
   return (tableName == PURCHASE_SQL_TABLE_NAME ||
           tableName == REMINDER_SQL_TABLE_NAME ||
-          tableName == COUPON_SQL_TABLE_NAME);
+          tableName == COUPON_SQL_TABLE_NAME ||
+          tableName == SHOPPING_LIST_SQL_TABLE_NAME);
 }
 
 bool JItemHelper::authenticationToRemove(const QString& tableName)
 {
   return (tableName == PURCHASE_SQL_TABLE_NAME ||
           tableName == REMINDER_SQL_TABLE_NAME ||
-          tableName == COUPON_SQL_TABLE_NAME);
+          tableName == COUPON_SQL_TABLE_NAME ||
+          tableName == SHOPPING_LIST_SQL_TABLE_NAME ||
+          tableName == CASH_CLOSING_SQL_TABLE_NAME);
 }
 
 QString JItemHelper::text(Functionality::Idx idx)
